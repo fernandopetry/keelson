@@ -40,6 +40,14 @@ Same engine everywhere; only the ~15-line adapter changes.
 /plugin install keelson@keelson
 ```
 
+To update to the latest version (refreshing the marketplace alone does **not**
+update installed plugins):
+
+```
+/plugin marketplace update keelson
+/plugin update keelson
+```
+
 ## Quick start
 
 In your project, run the interactive setup:
