@@ -9,7 +9,9 @@
 # NENHUMA atualização correspondente na pasta de docs.
 #
 # Fallback gracioso: sem `jq` ou sem a ficha, o hook NÃO trava o fluxo — emite
-# um aviso em stderr e sai 0. `stop_hook_active` evita loop: cutuca só uma vez.
+# um aviso em stderr e sai 0. `stop_hook_active` evita loop dentro do mesmo turno;
+# um marcador em .git/ evita re-cutucar em turnos seguintes enquanto o conjunto de
+# código alterado for o mesmo (só volta a cutucar se a mudança mudar).
 #
 # Heurística best-effort: olha o working tree (git status). Fluxos que já
 # commitaram código + docs juntos deixam o tree limpo e não disparam.
@@ -47,8 +49,10 @@ docs_root="$(jq -r '.docsRoot // "docs"' "$config" 2>/dev/null || echo docs)"
 # Sem paths de código declarados na ficha → nada a vigiar.
 [ -z "$code_paths" ] && exit 0
 
-# Status do working tree (caminhos limpos, renomeios resolvidos).
-changed="$(git -C "$proj" status --porcelain 2>/dev/null | sed -E 's/^.{2} //; s/^.* -> //' || true)"
+# Status do working tree (caminhos limpos, renomeios resolvidos; -uall lista
+# arquivos untracked individualmente — sem isso um diretório novo vira "dir/" e
+# o fingerprint anti-renudge não muda quando um arquivo novo entra nele).
+changed="$(git -C "$proj" status --porcelain -uall 2>/dev/null | sed -E 's/^.{2} //; s/^.* -> //' || true)"
 [ -z "$changed" ] && exit 0
 
 # path_has_prefix <lista-de-prefixos-multilinha> <arquivo> — true se o arquivo
@@ -68,13 +72,28 @@ path_has_prefix() {
 
 code_changed=""
 docs_changed=""
+code_files=""
 while IFS= read -r f; do
   [ -z "$f" ] && continue
-  path_has_prefix "$code_paths" "$f" && code_changed="yes"
+  if path_has_prefix "$code_paths" "$f"; then
+    code_changed="yes"
+    code_files="${code_files}${f}"$'\n'
+  fi
   path_has_prefix "$docs_root" "$f" && docs_changed="yes"
 done <<< "$changed"
 
 if [ -n "$code_changed" ] && [ -z "$docs_changed" ]; then
+  # Anti-renudge entre turnos: stop_hook_active só cobre o turno atual; sem o marcador,
+  # um working tree sujo re-dispararia o bloqueio ao fim de TODO turno da sessão.
+  git_dir="$(git -C "$proj" rev-parse --absolute-git-dir 2>/dev/null || true)"
+  marker="" fingerprint=""
+  if [ -n "$git_dir" ]; then
+    marker="$git_dir/keelson-doc-guard.last"
+    fingerprint="$(printf '%s' "$code_files" | sort -u | git hash-object --stdin 2>/dev/null || true)"
+    if [ -n "$fingerprint" ] && [ -f "$marker" ] && [ "$(cat "$marker" 2>/dev/null)" = "$fingerprint" ]; then
+      exit 0
+    fi
+  fi
   reason="$(cat <<EOF
 Documentação Autônoma (keelson): há código de feature alterado (paths de codePaths da ficha) mas NENHUM artefato em ${docs_root}/ foi atualizado nesta mudança.
 
@@ -86,6 +105,9 @@ Aplique a calibração (NÃO conclua sozinho 'nada a documentar'):
 - Domínio SEM cobertura e mudança TRIVIAL: mencione em 1 linha que o domínio não tem slug e pode encerrar — este aviso não se repetirá.
 EOF
 )"
+  if [ -n "$marker" ] && [ -n "$fingerprint" ]; then
+    printf '%s' "$fingerprint" > "$marker" 2>/dev/null || true
+  fi
   jq -n --arg reason "$reason" '{decision: "block", reason: $reason}'
   exit 0
 fi

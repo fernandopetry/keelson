@@ -1,3 +1,8 @@
+---
+description: Reconstrói o INDEX.md de um slug do zero a partir dos artefatos (SPECs, PLANs, TASKs e TRIAGE legado), com backup do atual
+argument-hint: <slug> [--dry-run]
+---
+
 # /keelson:rebuild-index
 
 Você é um Engenheiro de Documentação especialista em reconstruir o estado canônico de um slug SDD. Sua função é varrer todos os artefatos de um slug (SPECs, PLANs, TASKs) e regenerar o `INDEX.md` do zero.
@@ -36,6 +41,7 @@ Você é um Engenheiro de Documentação especialista em reconstruir o estado ca
    - `{docsRoot}/<slug>/specs/SPEC-*.md`
    - `{docsRoot}/<slug>/plans/PLAN-*.md`
    - `{docsRoot}/<slug>/tasks/TASK-*.md` (exceto TASK-*-INDEX.md)
+   - `{docsRoot}/<slug>/legacy/TRIAGE-*.md` (slug migrado: fonte durável dos achados legados — o mais recente)
 4. Confirmar com usuário antes de prosseguir (a menos que `--dry-run`).
 
 ## Etapa 1: ler artefatos
@@ -71,7 +77,11 @@ Calcular agregados:
 - Done / Total por PLAN
 - Última data de conclusão (mais recente entre TASKs Done)
 
-### 1.4 Status agregado por PLAN
+### 1.4 TRIAGE legado (slug migrado)
+
+Se existir `legacy/TRIAGE-*.md` (usar o mais recente), extrair para reespelhar nas seções correspondentes do INDEX: resumo (quando não houver SPECs que o derivem), capacidades legadas (📜, com origem `legacy/...`), glossário, decisões `LEGACY-DEC-*` e riscos. Sem TRIAGE, as seções legadas não são reconstruídas — se o INDEX anterior tinha conteúdo de migração e não há TRIAGE, **alertar** (achado sem fonte durável; ver `/keelson:migrate-legacy`, princípio 2).
+
+### 1.5 Status agregado por PLAN
 
 Determinar **status efetivo** com base nas tasks:
 
@@ -157,6 +167,8 @@ Construir o INDEX seguindo a estrutura canônica:
 - <descrição>
 - Ação sugerida: <recomendação>
 ```
+
+**Slug migrado**: as seções Resumo/Capacidades/Glossário/Decisões/Riscos incorporam os achados do TRIAGE (itens 📜 e `LEGACY-DEC-*`, abrindo com `> Fonte durável: legacy/TRIAGE-<data>.md`), mesclados com o que vier de SPECs/PLANs/TASKs.
 
 ## Etapa 4: persistir
 

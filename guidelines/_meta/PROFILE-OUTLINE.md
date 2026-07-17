@@ -13,6 +13,9 @@
 > Um perfil **DEVE** conter todas as seções marcadas `[obrigatória]`. Seção sem
 > conteúdo aplicável **DEVE** dizer explicitamente "não se aplica a esta stack porque…"
 > — silêncio não é permitido (esconde lacuna).
+>
+> Exceção única: o pseudo-perfil `none` (papel ausente — projeto sem frontend ou sem
+> backend) declara a ausência e dispensa as seções 1–12: não há linguagem a instanciar.
 
 ---
 
@@ -47,7 +50,7 @@ que o `/keelson:init` regenera quando detecta uma versão sem exemplar.
 Responde: *qual é o guia de estilo canônico e o que o impõe automaticamente?*
 - formatter/linter oficial + arquivo de config de referência;
 - o que é **erro** (bloqueia) vs **aviso** (não bloqueia);
-- o comando exato de lint (alimenta `sdd.config.json → quality.lint`).
+- o comando exato de lint (alimenta `keelson.config.json → quality.lint`).
 
 ## 3. Nomenclatura & idioma `[obrigatória]`  → Charter Art. 5
 
@@ -93,7 +96,7 @@ Cobrir, no mínimo:
 ## 7. Testes `[obrigatória]`  → Charter Art. 1, 9
 
 Responde: *como se prova comportamento nesta linguagem?*
-- runner canônico + comando exato (alimenta `sdd.config.json → quality.test`);
+- runner canônico + comando exato (alimenta `keelson.config.json → quality.test`);
 - convenção de nome e organização (ex.: arranjo-ação-asserção);
 - como cobrir comportamento (não implementação); o que mockar e o que não;
 - onde ficam fixtures/dados de teste compartilhados (evitar duplicação — Art. 3).
@@ -126,7 +129,7 @@ Responde: *quais pegadinhas específicas desta versão mordem quem vem de outra?
 
 ## 12. Ferramentas & comandos `[obrigatória]`
 
-O bloco que alimenta a ficha do projeto (`sdd.config.json`):
+O bloco que alimenta a ficha do projeto (`keelson.config.json`):
 
 | Papel | Comando |
 |-------|---------|

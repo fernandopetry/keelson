@@ -2,7 +2,7 @@
 
 > Memória institucional das decisões sobre como o keelson (spec-driven development) é praticado. Diferente da doutrina de código (QUALITY-CHARTER + perfil ativo, que regem o **código**), este arquivo rege o **processo de desenvolvimento**.
 
-**Última revisão**: 2026-07-10
+**Última revisão**: 2026-07-17
 **Status do documento**: vivo, atualizado conforme decisões evoluem
 
 ---
@@ -140,7 +140,7 @@ keelson/
 - Capacidades implementadas marcadas com 📜 (origem: legacy).
 - Decisões eventualmente extraídas marcadas com prefixo `LEGACY-DEC-`.
 
-**Persistência dos achados**: como `/keelson:rebuild-index` deriva o INDEX só de specs/plans/tasks, os achados da migração (glossário, decisões, capacidades) vivem em `legacy/` — a fonte durável — e o INDEX é espelho. Ver LRN-012.
+**Persistência dos achados**: os achados da migração (glossário, decisões, capacidades) vivem em `legacy/TRIAGE-*.md` — a fonte durável — e o INDEX é espelho; o `/keelson:rebuild-index` reespelha as seções legadas a partir do TRIAGE ao reconstruir. Ver LRN-012.
 
 **Política**: aplicação **on-demand**, quando você decide mexer no slug. Não migramos preventivamente.
 
@@ -295,14 +295,9 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 ## 6. Modos de orquestração no /keelson:implement
 
-### 6.1 Modo AGENT_TEAMS (preferido)
+*(Recalibrado em 2026-07-17: SUBAGENTS passou a ser o padrão — sem detecção automática de alternativas; AGENT_TEAMS virou opt-in explícito. Fonte de verdade: `commands/implement.md`, Etapa 0.1.)*
 
-- `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` habilitado
-- Teammates independentes, peer-to-peer
-- Worktrees por task, branches separadas
-- Custo: 3-5x tokens, ganho: até 2x mais rápido
-
-### 6.2 Modo SUBAGENTS (fallback)
+### 6.1 Modo SUBAGENTS (padrão)
 
 - Subagents na mesma sessão, sem peer-to-peer
 - Branch única por wave
@@ -310,9 +305,16 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 - Coordenação via main session
 - Usa `task-implementer` e `task-reviewer` por referência
 
-### 6.3 Modo SINGLE_THREAD (último recurso)
+### 6.2 Modo AGENT_TEAMS (opt-in via `--force-mode=teams`)
 
-- Tudo sequencial
+- Requer ambiente com suporte (ex.: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`)
+- Teammates independentes, peer-to-peer
+- Worktrees por task, branches separadas
+- Custo: 3-5x tokens, ganho: até 2x mais rápido
+
+### 6.3 Modo SINGLE_THREAD (wave única e sequencial de tasks pequenas)
+
+- Tudo sequencial, na main session
 - Sem paralelismo
 - Closure obrigatória do mesmo jeito
 

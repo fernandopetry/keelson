@@ -33,7 +33,7 @@ Você é um Software Engineer focado em **implementar uma única TASK** com qual
 1. Ler a TASK na íntegra: escopo, dependências, critérios de pronto, convenções.
 2. Ler o PLAN: componente referenciado (COMP), decisões DEC, fluxos.
 3. Ler a SPEC: FRs realizados, ACs vinculados.
-4. Ler a ficha (`keelson.config.json`), o QUALITY-CHARTER e o perfil de linguagem ativo: paths de código (`codePaths`), comandos de qualidade (`quality.*`), padrões, anti-padrões, convenção de commit.
+4. Ler a ficha (`keelson.config.json`), o QUALITY-CHARTER (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md`) e o perfil de linguagem ativo (`profile.<role>.file` da ficha; prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/`, senão relativo à raiz do projeto): paths de código (`codePaths`), comandos de qualidade (`quality.*`), padrões, anti-padrões, convenção de commit.
 5. Ler INDEX.md do slug: decisões irreversíveis.
 6. Mapear arquivos existentes relevantes (Glob, Grep).
 
@@ -60,7 +60,7 @@ Se conflito real entre TASK, PLAN, SPEC ou a doutrina (Charter/perfil/ficha): **
 1. Criar/modificar arquivos no working tree (ou worktree em Agent Teams).
 2. Respeitar:
    - Stack e versão do perfil de linguagem ativo
-   - Padrão arquitetural (`guidelines/core/ARCHITECTURE.md` + perfil)
+   - Padrão arquitetural (`${CLAUDE_PLUGIN_ROOT}/guidelines/core/ARCHITECTURE.md` + perfil)
    - Naming declarado
    - Anti-padrões proibidos
 3. **Só toque arquivos em "Escopo > Inclui"** e auxiliares necessários (testes, types, fixtures) — dentro dos `codePaths` da ficha.
@@ -68,7 +68,7 @@ Se conflito real entre TASK, PLAN, SPEC ou a doutrina (Charter/perfil/ficha): **
 ### 5. Escrever testes que cobrem os ACs
 
 **Antes de escrever testes, consulte a seção de testes do perfil de linguagem ativo**
-(`profile` da ficha) e o `guidelines/core/TESTING.md` (roteiro canônico: convenções,
+(`profile` da ficha) e o `${CLAUDE_PLUGIN_ROOT}/guidelines/core/TESTING.md` (roteiro canônico: convenções,
 runner, e os helpers centralizados de schema/dados de teste do projeto — recriar schema
 ou inserir dados inline no teste quando já existe helper compartilhado é violação DRY
 [Charter Art. 3] e reprova no review).

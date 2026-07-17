@@ -75,9 +75,9 @@ Rodar o `quality.lint` da ficha **escopado aos arquivos da task**, não o repo i
 
 Subitens:
 - 6.1 Stack autorizado: apenas linguagem/versão do perfil ativo (`profile` da ficha).
-- 6.2 Padrão arquitetural: camadas, dependências, fluxo (`guidelines/core/ARCHITECTURE.md` + perfil).
+- 6.2 Padrão arquitetural: camadas, dependências, fluxo (`${CLAUDE_PLUGIN_ROOT}/guidelines/core/ARCHITECTURE.md` + perfil).
 - 6.3 Naming: convenções do perfil respeitadas.
-- 6.4 Padrão de teste: runner e estrutura do perfil / `guidelines/core/TESTING.md`.
+- 6.4 Padrão de teste: runner e estrutura do perfil / `${CLAUDE_PLUGIN_ROOT}/guidelines/core/TESTING.md`.
 - 6.5 Anti-padrões proibidos: nenhum no código.
 - 6.6 Decisões irreversíveis: nenhuma quebrada.
 
@@ -87,7 +87,7 @@ Subitens:
 
 - Legibilidade (nomes claros).
 - Sem código morto, TODO sem dono, trechos comentados.
-- **Reúso / DRY** (Charter Art. 3): o código **não reimplementa** utilitário, validação, helper, conversão ou abstração que **já existe** no projeto. Não basta checar duplicação entre os arquivos novos — verifique se há equivalente canônico já existente que deveria ser usado (ver a seção "Reúso" do perfil de linguagem ativo e `guidelines/core/ARCHITECTURE.md`), inclusive **nos testes** (helpers centralizados de schema/dados: recriar schema ou inserir dados inline quando já existe helper compartilhado = FALHA). Reimplementação local de algo existente = FALHA, mesmo com o código correto. Também checar duplicação entre os próprios arquivos novos (ex.: par Create/Update do mesmo domínio).
+- **Reúso / DRY** (Charter Art. 3): o código **não reimplementa** utilitário, validação, helper, conversão ou abstração que **já existe** no projeto. Não basta checar duplicação entre os arquivos novos — verifique se há equivalente canônico já existente que deveria ser usado (ver a seção "Reúso" do perfil de linguagem ativo e `${CLAUDE_PLUGIN_ROOT}/guidelines/core/ARCHITECTURE.md`), inclusive **nos testes** (helpers centralizados de schema/dados: recriar schema ou inserir dados inline quando já existe helper compartilhado = FALHA). Reimplementação local de algo existente = FALHA, mesmo com o código correto. Também checar duplicação entre os próprios arquivos novos (ex.: par Create/Update do mesmo domínio).
 - Tratamento de erro presente.
 - Sem hardcoded strings que deveriam ser config.
 - **Calibração por exemplares**: antes de reprovar por estilo/padrão, compare com código análogo já **mergeado** (mesma camada/domínio) — padrão consistente com o repo aprovado não é smell; reprove o desvio real, não a divergência com um ideal abstrato.

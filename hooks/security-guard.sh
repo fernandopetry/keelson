@@ -16,7 +16,10 @@
 # tree) e registra isso na mensagem.
 #
 # Fallback gracioso: sem `jq` ou sem a ficha, o hook NÃO trava o fluxo — emite
-# aviso em stderr e sai 0. `stop_hook_active` evita loop: cutuca só uma vez.
+# aviso em stderr e sai 0. `stop_hook_active` evita loop dentro do mesmo turno;
+# um marcador em .git/ evita re-cutucar em turnos seguintes enquanto o diff
+# sensível for o mesmo (a comparação é da branch inteira — sem o marcador, uma
+# mudança sensível já commitada dispararia o bloqueio ao fim de todo turno).
 #
 # Natureza: a DETECÇÃO é heurística (padrão de conteúdo + path). Não prova que a
 # revisão rodou — cutuca para forçá-la.
@@ -73,7 +76,7 @@ if [ -n "$base" ]; then
   diff_ref="$base"
 else
   # Sem base determinável → comportamento antigo (working tree), registrado na mensagem.
-  changed="$(git status --porcelain 2>/dev/null | sed -E 's/^.{2} //; s/^.* -> //' || true)"
+  changed="$(git status --porcelain -uall 2>/dev/null | sed -E 's/^.{2} //; s/^.* -> //' || true)"
   diff_ref="HEAD"
   base_note=$'\n\n(Observação: não foi possível determinar a base da branch (main/master). A detecção caiu no comportamento antigo — working tree via git status — em vez do diff da branch.)'
 fi
@@ -136,6 +139,16 @@ content_sensitive="$(printf '%s\n%s\n' "$added" "$unt_content" | grep -nEi "$PAT
 path_sensitive="$(printf '%s\n' "$sensitive_files" | grep -iE '(auth|login|security|permiss|role|password|token|session|upload|payment|crypto|sql|query)' || true)"
 
 if [ -n "$content_sensitive" ] || [ -n "$path_sensitive" ]; then
+  # Anti-renudge entre turnos: stop_hook_active só cobre o turno atual.
+  git_dir="$(git rev-parse --absolute-git-dir 2>/dev/null || true)"
+  marker="" fingerprint=""
+  if [ -n "$git_dir" ]; then
+    marker="$git_dir/keelson-security-guard.last"
+    fingerprint="$(printf '%s\n%s\n%s' "$sensitive_files" "$content_sensitive" "$path_sensitive" | git hash-object --stdin 2>/dev/null || true)"
+    if [ -n "$fingerprint" ] && [ -f "$marker" ] && [ "$(cat "$marker" 2>/dev/null)" = "$fingerprint" ]; then
+      exit 0
+    fi
+  fi
   reason="$(cat <<EOF
 Gate de Segurança (keelson, gate 8): há mudança no código sensível (sensitiveGlobs da ficha) com indícios de auth, SQL, crypto, upload, cookies, exec, I/O de request, redirect ou dependências.
 
@@ -143,9 +156,12 @@ Antes de encerrar, aplique o gate de segurança:
 - Rode o security-reviewer OU o checklist de guidelines/core/SECURITY.md (e a seção de segurança do perfil ativo) sobre o diff.
 - Confirme: consultas parametrizadas; saída escapada no destino; autorização verificada (negar por padrão); sem segredo/PII em log; cookies httponly/secure/samesite; sem token em storage do cliente; sem renderização crua de dado de usuário.
 
-Se você JÁ revisou a segurança desta mudança, pode encerrar — este aviso não se repetirá.${base_note}
+Se você JÁ revisou a segurança desta mudança, pode encerrar — este aviso não se repetirá para esta mesma mudança.${base_note}
 EOF
 )"
+  if [ -n "$marker" ] && [ -n "$fingerprint" ]; then
+    printf '%s' "$fingerprint" > "$marker" 2>/dev/null || true
+  fi
   jq -n --arg reason "$reason" '{decision: "block", reason: $reason}'
   exit 0
 fi

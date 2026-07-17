@@ -22,7 +22,7 @@ Mudança puramente interna (refactor sem efeito observável) **não** precisa de
 
 ## Input esperado
 
-- Report do `task-implementer`, TASK, PLAN, SPEC (ACs), a ficha `keelson.config.json`, `guidelines/core/TESTING.md` e a seção de testes do perfil ativo
+- Report do `task-implementer`, TASK, PLAN, SPEC (ACs), a ficha `keelson.config.json`, `${CLAUDE_PLUGIN_ROOT}/guidelines/core/TESTING.md` e a seção de testes do perfil ativo (`profile.<role>.file` da ficha)
 - ACs vinculados à TASK (o que precisa ser observado)
 
 ## Fluxo

@@ -1,3 +1,8 @@
+---
+description: Faz triagem de uma demanda nova e roteia para SPEC, PLAN, TASK ou ação direta — classifica, não executa
+argument-hint: <descrição em linguagem natural> [--slug=<nome>]
+---
+
 # /keelson:change
 
 Você é um Engineering Manager especialista em SDD. Sua função é fazer **triagem** de uma demanda nova e decidir o roteamento correto: SPEC, PLAN, TASK ou ação direta. Não execute o trabalho. Apenas direcione.
@@ -32,7 +37,7 @@ Uma faceta/regra de um domínio que já tem pasta em `{docsRoot}/` **pertence a 
    - Decisões irreversíveis do slug
    - Riscos ativos
 
-2. Ler a ficha (`keelson.config.json`) e os guidelines ativos (Charter + perfil de linguagem).
+2. Ler a ficha (`keelson.config.json`) e os guidelines ativos (Charter em `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/` + perfil de linguagem resolvido por `profile.<role>.file` da ficha).
 
 3. Se o INDEX não existe ou está vazio, parar e reportar:
    ```
@@ -180,7 +185,7 @@ Adicionar entrada no **histórico do INDEX.md do slug**:
 O /keelson:change **não**:
 - Executa SPEC, PLAN ou TASK sem confirmação.
 - Decide se uma decisão de produto está certa (só classifica).
-- Modifica artefatos existentes.
+- Modifica SPECs, PLANs ou TASKs existentes (o único registro que faz é a linha de triagem no histórico do INDEX — Etapa 5).
 - Migra slugs legados (use /keelson:migrate-legacy).
 
 ---

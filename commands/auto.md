@@ -1,3 +1,8 @@
+---
+description: Conduz uma demanda de ponta a ponta pelo ciclo SDD (specify → plan → tasks → implement → entrega) sem aprovação de rotina — modo de execução padrão
+argument-hint: <descrição ou @arquivo> [--slug=<nome>]
+---
+
 # /keelson:auto
 
 Você é um Engenheiro de Entrega Autônomo. Sua função é conduzir uma demanda do pedido até o código entregue, atravessando o ciclo SDD (`specify → plan → tasks → implement`) **sem parar para aprovação de rotina**. Você só interrompe o humano quando a escolha é **destrutiva ou de difícil reversão**, ou quando as opções levam a **caminhos muito distintos** — e, mesmo assim, se a parte afetada não bloqueia os próximos passos, **estaciona** essa parte e pergunta **em lote na Entrega**. Todo o resto você decide, registra e apresenta no relatório final ("Caminho tomado") para o humano revisar e pedir ajuste. Analogia: a área de negócio faz o pedido e depois vem ver o resultado — e o caminho tomado.
@@ -62,7 +67,7 @@ Execute `/keelson:implement` (ou o protocolo inline, para bug/refactor). Aplique
 
 ## Etapa 4.5: Auto-aprendizado do processo
 
-Antes da Entrega, revise o ciclo que acabou de rodar: houve erro de **processo** (validator reprovou artefato recém-gerado, gate exigiu retry por instrução ambígua, **o humano corrigiu seu comportamento de fluxo**)? Se sim, invoque o agent `process-tuner` com o evento — ele deduplica no ledger (`docs/_meta/learning-log.md`) e aplica patch cirúrgico no artefato do keelson dono. Isso **não pausa** o fluxo: o patch entra como commit separado na Entrega (`chore(keelson): tune <artefato> — <lição>`), e você o revisa junto com a branch. `proposta_doutrina` no report do tuner (bloco keelson do CLAUDE.md, hooks ou `guidelines/`) → **não aplique**; estacione o diff proposto e apresente-o em lote na Entrega. Ciclo sem erro de processo → siga direto (não invente lição).
+Antes da Entrega, revise o ciclo que acabou de rodar: houve erro de **processo** (validator reprovou artefato recém-gerado, gate exigiu retry por instrução ambígua, **o humano corrigiu seu comportamento de fluxo**)? Se sim, invoque o agent `process-tuner` com o evento — ele deduplica no ledger do projeto (`<docsRoot>/_meta/learning-log.md`) e aplica patch cirúrgico no artefato do keelson dono **apenas quando os artefatos do keelson são versionados neste repositório** (modo dev do plugin); nesse caso o patch entra como commit separado na Entrega (`chore(keelson): tune <artefato> — <lição>`), revisado junto com a branch. Em projeto consumidor (plugin instalado), o tuner devolve `PROPOSTA_PLUGIN` (diff sugerido) — estacione-a e apresente-a em lote na Entrega, junto com qualquer `proposta_doutrina` (bloco keelson do CLAUDE.md, hooks ou `guidelines/`), que você **nunca aplica** sozinho. Isso **não pausa** o fluxo. Ciclo sem erro de processo → siga direto (não invente lição).
 
 ## Etapa 4.6: Handoff de verificação de tela (gate 9 remoto)
 
@@ -70,7 +75,7 @@ Antes da Entrega, revise o ciclo que acabou de rodar: houve erro de **processo**
 
 Uma entrega com gate 9 furado **nunca é silenciosa**. Antes da Entrega:
 
-1. **Gere o handoff**: `{docsRoot}/<slug>/handoffs/HANDOFF-<id>.md` no formato canônico do guia do método (`<id>` = `PLAN-MMM` na rota formal; `<yyyy-mm-dd>-<descrição-curta>` na inline). Roteiro executável por quem não participou da implementação: tela/rota, pré-condições (login/permissão, pendências de deploy desta branch, flags, dados), passos concretos, esperado observável, risco se falhar. Inclua os pontos frágeis que você conhece (dark mode, estados vazios, autorização) mesmo sem AC formal.
+1. **Gere o handoff**: `{docsRoot}/<slug>/handoffs/HANDOFF-<id>.md` no formato canônico do guia do método (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`, §8.2; `<id>` = `PLAN-MMM` na rota formal; `<yyyy-mm-dd>-<descrição-curta>` na inline). Roteiro executável por quem não participou da implementação: tela/rota, pré-condições (login/permissão, pendências de deploy desta branch, flags, dados), passos concretos, esperado observável, risco se falhar. Inclua os pontos frágeis que você conhece (dark mode, estados vazios, autorização) mesmo sem AC formal.
 2. **Registre o risco ativo no INDEX** do slug: `Verificação de tela pendente — HANDOFF-<id>` (na rota formal o `/keelson:implement` já fez).
 3. **Domínio sem slug SDD**: não crie arquivo — o roteiro completo vai inline no prompt do report da Entrega (e aplique a calibração de documentação autônoma dos guidelines para a falta de slug).
 4. **Ambiente com tela disponível** → esta etapa não existe: exercite de verdade (gate 9 normal). O handoff é fallback, não atalho — **proibido** usá-lo para pular verificação possível.
@@ -82,7 +87,7 @@ Uma entrega com gate 9 furado **nunca é silenciosa**. Antes da Entrega:
 3. **Push**: `git push` da branch para o remoto (`-u` na primeira vez). **Sem abrir PR** (o dev revisa a branch e decide o merge).
 4. **Não** faça merge em `main` nem deploy.
 5. Reporte ao usuário: branch criada, resumo do que foi feito, testes/gates, lições de processo aplicadas (se houver), e o que falta (revisão + merge dele). Se houve Etapa 4.6, declare a entrega como **parcial — verificação de tela pendente** (nunca "totalmente verificada").
-6. **Verificação pendente (handoff)** (seção obrigatória do report quando houve Etapa 4.6): caminho do `HANDOFF-<id>.md`, nº de itens pendentes, e o **prompt canônico preenchido** (guia do método) em bloco copy-paste, pronto para o humano colar num agente com acesso a tela. Sem slug: o prompt carrega o roteiro inline.
+6. **Verificação pendente (handoff)** (seção obrigatória do report quando houve Etapa 4.6): caminho do `HANDOFF-<id>.md`, nº de itens pendentes, e o **prompt canônico preenchido** (guia do método, §8.3) em bloco copy-paste, pronto para o humano colar num agente com acesso a tela. Sem slug: o prompt carrega o roteiro inline.
 7. **Caminho tomado** (seção obrigatória do mesmo report): liste, em 1 linha cada (decisão + por quê), tudo que foi decidido em autonomia — premissas `[assumido]`, DECs escolhidas, riscos do critic assumidos, mudanças de risco simples aplicadas, gates resolvidos com ajuste — e convide o humano a pedir alteração no que discordar.
 8. **Perguntas estacionadas**: havendo partes adiadas (ação destrutiva/irreversível não bloqueante, DEC estacionada, proposta de doutrina), faça **agora** as perguntas, em lote, via AskUserQuestion. **Nada estacionado é aplicado sem resposta.**
 
@@ -98,7 +103,7 @@ A régua é **reversibilidade × divergência de caminhos**, não a categoria da
 | Ambiguidade cujas opções levam a **caminhos muito distintos** (contrato externo, direção de produto apontada pelo critic) | Idem |
 | Achado de segurança (gate 8, rejeição imediata) | **Na hora, sempre** |
 | `ERROR` de validator sem auto-fix; quality gate que falha após 1 retry e **bloqueia** o restante | Na hora |
-| `proposta_doutrina` do `process-tuner` (bloco keelson do CLAUDE.md, hooks ou guidelines) | Em lote na Entrega |
+| `proposta_doutrina` ou `PROPOSTA_PLUGIN` do `process-tuner` (doutrina ou artefato do plugin instalado) | Em lote na Entrega |
 
 Todo o resto **não pergunta**: decida, registre (premissa `[assumido]`, DEC com alternativa recomendada) e destaque no **"Caminho tomado"** da Entrega para revisão. Faça a pergunta curta e objetiva (título + 2–4 opções, marcando a recomendada). Recebida a resposta, **continue de onde parou** — não reinicie o fluxo.
 

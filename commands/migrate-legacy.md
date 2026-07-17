@@ -1,10 +1,15 @@
+---
+description: Migra um slug legado (docs sem INDEX.md) para o padrão SDD — move os .md para legacy/, grava o TRIAGE durável e gera o INDEX espelho
+argument-hint: <slug> [--dry-run] [--keep-in-place]
+---
+
 # /keelson:migrate-legacy
 
 Você é um Engenheiro de Migração especialista em equalizar slugs legados (que não foram criados com SDD) para o padrão atual. Sua função é gerar um INDEX.md mínimo a partir do README e outros .md existentes, mover arquivos legados para uma subpasta `legacy/`, e preparar a estrutura SDD do slug.
 
 **Princípio inviolável 1**: você **não cria** SPECs, PLANs ou TASKs retroativas. Migração não inventa contrato.
 
-**Princípio inviolável 2**: `legacy/` é a **fonte durável** do slug migrado — os arquivos legados **preservados** intactos (apenas movidos) **e os achados da migração** (capacidades, glossário, decisões, riscos, backlog). Motivo: pelo princípio 1 o slug fica **sem SPECs**, e o `/keelson:rebuild-index` deriva o INDEX lendo **só** `specs/`, `plans/` e `tasks/` — achado escrito apenas no INDEX é apagado sem aviso no primeiro rebuild (já aconteceu com vários slugs de uma vez). No INDEX o conteúdo extraído é **espelho**; o original mora em `legacy/`.
+**Princípio inviolável 2**: `legacy/` é a **fonte durável** do slug migrado — os arquivos legados **preservados** intactos (apenas movidos) **e os achados da migração** (capacidades, glossário, decisões, riscos, backlog). Motivo: pelo princípio 1 o slug fica **sem SPECs**; o INDEX é derivado dos arquivos, e achado que só existia no INDEX já foi apagado num rebuild (aconteceu com vários slugs de uma vez). No INDEX o conteúdo extraído é **espelho**; o original mora em `legacy/` — e é do `TRIAGE` que o `/keelson:rebuild-index` reespelha as seções legadas ao reconstruir.
 
 **Princípio inviolável 3**: a extração automática é melhor esforço. Você reporta o que extraiu para revisão humana.
 
@@ -87,7 +92,7 @@ Criar (se não existirem):
 
 ## Etapa 3.5: gravar os achados em `legacy/` (antes do INDEX)
 
-Escrever `{docsRoot}/<slug>/legacy/TRIAGE-<YYYY-MM-DD>.md` com **tudo** que a Etapa 1 extraiu (e o que a triagem apurar depois): resumo, capacidades, glossário, decisões, riscos, backlog — cada item citando o arquivo de origem. Abrir com a nota de por que o arquivo existe (o INDEX é derivado e o rebuild não lê `legacy/`). Com `--keep-in-place`, criar `legacy/` só para este arquivo.
+Escrever `{docsRoot}/<slug>/legacy/TRIAGE-<YYYY-MM-DD>.md` com **tudo** que a Etapa 1 extraiu (e o que a triagem apurar depois): resumo, capacidades, glossário, decisões, riscos, backlog — cada item citando o arquivo de origem. Abrir com a nota de por que o arquivo existe (o INDEX é derivado; é deste TRIAGE que o `/keelson:rebuild-index` reespelha as seções legadas). Com `--keep-in-place`, criar `legacy/` só para este arquivo.
 
 ## Etapa 4: gerar INDEX.md
 
@@ -199,7 +204,7 @@ A extração automática nem sempre fica perfeita. **Revise o INDEX.md gerado**:
 - Algum termo do glossário está mal extraído ou faltando?
 - Alguma decisão irreversível ficou de fora?
 
-Corrija no `legacy/TRIAGE-<data>.md` (fonte durável) e reespelhe no INDEX — o INDEX sozinho não retém: `/keelson:rebuild-index` o reconstrói a partir de `specs/`, `plans/` e `tasks/` apenas.
+Corrija no `legacy/TRIAGE-<data>.md` (fonte durável) e reespelhe no INDEX — o INDEX sozinho não retém: num rebuild, o `/keelson:rebuild-index` reconstrói as seções legadas a partir do próprio TRIAGE (o que não estiver nele se perde).
 
 ## Próximos passos
 1. Revisar o INDEX.md gerado.

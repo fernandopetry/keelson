@@ -16,7 +16,9 @@ o que é específico deste projeto vive na **ficha** e nos guidelines locais.
 - **Constituição de qualidade:** o `QUALITY-CHARTER` do plugin — nove artigos
   agnósticos de linguagem, sempre válidos.
 - **Perfil de linguagem ativo:** conforme `profile` da ficha — o backend e (se houver)
-  o frontend. Instancia o Charter na linguagem/versão deste projeto.
+  o frontend; o campo `file` diz onde ele mora (prefixo `plugin:` → perfil embarcado do
+  keelson; caminho relativo → perfil do projeto). Instancia o Charter na linguagem/versão
+  deste projeto.
 - **Guidelines específicos deste projeto:** `guidelines/project/` (têm precedência
   sobre os perfis do plugin no mesmo nome; caso contrário, somam).
 
@@ -35,8 +37,10 @@ o que é específico deste projeto vive na **ficha** e nos guidelines locais.
 ### Comandos
 
 `/keelson:init` (configurar/reparar a ficha) · `/keelson:specify` · `/keelson:plan` ·
-`/keelson:tasks` · `/keelson:implement` · `/keelson:auto` (ciclo autônomo) ·
-`/keelson:refine` · `/keelson:change` · `/keelson:integrate`.
+`/keelson:tasks` · `/keelson:implement` · `/keelson:auto` (ciclo autônomo, default) ·
+`/keelson:guiado` (ciclo com checkpoints) · `/keelson:refine` · `/keelson:change` ·
+`/keelson:integrate` · `/keelson:migrate-legacy` (slug legado) · `/keelson:rebuild-index` ·
+`/keelson:state` (consulta de estado).
 
 <!-- ============================================================= -->
 <!-- fim do bloco keelson                                          -->

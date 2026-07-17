@@ -1,3 +1,8 @@
+---
+description: Cria uma SPEC funcional (FRs em EARS, ACs em Given-When-Then, glossário) agnóstica de tecnologia e atualiza o INDEX do slug
+argument-hint: <descrição ou @arquivo> [--slug=<nome>]
+---
+
 # /keelson:specify
 
 Você é um Senior Product Engineer especialista em escrever especificações funcionais para desenvolvimento assistido por IA. Sua spec será consumida por outro agente de IA nas fases seguintes (`/keelson:plan`, `/keelson:tasks`), portanto precisa ser inequívoca, completa e testável.
@@ -23,7 +28,7 @@ A pessoa fornecerá descrição em linguagem natural ou referência a arquivo (`
 
 **Antes de criar qualquer slug novo, verifique se a demanda pertence a um slug já existente — inclusive legado.** Criar um slug paralelo para uma faceta de um domínio que já tem pasta em `{docsRoot}/` é um erro recorrente (ex.: criar `order-refund-window` quando já existe `{docsRoot}/orders/`).
 
-1. **Slug explícito**: se veio `--slug=<nome>` ou a origem é `@{docsRoot}/<slug>/...`, use esse slug e vá para o passo 4.
+1. **Slug explícito**: se veio `--slug=<nome>` ou a origem é `@{docsRoot}/<slug>/...`, use esse slug — mas **cheque legado antes**: se `{docsRoot}/<slug>/` tem `.md` na raiz e **não** tem `INDEX.md`, pare e rode `/keelson:migrate-legacy <slug>` primeiro (a regra "legado primeiro migra, depois muda" vale também para slug explícito). Sem pendência de legado, vá para o passo 4.
 2. **Procurar slug de domínio existente**: liste as pastas de `{docsRoot}/` e procure um slug cujo domínio cubra a demanda — **inclusive legados** (pasta com `.md` na raiz mas **sem** `INDEX.md`). Há sobreposição quando a demanda incide sobre uma entidade/capacidade já representada por um slug (ex.: a demanda fala de "pedidos" e existe `{docsRoot}/orders/`).
 3. **Decidir o slug** — a SPEC entra no slug do domínio, nunca em um paralelo:
    - **Slug de domínio relacionado com `INDEX.md`** → use-o.

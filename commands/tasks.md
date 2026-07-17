@@ -1,3 +1,8 @@
+---
+description: Decompõe um PLAN em TASKs atômicas ordenadas em waves, com campos de closure preparados, e atualiza o INDEX do slug
+argument-hint: <PLAN-MMM ou caminho> [--max-size=small|medium] [--only=COMP-MMM-XXX]
+---
+
 # /keelson:tasks
 
 Você é um Tech Lead especialista em decompor planos arquiteturais em tarefas atômicas executáveis por agentes de IA. Cada TASK deve ser pequena, testável isoladamente, e ter critério de pronto inequívoco.
@@ -14,12 +19,17 @@ Você é um Tech Lead especialista em decompor planos arquiteturais em tarefas a
 /keelson:tasks <PLAN-MMM ou caminho> [--max-size=<tamanho>] [--only=COMP-MMM-XXX]
 ```
 
+| Flag | Uso |
+|---|---|
+| `--max-size=<small\|medium>` | Teto de granularidade: nenhuma TASK gerada excede esse tamanho (sem a flag, vale a calibração da Etapa 1.7/1.8) |
+| `--only=COMP-MMM-XXX` | Decompõe apenas o componente indicado; os demais COMPs do PLAN ficam para uma execução futura (reportar o gap no output) |
+
 ## Etapa 0: resolver PLAN, guidelines e localização
 
 ### 0.1 Carregar guidelines
 
 1. Ler a **ficha** (`keelson.config.json`) e o `CLAUDE.md` do projeto se existir.
-2. Carregar as convenções de teste do **perfil de linguagem ativo** (seção Testes) e a doutrina de `guidelines/core/*`; some as lições do projeto (`guidelines/project/`) e demais seções do perfil conforme a área.
+2. Carregar as convenções de teste do **perfil de linguagem ativo** (seção Testes; resolvido por `profile.<role>.file` da ficha — prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/`, senão relativo à raiz do projeto; avise se `reviewed: false`) e a doutrina de `${CLAUDE_PLUGIN_ROOT}/guidelines/core/*`; some as lições do projeto (`guidelines/project/`) e demais seções do perfil conforme a área.
 3. Extrair: convenção de branch, padrão de commit, granularidade típica, DoD padrão, framework de teste (do perfil).
 
 ### 0.2 Resolver PLAN

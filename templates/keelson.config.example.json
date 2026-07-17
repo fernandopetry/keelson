@@ -1,7 +1,7 @@
 {
   "profile": {
-    "backend": { "lang": "php", "version": "8.5" },
-    "frontend": { "lang": "none", "version": null }
+    "backend": { "lang": "php", "version": "8.5", "file": "plugin:backend/php.md" },
+    "frontend": { "lang": "none", "version": null, "file": "plugin:frontend/none.md" }
   },
   "codePaths": {
     "backend": ["src"],

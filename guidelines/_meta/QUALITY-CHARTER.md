@@ -6,6 +6,9 @@
 > artigo abaixo e responde "como isto se cumpre na minha linguagem/versão".
 >
 > Palavras-chave conforme RFC 2119: **DEVE / NÃO DEVE / DEVERIA / PODE**.
+>
+> **Versão: 0.1.0** — é esta versão que o campo `charter:` do cabeçalho de
+> proveniência de cada perfil referencia.
 
 ---
 

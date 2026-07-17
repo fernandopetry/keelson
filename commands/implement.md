@@ -1,3 +1,8 @@
+---
+description: Executa um PLAN aprovado wave a wave via subagents (implementer → reviewer + gates dedicados), com quality gates e closure obrigatória por task
+argument-hint: <PLAN-MMM ou caminho> [--max-parallel=N] [--dry-run] [--only-wave=N] [--force-mode=teams|subagents]
+---
+
 # /keelson:implement
 
 Você é um Engineering Manager especialista em orquestrar implementação assistida por IA. Sua função é executar um PLAN aprovado, decompondo as TASKs em waves paralelas ou sequenciais conforme critérios de segurança, mantendo qualidade inegociável.
@@ -23,13 +28,13 @@ Você é um Engineering Manager especialista em orquestrar implementação assis
 ### 0.1 Modo de orquestração
 
 1. **Padrão: `SUBAGENTS`** (subagents na main session). Não gaste turno detectando alternativas.
-2. `--force-mode=teams` habilita `AGENT_TEAMS` (worktrees/peer-to-peer) quando o ambiente suportar.
+2. `--force-mode=teams` habilita `AGENT_TEAMS` (worktrees/peer-to-peer) quando o ambiente suportar (ex.: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`).
 3. Wave única e sequencial de tasks pequenas → `SINGLE_THREAD` (main session direto) é aceitável.
 
 ### 0.2 Carregar guidelines e memo
 
 1. Ler a **ficha** (`keelson.config.json`): `profile`, `codePaths`, comandos de qualidade, `gates`, `docsRoot`. Ler o `CLAUDE.md` do projeto se existir.
-2. Carregar `guidelines/core/*` (sempre) e o **perfil de linguagem ativo** conforme o `profile` da ficha (backend e/ou frontend); em mudança sensível, a seção de segurança do perfil e do `QUALITY-CHARTER`; em queries pesadas, a seção de performance. Some as lições do projeto (`guidelines/project/`).
+2. Carregar `${CLAUDE_PLUGIN_ROOT}/guidelines/core/*` (sempre) e o **perfil de linguagem ativo** resolvido por `profile.<role>.file` da ficha (prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/`; senão relativo à raiz do projeto; avise se o perfil traz `reviewed: false`); em mudança sensível, a seção de segurança do perfil e do `QUALITY-CHARTER` (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/`); em queries pesadas, a seção de performance. Some as lições do projeto (`guidelines/project/`).
 3. **Memo de exploração**: se `thoughts/local/exploration-<slug>.md` existe, use-o como mapa do domínio e **passe o caminho aos subagents** (evita re-exploração; é snapshot — antes de editar, reler o arquivo real).
 4. Validar consistência guideline ↔ PLAN.
 
@@ -125,7 +130,7 @@ Revisão por agentes independentes (o implementer **nunca** revisa o próprio tr
 **Proporcional ao risco — gates dedicados, em paralelo ao reviewer:**
 
 8. **Segurança — via `security-reviewer`** (REJEIÇÃO IMEDIATA): obrigatório quando a mudança toca área sensível (auth, autorização, SQL/consulta, upload, dados pessoais, crypto, sessão/cookies, endpoints, redirect, exec, dependências) e o gate `gates.security` está ativo. Roda o checklist de segurança do `QUALITY-CHARTER` (Art. 2) mapeado na seção de segurança do perfil ativo. Fora desses casos, segurança é coberta pelo Gate 6.
-9. **Comportamento verificado — via `task-verifier`**: obrigatório quando a mudança tem efeito observável (endpoint, UI, regra exercitável). Roda os testes e exercita a app quando o ambiente está disponível. Refactor sem efeito observável dispensa (Gates 1/2 bastam). **Quando `gates.screenVerify` está ativo e o efeito é de tela** e o ambiente desta sessão **não permite exercitá-la** (worktree/nuvem, sem browser): o verifier reporta `PARCIAL` com `handoff_seed` — isso **não é falha de gate** (não consome retry, não bloqueia closure); o gate fica `pendente_handoff` e as seeds são consolidadas num **handoff de verificação** na Etapa 4 (ver o guia do método do keelson, seção de handoff de verificação). O que o verifier **conseguiu** exercitar (testes, chamadas de endpoint) continua bloqueante se divergir.
+9. **Comportamento verificado — via `task-verifier`**: obrigatório quando a mudança tem efeito observável (endpoint, UI, regra exercitável). Roda os testes e exercita a app quando o ambiente está disponível. Refactor sem efeito observável dispensa (Gates 1/2 bastam). **Quando `gates.screenVerify` está ativo e o efeito é de tela** e o ambiente desta sessão **não permite exercitá-la** (worktree/nuvem, sem browser): o verifier reporta `PARCIAL` com `handoff_seed` — isso **não é falha de gate** (não consome retry, não bloqueia closure); o gate fica `pendente_handoff` e as seeds são consolidadas num **handoff de verificação** na Etapa 4 (ver `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`, §8). O que o verifier **conseguiu** exercitar (testes, chamadas de endpoint) continua bloqueante se divergir.
 
 Falha em qualquer gate: motivo específico, 1 retry, depois escala humano. Vulnerabilidade (Gate 8) é sempre bloqueante.
 
@@ -173,8 +178,8 @@ Report incompleto ou inválido: rejeitar, refazer.
    - **Não** marcar Status do PLAN como Done automaticamente.
 4. **Registrar lição durável (memória da equipe)**: se algum report (`task-reviewer`, `security-reviewer` ou `task-verifier`) trouxe `licao_candidata` não-nula (defeito com causa-raiz generalizável, ou a task exigiu retry por motivo que pode se repetir), rotear pelo campo `alvo`:
    - **`alvo: projeto`** → persistir em `guidelines/project/lessons.md` no formato canônico (`## [Categoria] título` + **Erro/Causa/Solução**), abaixo do marcador `<!-- Adicionar lições abaixo desta linha -->`. **Deduplicar**: lição equivalente existente é atualizada, não duplicada. Área com perfil de linguagem de referência ganha também uma linha curta de anti-pattern na seção correspondente do perfil ativo.
-   - **`alvo: processo`** (um artefato do keelson induziu/não preveniu o erro — inclui `evento_aprendizado` emitido por validator e retry causado por instrução ambígua) → invocar o agent **`process-tuner`** com o evento; ele deduplica no ledger de aprendizado do keelson (`docs/_meta/learning-log.md`) e aplica o patch cirúrgico no artefato dono. `proposta_doutrina` no report do tuner → perguntar ao humano antes de aplicar.
-   - Como `guidelines/` e `docs/` são versionados, o commit + push distribui a lição. Mencionar no output quais lições foram registradas/patcheadas.
+   - **`alvo: processo`** (um artefato do keelson induziu/não preveniu o erro — inclui `evento_aprendizado` emitido por validator e retry causado por instrução ambígua) → invocar o agent **`process-tuner`** com o evento; ele deduplica no ledger do projeto (`<docsRoot>/_meta/learning-log.md`) e aplica o patch cirúrgico no artefato dono **apenas quando os artefatos do keelson são versionados neste repositório** (modo dev do plugin); em projeto consumidor (plugin instalado), devolve `PROPOSTA_PLUGIN` com o diff sugerido — apresente-a ao humano na entrega. `proposta_doutrina` no report do tuner → perguntar ao humano antes de aplicar.
+   - Como `guidelines/project/` e `<docsRoot>/` são versionados no projeto, o commit + push distribui a lição. Mencionar no output quais lições foram registradas/patcheadas (e quais viraram proposta).
 5. **Validar persistência**: reler TASK, TASK-INDEX e INDEX.md do slug.
 6. **Em modo paralelo**: commit das atualizações com `chore(<slug>): close TASK-MMM-XXX` (incluir as mudanças em `guidelines/` se houver lição registrada).
 
@@ -206,7 +211,7 @@ Falha: reportar específico, 1 retry, escalar.
 3. Validar cada item da DoD.
 4. Validar aderência global à ficha e ao perfil de linguagem ativo.
 5. **Remover o memo de exploração** (`thoughts/local/exploration-<slug>.md`), se existir — a closure do PLAN encerra o ciclo de exploração.
-6. **Handoff de verificação (gate 9 remoto)** — só quando `gates.screenVerify` está ativo: se alguma task fechou com `comportamento_gate9: pendente_handoff`, consolidar os `handoff_seed` de todas as tasks em **um** `{docsRoot}/<slug>/handoffs/HANDOFF-PLAN-MMM.md` no formato canônico do guia do método (contexto, já-verificado, pré-requisitos, roteiro, riscos, protocolo de conclusão). Deduplicar itens que exercitam o mesmo fluxo. O doc entra no commit da entrega.
+6. **Handoff de verificação (gate 9 remoto)** — só quando `gates.screenVerify` está ativo: se alguma task fechou com `comportamento_gate9: pendente_handoff`, consolidar os `handoff_seed` de todas as tasks em **um** `{docsRoot}/<slug>/handoffs/HANDOFF-PLAN-MMM.md` no formato canônico do guia do método (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`, §8.2 — contexto, já-verificado, pré-requisitos, roteiro, riscos, protocolo de conclusão). Deduplicar itens que exercitam o mesmo fluxo. O doc entra no commit da entrega.
 7. **Pendência de deploy visível no INDEX (check determinístico — não é opinião)**: toda pendência de deploy que a branch introduz — migration, seed, mudança de schema, criação de índice, secret/variável de ambiente novos, qualquer passo manual que produção exija **além** de subir o código — **DEVE** estar declarada no `{docsRoot}/<slug>/INDEX.md`. Compare o que a branch **realmente acrescenta** com o que o INDEX **declara**:
 
    ```bash
@@ -283,7 +288,7 @@ E sugerir a integração (não executar):
 ## Verificação pendente (handoff)            # OMITIR se gate 9 foi verificado, n/a, ou gates.screenVerify inativo
 - Doc: {docsRoot}/<slug>/handoffs/HANDOFF-PLAN-MMM.md (N itens pendentes)
 - Motivo: <ambiente sem acesso a testes de tela>
-- Prompt para o agente com tela: <bloco do prompt canônico do guia do método, preenchido>
+- Prompt para o agente com tela: <bloco do prompt canônico do guia do método (§8.3), preenchido>
 
 ## Próximos passos
 1. Revisar mudanças no working tree

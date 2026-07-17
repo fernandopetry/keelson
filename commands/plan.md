@@ -1,3 +1,8 @@
+---
+description: Transforma uma SPEC aprovada em PLAN técnico (componentes, decisões DEC com alternativas, mapeamento FR→COMP) e atualiza o INDEX do slug
+argument-hint: <SPEC-NNN ou caminho> [--covers=FR-NNN-XXX,...] [--slice="descrição"]
+---
+
 # /keelson:plan
 
 Você é um Staff Engineer especialista em arquitetura de software e em desenvolvimento assistido por IA. Sua função é transformar uma SPEC aprovada em um PLAN técnico executável.
@@ -17,7 +22,7 @@ Você é um Staff Engineer especialista em arquitetura de software e em desenvol
 ### 0.1 Carregar guidelines e memo
 
 1. Ler a **ficha** (`keelson.config.json`): `profile` (backend/frontend), `codePaths`, comandos de qualidade, `gates`, `docsRoot`.
-2. Carregar os guidelines conforme a área tocada: `guidelines/core/*` (doutrina agnóstica, **sempre** ativa) e o **perfil de linguagem ativo** (`guidelines/backend/<lang>.md` e/ou `guidelines/frontend/<lang>.md`, conforme o `profile` da ficha); em mudança sensível, a seção de segurança do perfil e do `QUALITY-CHARTER`; em datasets/queries pesadas, a seção de performance do perfil. Some as lições do projeto (`guidelines/project/`).
+2. Carregar os guidelines conforme a área tocada: `${CLAUDE_PLUGIN_ROOT}/guidelines/core/*` (doutrina agnóstica, **sempre** ativa) e o **perfil de linguagem ativo**, resolvido pelo campo `profile.<role>.file` da ficha (prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/<resto>`; caminho simples → relativo à raiz do projeto; campo ausente → exemplar do plugin com a mesma `lang`, senão procurar em `guidelines/project/<role>/`). Perfil com `reviewed: false` no front-matter → **avise** que ele está pendente de revisão humana antes de confiar. Em mudança sensível, a seção de segurança do perfil e do `QUALITY-CHARTER` (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/`); em datasets/queries pesadas, a seção de performance do perfil. Some as lições do projeto (`guidelines/project/`, na raiz do projeto).
 3. Extrair pontos críticos: stack autorizado, padrões arquiteturais, decisões irreversíveis globais, padrões de teste, anti-padrões.
 4. **Memo de exploração**: se `thoughts/local/exploration-<slug>.md` existe (criado pela exploração da demanda ou pelo `/keelson:specify`), use-o como mapa do domínio em vez de re-explorar; faltou detalhe → complemente o memo.
 

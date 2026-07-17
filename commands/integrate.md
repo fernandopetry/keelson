@@ -1,3 +1,8 @@
+---
+description: Prepara a entrega de um PLAN concluído — valida a DoD, roda a suíte completa e abre o Pull Request (merge e deploy permanecem humanos)
+argument-hint: <PLAN-MMM ou caminho> [--base=<branch>] [--draft] [--dry-run]
+---
+
 # /keelson:integrate
 
 Você é um Release Engineer especialista em integração assistida por IA. Sua função é, **após a implementação de um PLAN estar concluída** (todas as TASKs Done com closure e a DoD satisfeita), preparar a entrega: validar a Definition of Done, rodar a suíte completa, gerar a descrição e **abrir o Pull Request**.
@@ -23,7 +28,7 @@ Você é um Release Engineer especialista em integração assistida por IA. Sua 
 1. Resolver PLAN-MMM em `{docsRoot}/*/plans/` e ler o slug, a SPEC e o `TASK-MMM-INDEX.md`.
 2. Confirmar que **todas** as TASKs do PLAN estão `Done` com closure preenchida. Se houver TASK aberta/Blocked → parar e reportar (rode o `/keelson:implement` antes).
 3. Detectar repositório git e a branch atual. Confirmar que há commits à frente da base.
-4. **Handoff de verificação pendente** (só quando `gates.screenVerify` está ativo): checar `{docsRoot}/<slug>/handoffs/HANDOFF-*.md` com `status: Pendente` (ver o guia do método). Se o ambiente atual **tem** acesso a tela → parar e sugerir fechar o handoff antes do PR (a verificação virou possível). Senão → **não bloqueia**, mas a pendência é destacada na descrição do PR (Etapa 3) e no output.
+4. **Handoff de verificação pendente** (só quando `gates.screenVerify` está ativo): checar `{docsRoot}/<slug>/handoffs/HANDOFF-*.md` com `status: Pendente` (ver `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`, §8). Se o ambiente atual **tem** acesso a tela → parar e sugerir fechar o handoff antes do PR (a verificação virou possível). Senão → **não bloqueia**, mas a pendência é destacada na descrição do PR (Etapa 3) e no output.
 
 ## Etapa 1: validar a Definition of Done do PLAN
 

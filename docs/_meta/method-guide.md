@@ -121,7 +121,7 @@ Orquestra a implementação wave por wave, usando subagents (`task-implementer` 
 | `--dry-run` | Imprime o plano de execução (modo, waves, paralelismo) sem executar |
 | `--only-wave=N` | Executa apenas a wave N |
 | `--max-parallel=N` | Limita paralelismo |
-| `--force-mode=...` | Força `teams` ou `subagents` (default: detecção automática) |
+| `--force-mode=...` | Força `teams` ou `subagents` (default: `subagents`) |
 
 **Quality gates por task** (obrigatórios): implementação completa, testes cobrindo ACs passando, lint limpo, escopo respeitado, DECs respeitadas, aderência ao Charter + perfil ativo, code review pelo reviewer agent. Falha = 1 retry, depois escala para humano.
 
@@ -176,7 +176,7 @@ Regenera o `INDEX.md` de um slug a partir dos arquivos individuais (SPECs, PLANs
 
 **Quando usar**: INDEX deletado, corrompido, ou divergente dos arquivos. **Quando NÃO usar**: INDEX consistente (operação destrutiva) ou mudança incremental (use os comandos próprios). Também detecta inconsistências (FRs órfãos, PLANs sem SPEC, status incoerente) e pergunta antes de prosseguir nas críticas.
 
-> ⚠️ O `/keelson:rebuild-index` deriva o INDEX **só** de specs/plans/tasks — nunca lê `legacy/`. Achados de migração que precisam sobreviver a um rebuild vivem em `legacy/` (ver `/keelson:migrate-legacy` e a decisão 4.5 / LRN-012).
+> ⚠️ Achados de migração vivem em `legacy/TRIAGE-*.md` (fonte durável); o `/keelson:rebuild-index` deriva o INDEX de specs/plans/tasks **e reespelha as seções legadas a partir do TRIAGE** — o que não estiver no TRIAGE se perde no rebuild (ver `/keelson:migrate-legacy` e a decisão 4.5 / LRN-012).
 
 ### 3.8 `/keelson:integrate` — preparar entrega (suíte + PR)
 
@@ -270,7 +270,7 @@ Você normalmente não invoca estes diretamente — os comandos os orquestram:
 | `security-reviewer` | Gate de segurança (`guidelines/core/SECURITY.md` + seção de segurança do perfil ativo), rejeição imediata; em mudança sensível | `/keelson:implement` |
 | `task-verifier` | Gate de comportamento verificado (roda testes + exercita a app); em mudança observável | `/keelson:implement` |
 | `product-critic` | Crítica de mérito da SPEC; não decide (aprovação é humana) | `/keelson:specify` |
-| `process-tuner` | Auto-aprendizado do processo: patch cirúrgico no artefato keelson dono do erro + ledger `docs/_meta/learning-log.md`; anti-inchaço e modo destilação; a doutrina (Charter, hooks, guidelines) só propõe | closure do `/keelson:implement`, `/keelson:auto`, sob demanda |
+| `process-tuner` | Auto-aprendizado do processo: patch cirúrgico no artefato keelson dono do erro (modo dev do plugin) ou `PROPOSTA_PLUGIN` (projeto consumidor) + ledger `<docsRoot>/_meta/learning-log.md`; anti-inchaço e modo destilação; a doutrina (Charter, hooks, guidelines) só propõe | closure do `/keelson:implement`, `/keelson:auto`, sob demanda |
 
 ---
 
