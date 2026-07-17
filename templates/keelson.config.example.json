@@ -1,0 +1,22 @@
+{
+  "profile": {
+    "backend": { "lang": "php", "version": "8.5" },
+    "frontend": { "lang": "none", "version": null }
+  },
+  "codePaths": {
+    "backend": ["src"],
+    "frontend": []
+  },
+  "sensitiveGlobs": ["src/**"],
+  "quality": {
+    "test": "composer test",
+    "lint": "vendor/bin/php-cs-fixer fix --dry-run --diff",
+    "typecheck": null,
+    "build": null
+  },
+  "gates": {
+    "security": true,
+    "screenVerify": false
+  },
+  "docsRoot": "docs"
+}

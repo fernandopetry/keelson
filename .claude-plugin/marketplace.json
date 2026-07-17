@@ -1,0 +1,17 @@
+{
+  "name": "keelson",
+  "owner": {
+    "name": "Fernando Petry"
+  },
+  "metadata": {
+    "description": "Keelson — spec-driven development and a portable quality standard for Claude Code.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "keelson",
+      "source": "./",
+      "description": "Spec-driven development for Claude Code — a portable, verifiable quality standard with automated gates and per-language profiles."
+    }
+  ]
+}

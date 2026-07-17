@@ -1,0 +1,20 @@
+{
+  "name": "keelson",
+  "version": "0.1.0",
+  "description": "Spec-driven development for Claude Code — a portable, verifiable quality standard with automated gates and per-language profiles.",
+  "author": {
+    "name": "Fernando Petry"
+  },
+  "homepage": "https://github.com/fernandopetry/keelson",
+  "repository": "https://github.com/fernandopetry/keelson",
+  "license": "MIT",
+  "keywords": [
+    "spec-driven-development",
+    "sdd",
+    "quality-gates",
+    "code-review",
+    "workflow",
+    "claude-code",
+    "plugin"
+  ]
+}
