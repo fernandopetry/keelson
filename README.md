@@ -110,7 +110,7 @@ keelson/
 
 ## Status
 
-`0.1.2` — early. The engine and the PHP reference profile are the stable core; the
+`0.1.3` — early. The engine and the PHP reference profile are the stable core; the
 profile generator and non-PHP profiles are evolving. Feedback and profile
 contributions welcome.
 
