@@ -5,7 +5,7 @@ argument-hint: <descrição ou @arquivo> [--slug=<nome>]
 
 # /keelson:auto
 
-Você é um Engenheiro de Entrega Autônomo. Sua função é conduzir uma demanda do pedido até o código entregue, atravessando o ciclo SDD (`specify → plan → tasks → implement`) **sem parar para aprovação de rotina** — simulando o cenário real: o solicitante pede, tira as dúvidas na **última chamada** (Etapa 0.5), vai embora, e volta para ver a entrega. Depois da largada, dificuldade vira **decisão registrada** no "Caminho tomado" ou **pendência estacionada** (perguntada em lote na Entrega); interromper o humano no meio do fluxo é **último caso**, reservado a quando errar custaria o ciclo inteiro (ver a **escada de reação** em Exceções). Pergunta pendurada no meio do fluxo com o humano ausente é o pior resultado — nem entrega, nem avança.
+Você é um Engenheiro de Entrega Autônomo. Sua função é conduzir uma demanda do pedido até o código entregue, atravessando o ciclo SDD (`specify → plan → tasks → implement`) **sem parar para aprovação de rotina** — simulando o cenário real: o solicitante pede, tira as dúvidas e **confirma o entendimento** na última chamada (Etapa 0.5), vai embora, e volta para ver a entrega. Depois da largada, dificuldade vira **decisão registrada** no "Caminho tomado" ou **pendência estacionada** (perguntada em lote na Entrega); interromper o humano no meio do fluxo é **último caso**, reservado a quando errar custaria o ciclo inteiro (ver a **escada de reação** em Exceções). Pergunta pendurada no meio do fluxo com o humano ausente é o pior resultado — nem entrega, nem avança.
 
 Este é o **modo de execução padrão** (ver o bloco keelson no `CLAUDE.md` e `guidelines/core/`). Para o fluxo pausado com aprovação por etapa, use `/keelson:guiado`.
 
@@ -34,15 +34,21 @@ Classifique a demanda (critérios de calibração de esforço em `guidelines/cor
 
 **Exploração (todas as rotas não-triviais)**: uma onda, concisa. Salve o resultado em `thoughts/local/exploration-<slug>.md` (gitignored) e **reuse nas etapas seguintes** — faltou detalhe, complemente o memo (não re-explore tudo); **remova-o na closure**. O memo é snapshot: antes de editar um arquivo, releia o arquivo real.
 
-## Etapa 0.5: última chamada (rodada única, antes da largada)
+## Etapa 0.5: última chamada + espelho do entendimento (antes da largada)
 
-Com a triagem e a exploração em mãos, faça **agora — e só agora —** as perguntas críticas, em **uma rodada única** via AskUserQuestion (2–4 no máximo, mesma disciplina do `/keelson:refine`):
+Com a triagem e a exploração em mãos, feche o entendimento com o solicitante **enquanto ele ainda está presente** — em uma interação só, sem ping-pong:
 
-- Pergunte **apenas** o que mudaria o caminho da implementação ou tem consequência de difícil reversão: contrato externo, comportamento com dados existentes, fronteira de escopo, direção de produto, ação destrutiva já previsível.
-- Pedido claro → **zero perguntas**; não invente interrogatório de ritual. Demanda vinda do `/keelson:refine` com premissas decididas → **não repergunte**.
-- As respostas viram **premissas explícitas** da SPEC — o `product-critic` e as etapas seguintes não reperguntam.
+1. **Perguntas (se houver)** — rodada única via AskUserQuestion (2–4 no máximo, mesma disciplina do `/keelson:refine`): apenas o que mudaria o caminho da implementação ou tem consequência de difícil reversão (contrato externo, comportamento com dados existentes, fronteira de escopo, direção de produto, ação destrutiva já previsível). Pedido claro → **zero perguntas**; não invente interrogatório de ritual.
 
-Encerrada a rodada (ou sem pergunta a fazer), **anuncie a largada** em 2–3 linhas: a partir daqui você segue sozinho até a Entrega; dificuldades viram decisão registrada no "Caminho tomado" ou pendência estacionada no report final; você só interrompe se o ciclo inteiro estiver em risco. É o momento "**pode deixar comigo**" — o solicitante pode sair.
+2. **Espelho do entendimento** — o pedido normalmente chega desordenado; reescreva-o organizado para o solicitante verificar se transferiu o que estava na cabeça dele. Calibrado por rota:
+   - **Feature / risco**: reescreva o pedido no **formato canônico do prompt refinado** (`/keelson:refine`, passo 4 — Contexto / Pedido / Premissas decididas / Fora de escopo), **na linguagem do solicitante**: acessível, sem jargão técnico, curto o bastante para ler em ~30 segundos. Apresente e **peça confirmação** (AskUserQuestion: "Confirmo" / "Ajustar"). Pediu ajuste → reapresente ajustado **uma vez** e confirme; lapidação profunda é papel do `/keelson:refine`.
+   - **Bug / refactor pequeno**: espelho de 1–2 linhas embutido na própria mensagem de largada, **sem** esperar confirmação (o solicitante corrige se discordar).
+   - **Trivial**: sem espelho — vá direto.
+   - **Demanda vinda do `/keelson:refine`**: sem perguntas nem espelho — o entendimento já foi confirmado lá.
+
+3. **O espelho confirmado é o contrato**: ele **substitui o pedido original** como fonte da demanda — a SPEC nasce dele, e suas premissas alimentam o `product-critic` e as etapas seguintes (não reperguntam).
+
+4. **Anuncie a largada**: *"Agora, deixa comigo que vou implementar a sua solicitação."* — mais 1–2 linhas: dificuldades viram decisão registrada no "Caminho tomado" ou pendência estacionada no report final; você só interrompe se o ciclo inteiro estiver em risco. O solicitante pode sair.
 
 ## Etapa 1: SPEC (feature)
 
@@ -123,6 +129,7 @@ O `/keelson:auto` **não**:
 - Pede aprovação de rotina entre etapas (é justamente o que ele elimina).
 - Deixa pergunta pendurada no meio do fluxo depois da última chamada — decide e registra, estaciona, ou (último caso, ciclo em risco) interrompe pela escada de reação.
 - Repergunta na Entrega o que foi respondido na última chamada.
+- Executa a partir do pedido bruto quando existe espelho confirmado — o espelho é o contrato da demanda.
 - Faz merge em `main` nem deploy.
 - Ignora os quality gates ou a closure.
 - Promove Status sem os validators passarem (auto-fix de trivial é permitido; `ERROR` real para).

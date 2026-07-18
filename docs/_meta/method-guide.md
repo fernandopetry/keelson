@@ -190,7 +190,7 @@ Após a implementação de um PLAN concluída (TASKs Done, DoD satisfeita), vali
 
 ### 3.9 `/keelson:auto` — ciclo completo autônomo (modo padrão)
 
-Conduz `specify → plan → tasks → implement → entrega` de ponta a ponta **sem aprovação de etapa**, simulando "o solicitante pede e vai embora". Abre com a **última chamada** — rodada única de até 4 perguntas críticas (pedido claro → nenhuma) — e anuncia a largada ("pode deixar comigo"). Depois disso, não deixa pergunta pendurada: dificuldade vira decisão registrada ou parte estacionada perguntada em lote na entrega; interrupção no meio só em **último caso** (errar custaria o ciclo inteiro). É o **default**: basta pedir a tarefa em linguagem natural, sem digitar o comando. Governança: decisões 4.10, 4.11 e 4.13 de `decisions.md`.
+Conduz `specify → plan → tasks → implement → entrega` de ponta a ponta **sem aprovação de etapa**, simulando "o solicitante pede e vai embora". Abre com a **última chamada**: rodada única de até 4 perguntas críticas (pedido claro → nenhuma) + **espelho do entendimento** — o pedido reescrito de forma estruturada e acessível (formato do prompt refinado do `/keelson:refine`) para o solicitante confirmar; o espelho confirmado **vira a fonte da demanda**. Então anuncia a largada ("Agora, deixa comigo que vou implementar a sua solicitação"). Depois disso, não deixa pergunta pendurada: dificuldade vira decisão registrada ou parte estacionada perguntada em lote na entrega; interrupção no meio só em **último caso** (errar custaria o ciclo inteiro). É o **default**: basta pedir a tarefa em linguagem natural, sem digitar o comando. Governança: decisões 4.10, 4.11, 4.13 e 4.14 de `decisions.md`.
 
 ```
 /keelson:auto <descrição ou @arquivo> [--slug=<nome>]

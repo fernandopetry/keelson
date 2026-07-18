@@ -273,6 +273,18 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **Aplicação**: `commands/auto.md` (Etapa 0.5 + escada em Exceções — fonte de verdade) e `commands/guiado.md` (explicita a régua estrita própria).
 
+### 4.14 Espelho do entendimento: o prompt confirmado é o contrato (complementa 4.13)
+
+**Decisão (do humano)**: na largada do `/keelson:auto`, além das perguntas da última chamada, o agente **reescreve o pedido** de forma organizada e acessível — formato canônico do prompt refinado do `/keelson:refine` (Contexto / Pedido / Premissas decididas / Fora de escopo), na linguagem do solicitante, legível em ~30 segundos — e **valida o entendimento** antes de seguir. O espelho confirmado **substitui o pedido original** como fonte da demanda: a SPEC nasce dele.
+
+**Por quê**: o pedido chega desordenado, e o erro mais caro não é a dúvida não perguntada — é o detalhe entendido *diferente* sem que ninguém perceba a ambiguidade. O espelho custa ~30 segundos do solicitante (que ainda está presente) contra um ciclo perdido por interpretação errada; é a oportunidade de ele verificar se transferiu o que estava na cabeça.
+
+**Calibração anti-atrito** (para não recriar o atrito que o 4.10 eliminou): feature/risco → espelho completo com confirmação, no máximo **1 rodada de ajuste**; bug/refactor pequeno → espelho de 1–2 linhas na mensagem de largada, sem confirmação; trivial → sem espelho; demanda vinda do `/keelson:refine` → pula (já confirmada lá).
+
+**Um dono por regra**: o formato do prompt refinado pertence ao `/keelson:refine` (passo 4); o auto o referencia, não o duplica.
+
+**Aplicação**: `commands/auto.md` (Etapa 0.5) e `commands/refine.md` (formato canônico). Relacionada: decisão em aberto sobre um agente dedicado `request-mirror` (§8).
+
 ---
 
 ## 5. Quality gates inegociáveis
@@ -357,6 +369,7 @@ Quando aparece uma demanda nova, usar `/keelson:change` (triagem) ou decidir man
 - Convenção de UX-FRs (como escrever requisito de comportamento de interface em EARS).
 - Como integrar com ferramentas de wireframe externas referenciadas pelo PLAN.
 - Skill validadora do próprio bloco keelson do `CLAUDE.md`.
+- Agente dedicado `request-mirror` para o espelho do entendimento (decisão 4.14), caso a qualidade do espelho inline se mostre inconsistente na prática.
 - Política de arquivamento de slugs concluídos.
 - Política de aposentadoria do `/keelson:migrate-legacy` quando não houver mais slug legado no projeto.
 
