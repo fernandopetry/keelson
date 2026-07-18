@@ -153,3 +153,13 @@ artefato_patchado: skills/plan-validator/SKILL.md
 patch: Etapa 4 generalizada de "mapeamento FR -> componente" para "grafo de componentes (FR → COMP e COMP → COMP)"; WARNING novo — elemento da Interface pública sem consumidor declarado (COMP dependente/fluxo §4/rota) é código morto decidido no PLAN, com o contra-exemplo Toggle e a exceção para superfície sem consumidor interno por natureza (testes, rotas HTTP, CLI, migration). Saldo +1. Dono é o validator, não o /keelson:plan: o check só é possível com a §3 inteira escrita (ao redigir COMP-001-006 o COMP-001-007 ainda não existia) e é justamente o reflexo do CRUD canônico do gerador que precisa de avaliador externo (doutrina "gerador ≠ avaliador"). WARNING e não ERROR por calibração (LRN-010): a Interface pública de um COMP de Testes legitimamente não tem consumidor. PATCH DA REINCIDÊNCIA (2026-07-16): a regra que falhou foi REFORMULADA, não duplicada — o WARNING vira "Aresta de interface aberta" (toda aresta da §3 fecha nas DUAS pontas), com sub-bullet "Saída sem consumidor" (a regra de 2026-07-15, preservada com o contra-exemplo Toggle e a exceção) + sub-bullet "Entrada sem fornecedor" (argumento OU placeholder `:foo` do SQL escrito no PLAN sem origem declarada; origens válidas: path param da tabela de rotas, corpo/DTO, sessão/permissão, retorno de outro COMP; sinal forte: "só dá para obter consultando o banco antes"), com o contra-exemplo `:squad_id`. Saldo +2. Segue WARNING e não ERROR por calibração (LRN-010): nos PLANs mergeados todo argumento TEM origem declarada, ou seja o check discrimina em vez de disparar em série — mas assinaturas terse que omitem o nome do argumento fariam um ERROR bloquear a prática real
 reincidencia: 1
 estado: ativa
+
+## LRN-014: espelho do entendimento embutido no título do diálogo de confirmação
+data: 2026-07-18
+gatilho: correcao_humana
+origem: teste ao vivo do fluxo /keelson:auto (sandbox biblioteca-demo, sessão de 2026-07-18)
+causa_raiz: a Etapa 0.5 do /keelson:auto mandava "apresentar e pedir confirmação" sem especificar o veículo de apresentação — a execução de referência pôs o espelho inteiro no campo `question` do AskUserQuestion, que renderiza como título do diálogo (ilegível para prompt grande)
+artefato_patchado: commands/auto.md
+patch: Etapa 0.5 — o espelho vai no corpo da conversa (markdown) e o AskUserQuestion entra depois só com pergunta curta que o referencia, com proibição explícita de embutir o texto na pergunta. Saldo +2.
+reincidencia: 0
+estado: ativa
