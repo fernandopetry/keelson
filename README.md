@@ -98,7 +98,7 @@ keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
 ├── agents/            # subagents: implementer, reviewers, profile-writer…
 ├── skills/            # spec / plan / task validators + state
-├── hooks/             # doc-guard, security-guard (read the ficha)
+├── hooks/             # doc-guard, security-guard, stale-background-guard
 ├── guidelines/
 │   ├── _meta/         # QUALITY-CHARTER.md · PROFILE-OUTLINE.md
 │   ├── core/          # language-agnostic doctrine (always active)
@@ -110,7 +110,7 @@ keelson/
 
 ## Status
 
-`0.1.1` — early. The engine and the PHP reference profile are the stable core; the
+`0.1.2` — early. The engine and the PHP reference profile are the stable core; the
 profile generator and non-PHP profiles are evolving. Feedback and profile
 contributions welcome.
 
