@@ -2,7 +2,7 @@
 
 > Memória institucional das decisões sobre como o keelson (spec-driven development) é praticado. Diferente da doutrina de código (QUALITY-CHARTER + perfil ativo, que regem o **código**), este arquivo rege o **processo de desenvolvimento**.
 
-**Última revisão**: 2026-07-17
+**Última revisão**: 2026-07-18
 **Status do documento**: vivo, atualizado conforme decisões evoluem
 
 ---
@@ -246,7 +246,7 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **O que não muda**: rigor e gates (decisão 4.10), gate de segurança com rejeição imediata, merge/deploy humanos (4.8), e o `/keelson:guiado` — que mantém a régua estrita por ser o modo opt-in de acompanhamento.
 
-**Aplicação**: `commands/auto.md` (fonte de verdade) e o bloco keelson do `CLAUDE.md` (rede de proteção). Recalibra a "Rede de proteção" da decisão 4.10.
+**Aplicação**: `commands/auto.md` (fonte de verdade) e o bloco keelson do `CLAUDE.md` (rede de proteção). Recalibra a "Rede de proteção" da decisão 4.10. *(Recalibrada pela decisão 4.13: as perguntas do auto concentram-se na última chamada e no lote da Entrega; interrupção no meio do fluxo virou último caso.)*
 
 ### 4.12 Rota inline: prova externa falsificável (gerador ≠ avaliador)
 
@@ -257,6 +257,21 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 **Origem**: confronto do fluxo com material externo sobre trabalho orientado a objetivos (separação gerador/avaliador). No mesmo pacote, dois ajustes de processo registrados no ledger: calibração por exemplares nos avaliadores qualitativos (LRN-010) e não-vinculância da "Implementação sugerida" nas TASKs (LRN-011).
 
 **Aplicação**: bloco keelson do `CLAUDE.md` (Execução de Código) e o QUALITY-CHARTER (régua "gerador ≠ avaliador").
+
+### 4.13 Modo ausente no autônomo: última chamada + escada de reação (recalibra 4.11)
+
+**Decisão (do humano)**: o `/keelson:auto` simula o cenário real "o solicitante pede, tira as dúvidas, vai embora e volta para ver a entrega". Duas mudanças:
+
+1. **Última chamada (Etapa 0.5)**: antes da largada, uma **rodada única** de até 4 perguntas críticas (disciplina do `/keelson:refine`: pedido claro → zero perguntas; demanda vinda do refine não repergunta). Encerrada a rodada, o agente **anuncia** que segue sozinho até a Entrega ("pode deixar comigo").
+2. **Escada de reação pós-largada** (substitui o "na hora" da 4.11 dentro do auto): (1º) **decidir** a opção segura e reversível, registrando no "Caminho tomado"; (2º) **estacionar** a parte — até a feature inteira, se não for isolável — e perguntar em lote na Entrega (generalização do padrão de handoff do gate 9: entrega parcial estruturada vence pergunta pendurada); (3º) **interromper só em último caso**, quando errar contaminaria o ciclo inteiro, não há premissa reversível defensável e nada é entregável sem a resposta.
+
+**Por quê**: pergunta no meio do fluxo com o humano ausente não protege — pendura o trabalho (nem entrega, nem avança), e o solicitante volta para encontrar uma pergunta parada em vez de uma entrega (ainda que parcial).
+
+**O que não muda**: nada destrutivo/irreversível é aplicado sem resposta (estaciona — nunca "decide"); vulnerabilidade nunca entra na branch; merge/deploy humanos (4.8); os gates não são afrouxados (4.10); o `/keelson:guiado` mantém a régua estrita de perguntar na hora (humano presente por definição).
+
+**Trade-off aceito**: menos paradas = mais risco de premissa errada custar retrabalho; a contrapartida é a prova por teste falsificável, o "Caminho tomado" consolidado e a entrega em branch (errar custa um ajuste de revisão, não um rollback de produção).
+
+**Aplicação**: `commands/auto.md` (Etapa 0.5 + escada em Exceções — fonte de verdade) e `commands/guiado.md` (explicita a régua estrita própria).
 
 ---
 

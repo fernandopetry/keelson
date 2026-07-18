@@ -20,7 +20,7 @@ Cada etapa gera artefatos em `<docsRoot>/<slug>/` (a raiz vem de `docsRoot` na f
 
 **Não sabe por onde começar?** Use `/keelson:change "descrição da demanda"` — ele faz triagem e indica o comando certo.
 
-**Modo padrão = autônomo.** No dia a dia você não roda etapa por etapa: peça a tarefa em linguagem natural (ou use `/keelson:auto`) e o ciclo corre de ponta a ponta, parando **só** em dúvida crítica ou risco. Quer aprovar etapa a etapa? Use `/keelson:guiado`. Ver 3.9 e 3.10 e a decisão 4.10 de `decisions.md`.
+**Modo padrão = autônomo.** No dia a dia você não roda etapa por etapa: peça a tarefa em linguagem natural (ou use `/keelson:auto`) e o ciclo corre de ponta a ponta — as dúvidas críticas são feitas de uma vez na largada (última chamada) e o restante segue até a entrega, com interrupção no meio só em último caso. Quer aprovar etapa a etapa? Use `/keelson:guiado`. Ver 3.9 e 3.10 e as decisões 4.10/4.13 de `decisions.md`.
 
 ---
 
@@ -190,7 +190,7 @@ Após a implementação de um PLAN concluída (TASKs Done, DoD satisfeita), vali
 
 ### 3.9 `/keelson:auto` — ciclo completo autônomo (modo padrão)
 
-Conduz `specify → plan → tasks → implement → entrega` de ponta a ponta **sem aprovação de etapa**, parando só em exceção (dúvida crítica, decisão irreversível, mudança de risco, falha de gate após retry, segurança). É o **default**: basta pedir a tarefa em linguagem natural, sem digitar o comando.
+Conduz `specify → plan → tasks → implement → entrega` de ponta a ponta **sem aprovação de etapa**, simulando "o solicitante pede e vai embora". Abre com a **última chamada** — rodada única de até 4 perguntas críticas (pedido claro → nenhuma) — e anuncia a largada ("pode deixar comigo"). Depois disso, não deixa pergunta pendurada: dificuldade vira decisão registrada ou parte estacionada perguntada em lote na entrega; interrupção no meio só em **último caso** (errar custaria o ciclo inteiro). É o **default**: basta pedir a tarefa em linguagem natural, sem digitar o comando. Governança: decisões 4.10, 4.11 e 4.13 de `decisions.md`.
 
 ```
 /keelson:auto <descrição ou @arquivo> [--slug=<nome>]
@@ -202,7 +202,7 @@ Rigor proporcional preservado (trivial → direto; bug/refactor → inline; feat
 
 ### 3.10 `/keelson:guiado` — ciclo com checkpoints (opt-in pausado)
 
-O oposto opt-in do `/keelson:auto`: roda o ciclo **pausando em 2 marcos** (SPEC pronta, PLAN pronto) para o seu OK, e nas mesmas exceções. Use quando quer revisar o contrato e o desenho antes do desenvolvimento.
+O oposto opt-in do `/keelson:auto`: roda o ciclo **pausando em 2 marcos** (SPEC pronta, PLAN pronto) para o seu OK, e com a **régua estrita** de perguntar na hora em qualquer exceção (você está acompanhando — a escada de estacionamento do auto não se aplica). Use quando quer revisar o contrato e o desenho antes do desenvolvimento.
 
 ```
 /keelson:guiado <descrição ou @arquivo> [--slug=<nome>]

@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Você é um Engenheiro de Entrega que conduz o ciclo SDD (`specify → plan → tasks → implement`) **com checkpoints de aprovação**. É o oposto opt-in do `/keelson:auto`: use quando o humano quer **acompanhar e validar** o contrato (SPEC) e o desenho (PLAN) antes do desenvolvimento.
 
-Diferença para o `/keelson:auto`: além das paradas por exceção (que são idênticas), você **pausa de propósito em 2 marcos** e só segue com o OK do humano.
+Diferença para o `/keelson:auto`: você **pausa de propósito em 2 marcos** e mantém a **régua estrita de perguntar na hora** — aqui o humano está acompanhando por definição, então a última chamada e a escada de estacionamento do modo ausente não se aplicam.
 
 ## Input
 
@@ -28,9 +28,9 @@ Diferença para o `/keelson:auto`: além das paradas por exceção (que são id�
 
 4. **Entrega** — igual ao `/keelson:auto`: branch + commit + push, **sem PR**. Merge e deploy permanecem humanos.
 
-## Paradas por exceção (idênticas ao `/keelson:auto`)
+## Paradas por exceção (régua estrita — humano presente)
 
-Mesmo entre os checkpoints, **pare e pergunte** em: ambiguidade crítica na SPEC; DEC irreversível; mudança de risco (auth, schema, exclusão de dados, config de produção) antes de aplicar; `ERROR` de validator que não se auto-corrige; quality gate que falha após 1 retry; achado de segurança (gate 8).
+Mesmo entre os checkpoints, **pare e pergunte na hora** em: ambiguidade crítica na SPEC; DEC irreversível; mudança de risco (auth, schema, exclusão de dados, config de produção) antes de aplicar; `ERROR` de validator que não se auto-corrige; quality gate que falha após 1 retry; achado de segurança (gate 8). (No `/keelson:auto`, esses mesmos gatilhos seguem a escada de reação — decidir/estacionar/interromper em último caso; aqui não: o modo guiado existe para o humano decidir junto.)
 
 ## Quando usar
 
