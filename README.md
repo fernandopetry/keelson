@@ -97,20 +97,20 @@ contributed back to the plugin — that's how it grows, by curation, not by empt
 keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
 ├── agents/            # subagents: implementer, reviewers, profile-writer…
-├── skills/            # spec / plan / task validators + state
+├── skills/            # spec / plan / task validators + state + screen-verify
 ├── hooks/             # doc-guard, security-guard, stale-background-guard
 ├── guidelines/
 │   ├── _meta/         # QUALITY-CHARTER.md · PROFILE-OUTLINE.md
 │   ├── core/          # language-agnostic doctrine (always active)
 │   ├── backend/       # php.md (reference example) · none.md
 │   └── frontend/      # none.md (others generated on install)
-├── templates/         # keelson.config.example.json · CLAUDE block
+├── templates/         # keelson.config.example.json · keelson.local.example.json · CLAUDE block
 └── docs/_meta/        # method guide, decisions, learning log
 ```
 
 ## Status
 
-`0.1.3` — early. The engine and the PHP reference profile are the stable core; the
+`0.2.0` — early. The engine and the PHP reference profile are the stable core; the
 profile generator and non-PHP profiles are evolving. Feedback and profile
 contributions welcome.
 

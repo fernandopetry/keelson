@@ -54,14 +54,14 @@ Suba a app no `<root>` pelo **método do projeto** (ver `guidelines/project/` e 
 1. **Serviço/backend**: garantir no ar; se o projeto usa cache/container, **reiniciar/limpar** para enxergar o código novo da branch.
 2. **Seeds/migrations desta branch** (§3 do handoff): se o handoff lista seed/migration não aplicado no banco **local**, aplicá-lo pelo método do projeto — e lembrar que isso vira **pendência de deploy** em produção (registrar no relatório).
 3. **Feature flags / permissões** (§3 do handoff): garantir o estado exigido no ambiente local. Mudança sensível (ex.: autorização) → fazer só o mínimo e dizer o que alterou.
-4. **Frontend**: subir/servir conforme o método de verificação de tela do projeto.
+4. **Frontend**: subir/servir conforme o método de `gates.screenVerify.method` (a skill `screen-verify` abre uma aba na `baseUrl` do `keelson.local.json`).
 
 ## Etapa 3: executar o roteiro (gate screenVerify)
 
 Para cada `HANDOFF-*.md` pendente do alvo:
 
 1. Ler o handoff inteiro — §3 (pré-requisitos), §4 (itens V*), §5 (riscos).
-2. **Exercitar cada item V*** pelo **método de verificação de tela do projeto** (a skill/ferramenta que o projeto define para dirigir a UI autenticada — ver `guidelines/project/` e as skills do projeto): seguir os *Passos*, observar o *Esperado*, e **registrar a Evidência no próprio doc** — `✅`/`❌` + o que foi observado (screenshot/payload/estado), item a item. Nada de "está ok" sem evidência.
+2. **Exercitar cada item V*** pelo método em **`gates.screenVerify.method`** da ficha — tipicamente a skill **`screen-verify`**, que dirige o browser autenticado lendo os dados de acesso de DEV do `keelson.local.json` (URL, login, senha de teste). Pegadinhas de domínio (autorização, setup) vêm de `guidelines/project/`. Seguir os *Passos*, observar o *Esperado*, e **registrar a Evidência no próprio doc** — `✅`/`❌` + o que foi observado (screenshot/payload/estado), item a item. Nada de "está ok" sem evidência.
 3. **Divergência (`❌`)** → corrigir na **própria branch** pelo protocolo do projeto (escopo restrito + teste que cubra + os quality gates aplicáveis: `quality.lint`/`quality.typecheck`, e o gate de segurança se tocar algo sensível), commitar a correção (`fix(<slug>): <o quê>`) e **re-exercitar** o item.
 4. Não conseguiu fechar um item (bloqueio real, correção não trivial) → **parar**: deixar o handoff `Pendente` com a evidência do que falhou, e reportar. Não force o fechamento.
 

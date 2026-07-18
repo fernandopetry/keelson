@@ -16,7 +16,7 @@
   },
   "gates": {
     "security": true,
-    "screenVerify": false
+    "screenVerify": { "enabled": false, "method": null }
   },
   "docsRoot": "docs"
 }

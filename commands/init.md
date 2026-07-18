@@ -31,6 +31,7 @@ Use `Bash`/`Glob`/`Read` para inspecionar a raiz do projeto:
 
 Para cada valor que **não** inferiu com confiança, pergunte com opções fechadas e o efeito explícito. Exemplos:
 - *"Não encontrei frontend — confirma que é API-only?"* → **desliga** `gates.screenVerify` e o perfil de frontend.
+- **Se há frontend** — *"Como este projeto verifica tela? Detectei a skill `<x>` / Playwright / preview MCP / outro"* → define `gates.screenVerify.method`. A skill embarcada **`screen-verify`** dirige o browser lendo os dados de acesso do `keelson.local.json` (método `skill:screen-verify`); se o projeto tem um método próprio, registre-o.
 - *"Detectei o script `test` — usar `<comando>` como `quality.test`?"*
 - *"O código de backend fica em `<path>`?"*
 
@@ -49,7 +50,19 @@ Perfis gerados nascem **pendentes de revisão** e podem trazer marcas `⚠️ CO
 
 ## Etapa 4 — Escrever a ficha `keelson.config.json`
 
-Parta de `${CLAUDE_PLUGIN_ROOT}/templates/keelson.config.example.json` e preencha com os valores resolvidos: `profile` (backend/frontend com `lang`+`version`+`file` da Etapa 3), `codePaths`, `sensitiveGlobs`, `quality`, `gates` (ex.: `screenVerify` = há frontend?), `docsRoot`. Grave na raiz do projeto.
+Parta de `${CLAUDE_PLUGIN_ROOT}/templates/keelson.config.example.json` e preencha com os valores resolvidos: `profile` (backend/frontend com `lang`+`version`+`file` da Etapa 3), `codePaths`, `sensitiveGlobs`, `quality`, `docsRoot`, e `gates`:
+- `security` (bool);
+- `screenVerify` = objeto `{ "enabled": <há frontend?>, "method": <o da Etapa 2, ex. "skill:screen-verify"> }`. (Aceita também o atalho booleano `true`/`false` = `{enabled, method:null}`.)
+
+Grave na raiz do projeto.
+
+## Etapa 4.5 — Dados de acesso locais para verificação de tela (só se `screenVerify.enabled`)
+
+Se `gates.screenVerify.enabled` é `true` e o método precisa de credenciais (ex.: a skill `screen-verify`), a verificação exige URL + login de **desenvolvimento**. Esses dados são **particulares e não-versionados**:
+
+1. **Garanta o `.gitignore` ANTES de criar o arquivo**: `keelson.local.json` precisa estar no `.gitignore` (ver Etapa 5.5). **Nunca** crie o arquivo sem essa proteção — credencial não pode ir para o git.
+2. Copie `${CLAUDE_PLUGIN_ROOT}/templates/keelson.local.example.json` para `keelson.local.json` na raiz, como **placeholder**: preencha `baseUrl` e a rota de login que detectou; deixe `username`/`password` como placeholders.
+3. **Não escreva senha** você mesmo, nem que ela apareça em qualquer arquivo. Deixe o placeholder e **instrua o humano**: preencher só com credenciais de **DEV/teste descartáveis**, **nunca** de produção nem conta real. Reforce que o arquivo é local e fica fora do git.
 
 ## Etapa 5 — Injetar o bloco no `CLAUDE.md`
 
@@ -57,14 +70,15 @@ Insira o conteúdo de `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.keelson-block.md` 
 
 ## Etapa 5.5 — Garantir `thoughts/` fora do versionamento
 
-Memos de exploração e backups do keelson vivem em `thoughts/local/` no projeto (nunca versionados). Garanta que o `.gitignore` do projeto contém `thoughts/` — adicione a linha se faltar.
+Memos de exploração e backups do keelson vivem em `thoughts/local/` no projeto (nunca versionados). Garanta que o `.gitignore` do projeto contém `thoughts/` **e** `keelson.local.json` (dados de acesso locais — credenciais de dev, nunca versionadas) — adicione as linhas que faltarem.
 
 ## Etapa 6 — Self-check (falsificável, não confie na configuração)
 
 Prove que a ficha funciona:
 - `quality.test`/`quality.lint` declarados **existem/rodam** (execução rápida ou `--help`/dry-run);
 - os `codePaths` existem no disco;
-- os guidelines do perfil ativo resolvem: cada `profile.<role>.file` da ficha aponta para um arquivo existente (prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/`; senão relativo à raiz do projeto); perfil com `reviewed: false` no front-matter vira instrução de revisão no relatório.
+- os guidelines do perfil ativo resolvem: cada `profile.<role>.file` da ficha aponta para um arquivo existente (prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/`; senão relativo à raiz do projeto); perfil com `reviewed: false` no front-matter vira instrução de revisão no relatório;
+- se `screenVerify.enabled`: `keelson.local.json` existe **e** está no `.gitignore` (confirme que **não** aparece em `git status`/`git ls-files`); campos ainda em placeholder (`<...>`) viram instrução de preenchimento no relatório (com o aviso dev-only).
 Reporte cada item como ✓/✗. `✗` vira ação no relatório, não é silenciado.
 
 ## Etapa 7 — Relatório
