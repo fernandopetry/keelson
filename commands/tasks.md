@@ -229,8 +229,8 @@ Aplicar ao `{docsRoot}/<slug>/INDEX.md`:
 
 1. **Atualizar campo `Última atualização`**.
 
-2. **Atualizar coluna `Tasks` na linha do PLAN-MMM** na tabela "PLANs":
-   - De `0/? ⏸` para `0/<total de tasks geradas> ⏸ Todo`.
+2. **Atualizar coluna `Tasks` na linha do PLAN-MMM** na tabela "PLANs", no formato canônico do contrato do INDEX (method-guide, §6):
+   - De `0/? ⏸` para `0/<total de tasks geradas> ⏸`.
 
 3. **Adicionar entrada ao "Histórico recente"**:
    ```

@@ -22,10 +22,11 @@ Caminho de um ou mais `SPEC-*.md`. Múltiplos: validar em sequência, relatório
 
 ## Etapa 0: setup
 
-1. Ler o SPEC completo.
-2. Identificar slug a partir do caminho.
-3. Ler glossário de SPECs anteriores do mesmo slug.
-4. Inicializar três listas: `errors`, `warnings`, `infos`, `auto_fixes_applied`.
+1. Ler a **ficha** (`keelson.config.json` na raiz) e extrair `docsRoot` — é ele que resolve todo caminho `{docsRoot}/...` desta skill (sem ficha, assumir `docs/`).
+2. Ler o SPEC completo.
+3. Identificar slug a partir do caminho.
+4. Ler glossário de SPECs anteriores do mesmo slug.
+5. Inicializar três listas: `errors`, `warnings`, `infos`, `auto_fixes_applied`.
 
 ## Etapa 1: checks estruturais
 

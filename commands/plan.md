@@ -187,10 +187,11 @@ Aplicar ao INDEX.md do slug:
 
 1. **Atualizar campo `Última atualização`**.
 
-2. **Adicionar linha na tabela "PLANs"**:
+2. **Adicionar linha na tabela "PLANs"** no formato canônico do contrato do INDEX (`<docsRoot>/_meta/method-guide.md`, §6 — não redefina header nem célula):
    ```
    | PLAN-MMM | SPEC-NNN | <FRs cobertos resumidos> | 0/? ⏸ | Draft |
    ```
+   (INDEX antigo sem tabela na seção → criar antes o header canônico de 5 colunas.)
 
 3. **Mover capacidade entre seções**:
    - Identificar entrada em "Especificadas, ainda não planejadas" correspondente à SPEC.

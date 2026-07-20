@@ -163,3 +163,33 @@ artefato_patchado: commands/auto.md
 patch: Etapa 0.5 — o espelho vai no corpo da conversa (markdown) e o AskUserQuestion entra depois só com pergunta curta que o referencia, com proibição explícita de embutir o texto na pergunta. Saldo +2.
 reincidencia: 0
 estado: ativa
+
+## LRN-015: validators sem a ficha — docsRoot não resolvido e CLAUDE.md como fonte errada de convenção
+data: 2026-07-20
+gatilho: correcao_humana
+origem: auditoria da cadeia de raciocínio do plugin (sessão de 2026-07-20), correções aprovadas pelo humano
+causa_raiz: as skills de validação usavam `{docsRoot}` sem nunca ler `keelson.config.json` (docsRoot ≠ "docs" quebrava a localização dos artefatos silenciosamente) e cobravam convenções (branch, commit, stack) contra o CLAUDE.md, enquanto os geradores (/keelson:plan, /keelson:tasks) as derivam da ficha/perfil — gate que não mede o que o gerador produz (o CLAUDE.keelson-block.md nem declara branch/commit); o task-validator ainda exigia a seção "Convenções (do CLAUDE.md)" quando o template gera "Convenções (do projeto)"
+artefato_patchado: skills/spec-validator/SKILL.md, skills/plan-validator/SKILL.md, skills/task-validator/SKILL.md
+patch: Etapa 0 das três passa a ler a ficha (docsRoot + perfil); convenção é validada contra ficha/perfil (a fonte que o gerador usa) e o CLAUDE.md vira complementar — só conta quando declara a convenção explicitamente, nunca gera ERROR por ausência; nome de seção alinhado ao template real. Saldo +1 a +6 por skill.
+reincidencia: 0
+estado: ativa
+
+## LRN-016: tabela PLANs do INDEX com 5 escritores e nenhum contrato
+data: 2026-07-20
+gatilho: correcao_humana
+origem: auditoria da cadeia (2026-07-20); mesma classe do LRN-001 (regra escrita N vezes sem dono)
+causa_raiz: specify/plan/tasks/implement/rebuild-index redefiniam cada um, com palavras próprias, header e formato da célula Tasks/Status da tabela PLANs (4 formatos distintos; specify criava a seção como "(vazio)" sem header; "Done (sugerido)" vs "Implementado (aguardando confirmação)") — cada incremento posterior era inferência de estrutura, não leitura determinística
+artefato_patchado: docs/_meta/method-guide.md (§6, dono único) + referências em commands/specify.md, plan.md, tasks.md, implement.md, rebuild-index.md
+patch: contrato canônico no method-guide (header de 5 colunas; célula `X/Y M` com progressão ⏸→🟡→✅; coluna Status = front-matter do PLAN verbatim + único sufixo "Done (sugerido)"; "status efetivo" do rebuild-index só posiciona Capacidades); os 5 escritores referenciam o contrato em vez de redefinir; specify cria a tabela vazia com header. Critério de sucesso: specify→plan→tasks→implement seguido de rebuild-index --dry-run gera diff vazio na tabela PLANs.
+reincidencia: 0
+estado: ativa
+
+## LRN-017: gates 8/9 recarregavam SPEC+PLAN+perfil inteiros por task (over-fetching)
+data: 2026-07-20
+gatilho: correcao_humana
+origem: auditoria da cadeia (2026-07-20)
+causa_raiz: /keelson:implement passava aos gates dedicados apenas caminhos de artefatos inteiros; o security-reviewer usa só a seção de segurança do perfil e o task-verifier só ACs + seção de testes — numa wave, SPEC+PLAN+perfil (~1.000+ linhas) eram relidos ~4× por task sem que o conteúdo extra entrasse na decisão
+artefato_patchado: commands/implement.md (§3.3) + agents/security-reviewer.md, agents/task-verifier.md
+patch: main session monta briefing destilado (ACs literais copiados da SPEC, DECs do escopo, `git diff --name-only`, comandos `quality.*`) e aponta a seção do perfil a ler; artefatos completos ficam disponíveis só para conferência pontual. Saldo +3/+4/+2.
+reincidencia: 0
+estado: ativa

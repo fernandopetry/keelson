@@ -176,7 +176,8 @@ Se `{docsRoot}/<slug>/INDEX.md` não existe, criar do zero com este template, pr
 
 ## PLANs
 
-(vazio)
+| ID | Cobre | FRs cobertos | Tasks | Status |
+|----|-------|--------------|-------|--------|
 
 ## Glossário consolidado
 

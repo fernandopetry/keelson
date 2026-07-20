@@ -32,8 +32,9 @@ Fora desses casos, o checklist de segurança é coberto pelo Gate 6 do `task-rev
 
 ## Input esperado
 
+- **Briefing destilado da main session** (preferencial): ACs vinculados literais, DECs que tocam o escopo, arquivos modificados (`git diff --name-only`), `sensitiveGlobs` da ficha
 - Report do `task-implementer` (YAML) e/ou lista de arquivos modificados
-- Caminhos: TASK, PLAN, `${CLAUDE_PLUGIN_ROOT}/guidelines/core/SECURITY.md`, a ficha `keelson.config.json` (para o perfil ativo e seus `sensitiveGlobs`)
+- Caminhos: `${CLAUDE_PLUGIN_ROOT}/guidelines/core/SECURITY.md` e o perfil ativo — leia **apenas a seção de segurança** do perfil, não o arquivo inteiro; TASK/PLAN completos só para conferência pontual
 - (Opcional) `git diff` da mudança
 
 ## Checklist (de `core/SECURITY.md` + seção de segurança do perfil ativo)
@@ -65,7 +66,7 @@ Path Traversal, Command Injection, Mass Assignment, IDOR, Race Condition, Inform
 
 ## Fluxo
 
-1. Ler TASK/PLAN/`core/SECURITY.md`, a seção de segurança do perfil ativo e os arquivos modificados (`git diff` ou report).
+1. Ler o briefing da main session (na falta dele, TASK/PLAN), o `core/SECURITY.md`, a **seção de segurança** do perfil ativo e os arquivos modificados (`git diff` ou report).
 2. Rodar o checklist acima contra o diff. Quando aplicável, executar a auditoria de dependências do perfil ativo via Bash.
 3. Cada achado: categoria OWASP, `arquivo:linha`, severidade, correção objetiva.
 4. Decisão: **qualquer** vulnerabilidade real → REPROVADO.

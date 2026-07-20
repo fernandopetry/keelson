@@ -1,6 +1,6 @@
 ---
 name: plan-validator
-description: Valida PLANs SDD (arquivos sob {docsRoot}/*/plans/PLAN-*.md) contra princípios de cobertura explícita, DEC com alternativas, aderência ao CLAUDE.md, mapeamento FR-componente completo. Ativar automaticamente após /keelson:plan (gate de qualidade), ou sob demanda quando usuário pedir validação, revisão ou lint de PLAN. Reporta por severidade (ERROR/WARNING/INFO) e bloqueia mudança de Status para Approved enquanto houver ERROR.
+description: Valida PLANs SDD (arquivos sob {docsRoot}/*/plans/PLAN-*.md) contra princípios de cobertura explícita, DEC com alternativas, aderência à ficha/perfil, mapeamento FR-componente completo. Ativar automaticamente após /keelson:plan (gate de qualidade), ou sob demanda quando usuário pedir validação, revisão ou lint de PLAN. Reporta por severidade (ERROR/WARNING/INFO) e bloqueia mudança de Status para Approved enquanto houver ERROR.
 ---
 
 # Skill: plan-validator
@@ -20,11 +20,12 @@ Caminho de um ou mais `PLAN-*.md`.
 
 ## Etapa 0: setup
 
-1. Ler o PLAN.
-2. Ler a SPEC referenciada.
-3. Ler `CLAUDE.md`.
-4. Ler `INDEX.md` do slug.
-5. Inicializar: `errors`, `warnings`, `infos`, `auto_fixes_applied`.
+1. Ler a **ficha** (`keelson.config.json` na raiz): `docsRoot` (resolve os caminhos `{docsRoot}/...`; sem ficha, assumir `docs/`) e `profile.<role>.file` (perfil de linguagem ativo — a fonte primária de stack/convenções, a mesma de que o `/keelson:plan` gera).
+2. Ler o PLAN.
+3. Ler a SPEC referenciada.
+4. Ler `CLAUDE.md` se existir (fonte **complementar**; ausência dele, ou omissão de uma convenção nele, nunca gera ERROR).
+5. Ler `INDEX.md` do slug.
+6. Inicializar: `errors`, `warnings`, `infos`, `auto_fixes_applied`.
 
 ## Etapa 1: checks estruturais
 
@@ -94,16 +95,17 @@ Caminho de um ou mais `PLAN-*.md`.
   - **Saída sem consumidor** (código morto decidido no PLAN): elemento da `Interface pública` que nenhum consumidor declarado invoca (COMP dependente, fluxo da §4, rota). Contra-exemplo: uma operação `Toggle<X>` exposta na `Interface pública` de um COMP enquanto nenhum COMP dependente, fluxo da §4 ou rota declarada a invoca. Exceção: superfície sem consumidor interno por natureza (testes, rotas HTTP, CLI, migration).
   - **Entrada sem fornecedor** (inobtenível): valor que a `Interface pública` exige — argumento **ou** placeholder (`:foo`) do SQL escrito no PLAN — sem origem declarada no mesmo PLAN. Origens válidas: path param da tabela de rotas, corpo/DTO, sessão (identidade, permissão), retorno de outro COMP. Contra-exemplo: uma operação cuja `Interface pública` exige o identificador do agrupamento pai (`:parent_id`) sem origem declarada, enquanto a rota que a aciona traz apenas o id do próprio recurso no path (`DELETE /recurso/{id}`) — a única origem seria um `SELECT` antes da escrita, o check-then-act que uma DEC **citada pelo próprio PLAN** fecha. "Só dá para obter consultando o banco antes" é o sinal.
 
-## Etapa 5: checks de aderência ao CLAUDE.md
+## Etapa 5: checks de aderência à ficha/perfil (CLAUDE.md complementar)
 
 ### ERROR se:
 - Seção "Aderência a guidelines" ausente
-- `CLAUDE.md presente: sim` mas stack contradiz CLAUDE.md
+- Stack declarado contradiz o **perfil de linguagem ativo da ficha** (a fonte de que o `/keelson:plan` gera)
 - Decisão irreversível tocada sem entrar em "Exceções aos guidelines"
 
 ### WARNING se:
 - "Exceções" listadas sem justificativa ou aprovador
 - Stack introduz lib não declarada sem mencionar
+- Stack contradiz convenção que o `CLAUDE.md` **declara explicitamente** (complementar — nunca ERROR: o gerador não usa o CLAUDE.md como fonte primária de convenção)
 
 ## Etapa 6: checks de Definition of Done
 
@@ -113,7 +115,7 @@ Caminho de um ou mais `PLAN-*.md`.
 
 ### WARNING se:
 - DoD não menciona cobertura de teste
-- DoD não menciona aderência ao CLAUDE.md
+- DoD não menciona aderência à ficha/perfil
 
 ## Etapa 7: checks de não-violação de SPEC
 

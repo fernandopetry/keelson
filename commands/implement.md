@@ -132,6 +132,8 @@ Revisão por agentes independentes (o implementer **nunca** revisa o próprio tr
 8. **Segurança — via `security-reviewer`** (REJEIÇÃO IMEDIATA): obrigatório quando a mudança toca área sensível (auth, autorização, SQL/consulta, upload, dados pessoais, crypto, sessão/cookies, endpoints, redirect, exec, dependências) e o gate `gates.security` está ativo. Roda o checklist de segurança do `QUALITY-CHARTER` (Art. 2) mapeado na seção de segurança do perfil ativo. Fora desses casos, segurança é coberta pelo Gate 6.
 9. **Comportamento verificado — via `task-verifier`**: obrigatório quando a mudança tem efeito observável (endpoint, UI, regra exercitável). Roda os testes e exercita a app quando o ambiente está disponível. Refactor sem efeito observável dispensa (Gates 1/2 bastam). **Quando `gates.screenVerify` está ativo e o efeito é de tela** e o ambiente desta sessão **não permite exercitá-la** (worktree/nuvem, sem browser): o verifier reporta `PARCIAL` com `handoff_seed` — isso **não é falha de gate** (não consome retry, não bloqueia closure); o gate fica `pendente_handoff` e as seeds são consolidadas num **handoff de verificação** na Etapa 4 (ver `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`, §8). O que o verifier **conseguiu** exercitar (testes, chamadas de endpoint) continua bloqueante se divergir.
 
+**Briefing destilado para os gates dedicados**: ao invocar `security-reviewer`/`task-verifier`, monte no prompt um briefing com o que eles de fato usam — ACs vinculados **copiados literalmente** da SPEC, DECs que tocam o escopo, arquivos da task (`git diff --name-only`), comandos `quality.*` da ficha — e aponte a **seção** do perfil a ler (segurança → seção de segurança; verificação → seção de testes). Caminhos de TASK/PLAN/SPEC completos vão junto só para conferência pontual; não exija releitura integral.
+
 Falha em qualquer gate: motivo específico, 1 retry, depois escala humano. Vulnerabilidade (Gate 8) é sempre bloqueante.
 
 ### 3.4 Closure da task (OBRIGATÓRIA)
@@ -170,7 +172,7 @@ Report incompleto ou inválido: rejeitar, refazer.
 1. **Atualizar TASK-MMM-XXX-*.md**: preencher "Histórico de execução", Status: Done.
 2. **Atualizar TASK-MMM-INDEX.md**: marcar task concluída, atualizar agregados.
 3. **Atualizar INDEX.md do slug**:
-   - Atualizar coluna `Tasks` na linha do PLAN-MMM: de `X/Y` para `(X+1)/Y`.
+   - Atualizar coluna `Tasks` na linha do PLAN-MMM: de `X/Y` para `(X+1)/Y`, com o marcador do contrato do INDEX (method-guide, §6): `🟡` enquanto parcial, `✅` quando todas Done.
    - Atualizar campo `Última atualização`.
    - Se esta é a última task do PLAN (todas Done):
      - Mover capacidade de "Em desenvolvimento" para "Implementadas".

@@ -1,6 +1,6 @@
 ---
 name: task-validator
-description: Valida TASKs SDD (arquivos sob {docsRoot}/*/tasks/TASK-*.md) contra princípios de vinculação ao PLAN, FRs realizados existentes, ACs cobertos, dependências sem ciclos, convenções do CLAUDE.md aplicadas, e estrutura de campos de closure preparados. Ativar automaticamente após /keelson:tasks (gate de qualidade) ou sob demanda. Reporta por severidade e bloqueia execução de TASKs com ERROR.
+description: Valida TASKs SDD (arquivos sob {docsRoot}/*/tasks/TASK-*.md) contra princípios de vinculação ao PLAN, FRs realizados existentes, ACs cobertos, dependências sem ciclos, convenções da ficha/perfil aplicadas, e estrutura de campos de closure preparados. Ativar automaticamente após /keelson:tasks (gate de qualidade) ou sob demanda. Reporta por severidade e bloqueia execução de TASKs com ERROR.
 ---
 
 # Skill: task-validator
@@ -20,12 +20,13 @@ Caminho de uma ou mais `TASK-*.md`. Pode também receber caminho de `TASK-MMM-IN
 
 ## Etapa 0: setup
 
-1. Ler a TASK.
-2. Ler PLAN (`Pertence a`).
-3. Ler SPEC referenciada pelo PLAN.
-4. Ler CLAUDE.md.
-5. Ler outras TASKs do mesmo PLAN.
-6. Inicializar listas.
+1. Ler a **ficha** (`keelson.config.json` na raiz): `docsRoot` (resolve os caminhos `{docsRoot}/...`; sem ficha, assumir `docs/`) e `profile.<role>.file` (perfil ativo — fonte primária das convenções que o `/keelson:tasks` aplica).
+2. Ler a TASK.
+3. Ler PLAN (`Pertence a`).
+4. Ler SPEC referenciada pelo PLAN.
+5. Ler CLAUDE.md se existir (fonte **complementar**; ausência dele, ou omissão de uma convenção nele, nunca gera ERROR).
+6. Ler outras TASKs do mesmo PLAN.
+7. Inicializar listas.
 
 ## Etapa 1: checks estruturais
 
@@ -40,7 +41,7 @@ Caminho de uma ou mais `TASK-*.md`. Pode também receber caminho de `TASK-MMM-IN
 - `Tipo` em `{feature, bugfix, refactor, chore}` (auto-fix para `feature` se ausente)
 
 ### Seções obrigatórias
-- Convenções (do CLAUDE.md)
+- Convenções (do projeto) — o nome que o template do `/keelson:tasks` gera
 - Dependências
 - Contexto
 - Escopo (com Inclui e Não inclui)
@@ -85,7 +86,7 @@ Caminho de uma ou mais `TASK-*.md`. Pode também receber caminho de `TASK-MMM-IN
 ### WARNING se:
 - Critério não-verificável ("usuário fica feliz")
 - Falta critério explícito de cobertura de teste
-- Falta critério explícito de aderência ao CLAUDE.md
+- Falta critério explícito de aderência à ficha/perfil
 
 ## Etapa 5: checks de escopo
 
@@ -99,13 +100,17 @@ Caminho de uma ou mais `TASK-*.md`. Pode também receber caminho de `TASK-MMM-IN
 
 ## Etapa 6: checks de convenções
 
+A fonte primária de convenções é a **ficha/perfil** (o que o `/keelson:tasks` usa para gerar); o CLAUDE.md só conta quando **declara** a convenção explicitamente.
+
 ### ERROR se:
 - Seção "Convenções" ausente
-- Branch sugerida não segue padrão do CLAUDE.md
-- Padrão de commit declarado não bate com CLAUDE.md
+- Padrão de commit declarado contradiz convenção **explícita** do perfil ou do CLAUDE.md (nenhuma declaração → vale o default do gerador, Conventional Commits, sem ERROR)
+
+### WARNING se:
+- Branch sugerida foge do padrão declarado (perfil ou CLAUDE.md); sem padrão declarado, não avaliar
 
 ### Auto-fix se:
-- Convenções vazias mas CLAUDE.md tem dados: preencher
+- Convenções vazias mas ficha/perfil/CLAUDE.md têm dados: preencher
 
 ## Etapa 7: checks do histórico de execução
 
