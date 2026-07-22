@@ -29,7 +29,7 @@ Same engine everywhere; only the ~15-line adapter changes.
 |-------|------------|
 | **Quality Charter** | Nine language-agnostic articles that define "good". Each carries a *falsifiable rule* — how you prove it was met. Proof is external (a test), never a self-checklist. |
 | **Profile Outline** | The mandatory table of contents every language profile fills in — so a Node profile covers the same ground as the PHP one (parity). |
-| **Language profiles** | The Charter *instantiated* for a language/version (`backend/php.md`, `frontend/*`). Ships with PHP; other stacks are **generated on install** from your standard, then reviewed by you. |
+| **Language profiles** | The Charter *instantiated* for a language/version (`backend/php.md`, `frontend/*`). Ships with PHP — the 8.5 exemplar plus a curated legacy ladder (5.6 · 7.0 · 7.4 · 8.0); other stacks are **generated on install** from your standard, then reviewed by you. |
 | **The ficha** (`keelson.config.json`) | The per-project adapter: paths, quality commands, active profile, gates. |
 | **Gates** | The definition of done: tests, lint, scope, security, verified behavior — calibrated to *complexity × risk*, not fixed. |
 
@@ -120,7 +120,10 @@ You never edit the engine. You edit the **ficha**:
 ```
 
 New language or version? `/keelson:init` generates a candidate profile from your
-standard and marks it `reviewed: false` until you sign off. Profiles you refine can be
+standard and marks it `reviewed: false` until you sign off. When the language ships
+embedded profiles (PHP), the generator starts from the **nearest embedded version
+below** the project's and writes only the delta — never from a higher version, whose
+recommendations wouldn't exist in your runtime. Profiles you refine can be
 contributed back to the plugin — that's how it grows, by curation, not by empty stubs.
 
 ## Repository layout
@@ -134,7 +137,7 @@ keelson/
 ├── guidelines/
 │   ├── _meta/         # QUALITY-CHARTER.md · PROFILE-OUTLINE.md
 │   ├── core/          # language-agnostic doctrine (always active)
-│   ├── backend/       # php.md (reference example) · none.md
+│   ├── backend/       # php.md (8.5 exemplar) · php-{5.6,7.0,7.4,8.0}.md (legacy ladder) · none.md
 │   └── frontend/      # none.md (others generated on install)
 ├── templates/         # keelson.config.example.json · keelson.local.example.json · CLAUDE block
 └── docs/_meta/        # method guide, decisions, learning log
@@ -142,7 +145,8 @@ keelson/
 
 ## Status
 
-`0.4.0` — early. The engine and the PHP reference profile are the stable core; the
+`0.5.0` — early. The engine and the PHP reference profile are the stable core; the
+legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending drafts, and the
 profile generator and non-PHP profiles are evolving. Feedback and profile
 contributions welcome.
 

@@ -328,6 +328,18 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **Aplicação**: `commands/change.md` → `commands/triage.md` (git mv) + atualização de todas as referências (README, method-guide, CLAUDE.keelson-block, WORKFLOW.md, skills/state, commands que o citam, este arquivo). Entra na 0.4.0.
 
+### 4.19 Perfis PHP legados embarcados + resolução de versão pelo mais próximo abaixo
+
+**Problema**: o plugin embarca um único perfil PHP (8.5, exemplar). Projeto consumidor em versão legada (5.6, 7.x, 8.0 — onde o legado real estaciona) recebia perfil gerado na hora pelo `profile-writer`, `reviewed: false`, com as inferências de segurança por confirmar — justamente nas versões EOL, onde doutrina de segurança refinada mais importa (sem patch de segurança, `mcrypt`, sem `strict_types` em 5.6). E não havia regra explícita de **qual base usar** quando a versão detectada não tem perfil exato.
+
+**Decisão (do humano)**: embarcar uma **escada de perfis PHP legados** curados — **5.6, 7.0, 7.4 e 8.0** (`guidelines/backend/php-<versão>.md`) — escolhidos por "onde o mundo legado parou", não por intervalo regular: 5.6 fecha a linha 5.x; 7.0 é o piso da era 7; 7.4 é onde a maioria do legado 7.x estacionou; 8.0 é o divisor da era 8 (entre 8.0 e o exemplar 8.5 o delta é incremental). Rascunhos nascem do `profile-writer` com o exemplar como referência de rigor e cada um é promovido a `reviewed: true` por revisão humana individual.
+
+**Regra de resolução (a base vem sempre POR BAIXO)**: no `/keelson:init`: (1) perfil embarcado exato → ativa direto; (2) sem exato → a base é o perfil embarcado **mais próximo abaixo** da versão do projeto, e o `profile-writer` escreve só o **delta** (o que a versão do projeto adiciona); (3) sem nenhum abaixo → gerar do zero, usando o mais próximo acima apenas como referência de formato/rigor, nunca como fonte de recomendação de recurso. Motivo: perfil **recomenda recursos**; base de versão maior recomenda o que não existe no projeto (código que passa no lint e quebra em runtime — aviso do próprio exemplar); base de versão menor só recomenda o que existe, e o delta é trabalho aditivo seguro.
+
+**Custo assumido**: cada perfil replica a espinha do charter (seções 0–12) e carrega `charter:` no frontmatter — mudança de charter passa a reconciliar ~6 perfis, não 1. Aceito: o refino centralizado (sobretudo a §6 de segurança em versão EOL) paga o custo. O exemplar permanece `php.md`, sem rename — fichas de consumidores já referenciam `plugin:backend/php.md`.
+
+**Aplicação**: `guidelines/backend/php-{5.6,7.0,7.4,8.0}.md` (novos, `reviewed: false` até revisão), Etapa 3 de `commands/init.md` (regra de resolução), `agents/profile-writer.md` (modo derivação com base embarcada), `README.md` (conceito de perfis, layout, status). Plugin 0.4.0 → 0.5.0.
+
 ---
 
 ## 5. Quality gates inegociáveis
