@@ -3,7 +3,7 @@ description: Faz triagem de uma demanda nova e roteia para SPEC, PLAN, TASK ou a
 argument-hint: <descrição em linguagem natural> [--slug=<nome>]
 ---
 
-# /keelson:change
+# /keelson:triage
 
 Você é um Engineering Manager especialista em SDD. Sua função é fazer **triagem** de uma demanda nova e decidir o roteamento correto: SPEC, PLAN, TASK ou ação direta. Não execute o trabalho. Apenas direcione.
 
@@ -12,7 +12,7 @@ Você é um Engineering Manager especialista em SDD. Sua função é fazer **tri
 ## Input
 
 ```
-/keelson:change <descrição em linguagem natural> [--slug=<nome>]
+/keelson:triage <descrição em linguagem natural> [--slug=<nome>]
 ```
 
 A descrição pode ser uma frase ("mude o filtro de data para aceitar intervalo") ou um briefing maior.
@@ -126,7 +126,7 @@ Fazer até **3 perguntas** focadas para classificar a demanda. Adapte ao context
 > 
 > Recomendação: faça a mudança direto no código, commit no padrão do projeto.
 > 
-> Não vou criar SPEC, PLAN nem TASK para isso. Se a mudança crescer, retorne com /keelson:change."
+> Não vou criar SPEC, PLAN nem TASK para isso. Se a mudança crescer, retorne com /keelson:triage."
 
 ### Categoria 6: Inconclusivo
 
@@ -135,7 +135,7 @@ Fazer até **3 perguntas** focadas para classificar a demanda. Adapte ao context
 > - <ponto 1>
 > - <ponto 2>
 > 
-> Refine e rode `/keelson:change` novamente."
+> Refine e rode `/keelson:triage` novamente."
 
 ## Etapa 4: confirmação e execução opcional
 
@@ -150,7 +150,7 @@ Fazer até **3 perguntas** focadas para classificar a demanda. Adapte ao context
 Adicionar entrada no **histórico do INDEX.md do slug**:
 
 ```
-- <YYYY-MM-DD HH:MM>: /keelson:change classificou demanda "<descrição curta>" como <categoria>, ação: <comando ou "trivial">
+- <YYYY-MM-DD HH:MM>: /keelson:triage classificou demanda "<descrição curta>" como <categoria>, ação: <comando ou "trivial">
 ```
 
 ## Output ao usuário
@@ -174,7 +174,7 @@ Adicionar entrada no **histórico do INDEX.md do slug**:
 "Posso prosseguir com <ação>?"
 ```
 
-## Quando NÃO usar /keelson:change
+## Quando NÃO usar /keelson:triage
 
 - Quando você já sabe exatamente o que fazer (vá direto pro `/keelson:specify`, `/keelson:plan` ou `/keelson:tasks`).
 - Para triviais óbvios.
@@ -182,7 +182,7 @@ Adicionar entrada no **histórico do INDEX.md do slug**:
 
 ## Limites
 
-O /keelson:change **não**:
+O /keelson:triage **não**:
 - Executa SPEC, PLAN ou TASK sem confirmação.
 - Decide se uma decisão de produto está certa (só classifica).
 - Modifica SPECs, PLANs ou TASKs existentes (o único registro que faz é a linha de triagem no histórico do INDEX — Etapa 5).

@@ -73,6 +73,38 @@ Then work the cycle:
 
 or `/keelson:auto` for the autonomous end-to-end cycle.
 
+## Commands
+
+**The cycle** — each step gated by its validator:
+
+| Command | What it does |
+|---------|--------------|
+| `/keelson:specify` | Capture a functional SPEC (EARS requirements, Given-When-Then ACs), tech-agnostic |
+| `/keelson:plan` | Turn an approved SPEC into a technical PLAN (components, DEC decisions with alternatives) |
+| `/keelson:tasks` | Break a PLAN into atomic TASKs ordered in waves, closure fields prepared |
+| `/keelson:implement` | Execute the PLAN wave by wave via subagents (implementer → reviewer + dedicated gates) |
+
+**Orchestration** — how you enter the cycle:
+
+| Command | What it does |
+|---------|--------------|
+| `/keelson:auto` | The default: full cycle end-to-end — critical questions once at kickoff, then no per-step approval |
+| `/keelson:guiado` | Opt-in paused cycle — checkpoints at SPEC and PLAN for your OK |
+| `/keelson:refine` | Polish a raw idea into a refined prompt before it becomes a demand |
+| `/keelson:triage` | Triage a new demand — routes to SPEC, PLAN, TASK or direct action (classifies, doesn't execute) |
+
+**Support:**
+
+| Command | What it does |
+|---------|--------------|
+| `/keelson:init` | Interactive setup — detects the stack, writes the ficha and the `CLAUDE.md` block |
+| `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
+| `/keelson:audit` | On-demand dependency audit against known vulnerabilities (CVE/NVD); `full` adds hygiene (outdated, abandoned, licenses) |
+| `/keelson:state` | Executive summary of a slug's current state — what's done, in flight, planned |
+| `/keelson:migrate-legacy` | Migrate a legacy slug (docs without `INDEX.md`) to the SDD layout |
+| `/keelson:rebuild-index` | Rebuild a slug's `INDEX.md` from scratch out of its artifacts |
+| `/keelson:verify-handoff` | Close a pending screen-verification handoff produced in an environment without display |
+
 ## How customization works
 
 You never edit the engine. You edit the **ficha**:
@@ -110,7 +142,7 @@ keelson/
 
 ## Status
 
-`0.2.4` — early. The engine and the PHP reference profile are the stable core; the
+`0.4.0` — early. The engine and the PHP reference profile are the stable core; the
 profile generator and non-PHP profiles are evolving. Feedback and profile
 contributions welcome.
 

@@ -125,7 +125,7 @@ Criar `{docsRoot}/<slug>/INDEX.md` — as seções extraídas (Resumo, Capacidad
 
 ## SPECs
 
-(vazio: este slug foi migrado sem SPECs retroativas. Mudanças futuras geram SPECs a partir de agora via /keelson:change.)
+(vazio: este slug foi migrado sem SPECs retroativas. Mudanças futuras geram SPECs a partir de agora via /keelson:triage.)
 
 ## PLANs
 
@@ -158,7 +158,7 @@ Arquivos preservados em `{docsRoot}/<slug>/legacy/`:
 
 Esses arquivos descrevem o estado do slug conforme entendido antes da migração SDD. São referência histórica.
 
-**Importante**: o conteúdo desses arquivos não está vinculado a SPECs ou PLANs. Para qualquer mudança futura, use `/keelson:change` que vai criar nova SPEC.
+**Importante**: o conteúdo desses arquivos não está vinculado a SPECs ou PLANs. Para qualquer mudança futura, use `/keelson:triage` que vai criar nova SPEC.
 
 ## Histórico recente
 
@@ -208,7 +208,7 @@ Corrija no `legacy/TRIAGE-<data>.md` (fonte durável) e reespelhe no INDEX — o
 
 ## Próximos passos
 1. Revisar o INDEX.md gerado.
-2. Para mudança no slug: `/keelson:change "descrição"`. Vai criar nova SPEC.
+2. Para mudança no slug: `/keelson:triage "descrição"`. Vai criar nova SPEC.
 3. A skill `state` agora funciona neste slug.
 ```
 

@@ -110,7 +110,8 @@ Responde: *como se prova comportamento nesta linguagem?*
 
 Responde: *como se adiciona e audita dependência?*
 - gerenciador de pacotes e arquivo de lock;
-- política de versão; como auditar vulnerabilidade conhecida;
+- política de versão; como auditar vulnerabilidade conhecida: **nomear a ferramenta de
+  auditoria** e o advisory database que ela consulta (sincronizado com o CVE/NVD);
 - o que evitar (dependência abandonada, licença incompatível).
 
 ## 9. Reúso: o que já existe `[obrigatória]`  → Charter Art. 3

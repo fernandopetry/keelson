@@ -73,7 +73,7 @@ keelson/
 **Motivo**: `/keelson:*` agrupa visualmente no tab completion, comunica o intent (é o keelson agindo) e separa dos demais comandos do projeto, sem precisar inventar prefixo. Dentro do plugin, skills e agents ficam com nomes curtos (`spec-validator`, `task-implementer`, `security-reviewer`) porque o pacote já dá o escopo.
 
 **Aplicação**:
-- Commands: `/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `/keelson:implement`, `/keelson:change`, `/keelson:rebuild-index`, `/keelson:migrate-legacy`, `/keelson:auto`, `/keelson:guiado`, `/keelson:refine`, `/keelson:integrate`
+- Commands: `/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `/keelson:implement`, `/keelson:triage`, `/keelson:rebuild-index`, `/keelson:migrate-legacy`, `/keelson:auto`, `/keelson:guiado`, `/keelson:refine`, `/keelson:integrate`, `/keelson:verify-handoff`, `/keelson:audit`
 - Skills: `spec-validator`, `plan-validator`, `task-validator`, `state`
 - Agents: `task-implementer`, `task-reviewer`, `security-reviewer`, `task-verifier`, `product-critic`, `process-tuner`
 
@@ -119,15 +119,15 @@ keelson/
 
 **Roteamento por tipo**:
 - `feature`: vem de PLAN, sai do `/keelson:tasks`.
-- `bugfix`: criada via `/keelson:change` ou direto. Aponta para AC violado.
-- `refactor`: criada via `/keelson:change` ou direto. Critério: zero mudança de comportamento observável.
+- `bugfix`: criada via `/keelson:triage` ou direto. Aponta para AC violado.
+- `refactor`: criada via `/keelson:triage` ou direto. Critério: zero mudança de comportamento observável.
 - `chore`: criada manualmente. Sem vínculo obrigatório com FR.
 
 ### 4.5 Slugs legados migrados via comando dedicado
 
 **Decisão**: slugs que existiam antes da adoção do keelson (com README.md mas sem INDEX.md) são migrados via comando dedicado `/keelson:migrate-legacy`, não como feature embutida em outro comando.
 
-**Motivo da separação**: migração é concern temporário (vai parar de ser usado quando o legado acabar). Não deve poluir o `/keelson:change`, que é concern permanente.
+**Motivo da separação**: migração é concern temporário (vai parar de ser usado quando o legado acabar). Não deve poluir o `/keelson:triage`, que é concern permanente.
 
 **O que o comando faz**:
 - Move arquivos `.md` da raiz do slug para `<docsRoot>/<slug>/legacy/`.
@@ -144,7 +144,7 @@ keelson/
 
 **Política**: aplicação **on-demand**, quando você decide mexer no slug. Não migramos preventivamente.
 
-**Mudanças em slug migrado**: como não há SPEC anterior, qualquer mudança via `/keelson:change` gera **nova SPEC** (sem supersede). Construímos o histórico keelson daquele slug a partir do ponto da migração.
+**Mudanças em slug migrado**: como não há SPEC anterior, qualquer mudança via `/keelson:triage` gera **nova SPEC** (sem supersede). Construímos o histórico keelson daquele slug a partir do ponto da migração.
 
 ### 4.6 Documentação autônoma; README por feature descontinuado
 
@@ -209,7 +209,7 @@ A distinção-chave: "esta *mudança* precisa de doc?" (trivial → não) ≠ "e
 
 Slug próprio só se justifica para domínio distinto; faceta/regra de um domínio já existente entra no slug do domínio.
 
-**Aplicação**: passo de resolução de slug do `/keelson:specify` e triagem do `/keelson:change`. Reforça a regra de ouro #6 e a decisão 4.5 (migração de legado).
+**Aplicação**: passo de resolução de slug do `/keelson:specify` e triagem do `/keelson:triage`. Reforça a regra de ouro #6 e a decisão 4.5 (migração de legado).
 
 **Garantia**: instrução explícita nos dois comandos, com o contraste "faceta de um domínio existente" vs "slug paralelo novo". Não há hook determinístico; a robustez vem do passo **obrigatório** de detecção de slug de domínio antes de criar qualquer slug novo.
 
@@ -295,6 +295,39 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **Natureza**: como os irmãos — heurístico no sentido de que não *prova* que a revisão rodou (cutuca para forçá-la); anti-renudge por fingerprint em `.git/` (mesma mudança não re-bloqueia); fallback gracioso sem `jq`/ficha. Terceiro da família doc-guard (4.6) / security-guard (4.8).
 
+### 4.16 Gate de segurança: superset OWASP multi-edição + CVE por ferramenta
+
+**Problema**: o checklist de `guidelines/core/SECURITY.md` usava a taxonomia OWASP 2021 de facto, sem citar edição; categorias que mudam entre edições ficavam sem dono nomeado (Supply Chain promovida a A03 em 2025, Mishandling of Exceptional Conditions criada em 2025, CSRF extinta como categoria desde 2013 mas ainda relevante). E não havia noção de vulnerabilidade **conhecida** (CVE/NVD): a única auditoria concreta era `composer audit` no perfil PHP; projeto sem perfil ficava sem auditoria **em silêncio**. (Origem: sugestão externa avaliada — "OWASP Top 10 de todos os anos" + "procurar CVEs no NVD".)
+
+**Decisão (do humano)**:
+- **Superset consolidado, não N listas por ano**: tabela única ano-agnóstica com a **união** das categorias de todas as edições (2003→2025) e coluna de mapeamento (`A06:2021 · A03:2025`), com link para o repositório oficial das edições. Colar as listas por ano duplicaria ~80% do conteúdo (parcimônia do Charter).
+- **CVE por ferramenta local, nunca de memória**: o `security-reviewer` roda a auditoria do ecossistema via Bash (advisory databases sincronizam com o CVE/NVD) e **cita o CVE/advisory ID vindo da saída da ferramenta** (campo `cve` no report). LLM não afirma nem descarta CVE de memória (alucinação). Nenhuma ferramenta disponível → achado `media` "auditoria indisponível" (**fail-visible**, não bloqueante sozinho). Consulta online ao NVD dentro do gate foi descartada (lento/sujeito a falha de rede).
+- **Dependência é sensível por definição**: o `security-guard.sh` passa a disparar também quando o diff da branch toca manifesto/lockfile de dependência, independente dos `sensitiveGlobs` — "mudança de dependências" já era gatilho declarado do gate 8, mas sem garantia determinística.
+
+**Sincronia**: CSRF e `samesite` estavam no checklist do agente mas não nomeados no core (dessincronia corrigida — CSRF agora é linha do superset, dona única da regra); `PROFILE-OUTLINE.md` §8 passa a exigir que todo perfil nomeie a ferramenta de auditoria e o advisory database que ela consulta.
+
+**Aplicação**: `guidelines/core/SECURITY.md` (superset + seção *Dependências & CVE (NVD)*), `agents/security-reviewer.md` (checklist sincronizado + seção *Auditoria de dependências*), `guidelines/_meta/PROFILE-OUTLINE.md` §8, `guidelines/backend/php.md` §8, `hooks/security-guard.sh`. Charter **intocado** (Art. 2 não muda; a doutrina o instancia melhor). Plugin 0.3.1 → 0.4.0.
+
+### 4.17 `/keelson:audit`: auditoria de dependências fora do ciclo de task (complementa 4.16)
+
+**Problema**: a auditoria de CVE da decisão 4.16 é disparada por **diff** (mudança de dependências no gate 8; uma rodada na entrega via `/keelson:integrate`). Isso cobre a *introdução* de pacote vulnerável, mas nunca o *envelhecimento*: CVE publicado **depois** de a dependência entrar não aparece em diff nenhum — o lockfile não mudou. Cobrir isso apertando o gate por task seria desperdício (auditar a cada geração de código sem mudança de pacote) com cobertura ruim.
+
+**Decisão (do humano)**: novo comando **`/keelson:audit [full]`** — auditoria manual de dependências em **momento oportuno escolhido pelo humano** (começo de ciclo, antes de entrega grande, projeto parado). Por padrão só vulnerabilidade conhecida (CVE); `full` inclui higiene (desatualizados, abandonados, licenças), reportada em bloco separado sem inflar severidade. Herda a doutrina da 4.16: resolve a ferramenta pela §8 do perfil ativo (fallback: detecção de lockfile, multi-ecossistema), CVE citado **da saída da ferramenta** (nunca de memória), ecossistema sem ferramenta → `INDISPONÍVEL` fail-visible (não instala nada sozinho).
+
+**Fronteiras**: o comando **não atualiza dependência** — achado vira **oferta de demanda** de upgrade pelo ciclo normal (upgrade toca lockfile → gate 8 dispara). E não substitui cobertura contínua: é pull-based (só roda se alguém rodar); o próprio report lembra que Dependabot/Renovate ou CI agendada são o instrumento de calendário — divisão de trabalho: **o gate cobre a introdução (evento de diff), a plataforma cobre o envelhecimento (evento de calendário), o `/keelson:audit` é o instrumento manual entre os dois**.
+
+**Aplicação**: `commands/audit.md` (novo), nota "Quando roda" em `guidelines/core/SECURITY.md`, §3.12 do `method-guide.md`, lista de comandos do `templates/CLAUDE.keelson-block.md`. Entra na 0.4.0 junto com a 4.16.
+
+### 4.18 Rename: `/keelson:change` → `/keelson:triage`
+
+**Problema**: todos os comandos são verbos que descrevem **a ação do comando** (`specify` especifica, `plan` planeja, `audit` audita) — mas `change` não muda nada: ele classifica e roteia. O nome descrevia o *input* ("tenho uma mudança") em vez da *ação*, sugerindo o oposto do princípio do comando ("classifica, não executa"). A própria doutrina já usava o vocabulário certo em toda parte: a description dizia "faz **triagem**", o output se chamava `# Triagem:`, o §3.5 do method-guide se chamava "triagem de demanda nova" — só o nome do comando tinha ficado para trás.
+
+**Decisão (do humano)**: renomear para **`/keelson:triage`** — descreve a ação, mantém o padrão verbo-inglês e é cognato de "triagem", o termo consagrado na doutrina. **Corte limpo**, sem stub de depreciação: o plugin está em 0.x declarado "early" e o custo de renomear nunca será menor; um stub seria inchaço com data de remoção que alguém precisaria lembrar.
+
+**Alternativas descartadas**: `route` (descreve o resultado, não a análise), `classify` (correto porém burocrático), `intake` (menos óbvio), manter `change` (perpetua o desalinhamento).
+
+**Aplicação**: `commands/change.md` → `commands/triage.md` (git mv) + atualização de todas as referências (README, method-guide, CLAUDE.keelson-block, WORKFLOW.md, skills/state, commands que o citam, este arquivo). Entra na 0.4.0.
+
 ---
 
 ## 5. Quality gates inegociáveis
@@ -359,7 +392,7 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 ## 7. Roteamento de mudanças
 
-Quando aparece uma demanda nova, usar `/keelson:change` (triagem) ou decidir manualmente:
+Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir manualmente:
 
 | Tipo de mudança | Artefato |
 |---|---|
@@ -368,7 +401,7 @@ Quando aparece uma demanda nova, usar `/keelson:change` (triagem) ou decidir man
 | Bug (implementação ≠ AC) | TASK do tipo bugfix |
 | Refactor sem mudança de comportamento | TASK do tipo refactor |
 | Trivial (typo, copy, cor) | Direto no código |
-| Mexer em slug legado pela primeira vez | `/keelson:migrate-legacy` antes, depois `/keelson:change` |
+| Mexer em slug legado pela primeira vez | `/keelson:migrate-legacy` antes, depois `/keelson:triage` |
 
 ---
 

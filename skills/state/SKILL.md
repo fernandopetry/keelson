@@ -150,7 +150,7 @@ A skill **não**:
 - Modifica nenhum arquivo.
 - Sugere mudanças no código.
 - Decide se algo está certo ou errado tecnicamente.
-- Substitui o `/keelson:change` para roteamento de demandas.
+- Substitui o `/keelson:triage` para roteamento de demandas.
 
 ## Saída de cortesia
 

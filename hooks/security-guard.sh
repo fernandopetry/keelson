@@ -5,6 +5,9 @@
 # parametrizar — nada de caminho sensível hardcoded. Da ficha extrai:
 #   - gates.security  → se `false`, o hook sai sem cutucar;
 #   - sensitiveGlobs  → quais caminhos deste projeto são sensíveis.
+# Além dos globs, manifesto/lockfile de DEPENDÊNCIA é sensível por definição
+# ("mudança de dependências" é gatilho declarado do gate 8) — vigiado sempre,
+# independente dos sensitiveGlobs.
 # Detecta mudança SENSÍVEL na BRANCH e bloqueia o encerramento UMA vez,
 # lembrando de aplicar o gate de segurança (o agent `security-reviewer` OU o
 # checklist de `guidelines/core/SECURITY.md` + a seção de segurança do perfil ativo).
@@ -53,9 +56,8 @@ active="$(printf '%s' "$input" | jq -r '.stop_hook_active // false' 2>/dev/null 
 sec_gate="$(jq -r 'if .gates.security == false then "off" else "on" end' "$config" 2>/dev/null || echo on)"
 [ "$sec_gate" = "off" ] && exit 0
 
-# Globs sensíveis vindos da ficha. Sem eles, nada a vigiar.
+# Globs sensíveis vindos da ficha. Sem eles ainda vigiamos dependências (abaixo).
 sensitive_globs="$(jq -r '.sensitiveGlobs[]?' "$config" 2>/dev/null || true)"
-[ -z "$sensitive_globs" ] && exit 0
 
 cd "$proj" 2>/dev/null || exit 0
 
@@ -86,6 +88,11 @@ untracked_all="$(git ls-files --others --exclude-standard 2>/dev/null || true)"
 changed="$(printf '%s\n%s\n' "$changed" "$untracked_all" | sed '/^$/d' | sort -u)"
 [ -z "$changed" ] && exit 0
 
+# Manifesto/lockfile de dependência mudou? Sensível por definição (gate 8),
+# independente dos sensitiveGlobs.
+DEP_MANIFESTS='composer\.json|composer\.lock|package\.json|package-lock\.json|pnpm-lock\.yaml|yarn\.lock|requirements\.txt|poetry\.lock|uv\.lock|go\.mod|go\.sum|Cargo\.toml|Cargo\.lock|Gemfile|Gemfile\.lock'
+dep_changed="$(printf '%s\n' "$changed" | grep -E "(^|/)(${DEP_MANIFESTS})$" || true)"
+
 # path_matches_any_glob <globs-multilinha> <arquivo> — casa o path contra os globs
 # da ficha (ex.: "src/**"). Em `case`, `*` já casa `/`, então "src/**" pega tudo sob src.
 path_matches_any_glob() {
@@ -107,7 +114,7 @@ while IFS= read -r f; do
   path_matches_any_glob "$sensitive_globs" "$f" && sensitive_files="${sensitive_files}${f}"$'\n'
 done <<< "$changed"
 sensitive_files="$(printf '%s' "$sensitive_files" | sed '/^$/d')"
-[ -z "$sensitive_files" ] && exit 0
+[ -z "$sensitive_files" ] && [ -z "$dep_changed" ] && exit 0
 
 # Padrões sensíveis — heurística (superset de stacks comuns) derivada de
 # guidelines/core/SECURITY.md. Falso-positivo apenas nudga a revisão (lado seguro);
@@ -138,16 +145,20 @@ content_sensitive="$(printf '%s\n%s\n' "$added" "$unt_content" | grep -nEi "$PAT
 # Path sensível por palavra-chave (auth, sql, upload, ...).
 path_sensitive="$(printf '%s\n' "$sensitive_files" | grep -iE '(auth|login|security|permiss|role|password|token|session|upload|payment|crypto|sql|query)' || true)"
 
-if [ -n "$content_sensitive" ] || [ -n "$path_sensitive" ]; then
+if [ -n "$content_sensitive" ] || [ -n "$path_sensitive" ] || [ -n "$dep_changed" ]; then
   # Anti-renudge entre turnos: stop_hook_active só cobre o turno atual.
   git_dir="$(git rev-parse --absolute-git-dir 2>/dev/null || true)"
   marker="" fingerprint=""
   if [ -n "$git_dir" ]; then
     marker="$git_dir/keelson-security-guard.last"
-    fingerprint="$(printf '%s\n%s\n%s' "$sensitive_files" "$content_sensitive" "$path_sensitive" | git hash-object --stdin 2>/dev/null || true)"
+    fingerprint="$(printf '%s\n%s\n%s\n%s' "$sensitive_files" "$content_sensitive" "$path_sensitive" "$dep_changed" | git hash-object --stdin 2>/dev/null || true)"
     if [ -n "$fingerprint" ] && [ -f "$marker" ] && [ "$(cat "$marker" 2>/dev/null)" = "$fingerprint" ]; then
       exit 0
     fi
+  fi
+  dep_note=""
+  if [ -n "$dep_changed" ]; then
+    dep_note=$'\n\nMudança de dependências detectada (gatilho do gate 8):\n'"$dep_changed"$'\nRode a auditoria do ecossistema (a do perfil ativo — ex.: composer audit, npm audit, pip-audit, osv-scanner) e cite o CVE/advisory ID de qualquer achado — nunca de memória.'
   fi
   reason="$(cat <<EOF
 Gate de Segurança (keelson, gate 8): há mudança no código sensível (sensitiveGlobs da ficha) com indícios de auth, SQL, crypto, upload, cookies, exec, I/O de request, redirect ou dependências.
@@ -156,7 +167,7 @@ Antes de encerrar, aplique o gate de segurança:
 - Rode o security-reviewer OU o checklist de guidelines/core/SECURITY.md (e a seção de segurança do perfil ativo) sobre o diff.
 - Confirme: consultas parametrizadas; saída escapada no destino; autorização verificada (negar por padrão); sem segredo/PII em log; cookies httponly/secure/samesite; sem token em storage do cliente; sem renderização crua de dado de usuário.
 
-Se você JÁ revisou a segurança desta mudança, pode encerrar — este aviso não se repetirá para esta mesma mudança.${base_note}
+Se você JÁ revisou a segurança desta mudança, pode encerrar — este aviso não se repetirá para esta mesma mudança.${dep_note}${base_note}
 EOF
 )"
   if [ -n "$marker" ] && [ -n "$fingerprint" ]; then

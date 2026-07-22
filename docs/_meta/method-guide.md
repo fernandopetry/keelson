@@ -18,7 +18,7 @@ keelson: a especificação é a fonte da verdade. Todo desenvolvimento não-triv
 
 Cada etapa gera artefatos em `<docsRoot>/<slug>/` (a raiz vem de `docsRoot` na ficha; `docs/` por padrão) e passa por um **gate de validação automático** (skills `*-validator`). O `INDEX.md` de cada slug é mantido automaticamente pelos comandos — **nunca edite manualmente**.
 
-**Não sabe por onde começar?** Use `/keelson:change "descrição da demanda"` — ele faz triagem e indica o comando certo.
+**Não sabe por onde começar?** Use `/keelson:triage "descrição da demanda"` — ele faz triagem e indica o comando certo.
 
 **Modo padrão = autônomo.** No dia a dia você não roda etapa por etapa: peça a tarefa em linguagem natural (ou use `/keelson:auto`) e o ciclo corre de ponta a ponta — as dúvidas críticas são feitas de uma vez na largada (última chamada) e o restante segue até a entrega, com interrupção no meio só em último caso. Quer aprovar etapa a etapa? Use `/keelson:guiado`. Ver 3.9 e 3.10 e as decisões 4.10/4.13 de `decisions.md`.
 
@@ -127,12 +127,12 @@ Orquestra a implementação wave por wave, usando subagents (`task-implementer` 
 
 **O que ele NÃO faz**: promover Status do PLAN para Done (apenas sugere), deploy, criar PR, resolver conflito de merge, modificar SPEC/PLAN durante a implementação.
 
-### 3.5 `/keelson:change` — triagem de demanda nova
+### 3.5 `/keelson:triage` — triagem de demanda nova
 
 Quando você não sabe se uma demanda vira SPEC, PLAN ou TASK, este comando classifica e roteia. **Não executa nada sem confirmação.**
 
 ```
-/keelson:change <descrição em linguagem natural> [--slug=<nome>]
+/keelson:triage <descrição em linguagem natural> [--slug=<nome>]
 ```
 
 Roteamento que ele aplica:
@@ -215,6 +215,16 @@ Refina um pedido vago **antes** de virar demanda: ancoragem barata no domínio, 
 ```
 /keelson:refine <ideia em linguagem natural ou @arquivo>
 ```
+
+### 3.12 `/keelson:audit` — auditoria manual de dependências (CVE/NVD)
+
+Roda a auditoria de vulnerabilidade conhecida sobre as dependências, **em momento oportuno escolhido por você** (começo de ciclo, antes de entrega grande, projeto parado). Cobre o cenário que os gates por diff não cobrem: CVE publicado **depois** de a dependência entrar. Resolve a ferramenta pela §8 do perfil ativo (fallback: detecção de lockfile), cita o CVE ID da saída da ferramenta (nunca de memória) e reporta ecossistema sem ferramenta como `INDISPONÍVEL` — nunca em silêncio. Achado vira **oferta de demanda** de upgrade pelo ciclo normal; o comando não atualiza nada.
+
+```
+/keelson:audit [full]
+```
+
+`full` inclui higiene (desatualizados, abandonados, licenças). É manual (pull) — para cobertura contínua, Dependabot/Renovate ou CI agendada. Governança: decisão 4.17 de `decisions.md`.
 
 ---
 
@@ -328,8 +338,8 @@ Todo escritor do INDEX (`/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `
 3. **Promoção de Status é manual.** Validators bloqueiam errors, mas quem promove `Draft → Approved → Done` é você, no front-matter do artefato.
 4. **Closure é inegociável.** Task sem "Histórico de execução" preenchido não é Done, mesmo com código pronto.
 5. **Trivial pula o ciclo.** Typo, copy, cor: commit direto no padrão do perfil ativo.
-6. **Legado primeiro migra, depois muda.** Slug sem INDEX.md → `/keelson:migrate-legacy` antes de qualquer `/keelson:change`.
-7. **Na dúvida, `/keelson:change`.** Ele classifica a demanda e te dá o comando pronto.
+6. **Legado primeiro migra, depois muda.** Slug sem INDEX.md → `/keelson:migrate-legacy` antes de qualquer `/keelson:triage`.
+7. **Na dúvida, `/keelson:triage`.** Ele classifica a demanda e te dá o comando pronto.
 8. **Entrega sem tela não silencia o gate 9.** Ambiente sem acesso a testes de tela → **handoff de verificação** obrigatório (ver §8); a entrega é declarada parcial até o handoff ser fechado.
 
 ---

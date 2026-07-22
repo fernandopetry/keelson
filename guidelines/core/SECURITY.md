@@ -11,20 +11,26 @@
 
 ---
 
-## OWASP Top 10 — checklist rápido
+## OWASP Top 10 — superset consolidado (todas as edições)
 
-| # | Vulnerabilidade | Prevenção (agnóstica) |
-|---|-----------------|-----------------------|
-| A01 | **Broken Access Control** | Verificar autorização em **toda** ação; **negar por padrão** |
-| A02 | **Cryptographic Failures** | Hash de senha com algoritmo dedicado, com sal e custo (ex.: Argon2/bcrypt/scrypt); TLS em trânsito; nunca logar dado sensível |
-| A03 | **Injection** | Consultas/comandos **parametrizados**; escapar a saída no destino; validar a entrada |
-| A04 | **Insecure Design** | Validar sempre no servidor; **nunca** confiar no cliente |
-| A05 | **Security Misconfiguration** | Debug desligado em produção; cabeçalhos de segurança |
-| A06 | **Vulnerable Components** | Auditar dependências com a ferramenta do ecossistema; manter atualizado |
-| A07 | **Auth Failures** | Rate limiting; MFA; sessões seguras |
-| A08 | **Data Integrity Failures** | Verificar integridade de uploads e artefatos; CSP |
-| A09 | **Logging Failures** | Logar tentativas de acesso; **nunca** logar senhas/tokens/PII |
-| A10 | **SSRF** | Validar/allowlist de URLs externas; recusar IPs internos |
+As categorias mudam de nome e posição entre edições (2003→2025), mas os ataques não
+morrem com elas — esta tabela cobre a **união** das edições, com o mapeamento de cada
+categoria. Texto integral de cada edição: <https://github.com/OWASP/Top10>.
+
+| Categoria | Edições | Prevenção (agnóstica) |
+|-----------|---------|-----------------------|
+| **Broken Access Control** | A01:2021 · A01:2025 | Verificar autorização em **toda** ação; **negar por padrão** |
+| **Cryptographic Failures** | A02:2021 · A04:2025 | Hash de senha com algoritmo dedicado, com sal e custo (ex.: Argon2/bcrypt/scrypt); TLS em trânsito; nunca logar dado sensível |
+| **Injection** (inclui XSS) | A03:2021 · A05:2025 | Consultas/comandos **parametrizados**; escapar a saída no destino; validar a entrada |
+| **Insecure Design** | A04:2021 · A06:2025 | Validar sempre no servidor; **nunca** confiar no cliente |
+| **Security Misconfiguration** (inclui XXE) | A05:2021 · A02:2025 | Debug desligado em produção; cabeçalhos de segurança; parser XML sem entidades externas |
+| **Software Supply Chain Failures** (amplia Vulnerable Components) | A06:2021 · A03:2025 | Lockfile commitado; auditar dependências contra o advisory database do ecossistema (ver seção *Dependências & CVE* abaixo); conferir a procedência do pacote (typosquatting) |
+| **Authentication Failures** | A07:2021 · A07:2025 | Rate limiting; MFA; sessões seguras |
+| **Software/Data Integrity Failures** (inclui deserialização insegura) | A08:2021 · A08:2025 | Verificar integridade de uploads e artefatos; CSP; nunca deserializar entrada não confiável |
+| **Security Logging & Alerting Failures** | A09:2021 · A09:2025 | Logar tentativas de acesso; **nunca** logar senhas/tokens/PII |
+| **SSRF** | A10:2021 · absorvido em A01:2025 | Validar/allowlist de URLs externas; recusar IPs internos |
+| **Mishandling of Exceptional Conditions** | A10:2025 | Erro trata **fail-closed** — exceção nunca deixa recurso em estado permissivo; detalhe interno não chega à resposta |
+| **CSRF** | categoria própria até 2013 | Token anti-CSRF em mutações autenticadas por cookie; `samesite` no cookie de sessão |
 
 ---
 
@@ -77,10 +83,35 @@ para qualquer stack:
 
 - **Segredos** vêm de configuração/secret store — **nunca** hardcoded, **nunca** em log,
   **nunca** em URL. Token de autenticação não mora em armazenamento acessível a script do
-  cliente; use transporte seguro (ex.: cookie `httpOnly`/`secure`).
+  cliente; use transporte seguro (ex.: cookie `httpOnly`/`secure`/`samesite`).
 - **Saída** para qualquer contexto (HTML, shell, SQL, log) é **escapada no destino**, no
   formato daquele contexto. Não renderize dado de usuário cru.
 - **PII** não vai para log nem para telemetria sem necessidade.
+
+---
+
+## Dependências & CVE (NVD)
+
+Vulnerabilidade **conhecida** tem registro público: o **CVE** (Common Vulnerabilities and
+Exposures), catalogado no **NVD** (<https://nvd.nist.gov/>). A checagem é sempre por
+**ferramenta** — o auditor do ecossistema consulta um advisory database sincronizado com
+o CVE/NVD:
+
+- **Rodar a ferramenta de auditoria do ecossistema** sobre o lockfile — a nomeada no
+  perfil ativo (ex.: `composer audit`, `npm audit`, `pip-audit`, `govulncheck`,
+  `cargo audit`, `bundler-audit`; `osv-scanner` como genérico).
+- Achado de dependência vulnerável **cita o CVE/advisory ID** vindo da saída da
+  ferramenta. **Nunca** afirmar ou descartar um CVE de memória — sem ferramenta, não há
+  resposta confiável.
+- Sem ferramenta disponível para o ecossistema → a lacuna **DEVE** ser reportada
+  ("auditoria de dependências indisponível"), nunca silenciada.
+- Lockfile **commitado**; mudança de dependência é sensível por definição (gatilho do
+  gate de segurança).
+- **Quando roda**: no gate, apenas quando a mudança toca dependências (manifesto/
+  lockfile) — e uma vez na entrega. CVE publicado **depois** de a dependência entrar não
+  aparece em diff nenhum: esse caso exige auditoria **fora do ciclo de task** — manual em
+  momento oportuno (`/keelson:audit`) e, para cobertura contínua, alertas do repositório
+  (Dependabot/Renovate) ou CI agendada, que não são papel do gate.
 
 ---
 
@@ -94,4 +125,6 @@ para qualquer stack:
 - [ ] Segredos e tokens fora do código, do log e da URL; sessão em transporte seguro
 - [ ] Sem dado sensível/PII em logs
 - [ ] Redirecionamentos e uploads restritos por allowlist
-- [ ] Dependências auditadas
+- [ ] Mutação autenticada por cookie exige token anti-CSRF
+- [ ] Erro/exceção trata fail-closed; sem stack trace/detalhe interno na resposta
+- [ ] Dependências auditadas contra o advisory database (CVE), com lockfile commitado

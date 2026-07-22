@@ -123,7 +123,7 @@ Toda tarefa não trivial segue o ciclo abaixo; cada etapa gera artefatos em
      (SPEC)            (PLAN)          (TASKs)            (código)
 ```
 
-- **Não sabe como rotear uma demanda nova?** `/keelson:change "<descrição>"` faz a triagem.
+- **Não sabe como rotear uma demanda nova?** `/keelson:triage "<descrição>"` faz a triagem.
 
 ### Execução de código (protocolo proporcional)
 
@@ -187,7 +187,7 @@ O fluxo modela um time de engenharia — a separação de poderes é intencional
 | QA de artefatos (lint) | `spec/plan/task-validator` | IA |
 | Integrador (suíte + PR) | `/keelson:integrate` | IA até o PR; **humano mergeia/deploya** |
 | Analista de estado | `state` | IA (read-only) |
-| Triador de demandas | `/keelson:change` | IA |
+| Triador de demandas | `/keelson:triage` | IA |
 | Aprovador / dono / escalonamento | — | **humano** |
 
 Separação de poderes: quem implementa ≠ quem revisa código ≠ quem revisa segurança ≠ quem

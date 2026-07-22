@@ -296,7 +296,7 @@ E sugerir a integração (não executar):
 1. Revisar mudanças no working tree
 2. Code review humano em mudanças sensíveis
 3. Atualizar Status do PLAN se aplicável
-4. Considerar próximo PLAN ou /keelson:change para nova demanda
+4. Considerar próximo PLAN ou /keelson:triage para nova demanda
 ```
 
 ## Comportamento em caso de falha

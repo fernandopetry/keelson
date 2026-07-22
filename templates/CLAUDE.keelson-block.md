@@ -38,9 +38,10 @@ o que é específico deste projeto vive na **ficha** e nos guidelines locais.
 
 `/keelson:init` (configurar/reparar a ficha) · `/keelson:specify` · `/keelson:plan` ·
 `/keelson:tasks` · `/keelson:implement` · `/keelson:auto` (ciclo autônomo, default) ·
-`/keelson:guiado` (ciclo com checkpoints) · `/keelson:refine` · `/keelson:change` ·
+`/keelson:guiado` (ciclo com checkpoints) · `/keelson:refine` · `/keelson:triage` ·
 `/keelson:integrate` · `/keelson:migrate-legacy` (slug legado) · `/keelson:rebuild-index` ·
-`/keelson:state` (consulta de estado) · `/keelson:verify-handoff` (fecha o gate de tela remoto).
+`/keelson:state` (consulta de estado) · `/keelson:verify-handoff` (fecha o gate de tela remoto) ·
+`/keelson:audit` (auditoria manual de dependências — CVE/NVD).
 
 <!-- ============================================================= -->
 <!-- fim do bloco keelson                                          -->

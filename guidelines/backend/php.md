@@ -432,7 +432,8 @@ middlewares de produção.
   garante a versão exata em CI/produção. `composer install` em CI (respeita o lock),
   `composer update` só deliberadamente.
 - **Auditar vulnerabilidade conhecida:** `composer audit` no pipeline (consulta o advisory
-  database) — reprovar em vulnerabilidade de severidade relevante.
+  database do ecossistema PHP, sincronizado com o CVE/NVD) — reprovar em vulnerabilidade de
+  severidade relevante, **citando o CVE/advisory ID** reportado.
 - **Higiene:** `composer outdated` para atrasos; evite pacote **abandonado** (o Packagist
   marca `abandoned`) e confira **licença** compatível antes de adicionar.
 - **Autoload PSR-4:** classe nova exige `composer dump-autoload` (ou `-o` em produção) para
