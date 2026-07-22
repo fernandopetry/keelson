@@ -116,10 +116,20 @@ done <<< "$changed"
 sensitive_files="$(printf '%s' "$sensitive_files" | sed '/^$/d')"
 [ -z "$sensitive_files" ] && [ -z "$dep_changed" ] && exit 0
 
-# Padrões sensíveis — heurística (superset de stacks comuns) derivada de
-# guidelines/core/SECURITY.md. Falso-positivo apenas nudga a revisão (lado seguro);
-# a prova de verdade é o security-reviewer + o perfil ativo.
-PATTERN='password|passwd|senha|token|secret|api[_-]?key|argon2|bcrypt|password_hash|hash_equals|setcookie|session|csrf|->prepare|->query|->exec\(|SELECT |INSERT |UPDATE |DELETE |\bpdo\b|mysqli|shell_exec|system\(|proc_open|popen|\$_GET|\$_POST|\$_REQUEST|\$_COOKIE|header\(|move_uploaded_file|file_get_contents|file_put_contents|unserialize|curl_|localStorage|sessionStorage|v-html|innerHTML|dangerouslySetInnerHTML|redirect|permission|authoriz'
+# Padrões sensíveis — heurística multi-linguagem derivada das categorias de
+# guidelines/core/SECURITY.md, composta por categoria (PHP/JS/Python/Go/Java/Ruby).
+# Falso-positivo apenas nudga a revisão (lado seguro); a prova de verdade é o
+# security-reviewer + o perfil ativo. Grep roda com -i (case-insensitive).
+P_SECRET='password|passwd|senha|token|secret|api[_-]?key|credential|jwt|argon2|bcrypt|scrypt|pbkdf2|password_hash|hash_equals|hmac'
+P_AUTHZ='csrf|session|cookie|permission|authoriz|redirect'
+P_SQL='SELECT |INSERT |UPDATE |DELETE |->prepare|->query|->exec\(|\bpdo\b|mysqli|cursor\.execute|prepareStatement|createStatement|executeQuery|\bjdbc\b|db\.Query|db\.Exec|database/sql|find_by_sql|ActiveRecord|\.raw\('
+P_EXEC='shell_exec|system\(|proc_open|popen|subprocess|child_process|exec\.Command|os/exec|Runtime\.getRuntime|ProcessBuilder'
+P_INPUT='\$_GET|\$_POST|\$_REQUEST|\$_COOKIE|request\.(GET|POST|args|form|json|data)|req\.(query|body|params)|params\[|r\.FormValue|r\.URL\.Query|getParameter|@Request(Param|Body)'
+P_DESER='unserialize|\bpickle\b|yaml\.load|Marshal\.load|ObjectInputStream|readObject|deserializ|render_template_string'
+P_IO='move_uploaded_file|file_get_contents|file_put_contents|curl_|urllib|http\.Get|MultipartFile|\bupload'
+P_FRONT='localStorage|sessionStorage|v-html|innerHTML|dangerouslySetInnerHTML|document\.write|bypassSecurityTrust'
+P_HDR='setcookie|header\(|Set-Cookie'
+PATTERN="${P_SECRET}|${P_AUTHZ}|${P_SQL}|${P_EXEC}|${P_INPUT}|${P_DESER}|${P_IO}|${P_FRONT}|${P_HDR}"
 
 # Pathspec (array indexado — ok em bash 3.2) só com os arquivos sensíveis.
 sens_arr=()
