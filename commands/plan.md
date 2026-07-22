@@ -81,7 +81,8 @@ Conflito irresolvível: parar antes de escrever.
 
 1. **Não revisar a SPEC**.
 2. **Decisões técnicas explícitas**: cada escolha vira `DEC-MMM-XXX` rastreável.
-3. **Trade-offs documentados**: cada DEC lista alternativas.
+3. **Trade-offs documentados**: cada DEC lista alternativas — incluindo a alternativa
+   mais simples (sem o padrão/abstração), com o motivo do descarte.
 4. **Stack vigente herdado** da ficha/perfil sem reescolher.
 5. **Mapeamento FR → componente**.
 6. **Definition of Done do PLAN**.

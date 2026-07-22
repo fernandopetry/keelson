@@ -42,6 +42,8 @@ intuição aponta, e otimizar no escuro troca legibilidade por nada.
   **invalidação**.
 - **Trabalho pesado** (e-mail, import/export, webhooks, processamento longo) vai para
   **jobs/filas assíncronas**, não para o caminho da requisição.
+- **Timeout explícito** em toda chamada de rede (HTTP, banco, fila) — sem timeout, a
+  falha do serviço externo vira travamento do seu.
 
 ---
 

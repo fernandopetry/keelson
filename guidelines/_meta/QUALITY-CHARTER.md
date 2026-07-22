@@ -7,7 +7,7 @@
 >
 > Palavras-chave conforme RFC 2119: **DEVE / NÃO DEVE / DEVERIA / PODE**.
 >
-> **Versão: 0.2.0** — é esta versão que o campo `charter:` do cabeçalho de
+> **Versão: 0.3.0** — é esta versão que o campo `charter:` do cabeçalho de
 > proveniência de cada perfil referencia.
 
 ---
@@ -71,12 +71,17 @@ Cada unidade (função, módulo, camada) **DEVE** ter uma responsabilidade e dep
 **DEVE** ser explícito e isolável. Uma assinatura com muitos parâmetros é sintoma de
 responsabilidade em excesso ou de conceito não agrupado — informações que viajam juntas
 **DEVERIAM** ser agrupadas num objeto com nome de domínio (o perfil dá a forma idiomática).
+Abstração e indireção (interface, fábrica, camada, padrão de projeto) se justificam por uma
+dor **presente** — variação real, isolamento de efeito colateral, testabilidade — nunca por
+antecipação. Padrão é vocabulário para uma solução, não um objetivo.
 
 - **Por quê:** limites nítidos tornam a mudança local, o teste possível e o raciocínio
   barato; acoplamento difuso faz o oposto.
 - **Régua:** a unidade pode ser testada sem levantar o mundo inteiro; trocar um detalhe
   (driver, framework, view) não obriga a reescrever a regra de negócio; a assinatura não
-  carrega uma lista longa de parâmetros soltos onde um conceito nomeado os agruparia.
+  carrega uma lista longa de parâmetros soltos onde um conceito nomeado os agruparia; toda
+  indireção nova responde a uma necessidade demonstrável no diff ou numa DEC — não há
+  interface/hierarquia sem um motivo real (variante existente, porta de I/O ou teste).
 
 ## Art. 5 — Nomear pela intenção
 

@@ -77,6 +77,37 @@ o domínio testável sem infraestrutura (Charter Art. 1 e Art. 4).
 
 ---
 
+## Padrões de projeto: vocabulário, não objetivo
+
+Um padrão nomeia uma **solução para uma dor** — nunca se aplica um padrão para "seguir boas
+práticas". Três perguntas antes de introduzir qualquer padrão (Charter Art. 4):
+
+1. **A dor existe agora, neste diff?** Se é antecipação ("pode variar no futuro"), não aplique.
+2. **A linguagem tem construção idiomática mais simples** que o padrão clássico? O perfil de
+   linguagem responde — muitos padrões viraram feature nativa.
+3. **A escolha molda componentes ou contratos?** Então é uma **DEC no PLAN**, com a
+   alternativa mais simples (sem o padrão) entre as descartadas.
+
+Mapa mínimo dor → padrão (o perfil dá a forma idiomática):
+
+| Dor presente | Padrão |
+|--------------|--------|
+| Condicional que despacha pela mesma variante em vários pontos (Art. 7) | Polimorfismo (Strategy/State) |
+| Construção complexa com invariantes a garantir | Fábrica |
+| Dependência de serviço externo / I/O | Porta + adaptador (regra da dependência) |
+| Vários interessados desconhecidos num acontecimento | Eventos (observer) |
+| Contrato de terceiro incompatível com o do domínio | Adapter |
+
+**Armadilhas por default:** Singleton e estado estático mutável (é o "estado global
+implícito" acima, com nome próprio); herança para reuso de código (prefira composição);
+camada ou abstração genérica "para o futuro" (viola o Art. 4).
+
+*Resiliência distribuída* (circuit breaker, retry + idempotência, saga, outbox) é domínio
+de `guidelines/project/` e de DECs enquanto não houver stack distribuída com perfil —
+quando houver, nasce `core/RESILIENCE.md`.
+
+---
+
 ## Nomear seguindo o vizinho
 
 Antes de nomear um tipo, arquivo, tabela ou coluna, **leia 2–3 vizinhos do mesmo

@@ -67,6 +67,9 @@ Responde: *onde cada tipo de código mora e quais são os limites?*
 - como o efeito colateral é isolado;
 - como a linguagem agrupa parâmetros (objeto de parâmetro/DTO idiomático) e simplifica
   condicionais (guard clause, a construção polimórfica idiomática) — Art. 4 e 7.
+- quais padrões clássicos têm construção idiomática **mais simples** nesta linguagem (e
+  qual), e quais padrões são **armadilha** nesta stack — instancia a seção "Padrões de
+  projeto" de `../core/ARCHITECTURE.md`.
 - *Nota:* a arquitetura **específica do projeto** (nomes de camadas próprios) fica em
   `guidelines/project/`; aqui vai o padrão idiomático da linguagem.
 

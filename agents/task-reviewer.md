@@ -87,6 +87,7 @@ Subitens:
 
 - Legibilidade (nomes claros; nome genérico onde existe nome de domínio mais específico é smell — ver "Sinais de alerta em nomes" no `${CLAUDE_PLUGIN_ROOT}/guidelines/core/CODE-REVIEW.md`).
 - Condicionais e assinaturas (Charter Art. 4, 7): aninhamento profundo onde guard clause/extração resolveria; condicional-por-variante repetida que pede polimorfismo; assinatura longa sem objeto de parâmetro.
+- Abstração especulativa (Charter Art. 4): indireção/padrão sem dor demonstrável no diff e sem DEC que o justifique — sinalizar (bloqueia quando óbvio).
 - Sem código morto, TODO sem dono, trechos comentados.
 - **Reúso / DRY** (Charter Art. 3): o código **não reimplementa** utilitário, validação, helper, conversão ou abstração que **já existe** no projeto. Não basta checar duplicação entre os arquivos novos — verifique se há equivalente canônico já existente que deveria ser usado (ver a seção "Reúso" do perfil de linguagem ativo e `${CLAUDE_PLUGIN_ROOT}/guidelines/core/ARCHITECTURE.md`), inclusive **nos testes** (helpers centralizados de schema/dados: recriar schema ou inserir dados inline quando já existe helper compartilhado = FALHA). Reimplementação local de algo existente = FALHA, mesmo com o código correto. Também checar duplicação entre os próprios arquivos novos (ex.: par Create/Update do mesmo domínio).
 - Tratamento de erro presente.

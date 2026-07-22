@@ -1,7 +1,7 @@
 ---
 lang: php
 version: "8.5"
-charter: 0.2.0
+charter: 0.3.0
 generated-by: exemplar
 reviewed: true
 reviewer: "Fernando Petry"
@@ -171,6 +171,19 @@ arguments* cobrem os opcionais sem inflar a assinatura.
 **Armadilha comum:** SQL ou `$_SESSION`/`getenv()` dentro do UseCase ou da Action —
 vaza detalhe de infraestrutura para dentro da regra de negócio e torna o teste refém do
 ambiente. Detalhe de I/O só na Infrastructure.
+
+**Padrões na prática (PHP 8.5)** — a construção idiomática vem **antes** do padrão
+clássico (ver "Padrões de projeto" em `../core/ARCHITECTURE.md`):
+
+- **Strategy/State** → `enum` com `match` exaustivo ou *first-class callable* antes de
+  hierarquia de classes; hierarquia só quando as variantes carregam estado/dependências.
+- **Factory** → *named constructor* estático (`fromArray()`, `fromRequest()`) antes de
+  classe-fábrica dedicada; fábrica dedicada só quando a construção tem variantes reais.
+- **Observer** → eventos do framework / PSR-14, nunca implementação manual do padrão.
+- **Builder** → desnecessário: *named arguments* + construtor `readonly` resolvem.
+- **Armadilhas PHP:** Singleton e `static` mutável; *service location* (puxar do
+  container) dentro de Domain/Application — a dependência entra pelo construtor;
+  herança para reuso de código (prefira composição).
 
 ---
 
