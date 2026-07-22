@@ -59,12 +59,14 @@ Responde: *como se nomeia, e em que idioma?*
 - idioma do código vs idioma do comentário;
 - padrões de nome que sinalizam papel (interface, teste, DTO…).
 
-## 4. Estrutura & arquitetura `[obrigatória]`  → Charter Art. 4
+## 4. Estrutura & arquitetura `[obrigatória]`  → Charter Art. 4, 7
 
 Responde: *onde cada tipo de código mora e quais são os limites?*
 - unidade de organização (camadas, módulos, pastas) e o que pode depender de quê;
 - onde ficam regra de negócio, I/O, apresentação;
-- como o efeito colateral é isolado.
+- como o efeito colateral é isolado;
+- como a linguagem agrupa parâmetros (objeto de parâmetro/DTO idiomático) e simplifica
+  condicionais (guard clause, a construção polimórfica idiomática) — Art. 4 e 7.
 - *Nota:* a arquitetura **específica do projeto** (nomes de camadas próprios) fica em
   `guidelines/project/`; aqui vai o padrão idiomático da linguagem.
 

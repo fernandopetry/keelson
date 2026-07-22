@@ -91,7 +91,7 @@ Memos de exploração e backups do keelson vivem em `thoughts/local/` no projeto
 Prove que a ficha funciona:
 - `quality.test`/`quality.lint` declarados **existem/rodam** (execução rápida ou `--help`/dry-run);
 - os `codePaths` existem no disco;
-- os guidelines do perfil ativo resolvem: cada `profile.<role>.file` da ficha aponta para um arquivo existente (prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/`; senão relativo à raiz do projeto); perfil com `reviewed: false` no front-matter vira instrução de revisão no relatório;
+- os guidelines do perfil ativo resolvem: cada `profile.<role>.file` da ficha aponta para um arquivo existente (prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/`; senão relativo à raiz do projeto); perfil com `reviewed: false` no front-matter vira instrução de revisão no relatório; perfil cujo `charter:` no front-matter é **menor** que a versão atual do `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md` vira aviso de re-derivação/revisão no relatório (o perfil instancia doutrina desatualizada);
 - se `screenVerify.enabled`: `keelson.local.example.json` existe e está **versionado** (sem senha real); `keelson.local.json` existe **e** está no `.gitignore` (confirme que **não** aparece em `git status`/`git ls-files`); campos ainda em placeholder (`<...>`) viram instrução de preenchimento no relatório (com o aviso dev-only).
 Reporte cada item como ✓/✗. `✗` vira ação no relatório, não é silenciado.
 

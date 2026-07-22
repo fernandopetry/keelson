@@ -7,7 +7,7 @@
 >
 > Palavras-chave conforme RFC 2119: **DEVE / NÃO DEVE / DEVERIA / PODE**.
 >
-> **Versão: 0.1.0** — é esta versão que o campo `charter:` do cabeçalho de
+> **Versão: 0.2.0** — é esta versão que o campo `charter:` do cabeçalho de
 > proveniência de cada perfil referencia.
 
 ---
@@ -34,7 +34,7 @@ exercitada no ambiente real, não só em teste unitário.
 - **Por quê:** quem escreve o código é o pior juiz de que ele funciona; a confiança
   vem de um oráculo independente, não da intenção do autor.
 - **Régua:** existe um teste que cobre o comportamento e que **falha** se o código
-  for rerevertido. Mudança sem teste possível (ex.: refactor de legibilidade) → uma
+  for revertido. Mudança sem teste possível (ex.: refactor de legibilidade) → uma
   passada de revisão independente com contexto limpo.
 
 ## Art. 2 — Seguro por padrão; negar por padrão
@@ -68,23 +68,30 @@ Antes de escrever helper, validação, conversão, componente ou abstração, vo
 
 Cada unidade (função, módulo, camada) **DEVE** ter uma responsabilidade e depender de
 **abstrações**, não de detalhes. Efeito colateral (I/O, rede, banco, estado global)
-**DEVE** ser explícito e isolável.
+**DEVE** ser explícito e isolável. Uma assinatura com muitos parâmetros é sintoma de
+responsabilidade em excesso ou de conceito não agrupado — informações que viajam juntas
+**DEVERIAM** ser agrupadas num objeto com nome de domínio (o perfil dá a forma idiomática).
 
 - **Por quê:** limites nítidos tornam a mudança local, o teste possível e o raciocínio
   barato; acoplamento difuso faz o oposto.
 - **Régua:** a unidade pode ser testada sem levantar o mundo inteiro; trocar um detalhe
-  (driver, framework, view) não obriga a reescrever a regra de negócio.
+  (driver, framework, view) não obriga a reescrever a regra de negócio; a assinatura não
+  carrega uma lista longa de parâmetros soltos onde um conceito nomeado os agruparia.
 
 ## Art. 5 — Nomear pela intenção
 
-Nomes **DEVEM** revelar propósito, não implementação. O idioma de código e o idioma de
-comentário **DEVEM** ser consistentes em toda a base. Código novo **DEVE** ler como o
-código vizinho — mesma convenção, mesma densidade de comentário, mesmo idioma.
+Nomes **DEVEM** revelar propósito, não implementação. O nome **DEVE** cobrir também os
+**efeitos colaterais** da unidade: um `login()` que também envia e-mail ou limpa cache
+surpreende quem chama — é violação mesmo com o efeito isolado atrás de abstração (Art. 4).
+O idioma de código e o idioma de comentário **DEVEM** ser consistentes em toda a base.
+Código novo **DEVE** ler como o código vizinho — mesma convenção, mesma densidade de
+comentário, mesmo idioma.
 
 - **Por quê:** o código é lido muito mais vezes do que escrito; o nome é a documentação
   que nunca desatualiza se disser a intenção.
-- **Régua:** um revisor entende o que a unidade faz pelo nome, sem ler o corpo; não há
-  mistura de convenções/idiomas dentro do mesmo arquivo.
+- **Régua:** um revisor entende o que a unidade faz pelo nome, sem ler o corpo; nenhum
+  efeito colateral relevante fica fora do que o nome anuncia; não há mistura de
+  convenções/idiomas dentro do mesmo arquivo.
 
 ## Art. 6 — Escopo restrito; reversibilidade calibra o rigor
 
@@ -101,12 +108,16 @@ público), mais alto o rigor e mais necessária a **confirmação humana** antes
 
 Clareza **DEVE** vencer esperteza. Comentário **DEVE** explicar o *porquê* (a decisão,
 a armadilha), não parafrasear o *como*. Complexidade acidental **DEVE** ser removida
-antes de comentada.
+antes de comentada. Condicional profundamente aninhada ou difícil de acompanhar é
+complexidade acidental: prefira **retorno antecipado** (guard clause) e **extração de
+método nomeado**; condicional que despacha pela mesma variante/tipo em vários pontos
+pede **polimorfismo** (o perfil dá a construção idiomática).
 
 - **Por quê:** o próximo a manter isto — talvez você em seis meses, talvez um dos 70 —
   paga o custo da esperteza sem o contexto que a gerou.
 - **Régua:** um dev do time, sem contexto prévio, entende a intenção do trecho em uma
-  leitura; os comentários respondem "por que", não "o que".
+  leitura; os comentários respondem "por que", não "o que"; não há aninhamento profundo
+  onde um guard clause ou uma extração resolveria.
 
 ## Art. 8 — Eficiência consciente, medida — não presumida
 

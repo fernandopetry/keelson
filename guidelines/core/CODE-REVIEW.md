@@ -29,6 +29,17 @@
 
 ---
 
+## Sinais de alerta em nomes (Charter Art. 5, 7)
+
+Nomes genéricos escondem intenção: `process()`, `execute()`, `handle()`, `doStuff()`,
+`data`, `info`, `obj`, `temp`, `value`, `result`, `*Manager`, `*Util`. Não são proibição
+mecânica — `execute()` num contrato canônico (ex.: um caso de uso de método único) é
+legítimo. São **gatilho de pergunta**: *"existe nome mais específico do domínio?"*. Se
+existe, o genérico é smell a apontar. Nome que **silencia efeito colateral** (`login()`
+que também envia e-mail) é o mesmo smell, mais grave — viola a régua do Art. 5.
+
+---
+
 ## Rejeição imediata
 
 - Vulnerabilidade de segurança (ver `./SECURITY.md`)

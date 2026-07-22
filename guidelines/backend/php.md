@@ -1,7 +1,7 @@
 ---
 lang: php
 version: "8.5"
-charter: 0.1.0
+charter: 0.2.0
 generated-by: exemplar
 reviewed: true
 reviewer: "Fernando Petry"
@@ -104,7 +104,7 @@ mente assim que o *como* muda.
 
 ---
 
-## 4. Estrutura & arquitetura → Charter Art. 4
+## 4. Estrutura & arquitetura → Charter Art. 4, 7
 
 O padrão idiomático para backend PHP de porte é **Clean/Hexagonal Architecture**, com a
 dependência apontando **para dentro**, em direção ao domínio:
@@ -162,6 +162,12 @@ final class CreateUserUseCase
 global) entra por uma **interface** injetada no construtor. É isso que deixa o UseCase ser
 testado sem levantar o mundo (Art. 4 da régua) e trocar o driver sem tocar a regra.
 
+**Condicionais e assinaturas (Art. 4, 7):** prefira *early return* (guard clause) a
+`if/else` aninhado; condicional que despacha pela mesma variante em vários pontos vira
+**enum com `match` exaustivo** ou implementações da interface (polimorfismo). Método
+passando de **~4 parâmetros** → agrupe num **DTO/objeto de parâmetro `readonly`**; *named
+arguments* cobrem os opcionais sem inflar a assinatura.
+
 **Armadilha comum:** SQL ou `$_SESSION`/`getenv()` dentro do UseCase ou da Action —
 vaza detalhe de infraestrutura para dentro da regra de negócio e torna o teste refém do
 ambiente. Detalhe de I/O só na Infrastructure.
@@ -184,8 +190,8 @@ encontrado" esperado) PODE ser `?T`/`null`; violação de regra é **exceção t
 
 ```php
 try {
-    $result = $this->useCase->execute($dto);
-    return $this->ok($response, $result->toArray());
+    $user = $this->useCase->execute($dto);
+    return $this->ok($response, $user->toArray());
 } catch (\InvalidArgumentException $e) {
     return $this->error($response, 'Validation failed', 422); // detalhe de campo, sem stack
 } catch (\DomainException $e) {
