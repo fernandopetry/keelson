@@ -98,7 +98,7 @@ keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
 ├── agents/            # subagents: implementer, reviewers, profile-writer…
 ├── skills/            # spec / plan / task validators + state + screen-verify
-├── hooks/             # doc-guard, security-guard, stale-background-guard
+├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard
 ├── guidelines/
 │   ├── _meta/         # QUALITY-CHARTER.md · PROFILE-OUTLINE.md
 │   ├── core/          # language-agnostic doctrine (always active)

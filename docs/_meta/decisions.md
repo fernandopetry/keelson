@@ -2,7 +2,7 @@
 
 > Memória institucional das decisões sobre como o keelson (spec-driven development) é praticado. Diferente da doutrina de código (QUALITY-CHARTER + perfil ativo, que regem o **código**), este arquivo rege o **processo de desenvolvimento**.
 
-**Última revisão**: 2026-07-18
+**Última revisão**: 2026-07-22
 **Status do documento**: vivo, atualizado conforme decisões evoluem
 
 ---
@@ -284,6 +284,16 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 **Um dono por regra**: o formato do prompt refinado pertence ao `/keelson:refine` (passo 4); o auto o referencia, não o duplica.
 
 **Aplicação**: `commands/auto.md` (Etapa 0.5) e `commands/refine.md` (formato canônico). Relacionada: decisão em aberto sobre um agente dedicado `request-mirror` (§8).
+
+### 4.15 Code review forçado fora do fluxo SDD: review-guard com limiar
+
+**Problema**: quando o desenvolvedor trabalha sem os comandos `/keelson:*` (edição ad hoc via Claude Code), os gates de review do `/keelson:implement` nunca disparam — só docs (doc-guard) e segurança (security-guard) tinham garantia determinística. Code review geral (gate 7) dependia de disciplina.
+
+**Decisão**: hook `Stop` `hooks/review-guard.sh` detecta mudança de código na branch (diff contra merge-base, filtrado pelos `codePaths` da ficha) **acima de um limiar** e bloqueia o encerramento uma vez, exigindo o code review (`task-reviewer` sobre o diff OU checklist de `guidelines/core/CODE-REVIEW.md` + perfil ativo).
+
+**Limiar (Charter Art. 6 — rigor proporcional)**: dispara com ≥ 2 arquivos de código alterados OU ≥ 30 linhas adicionadas; abaixo disso a mudança é trivial e passa sem cutucar. Configurável na ficha via `gates.reviewThreshold: { files, lines }`; o gate inteiro desliga com `gates.review: false` (default: ligado).
+
+**Natureza**: como os irmãos — heurístico no sentido de que não *prova* que a revisão rodou (cutuca para forçá-la); anti-renudge por fingerprint em `.git/` (mesma mudança não re-bloqueia); fallback gracioso sem `jq`/ficha. Terceiro da família doc-guard (4.6) / security-guard (4.8).
 
 ---
 

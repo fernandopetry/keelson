@@ -16,6 +16,8 @@
   },
   "gates": {
     "security": true,
+    "review": true,
+    "reviewThreshold": { "files": 2, "lines": 30 },
     "screenVerify": { "enabled": false, "method": null }
   },
   "docsRoot": "docs"
