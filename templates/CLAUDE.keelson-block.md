@@ -21,6 +21,9 @@ o que é específico deste projeto vive na **ficha** e nos guidelines locais.
   deste projeto.
 - **Guidelines específicos deste projeto:** `guidelines/project/` (têm precedência
   sobre os perfis do plugin no mesmo nome; caso contrário, somam).
+- **Integração com Jira (opcional):** se a ficha tem `jira.enabled: true`, o ciclo espelha
+  SPEC/TASKs em issues via conector MCP Atlassian — config por ID no bloco `jira` e no mapa
+  `jira.mapFile`. É **best-effort** (nunca bloqueia) e **sem segredos**. Desligada por padrão.
 
 ### Como trabalhar
 
@@ -38,7 +41,8 @@ o que é específico deste projeto vive na **ficha** e nos guidelines locais.
 `/keelson:init` (configurar/reparar a ficha) · `/keelson:specify` · `/keelson:plan` ·
 `/keelson:tasks` · `/keelson:implement` · `/keelson:auto` (ciclo autônomo, default) ·
 `/keelson:guided` (ciclo com checkpoints) · `/keelson:refine` · `/keelson:triage` ·
-`/keelson:integrate` · `/keelson:migrate-legacy` (slug legado) · `/keelson:rebuild-index` ·
+`/keelson:integrate` · `/keelson:jira-sync` (reconciliar com o Jira, se ativo) ·
+`/keelson:migrate-legacy` (slug legado) · `/keelson:rebuild-index` ·
 `/keelson:status` (consulta de estado) · `/keelson:verify-handoff` (fecha o gate de tela remoto) ·
 `/keelson:audit` (auditoria manual de dependências — CVE/NVD).
 

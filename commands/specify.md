@@ -92,6 +92,7 @@ Ambiguidade não crítica vira premissa `[assumido]`.
 **Versão**: 0.1
 **Autor**: <preencher>
 **Data**: <YYYY-MM-DD>
+**Jira**: <KEY — só quando a integração Jira está ativa; no modo `link`, preencha com a issue existente; omita a linha se `jira.enabled` for false>
 
 ## 1. Contexto e objetivo
 ### 1.1 Problema
@@ -148,6 +149,10 @@ Criar do zero seguindo o **template canônico do INDEX** (method-guide §6 — `
 ### 5.2 Atualizar INDEX se já existe
 
 Aplicar a **receita de atualização do INDEX** (method-guide §6). Específicos desta etapa: linha nova na tabela "SPECs"; capacidade nova em "Especificadas, ainda não planejadas" (texto curto do outcome); termos e riscos da SPEC mesclados.
+
+### 5.3 Sincronização com Jira (opcional)
+
+Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §6) para **criar** (modo `create`) **ou validar o vínculo** (modo `link`) da issue principal desta SPEC e gravar a key no front-matter `Jira:`. Best-effort (§0): conector indisponível/falha → aviso, sem bloquear a criação da SPEC.
 
 ## Output final ao usuário
 

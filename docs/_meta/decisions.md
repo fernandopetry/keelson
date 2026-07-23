@@ -73,7 +73,7 @@ keelson/
 **Motivo**: `/keelson:*` agrupa visualmente no tab completion, comunica o intent (é o keelson agindo) e separa dos demais comandos do projeto, sem precisar inventar prefixo. Dentro do plugin, skills e agents ficam com nomes curtos (`spec-validator`, `task-implementer`, `security-reviewer`) porque o pacote já dá o escopo.
 
 **Aplicação**:
-- Commands: `/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `/keelson:implement`, `/keelson:triage`, `/keelson:rebuild-index`, `/keelson:migrate-legacy`, `/keelson:auto`, `/keelson:guided`, `/keelson:refine`, `/keelson:integrate`, `/keelson:verify-handoff`, `/keelson:audit`
+- Commands: `/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `/keelson:implement`, `/keelson:triage`, `/keelson:rebuild-index`, `/keelson:migrate-legacy`, `/keelson:auto`, `/keelson:guided`, `/keelson:refine`, `/keelson:integrate`, `/keelson:jira-sync`, `/keelson:verify-handoff`, `/keelson:audit`
 - Skills: `spec-validator`, `plan-validator`, `task-validator`, `status`
 - Agents: `task-implementer`, `task-reviewer`, `security-reviewer`, `task-verifier`, `product-critic`, `process-tuner`
 
@@ -366,6 +366,25 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 - **Auditados e mantidos**: `tasks` (simetria do ciclo vence a pureza do verbo), `auto` (par de modos), `integrate` (não faz merge, mas a fronteira é documentada em voz alta no comando e no PR; `submit` descartado — ganho não paga o churn), `audit` (nome curto; o escopo de dependências está na description e no argumento `full`).
 
 **Aplicação**: `commands/guiado.md` → `commands/guided.md` e `skills/state/` → `skills/status/` (git mv) + atualização de todas as referências (README, method-guide, CLAUDE.keelson-block, WORKFLOW.md, commands que os citam, este arquivo). Rename = quebra → plugin 0.5.1 → 0.6.0.
+
+### 4.22 Integração opcional com Jira via conector MCP Atlassian
+
+**Problema**: times que já usam o Jira como quadro de trabalho não têm ponte entre os artefatos SDD do keelson (SPEC, TASKs) e as issues do Jira — o rastreio é manual e duplicado. O keelson não tem hoje onde guardar um ID externo (o closure da TASK só carrega `Commit SHA` e `Notas`), nem qualquer efeito colateral externo de escrita além de `git push`/`gh pr create`.
+
+**Decisão (do humano)** — integração **opcional, best-effort**, com estas regras:
+- **Mecanismo**: conector **MCP Atlassian**, nunca API/token direto. O keelson emite instruções e o agente usa as ferramentas do conector (`createJiraIssue`, `transitionJiraIssue`, `addCommentToJiraIssue`, `createIssueLink`, `getJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFields`, `getTransitionsForJiraIssue`…). **Zero segredo** no repositório (nem na ficha nem em `keelson.local.json`); nenhum SDK no consumidor.
+- **Best-effort inviolável**: a sincronização **nunca bloqueia** o ciclo SDD. Bloco ausente/`enabled:false`, conector indisponível (não autorizado, headless), ou operação Jira que falha (permissão, campo obrigatório, transição inexistente) → **avisa e segue**, mesma filosofia do fallback gracioso dos hooks (`sem jq → exit 0`). Essencial porque o `/keelson:auto` roda de ponta a ponta e não pode travar por serviço externo.
+- **Público e agnóstico**: nenhum artefato versionado do plugin (templates, README, este arquivo, protocolo, exemplos) embarca dado de empresa (site, `projectKey`, `cloudId`, IDs de tipo/status/campo, componentes, nomes). Tudo específico de um projeto é **descoberto em runtime** (createmeta / amostragem de status) e gravado **no repo do consumidor** (ficha + mapa `.md`); templates e exemplos usam placeholders neutros (`PROJ`, `your-site.atlassian.net`, `customfield_XXXXX`, `<PROJECT>`, `<id>`).
+- **Config por ID, não por nome**: o bloco `jira` da ficha guarda **IDs** de issue type e status (nomes são localizados e ambíguos, variam por projeto), resolvidos pelo `init` via `getJiraProjectIssueTypesMetadata`. Sem defaults hardcoded (`"Story"`/`"Sub-task"`/`"Done"` não são universais).
+- **Dois modos**: `create` (cria a issue da SPEC + uma sub-task por TASK — ideal para projeto limpo/team-managed) e `link` (pendura numa issue existente informada no front-matter da SPEC — ideal para projeto governado/company-managed).
+- **Persistência das keys**: front-matter da SPEC (`Jira:`) e novo campo no bloco de closure da TASK; o INDEX registra só no "Histórico recente" — o contrato da tabela "PLANs" (§6 do method-guide) fica intocado.
+- **Não mover o card por padrão**: transição de status é frágil em company-managed (transições condicionais, com tela, sem "Done" real). Default `transition:comment` (comenta progresso, não move o card); `auto` é opt-in por projeto, resolvido em runtime via `getTransitionsForJiraIssue`. As **colunas do board não são legíveis** pelo conector (Agile API fora do escopo) → o humano declara um mapa acionável (etapa keelson → coluna + status-alvo por ID) no `.md` do projeto, semeado pelo `init` a partir da `statusCategory` (new/indeterminate/done); atua só em `auto`, com o alvo validado em runtime.
+- **Campos personalizados**: descobertos por `getJiraIssueTypeMetaWithFields` (nunca hardcode de `customfield_*`); enriquecimento **opt-in** e **bidirecional** via mapa `.md` por projeto gerado pelo `init` (escrita: `fixed`/`from`; leitura: semeia SPEC/TASK no modo `link`). Custom fields tipicamente não são obrigatórios na criação → `summary`+`description` bastam como mínimo.
+- **Um dono por regra** (decisão 4.20): a lógica de sync vive em `skills/_shared/jira-sync-protocol.md`; os comandos do ciclo apenas a referenciam. `guidelines/` não muda (integração externa é capacidade do motor, não doutrina de qualidade de código).
+
+**Custo assumido**: primeira integração externa de **escrita** do keelson além do git/GitHub — passa a existir efeito externo em 4 comandos do ciclo + 1 comando novo (`jira-sync`). Mitigado pelo best-effort e pela idempotência (checar a key gravada antes de criar). A superfície de dessincronia cresce (bloco de ficha novo, mapa `.md` por projeto, ganchos em 5 comandos), aceita em troca da rastreabilidade SDD→Jira automática para quem opta.
+
+**Aplicação**: `templates/keelson.config.example.json` (bloco `jira`), `commands/init.md` (Etapa 4.6 — resolução via createmeta + amostragem de status + geração do esqueleto do mapa `.md`), `skills/_shared/jira-sync-protocol.md` (novo, dono único da lógica), `commands/{specify,tasks,implement,integrate,auto}.md` (ganchos + campo `Jira:`), `commands/jira-sync.md` (novo) + os 4 lugares de comando (README tabela *Commands*, method-guide §3.13, `templates/CLAUDE.keelson-block.md`, este arquivo §3), nova subseção "Jira integration (optional)" no `README.md`. Capacidade nova → minor: plugin 0.6.0 → 0.7.0.
 
 ---
 

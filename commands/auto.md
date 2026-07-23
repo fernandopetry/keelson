@@ -100,7 +100,7 @@ Uma entrega com gate 9 furado **nunca é silenciosa**. Antes da Entrega:
 
 1. **Branch**: se estiver em `main` (ou na branch default), crie `feat/<slug>-<descrição-curta>` (kebab-case) e use-a. Se já estiver numa branch de trabalho, use-a. **Nunca** trabalhe direto na `main`.
 2. **Commit**: mensagem em inglês, descritiva, no padrão do projeto. Patch do `process-tuner` (se houver) vai em **commit separado** `chore(keelson): tune ...`.
-3. **Push**: `git push` da branch para o remoto (`-u` na primeira vez). **Sem abrir PR** (o dev revisa a branch e decide o merge).
+3. **Push**: `git push` da branch para o remoto (`-u` na primeira vez). **Sem abrir PR** (o dev revisa a branch e decide o merge). Se `jira.enabled`, aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §11) para comentar a branch/push na issue principal — best-effort (§0), a criação de issues e o progresso já foram cobertos pelos ganchos de `specify`/`tasks`/`implement`.
 4. **Não** faça merge em `main` nem deploy.
 5. Reporte ao usuário: branch criada, resumo do que foi feito, testes/gates, lições de processo aplicadas (se houver), e o que falta (revisão + merge dele). Se houve Etapa 4.6, declare a entrega como **parcial — verificação de tela pendente** (nunca "totalmente verificada").
 6. **Verificação pendente (handoff)** (seção obrigatória do report quando houve Etapa 4.6): caminho do `HANDOFF-<id>.md`, nº de itens pendentes, e o **prompt canônico preenchido** (guia do método, §8.3) em bloco copy-paste, pronto para o humano colar num agente com acesso a tela. Sem slug: o prompt carrega o roteiro inline.

@@ -63,6 +63,7 @@ Se o repositório tiver template de PR, respeitá-lo.
 
 1. Adicionar entrada ao "Histórico recente" do `INDEX.md` do slug: `<data>: PR aberto para PLAN-MMM (#<n>), aguardando revisão/merge humano`.
 2. Repetir a sugestão (não a ação) de promover o Status do PLAN para Done manualmente, quando a DoD estiver satisfeita.
+3. **Sincronização com Jira (opcional)**: só quando `jira.enabled` e não é `--dry-run`. Aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §11) para comentar/linkar a URL do PR na issue principal do slug. Best-effort (§0): conector ausente/falha → aviso, sem bloquear a entrega.
 
 ## Output ao usuário
 

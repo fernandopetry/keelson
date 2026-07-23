@@ -237,6 +237,23 @@ Roda a auditoria de vulnerabilidade conhecida sobre as dependências, **em momen
 
 `full` inclui higiene (desatualizados, abandonados, licenças). É manual (pull) — para cobertura contínua, Dependabot/Renovate ou CI agendada. Governança: decisão 4.17 de `decisions.md`.
 
+### 3.13 `/keelson:jira-sync` — reconciliar um slug com o Jira (opcional)
+
+Rede de segurança da integração opcional com Jira (via **conector MCP Atlassian**, ligada em `jira.enabled` na ficha). Os comandos do ciclo já sincronizam **best-effort**; quando o conector esteve indisponível ou uma operação falhou, este comando reprocessa o slug e cria/vincula/comenta/transiciona o que ficou para trás, de forma **idempotente**.
+
+```
+/keelson:jira-sync <slug ou PLAN-MMM> [--dry-run]
+```
+
+| Aspecto | Detalhe |
+|---|---|
+| Gera | Issues/sub-tasks no Jira (via conector); grava o campo `Jira:` na SPEC e nas TASKs |
+| Atualiza | 1 linha no "Histórico recente" do `INDEX.md` (contrato da tabela "PLANs" intocado) |
+| Gate | — (best-effort; `jira.enabled:false` ou conector ausente → não faz nada) |
+| Lógica | Toda no `skills/_shared/jira-sync-protocol.md` — o comando só orquestra |
+
+Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisão 4.22 de `decisions.md`.
+
 ---
 
 ## 4. Skills

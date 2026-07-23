@@ -99,6 +99,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 |---------|--------------|
 | `/keelson:init` | Interactive setup — detects the stack, writes the ficha and the `CLAUDE.md` block |
 | `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
+| `/keelson:jira-sync` | Reconcile a slug with Jira via the Atlassian MCP connector — idempotent, best-effort (optional) |
 | `/keelson:audit` | On-demand dependency audit against known vulnerabilities (CVE/NVD); `full` adds hygiene (outdated, abandoned, licenses) |
 | `/keelson:status` | Executive summary of a slug's current state — what's done, in flight, planned |
 | `/keelson:migrate-legacy` | Migrate a legacy slug (docs without `INDEX.md`) to the SDD layout |
@@ -126,6 +127,43 @@ below** the project's and writes only the delta — never from a higher version,
 recommendations wouldn't exist in your runtime. Profiles you refine can be
 contributed back to the plugin — that's how it grows, by curation, not by empty stubs.
 
+## Jira integration (optional)
+
+If your team runs work on Jira, keelson can mirror the SDD cycle onto it — a SPEC becomes
+an issue, its TASKs become sub-tasks, and progress flows back as comments (or transitions).
+It's **off by default** and **best-effort**: it never blocks the cycle.
+
+- **Connector, not tokens.** It works through the **Atlassian MCP connector** — no API token,
+  no SDK, nothing in `keelson.local.json`. If the connector isn't authorized, the sync is
+  simply skipped with a note.
+- **Discovered, never hardcoded.** `/keelson:init` learns your project's issue types, statuses
+  and custom fields at runtime (Jira metadata) and stores **IDs** in the ficha's `jira` block.
+  No Atlassian site, project key or field ID ever ships in the plugin.
+- **Two modes.** `create` (keelson creates the SPEC issue + sub-tasks — ideal for a clean,
+  team-managed project) or `link` (it hangs work under an issue you already opened — ideal for
+  a governed, company-managed project).
+- **Custom fields & board columns** live in a per-project map file (`jira.mapFile`, a Markdown
+  table) that `init` scaffolds and you fill in — write-enrichment (`fixed`/`from`) and, in
+  `link` mode, read-seeding of the SPEC.
+- **Status policy.** Default `comment` posts progress without moving the card; moving cards is
+  opt-in per project (`transition: auto`), always validated against the live workflow.
+
+The ficha's `jira` block (all IDs, zero secrets):
+
+```jsonc
+"jira": {
+  "enabled": false,
+  "site": null, "cloudId": null, "projectKey": null,
+  "mode": "create",                       // "create" | "link"
+  "issueType": { "spec": null, "task": null },
+  "transition": "comment",                // "off" | "comment" | "auto"
+  "mapFile": null, "boardId": null
+}
+```
+
+Re-run `/keelson:jira-sync <slug>` any time to reconcile what a best-effort run skipped.
+Governance: decision 4.22 in `docs/_meta/decisions.md`.
+
 ## Repository layout
 
 ```
@@ -145,10 +183,10 @@ keelson/
 
 ## Status
 
-`0.6.0` — early. The engine and the PHP reference profile are the stable core; the
+`0.7.0` — early. The engine and the PHP reference profile are the stable core; the
 legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending drafts, and the
-profile generator and non-PHP profiles are evolving. Feedback and profile
-contributions welcome.
+profile generator and non-PHP profiles are evolving. The optional Jira integration
+(via the Atlassian MCP connector) is new. Feedback and profile contributions welcome.
 
 ## Author & license
 

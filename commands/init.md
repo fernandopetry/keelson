@@ -78,6 +78,20 @@ Regras:
 - **Não escreva senha** você mesmo em nenhum dos dois. Deixe o placeholder e **instrua o humano** a preencher só o `keelson.local.json`, com credenciais de **DEV/teste descartáveis** — **nunca** produção nem conta real.
 - **Merge-preserving** (Regra de merge): se o `keelson.local.json` já existe, **não o sobrescreva** — preserva a senha já preenchida e completa só campos ausentes. O `.example` pode ganhar campos novos, sempre **sem** senha.
 
+## Etapa 4.6 — Integração com Jira (opcional, best-effort)
+
+Ofereça a integração keelson↔Jira apenas se fizer sentido para o projeto (o time usa Jira como quadro). **Não é obrigatória** e nasce **desligada** (`jira.enabled: false`) — pule sem cerimônia se o humano não quiser. Toda a mecânica de runtime vive no **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`); aqui você só **descobre e grava a config**, nunca embarca dado de empresa no plugin.
+
+Se o humano optar por ligar (requer o **conector Atlassian** autorizado — sem ele, avise e deixe `enabled:false`):
+
+1. **Perguntas de produto** (opções fechadas): `site` (hostname Atlassian), `projectKey`, e `mode` — `create` (o keelson cria a issue da SPEC + sub-tasks; ideal para projeto limpo/team-managed) ou `link` (pendura numa issue existente; ideal para projeto governado/company-managed).
+2. **Resolver por descoberta** (protocolo §1, sempre por **ID**, nunca por nome): `getAccessibleAtlassianResources`/`site` → `cloudId`; `getJiraProjectIssueTypesMetadata` → escolher `issueType.spec` e `issueType.task` (se houver mais de um tipo de sub-task, **pergunte** qual); confirmar que `issueType.task` é `subtask:true` (senão, avise o fallback para issue linkada — §7).
+3. **Status/transição**: `getJiraIssueTypeMetaWithFields` + amostragem de status (`searchJiraIssuesUsingJql`/`getTransitionsForJiraIssue`) para conhecer o workflow. Default seguro `transition:comment` (não move card); só proponha `auto` se houver caminho de transição claro.
+4. **Gerar o esqueleto do mapa `.md`** em `{docsRoot}/_meta/jira.<PROJECT>.md` e apontar `jira.mapFile` para ele. Duas seções (protocolo §3): **Campos** (uma linha por campo relevante do createmeta — `ID | Nome | Tipo | Direção | Estratégia | Valor` — com `allowedValues` como referência em comentário; o humano preenche Direção/Estratégia/Valor) e **Etapas/Colunas** (`Etapa | Coluna | Status-alvo (ID) | Gatilho`, pré-preenchida por `statusCategory`). Avise que o `.md` pode conter nomes de pessoas (via `allowedValues`) — é config de projeto, versionável, **não segredo**.
+5. **Gravar o bloco `jira`** na ficha (campos por ID). **Nenhum token/segredo** — o conector é o único canal; nada vai para `keelson.local.json`.
+
+Merge-preserving (Regra de merge): bloco `jira` já presente → preserva; ficha antiga sem o bloco → acrescenta com `enabled:false`.
+
 ## Etapa 5 — Injetar o bloco no `CLAUDE.md`
 
 Insira o conteúdo de `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.keelson-block.md` no `CLAUDE.md` do projeto (crie o arquivo se não existir). Se um bloco keelson já existir (entre os marcadores `<!-- ... keelson ... -->`), **substitua-o** — não duplique.
@@ -93,6 +107,7 @@ Prove que a ficha funciona:
 - os `codePaths` existem no disco;
 - os guidelines do perfil ativo resolvem: cada `profile.<role>.file` da ficha aponta para um arquivo existente (regra de resolução da Etapa 3); perfil com `reviewed: false` no front-matter vira instrução de revisão no relatório; perfil cujo `charter:` no front-matter é **menor** que a versão atual do `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md` vira aviso de re-derivação/revisão no relatório (o perfil instancia doutrina desatualizada);
 - se `screenVerify.enabled`: `keelson.local.example.json` existe e está **versionado** (sem senha real); `keelson.local.json` existe **e** está no `.gitignore` (confirme que **não** aparece em `git status`/`git ls-files`); campos ainda em placeholder (`<...>`) viram instrução de preenchimento no relatório (com o aviso dev-only).
+- se `jira.enabled`: `jira.projectKey` e os IDs de `issueType.spec`/`issueType.task` estão preenchidos; se `jira.mapFile` aponta um caminho, o arquivo existe. Conector indisponível não é `✗` (best-effort) — vira aviso "sync Jira pulado até autorizar o conector".
 Reporte cada item como ✓/✗. `✗` vira ação no relatório, não é silenciado.
 
 ## Etapa 7 — Relatório

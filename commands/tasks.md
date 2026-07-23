@@ -150,6 +150,7 @@ mais fraca).>
 **Data conclusão**: 
 **Branch**: 
 **Commit SHA**: 
+**Jira**: 
 **Implementado por**: 
 **Revisado por**: 
 **Tentativas**: 
@@ -226,6 +227,10 @@ Após gerar todas as TASKs e o TASK-MMM-INDEX, invocar a skill `task-validator` 
 ## Etapa 6: atualização do INDEX.md do slug
 
 Aplicar a **receita de atualização do INDEX** (method-guide §6). Específico desta etapa: atualizar a coluna `Tasks` na linha do PLAN-MMM, no formato canônico do contrato — de `0/? ⏸` para `0/<total de tasks geradas> ⏸`.
+
+## Etapa 7: sincronização com Jira (opcional)
+
+Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §7) para criar uma **sub-task** por TASK sob a issue principal da SPEC (idempotente — §4) e gravar a key no campo `Jira:` da closure de cada TASK. Best-effort (§0): conector indisponível/falha → aviso, sem bloquear a geração das TASKs.
 
 ## Output final ao usuário
 
