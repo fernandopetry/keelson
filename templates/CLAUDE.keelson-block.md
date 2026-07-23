@@ -22,8 +22,9 @@ o que é específico deste projeto vive na **ficha** e nos guidelines locais.
 - **Guidelines específicos deste projeto:** `guidelines/project/` (têm precedência
   sobre os perfis do plugin no mesmo nome; caso contrário, somam).
 - **Integração com Jira (opcional):** se a ficha tem `jira.enabled: true`, o ciclo espelha
-  SPEC/TASKs em issues via conector MCP Atlassian — config por ID no bloco `jira` e no mapa
-  `jira.mapFile`. É **best-effort** (nunca bloqueia) e **sem segredos**. Desligada por padrão.
+  SPEC/funcionalidades/TASKs em issues via conector MCP Atlassian — config por ID no bloco
+  `jira` e no mapa `jira.mapFile`. É **best-effort** (nunca bloqueia) e **sem segredos**.
+  Desligada por padrão.
 
 ### Como trabalhar
 

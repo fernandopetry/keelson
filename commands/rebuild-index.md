@@ -90,7 +90,7 @@ Determinar **status efetivo** com base nas tasks:
 - **Implementado (aguardando confirmação)**: todas Done, mas Status do PLAN não é Done.
 - **Done**: todas Done E Status do PLAN é Done.
 
-O status efetivo posiciona a capacidade na seção "Capacidades". A coluna `Status` da tabela PLANs usa o Status do **front-matter do PLAN, verbatim** (contrato do INDEX — method-guide, §6); o status efetivo nunca entra nela.
+O status efetivo posiciona a capacidade na seção "Capacidades". SPEC que declara FEATs (headings `### FEAT-` na §5) → derivar **uma capacidade por FEAT**, posicionada pelo estado real das TASKs que a listam em `Funcionalidade` (lendo os `TASK-MMM-INDEX`); SPEC sem FEATs → uma capacidade por SPEC, como sempre. A coluna `Status` da tabela PLANs usa o Status do **front-matter do PLAN, verbatim** (contrato do INDEX — method-guide, §6); o status efetivo nunca entra nela.
 
 ## Etapa 2: validar consistência
 

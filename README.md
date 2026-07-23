@@ -130,8 +130,9 @@ contributed back to the plugin — that's how it grows, by curation, not by empt
 ## Jira integration (optional)
 
 If your team runs work on Jira, keelson can mirror the SDD cycle onto it — a SPEC becomes
-an issue, its TASKs become sub-tasks, and progress flows back as comments (or transitions).
-It's **off by default** and **best-effort**: it never blocks the cycle.
+an issue (or Epic), each **feature** (a QA-testable flow declared in the SPEC, `FEAT-*`)
+becomes a Story, its TASKs become sub-tasks, and progress flows back as comments (or
+transitions). It's **off by default** and **best-effort**: it never blocks the cycle.
 
 - **Connector, not tokens.** It works through the **Atlassian MCP connector** — no API token,
   no SDK, nothing in `keelson.local.json`. If the connector isn't authorized, the sync is
@@ -142,6 +143,10 @@ It's **off by default** and **best-effort**: it never blocks the cycle.
 - **Two modes.** `create` (keelson creates the SPEC issue + sub-tasks — ideal for a clean,
   team-managed project) or `link` (it hangs work under an issue you already opened — ideal for
   a governed, company-managed project).
+- **Two or three levels.** SPECs with a single deliverable flow stay on the 2-level projection
+  (SPEC issue ▸ sub-tasks). SPECs that declare features (`FEAT-*` headings) plus a configured
+  `issueType.feature` get the full Epic ▸ Story ▸ Sub-task hierarchy, with a
+  "feature ready for QA" milestone per Story. Both opt-ins missing → nothing changes.
 - **Custom fields & board columns** live in a per-project map file (`jira.mapFile`, a Markdown
   table) that `init` scaffolds and you fill in — write-enrichment (`fixed`/`from`) and, in
   `link` mode, read-seeding of the SPEC.
@@ -155,14 +160,14 @@ The ficha's `jira` block (all IDs, zero secrets):
   "enabled": false,
   "site": null, "cloudId": null, "projectKey": null,
   "mode": "create",                       // "create" | "link"
-  "issueType": { "spec": null, "task": null },
+  "issueType": { "spec": null, "feature": null, "task": null },
   "transition": "comment",                // "off" | "comment" | "auto"
   "mapFile": null, "boardId": null
 }
 ```
 
 Re-run `/keelson:jira-sync <slug>` any time to reconcile what a best-effort run skipped.
-Governance: decision 4.22 in `docs/_meta/decisions.md`.
+Governance: decisions 4.22 and 4.27 in `docs/_meta/decisions.md`.
 
 ## Repository layout
 
@@ -183,10 +188,11 @@ keelson/
 
 ## Status
 
-`0.9.0` — early. The engine and the PHP reference profile are the stable core; the
+`0.10.0` — early. The engine and the PHP reference profile are the stable core; the
 legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending drafts, and the
 profile generator and non-PHP profiles are evolving. The optional Jira integration
-(via the Atlassian MCP connector) and multi-realm screen verification are new.
+(via the Atlassian MCP connector), multi-realm screen verification and the optional
+feature layer (`FEAT-*`, the QA unit with 3-level Jira projection) are new.
 Feedback and profile contributions welcome.
 
 ## Author & license

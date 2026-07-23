@@ -39,12 +39,17 @@ Aplicar o protocolo de sync Jira sobre o slug, na ordem:
 
 1. **Issue da SPEC** (§4–§6): criar (modo `create`) ou validar o vínculo (modo `link`); gravar
    a key no front-matter se criada.
-2. **Sub-tasks das TASKs** (§7): criar as que faltam (idempotência por key na closure); aplicar
+2. **Stories das FEATs** (§6.1): quando a SPEC declara FEATs e `issueType.feature` está
+   preenchido, criar/vincular as que faltam (idempotência por key sob o heading); gravar as
+   keys na SPEC. Estado misto (sub-tasks legadas sob a issue da SPEC) → reportar, nunca
+   re-parentar (§4).
+3. **Sub-tasks das TASKs** (§7): criar as que faltam (idempotência por key na closure); aplicar
    campos do mapa (§8).
-3. **Status** (§9): só com `transition:comment`/`auto`. Em `auto`, alinhar cada sub-task ao
+4. **Status** (§9): só com `transition:comment`/`auto`. Em `auto`, alinhar cada sub-task ao
    status-alvo correspondente ao estado real da TASK (ex.: TASK Done → status-alvo de
-   "concluída"), sempre validando a transição em runtime.
-4. **Persistência** (§10): keys gravadas; 1 linha no "Histórico recente" do INDEX.
+   "concluída"), sempre validando a transição em runtime — e aplicar o gatilho
+   "Funcionalidade pronta p/ QA" (§6.1 item 5) às FEATs já completas.
+5. **Persistência** (§10): keys gravadas; 1 linha no "Histórico recente" do INDEX.
 
 `--dry-run` → apenas imprimir o plano de reconciliação (o que seria criado/vinculado/movido),
 sem chamar as ferramentas de escrita.
@@ -55,6 +60,7 @@ sem chamar as ferramentas de escrita.
 # Reconciliação Jira: <slug>
 
 - Issue da SPEC: <KEY> (criada | vinculada | já existia)
+- Stories de FEAT: <N criadas>, <M já existiam> | n/a
 - Sub-tasks: <N criadas>, <M já existiam>
 - Status alinhado: <K movidas | só comentado | n/a>
 - Pulado/avisos: <itens best-effort que falharam, se houver>
@@ -62,5 +68,6 @@ sem chamar as ferramentas de escrita.
 
 ## Limites
 
-Não cria PR nem faz merge/deploy; não altera SPEC/PLAN/TASK além do campo `Jira:`; nunca
-bloqueia (best-effort — protocolo §0). Governança: decisão 4.22 de `decisions.md`.
+Não cria PR nem faz merge/deploy; não altera SPEC/PLAN/TASK além dos campos `Jira:`
+(front-matter da SPEC, linha sob o heading da FEAT, closure da TASK); nunca bloqueia
+(best-effort — protocolo §0). Governança: decisões 4.22 e 4.27 de `decisions.md`.

@@ -36,7 +36,8 @@ Você é um Tech Lead especialista em decompor planos arquiteturais em tarefas a
 
 1. Buscar `{docsRoot}/*/plans/PLAN-MMM-*.md`. Desambiguar.
 2. Ler PLAN completo.
-3. Ler SPEC referenciada (ACs).
+3. Ler SPEC referenciada (ACs). Se a §5 da SPEC declara FEATs (headings `### FEAT-`),
+   extrair o mapa FR→FEAT (posicional: o FR pertence à FEAT sob cujo heading está).
 4. Slug é a pasta-pai de `plans/`.
 
 ### 0.3 Ler INDEX.md
@@ -91,6 +92,7 @@ Um arquivo por task: `{docsRoot}/<slug>/tasks/TASK-MMM-XXX-<titulo-kebab>.md`.
 **Slug**: <slug>
 **Pertence a**: PLAN-MMM
 **Realiza (FRs)**: FR-NNN-XXX, FR-NNN-YYY
+**Funcionalidade**: FEAT-NNN-XXX (primária)[, FEAT-NNN-YYY]
 **Componente**: COMP-MMM-XXX
 **Wave**: <número>
 **Tamanho estimado**: small | medium
@@ -171,6 +173,19 @@ mais fraca).>
 **Notas**: 
 ```
 
+### Campo `Funcionalidade` — derivado dos FRs, nunca inventado
+
+Só existe quando a SPEC declara FEATs na §5 — **SPEC sem FEATs → omitir a linha** (a
+funcionalidade é a própria SPEC). Task `chore` sem FR realizado pode omitir. Regras:
+- O conjunto listado é **exatamente** o conjunto de FEATs dos FRs de `Realiza (FRs)`
+  (via mapa FR→FEAT da Etapa 0.2) — nem a mais, nem a menos.
+- Uma FEAT é marcada `(primária)`: a que tem mais FRs realizados pela task (empate →
+  menor ID). Julgamento pode sobrescrever a heurística, mas a primária deve pertencer
+  ao conjunto derivado.
+- Task **transversal** (FRs de 2+ FEATs — ex.: um front único servindo login e
+  lançamento) lista todas; a primária define o parent no Jira (§7 do protocolo), as
+  demais viram links.
+
 ### Mapeamento de cada AC — camada que enforça, gate que verifica
 
 Primeiro decida **qual camada enforça** o AC e liste-o nos "Critérios de pronto" **dessa** task, não de uma vizinha: recusa por **estado prévio** (ex.: registro já vinculado) é guard da camada de regra de negócio; unicidade por **corrida/persistência** (violação de restrição → conflito) é da camada de persistência; **autorização/borda** é da camada de entrada; **comportamento de tela** é do frontend (gate de tela, quando `gates.screenVerify`). AC não enforçável na camada da task (ex.: uma escrita idempotente que delega a unicidade ao armazenamento) não é testável ali — realoque para a task que o impõe.
@@ -215,6 +230,14 @@ Criar/atualizar `{docsRoot}/<slug>/tasks/TASK-MMM-INDEX.md`:
 | AC | TASKs |
 |----|-------|
 | AC-NNN-001 | TASK-MMM-003 |
+
+## Cobertura por funcionalidade
+
+<!-- Só quando a SPEC declara FEATs; omitir a seção no colapso. P = primária. -->
+
+| FEAT | TASKs (P = primária) | Done |
+|------|----------------------|------|
+| FEAT-NNN-001 | TASK-MMM-001 (P), TASK-MMM-004 | 0/2 |
 ```
 
 ## Etapa 5: gate de validação
@@ -230,7 +253,7 @@ Aplicar a **receita de atualização do INDEX** (method-guide §6). Específico 
 
 ## Etapa 7: sincronização com Jira (opcional)
 
-Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §7) para criar uma **sub-task** por TASK sob a issue principal da SPEC (idempotente — §4) e gravar a key no campo `Jira:` da closure de cada TASK. Best-effort (§0): conector indisponível/falha → aviso, sem bloquear a geração das TASKs.
+Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §7) para criar uma **sub-task** por TASK (idempotente — §4) e gravar a key no campo `Jira:` da closure de cada TASK. Com a projeção de 3 níveis ativa (SPEC declara FEATs ∧ `issueType.feature` preenchido), o `parent` da sub-task é a **Story da FEAT primária** — criar antes as Stories que faltarem (§6.1) — e as FEATs secundárias recebem link "relates to"; sem FEATs ou sem `issueType.feature`, parent = issue principal da SPEC, como sempre. Best-effort (§0): conector indisponível/falha → aviso, sem bloquear a geração das TASKs.
 
 ## Output final ao usuário
 
@@ -241,4 +264,5 @@ Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira*
 5. Resultado da validação: errors, warnings.
 6. Tasks da Wave 1 (por onde começar).
 7. Gaps detectados (FRs sem TASK ou ACs sem verificação).
-8. Próximo comando: `/keelson:implement PLAN-MMM` ou `--dry-run` primeiro.
+8. Cobertura por funcionalidade (FEAT → TASKs), se a SPEC declara FEATs.
+9. Próximo comando: `/keelson:implement PLAN-MMM` ou `--dry-run` primeiro.

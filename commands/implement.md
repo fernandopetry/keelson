@@ -168,15 +168,16 @@ Report incompleto ou inválido: rejeitar, refazer.
 #### 3.4.2 Closure executada pela main session
 
 1. **Atualizar TASK-MMM-XXX-*.md**: preencher "Histórico de execução", Status: Done.
-2. **Atualizar TASK-MMM-INDEX.md**: marcar task concluída, atualizar agregados.
+2. **Atualizar TASK-MMM-INDEX.md**: marcar task concluída, atualizar agregados. Se a SPEC declara FEATs: atualizar a coluna `Done` da seção "Cobertura por funcionalidade".
 3. **Atualizar INDEX.md do slug**:
    - Atualizar coluna `Tasks` na linha do PLAN-MMM: de `X/Y` para `(X+1)/Y`, com o marcador do contrato do INDEX (method-guide, §6): `🟡` enquanto parcial, `✅` quando todas Done.
    - Atualizar campo `Última atualização`.
-   - Se esta é a última task do PLAN (todas Done):
+   - Se a SPEC declara FEATs e esta closure **completou uma FEAT** (todos os FRs dela cobertos por PLANs e todas as TASKs que a listam em `Funcionalidade` — primária ou secundária, em qualquer PLAN do slug — Done): mover a capacidade da FEAT de "Em desenvolvimento" para "Implementadas", texto `<nome da FEAT> (SPEC-NNN/FEAT-NNN-XXX, PLAN-MMM, ✅ <data>)`.
+   - Se esta é a última task do PLAN (todas Done) e a SPEC **não** declara FEATs:
      - Mover capacidade de "Em desenvolvimento" para "Implementadas".
      - Texto: `<capacidade> (SPEC-NNN, PLAN-MMM, ✅ <data>)`.
    - **Não** marcar Status do PLAN como Done automaticamente.
-4. **Sincronizar progresso com Jira (opcional)**: só quando `jira.enabled`. Aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §9) para registrar o progresso na sub-task correspondente — `transition:comment` (default) comenta o marco; `auto` transiciona validando em runtime; `off` não faz nada. O campo `Jira:` da closure (§10) identifica a sub-task. Best-effort (§0): conector ausente/falha → aviso, **não** bloqueia a closure.
+4. **Sincronizar progresso com Jira (opcional)**: só quando `jira.enabled`. Aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §9) para registrar o progresso na sub-task correspondente — `transition:comment` (default) comenta o marco; `auto` transiciona validando em runtime; `off` não faz nada. O campo `Jira:` da closure (§10) identifica a sub-task. Se a closure completou uma FEAT (check do item 3) e a projeção de 3 níveis está ativa, aplicar também o **§6.1 item 5** na Story da FEAT (comentar/transicionar "pronta p/ QA"). Best-effort (§0): conector ausente/falha → aviso, **não** bloqueia a closure.
 5. **Registrar lição durável (memória da equipe)**: se algum report (`task-reviewer`, `security-reviewer` ou `task-verifier`) trouxe `licao_candidata` não-nula (defeito com causa-raiz generalizável, ou a task exigiu retry por motivo que pode se repetir), rotear pelo campo `alvo`:
    - **`alvo: projeto`** → persistir em `guidelines/project/lessons.md` no formato canônico (`## [Categoria] título` + **Erro/Causa/Solução**), abaixo do marcador `<!-- Adicionar lições abaixo desta linha -->`. **Deduplicar**: lição equivalente existente é atualizada, não duplicada. Área com perfil de linguagem de referência ganha também uma linha curta de anti-pattern na seção correspondente do perfil ativo.
    - **`alvo: processo`** (um artefato do keelson induziu/não preveniu o erro — inclui `evento_aprendizado` emitido por validator e retry causado por instrução ambígua) → invocar o agent **`process-tuner`** com o evento; ele deduplica no ledger do projeto (`<docsRoot>/_meta/learning-log.md`) e aplica o patch cirúrgico no artefato dono **apenas quando os artefatos do keelson são versionados neste repositório** (modo dev do plugin); em projeto consumidor (plugin instalado), devolve `PROPOSTA_PLUGIN` com o diff sugerido — apresente-a ao humano na entrega. `proposta_doutrina` no report do tuner → perguntar ao humano antes de aplicar.

@@ -124,6 +124,8 @@ Conflito irresolvível: parar antes de escrever.
 - Cobertos por planos anteriores: Y
 - Cobertos por este: Z
 - Gap restante: W
+- Funcionalidades cobertas: FEAT-NNN-XXX (total), FEAT-NNN-YYY (parcial) <!-- só quando a SPEC declara FEATs; informativo, para orientar o slicing — o PLAN não ganha estrutura FEAT -->
+
 
 ## 1. Visão técnica
 

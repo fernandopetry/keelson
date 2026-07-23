@@ -93,6 +93,8 @@ Transforma uma demanda em especificação funcional (FRs em EARS, ACs em Given-W
 
 Pode fazer até 5 perguntas se houver ambiguidade crítica (contrato externo, falha, segurança, decisão irreversível). Ambiguidade menor vira premissa `[assumido]` — revise-as no output.
 
+SPEC com **2+ fluxos entregáveis** (unidades de teste do QA) agrupa os FRs da §5 sob headings `### FEAT-NNN-XXX: <nome>` — cada FR pertence a exatamente uma FEAT; os ACs derivam a filiação do FR que cobrem. Um fluxo só → **não** declare a camada (a funcionalidade colapsa na própria SPEC). Decisão 4.27.
+
 ### 3.2 `/keelson:plan` — criar PLAN
 
 Transforma uma SPEC em plano técnico: componentes (COMP), decisões arquiteturais (DEC) com alternativas, mapeamento FR → componente, riscos técnicos (TRISK). Herda stack e padrões da **ficha** (`keelson.config.json`) e do **perfil ativo** — não reescolhe.
@@ -130,6 +132,8 @@ Quebra o PLAN em tarefas atômicas (small: 30min–2h, medium: 2–4h), ordenada
 | Próximo passo | `/keelson:implement PLAN-MMM` (ou `--dry-run` primeiro) |
 
 Cada TASK contém campos de closure vazios ("Histórico de execução") que o `/keelson:implement` preenche. Não preencha manualmente.
+
+Quando a SPEC declara FEATs, cada TASK ganha o campo `**Funcionalidade**:` (FEATs dos FRs realizados, uma marcada `(primária)`; task transversal lista todas) e o `TASK-MMM-INDEX.md` ganha a seção "Cobertura por funcionalidade" (FEAT → TASKs → Done).
 
 ### 3.4 `/keelson:implement` — executar PLAN
 
@@ -259,12 +263,12 @@ Rede de segurança da integração opcional com Jira (via **conector MCP Atlassi
 
 | Aspecto | Detalhe |
 |---|---|
-| Gera | Issues/sub-tasks no Jira (via conector); grava o campo `Jira:` na SPEC e nas TASKs |
+| Gera | Issues, Stories de FEAT (quando a SPEC declara FEATs e `issueType.feature` está preenchido) e sub-tasks no Jira (via conector); grava o campo `Jira:` na SPEC, sob os headings FEAT e nas TASKs |
 | Atualiza | 1 linha no "Histórico recente" do `INDEX.md` (contrato da tabela "PLANs" intocado) |
 | Gate | — (best-effort; `jira.enabled:false` ou conector ausente → não faz nada) |
 | Lógica | Toda no `skills/_shared/jira-sync-protocol.md` — o comando só orquestra |
 
-Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisão 4.22 de `decisions.md`.
+Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22 e 4.27 de `decisions.md`.
 
 ---
 
@@ -348,6 +352,7 @@ Você normalmente não invoca estes diretamente — os comandos os orquestram:
 | `FR-NNN-XXX` / `NFR-NNN-XXX` | Requisito funcional / não-funcional | NNN = nº da SPEC |
 | `AC-NNN-XXX` | Critério de aceitação (Given-When-Then) | NNN = nº da SPEC |
 | `RISK-NNN-XXX` / `A-NNN-XXX` / `Q-NNN-XXX` | Risco / premissa / questão aberta | NNN = nº da SPEC |
+| `FEAT-NNN-XXX` | Funcionalidade — fluxo entregável, unidade de teste do QA (camada opcional: só com 2+ fluxos na SPEC; decisão 4.27) | NNN = nº da SPEC |
 | `COMP-MMM-XXX` | Componente | MMM = nº do PLAN |
 | `DEC-MMM-XXX` | Decisão arquitetural (com alternativas e flag `Irreversível`) | MMM = nº do PLAN |
 | `TRISK-MMM-XXX` | Risco técnico | MMM = nº do PLAN |
@@ -430,13 +435,14 @@ Seção ainda sem conteúdo leva nota curta do que a preenche (ex.: "(vazio até
 - **`/keelson:rebuild-index`**: acrescenta ao aviso a linha `> Última reconstrução completa via /keelson:rebuild-index: <ISO 8601>` e, se houver, a seção final `## Inconsistências conhecidas` (descrição + ação sugerida).
 - **`/keelson:migrate-legacy`**: acrescenta `**Origem**: migrado de legado em <YYYY-MM-DD> via /keelson:migrate-legacy`; capacidades legadas entram em `### Implementadas (legado, sem rastreabilidade SDD)` com marcador 📜 e origem (`legacy/<arquivo>`); decisões extraídas viram `LEGACY-DEC-*`; "SPECs"/"PLANs" ficam vazios com nota de que não há artefatos retroativos; seção extra `## Documentação legada` lista os arquivos preservados.
 - **Slug migrado** (em qualquer rebuild): as seções espelhadas do legado abrem com `> Fonte durável: legacy/TRIAGE-<data>.md` — é do TRIAGE que o rebuild as reespelha.
+- **Granularidade das Capacidades**: SPEC que declara FEATs → **uma entrada de capacidade por FEAT**, no formato `<nome da FEAT> (SPEC-NNN/FEAT-NNN-XXX, PLAN-MMM, <marcador>)`, movida entre subseções quando a FEAT fica pronta (todas as TASKs que a listam Done); SPEC sem FEATs → uma entrada por SPEC, como sempre.
 
 ### Receita de atualização do INDEX (fonte única)
 
 Todo comando que **atualiza** um INDEX existente aplica — mesclando, nunca sobrescrevendo:
 
 1. Atualizar `Última atualização`.
-2. Refletir o artefato na tabela correspondente (SPECs/PLANs — contrato acima) e nas seções que ele afeta: capacidades (movendo entre "Especificadas" → "Em desenvolvimento" → "Implementadas" conforme o ciclo), glossário (termo já existente com definição diferente → **parar e reportar conflito**), decisões irreversíveis, riscos ativos.
+2. Refletir o artefato na tabela correspondente (SPECs/PLANs — contrato acima) e nas seções que ele afeta: capacidades (movendo entre "Especificadas" → "Em desenvolvimento" → "Implementadas" conforme o ciclo; por FEAT quando a SPEC as declara), glossário (termo já existente com definição diferente → **parar e reportar conflito**), decisões irreversíveis, riscos ativos.
 3. Adicionar entrada ao "Histórico recente" com timestamp e ação — **máximo 10 entradas**.
 
 ---

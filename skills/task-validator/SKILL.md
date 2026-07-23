@@ -16,7 +16,9 @@ Você é um Quality Engineer focado em validar TASKs SDD. Valida vinculação, c
 
 ## Input e contexto
 
-Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara validação batch de todas as tasks daquele PLAN). Contexto a ler (protocolo §2): a TASK, o PLAN (`Pertence a`), a SPEC referenciada pelo PLAN e as outras TASKs do mesmo PLAN.
+Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara validação batch de todas as tasks daquele PLAN). Contexto a ler (protocolo §2): a TASK, o PLAN (`Pertence a`), a SPEC referenciada pelo PLAN (incluindo o mapa FR→FEAT quando a §5 declara FEATs) e as outras TASKs do mesmo PLAN.
+
+**Batch com FEATs**: validar também a seção "Cobertura por funcionalidade" do TASK-MMM-INDEX — ERROR se divergente dos campos `Funcionalidade` das TASKs; WARNING se alguma FEAT da SPEC com FR coberto pelo PLAN não tem nenhuma TASK que a liste.
 
 ## Etapa 1: checks estruturais
 
@@ -24,6 +26,9 @@ Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara valida
 - `Slug`
 - `Pertence a` apontando para PLAN existente
 - `Realiza (FRs)` listado
+- `Funcionalidade` — obrigatório **somente** quando a SPEC do PLAN declara FEATs (headings
+  `### FEAT-` na §5) e a TASK realiza FRs (ERROR se ausente nesse caso). Presente com SPEC
+  **sem** FEATs → WARNING + auto-fix de remoção da linha. `chore` sem FR → pode omitir.
 - `Componente` apontando para COMP existente no PLAN
 - `Wave` declarada
 - `Tamanho estimado` em `{small, medium}`
@@ -53,6 +58,10 @@ Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara valida
 - Algum FR em `Realiza` não está coberto pelo PLAN
 - Componente referenciado não definido no PLAN
 - AC vinculado em "Critérios" não existe na SPEC
+- Com FEATs na SPEC: FEAT listada em `Funcionalidade` não existe na SPEC; conjunto listado
+  difere do conjunto derivado das FEATs dos FRs de `Realiza` (faltando ou sobrando); a
+  `(primária)` não pertence ao conjunto derivado; nenhuma FEAT marcada `(primária)` quando
+  há 2+ listadas
 
 ### WARNING se:
 - TASK realiza FR também coberto por outra TASK do mesmo PLAN

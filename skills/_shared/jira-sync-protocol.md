@@ -38,7 +38,7 @@ variam por projeto.
 | `site` / `cloudId` | resolução do site (§1) |
 | `projectKey` | projeto-alvo das criações |
 | `mode` | `create` (cria hierarquia) \| `link` (pendura em issue existente) — §5 |
-| `issueType.spec` / `issueType.task` | **IDs** do tipo da issue da SPEC e da sub-task da TASK |
+| `issueType.spec` / `issueType.feature` / `issueType.task` | **IDs** do tipo da issue da SPEC, da Story de funcionalidade (opcional — `null` desliga o 3º nível, §6.1) e da sub-task da TASK |
 | `transition` | `off` \| `comment` (default) \| `auto` — §9 |
 | `mapFile` | caminho do mapa `.md` do projeto (§3); `null` → só `summary`+`description`, sem mover card |
 | `boardId` | opcional, só para compor link "ver no board" em comentário |
@@ -54,14 +54,20 @@ editado pelo humano. Ausente → o protocolo usa só `summary`+`description` e n
     `Valor`, ex.: ACs da SPEC, resumo, `pr.url`) · vazio = ignorar.
   - Campos `option`/`array` guardam o **ID** da opção em `Valor`, nunca o texto.
 - **Seção "Etapas/Colunas"** — tabela `Etapa | Coluna | Status-alvo (ID) | Gatilho`: mapeia
-  cada marco do ciclo a um status-alvo (§9). `Coluna` é só rótulo legível.
+  cada marco do ciclo a um status-alvo (§9). `Coluna` é só rótulo legível. Com o 3º nível
+  ativo (§6.1), a tabela pode declarar a linha
+  `Funcionalidade pronta p/ QA | <coluna> | <status-id> | todas as TASKs da FEAT Done` —
+  status-alvo aplicado **na Story** da FEAT; ausente → o marco vira comentário.
 
 ## §4. Idempotência (obrigatória)
 
 Antes de **criar** qualquer issue, checar a key já persistida (§10): front-matter da SPEC
-para a issue principal; bloco de closure da TASK para a sub-task. Se a key existe e resolve
-(`getJiraIssue` ok) → **atualizar/no-op**, nunca recriar. Garante que re-runs (`tasks` duas
-vezes, reconciliação) não duplicam issues.
+para a issue principal; linha `**Jira**:` sob o heading da FEAT para a Story (§6.1); bloco
+de closure da TASK para a sub-task. Se a key existe e resolve (`getJiraIssue` ok) →
+**atualizar/no-op**, nunca recriar. Garante que re-runs (`tasks` duas vezes, reconciliação)
+não duplicam issues. **Nunca re-parentar**: sub-tasks criadas no modo 2 níveis antes da
+adoção do 3º nível permanecem sob a issue da SPEC — mover parent de sub-task não é suportado
+com segurança; o estado misto é **reportado**, não corrigido.
 
 ## §5. Modos `create` e `link`
 
@@ -78,6 +84,34 @@ vezes, reconciliação) não duplicam issues.
 gravar a key no front-matter (§10). 3. `link` → validar a key existente e aplicar campos
 `write`/`read` conforme o mapa. PLAN **não** vira issue (fica implícito na descrição).
 
+## §6.1. Stories das funcionalidades (FEAT) — 3º nível opcional
+
+1. **Ativação (duplo opt-in)**: a SPEC declara FEATs (headings `### FEAT-` na §5) **e**
+   `issueType.feature` está preenchido. Qualquer um ausente → esta seção inteira é no-op e
+   a projeção segue em 2 níveis, idêntica à de hoje.
+2. **Pré-check de hierarquia** (operar por ID, §1): via `getJiraProjectIssueTypesMetadata`,
+   conferir `hierarchyLevel` — o caminho pleno exige `issueType.spec` epic-level (1),
+   `issueType.feature` standard (0) e `issueType.task` `subtask:true` (-1).
+3. **Criação** (modo `create`, por FEAT sem key — idempotência §4): `createJiraIssue` com
+   `projectKey`, `issueType.feature`, `parent` = key da issue da SPEC, `summary` = nome da
+   FEAT, `description` = descrição (`>`) + lista dos ACs derivados
+   (`ACs(FEAT) = ACs que cobrem FRs da FEAT`); aplicar campos `write` (§8); gravar a key na
+   linha `**Jira**:` sob o heading (§10).
+4. **Escada de degradação (best-effort §0)**:
+   - (i) `issueType.spec` não é epic-level ou o Jira rejeita o `parent` → criar a Story
+     **sem parent** + `createIssueLink` "relates to" com a issue da SPEC + aviso de 1 linha.
+   - (ii) modo `link` → as Stories penduram na issue humana do front-matter se a hierarquia
+     dela aceitar filhos; senão, degrau (i). Key pré-preenchida pelo humano numa FEAT →
+     validar com `getJiraIssue` e no-op (mesma semântica do `link` da SPEC).
+   - (iii) criação da Story falhou de vez → as sub-tasks daquela FEAT caem no parent da
+     issue da SPEC (comportamento 2 níveis) + aviso. **Nunca bloqueia.**
+5. **Pronta p/ QA**: quando o chamador (implement, ou a reconciliação §12) constatar a FEAT
+   pronta — **todas** as TASKs que a listam em `Funcionalidade` (primária **ou** secundária,
+   em qualquer PLAN do slug) estão `Done`, com os ACs verificados pelos gates — aplicar a
+   política de `transition` **na Story**: `comment` → comenta "funcionalidade pronta para
+   QA"; `auto` → transiciona para o status-alvo do gatilho "Funcionalidade pronta p/ QA" do
+   mapa (validação em runtime, §9); sem linha no mapa → cai para comentário.
+
 ## §7. Criar sub-tasks das TASKs
 
 Para cada TASK sem key: `createJiraIssue` com `issueType.task` e `parent` = key da issue da
@@ -85,6 +119,12 @@ SPEC; `summary` = título da TASK; aplicar campos `write`. Gravar a key na closu
 **Robustez**: se `issueType.task` não for `subtask:true` no projeto (checar via
 `getJiraProjectIssueTypesMetadata`), fazer fallback para issue normal + `createIssueLink`
 ("relates to") em vez de sub-task.
+
+**Com §6.1 ativo**: `parent` = key da **Story da FEAT primária** da TASK (campo
+`Funcionalidade`); cada FEAT secundária recebe `createIssueLink` "relates to" entre a
+sub-task e a Story dela. Story primária sem key (criação falhou, §6.1 degrau iii) →
+fallback: `parent` = issue da SPEC + aviso. O fallback de `subtask:false` acima continua
+valendo — o link "relates to" aponta para a Story primária quando ela existe.
 
 ## §8. Campos personalizados (§3, seção Campos)
 
@@ -107,9 +147,14 @@ Conforme `jira.transition`:
   satisfazê-las; aplicar via `transitionJiraIssue`. **Sem caminho seguro → cai para comentar**
   (não força, não erra). O mapa é intenção; a transição real é sempre validada em runtime.
 
+O marco de closure atua na **sub-task**; o marco de funcionalidade pronta atua na **Story**
+e é regido pelo §6.1 item 5.
+
 ## §10. Persistência das keys
 
 - **SPEC** → campo `Jira: <KEY>` no front-matter (`null`/ausente = ainda não sincronizada).
+- **FEAT** → linha `**Jira**: <KEY>` imediatamente sob o heading `### FEAT-NNN-XXX` na SPEC
+  (ausente = Story ainda não sincronizada).
 - **TASK** → campo `Jira: <KEY>` no bloco "Histórico de execução" da closure, ao lado de
   `Commit SHA`.
 - **INDEX** → apenas 1 linha no "Histórico recente" (`issues Jira: <KEY> + N sub-tasks`); o
@@ -123,7 +168,10 @@ Best-effort (§0).
 
 ## §12. Reconciliação (`/keelson:jira-sync`)
 
-Reprocessa um slug de forma idempotente (§4): cria/vincula a issue da SPEC e as sub-tasks
-faltantes, aplica campos, e — se `transition:auto` — alinha o status ao estado real das
-TASKs (Done → status-alvo de "concluída"). É a rede de segurança do best-effort para o que
-uma execução anterior pulou (conector offline, transição barrada).
+Reprocessa um slug de forma idempotente (§4), na ordem: issue da SPEC (§6) → Stories das
+FEATs (§6.1) → sub-tasks (§7) → status (§9, incluindo o gatilho "Funcionalidade pronta
+p/ QA" para FEATs já completas). Aplica campos e — se `transition:auto` — alinha o status
+ao estado real das TASKs (Done → status-alvo de "concluída"). Estado misto (sub-tasks
+legadas sob a issue da SPEC com o 3º nível ativo) é **reportado no output**, nunca
+re-parentado (§4). É a rede de segurança do best-effort para o que uma execução anterior
+pulou (conector offline, transição barrada).

@@ -40,7 +40,7 @@ Caminho de um ou mais `SPEC-*.md`. Contexto a ler (protocolo §2): a SPEC comple
 10. Fora deste documento
 
 ### IDs (ERROR)
-- Formato: `FR-NNN-XXX`, `NFR-NNN-XXX`, `AC-NNN-XXX`, `RISK-NNN-XXX`, `A-NNN-XXX`, `Q-NNN-XXX`
+- Formato: `FR-NNN-XXX`, `NFR-NNN-XXX`, `AC-NNN-XXX`, `RISK-NNN-XXX`, `A-NNN-XXX`, `Q-NNN-XXX`, `FEAT-NNN-XXX`
 - NNN é o número da SPEC, XXX sequencial zero-padded em 3 dígitos
 - Auto-fix se zero-padding ausente
 - Auto-fix se sequência tem buraco
@@ -96,6 +96,27 @@ Unwanted behavior: Se <gatilho indesejado>, então o <sistema> deve <resposta>.
 - AC fora de Given-When-Then
 - NFR vago: "rápido", "seguro", "user-friendly", "intuitivo", "escalável"
 - NFR sem valor numérico
+
+## Etapa 4.5: checks de funcionalidades (FEAT — camada opcional)
+
+Nenhum heading `### FEAT-` na seção 5 → **pular esta etapa sem aviso** (colapso válido: a
+funcionalidade é a própria SPEC). A filiação FR→FEAT é posicional (o FR está sob o heading);
+os ACs derivam a filiação do FR que cobrem — não há vínculo AC→FEAT literal a validar.
+
+### ERROR se:
+- FR fora de qualquer heading FEAT quando ao menos uma FEAT existe (partição parcial)
+- FEAT sem nenhum FR sob o heading
+- Heading `### FEAT-` fora da seção 5
+- FEAT sem AC derivado (nenhum AC cobre FR dela — na prática já coberto por "FR sem AC",
+  manter por robustez)
+
+### WARNING se:
+- Exatamente 1 FEAT declarada (sugerir colapso: remover a camada, a funcionalidade é a SPEC)
+- FEAT sem a linha de descrição `>` (o QA não sabe o que testar de ponta a ponta)
+- Nome de FEAT que não é um fluxo verificável (ex.: "melhorias gerais", "ajustes")
+
+A linha `**Jira**:` sob o heading da FEAT é tolerada e ignorada pelos checks (mesma semântica
+do `Jira:` do front-matter).
 
 ## Etapa 5: checks de domínio vs tecnologia
 

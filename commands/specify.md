@@ -75,12 +75,18 @@ Ambiguidade não crítica vira premissa `[assumido]`.
    - Optional: `Onde <feature presente>, o <sistema> deve <resposta>.`
    - Unwanted: `Se <gatilho indesejado>, então o <sistema> deve <resposta>.`
 4. **RFC 2119**: MUST, SHOULD, MAY em maiúsculas.
-5. **IDs escopados ao SPEC**: `FR-NNN-001`, `NFR-NNN-001`, `AC-NNN-001`, `RISK-NNN-001`.
-6. **Verificabilidade absoluta**.
-7. **Separação rígida o quê vs como**: proibido mencionar tecnologia.
-8. **Suposições explícitas**: `[confirmar]` ou `[assumido]`.
-9. **Escopo e não-escopo simétricos**.
-10. **Aderência à linguagem do projeto**: se o `CLAUDE.md` ou o INDEX declaram convenção de linguagem, seguir.
+5. **IDs escopados ao SPEC**: `FR-NNN-001`, `NFR-NNN-001`, `AC-NNN-001`, `RISK-NNN-001`, `FEAT-NNN-001`.
+6. **Funcionalidades (FEAT) — só quando há 2+ fluxos entregáveis**: se a SPEC contém dois ou
+   mais fluxos que o QA testa de ponta a ponta de forma independente (ex.: "login no portal"
+   e "lançamento de horas"), agrupe os FRs da §5 sob headings `### FEAT-NNN-XXX: <nome>` —
+   cada FR pertence a **exatamente uma** FEAT (partição total). Os ACs **não** redeclaram
+   filiação: derivam da FEAT do FR que cobrem. Um fluxo só → **não** declare a camada (a
+   funcionalidade é a própria SPEC e a §5 fica em lista plana).
+7. **Verificabilidade absoluta**.
+8. **Separação rígida o quê vs como**: proibido mencionar tecnologia.
+9. **Suposições explícitas**: `[confirmar]` ou `[assumido]`.
+10. **Escopo e não-escopo simétricos**.
+11. **Aderência à linguagem do projeto**: se o `CLAUDE.md` ou o INDEX declaram convenção de linguagem, seguir.
 
 ## Etapa 3: estrutura obrigatória do arquivo SPEC
 
@@ -108,7 +114,16 @@ Ambiguidade não crítica vira premissa `[assumido]`.
 ### 4.2 Out-of-scope
 
 ## 5. Requisitos funcionais (EARS)
+<!-- Com 1 único fluxo entregável, mantenha a lista plana (sem FEAT): -->
 - **FR-NNN-001** [MUST] ...
+<!-- Com 2+ fluxos entregáveis (unidades de teste do QA), agrupe TODOS os FRs sob headings FEAT:
+### FEAT-NNN-001: <Nome do fluxo entregável>
+> <1–2 linhas: o fluxo do ponto de vista do QA — o que se testa de ponta a ponta>
+
+**Jira**: <KEY da Story — só com projeção 3 níveis ativa; omita a linha se não sincronizada>
+
+- **FR-NNN-001** [MUST] ...
+-->
 
 ## 6. Requisitos não-funcionais
 - **NFR-NNN-001** [MUST] ...
@@ -152,7 +167,7 @@ Aplicar a **receita de atualização do INDEX** (method-guide §6). Específicos
 
 ### 5.3 Sincronização com Jira (opcional)
 
-Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §6) para **criar** (modo `create`) **ou validar o vínculo** (modo `link`) da issue principal desta SPEC e gravar a key no front-matter `Jira:`. Best-effort (§0): conector indisponível/falha → aviso, sem bloquear a criação da SPEC.
+Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §6) para **criar** (modo `create`) **ou validar o vínculo** (modo `link`) da issue principal desta SPEC e gravar a key no front-matter `Jira:`. Se a SPEC declara FEATs e `issueType.feature` está preenchido, aplicar também o **§6.1** — criar/vincular a Story de cada FEAT e gravar a key na linha `**Jira**:` sob o heading. Best-effort (§0): conector indisponível/falha → aviso, sem bloquear a criação da SPEC.
 
 ## Output final ao usuário
 
