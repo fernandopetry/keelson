@@ -7,25 +7,16 @@ description: Valida PLANs SDD (arquivos sob {docsRoot}/*/plans/PLAN-*.md) contra
 
 Você é um Quality Engineer focado em validar PLANs técnicos SDD. Valida estrutura, cobertura, decisões arquiteturais, aderência a guidelines.
 
-**Calibração por exemplares (antes de reprovar por convenção)**: o padrão-ouro vivo são os PLANs **aprovados/mergeados** do projeto (`{docsRoot}/*/plans/`). Se um check de convenção diverge da prática real de 2–3 deles, suspeite da regra, não do artefato: não gere ERROR; emita `evento_aprendizado` de falso positivo.
+**Protocolo comum** (leia antes de validar): a moldura desta skill vive em `${CLAUDE_PLUGIN_ROOT}/skills/_shared/validator-protocol.md` — calibração por exemplares, setup, severidades/auto-fix, gate de status/override, relatório, evento de aprendizado e limites. Abaixo, só os checks próprios de PLAN. Exemplares (protocolo §1): PLANs aprovados em `{docsRoot}/*/plans/`; comando gerador (protocolo §6): `commands/plan.md`.
 
 ## Ativação
 
 1. **Automática**: ao final do `/keelson:plan`.
 2. **Manual**: validação de PLAN existente.
 
-## Input
+## Input e contexto
 
-Caminho de um ou mais `PLAN-*.md`.
-
-## Etapa 0: setup
-
-1. Ler a **ficha** (`keelson.config.json` na raiz): `docsRoot` (resolve os caminhos `{docsRoot}/...`; sem ficha, assumir `docs/`) e `profile.<role>.file` (perfil de linguagem ativo — a fonte primária de stack/convenções, a mesma de que o `/keelson:plan` gera).
-2. Ler o PLAN.
-3. Ler a SPEC referenciada.
-4. Ler `CLAUDE.md` se existir (fonte **complementar**; ausência dele, ou omissão de uma convenção nele, nunca gera ERROR).
-5. Ler `INDEX.md` do slug.
-6. Inicializar: `errors`, `warnings`, `infos`, `auto_fixes_applied`.
+Caminho de um ou mais `PLAN-*.md`. Contexto a ler (protocolo §2): o PLAN, a SPEC referenciada e o `INDEX.md` do slug.
 
 ## Etapa 1: checks estruturais
 
@@ -126,61 +117,6 @@ Caminho de um ou mais `PLAN-*.md`.
 ### INFO se:
 - Inconsistência genuína na SPEC identificada (não bloqueante: resolve criando nova SPEC).
 
-## Etapa 8: aplicar auto-fixes
+## Fechamento
 
-Aplicar e registrar.
-
-## Etapa 9: gate de status
-
-- Errors não-vazia e Status: Approved: forçar Draft.
-- Errors vazia: pode ser promovido manualmente.
-
-### Override
-```yaml
-override-erros: <IDs>
-override-justificativa: <texto>
-override-aprovador: <nome>
-```
-
-## Output
-
-```markdown
-# Relatório de validação: PLAN-MMM
-
-**Arquivo**: <caminho>
-**Status atual**: <status>
-**Resultado**: PASSOU | PASSOU COM RESSALVAS | BLOQUEADO
-
-## Resumo
-- Errors: N | Warnings: N | Infos: N
-
-## Auto-fixes aplicados
-- ...
-
-## Errors pendentes
-- **[DEC-MMM-XXX]** sem alternativas listadas.
-  Sugestão: adicionar ao menos 1 alternativa descartada.
-
-## Warnings
-- ...
-
-## Próximos passos
-1. Resolver errors
-2. Rodar validação novamente
-3. Quando errors == 0, promover Status manualmente
-```
-
-## Evento de aprendizado (telemetria do processo)
-
-Se o PLAN validado foi **recém-gerado por um comando do keelson** e restou ERROR não auto-corrigível, acrescente ao relatório um bloco `evento_aprendizado` (gatilho `validator_error`, causa_raiz, `artefato_suspeito: commands/plan.md`) para a main session rotear ao `process-tuner`. Falso positivo recorrente deste validator também é evento (artefato_suspeito: esta skill).
-
-## Limites
-
-Não valida:
-- Se a arquitetura é a melhor para o problema
-- Se DEC é tecnicamente correta
-- Performance, segurança ou escalabilidade real
-
----
-
-**Agora processe o arquivo PLAN fornecido.**
+Aplicar auto-fixes, gate de status e relatório conforme o protocolo (§3–§6).

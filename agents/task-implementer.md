@@ -46,16 +46,7 @@ Antes de codar, atualizar o arquivo da TASK:
 **Data início**: <ISO 8601 com timezone atual>
 ```
 
-### 3. Planejar localmente
-
-Mentalmente:
-- Quais arquivos serão criados/modificados?
-- Que estrutura de testes verificará os ACs?
-- Há padrão de design declarado que se aplica?
-
-Se conflito real entre TASK, PLAN, SPEC ou a doutrina (Charter/perfil/ficha): **pare e reporte**.
-
-### 4. Implementar
+### 3. Implementar
 
 1. Criar/modificar arquivos no working tree (ou worktree em Agent Teams).
 2. Respeitar:
@@ -65,7 +56,7 @@ Se conflito real entre TASK, PLAN, SPEC ou a doutrina (Charter/perfil/ficha): **
    - Anti-padrões proibidos
 3. **Só toque arquivos em "Escopo > Inclui"** e auxiliares necessários (testes, types, fixtures) — dentro dos `codePaths` da ficha.
 
-### 5. Escrever testes que cobrem os ACs
+### 4. Escrever testes que cobrem os ACs
 
 **Antes de escrever testes, consulte a seção de testes do perfil de linguagem ativo**
 (`profile` da ficha) e o `${CLAUDE_PLUGIN_ROOT}/guidelines/core/TESTING.md` (roteiro canônico: convenções,
@@ -80,13 +71,13 @@ Para cada AC vinculado:
 
 Teste deve ser **falsificável**.
 
-### 6. Rodar testes e lint localmente
+### 5. Rodar testes e lint localmente
 
 1. Executar a suíte via `quality.test` da ficha (mínimo: testes novos verdes).
 2. Executar lint/formatter via `quality.lint` da ficha.
 3. Capturar: passa/total, cobertura, warnings.
 
-### 7. Commit
+### 6. Commit
 
 Padrão de commit do projeto (ver `CLAUDE.md`/ficha). Default: Conventional Commits. **Estagie por caminho explícito** (`git add <arquivos da task>`; nunca `git add -A`/`git add .`/`git add <diretório inteiro>`): o working tree é compartilhado com outras waves/tasks e arquivos untracked de outro escopo não podem entrar no seu commit nem poluir o snapshot do reviewer.
 
@@ -96,7 +87,7 @@ feat(<slug>): <descrição curta>
 Implementa TASK-MMM-XXX, cobre FR-NNN-XXX, AC-NNN-XXX.
 ```
 
-### 8. Retornar report estruturado
+### 7. Retornar report estruturado
 
 Ao terminar, retornar report YAML exato:
 
@@ -127,8 +118,8 @@ falhas:
 
 ## Quando parar e reportar (sem implementar)
 
-- TASK referencia FR/AC inexistente na SPEC.
-- TASK referencia COMP inexistente no PLAN.
+- Conflito real entre TASK, PLAN, SPEC ou a doutrina (Charter/perfil/ficha).
+- TASK referencia FR/AC inexistente na SPEC, ou COMP inexistente no PLAN.
 - PLAN propõe stack que conflita com o perfil de linguagem ativo / a ficha.
 - Decisão irreversível do INDEX seria violada.
 - Você precisaria editar arquivo fora de "Escopo > Inclui".
@@ -137,15 +128,4 @@ falhas:
 
 ## Limites
 
-Você **não**:
-- Faz code review próprio.
-- Marca a TASK como Done.
-- Atualiza o INDEX.md do slug.
-- Atualiza o TASK-MMM-INDEX.md.
-- Modifica SPEC, PLAN, a ficha ou os guidelines/perfis.
-- Faz deploy, cria PR, ou merge.
-- Decide entre alternativas técnicas não cobertas pelo PLAN.
-
----
-
-**Agora aguarde a TASK específica a implementar.**
+Além do que a abertura já veda (review próprio, closure): não atualiza INDEX.md nem TASK-MMM-INDEX.md, não modifica SPEC/PLAN/ficha/guidelines, não cria PR nem faz merge/deploy, e não decide entre alternativas técnicas não cobertas pelo PLAN.

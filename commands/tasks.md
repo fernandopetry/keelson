@@ -29,7 +29,7 @@ Você é um Tech Lead especialista em decompor planos arquiteturais em tarefas a
 ### 0.1 Carregar guidelines
 
 1. Ler a **ficha** (`keelson.config.json`) e o `CLAUDE.md` do projeto se existir.
-2. Carregar as convenções de teste do **perfil de linguagem ativo** (seção Testes; resolvido por `profile.<role>.file` da ficha — prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/`, senão relativo à raiz do projeto; avise se `reviewed: false`) e a doutrina de `${CLAUDE_PLUGIN_ROOT}/guidelines/core/*`; some as lições do projeto (`guidelines/project/`) e demais seções do perfil conforme a área.
+2. Carregar a doutrina e as convenções de teste do **perfil de linguagem ativo** (resolução e avisos: convenção comum — method-guide §3.0, `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`), mais as demais seções do perfil conforme a área.
 3. Extrair: convenção de branch, padrão de commit, granularidade típica, DoD padrão, framework de teste (do perfil).
 
 ### 0.2 Resolver PLAN
@@ -225,36 +225,7 @@ Após gerar todas as TASKs e o TASK-MMM-INDEX, invocar a skill `task-validator` 
 
 ## Etapa 6: atualização do INDEX.md do slug
 
-Aplicar ao `{docsRoot}/<slug>/INDEX.md`:
-
-1. **Atualizar campo `Última atualização`**.
-
-2. **Atualizar coluna `Tasks` na linha do PLAN-MMM** na tabela "PLANs", no formato canônico do contrato do INDEX (method-guide, §6):
-   - De `0/? ⏸` para `0/<total de tasks geradas> ⏸`.
-
-3. **Adicionar entrada ao "Histórico recente"**:
-   ```
-   - <YYYY-MM-DD HH:MM>: PLAN-MMM decomposto em <N> tasks via /keelson:tasks
-   ```
-
-### Validar persistência
-
-Reler INDEX, confirmar coluna Tasks atualizada para o PLAN.
-
-## Etapa 7: validação manual final
-
-- [ ] PLAN identificado e lido
-- [ ] Ficha lida
-- [ ] INDEX.md atualizado
-- [ ] Convenções aplicadas em cada TASK
-- [ ] Toda task tem `Pertence a` correto
-- [ ] Cada FR coberto pelo PLAN tem ao menos uma TASK
-- [ ] Cada AC tem TASK que o verifica
-- [ ] Dependências topológicas sem ciclos
-- [ ] Cada TASK tem seção "Histórico de execução" vazia
-- [ ] TASK-MMM-INDEX.md gerado
-- [ ] Skill task-validator executada
-- [ ] INDEX.md do slug atualizado
+Aplicar a **receita de atualização do INDEX** (method-guide §6). Específico desta etapa: atualizar a coluna `Tasks` na linha do PLAN-MMM, no formato canônico do contrato — de `0/? ⏸` para `0/<total de tasks geradas> ⏸`.
 
 ## Output final ao usuário
 
@@ -266,7 +237,3 @@ Reler INDEX, confirmar coluna Tasks atualizada para o PLAN.
 6. Tasks da Wave 1 (por onde começar).
 7. Gaps detectados (FRs sem TASK ou ACs sem verificação).
 8. Próximo comando: `/keelson:implement PLAN-MMM` ou `--dry-run` primeiro.
-
----
-
-**Agora processe a entrada do usuário.**

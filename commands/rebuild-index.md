@@ -109,66 +109,7 @@ Detectar e listar:
 
 ## Etapa 3: gerar o INDEX
 
-Construir o INDEX seguindo a estrutura canônica:
-
-```markdown
-# <Nome do slug em formato título>
-
-> Arquivo gerado automaticamente. Não edite manualmente.
-> Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
-> Última reconstrução completa via /keelson:rebuild-index: <ISO 8601>
-
-**Slug**: <slug>
-**Última atualização**: <ISO 8601>
-
-## Resumo
-<2 a 3 linhas derivadas dos outcomes das SPECs aprovadas.>
-
-## Capacidades
-
-### Implementadas
-- <capacidade> (SPEC-NNN, PLAN-MMM, ✅ <data>)
-
-### Em desenvolvimento
-- <capacidade> (SPEC-NNN, PLAN-MMM, 🟡 X/Y tasks Done)
-
-### Especificadas, ainda não planejadas
-- <outcome> (SPEC-NNN, ⏸ aguardando /keelson:plan)
-
-## SPECs
-
-| ID | Título | Status | Data |
-|----|--------|--------|------|
-
-## PLANs
-
-| ID | Cobre | FRs cobertos | Tasks | Status |
-|----|-------|--------------|-------|--------|
-
-## Glossário consolidado
-
-| Termo | Definição | Origem |
-|-------|-----------|--------|
-
-## Decisões irreversíveis
-
-- **DEC-MMM-XXX** (PLAN-MMM): <texto curto>
-
-## Riscos ativos
-
-| ID | Risco | Mitigação | Origem |
-|----|-------|-----------|--------|
-
-## Histórico recente
-
-- <data>: SPEC-NNN aprovada
-- <data>: PLAN-MMM concluído (N tasks)
-
-## Inconsistências conhecidas (se houver)
-
-- <descrição>
-- Ação sugerida: <recomendação>
-```
+Construir o INDEX seguindo o **template canônico** (method-guide §6 — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`), com a variação do rebuild descrita lá: linha extra no aviso (`> Última reconstrução completa via /keelson:rebuild-index: <ISO 8601>`) e, se houver, a seção final `## Inconsistências conhecidas` (descrição + ação sugerida).
 
 **Slug migrado**: as seções Resumo/Capacidades/Glossário/Decisões/Riscos incorporam os achados do TRIAGE (itens 📜 e `LEGACY-DEC-*`, abrindo com `> Fonte durável: legacy/TRIAGE-<data>.md`), mesclados com o que vier de SPECs/PLANs/TASKs.
 
@@ -176,8 +117,7 @@ Construir o INDEX seguindo a estrutura canônica:
 
 Se não for `--dry-run`:
 1. Escrever em `{docsRoot}/<slug>/INDEX.md`.
-2. Validar persistência.
-3. Manter o backup.
+2. Manter o backup.
 
 Se `--dry-run`:
 1. Imprimir o INDEX gerado.
@@ -218,12 +158,4 @@ Se `--dry-run`:
 
 ## Limites
 
-O /keelson:rebuild-index **não**:
-- Modifica SPECs, PLANs ou TASKs.
-- Resolve inconsistências automaticamente.
-- Promove status.
-- Cria backup de SPECs/PLANs/TASKs (só do INDEX).
-
----
-
-**Agora processe a solicitação do usuário.**
+Não resolve inconsistências automaticamente, não promove status, e o backup cobre só o INDEX (SPECs/PLANs/TASKs nunca são tocados — princípio 2).

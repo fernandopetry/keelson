@@ -22,9 +22,9 @@ Você é um Staff Engineer especialista em arquitetura de software e em desenvol
 ### 0.1 Carregar guidelines e memo
 
 1. Ler a **ficha** (`keelson.config.json`): `profile` (backend/frontend), `codePaths`, comandos de qualidade, `gates`, `docsRoot`.
-2. Carregar os guidelines conforme a área tocada: `${CLAUDE_PLUGIN_ROOT}/guidelines/core/*` (doutrina agnóstica, **sempre** ativa) e o **perfil de linguagem ativo**, resolvido pelo campo `profile.<role>.file` da ficha (prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/<resto>`; caminho simples → relativo à raiz do projeto; campo ausente → exemplar do plugin com a mesma `lang`, senão procurar em `guidelines/project/<role>/`). Perfil com `reviewed: false` no front-matter → **avise** que ele está pendente de revisão humana antes de confiar. Em mudança sensível, a seção de segurança do perfil e do `QUALITY-CHARTER` (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/`); em datasets/queries pesadas, a seção de performance do perfil. Some as lições do projeto (`guidelines/project/`, na raiz do projeto).
+2. Carregar a doutrina e o **perfil de linguagem ativo** (resolução e avisos: convenção comum — method-guide §3.0, `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`). Em mudança sensível, some a seção de segurança do perfil e o `QUALITY-CHARTER` (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/`); em datasets/queries pesadas, a seção de performance do perfil.
 3. Extrair pontos críticos: stack autorizado, padrões arquiteturais, decisões irreversíveis globais, padrões de teste, anti-padrões.
-4. **Memo de exploração**: se `thoughts/local/exploration-<slug>.md` existe (criado pela exploração da demanda ou pelo `/keelson:specify`), use-o como mapa do domínio em vez de re-explorar; faltou detalhe → complemente o memo.
+4. **Memo de exploração**: se existe, use-o como mapa do domínio (convenção comum — method-guide §3.0).
 
 ### 0.2 Resolver SPEC alvo
 
@@ -184,51 +184,11 @@ Após gerar o PLAN, invocar a skill `plan-validator` no arquivo.
 
 ## Etapa 7: atualização do INDEX.md
 
-Aplicar ao INDEX.md do slug:
+Aplicar a **receita de atualização do INDEX** (method-guide §6). Específicos desta etapa:
 
-1. **Atualizar campo `Última atualização`**.
-
-2. **Adicionar linha na tabela "PLANs"** no formato canônico do contrato do INDEX (`<docsRoot>/_meta/method-guide.md`, §6 — não redefina header nem célula):
-   ```
-   | PLAN-MMM | SPEC-NNN | <FRs cobertos resumidos> | 0/? ⏸ | Draft |
-   ```
-   (INDEX antigo sem tabela na seção → criar antes o header canônico de 5 colunas.)
-
-3. **Mover capacidade entre seções**:
-   - Identificar entrada em "Especificadas, ainda não planejadas" correspondente à SPEC.
-   - Se este PLAN cobre 100% dos FRs da SPEC, **remover** essa entrada.
-   - Se cobre parcial, manter mas reduzir o escopo descrito.
-   - **Adicionar nova entrada** em "Em desenvolvimento" com texto curto descrevendo a capacidade que este PLAN entrega.
-
-4. **Adicionar DEC irreversíveis** ao bloco "Decisões irreversíveis":
-   - Para cada DEC-MMM-XXX com `Irreversível: sim`, adicionar linha:
-   ```
-   - **DEC-MMM-XXX** (PLAN-MMM): <texto curto da decisão>
-   ```
-
-5. **Adicionar TRISK-MMM-XXX altos** à tabela "Riscos ativos".
-
-6. **Adicionar entrada ao "Histórico recente"**:
-   ```
-   - <YYYY-MM-DD HH:MM>: PLAN-MMM criado (cobre <N> FRs da SPEC-NNN)
-   ```
-   Máximo 10 entradas.
-
-### Validar persistência
-
-Reler INDEX, confirmar tabela PLANs com nova linha e timestamp atualizado. Se não persistiu, alertar.
-
-## Etapa 8: validação manual final
-
-- [ ] SPEC alvo identificada
-- [ ] Ficha e INDEX.md lidos
-- [ ] Cobertura calculada
-- [ ] Stack autorizado
-- [ ] Decisões irreversíveis do slug respeitadas
-- [ ] Cada FR coberto mapeado para um COMP
-- [ ] Cada DEC tem alternativas e Irreversível: sim|não
-- [ ] Skill plan-validator executada
-- [ ] INDEX.md atualizado
+1. **Linha nova na tabela "PLANs"** no formato canônico do contrato (method-guide §6 — não redefina header nem célula): `| PLAN-MMM | SPEC-NNN | <FRs cobertos resumidos> | 0/? ⏸ | Draft |`. (INDEX antigo sem tabela na seção → criar antes o header canônico de 5 colunas.)
+2. **Mover capacidade entre seções**: PLAN cobre 100% dos FRs da SPEC → **remover** a entrada de "Especificadas, ainda não planejadas"; cobertura parcial → manter, reduzindo o escopo descrito. Adicionar entrada em "Em desenvolvimento" com a capacidade que este PLAN entrega.
+3. **Adicionar DEC com `Irreversível: sim`** ao bloco "Decisões irreversíveis" e **TRISK altos** à tabela "Riscos ativos".
 
 ## Output final ao usuário
 
@@ -240,7 +200,3 @@ Reler INDEX, confirmar tabela PLANs com nova linha e timestamp atualizado. Se n�
 6. Alertas: overlap, gap, conflito de guideline.
 7. Estado do INDEX.
 8. Próximo comando: `/keelson:tasks PLAN-MMM`.
-
----
-
-**Agora processe a entrada do usuário.**

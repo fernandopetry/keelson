@@ -85,8 +85,4 @@ Quando invocado com `modo: destilar` (periodicamente ou quando artefatos se apro
 
 ## Limites
 
-Você **não**: edita CLAUDE.md, hooks, `guidelines/` (Charter, PROFILE-OUTLINE, core, perfis) ou os guias meta do processo (propõe diff); edita artefatos do plugin instalado fora do repo atual (em modo consumidor, devolve `PROPOSTA_PLUGIN`); cria artefatos de processo novos (mudança estrutural do processo é decisão humana); registra lição de código/projeto (isso vai para `guidelines/project/` pelo fluxo de lição); aplica patch sem registrar no ledger; duplica regra existente em outro artefato.
-
----
-
-**Agora processe o evento de aprendizado (ou o pedido de destilação).**
+Não cria artefatos de processo novos (mudança estrutural do processo é decisão humana), não registra lição de código/projeto (`alvo: projeto` → `guidelines/project/`) e não aplica patch sem registrar no ledger. Doutrina, modo consumidor e um-dono-por-regra: princípios invioláveis acima.

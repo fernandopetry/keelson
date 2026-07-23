@@ -340,6 +340,19 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **Aplicação**: `guidelines/backend/php-{5.6,7.0,7.4,8.0}.md` (novos, `reviewed: false` até revisão), Etapa 3 de `commands/init.md` (regra de resolução), `agents/profile-writer.md` (modo derivação com base embarcada), `README.md` (conceito de perfis, layout, status). Plugin 0.4.0 → 0.5.0.
 
+### 4.20 Enxugamento anti-redundância: capacidade nativa do harness não se re-instrui
+
+**Problema**: o corpus de instrução do plugin (~10k linhas) acumulou dois tipos de gordura à medida que o harness do Claude Code ficou mais capaz: (1) **duplicação entre artefatos** — o template do INDEX copiado em 3 comandos, a resolução de perfil em 5–6, a receita de atualização do INDEX em 4, a moldura dos 3 validators (~metade de cada SKILL.md), o checklist de `SECURITY.md` reimpresso no `security-reviewer`; (2) **defensividade que o modelo moderno dispensa** — checklists de "validação manual final" que só reafirmam o corpo, passos "reler para confirmar que gravou", micro-instruções de ferramenta ("use Bash/Glob/Read"), roteiros literais de mensagens, closers rituais ("Agora processe…") e seções `Limites` que recapitulam princípios já declarados (caso extremo: a mesma regra 8× no `auto.md`). Redundância não é neutra: dilui a doutrina real e cria N lugares para dessincronizar.
+
+**Decisão (do humano)**: princípio de escrita dos artefatos — **instrução só onde há doutrina ou limiar próprio; capacidade nativa do harness não se re-instrui**. Aplicações estruturais:
+- **Donos canônicos no method-guide**: §3.0 (convenções comuns dos comandos — ficha primeiro, resolução de perfil, memo de exploração, resolução de slug, merge/deploy humanos, protocolo 1-retry) e §6 (template canônico do INDEX + receita de atualização); os comandos apontam com 1 linha em vez de copiar.
+- **Validators**: moldura comum (calibração por exemplares, setup, severidades/auto-fix, gate de status/override, relatório, `evento_aprendizado`, limites) extraída para `skills/_shared/validator-protocol.md`; cada SKILL.md fica só com os checks do seu artefato.
+- **`security-reviewer` lê o gabarito em runtime** (`Read` em `core/SECURITY.md` + seção 6 do perfil ativo) em vez de replicar o checklist — **revoga a regra de sincronia manual** que vivia no `CLAUDE.md` do repo. Custo: um Read por invocação do gate; ganho: zero risco de dessincronia.
+- **Entre agents, dedup só quando compensa o Read**: schema pequeno (ex.: `licao_candidata`, ~8 linhas) permanece inline nos 3 agents — extrair para arquivo externo trocaria 8 linhas por um Read em runtime.
+- **Fora do corte, por decisão do humano**: os 4 hooks ficam (o gatilho determinístico no Stop não tem equivalente nativo) e `guidelines/` inteiro fica intacto por enquanto (doutrina distribuída aos consumidores).
+
+**Aplicação**: `commands/*` (14 arquivos), `agents/*` (6 de 7 — `profile-writer` já enxuto, intocado), `skills/*` (5 SKILL.md + `skills/_shared/validator-protocol.md` novo), `templates/CLAUDE.keelson-block.md`, `docs/_meta/method-guide.md` (§3.0 novo, §6 ampliado), `CLAUDE.md` do repo. Redução líquida ≈ 780 linhas. Ajuste fino sem capacidade nova → patch: plugin 0.5.0 → 0.5.1.
+
 ---
 
 ## 5. Quality gates inegociáveis

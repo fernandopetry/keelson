@@ -25,7 +25,7 @@ A descrição pode ser uma frase ("mude o filtro de data para aceitar intervalo"
    - Procurar termos de domínio que apareçam em INDEX.md de algum slug.
 3. Se não conseguir inferir, perguntar: "Qual slug é afetado? <listar slugs existentes em {docsRoot}/>".
 
-Uma faceta/regra de um domínio que já tem pasta em `{docsRoot}/` **pertence a esse slug** — não é demanda nova. Só trate como **completamente nova** (sugerindo slug novo via `/keelson:specify`) quando nenhum slug existente cobre o domínio. Se o slug do domínio é **legado** (sem `INDEX.md`), aplique a Etapa 1.3: migrar primeiro com `/keelson:migrate-legacy`, **nunca** criar um slug paralelo para a mesma capacidade.
+A resolução de slug segue a regra canônica (Etapa 0.2 do `/keelson:specify`): faceta de um domínio que já tem pasta **pertence a esse slug**; slug novo só quando nenhum existente cobre o domínio; legado **primeiro migra** (`/keelson:migrate-legacy`), nunca ganha slug paralelo.
 
 ## Etapa 1: carregar contexto
 
@@ -67,75 +67,16 @@ Fazer até **3 perguntas** focadas para classificar a demanda. Adapte ao context
 
 ## Etapa 3: classificar e decidir o roteamento
 
-### Categoria 1: Nova SPEC necessária
+Classifique numa das categorias abaixo e componha você mesmo a mensagem de roteamento — classificação + motivo + comando pronto (com descrição/parâmetros sugeridos) + pedido de confirmação:
 
-**Critérios**: mudança altera FRs, ACs ou escopo. Cria capacidade nova. Não cabe em SPEC existente.
-
-**Roteamento**:
-> "Esta demanda é uma **nova capacidade do contrato**. Recomendo criar **SPEC-NNN+1** no slug `<slug>` via `/keelson:specify`.
-> 
-> Sugestão de descrição inicial: <gerar resumo>.
-> 
-> Confirma? Se sim, executo `/keelson:specify` com essa descrição."
-
-### Categoria 2: Novo PLAN da mesma SPEC
-
-**Critérios**: contrato não muda, estratégia técnica diferente.
-
-**Roteamento**:
-> "Esta demanda mantém o contrato da SPEC-NNN, mas requer **estratégia técnica nova**. Recomendo criar **PLAN-MMM+1** via `/keelson:plan SPEC-NNN --slice='<descrição>'`.
-> 
-> FRs que este novo PLAN deve cobrir: <inferir>.
-> 
-> Confirma? Se sim, executo `/keelson:plan` com esses parâmetros."
-
-### Categoria 3: TASK de bugfix
-
-**Critérios**: implementação viola um AC. SPEC e PLAN estão certos.
-
-**Roteamento**:
-> "Esta demanda é um **bug**. O comportamento atual viola AC-NNN-XXX da SPEC-NNN.
-> 
-> Recomendo criar TASK de bugfix em `{docsRoot}/<slug>/tasks/` apontando para o PLAN-MMM original.
-> 
-> Nome sugerido: `TASK-MMM-XXX-fix-<descrição-curta>.md`.
-> 
-> Confirma? Se sim, posso gerar a TASK pré-preenchida (você executa via `/keelson:implement` depois)."
-
-### Categoria 4: TASK de refactor
-
-**Critérios**: comportamento observável não muda. Objetivo é melhorar código.
-
-**Roteamento**:
-> "Esta demanda é um **refactor**. Comportamento observável não muda.
-> 
-> Recomendo criar TASK em `{docsRoot}/<slug>/tasks/`.
-> 
-> **Atenção**: garanta que testes existentes estão verdes antes; devem continuar verdes após.
-> 
-> Nome sugerido: `TASK-MMM-XXX-refactor-<descrição>.md`.
-> 
-> Confirma? Se sim, posso gerar a TASK pré-preenchida."
-
-### Categoria 5: Trivial, ação direta
-
-**Critérios**: mudança de texto, copy, cor, espaçamento. Sem impacto em contrato.
-
-**Roteamento**:
-> "Esta demanda é **trivial**. SDD seria overhead.
-> 
-> Recomendação: faça a mudança direto no código, commit no padrão do projeto.
-> 
-> Não vou criar SPEC, PLAN nem TASK para isso. Se a mudança crescer, retorne com /keelson:triage."
-
-### Categoria 6: Inconclusivo
-
-**Roteamento**:
-> "A demanda mistura <natureza X> e <natureza Y>. Preciso de decisão sua sobre:
-> - <ponto 1>
-> - <ponto 2>
-> 
-> Refine e rode `/keelson:triage` novamente."
+| Categoria | Critérios | Roteamento proposto |
+|---|---|---|
+| **1. Nova SPEC** | Muda FRs, ACs ou escopo; capacidade nova que não cabe em SPEC existente | `/keelson:specify` no slug do domínio, com sugestão de descrição inicial |
+| **2. Novo PLAN da mesma SPEC** | Contrato não muda; estratégia técnica nova | `/keelson:plan SPEC-NNN --slice='...'`, inferindo os FRs a cobrir |
+| **3. TASK de bugfix** | Implementação viola um AC; SPEC e PLAN estão certos | TASK `TASK-MMM-XXX-fix-<descrição>.md` pré-preenchida apontando ao PLAN original, citando o AC violado |
+| **4. TASK de refactor** | Comportamento observável não muda; objetivo é melhorar código | TASK `TASK-MMM-XXX-refactor-<descrição>.md` pré-preenchida; alertar: testes verdes antes, verdes depois |
+| **5. Trivial** | Texto, copy, cor, espaçamento; sem impacto em contrato | Direto no código, commit no padrão do projeto, sem SDD (se crescer, nova triagem) |
+| **6. Inconclusivo** | Demanda mistura naturezas distintas | Listar os pontos a decidir e pedir refinamento antes de nova triagem |
 
 ## Etapa 4: confirmação e execução opcional
 
@@ -155,39 +96,8 @@ Adicionar entrada no **histórico do INDEX.md do slug**:
 
 ## Output ao usuário
 
-```markdown
-# Triagem: <descrição curta>
-
-## Contexto identificado
-- Slug afetado: <slug>
-- SPECs existentes: <lista>
-- Capacidades relacionadas: <lista>
-
-## Classificação
-- Categoria: <nome>
-- Motivo: <justificativa>
-
-## Roteamento proposto
-<comando ou ação>
-
-## Pergunta de confirmação
-"Posso prosseguir com <ação>?"
-```
-
-## Quando NÃO usar /keelson:triage
-
-- Quando você já sabe exatamente o que fazer (vá direto pro `/keelson:specify`, `/keelson:plan` ou `/keelson:tasks`).
-- Para triviais óbvios.
-- Em emergências.
+Reporte: contexto identificado (slug, SPECs e capacidades relacionadas), classificação com motivo, roteamento proposto e a pergunta de confirmação.
 
 ## Limites
 
-O /keelson:triage **não**:
-- Executa SPEC, PLAN ou TASK sem confirmação.
-- Decide se uma decisão de produto está certa (só classifica).
-- Modifica SPECs, PLANs ou TASKs existentes (o único registro que faz é a linha de triagem no histórico do INDEX — Etapa 5).
-- Migra slugs legados (use /keelson:migrate-legacy).
-
----
-
-**Agora processe a demanda do usuário.**
+Não executa nada sem confirmação, não decide mérito de produto (só classifica), não migra legado (`/keelson:migrate-legacy`); o único registro que faz é a linha de triagem no histórico do INDEX (Etapa 5).

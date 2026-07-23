@@ -39,85 +39,45 @@ As credenciais e a URL de teste vêm do `keelson.local.json` na raiz do projeto 
 - **Nunca** ecoe a senha em log, relatório, screenshot de terminal ou mensagem. Use-a só no
   preenchimento do campo de login.
 
-## Ferramentas: o browser MCP (`mcp__Claude_Browser__*`)
+## Ferramentas
 
-A verificação visual é feita pelas ferramentas do **Claude Browser** (navegador embutido,
-com abas): sobem/abrem servidor, navegam, preenchem formulário, clicam, leem a página e
-tiram screenshot.
-
-| Objetivo | Ferramenta |
-|----------|-----------|
-| Abrir uma URL numa aba (sem subir server) | `preview_start` com `{url}` |
-| Subir um dev server do `launch.json` | `preview_start` com `{name}` |
-| Navegar / voltar / avançar | `navigate` (`{tabId, url}`) |
-| Ler a página (árvore de acessibilidade, com `ref_N`) | `read_page` (`{tabId, filter:"interactive"|"all"}`) |
-| Achar um elemento por linguagem natural | `find` (`{tabId, query}`) → devolve `ref_N` |
-| Preencher um campo de formulário | `form_input` (`{tabId, ref, value}`) |
-| Clicar / digitar / screenshot / scroll | `computer` (`{tabId, action, coordinate|ref|text}`) |
-| Extrair o texto visível | `get_page_text` (`{tabId}`) |
-| Rodar JS na página (debug/inspeção) | `javascript_tool` (`{tabId, action:"javascript_exec", text}`) |
-| Erros de console | `read_console_messages` (`{tabId, onlyErrors:true}`) |
-| Chamadas de rede (falhas / corpo de resposta) | `read_network_requests` (`{tabId, urlPattern|requestId}`) |
-| Responsivo / dark mode | `resize_window` (`{tabId, preset:"mobile"|"tablet", colorScheme:"dark"}`) |
-| Logs do server / parar server | `preview_logs` (`{serverId}`) / `preview_stop` (`{serverId}`) |
-
-> **Não** use `claude-in-chrome`, `computer-use` nem `Bash` para dirigir o navegador — só as
-> `mcp__Claude_Browser__*`. `Bash` continua válido para setup de ambiente/banco do projeto.
-
-Quase toda ferramenta exige um **`tabId`**. O `preview_start` devolve um `tabId` e um
-`serverId`; passe o `tabId` para `navigate`/`read_page`/`computer`/etc.
+Dirija o navegador **só** com as ferramentas do browser embutido (`mcp__Claude_Browser__*`)
+— não use `claude-in-chrome`, `computer-use` nem `Bash` para isso (`Bash` continua válido
+para setup de ambiente/banco do projeto).
 
 ## 1. Subir/abrir o ambiente
 
-Suba/abra a app pelo **método do projeto** (ver `guidelines/project/` e a ficha). No dia a
-dia, se o server já está de pé, **não suba nada** — só abra uma aba:
+Suba/abra a app pelo **método do projeto** (ver `guidelines/project/` e a ficha). Se o
+server já está de pé, **não suba nada** — só abra uma aba na `baseUrl` do
+`keelson.local.json` (`preview_start {url}` abre a aba sem iniciar server nem conflitar
+com porta). Sem sessão, a app cai na tela de login. Nenhum server rodando → suba pelo
+`launch.json`/método do projeto.
 
-```
-preview_start { url: "<baseUrl do keelson.local.json>" }
-```
+## 2. Login
 
-O modo `{url}` apenas abre uma aba (não inicia server, não conflita com porta) e dirigi-la
-não perturba o dev server. Confirme com `read_page`. Sem sessão, a app cai na tela de login.
-Se nenhum server estiver rodando, suba pelo `launch.json`/método do projeto.
+Na tela de login, preencha usuário e senha com os valores de `login` do
+`keelson.local.json` (havendo "lembrar de mim", marque — prolonga a sessão), submeta e
+**confirme que saiu da rota de login**. A sessão (cookie httpOnly) persiste na aba;
+navegue então à tela alvo (`<baseUrl><rota>`).
 
-## 2. Login (parametrizado pelo `keelson.local.json`)
-
-1. `read_page { tabId, filter: "interactive" }` na tela de login → pega os `ref_N` dos
-   campos (usuário, senha, eventual "lembrar de mim", botão entrar).
-2. `form_input { tabId, ref: <usuário>, value: <login.username> }`.
-3. `form_input { tabId, ref: <senha>, value: <login.password> }`.
-4. Se houver "lembrar de mim", marque para prolongar a sessão.
-5. `computer { tabId, action: "left_click", ref: <botão entrar> }`.
-6. Confirme o redirect com `read_page` (ou `javascript_tool` lendo `window.location.pathname`)
-   — deve sair da rota de login.
-
-A sessão costuma ser cookie httpOnly mantido pela aba entre navegações. Depois de logado,
-vá à tela alvo com `navigate { tabId, url: "<baseUrl><rota>" }` e `read_page` para conferir.
-
-## 3. Executar o roteiro (workflow de verificação)
+## 3. Executar o roteiro (o que verificar)
 
 Chegando à tela com dados reais, escolha os passos relevantes:
-- `read_console_messages { tabId, onlyErrors:true }` e `preview_logs { serverId }` — erros de runtime/build.
-- `read_network_requests { tabId, urlPattern }` — chamadas de API que falharam; `requestId` inspeciona o corpo.
-- `read_page` / `get_page_text` — texto e estrutura (KPIs, listas, badges, estados vazios, presença/ausência de item).
-- `javascript_tool` (`javascript_exec`) — valores de CSS concretos (cor, dark mode, espaçamento). Mais confiável que screenshot para cor/fonte.
-- `computer` (`left_click`/`type`) — exercitar interação (drill-down, filtro) e reconfirmar com `read_page`.
-- `resize_window { preset:"mobile"|"tablet" }` ou `{ colorScheme:"dark" }` — responsivo e tema escuro.
-- `computer { action:"screenshot" }` — prova visual final.
+- Erros de console e logs do server — runtime/build quebrados.
+- Chamadas de rede — APIs que falharam; inspecione o corpo da resposta quando importar.
+- Texto e estrutura da página — KPIs, listas, badges, estados vazios, presença/ausência de item.
+- JS na página para valores de CSS concretos (cor, dark mode, espaçamento) — mais confiável que screenshot para cor/fonte.
+- Interação real (drill-down, filtro) reconfirmando o estado depois.
+- Viewport mobile/tablet e tema escuro — responsivo e dark mode.
+- Screenshot como prova visual final.
 
-Registre a evidência (screenshot/payload/o que foi visto) item a item — **nunca** "está ok"
-sem prova. Ao fechar um `HANDOFF-*.md`, grave a evidência no próprio doc (`✅`/`❌`).
+Registre a evidência (screenshot/payload/o que foi visto) item a item. Ao fechar um
+`HANDOFF-*.md`, grave a evidência no próprio doc (`✅`/`❌`).
 
 ## 4. Regras de segurança (não-negociáveis)
 
-- **Só ambiente local.** Nunca rode login programático, alteração de permissões, reset de
-  senha ou aplicação de seed/fixture contra produção.
-- **Nunca autentique com conta real** nem credenciais de produção — só o usuário de dev do
-  `keelson.local.json`.
-- **Credenciais só no `keelson.local.json`** (gitignored, dev-only e descartável). Não as
-  copie para arquivos versionados, log ou relatório.
-- Alterar permissões/senha, mesmo em dev, é **mudança sensível**: faça o mínimo para
-  destravar a verificação e **diga ao humano o que alterou**.
-- Detalhes de ambiente e de domínio do projeto (como subir os serviços, aplicar fixtures,
-  pegadinhas de autorização) vivem em `guidelines/project/` — consulte-os quando o setup ou
-  uma tela gated exigir.
+Além da fronteira local-only e do sigilo da senha (acima): alterar permissões/senha, mesmo
+em dev, é **mudança sensível** — faça o mínimo para destravar a verificação e **diga ao
+humano o que alterou**. Detalhes de ambiente/domínio (subir serviços, fixtures, pegadinhas
+de autorização) vivem em `guidelines/project/` — consulte-os quando o setup ou uma tela
+gated exigir.

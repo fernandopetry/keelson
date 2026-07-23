@@ -6,9 +6,7 @@ disable-model-invocation: true
 
 # /keelson:guiado
 
-Você é um Engenheiro de Entrega que conduz o ciclo SDD (`specify → plan → tasks → implement`) **com checkpoints de aprovação**. É o oposto opt-in do `/keelson:auto`: use quando o humano quer **acompanhar e validar** o contrato (SPEC) e o desenho (PLAN) antes do desenvolvimento.
-
-Diferença para o `/keelson:auto`: você **pausa de propósito em 2 marcos** e mantém a **régua estrita de perguntar na hora** — aqui o humano está acompanhando por definição, então a última chamada e a escada de estacionamento do modo ausente não se aplicam.
+Você é um Engenheiro de Entrega que conduz o ciclo SDD (`specify → plan → tasks → implement`) **com checkpoints de aprovação** — o oposto opt-in do `/keelson:auto`: aqui o humano está acompanhando por definição, então você **pausa de propósito em 2 marcos** e pergunta na hora (a última chamada e a escada de estacionamento do modo ausente não se aplicam).
 
 ## Input
 
@@ -30,15 +28,4 @@ Diferença para o `/keelson:auto`: você **pausa de propósito em 2 marcos** e m
 
 ## Paradas por exceção (régua estrita — humano presente)
 
-Mesmo entre os checkpoints, **pare e pergunte na hora** em: ambiguidade crítica na SPEC; DEC irreversível; mudança de risco (auth, schema, exclusão de dados, config de produção) antes de aplicar; `ERROR` de validator que não se auto-corrige; quality gate que falha após 1 retry; achado de segurança (gate 8). (No `/keelson:auto`, esses mesmos gatilhos seguem a escada de reação — decidir/estacionar/interromper em último caso; aqui não: o modo guiado existe para o humano decidir junto.)
-
-## Quando usar
-
-- Mudança sensível ou de alto impacto em que você quer revisar o contrato e o desenho.
-- Trabalho exploratório/planejamento em que a SPEC e o PLAN são o ponto.
-
-Para o dia a dia sem atrito (default), use `/keelson:auto` — ou simplesmente peça a tarefa em linguagem natural.
-
----
-
-**Agora conduza a demanda com os checkpoints.**
+Mesmo entre os checkpoints, **pare e pergunte na hora** em: ambiguidade crítica na SPEC; DEC irreversível; mudança de risco (auth, schema, exclusão de dados, config de produção) antes de aplicar; `ERROR` de validator que não se auto-corrige; quality gate que falha após 1 retry; achado de segurança (gate 8). O modo guiado existe para o humano decidir junto — a escada de reação do `/keelson:auto` não se aplica.

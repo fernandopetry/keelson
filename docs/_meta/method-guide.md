@@ -53,6 +53,17 @@ Para consultar o estado a qualquer momento:
 
 ## 3. Comandos
 
+### 3.0 Convenções comuns (fonte única — os comandos apontam para cá)
+
+Todo comando `/keelson:*` segue estas convenções sem redeclará-las:
+
+- **Ficha primeiro.** Ler `keelson.config.json` na raiz antes de qualquer coisa — dela vêm `docsRoot`, `codePaths`, `profile`, os comandos de qualidade (`quality.*`) e os `gates`. Nunca assumir caminhos ou comandos fixos.
+- **Perfil de linguagem ativo.** Resolvido pelo campo `profile.<role>.file` da ficha: prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/<resto>`; caminho simples → relativo à raiz do projeto; campo ausente → exemplar do plugin com a mesma `lang`, senão `guidelines/project/<role>/`. Perfil com `reviewed: false` no front-matter → avisar que está pendente de revisão humana. A doutrina `${CLAUDE_PLUGIN_ROOT}/guidelines/core/*` está sempre ativa; some as lições do projeto (`guidelines/project/`).
+- **Memo de exploração.** Exploração de código/domínio é salva em `thoughts/local/exploration-<slug>.md` (concisa: caminhos + mecanismo); as etapas seguintes leem o memo em vez de re-explorar e o complementam se faltar detalhe. O memo é snapshot — antes de editar, vale o arquivo real.
+- **Resolução de slug.** Dona é a Etapa 0.2 do `/keelson:specify`: reusar slug de domínio existente (inclusive legado — que primeiro migra) antes de criar novo; na dúvida, perguntar ao humano.
+- **Merge e deploy são humanos.** Nenhum comando faz merge nem deploy; a promoção de Status (`Draft → Approved → Done`) também é sempre humana.
+- **Falha de gate**: 1 retry; persistiu → escalar ao humano com o diagnóstico.
+
 ### 3.1 `/keelson:specify` — criar SPEC
 
 Transforma uma demanda em especificação funcional (FRs em EARS, ACs em Given-When-Then, glossário, escopo). **Agnóstica de tecnologia** — stack e arquitetura são proibidos na SPEC.
@@ -328,6 +339,76 @@ Todo escritor do INDEX (`/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `
 - **Header**: as 5 colunas acima, nesta ordem. O `/keelson:specify` já cria a seção "## PLANs" com o header (tabela vazia); quem adiciona a primeira linha **não** inventa header.
 - **Célula `Tasks`** = `X/Y M`: `X` tasks Done, `Y` total (`?` até o `/keelson:tasks` rodar), `M` marcador — `⏸` (nenhuma Done), `🟡` (parcial), `✅` (todas Done). Progressão: `0/? ⏸` (plan) → `0/N ⏸` (tasks) → `X/N 🟡` (implement, closure por task) → `N/N ✅` (última closure).
 - **Coluna `Status`** = o Status do front-matter do arquivo PLAN, **verbatim** (`Draft | Review | Approved | Done`), com um único sufixo permitido: `Done (sugerido)`, escrito pelo `/keelson:implement` quando a DoD está satisfeita mas a promoção humana ainda não aconteceu. O "status efetivo" que o `/keelson:rebuild-index` calcula serve **só** para posicionar a capacidade na seção "Capacidades" — nunca entra nesta coluna.
+
+### Template canônico do INDEX.md (fonte única)
+
+Todo comando que **cria** um INDEX (`/keelson:specify` na 1ª SPEC, `/keelson:rebuild-index`, `/keelson:migrate-legacy`) usa este esqueleto — nenhum comando redefine seções por conta própria:
+
+```markdown
+# <Nome do slug em formato título>
+
+> Arquivo gerado automaticamente. Não edite manualmente.
+> Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
+
+**Slug**: <slug>
+**Última atualização**: <ISO 8601 com timezone>
+
+## Resumo
+<2 a 3 linhas derivadas dos outcomes das SPECs — ou do legado, na migração>
+
+## Capacidades
+
+### Implementadas
+- <capacidade> (SPEC-NNN, PLAN-MMM, ✅ <data>)
+
+### Em desenvolvimento
+- <capacidade> (SPEC-NNN, PLAN-MMM, 🟡 X/Y tasks Done)
+
+### Especificadas, ainda não planejadas
+- <outcome> (SPEC-NNN, ⏸ aguardando /keelson:plan)
+
+## SPECs
+
+| ID | Título | Status | Data |
+|----|--------|--------|------|
+
+## PLANs
+
+| ID | Cobre | FRs cobertos | Tasks | Status |
+|----|-------|--------------|-------|--------|
+
+## Glossário consolidado
+
+| Termo | Definição | Origem |
+|-------|-----------|--------|
+
+## Decisões irreversíveis
+
+- **DEC-MMM-XXX** (PLAN-MMM): <texto curto>
+
+## Riscos ativos
+
+| ID | Risco | Mitigação | Origem |
+|----|-------|-----------|--------|
+
+## Histórico recente
+
+- <YYYY-MM-DD HH:MM>: <ação> via /keelson:<comando>
+```
+
+Seção ainda sem conteúdo leva nota curta do que a preenche (ex.: "(vazio até /keelson:plan)"). Variações por comando:
+
+- **`/keelson:rebuild-index`**: acrescenta ao aviso a linha `> Última reconstrução completa via /keelson:rebuild-index: <ISO 8601>` e, se houver, a seção final `## Inconsistências conhecidas` (descrição + ação sugerida).
+- **`/keelson:migrate-legacy`**: acrescenta `**Origem**: migrado de legado em <YYYY-MM-DD> via /keelson:migrate-legacy`; capacidades legadas entram em `### Implementadas (legado, sem rastreabilidade SDD)` com marcador 📜 e origem (`legacy/<arquivo>`); decisões extraídas viram `LEGACY-DEC-*`; "SPECs"/"PLANs" ficam vazios com nota de que não há artefatos retroativos; seção extra `## Documentação legada` lista os arquivos preservados.
+- **Slug migrado** (em qualquer rebuild): as seções espelhadas do legado abrem com `> Fonte durável: legacy/TRIAGE-<data>.md` — é do TRIAGE que o rebuild as reespelha.
+
+### Receita de atualização do INDEX (fonte única)
+
+Todo comando que **atualiza** um INDEX existente aplica — mesclando, nunca sobrescrevendo:
+
+1. Atualizar `Última atualização`.
+2. Refletir o artefato na tabela correspondente (SPECs/PLANs — contrato acima) e nas seções que ele afeta: capacidades (movendo entre "Especificadas" → "Em desenvolvimento" → "Implementadas" conforme o ciclo), glossário (termo já existente com definição diferente → **parar e reportar conflito**), decisões irreversíveis, riscos ativos.
+3. Adicionar entrada ao "Histórico recente" com timestamp e ação — **máximo 10 entradas**.
 
 ---
 

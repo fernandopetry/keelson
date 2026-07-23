@@ -42,7 +42,7 @@ Você é um auditor de dependências. Sua função é rodar, **em momento oportu
 
 ## Etapa 1: auditoria de vulnerabilidade (sempre)
 
-1. Rodar a ferramenta de cada ecossistema via Bash (a consulta ao advisory database é online — sem rede, reportar como indisponível).
+1. Rodar a ferramenta de cada ecossistema (a consulta ao advisory database é online — sem rede, reportar como indisponível).
 2. Parsear a saída: cada vulnerabilidade vira uma linha com **CVE/advisory ID**, pacote, versão instalada, versão corrigida e severidade — tudo **da saída da ferramenta**.
 3. Ferramenta ausente → **não instalar por conta própria**: registrar o ecossistema como `INDISPONÍVEL` com o comando de instalação sugerido (tabela acima). A lacuna aparece no report — nunca em silêncio.
 
@@ -77,11 +77,3 @@ Conforme a §8 do perfil ativo (ex.: PHP → `composer outdated`, pacote `abando
 - <se achados> Criar demanda de upgrade? (`/keelson:auto "atualizar <pacote> — <CVE>"`)
 - Cobertura contínua: este comando é manual — considere Dependabot/Renovate ou CI agendada.
 ```
-
-## Limites
-
-O `/keelson:audit` **não**: instala ferramentas; atualiza dependências; edita manifesto/lockfile; afirma ou descarta CVE sem ferramenta; substitui a auditoria contínua de plataforma; cria artefato SDD (a demanda de upgrade, se aceita, nasce pelo comando de ciclo).
-
----
-
-**Agora rode a auditoria.**

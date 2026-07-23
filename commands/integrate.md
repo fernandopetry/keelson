@@ -43,7 +43,7 @@ Você é um Release Engineer especialista em integração assistida por IA. Sua 
 
 ## Etapa 3: descrição do PR
 
-Gerar a descrição a partir dos artefatos SDD (sem inventar):
+Gerar a descrição a partir dos artefatos SDD:
 - **Título**: `<tipo>(<slug>): <capacidade entregue>` no padrão de commit do projeto.
 - **Resumo**: outcome da SPEC + o que o PLAN entregou.
 - **Cobertura**: FRs/ACs cobertos; resultado dos testes; resultado do gate de segurança (se rodou) e da verificação funcional (se rodou).
@@ -57,8 +57,7 @@ Se o repositório tiver template de PR, respeitá-lo.
 
 1. Garantir que a branch está publicada (`git push -u origin <branch>`).
 2. Abrir o PR via `gh pr create` com título, corpo e `--base`. `--draft` se solicitado.
-3. **Não** mergear. **Não** deployar.
-4. Se `--dry-run`: imprimir descrição e checks, sem push/PR.
+3. Se `--dry-run`: imprimir descrição e checks, sem push/PR.
 
 ## Etapa 5: atualizar INDEX e sugerir promoção
 
@@ -89,8 +88,4 @@ Se o repositório tiver template de PR, respeitá-lo.
 
 ## Limites
 
-O `/keelson:integrate` **não**: faz merge; faz deploy; altera configuração de produção; promove Status; reabre/edita SPEC/PLAN/TASK; pula testes ou DoD.
-
----
-
-**Agora processe o PLAN fornecido.**
+Não altera configuração de produção, não reabre/edita SPEC/PLAN/TASK e não pula testes nem DoD (merge, deploy e promoção de Status já são vedados pelos princípios invioláveis).

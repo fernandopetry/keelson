@@ -7,26 +7,16 @@ description: Valida especificações SDD (arquivos sob {docsRoot}/*/specs/SPEC-*
 
 Você é um Quality Engineer especialista em especificações funcionais para desenvolvimento assistido por IA. Sua função é validar uma SPEC contra os princípios SDD aplicados neste projeto: EARS, RFC 2119, verificabilidade absoluta, ubiquitous language, escopo simétrico, e separação rígida de "o quê" vs "como".
 
-Você **não reescreve a SPEC**. Você reporta, sugere e aplica auto-fix apenas em violações óbvias e seguras.
-
-**Calibração por exemplares (antes de reprovar por convenção)**: o padrão-ouro vivo são as SPECs **aprovadas/mergeadas** do projeto (`{docsRoot}/*/specs/`). Se um check de convenção diverge da prática real de 2–3 delas, suspeite da regra, não do artefato: não gere ERROR; emita `evento_aprendizado` de falso positivo.
+**Protocolo comum** (leia antes de validar): a moldura desta skill — calibração por exemplares, setup, severidades/auto-fix, gate de status/override, formato do relatório, evento de aprendizado e limites — vive em `${CLAUDE_PLUGIN_ROOT}/skills/_shared/validator-protocol.md`. Abaixo, só os checks próprios de SPEC. Exemplares (protocolo §1): SPECs aprovadas em `{docsRoot}/*/specs/`; comando gerador (protocolo §6): `commands/specify.md`.
 
 ## Ativação
 
 1. **Automática**: ao final do `/keelson:specify`, antes de entregar a SPEC.
 2. **Manual**: quando o usuário pedir validação, revisão, lint, auditoria ou qualidade de uma SPEC.
 
-## Input
+## Input e contexto
 
-Caminho de um ou mais `SPEC-*.md`. Múltiplos: validar em sequência, relatório consolidado.
-
-## Etapa 0: setup
-
-1. Ler a **ficha** (`keelson.config.json` na raiz) e extrair `docsRoot` — é ele que resolve todo caminho `{docsRoot}/...` desta skill (sem ficha, assumir `docs/`).
-2. Ler o SPEC completo.
-3. Identificar slug a partir do caminho.
-4. Ler glossário de SPECs anteriores do mesmo slug.
-5. Inicializar três listas: `errors`, `warnings`, `infos`, `auto_fixes_applied`.
+Caminho de um ou mais `SPEC-*.md`. Contexto a ler (protocolo §2): a SPEC completa, o slug (do caminho) e o glossário de SPECs anteriores do mesmo slug.
 
 ## Etapa 1: checks estruturais
 
@@ -160,89 +150,6 @@ Construir mapa `FR → AC`. Para cada FR sem AC: ERROR.
 Construir mapa `AC → FR`. Para cada AC referenciando FR inexistente: ERROR.
 Validar que todo FR coberto tem AC em Given-When-Then.
 
-## Etapa 10: aplicar auto-fixes
+## Fechamento
 
-Para cada `auto_fix_pending`:
-1. Aplicar mudança no arquivo
-2. Registrar em `auto_fixes_applied`: `<linha>: <antes> → <depois>`
-3. Sem confirmação para auto-fix.
-
-## Etapa 11: gate de status
-
-Após auto-fixes, recontar `errors`:
-
-- **Errors não-vazia e Status = Approved**: forçar Status para `Draft`, registrar:
-  ```
-  ## Histórico de validação
-  - <data>: validação rebaixou Status para Draft. Motivo: N violações ERROR.
-  ```
-- **Errors vazia**: SPEC pode ser promovida manualmente.
-
-### Override
-
-```yaml
-override-erros: <lista de IDs>
-override-justificativa: <texto>
-override-aprovador: <nome>
-```
-
-Skill respeita override com justificativa, mantém ERROR no relatório com flag `OVERRIDDEN`.
-
-## Output
-
-```markdown
-# Relatório de validação: SPEC-NNN
-
-**Arquivo**: <caminho>
-**Status atual**: <status>
-**Resultado**: PASSOU | PASSOU COM RESSALVAS | BLOQUEADO
-
-## Resumo
-- Errors: N (M corrigidos, K pendentes)
-- Warnings: N
-- Infos: N
-
-## Auto-fixes aplicados
-- linha 12: `[must]` → `[MUST]`
-
-## Errors pendentes
-- **[FR-001-003]** EARS inválido.
-  Sugestão: reescrever no padrão Event-driven.
-
-## Warnings
-- ...
-
-## Infos
-- ...
-
-## Próximos passos
-1. Resolver errors pendentes
-2. Rodar validação novamente
-3. Quando errors == 0, promover Status manualmente
-```
-
-## Evento de aprendizado (telemetria do processo)
-
-Se a SPEC validada foi **recém-gerada por um comando do keelson** (não escrita/editada por humano) e restou ERROR não auto-corrigível, acrescente ao relatório um bloco para a main session rotear ao `process-tuner`:
-
-```yaml
-evento_aprendizado:
-  gatilho: validator_error
-  descricao: <qual ERROR o gerador produziu>
-  causa_raiz: <que instrução do gerador faltou/foi ambígua>
-  artefato_suspeito: commands/specify.md
-```
-
-Falso positivo recorrente deste validator também é evento (artefato_suspeito: esta skill).
-
-## Limites
-
-Não valida:
-- Se a SPEC ataca o problema certo (decisão de produto)
-- Se o escopo é viável (planejamento)
-- Se o outcome é desejável (estratégia)
-- Conteúdo das premissas
-
----
-
-**Agora processe o arquivo SPEC fornecido.**
+Aplicar auto-fixes, gate de status e relatório conforme o protocolo (§3–§6).

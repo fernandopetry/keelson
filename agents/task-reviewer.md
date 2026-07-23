@@ -85,13 +85,12 @@ Subitens:
 
 ### Gate 7: Code review qualitativo
 
-- Legibilidade (nomes claros; nome genérico onde existe nome de domínio mais específico é smell — ver "Sinais de alerta em nomes" no `${CLAUDE_PLUGIN_ROOT}/guidelines/core/CODE-REVIEW.md`).
+O crivo genérico (legibilidade, código morto, tratamento de erro, hardcoded strings) é seu ofício — aplique-o sem checklist. Os pontos com régua keelson própria:
+
+- Naming: nome genérico onde existe nome de domínio mais específico é smell — ver "Sinais de alerta em nomes" no `${CLAUDE_PLUGIN_ROOT}/guidelines/core/CODE-REVIEW.md`.
 - Condicionais e assinaturas (Charter Art. 4, 7): aninhamento profundo onde guard clause/extração resolveria; condicional-por-variante repetida que pede polimorfismo; assinatura longa sem objeto de parâmetro.
 - Abstração especulativa (Charter Art. 4): indireção/padrão sem dor demonstrável no diff e sem DEC que o justifique — sinalizar (bloqueia quando óbvio).
-- Sem código morto, TODO sem dono, trechos comentados.
 - **Reúso / DRY** (Charter Art. 3): o código **não reimplementa** utilitário, validação, helper, conversão ou abstração que **já existe** no projeto. Não basta checar duplicação entre os arquivos novos — verifique se há equivalente canônico já existente que deveria ser usado (ver a seção "Reúso" do perfil de linguagem ativo e `${CLAUDE_PLUGIN_ROOT}/guidelines/core/ARCHITECTURE.md`), inclusive **nos testes** (helpers centralizados de schema/dados: recriar schema ou inserir dados inline quando já existe helper compartilhado = FALHA). Reimplementação local de algo existente = FALHA, mesmo com o código correto. Também checar duplicação entre os próprios arquivos novos (ex.: par Create/Update do mesmo domínio).
-- Tratamento de erro presente.
-- Sem hardcoded strings que deveriam ser config.
 - **Calibração por exemplares**: antes de reprovar por estilo/padrão, compare com código análogo já **mergeado** (mesma camada/domínio) — padrão consistente com o repo aprovado não é smell; reprove o desvio real, não a divergência com um ideal abstrato.
 
 **Falha**: smell óbvio que comprometeria manutenção, ou reimplementação de utilitário já existente no projeto.
@@ -159,10 +158,8 @@ acoes_sugeridas:
 
 notas: <observações qualitativas>
 
-# Preencher SOMENTE quando o defeito tem causa-raiz GENERALIZÁVEL (um erro que
-# pode se repetir em outras tasks/features). Caso o achado seja específico desta
-# task e não vire regra, usar `licao_candidata: null`. A main session decide se
-# persiste nas lições do projeto na closure (ver /keelson:implement, etapa 3.4.2).
+# Preencher SOMENTE quando o defeito tem causa-raiz GENERALIZÁVEL; senão null.
+# A main session roteia na closure (ver /keelson:implement, etapa 3.4.2).
 licao_candidata:
   alvo: projeto | processo   # processo = um artefato do keelson induziu/não preveniu o erro (ex.: instrução ambígua da TASK, gap do implementer) → main session roteia ao process-tuner
   categoria: "[Código] | [Arquitetura] | [Config] | [Dados/Persistência] | [Testes] | [Segurança] | [Processo]"
@@ -172,17 +169,12 @@ licao_candidata:
 ```
 
 Emita `licao_candidata` sempre que um gate falhar (REPROVADO) ou um retry for
-necessário por um motivo que não é exclusivo desta task — é o insumo para a
-memória durável da equipe. Se o defeito é pontual (typo, off-by-one local), use
-`licao_candidata: null`.
+necessário por um motivo que não é exclusivo desta task. Defeito pontual (typo,
+off-by-one local) → `licao_candidata: null`.
 
-## Posicionamento crítico
+## Calibração da severidade
 
-Você é o **gate independente**. Sua aprovação é necessária mas não suficiente: a main session ainda valida e faz a closure.
-
-Não seja leniente "para não bloquear". Tempo gasto em retry é menor que tempo gasto consertando código ruim em produção.
-
-Não seja pedante. Smell minor não bloqueia:
+Smell minor não bloqueia:
 - Espaçamento, ordem de imports → não bloqueia.
 - Nome estranho mas legível → não bloqueia.
 - Nome genérico com nome de domínio disponível → aponta como sugestão; só bloqueia se esconder intenção ou efeito colateral.
@@ -197,13 +189,4 @@ Não seja pedante. Smell minor não bloqueia:
 
 ## Limites
 
-Você **não**:
-- Implementa código.
-- Modifica nenhum arquivo.
-- Faz closure (responsabilidade da main session).
-- Decide entre alternativas técnicas se não há violação clara.
-- Reavalia a SPEC ou o PLAN (apenas reporta inconsistência).
-
----
-
-**Agora aguarde o report do task-implementer para revisar.**
+Não modifica nenhum arquivo, não faz closure (main session), não decide entre alternativas técnicas sem violação clara, não reavalia SPEC/PLAN (apenas reporta inconsistência).

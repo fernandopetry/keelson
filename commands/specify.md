@@ -22,7 +22,7 @@ A pessoa fornecerá descrição em linguagem natural ou referência a arquivo (`
 1. Ler a **ficha** (`keelson.config.json`) na raiz — dela vêm `docsRoot`, o `profile` de linguagem, `codePaths`, os comandos de qualidade e os gates ativos.
 2. Ler o `CLAUDE.md` do projeto se existir e extrair apenas o relevante para SPEC: glossário de domínio, convenções de linguagem, anti-padrões de spec.
 3. Ignorar, aqui, tudo que for stack, frameworks e padrões arquiteturais (isso é do PLAN).
-4. **Memo de exploração**: se a demanda exigiu explorar o código/domínio, salve o resultado em `thoughts/local/exploration-<slug>.md` (uma onda, concisa: caminhos + mecanismo) — as etapas seguintes (`/keelson:plan`, `/keelson:implement`) leem dele em vez de re-explorar. Se o memo já existe, reuse/complemente.
+4. **Memo de exploração**: se a demanda exigiu explorar o código/domínio, salve/complemente o memo (convenção comum — method-guide §3.0).
 
 ### 0.2 Resolver slug
 
@@ -143,93 +143,11 @@ A crítica **não bloqueia** a criação da SPEC nem a atualização do INDEX (a
 
 ### 5.1 Criar INDEX se não existe
 
-Se `{docsRoot}/<slug>/INDEX.md` não existe, criar do zero com este template, preenchido com dados da SPEC recém-criada:
-
-```markdown
-# <Nome do slug em formato título>
-
-> Arquivo gerado automaticamente. Não edite manualmente.
-> Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
-
-**Slug**: <slug>
-**Última atualização**: <ISO 8601 com timezone>
-
-## Resumo
-<2 a 3 linhas derivadas de "1.1 Problema" e "1.2 Outcome esperado" da SPEC>
-
-## Capacidades
-
-### Implementadas
-(vazio até /keelson:implement concluir um PLAN)
-
-### Em desenvolvimento
-(vazio até /keelson:plan ser executado)
-
-### Especificadas, ainda não planejadas
-- <outcome esperado da SPEC> (SPEC-NNN, ⏸ aguardando /keelson:plan)
-
-## SPECs
-
-| ID | Título | Status | Data |
-|----|--------|--------|------|
-| SPEC-NNN | <título> | <status> | <data> |
-
-## PLANs
-
-| ID | Cobre | FRs cobertos | Tasks | Status |
-|----|-------|--------------|-------|--------|
-
-## Glossário consolidado
-
-| Termo | Definição | Origem |
-|-------|-----------|--------|
-| <termo do glossário da SPEC> | <definição> | SPEC-NNN |
-
-## Decisões irreversíveis
-
-(vazio)
-
-## Riscos ativos
-
-| ID | Risco | Mitigação | Origem |
-|----|-------|-----------|--------|
-| RISK-NNN-001 | <texto> | <mitigação> | SPEC-NNN |
-
-## Histórico recente
-
-- <YYYY-MM-DD HH:MM>: SPEC-NNN criada via /keelson:specify
-```
+Criar do zero seguindo o **template canônico do INDEX** (method-guide §6 — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`), preenchido com a SPEC recém-criada: linha na tabela "SPECs", capacidade em "Especificadas, ainda não planejadas" (derivada do outcome esperado), glossário e riscos da SPEC, Histórico recente com `SPEC-NNN criada via /keelson:specify`.
 
 ### 5.2 Atualizar INDEX se já existe
 
-Se INDEX.md já existe, aplicar (mesclar, não sobrescrever):
-
-1. **Atualizar campo `Última atualização`**.
-2. **Adicionar linha na tabela "SPECs"** com a nova SPEC.
-3. **Mesclar glossário consolidado**: adicionar termos novos. Se um termo já está com definição diferente, **parar e reportar conflito**.
-4. **Adicionar capacidade em "Especificadas, ainda não planejadas"** com texto curto derivado do outcome esperado.
-5. **Adicionar riscos novos da SPEC** à tabela "Riscos ativos".
-6. **Adicionar entrada ao "Histórico recente"** com timestamp e ação. Máximo 10 entradas.
-
-### 5.3 Validar persistência
-
-1. Reler `{docsRoot}/<slug>/INDEX.md`.
-2. Confirmar que a nova SPEC aparece.
-3. Confirmar glossário mesclado.
-4. Confirmar timestamp atualizado.
-5. Se algo não persistiu: alertar usuário, não bloquear.
-
-## Etapa 6: validação manual final
-
-- [ ] Slug confirmado, pasta `specs/` existe, número não colide
-- [ ] Cada FR em EARS válido com AC vinculado
-- [ ] Nenhum item menciona tecnologia
-- [ ] Out-of-scope declarado e não-vazio
-- [ ] Métrica de sucesso mensurável
-- [ ] Premissas listadas
-- [ ] Glossário reutiliza termos do INDEX (se existia) e do `CLAUDE.md`
-- [ ] Skill spec-validator executada
-- [ ] INDEX.md criado ou atualizado com sucesso
+Aplicar a **receita de atualização do INDEX** (method-guide §6). Específicos desta etapa: linha nova na tabela "SPECs"; capacidade nova em "Especificadas, ainda não planejadas" (texto curto do outcome); termos e riscos da SPEC mesclados.
 
 ## Output final ao usuário
 
@@ -245,7 +163,3 @@ Se INDEX.md já existe, aplicar (mesclar, não sobrescrever):
 6. Premissas `[assumido]` que precisam confirmação.
 7. Estado do INDEX após esta operação.
 8. Próximo comando: `/keelson:plan SPEC-NNN` ou `/keelson:plan SPEC-NNN --slice="..."` se errors == 0.
-
----
-
-**Agora processe a entrada do usuário.**

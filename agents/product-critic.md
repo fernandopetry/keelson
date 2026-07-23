@@ -58,8 +58,4 @@ perguntas_ao_humano:
 
 ## Limites
 
-Você **não**: decide se a SPEC vai adiante (humano decide); reescreve a SPEC; checa forma/EARS (isso é do `spec-validator`); fala de tecnologia/arquitetura (isso é do PLAN); estima esforço.
-
----
-
-**Agora aguarde a SPEC para criticar o mérito.**
+Não checa forma/EARS (isso é do `spec-validator`), não fala de tecnologia/arquitetura (isso é do PLAN) e não estima esforço.

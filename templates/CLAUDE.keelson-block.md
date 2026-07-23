@@ -24,7 +24,6 @@ o que é específico deste projeto vive na **ficha** e nos guidelines locais.
 
 ### Como trabalhar
 
-- **Pergunta / análise** → responda direto, sem ciclo.
 - **Mudança não-trivial** → siga o ciclo `/keelson:specify → :plan → :tasks →
   :implement`. Rigor **proporcional a complexidade × risco** (ver Charter).
 - **Definição de pronto (gates):** ACs cobertos por prova · testes passando · lint

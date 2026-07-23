@@ -34,38 +34,15 @@ Você é um Engenheiro de Migração especialista em equalizar slugs legados (qu
 
 ## Etapa 1: leitura e extração
 
-Ler todos os `.md` na raiz da pasta do slug. README.md tem prioridade.
+Ler todos os `.md` na raiz da pasta do slug (README.md tem prioridade) e **extrair, melhor esforço**:
 
-**Extrair** (melhor esforço, sem invenção):
+- **Resumo**: seção de visão geral/descrição do README; na falta, seus primeiros 2–3 parágrafos não-vazios.
+- **Capacidades de alto nível**: listas de funcionalidades, headers que descrevem capacidades, endpoints de API — frases curtas de "o que o slug faz".
+- **Glossário**: tabelas termo/definição, seções de conceitos, listas `**X**: definição`.
+- **Decisões arquiteturais**: seções de decisões/ADR/arquitetura, trechos "decidimos/optamos", arquivos `ADR-*.md`, `DECISIONS.md`, `ARCHITECTURE.md`.
+- **Stack mencionado**: tecnologias citadas — **validar contra a ficha e o `CLAUDE.md`** e reportar divergências sem corrigir.
 
-### 1.1 Resumo
-Procurar seções (em ordem): "Visão geral", "Overview", "Sobre", "Descrição", "About", "Summary".
-Se nenhuma encontrada, usar primeiros 2-3 parágrafos não-vazios do README.
-
-### 1.2 Capacidades de alto nível
-Buscar:
-- Lista de bullets em seções tipo "Funcionalidades", "Features", "What it does"
-- Headers de nível 2 ou 3 que descrevem capacidades
-- Lista de endpoints (se mencionados como API)
-
-Formato esperado: frases curtas descrevendo "o que o slug faz".
-
-### 1.3 Glossário
-Buscar:
-- Tabelas com colunas tipo "Termo | Definição"
-- Seções "Conceitos", "Definições", "Termos", "Glossary"
-- Listas de definições em formato "**X**: definição"
-
-### 1.4 Decisões arquiteturais
-Buscar:
-- Seções "Decisões", "ADR", "Arquitetura", "Design decisions", "Architecture"
-- Trechos com "decidimos", "optamos por", "escolhemos"
-- Arquivos `ADR-*.md`, `DECISIONS.md`, `ARCHITECTURE.md`
-
-### 1.5 Stack mencionado
-Identificar tecnologias citadas. **Validar contra a ficha (`keelson.config.json`) e o `CLAUDE.md`** se existirem. Reportar divergências sem corrigir.
-
-**Importante**: cada item extraído deve referenciar o arquivo de origem, para revisão.
+Cada item extraído referencia o arquivo de origem, para revisão.
 
 ## Etapa 2: organizar arquivos legados
 
@@ -96,84 +73,9 @@ Escrever `{docsRoot}/<slug>/legacy/TRIAGE-<YYYY-MM-DD>.md` com **tudo** que a Et
 
 ## Etapa 4: gerar INDEX.md
 
-Criar `{docsRoot}/<slug>/INDEX.md` — as seções extraídas (Resumo, Capacidades, Glossário, Decisões, Riscos) são **espelho** do TRIAGE e abrem com `> Fonte durável: legacy/TRIAGE-<data>.md`:
+Criar `{docsRoot}/<slug>/INDEX.md` seguindo o **template canônico** (method-guide §6 — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`) com a variação de migração descrita lá: `**Origem**: migrado de legado em <YYYY-MM-DD>`, capacidades legadas 📜 em "Implementadas (legado, sem rastreabilidade SDD)", decisões `LEGACY-DEC-*`, "SPECs"/"PLANs" vazios com nota (mudanças futuras geram SPECs via `/keelson:triage`), e a seção `## Documentação legada` listando os arquivos preservados. As seções extraídas (Resumo, Capacidades, Glossário, Decisões, Riscos) são **espelho** do TRIAGE e abrem com `> Fonte durável: legacy/TRIAGE-<data>.md`; o que não foi identificado leva nota "não identificado, revisar manualmente".
 
-```markdown
-# <Nome do slug em formato título>
-
-> Arquivo gerado automaticamente. Não edite manualmente.
-> Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
-
-**Slug**: <slug>
-**Última atualização**: <ISO 8601 com timezone>
-**Origem**: migrado de legado em <YYYY-MM-DD> via /keelson:migrate-legacy
-
-## Resumo
-<extraído do README, 2-3 linhas; se não conseguiu extrair, indicar "não identificado, revisar manualmente">
-
-## Capacidades
-
-### Implementadas (legado, sem rastreabilidade SDD)
-- <capacidade 1> 📜 (origem: legacy/README.md)
-- <capacidade 2> 📜 (origem: legacy/README.md)
-
-### Em desenvolvimento
-(vazio: nenhum PLAN ativo)
-
-### Especificadas, ainda não planejadas
-(vazio: nenhuma SPEC nova ainda)
-
-## SPECs
-
-(vazio: este slug foi migrado sem SPECs retroativas. Mudanças futuras geram SPECs a partir de agora via /keelson:triage.)
-
-## PLANs
-
-(vazio)
-
-## Glossário consolidado
-
-| Termo | Definição | Origem |
-|-------|-----------|--------|
-| <termo extraído> | <definição> | legacy/README.md |
-
-(Se nenhum termo foi extraído, deixar tabela vazia com nota: "Glossário não identificado no legado. Será populado conforme novas SPECs forem criadas.")
-
-## Decisões irreversíveis
-
-<lista de decisões extraídas, cada uma marcada como origem: legado>
-- **LEGACY-DEC-001** (legacy/ARCHITECTURE.md): <texto da decisão>
-
-(Se nenhuma decisão foi identificada, deixar vazio com nota: "Nenhuma decisão arquitetural foi explicitamente identificada no legado. Decisões herdadas do código existem mas precisam ser documentadas conforme aparecem em novos PLANs.")
-
-## Riscos ativos
-
-(vazio: sem auditoria retroativa do legado)
-
-## Documentação legada
-
-Arquivos preservados em `{docsRoot}/<slug>/legacy/`:
-- README.md
-- <outros .md>
-
-Esses arquivos descrevem o estado do slug conforme entendido antes da migração SDD. São referência histórica.
-
-**Importante**: o conteúdo desses arquivos não está vinculado a SPECs ou PLANs. Para qualquer mudança futura, use `/keelson:triage` que vai criar nova SPEC.
-
-## Histórico recente
-
-- <YYYY-MM-DD HH:MM>: slug migrado de legado via /keelson:migrate-legacy (N arquivos movidos para legacy/)
-```
-
-## Etapa 5: validar persistência
-
-1. Reler `{docsRoot}/<slug>/INDEX.md` e confirmar criação.
-2. Confirmar que arquivos foram movidos (se aplicável) e que o TRIAGE existe: `ls {docsRoot}/<slug>/legacy/`.
-3. Confirmar que pastas vazias existem: `specs/`, `plans/`, `tasks/`.
-
-Se algo falhou: rollback (mover arquivos de volta, deletar INDEX criado, reportar erro).
-
-## Etapa 6: reportar ao usuário
+## Etapa 5: reportar ao usuário
 
 ```markdown
 # Migração concluída: <slug>
@@ -214,31 +116,10 @@ Corrija no `legacy/TRIAGE-<data>.md` (fonte durável) e reespelhe no INDEX — o
 
 ## Comportamento em caso de falha
 
-**Pasta `{docsRoot}/<slug>/` não existe**: parar, reportar.
-
-**INDEX.md já existe**: parar, sugerir `/keelson:rebuild-index <slug>` (slug não é legado, só precisa rebuild a partir dos arquivos SDD existentes).
-
-**Pastas SDD parciais existem** (`specs/`, `plans/` ou `tasks/`): alertar, perguntar como tratar:
-- Ignorar e prosseguir (assume que existem por outro motivo)
-- Abortar migração (caso seja um híbrido inesperado)
-
-**Falha ao mover arquivos**: rollback (mover de volta os já movidos), reportar.
-
-**Falha ao criar INDEX**: rollback (mover arquivos de volta), reportar.
-
-**Conflito stack legado vs ficha/perfil**: reportar como warning, não bloquear. Migração registra o que encontrou, não corrige.
+- **Falha ao mover arquivos ou ao criar o INDEX**: rollback (mover de volta os já movidos, remover o INDEX criado), reportar. Os pré-checks da Etapa 0 já cobrem pasta inexistente / INDEX já existente.
+- **Pastas SDD parciais** (`specs/`, `plans/`, `tasks/`): alertar e perguntar — prosseguir ignorando, ou abortar (híbrido inesperado).
+- **Conflito stack legado vs ficha/perfil**: warning, não bloqueia — migração registra o que encontrou, não corrige.
 
 ## Limites
 
-O `/keelson:migrate-legacy` **não**:
-- Cria SPECs, PLANs ou TASKs retroativas.
-- Interpreta código-fonte (só lê documentação).
-- Conecta capacidades a FRs específicos (impossível sem SPEC original).
-- Decide se uma capacidade legada vale ser registrada (lista tudo encontrado).
-- Modifica conteúdo dos arquivos legados após mover (apenas relocaliza).
-- Deleta nada (preservação é princípio).
-- Atualiza a ficha/CLAUDE.md baseado no legado (decisão humana).
-
----
-
-**Agora processe o slug fornecido.**
+Além dos princípios invioláveis (sem artefatos retroativos, preservação total): não interpreta código-fonte (só documentação), não conecta capacidades a FRs (impossível sem SPEC original), não decide o que "vale registrar" (lista tudo encontrado), não atualiza ficha/`CLAUDE.md` a partir do legado (decisão humana).

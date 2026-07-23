@@ -7,26 +7,16 @@ description: Valida TASKs SDD (arquivos sob {docsRoot}/*/tasks/TASK-*.md) contra
 
 Você é um Quality Engineer focado em validar TASKs SDD. Valida vinculação, cobertura, atomicidade e prontidão para execução pelo `/keelson:implement`.
 
-**Calibração por exemplares (antes de reprovar por convenção)**: o padrão-ouro vivo são as TASKs **concluídas (Done)** de PLANs mergeados (`{docsRoot}/*/tasks/`). Se um check de convenção diverge da prática real de 2–3 delas, suspeite da regra, não do artefato: não gere ERROR; emita `evento_aprendizado` de falso positivo.
+**Protocolo comum** (leia antes de validar): a moldura desta skill vive em `${CLAUDE_PLUGIN_ROOT}/skills/_shared/validator-protocol.md` — calibração por exemplares, setup, severidades/auto-fix, gate de status/override, relatório, evento de aprendizado e limites. Abaixo, só os checks próprios de TASK. Exemplares (protocolo §1): TASKs **Done** de PLANs mergeados em `{docsRoot}/*/tasks/`; comando gerador (protocolo §6): `commands/tasks.md`.
 
 ## Ativação
 
 1. **Automática**: ao final do `/keelson:tasks`.
 2. **Manual**: revisão de TASKs existentes.
 
-## Input
+## Input e contexto
 
-Caminho de uma ou mais `TASK-*.md`. Pode também receber caminho de `TASK-MMM-INDEX.md` (dispara validação batch de todas as tasks daquele PLAN).
-
-## Etapa 0: setup
-
-1. Ler a **ficha** (`keelson.config.json` na raiz): `docsRoot` (resolve os caminhos `{docsRoot}/...`; sem ficha, assumir `docs/`) e `profile.<role>.file` (perfil ativo — fonte primária das convenções que o `/keelson:tasks` aplica).
-2. Ler a TASK.
-3. Ler PLAN (`Pertence a`).
-4. Ler SPEC referenciada pelo PLAN.
-5. Ler CLAUDE.md se existir (fonte **complementar**; ausência dele, ou omissão de uma convenção nele, nunca gera ERROR).
-6. Ler outras TASKs do mesmo PLAN.
-7. Inicializar listas.
+Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara validação batch de todas as tasks daquele PLAN). Contexto a ler (protocolo §2): a TASK, o PLAN (`Pertence a`), a SPEC referenciada pelo PLAN e as outras TASKs do mesmo PLAN.
 
 ## Etapa 1: checks estruturais
 
@@ -135,66 +125,6 @@ A fonte primária de convenções é a **ficha/perfil** (o que o `/keelson:tasks
 ### Tipo = chore
 - INFO: chore não precisa FR vinculado.
 
-## Etapa 9: aplicar auto-fixes
+## Fechamento
 
-Aplicar e registrar.
-
-## Etapa 10: gate
-
-- TASK com ERROR: não executável pelo `/keelson:implement`. Status forçado para Blocked se Todo.
-- **Override**:
-  ```yaml
-  override-erros: <IDs>
-  override-justificativa: <texto>
-  ```
-
-## Output
-
-```markdown
-# Relatório de validação: TASK-MMM-XXX
-
-**Arquivo**: <caminho>
-**Status atual**: <status>
-**Tipo**: <tipo>
-**Resultado**: PASSOU | PASSOU COM RESSALVAS | BLOQUEADO
-
-## Resumo
-- Errors: N | Warnings: N | Infos: N
-
-## Auto-fixes aplicados
-- ...
-
-## Errors pendentes
-- **[Vinculação]** FR-NNN-XXX listado mas não existe na SPEC.
-  Sugestão: <ação>
-
-## Warnings
-- ...
-
-## Próximos passos
-1. Resolver errors
-2. Validar novamente
-3. Quando errors == 0, TASK pode ir para Todo e ser executada pelo /keelson:implement
-```
-
-## Modo batch
-
-Se input é `TASK-MMM-INDEX.md`:
-1. Listar todas as TASKs do PLAN.
-2. Validar cada uma.
-3. Relatório consolidado.
-
-## Evento de aprendizado (telemetria do processo)
-
-Se as TASKs validadas foram **recém-geradas por um comando do keelson** e restou ERROR não auto-corrigível, acrescente ao relatório um bloco `evento_aprendizado` (gatilho `validator_error`, causa_raiz, `artefato_suspeito: commands/tasks.md`) para a main session rotear ao `process-tuner`. Falso positivo recorrente deste validator também é evento (artefato_suspeito: esta skill).
-
-## Limites
-
-Não valida:
-- Se a TASK é a granularidade ideal
-- Se a implementação proposta é a melhor abordagem
-- Conteúdo do código que será produzido
-
----
-
-**Agora processe o arquivo TASK fornecido.**
+Aplicar auto-fixes, gate de status e relatório conforme o protocolo (§3–§6). No relatório desta skill, inclua também a linha `**Tipo**: <tipo>`.

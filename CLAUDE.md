@@ -21,9 +21,12 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   do `README.md` · §3.x do `docs/_meta/method-guide.md` · lista de comandos do
   `templates/CLAUDE.keelson-block.md`.
 - **Um dono por regra**: o core (`guidelines/core/`) diz *o quê* (agnóstico); o perfil diz
-  *como* na linguagem. Não duplicar regra entre eles.
-- O `agents/security-reviewer.md` **replica** o checklist de `guidelines/core/SECURITY.md`
-  para ter contexto próprio — mudou um, sincronize o outro.
+  *como* na linguagem. Não duplicar regra entre eles. Blocos compartilhados dos comandos
+  (convenções comuns, template/receita do INDEX) têm dono único no
+  `docs/_meta/method-guide.md` (§3.0/§6); a moldura dos validators, em
+  `skills/_shared/validator-protocol.md`; o `security-reviewer` **lê** o checklist de
+  `guidelines/core/SECURITY.md` em runtime, não o replica (decisão 4.20) — mudou a regra,
+  mude no dono, nunca copie no consumidor.
 - Perfil com `reviewed: true` (ex.: `backend/php.md`) é revisado por humano: edição nele
   deve ser sinalizada na entrega para re-olhada humana.
 

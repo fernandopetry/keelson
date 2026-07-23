@@ -34,17 +34,13 @@ Você é um Engineering Manager especialista em orquestrar implementação assis
 ### 0.2 Carregar guidelines e memo
 
 1. Ler a **ficha** (`keelson.config.json`): `profile`, `codePaths`, comandos de qualidade, `gates`, `docsRoot`. Ler o `CLAUDE.md` do projeto se existir.
-2. Carregar `${CLAUDE_PLUGIN_ROOT}/guidelines/core/*` (sempre) e o **perfil de linguagem ativo** resolvido por `profile.<role>.file` da ficha (prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/`; senão relativo à raiz do projeto; avise se o perfil traz `reviewed: false`); em mudança sensível, a seção de segurança do perfil e do `QUALITY-CHARTER` (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/`); em queries pesadas, a seção de performance. Some as lições do projeto (`guidelines/project/`).
-3. **Memo de exploração**: se `thoughts/local/exploration-<slug>.md` existe, use-o como mapa do domínio e **passe o caminho aos subagents** (evita re-exploração; é snapshot — antes de editar, reler o arquivo real).
+2. Carregar a doutrina e o **perfil de linguagem ativo** (resolução e avisos: convenção comum — method-guide §3.0, `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`); em mudança sensível, some a seção de segurança do perfil e o `QUALITY-CHARTER` (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/`); em queries pesadas, a seção de performance.
+3. **Memo de exploração**: se existe, use-o como mapa do domínio e **passe o caminho aos subagents** (convenção comum — method-guide §3.0).
 4. Validar consistência guideline ↔ PLAN.
 
 ### 0.3 Identificar e ler artefatos SDD
 
-1. Buscar PLAN-MMM em `{docsRoot}/*/plans/`.
-2. Ler PLAN completo.
-3. Ler SPEC referenciada.
-4. Ler TASK-MMM-INDEX.md.
-5. Ler cada TASK-MMM-XXX.md.
+Buscar PLAN-MMM em `{docsRoot}/*/plans/` e ler o conjunto completo: PLAN, SPEC referenciada, TASK-MMM-INDEX.md e cada TASK-MMM-XXX.md.
 
 ### 0.4 Ler INDEX.md do slug
 
@@ -182,8 +178,7 @@ Report incompleto ou inválido: rejeitar, refazer.
    - **`alvo: projeto`** → persistir em `guidelines/project/lessons.md` no formato canônico (`## [Categoria] título` + **Erro/Causa/Solução**), abaixo do marcador `<!-- Adicionar lições abaixo desta linha -->`. **Deduplicar**: lição equivalente existente é atualizada, não duplicada. Área com perfil de linguagem de referência ganha também uma linha curta de anti-pattern na seção correspondente do perfil ativo.
    - **`alvo: processo`** (um artefato do keelson induziu/não preveniu o erro — inclui `evento_aprendizado` emitido por validator e retry causado por instrução ambígua) → invocar o agent **`process-tuner`** com o evento; ele deduplica no ledger do projeto (`<docsRoot>/_meta/learning-log.md`) e aplica o patch cirúrgico no artefato dono **apenas quando os artefatos do keelson são versionados neste repositório** (modo dev do plugin); em projeto consumidor (plugin instalado), devolve `PROPOSTA_PLUGIN` com o diff sugerido — apresente-a ao humano na entrega. `proposta_doutrina` no report do tuner → perguntar ao humano antes de aplicar.
    - Como `guidelines/project/` e `<docsRoot>/` são versionados no projeto, o commit + push distribui a lição. Mencionar no output quais lições foram registradas/patcheadas (e quais viraram proposta).
-5. **Validar persistência**: reler TASK, TASK-INDEX e INDEX.md do slug.
-6. **Em modo paralelo**: commit das atualizações com `chore(<slug>): close TASK-MMM-XXX` (incluir as mudanças em `guidelines/` se houver lição registrada).
+5. **Em modo paralelo**: commit das atualizações com `chore(<slug>): close TASK-MMM-XXX` (incluir as mudanças em `guidelines/` se houver lição registrada).
 
 Closure falha se:
 - Arquivo TASK não atualizado
@@ -225,7 +220,7 @@ Falha: reportar específico, 1 retry, escalar.
 
    Artefato no primeiro conjunto e ausente do segundo → **corrigir o INDEX antes de concluir**. Declare também a **ordem** (quando importa) e se a pendência é **pré-requisito do código** (ex.: uma coluna nova que a leitura passa a exigir — sem ela a funcionalidade quebra, não só a capacidade nova).
 
-   *Por que este check existe*: o INDEX é o que uma sessão futura — ou outra máquina — lê para saber o que falta aplicar. PLAN é histórico e a memória do agente **não é versionada**: nenhum dos dois substitui o INDEX. Origem: um caso real em que o INDEX declarava 1 de 2 migrations, e a segunda só existia no PLAN e na memória local — teria ido para outra máquina invisível.
+   *Por quê*: o INDEX é o que uma sessão futura — ou outra máquina — lê para saber o que falta aplicar; PLAN é histórico e memória local não é versionada. Origem: caso real de migration declarada só no PLAN, invisível noutra máquina.
 
 ### 4.1 Atualização do INDEX para fim de PLAN
 
@@ -311,14 +306,4 @@ E sugerir a integração (não executar):
 
 ## Limites desta orquestração
 
-O `/keelson:implement` **não**:
-- Promove Status do PLAN para Done (sugere apenas)
-- Faz deploy
-- Cria pull request
-- Resolve conflito de merge
-- Pula testes, ACs, guidelines ou closure
-- Modifica SPEC, PLAN ou a ficha durante implementação
-
----
-
-**Agora processe o PLAN fornecido.**
+Não promove Status do PLAN (sugere apenas), não cria PR (isso é do `/keelson:integrate`), não resolve conflito de merge, e não modifica SPEC, PLAN ou a ficha durante a implementação.

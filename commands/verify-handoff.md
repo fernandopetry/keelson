@@ -61,7 +61,7 @@ Suba a app no `<root>` pelo **método do projeto** (ver `guidelines/project/` e 
 Para cada `HANDOFF-*.md` pendente do alvo:
 
 1. Ler o handoff inteiro — §3 (pré-requisitos), §4 (itens V*), §5 (riscos).
-2. **Exercitar cada item V*** pelo método em **`gates.screenVerify.method`** da ficha — tipicamente a skill **`screen-verify`**, que dirige o browser autenticado lendo os dados de acesso de DEV do `keelson.local.json` (URL, login, senha de teste). Pegadinhas de domínio (autorização, setup) vêm de `guidelines/project/`. Seguir os *Passos*, observar o *Esperado*, e **registrar a Evidência no próprio doc** — `✅`/`❌` + o que foi observado (screenshot/payload/estado), item a item. Nada de "está ok" sem evidência.
+2. **Exercitar cada item V*** pelo método em **`gates.screenVerify.method`** da ficha — tipicamente a skill **`screen-verify`**, que dirige o browser autenticado lendo os dados de acesso de DEV do `keelson.local.json` (URL, login, senha de teste). Pegadinhas de domínio (autorização, setup) vêm de `guidelines/project/`. Seguir os *Passos*, observar o *Esperado*, e **registrar a Evidência no próprio doc** — `✅`/`❌` + o que foi observado (screenshot/payload/estado), item a item.
 3. **Divergência (`❌`)** → corrigir na **própria branch** pelo protocolo do projeto (escopo restrito + teste que cubra + os quality gates aplicáveis: `quality.lint`/`quality.typecheck`, e o gate de segurança se tocar algo sensível), commitar a correção (`fix(<slug>): <o quê>`) e **re-exercitar** o item.
 4. Não conseguiu fechar um item (bloqueio real, correção não trivial) → **parar**: deixar o handoff `Pendente` com a evidência do que falhou, e reportar. Não force o fechamento.
 
@@ -105,8 +105,4 @@ Para cada `HANDOFF-*.md` pendente do alvo:
 
 ## Limites
 
-O `/keelson:verify-handoff` **não**: faz merge nem deploy (para no gate e aponta para `/keelson:integrate`); fecha handoff sem exercício real de tela (sem ambiente de tela → aborta, não marca Concluído); troca a branch de um `<root>` sujo ou ocupado por outra sessão (laboratório único — uma verificação por vez); aplica seed/fixture/permissão contra **produção** (só ambiente local, e avisa o que alterou); roda por iniciativa de outro comando — só por invocação humana direta ou encadeado pelo `/keelson:integrate`.
-
----
-
-**Agora feche a verificação de tela do alvo indicado (ou liste os handoffs pendentes e pergunte qual).**
+Nunca aplica seed/fixture/permissão contra **produção** (só ambiente local, avisando o que alterou); sem ambiente de tela real → aborta, não marca Concluído (merge/deploy, laboratório único e autorização de invocação: princípios acima).

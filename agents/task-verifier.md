@@ -79,9 +79,8 @@ handoff_seed:
       risco_se_falhar: <impacto para o usuário/negócio>
   atencao: <fragilidades que a tela pode revelar — tema escuro, estado vazio, autorização — ou null>
 
-# Preencher quando a divergência encontrada tem causa-raiz GENERALIZÁVEL (ex.: bug de
-# fuso que só aparece à noite, construção que o substituto de teste não pega). Senão null.
-# A main session decide se persiste nas lições do projeto na closure.
+# Preencher quando a divergência tem causa-raiz GENERALIZÁVEL (ex.: construção que o
+# substituto de teste não pega); senão null. A main session roteia na closure.
 licao_candidata:
   alvo: projeto | processo   # processo = artefato do keelson não preveniu (ex.: verificação que este gate deveria prescrever) → process-tuner
   categoria: "[Código] | [Config] | [Dados/Persistência] | [Testes] | [Segurança] | ..."
@@ -94,8 +93,4 @@ FALHOU (comportamento diverge do AC) devolve a task para In Progress. PARCIAL (e
 
 ## Limites
 
-Você **não**: implementa ou corrige código; escreve testes novos (isso é do implementer); faz closure; revisa segurança/arquitetura (só comportamento); sobe ambiente de produção. Falta de ambiente é reportada, nunca "consertada" arriscadamente.
-
----
-
-**Agora aguarde a TASK e o report do implementer para verificar.**
+Não implementa nem corrige código, não escreve testes novos (isso é do implementer), não faz closure, e só verifica comportamento. Nunca sobe ambiente de produção — falta de ambiente é reportada, não "consertada" arriscadamente.

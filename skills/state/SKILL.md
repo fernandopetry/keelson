@@ -45,88 +45,13 @@ Esta skill ativa quando o usuário pede entender estado/status/situação/progre
 
 ## Etapa 2: síntese
 
-### Template para visão geral
+Componha você mesmo o resumo executivo em markdown, calibrado ao foco — sem template rígido; o que cada foco cobre:
 
-```markdown
-# Estado: <slug em formato título>
-
-**Última atualização do slug**: <data do INDEX>
-
-## Resumo executivo
-<2 a 3 linhas: o que esta área faz hoje, no estado atual.>
-
-## Capacidades disponíveis (em produção)
-- <capacidade> ✅
-- <capacidade> ✅
-
-## Em desenvolvimento agora
-- <capacidade> 🟡 (PLAN-MMM, X/Y tasks Done)
-
-## Especificado, ainda não iniciado
-- <capacidade> ⏸ (SPEC-NNN, aguardando /keelson:plan)
-
-## Próximo movimento sugerido
-<próximo passo lógico: planejar SPEC pendente, retomar PLAN em andamento, etc>
-
-## Riscos ativos que merecem atenção
-<lista curta dos riscos abertos do INDEX, no máximo 3>
-
-## Saúde do slug
-- N SPECs (X approved, Y draft)
-- N PLANs (X done, Y em desenvolvimento)
-- N decisões irreversíveis acumuladas
-- N termos no glossário consolidado
-- Última atividade: <data>
-```
-
-### Template para foco específico
-
-Para `--focus=risks`:
-```markdown
-# Riscos ativos: <slug>
-
-## Riscos abertos no INDEX
-<lista completa com mitigação>
-
-## Questões em aberto nas SPECs ativas
-<Q-NNN-XXX agregados de SPECs em Approved>
-
-## Riscos técnicos abertos nos PLANs em desenvolvimento
-<TRISK-MMM-XXX agregados>
-```
-
-Para `--focus=glossary`:
-```markdown
-# Glossário: <slug>
-
-<tabela do INDEX + verificação de inconsistências entre SPECs diferentes>
-
-## Inconsistências detectadas (se houver)
-- Termo "X": definido em SPEC-001 como "...", divergente em SPEC-003.
-```
-
-Para `--focus=in-progress`:
-```markdown
-# Em desenvolvimento: <slug>
-
-## PLAN-MMM (X/Y tasks Done)
-- Capacidade: <descrição>
-- Tasks abertas: <lista>
-- Bloqueios: <se houver>
-
-## Próximas tasks (Wave atual)
-- <TASK-MMM-XXX>: <título>
-```
-
-Para `--focus=decisions`:
-```markdown
-# Decisões irreversíveis: <slug>
-
-<lista do INDEX com expansão: contexto, decisão, alternativas descartadas>
-
-## Considere antes de mexer
-- <decisão crítica> impede <ação que pareceria razoável>
-```
+- **Visão geral**: resumo de 2–3 linhas do que a área faz hoje; capacidades por estágio (✅ implementadas · 🟡 em desenvolvimento, com PLAN-MMM e X/Y tasks Done · ⏸ especificadas, aguardando plan); próximo movimento sugerido; riscos ativos que merecem atenção (máx. 3); saúde do slug (contagens de SPECs/PLANs por status, decisões irreversíveis, termos do glossário, última atividade).
+- **`--focus=risks`**: riscos abertos do INDEX com mitigação + `Q-*` agregados das SPECs Approved + `TRISK-*` dos PLANs em desenvolvimento.
+- **`--focus=glossary`**: tabela do INDEX + inconsistências entre SPECs (termo definido de forma divergente, citando as SPECs).
+- **`--focus=in-progress`**: por PLAN em andamento — capacidade, tasks abertas, bloqueios, próximas tasks da wave atual.
+- **`--focus=decisions`**: decisões irreversíveis expandidas (contexto, decisão, alternativas descartadas) + "considere antes de mexer" (o que cada decisão impede).
 
 ## Etapa 3: detecção de inconsistências
 
@@ -144,20 +69,6 @@ Se inconsistência:
   Detalhes: <listar>.
   ```
 
-## Limites desta skill
+## Limites
 
-A skill **não**:
-- Modifica nenhum arquivo.
-- Sugere mudanças no código.
-- Decide se algo está certo ou errado tecnicamente.
-- Substitui o `/keelson:triage` para roteamento de demandas.
-
-## Saída de cortesia
-
-Se a pergunta for aberta, ofereça aprofundamento:
-
-> "Quer mais detalhe sobre algum aspecto? Posso focar em riscos, glossário, decisões ou tasks em andamento."
-
----
-
-**Agora processe a pergunta do usuário.**
+Não sugere mudanças de código, não julga mérito técnico e não substitui o `/keelson:triage` para roteamento de demandas (modificar arquivos já é vedado pelo princípio inviolável).
