@@ -193,3 +193,13 @@ artefato_patchado: commands/implement.md (§3.3) + agents/security-reviewer.md, 
 patch: main session monta briefing destilado (ACs literais copiados da SPEC, DECs do escopo, `git diff --name-only`, comandos `quality.*`) e aponta a seção do perfil a ler; artefatos completos ficam disponíveis só para conferência pontual. Saldo +3/+4/+2.
 reincidencia: 0
 estado: ativa
+
+## LRN-018: /auto parava entre waves por "fôlego" — gatilho inventado fora da escada
+data: 2026-07-23
+gatilho: correcao_humana
+origem: execução overnight real em projeto consumidor — parou na wave 2/6 alegando "ponto limpo que você autorizou quando o build ficasse longo" e encerrou o turno perguntando "continuo na Wave 3 ou você revisa primeiro?"
+causa_raiz: a escada de reação do auto.md enumerava os gatilhos legítimos de pausa mas não negava os de fôlego (duração da sessão, contexto, tokens, "ponto limpo"), permitindo ao modelo promover um comentário genérico do humano a autorização permanente de parada; o degrau 2 ("estacionar a feature inteira também vale") dava álibi textual para entrega parcial voluntária; e o implement.md não declarava condição de término do loop de waves
+artefato_patchado: commands/auto.md (Exceções — parágrafo "Fôlego não é gatilho" + emenda no degrau 2) + commands/implement.md (§3.6 item 5)
+patch: negação explícita — fôlego não sobe degrau nenhum; próxima wave começa imediatamente; "continuo?" entre waves = aprovação de rotina proibida; parada antecipada exige pedido explícito do humano na execução corrente; loop da Etapa 3 do implement só termina na última wave ou em falha listada. Reforço mecânico (mesma data, ideia do humano): run-state em disco + hook Stop wave-guard, imune à sumarização de contexto — decisão 4.24. Critério de sucesso: execução overnight de PLAN multi-wave chega à Etapa 5 (Entrega) sem turno encerrado entre waves. Registrada como decisão 4.23.
+reincidencia: 0
+estado: ativa

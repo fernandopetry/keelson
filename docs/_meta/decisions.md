@@ -386,6 +386,22 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **Aplicação**: `templates/keelson.config.example.json` (bloco `jira`), `commands/init.md` (Etapa 4.6 — resolução via createmeta + amostragem de status + geração do esqueleto do mapa `.md`), `skills/_shared/jira-sync-protocol.md` (novo, dono único da lógica), `commands/{specify,tasks,implement,integrate,auto}.md` (ganchos + campo `Jira:`), `commands/jira-sync.md` (novo) + os 4 lugares de comando (README tabela *Commands*, method-guide §3.13, `templates/CLAUDE.keelson-block.md`, este arquivo §3), nova subseção "Jira integration (optional)" no `README.md`. Capacidade nova → minor: plugin 0.6.0 → 0.7.0.
 
+### 4.23 Fôlego não é gatilho: o /keelson:auto corre até a Entrega, sem "ponto limpo" entre waves
+
+**Problema**: em execuções longas (overnight), o `/keelson:auto` parava entre waves (ex.: 2 de 6 concluídas) declarando "ponto limpo autorizado porque o build ficou longo" e encerrando o turno com a pergunta "continuo na próxima wave ou você revisa primeiro?" — que ficava pendurada a noite inteira, exatamente o anti-padrão que a escada de reação existe para impedir. Duas brechas textuais permitiam a racionalização: a escada enumerava os gatilhos legítimos mas **não negava os ilegítimos** (duração da sessão, contexto, tokens, "ponto limpo"), e o degrau 2 ("estacionar a feature inteira também vale") dava álibi para entrega parcial voluntária. O `/keelson:implement` tampouco dizia que o loop de waves só termina na última wave ou em falha.
+
+**Decisão (do humano, ao reportar o comportamento)**: **fôlego nunca é gatilho da escada.** Duração da sessão, número de waves restantes, tamanho do contexto/custo de tokens e "ponto limpo para parar" não são dificuldade nem risco; terminada uma wave, a próxima começa imediatamente, e perguntar "continuo?" entre waves é aprovação de rotina (proibida no modo auto). Parada antecipada exige pedido **explícito do humano na execução corrente** ("pare depois da wave N") — comentário genérico de conversa anterior não é autorização permanente. O degrau 2 fica restrito aos gatilhos da própria linha (irreversibilidade, vulnerabilidade persistente, ambiguidade divergente), nunca a fôlego.
+
+**Aplicação**: `commands/auto.md` (parágrafo "Fôlego não é gatilho" nas Exceções + emenda no degrau 2), `commands/implement.md` (§3.6 item 5 — o loop de waves só termina na última wave ou em falha listada), `learning-log.md` LRN-018. Entra na leva 0.8.0, junto com a 4.24.
+
+### 4.24 Guarda mecânica de waves: run-state em disco + hook Stop `wave-guard`
+
+**Problema**: a decisão 4.23 corrige por instrução, mas instrução mora no contexto do modelo — numa execução overnight o contexto é sumarizado e a regra "não pare entre waves" pode se perder do resumo, reabrindo a reincidência da LRN-018. Os artefatos SDD já guardam *o que* retomar; faltava um sinal **fora do contexto** dizendo que há um run em andamento.
+
+**Decisão (ideia do humano)**: estado de run em disco + verificação determinística no encerramento do turno. O `/keelson:implement` mantém `thoughts/local/run-state-<slug>.md` (formato canônico no method-guide §3.0, dono único): criado antes da primeira wave, `waves_concluidas` atualizado a cada final de wave, encerrado na Entrega (removido pelo `/keelson:auto` após o push; marcado `encerrado` pelo implement avulso). O hook Stop `wave-guard` lê o arquivo — imune à sumarização — e **bloqueia o encerramento** enquanto `status: em_andamento`, devolvendo a instrução de retomada (INDEX + TASK-INDEX) ou de registro de parada legítima (`status: encerrado — <motivo>`). O guard não julga mérito da parada: garante que parar seja ato deliberado e registrado, nunca esquecimento ou "ponto limpo" inventado. Fallback gracioso (sem python3/cwd/arquivo → `exit 0`) e `stop_hook_active` anti-loop, no padrão dos demais hooks.
+
+**Aplicação**: `hooks/wave-guard.sh` (novo) + registro em `hooks/hooks.json`; convenção do run-state no method-guide §3.0; ganchos em `commands/implement.md` (criação na Etapa 3, atualização no §3.6, encerramento na Etapa 5) e `commands/auto.md` (remoção na Entrega após o push + referência no "Fôlego não é gatilho"). Validado com `bash -n` + 5 cenários sintéticos no scratchpad (bloqueia em `em_andamento`; passa com `stop_hook_active`, `encerrado`, sem arquivo, sem `cwd`). Resolve a pendência "wave-guard" da §8. Hook novo = capacidade nova → minor: plugin 0.7.0 → 0.8.0.
+
 ---
 
 ## 5. Quality gates inegociáveis

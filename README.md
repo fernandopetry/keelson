@@ -171,7 +171,7 @@ keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
 ├── agents/            # subagents: implementer, reviewers, profile-writer…
 ├── skills/            # spec / plan / task validators + state + screen-verify
-├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard
+├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard
 ├── guidelines/
 │   ├── _meta/         # QUALITY-CHARTER.md · PROFILE-OUTLINE.md
 │   ├── core/          # language-agnostic doctrine (always active)
@@ -183,7 +183,7 @@ keelson/
 
 ## Status
 
-`0.7.0` — early. The engine and the PHP reference profile are the stable core; the
+`0.8.0` — early. The engine and the PHP reference profile are the stable core; the
 legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending drafts, and the
 profile generator and non-PHP profiles are evolving. The optional Jira integration
 (via the Atlassian MCP connector) is new. Feedback and profile contributions welcome.

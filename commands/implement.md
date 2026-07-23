@@ -85,6 +85,8 @@ Se `--dry-run`, parar.
 
 ## Etapa 3: execução wave por wave
 
+**Antes da primeira wave**, grave o estado do run em `thoughts/local/run-state-<slug>.md` no formato canônico do method-guide §3.0 (`status: em_andamento`, `waves_concluidas: 0`). Ele é o sentinela do hook `wave-guard`: vive em disco, sobrevive à sumarização de contexto e bloqueia encerramento de turno no meio do run (decisões 4.23/4.24).
+
 ### 3.1 Setup da wave
 
 **AGENT_TEAMS paralela**: worktrees por task, branches separadas, teammates com peer-to-peer.
@@ -201,6 +203,8 @@ Falha: reportar específico, 1 retry, escalar.
 2. Merge de worktrees (só AGENT_TEAMS).
 3. Rodar a suíte **relevante ao escopo da wave** no working tree principal — ampla o bastante para pegar regressão cross-task (não só os `--filter` de cada task), mas **não** a suíte completa a cada wave. A completa roda 1× na Etapa 4 (verificação forte e única).
 4. Regressão: parar e reportar.
+5. Atualizar `waves_concluidas` no `thoughts/local/run-state-<slug>.md` (o `status` continua `em_andamento` até a Entrega).
+6. **Iniciar a próxima wave imediatamente.** O loop da Etapa 3 só termina de dois jeitos: última wave fechada (→ Etapa 4) ou falha listada em "Comportamento em caso de falha". Duração da sessão, tamanho do contexto ou "ponto limpo" **não** encerram o loop — não termine o turno entre waves nem pergunte se deve continuar.
 
 ## Etapa 4: validação final contra DoD do PLAN
 
@@ -243,6 +247,8 @@ E sugerir a integração (não executar):
 > "Para preparar a entrega, rode `/keelson:integrate PLAN-MMM` — ele valida a DoD, roda a suíte completa e abre o PR. Merge e deploy permanecem decisão sua."
 
 ## Etapa 5: output final ao usuário
+
+**Run-state antes do output**: executado **dentro do `/keelson:auto`**, mantenha `status: em_andamento` — a Entrega do auto encerra/remove o arquivo após o push. Executado **avulso**, atualize para `status: encerrado — implement concluído (integração é humana)`; sem isso o `wave-guard` bloqueia o encerramento do turno.
 
 ```markdown
 # Implementação concluída: PLAN-MMM

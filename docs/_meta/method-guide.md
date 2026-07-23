@@ -60,6 +60,18 @@ Todo comando `/keelson:*` segue estas convenções sem redeclará-las:
 - **Ficha primeiro.** Ler `keelson.config.json` na raiz antes de qualquer coisa — dela vêm `docsRoot`, `codePaths`, `profile`, os comandos de qualidade (`quality.*`) e os `gates`. Nunca assumir caminhos ou comandos fixos.
 - **Perfil de linguagem ativo.** Resolvido pelo campo `profile.<role>.file` da ficha: prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/<resto>`; caminho simples → relativo à raiz do projeto; campo ausente → exemplar do plugin com a mesma `lang`, senão `guidelines/project/<role>/`. Perfil com `reviewed: false` no front-matter → avisar que está pendente de revisão humana. A doutrina `${CLAUDE_PLUGIN_ROOT}/guidelines/core/*` está sempre ativa; some as lições do projeto (`guidelines/project/`).
 - **Memo de exploração.** Exploração de código/domínio é salva em `thoughts/local/exploration-<slug>.md` (concisa: caminhos + mecanismo); as etapas seguintes leem o memo em vez de re-explorar e o complementam se faltar detalhe. O memo é snapshot — antes de editar, vale o arquivo real.
+- **Estado de run (guarda anti-parada).** Execução de waves mantém `thoughts/local/run-state-<slug>.md` — formato canônico (uma linha por campo, exatamente estas chaves):
+
+  ```md
+  status: em_andamento
+  slug: <slug>
+  plan: PLAN-MMM
+  waves_concluidas: <X>
+  waves_total: <N>
+  retomada: {docsRoot}/<slug>/INDEX.md + {docsRoot}/<slug>/tasks/TASK-MMM-INDEX.md
+  ```
+
+  O `/keelson:implement` cria antes da primeira wave e atualiza `waves_concluidas` a cada final de wave; a Entrega (Etapa 5 do `/keelson:auto`, ou o output final do implement avulso) encerra/remove. O hook `wave-guard` (Stop) lê este arquivo **fora do contexto do modelo** — imune à sumarização — e bloqueia encerramento de turno enquanto `status: em_andamento` (decisões 4.23/4.24). Parada legítima (Entrega feita, degrau 3 com pergunta já disparada, pedido explícito do humano) muda `status:` para `encerrado — <motivo>` antes de encerrar.
 - **Resolução de slug.** Dona é a Etapa 0.2 do `/keelson:specify`: reusar slug de domínio existente (inclusive legado — que primeiro migra) antes de criar novo; na dúvida, perguntar ao humano.
 - **Merge e deploy são humanos.** Nenhum comando faz merge nem deploy; a promoção de Status (`Draft → Approved → Done`) também é sempre humana.
 - **Falha de gate**: 1 retry; persistiu → escalar ao humano com o diagnóstico.
