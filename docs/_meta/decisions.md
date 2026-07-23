@@ -73,8 +73,8 @@ keelson/
 **Motivo**: `/keelson:*` agrupa visualmente no tab completion, comunica o intent (é o keelson agindo) e separa dos demais comandos do projeto, sem precisar inventar prefixo. Dentro do plugin, skills e agents ficam com nomes curtos (`spec-validator`, `task-implementer`, `security-reviewer`) porque o pacote já dá o escopo.
 
 **Aplicação**:
-- Commands: `/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `/keelson:implement`, `/keelson:triage`, `/keelson:rebuild-index`, `/keelson:migrate-legacy`, `/keelson:auto`, `/keelson:guiado`, `/keelson:refine`, `/keelson:integrate`, `/keelson:verify-handoff`, `/keelson:audit`
-- Skills: `spec-validator`, `plan-validator`, `task-validator`, `state`
+- Commands: `/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `/keelson:implement`, `/keelson:triage`, `/keelson:rebuild-index`, `/keelson:migrate-legacy`, `/keelson:auto`, `/keelson:guided`, `/keelson:refine`, `/keelson:integrate`, `/keelson:verify-handoff`, `/keelson:audit`
+- Skills: `spec-validator`, `plan-validator`, `task-validator`, `status`
 - Agents: `task-implementer`, `task-reviewer`, `security-reviewer`, `task-verifier`, `product-critic`, `process-tuner`
 
 **Docs de governança**: `decisions.md`, `method-guide.md` e `learning-log.md` moram em `<docsRoot>/_meta/` (fora do plugin) e não são invocáveis.
@@ -87,9 +87,9 @@ keelson/
 
 **Decisão**: SPEC-NNN é numeração sequencial pura, sem supersede automático nem versionamento semântico.
 
-**Consequência**: cada SPEC vale por si. Conflito entre SPECs do mesmo slug é detectado pela leitura humana ou pela skill `state`. Não há resolução automática.
+**Consequência**: cada SPEC vale por si. Conflito entre SPECs do mesmo slug é detectado pela leitura humana ou pela skill `status`. Não há resolução automática.
 
-**Risco aceito**: rastreabilidade entre SPECs é responsabilidade do INDEX.md e da skill `state`.
+**Risco aceito**: rastreabilidade entre SPECs é responsabilidade do INDEX.md e da skill `status`.
 
 ### 4.2 README manual abandonado, INDEX.md automático
 
@@ -215,7 +215,7 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ### 4.10 Modo de execução padrão: ciclo autônomo (full-auto)
 
-**Decisão**: o **modo padrão** de atender um pedido de mudança não-trivial é o **autônomo** (`/keelson:auto`): o agente conduz `specify → plan → tasks → implement → entrega` de ponta a ponta **sem aprovação humana de rotina entre etapas**, parando apenas nas exceções. O fluxo pausado (aprovar etapa a etapa) passa a ser **opt-in** via `/keelson:guiado`. O usuário não precisa digitar o comando — basta pedir a tarefa em linguagem natural; o bloco keelson do `CLAUDE.md` declara isso como default.
+**Decisão**: o **modo padrão** de atender um pedido de mudança não-trivial é o **autônomo** (`/keelson:auto`): o agente conduz `specify → plan → tasks → implement → entrega` de ponta a ponta **sem aprovação humana de rotina entre etapas**, parando apenas nas exceções. O fluxo pausado (aprovar etapa a etapa) passa a ser **opt-in** via `/keelson:guided`. O usuário não precisa digitar o comando — basta pedir a tarefa em linguagem natural; o bloco keelson do `CLAUDE.md` declara isso como default.
 
 **Por quê**: reduzir atrito. Analogia do solicitante: "a área de negócio pede e depois vem ver o resultado." Pedir aprovação a cada etapa é caro quando a demanda é clara.
 
@@ -224,7 +224,7 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 - Pedido de modificar/editar/implementar não-trivial → modo autônomo.
 - Trivial (typo, copy, cor) → direto, sem keelson.
 
-**Delegação consciente (reinterpreta a regra de ouro #3 / decisão 4.2)**: no modo autônomo, a **promoção de Status** (`Draft → Approved → Done`) é **delegada ao agente** para aquele ciclo. Continua valendo a invariante de que o INDEX é gerado (não editado à mão); o que muda é que o "Approved/Done" deixa de exigir clique humano por etapa quando o usuário optou pelo modo autônomo (o default). No `/keelson:guiado`, a promoção volta a depender do OK humano nos checkpoints.
+**Delegação consciente (reinterpreta a regra de ouro #3 / decisão 4.2)**: no modo autônomo, a **promoção de Status** (`Draft → Approved → Done`) é **delegada ao agente** para aquele ciclo. Continua valendo a invariante de que o INDEX é gerado (não editado à mão); o que muda é que o "Approved/Done" deixa de exigir clique humano por etapa quando o usuário optou pelo modo autônomo (o default). No `/keelson:guided`, a promoção volta a depender do OK humano nos checkpoints.
 
 **Rede de proteção preservada (nunca desligada)**: ambiguidade crítica na SPEC, decisão arquitetural **irreversível** (DEC), mudança de **risco** (auth/autorização, schema de banco, exclusão de dados, config de produção), `ERROR` de validator não auto-corrigível, quality gate que falha após 1 retry e achado de **segurança** **sempre param e perguntam**. **Merge e deploy permanecem humanos** — a fronteira IA/humano da decisão 4.8 não muda. *(Recalibrada pela decisão 4.11: a régua de pausa passou a ser reversibilidade × divergência, com perguntas adiáveis em lote.)*
 
@@ -244,7 +244,7 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **Por quê**: a régua por categoria pausava em escolhas óbvias e reversíveis (ex.: coluna nullable), gastando interrupção humana sem risco real; e as decisões autônomas ficavam enterradas na SPEC/PLAN, sem visão consolidada para revisão.
 
-**O que não muda**: rigor e gates (decisão 4.10), gate de segurança com rejeição imediata, merge/deploy humanos (4.8), e o `/keelson:guiado` — que mantém a régua estrita por ser o modo opt-in de acompanhamento.
+**O que não muda**: rigor e gates (decisão 4.10), gate de segurança com rejeição imediata, merge/deploy humanos (4.8), e o `/keelson:guided` — que mantém a régua estrita por ser o modo opt-in de acompanhamento.
 
 **Aplicação**: `commands/auto.md` (fonte de verdade) e o bloco keelson do `CLAUDE.md` (rede de proteção). Recalibra a "Rede de proteção" da decisão 4.10. *(Recalibrada pela decisão 4.13: as perguntas do auto concentram-se na última chamada e no lote da Entrega; interrupção no meio do fluxo virou último caso.)*
 
@@ -267,11 +267,11 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **Por quê**: pergunta no meio do fluxo com o humano ausente não protege — pendura o trabalho (nem entrega, nem avança), e o solicitante volta para encontrar uma pergunta parada em vez de uma entrega (ainda que parcial).
 
-**O que não muda**: nada destrutivo/irreversível é aplicado sem resposta (estaciona — nunca "decide"); vulnerabilidade nunca entra na branch; merge/deploy humanos (4.8); os gates não são afrouxados (4.10); o `/keelson:guiado` mantém a régua estrita de perguntar na hora (humano presente por definição).
+**O que não muda**: nada destrutivo/irreversível é aplicado sem resposta (estaciona — nunca "decide"); vulnerabilidade nunca entra na branch; merge/deploy humanos (4.8); os gates não são afrouxados (4.10); o `/keelson:guided` mantém a régua estrita de perguntar na hora (humano presente por definição).
 
 **Trade-off aceito**: menos paradas = mais risco de premissa errada custar retrabalho; a contrapartida é a prova por teste falsificável, o "Caminho tomado" consolidado e a entrega em branch (errar custa um ajuste de revisão, não um rollback de produção).
 
-**Aplicação**: `commands/auto.md` (Etapa 0.5 + escada em Exceções — fonte de verdade) e `commands/guiado.md` (explicita a régua estrita própria).
+**Aplicação**: `commands/auto.md` (Etapa 0.5 + escada em Exceções — fonte de verdade) e `commands/guided.md` (explicita a régua estrita própria).
 
 ### 4.14 Espelho do entendimento: o prompt confirmado é o contrato (complementa 4.13)
 
@@ -326,7 +326,7 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **Alternativas descartadas**: `route` (descreve o resultado, não a análise), `classify` (correto porém burocrático), `intake` (menos óbvio), manter `change` (perpetua o desalinhamento).
 
-**Aplicação**: `commands/change.md` → `commands/triage.md` (git mv) + atualização de todas as referências (README, method-guide, CLAUDE.keelson-block, WORKFLOW.md, skills/state, commands que o citam, este arquivo). Entra na 0.4.0.
+**Aplicação**: `commands/change.md` → `commands/triage.md` (git mv) + atualização de todas as referências (README, method-guide, CLAUDE.keelson-block, WORKFLOW.md, skills/status, commands que o citam, este arquivo). Entra na 0.4.0.
 
 ### 4.19 Perfis PHP legados embarcados + resolução de versão pelo mais próximo abaixo
 
@@ -352,6 +352,20 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 - **Fora do corte, por decisão do humano**: os 4 hooks ficam (o gatilho determinístico no Stop não tem equivalente nativo) e `guidelines/` inteiro fica intacto por enquanto (doutrina distribuída aos consumidores).
 
 **Aplicação**: `commands/*` (14 arquivos), `agents/*` (6 de 7 — `profile-writer` já enxuto, intocado), `skills/*` (5 SKILL.md + `skills/_shared/validator-protocol.md` novo), `templates/CLAUDE.keelson-block.md`, `docs/_meta/method-guide.md` (§3.0 novo, §6 ampliado), `CLAUDE.md` do repo. Redução líquida ≈ 780 linhas. Ajuste fino sem capacidade nova → patch: plugin 0.5.0 → 0.5.1.
+
+### 4.21 Doutrina de nomenclatura do namespace + renames `guiado` → `guided` e `state` → `status`
+
+**Problema**: a decisão 4.18 fixou o princípio de nomenclatura ("o nome descreve a ação do comando, verbo em inglês") apenas implicitamente, ao renomear um comando; a convenção completa nunca foi registrada. Uma auditoria dos 26 nomes do namespace (14 comandos, 5 skills, 7 agents) encontrou uma incoerência real — `/keelson:guiado`, único nome em português de todo o namespace — e um desvio idiomático — a skill `state`, quando `status` é o consagrado de CLI para "mostrar o estado" (`git status`).
+
+**Decisão (do humano)** — convenção de nomenclatura do namespace:
+- **Comandos de ação**: verbo em inglês que descreve a ação (`specify`, `plan`, `implement`, `init`, `refine`, `triage`, `integrate`, `audit`); com objeto quando a precisão pedir (`migrate-legacy`, `rebuild-index`, `verify-handoff`).
+- **Etapas do ciclo** podem nomear o artefato que produzem — exceção consciente: `tasks` (substantivo) preserva o mnemônico `specify → plan → tasks → implement`.
+- **Modos de condução** são nomeados pelo modo, não pela ação: `auto` / `guided` — o eixo autônomo × acompanhado é a informação que os distingue.
+- **Skills e agents**: `<objeto>-<papel>` (`spec-validator`, `task-implementer`, `security-reviewer`, `process-tuner`, `profile-writer`). Exceção deliberada: `screen-verify` espelha o nome do gate `gates.screenVerify` da ficha — renomeá-la quebraria fichas de consumidores (`"method": "skill:screen-verify"`).
+- **Renames aplicados** (corte limpo sem stub, padrão 0.x da 4.18): `/keelson:guiado` → **`/keelson:guided`** e skill `state` → **`status`**.
+- **Auditados e mantidos**: `tasks` (simetria do ciclo vence a pureza do verbo), `auto` (par de modos), `integrate` (não faz merge, mas a fronteira é documentada em voz alta no comando e no PR; `submit` descartado — ganho não paga o churn), `audit` (nome curto; o escopo de dependências está na description e no argumento `full`).
+
+**Aplicação**: `commands/guiado.md` → `commands/guided.md` e `skills/state/` → `skills/status/` (git mv) + atualização de todas as referências (README, method-guide, CLAUDE.keelson-block, WORKFLOW.md, commands que os citam, este arquivo). Rename = quebra → plugin 0.5.1 → 0.6.0.
 
 ---
 

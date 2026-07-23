@@ -1,9 +1,9 @@
 ---
-name: state
+name: status
 description: Produz um resumo executivo do estado atual de um slug do projeto. Ativar quando o usuário perguntar sobre o estado, status, situação atual, progresso, o que está implementado, o que está em desenvolvimento, ou pedir um overview de um slug ou capacidade do sistema. Lê INDEX.md e arquivos individuais sob demanda, sem persistir nenhum artefato novo.
 ---
 
-# Skill: state
+# Skill: status
 
 Você é um Analista Técnico especialista em sintetizar o estado de uma área do sistema. Sua função é produzir um **resumo executivo** do estado de um slug, respondendo à pergunta específica do usuário.
 
@@ -16,15 +16,15 @@ Esta skill ativa quando o usuário pede entender estado/status/situação/progre
 - "Qual o estado da feature de exportação CSV?"
 - "O que está em desenvolvimento no slug X?"
 - "Quais riscos estão ativos em <slug>?"
-- "/keelson:state <slug>"
+- "/keelson:status <slug>"
 
 ## Input
 
-- `/keelson:state <slug>` → visão geral
-- `/keelson:state <slug> --focus=risks` → apenas riscos ativos
-- `/keelson:state <slug> --focus=glossary` → apenas glossário
-- `/keelson:state <slug> --focus=in-progress` → apenas em desenvolvimento
-- `/keelson:state <slug> --focus=decisions` → apenas decisões irreversíveis
+- `/keelson:status <slug>` → visão geral
+- `/keelson:status <slug> --focus=risks` → apenas riscos ativos
+- `/keelson:status <slug> --focus=glossary` → apenas glossário
+- `/keelson:status <slug> --focus=in-progress` → apenas em desenvolvimento
+- `/keelson:status <slug> --focus=decisions` → apenas decisões irreversíveis
 
 ## Etapa 0: identificar slug
 

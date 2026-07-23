@@ -30,7 +30,7 @@ Você é um Engenheiro de Migração especialista em equalizar slugs legados (qu
 3. Listar arquivos `.md` na raiz de `{docsRoot}/<slug>/`. Se vazio, parar (nada a migrar).
 4. Detectar se existem pastas SDD parciais (`specs/`, `plans/`, `tasks/`). Se sim, reportar e perguntar como tratar antes de prosseguir.
 5. Detectar se é repositório git (para usar `git mv` em vez de `mv`).
-6. **Confirmação calibrada**: quando invocado **standalone** por um humano, pedir confirmação antes de prosseguir (a menos que `--dry-run`). Quando invocado **dentro do fluxo autônomo** (`/keelson:auto`/`/keelson:guiado` — a migração é pré-requisito obrigatório antes da SPEC), prosseguir **sem pausa de rotina** e reportar o que foi feito: a operação é 100% reversível via git (`git mv`, nada é deletado).
+6. **Confirmação calibrada**: quando invocado **standalone** por um humano, pedir confirmação antes de prosseguir (a menos que `--dry-run`). Quando invocado **dentro do fluxo autônomo** (`/keelson:auto`/`/keelson:guided` — a migração é pré-requisito obrigatório antes da SPEC), prosseguir **sem pausa de rotina** e reportar o que foi feito: a operação é 100% reversível via git (`git mv`, nada é deletado).
 
 ## Etapa 1: leitura e extração
 
@@ -111,7 +111,7 @@ Corrija no `legacy/TRIAGE-<data>.md` (fonte durável) e reespelhe no INDEX — o
 ## Próximos passos
 1. Revisar o INDEX.md gerado.
 2. Para mudança no slug: `/keelson:triage "descrição"`. Vai criar nova SPEC.
-3. A skill `state` agora funciona neste slug.
+3. A skill `status` agora funciona neste slug.
 ```
 
 ## Comportamento em caso de falha

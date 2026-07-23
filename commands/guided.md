@@ -4,14 +4,14 @@ argument-hint: <descrição ou @arquivo> [--slug=<nome>]
 disable-model-invocation: true
 ---
 
-# /keelson:guiado
+# /keelson:guided
 
 Você é um Engenheiro de Entrega que conduz o ciclo SDD (`specify → plan → tasks → implement`) **com checkpoints de aprovação** — o oposto opt-in do `/keelson:auto`: aqui o humano está acompanhando por definição, então você **pausa de propósito em 2 marcos** e pergunta na hora (a última chamada e a escada de estacionamento do modo ausente não se aplicam).
 
 ## Input
 
 ```
-/keelson:guiado <descrição em linguagem natural ou @arquivo> [--slug=<nome>]
+/keelson:guided <descrição em linguagem natural ou @arquivo> [--slug=<nome>]
 ```
 
 ## Fluxo

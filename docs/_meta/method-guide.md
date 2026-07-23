@@ -20,7 +20,7 @@ Cada etapa gera artefatos em `<docsRoot>/<slug>/` (a raiz vem de `docsRoot` na f
 
 **Não sabe por onde começar?** Use `/keelson:triage "descrição da demanda"` — ele faz triagem e indica o comando certo.
 
-**Modo padrão = autônomo.** No dia a dia você não roda etapa por etapa: peça a tarefa em linguagem natural (ou use `/keelson:auto`) e o ciclo corre de ponta a ponta — as dúvidas críticas são feitas de uma vez na largada (última chamada) e o restante segue até a entrega, com interrupção no meio só em último caso. Quer aprovar etapa a etapa? Use `/keelson:guiado`. Ver 3.9 e 3.10 e as decisões 4.10/4.13 de `decisions.md`.
+**Modo padrão = autônomo.** No dia a dia você não roda etapa por etapa: peça a tarefa em linguagem natural (ou use `/keelson:auto`) e o ciclo corre de ponta a ponta — as dúvidas críticas são feitas de uma vez na largada (última chamada) e o restante segue até a entrega, com interrupção no meio só em último caso. Quer aprovar etapa a etapa? Use `/keelson:guided`. Ver 3.9 e 3.10 e as decisões 4.10/4.13 de `decisions.md`.
 
 ---
 
@@ -46,7 +46,7 @@ Cada etapa gera artefatos em `<docsRoot>/<slug>/` (a raiz vem de `docsRoot` na f
 Para consultar o estado a qualquer momento:
 
 ```bash
-/keelson:state relatorios
+/keelson:status relatorios
 ```
 
 ---
@@ -211,12 +211,12 @@ Rigor proporcional preservado (trivial → direto; bug/refactor → inline; feat
 
 **Ambiente sem tela** (worktree/nuvem, ou `gates.screenVerify` sem app disponível): o gate 9 não exercitável gera **handoff de verificação** — doc com roteiro + prompt copy-paste no report para um agente com tela fechar a verificação (ver §8). A entrega é declarada parcial até lá.
 
-### 3.10 `/keelson:guiado` — ciclo com checkpoints (opt-in pausado)
+### 3.10 `/keelson:guided` — ciclo com checkpoints (opt-in pausado)
 
 O oposto opt-in do `/keelson:auto`: roda o ciclo **pausando em 2 marcos** (SPEC pronta, PLAN pronto) para o seu OK, e com a **régua estrita** de perguntar na hora em qualquer exceção (você está acompanhando — a escada de estacionamento do auto não se aplica). Use quando quer revisar o contrato e o desenho antes do desenvolvimento.
 
 ```
-/keelson:guiado <descrição ou @arquivo> [--slug=<nome>]
+/keelson:guided <descrição ou @arquivo> [--slug=<nome>]
 ```
 
 ### 3.11 `/keelson:refine` — lapidar uma ideia crua (opt-in, pré-ciclo)
@@ -248,7 +248,7 @@ Skills não geram artefatos novos — validam ou consultam. As três validators 
 | `spec-validator` | EARS, RFC 2119, IDs, verificabilidade FR↔AC, domínio vs tecnologia, glossário, escopo simétrico | Final do `/keelson:specify` |
 | `plan-validator` | Estrutura, cobertura declarada, DECs com alternativas, mapeamento FR→COMP, aderência ao Charter + perfil, DoD | Final do `/keelson:plan` |
 | `task-validator` | Vinculação ao PLAN, FRs/ACs existentes, dependências sem ciclo, convenções, campos de closure preparados | Final do `/keelson:tasks` |
-| `state` | **Consulta** (read-only): resumo executivo do estado de um slug | Perguntas sobre estado/progresso |
+| `status` | **Consulta** (read-only): resumo executivo do estado de um slug | Perguntas sobre estado/progresso |
 
 ### Severidades e gate de status
 
@@ -266,14 +266,14 @@ override-justificativa: <texto>
 override-aprovador: <nome>
 ```
 
-### `/keelson:state` — consultar estado
+### `/keelson:status` — consultar estado
 
 ```
-/keelson:state <slug>                      # visão geral
-/keelson:state <slug> --focus=risks        # apenas riscos ativos
-/keelson:state <slug> --focus=glossary     # apenas glossário
-/keelson:state <slug> --focus=in-progress  # apenas o que está em desenvolvimento
-/keelson:state <slug> --focus=decisions    # apenas decisões irreversíveis
+/keelson:status <slug>                      # visão geral
+/keelson:status <slug> --focus=risks        # apenas riscos ativos
+/keelson:status <slug> --focus=glossary     # apenas glossário
+/keelson:status <slug> --focus=in-progress  # apenas o que está em desenvolvimento
+/keelson:status <slug> --focus=decisions    # apenas decisões irreversíveis
 ```
 
 Nunca modifica arquivos. Se detectar divergência entre INDEX e arquivos, sugere `/keelson:rebuild-index`.

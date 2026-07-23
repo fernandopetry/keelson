@@ -186,7 +186,7 @@ O fluxo modela um time de engenharia — a separação de poderes é intencional
 | Verificador funcional (gate 9) | `task-verifier` | IA |
 | QA de artefatos (lint) | `spec/plan/task-validator` | IA |
 | Integrador (suíte + PR) | `/keelson:integrate` | IA até o PR; **humano mergeia/deploya** |
-| Analista de estado | `state` | IA (read-only) |
+| Analista de estado | `status` | IA (read-only) |
 | Triador de demandas | `/keelson:triage` | IA |
 | Aprovador / dono / escalonamento | — | **humano** |
 
