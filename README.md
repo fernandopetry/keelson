@@ -147,6 +147,11 @@ transitions). It's **off by default** and **best-effort**: it never blocks the c
   (SPEC issue ▸ sub-tasks). SPECs that declare features (`FEAT-*` headings) plus a configured
   `issueType.feature` get the full Epic ▸ Story ▸ Sub-task hierarchy, with a
   "feature ready for QA" milestone per Story. Both opt-ins missing → nothing changes.
+- **Standalone tasks.** One-off work (a bugfix or chore routed straight to a TASK, or a
+  cross-cutting task with no honest primary feature) projects as `issueType.standalone` —
+  a level-0 card QA can test on its own, hung under the Epic when the hierarchy allows.
+  `/keelson:init` validates that your type mapping actually nests (Jira only links
+  strictly adjacent hierarchy levels) and warns with the correct type when a leg doesn't.
 - **Custom fields & board columns** live in a per-project map file (`jira.mapFile`, a Markdown
   table) that `init` scaffolds and you fill in — write-enrichment (`fixed`/`from`) and, in
   `link` mode, read-seeding of the SPEC.
@@ -160,14 +165,14 @@ The ficha's `jira` block (all IDs, zero secrets):
   "enabled": false,
   "site": null, "cloudId": null, "projectKey": null,
   "mode": "create",                       // "create" | "link"
-  "issueType": { "spec": null, "feature": null, "task": null },
+  "issueType": { "spec": null, "feature": null, "task": null, "standalone": null },
   "transition": "comment",                // "off" | "comment" | "auto"
   "mapFile": null, "boardId": null
 }
 ```
 
 Re-run `/keelson:jira-sync <slug>` any time to reconcile what a best-effort run skipped.
-Governance: decisions 4.22 and 4.27 in `docs/_meta/decisions.md`.
+Governance: decisions 4.22, 4.27 and 4.28 in `docs/_meta/decisions.md`.
 
 ## Repository layout
 
@@ -188,7 +193,7 @@ keelson/
 
 ## Status
 
-`0.10.0` — early. The engine and the PHP reference profile are the stable core; the
+`0.11.0` — early. The engine and the PHP reference profile are the stable core; the
 legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending drafts, and the
 profile generator and non-PHP profiles are evolving. The optional Jira integration
 (via the Atlassian MCP connector), multi-realm screen verification and the optional

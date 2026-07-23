@@ -27,7 +27,7 @@
     "cloudId": null,
     "projectKey": null,
     "mode": "create",
-    "issueType": { "spec": null, "feature": null, "task": null },
+    "issueType": { "spec": null, "feature": null, "task": null, "standalone": null },
     "transition": "comment",
     "mapFile": null,
     "boardId": null

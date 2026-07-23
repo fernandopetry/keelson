@@ -263,12 +263,12 @@ Rede de segurança da integração opcional com Jira (via **conector MCP Atlassi
 
 | Aspecto | Detalhe |
 |---|---|
-| Gera | Issues, Stories de FEAT (quando a SPEC declara FEATs e `issueType.feature` está preenchido) e sub-tasks no Jira (via conector); grava o campo `Jira:` na SPEC, sob os headings FEAT e nas TASKs |
+| Gera | Issues, Stories de FEAT (quando a SPEC declara FEATs e `issueType.feature` está preenchido), sub-tasks e tarefas isoladas (`issueType.standalone` — TASK avulsa ou transversal sem primária) no Jira (via conector); grava o campo `Jira:` na SPEC, sob os headings FEAT e nas TASKs |
 | Atualiza | 1 linha no "Histórico recente" do `INDEX.md` (contrato da tabela "PLANs" intocado) |
 | Gate | — (best-effort; `jira.enabled:false` ou conector ausente → não faz nada) |
 | Lógica | Toda no `skills/_shared/jira-sync-protocol.md` — o comando só orquestra |
 
-Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22 e 4.27 de `decisions.md`.
+Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27 e 4.28 de `decisions.md`.
 
 ---
 

@@ -60,8 +60,9 @@ Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara valida
 - AC vinculado em "Critérios" não existe na SPEC
 - Com FEATs na SPEC: FEAT listada em `Funcionalidade` não existe na SPEC; conjunto listado
   difere do conjunto derivado das FEATs dos FRs de `Realiza` (faltando ou sobrando); a
-  `(primária)` não pertence ao conjunto derivado; nenhuma FEAT marcada `(primária)` quando
-  há 2+ listadas
+  `(primária)` não pertence ao conjunto derivado; com 2+ FEATs listadas, nem uma marcada
+  `(primária)` nem a forma `transversal (FEAT-..., FEAT-...)` — uma das duas é obrigatória;
+  forma `transversal (...)` com apenas 1 FEAT (transversal exige 2+)
 
 ### WARNING se:
 - TASK realiza FR também coberto por outra TASK do mesmo PLAN

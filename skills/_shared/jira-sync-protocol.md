@@ -38,7 +38,7 @@ variam por projeto.
 | `site` / `cloudId` | resolução do site (§1) |
 | `projectKey` | projeto-alvo das criações |
 | `mode` | `create` (cria hierarquia) \| `link` (pendura em issue existente) — §5 |
-| `issueType.spec` / `issueType.feature` / `issueType.task` | **IDs** do tipo da issue da SPEC, da Story de funcionalidade (opcional — `null` desliga o 3º nível, §6.1) e da sub-task da TASK |
+| `issueType.spec` / `issueType.feature` / `issueType.task` / `issueType.standalone` | **IDs** do tipo da issue da SPEC, da Story de funcionalidade (opcional — `null` desliga o 3º nível, §6.1), da sub-task da TASK, e do tipo **nível 0** da tarefa isolada (opcional — `null` = tasks isoladas não sincronizam, §7) |
 | `transition` | `off` \| `comment` (default) \| `auto` — §9 |
 | `mapFile` | caminho do mapa `.md` do projeto (§3); `null` → só `summary`+`description`, sem mover card |
 | `boardId` | opcional, só para compor link "ver no board" em comentário |
@@ -90,8 +90,12 @@ gravar a key no front-matter (§10). 3. `link` → validar a key existente e apl
    `issueType.feature` está preenchido. Qualquer um ausente → esta seção inteira é no-op e
    a projeção segue em 2 níveis, idêntica à de hoje.
 2. **Pré-check de hierarquia** (operar por ID, §1): via `getJiraProjectIssueTypesMetadata`,
-   conferir `hierarchyLevel` — o caminho pleno exige `issueType.spec` epic-level (1),
-   `issueType.feature` standard (0) e `issueType.task` `subtask:true` (-1).
+   conferir `hierarchyLevel` — o Jira só aninha pai→filho entre níveis **estritamente
+   descendentes e adjacentes** (pai exatamente um nível acima do filho). O caminho pleno
+   exige `issueType.spec` epic-level (1), `issueType.feature` standard (0) e
+   `issueType.task` `subtask:true` (-1). Perna não-adjacente (ex.: Story(0) sob Tarefa(0)
+   — irmãos; sub-task(-1) sob Epic(1)) → não tentar o `parent`, ir direto ao degrau de
+   degradação correspondente, com aviso.
 3. **Criação** (modo `create`, por FEAT sem key — idempotência §4): `createJiraIssue` com
    `projectKey`, `issueType.feature`, `parent` = key da issue da SPEC, `summary` = nome da
    FEAT, `description` = descrição (`>`) + lista dos ACs derivados
@@ -103,8 +107,10 @@ gravar a key no front-matter (§10). 3. `link` → validar a key existente e apl
    - (ii) modo `link` → as Stories penduram na issue humana do front-matter se a hierarquia
      dela aceitar filhos; senão, degrau (i). Key pré-preenchida pelo humano numa FEAT →
      validar com `getJiraIssue` e no-op (mesma semântica do `link` da SPEC).
-   - (iii) criação da Story falhou de vez → as sub-tasks daquela FEAT caem no parent da
-     issue da SPEC (comportamento 2 níveis) + aviso. **Nunca bloqueia.**
+   - (iii) criação da Story falhou de vez → **nunca** criar sub-task órfã nem sub-task sob
+     Epic (níveis não-adjacentes): a task daquela FEAT projeta via `issueType.standalone`
+     com `parent` = issue da SPEC quando adjacente (Epic(1) ▸ nível 0); senão issue normal
+     + `createIssueLink` "relates to" (padrão de robustez do §7) + aviso. **Nunca bloqueia.**
 5. **Pronta p/ QA**: quando o chamador (implement, ou a reconciliação §12) constatar a FEAT
    pronta — **todas** as TASKs que a listam em `Funcionalidade` (primária **ou** secundária,
    em qualquer PLAN do slug) estão `Done`, com os ACs verificados pelos gates — aplicar a
@@ -122,9 +128,22 @@ SPEC; `summary` = título da TASK; aplicar campos `write`. Gravar a key na closu
 
 **Com §6.1 ativo**: `parent` = key da **Story da FEAT primária** da TASK (campo
 `Funcionalidade`); cada FEAT secundária recebe `createIssueLink` "relates to" entre a
-sub-task e a Story dela. Story primária sem key (criação falhou, §6.1 degrau iii) →
-fallback: `parent` = issue da SPEC + aviso. O fallback de `subtask:false` acima continua
+sub-task e a Story dela. Story primária sem key (criação falhou) → degrau (iii) do §6.1
+(standalone/link — nunca sub-task órfã). O fallback de `subtask:false` acima continua
 valendo — o link "relates to" aponta para a Story primária quando ela existe.
+
+**Tarefa isolada (`issueType.standalone`)** — o card de QA fora do aninhamento; `null` →
+tasks isoladas não sincronizam (nem avisa). Duas origens:
+- **TASK avulsa** (roteada pelo `/keelson:triage` direto para TASK — bugfix/chore/ops, sem
+  SPEC/FEAT): issue de `issueType.standalone`, **sem `parent`**; se o slug tem issue-SPEC,
+  `createIssueLink` "relates to" com ela. Criada pelo gancho do comando que gera/executa a
+  TASK (closure do `/keelson:implement` quando não há key) ou pela reconciliação (§12).
+- **TASK transversal sem primária honesta** (campo `**Funcionalidade**: transversal
+  (FEAT-A, FEAT-B)` — serve a todas/quase todas as FEATs): issue de `issueType.standalone`
+  com `parent` = issue da SPEC quando adjacente (Epic(1) ▸ nível 0); senão sem pai + link
+  "relates to". Cada FEAT listada recebe link "relates to" com a Story dela. Nunca
+  replicada: ou aninha na primária (default), ou é **uma** issue isolada.
+Key persistida na closure da TASK (§10), como qualquer sub-task.
 
 ## §8. Campos personalizados (§3, seção Campos)
 
@@ -148,7 +167,9 @@ Conforme `jira.transition`:
   (não força, não erra). O mapa é intenção; a transição real é sempre validada em runtime.
 
 O marco de closure atua na **sub-task**; o marco de funcionalidade pronta atua na **Story**
-e é regido pelo §6.1 item 5.
+e é regido pelo §6.1 item 5. **Tarefa isolada** (§7) é a própria unidade de QA: na closure
+`Done`, além do marco normal, aplicar o marco "pronta p/ QA" (gatilho do mapa / política de
+`transition`) **na própria issue** — equivalente ao que a Story recebe quando a FEAT completa.
 
 ## §10. Persistência das keys
 

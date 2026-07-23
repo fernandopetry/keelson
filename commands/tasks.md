@@ -185,6 +185,11 @@ funcionalidade é a própria SPEC). Task `chore` sem FR realizado pode omitir. R
 - Task **transversal** (FRs de 2+ FEATs — ex.: um front único servindo login e
   lançamento) lista todas; a primária define o parent no Jira (§7 do protocolo), as
   demais viram links.
+- **Sem primária honesta** (a task serve a todas/quase todas as FEATs e eleger uma seria
+  arbitrário): use a forma `**Funcionalidade**: transversal (FEAT-NNN-XXX, FEAT-NNN-YYY)`
+  — sem `(primária)`. No Jira ela projeta como tarefa isolada (`issueType.standalone`,
+  §7 do protocolo), nunca replicada. O cálculo de "FEAT pronta" conta a task em **todas**
+  as FEATs listadas, em qualquer forma.
 
 ### Mapeamento de cada AC — camada que enforça, gate que verifica
 
@@ -253,7 +258,7 @@ Aplicar a **receita de atualização do INDEX** (method-guide §6). Específico 
 
 ## Etapa 7: sincronização com Jira (opcional)
 
-Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §7) para criar uma **sub-task** por TASK (idempotente — §4) e gravar a key no campo `Jira:` da closure de cada TASK. Com a projeção de 3 níveis ativa (SPEC declara FEATs ∧ `issueType.feature` preenchido), o `parent` da sub-task é a **Story da FEAT primária** — criar antes as Stories que faltarem (§6.1) — e as FEATs secundárias recebem link "relates to"; sem FEATs ou sem `issueType.feature`, parent = issue principal da SPEC, como sempre. Best-effort (§0): conector indisponível/falha → aviso, sem bloquear a geração das TASKs.
+Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §7) para criar uma **sub-task** por TASK (idempotente — §4) e gravar a key no campo `Jira:` da closure de cada TASK. Com a projeção de 3 níveis ativa (SPEC declara FEATs ∧ `issueType.feature` preenchido), o `parent` da sub-task é a **Story da FEAT primária** — criar antes as Stories que faltarem (§6.1) — e as FEATs secundárias recebem link "relates to"; TASK na forma `transversal (...)` vira tarefa isolada (`issueType.standalone`, §7); sem FEATs ou sem `issueType.feature`, parent = issue principal da SPEC, como sempre. Best-effort (§0): conector indisponível/falha → aviso, sem bloquear a geração das TASKs.
 
 ## Output final ao usuário
 
