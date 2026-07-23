@@ -87,14 +87,14 @@ Antes da Entrega, revise o ciclo que acabou de rodar: houve erro de **processo**
 
 ## Etapa 4.6: Handoff de verificação de tela (gate 9 remoto)
 
-**Só se aplica quando `gates.screenVerify` está ativo.** **Gatilho**: a mudança tem efeito observável em tela e o ambiente desta sessão **não permite exercitá-la** (worktree sem app/browser, execução na nuvem, containers indisponíveis). Vale para **todas as rotas** — na formal o `/keelson:implement` já consolidou os `handoff_seed` do `task-verifier`; na inline, você mesmo identifica o que não conseguiu exercitar na auto-revisão.
+**Só se aplica quando `gates.screenVerify` está ativo.** **Gatilho**: a mudança tem efeito observável em tela e o ambiente desta sessão **não permite exercitá-la** (worktree sem app/browser, execução na nuvem, containers indisponíveis). **Indisponibilidade é provada, não presumida** (decisão 4.26): antes de tratar o gate como `pendente_handoff`, rode a sondagem barata — o `keelson.local.json` existe com os dados do realm alvo? a `baseUrl` do realm responde, ou a app sobe pelo método do projeto? a sessão tem ferramenta de tela? Só a sondagem **falhando, com evidência registrada** (o que foi tentado e o que retornou — vai no `sonda:` do handoff), autoriza esta etapa; multi-realm sonda **por realm** do roteiro. Vale para **todas as rotas** — na formal o `/keelson:implement` já consolidou os `handoff_seed` do `task-verifier` (com as evidências); na inline, você mesmo roda a sondagem e identifica o que não conseguiu exercitar na auto-revisão.
 
 Uma entrega com gate 9 furado **nunca é silenciosa**. Antes da Entrega:
 
 1. **Gere o handoff**: `{docsRoot}/<slug>/handoffs/HANDOFF-<id>.md` no formato e nas regras de roteiro canônicos do guia do método (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`, §8.2; `<id>` = `PLAN-MMM` na rota formal; `<yyyy-mm-dd>-<descrição-curta>` na inline), incluindo os pontos frágeis que você conhece (dark mode, estados vazios, autorização) mesmo sem AC formal.
 2. **Registre o risco ativo no INDEX** do slug: `Verificação de tela pendente — HANDOFF-<id>` (na rota formal o `/keelson:implement` já fez).
 3. **Domínio sem slug SDD**: não crie arquivo — o roteiro completo vai inline no prompt do report da Entrega (e aplique a calibração de documentação autônoma dos guidelines para a falta de slug).
-4. **Ambiente com tela disponível** → esta etapa não existe: exercite de verdade (gate 9 normal). O handoff é fallback, não atalho — **proibido** usá-lo para pular verificação possível.
+4. **Ambiente com tela disponível** → esta etapa não existe: exercite de verdade (gate 9 normal). O handoff é fallback, não atalho — **proibido** usá-lo para pular verificação possível; alegação de "ambiente sem tela" sem a sondagem registrada acima **não vale** (decisão 4.26).
 
 ## Etapa 5: Entrega
 

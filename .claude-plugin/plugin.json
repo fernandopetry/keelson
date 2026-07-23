@@ -1,6 +1,6 @@
 {
   "name": "keelson",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Spec-driven development for Claude Code — a portable, verifiable quality standard with automated gates and per-language profiles.",
   "author": {
     "name": "Fernando Petry"

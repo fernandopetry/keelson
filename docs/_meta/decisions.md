@@ -402,6 +402,22 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **Aplicação**: `hooks/wave-guard.sh` (novo) + registro em `hooks/hooks.json`; convenção do run-state no method-guide §3.0; ganchos em `commands/implement.md` (criação na Etapa 3, atualização no §3.6, encerramento na Etapa 5) e `commands/auto.md` (remoção na Entrega após o push + referência no "Fôlego não é gatilho"). Validado com `bash -n` + 5 cenários sintéticos no scratchpad (bloqueia em `em_andamento`; passa com `stop_hook_active`, `encerrado`, sem arquivo, sem `cwd`). Resolve a pendência "wave-guard" da §8. Hook novo = capacidade nova → minor: plugin 0.7.0 → 0.8.0.
 
+### 4.25 Verificação de tela multi-realm: realms nomeados no `keelson.local.json`
+
+**Problema**: o `keelson.local.json` modelava um único acesso (`baseUrl` + `login` direto), mas surgiu projeto consumidor com **duas áreas logadas** — a administrativa e um portal de usuários não-admin, com URL e usuário distintos. Sem noção de realm, a verificação de tela não sabe qual credencial usar em qual tela; e o atalho tentador (logar como admin para olhar o portal) **mascara exatamente os bugs de autorização/isolamento** que o gate existe para pegar.
+
+**Decisão**: `screenVerify.realms` nomeados no `keelson.local.json` — cada realm com `description` (do que se trata o acesso), `baseUrl` e `login` próprios, mais `defaultRealm`; o formato flat legado segue aceito como realm único implícito (nenhum consumidor quebra; o `/keelson:init` migra merge-preserving). Regras: **seleção** pelo campo `Realm` do item do roteiro/pedido do humano, ou casamento da rota alvo com a `baseUrl` mais específica — sem casamento, pergunta, nunca chuta credencial; **isolamento** não-negociável (credencial do realm X só no login do realm X; aba própria por realm; nunca reusar sessão de um realm noutro); itens **negativos cross-realm** ("sessão do portal em rota admin → negado") viram itens V* legítimos. A ficha versionada não muda (`gates.screenVerify.{enabled, method}`): o que cada acesso é fica no local.json, junto das credenciais, fora do git.
+
+**Aplicação**: `templates/keelson.local.example.json` (formato realms), `skills/screen-verify/SKILL.md` (schema + seleção + isolamento), `commands/init.md` (pergunta de realms na Etapa 2; Etapa 4.5 com migração flat→realms), method-guide §8.2 (campo Realm no item V*), `agents/task-verifier.md` (`handoff_seed.itens[].realm`), `commands/implement.md` (consolidação preserva realm; dedup por fluxo+realm), `commands/verify-handoff.md` (exercício por realm do item). Capacidade nova → minor: plugin 0.8.0 → 0.9.0, na mesma leva da 4.26.
+
+### 4.26 Prova de indisponibilidade: gate 9 só vira handoff com sondagem falhada e registrada
+
+**Problema**: execução real do `/keelson:auto` declarou "não dá para exercitar o SPA nesta sessão" e converteu o gate 9 em handoff **sem nenhuma tentativa** — o `keelson.local.json` estava presente e o browser disponível; o humano precisou apontar o arquivo manualmente (LRN-019). A doutrina proibia o atalho ("handoff é fallback, não atalho") mas sem dente: nenhum artefato exigia **prova** da indisponibilidade, o `ambiente_indisponivel` do verifier era auto-declarável, e o conhecimento de que as credenciais vivem no `keelson.local.json` estava enterrado na skill `screen-verify` — carregada só **depois** da decisão de verificar (circularidade).
+
+**Decisão (do humano, ao reportar o comportamento)**: indisponibilidade de tela é **afirmação que se prova**, no mesmo padrão do check determinístico de pendência de deploy. Antes de `pendente_handoff`, sondagem barata obrigatória: o `keelson.local.json` existe com os dados do realm alvo? a `baseUrl` do realm responde (ou a app sobe pelo método do projeto)? a sessão tem ferramenta de tela? Só a sondagem **falhando, com evidência registrada** (report do verifier `evidencia_indisponibilidade`; front-matter `sonda:` do handoff) autoriza o handoff — seed sem evidência é report rejeitado. Multi-realm (4.25): sonda por realm envolvido no roteiro, e um realm de pé com outro caído gera pendência só do indisponível.
+
+**Aplicação**: method-guide §8.1 (dono do ciclo de vida — sondagem na Detecção) e §8.2 (`sonda:` no front-matter), `agents/task-verifier.md` (fluxo 2 + campo `evidencia_indisponibilidade` obrigatório), `commands/implement.md` (gate 9 rejeita seed sem sondagem), `commands/auto.md` (Etapa 4.6 — sondagem antes do gatilho; item 4 sem sondagem não vale). Origem: LRN-019. Mesma leva 0.9.0 da 4.25.
+
 ---
 
 ## 5. Quality gates inegociáveis

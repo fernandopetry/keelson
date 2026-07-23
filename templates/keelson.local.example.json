@@ -1,12 +1,28 @@
 {
   "_comment": "keelson.local.json — arquivo LOCAL e NAO-VERSIONADO (mantenha no .gitignore). Preencha SOMENTE com credenciais de DESENVOLVIMENTO/TESTE descartaveis, para ambiente local. NUNCA use URL, login ou senha de PRODUCAO aqui, nem conta real de usuario.",
+  "_comment_realms": "Um realm por area logada da aplicacao (ex.: admin, portal de usuarios finais). 'description' diz do que se trata cada acesso; cada realm tem URL e usuario de dev proprios. Projeto com uma unica area: mantenha so um realm. O formato flat legado (baseUrl + login direto sob screenVerify) segue aceito e equivale a um unico realm.",
   "screenVerify": {
-    "baseUrl": "http://localhost:5173/",
-    "login": {
-      "path": "/auth/login",
-      "username": "<usuario ou email de dev>",
-      "password": "<senha de dev — apenas ambiente de testes>"
+    "realms": {
+      "admin": {
+        "description": "Area administrativa — usuarios internos",
+        "baseUrl": "http://localhost:5173/",
+        "login": {
+          "path": "/auth/login",
+          "username": "<usuario ou email de dev>",
+          "password": "<senha de dev — apenas ambiente de testes>"
+        }
+      },
+      "portal": {
+        "description": "<segunda area logada, se existir — ex.: portal de usuarios nao-admin. Remova este realm se o projeto tem uma area so.>",
+        "baseUrl": "http://localhost:5173/portal/",
+        "login": {
+          "path": "/portal/login",
+          "username": "<usuario de dev do portal — conta distinta da admin>",
+          "password": "<senha de dev — apenas ambiente de testes>"
+        }
+      }
     },
+    "defaultRealm": "admin",
     "notes": "Opcional: dicas de setup local especificas do projeto (como subir o servico, aplicar fixture/seed de dev, etc.)."
   }
 }

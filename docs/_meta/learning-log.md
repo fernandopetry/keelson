@@ -203,3 +203,13 @@ artefato_patchado: commands/auto.md (Exceções — parágrafo "Fôlego não é 
 patch: negação explícita — fôlego não sobe degrau nenhum; próxima wave começa imediatamente; "continuo?" entre waves = aprovação de rotina proibida; parada antecipada exige pedido explícito do humano na execução corrente; loop da Etapa 3 do implement só termina na última wave ou em falha listada. Reforço mecânico (mesma data, ideia do humano): run-state em disco + hook Stop wave-guard, imune à sumarização de contexto — decisão 4.24. Critério de sucesso: execução overnight de PLAN multi-wave chega à Etapa 5 (Entrega) sem turno encerrado entre waves. Registrada como decisão 4.23.
 reincidencia: 0
 estado: ativa
+
+## LRN-019: gate 9 virou handoff sem tentar — "ambiente sem tela" presumido, não provado
+data: 2026-07-23
+gatilho: correcao_humana
+origem: execução real do /auto em projeto consumidor (portal do profissional) — a main session despachou a última task já dizendo "gate 9 provavelmente vira handoff (não há como subir o SPA nesta sessão)" e fechou a entrega com handoff, sem ler o keelson.local.json nem tentar abrir a baseUrl; o humano precisou apontar manualmente que os dados de acesso estavam no arquivo
+causa_raiz: a proibição "handoff é fallback, não atalho" era declarativa, sem pré-condição verificável — nenhum artefato exigia sondagem antes de declarar indisponibilidade; o campo `ambiente_indisponivel` do report do verifier era auto-declarável sem evidência; e o conhecimento de que as credenciais vivem no keelson.local.json estava enterrado na skill screen-verify, carregada só DEPOIS da decisão de verificar (circularidade)
+artefato_patchado: docs/_meta/method-guide.md (§8.1/§8.2) + agents/task-verifier.md (fluxo 2 + evidencia_indisponibilidade) + commands/implement.md (gate 9) + commands/auto.md (Etapa 4.6)
+patch: sondagem obrigatória e barata antes de `pendente_handoff` (local.json presente com o realm alvo? baseUrl responde ou app sobe pelo método do projeto? ferramenta de tela na sessão?); só sondagem falhando com evidência registrada (`evidencia_indisponibilidade` no report; `sonda:` no handoff) autoriza o handoff; seed sem evidência = report rejeitado. Critério de sucesso: nenhuma entrega futura declara handoff com keelson.local.json válido e ambiente de pé. Registrada como decisão 4.26.
+reincidencia: 0
+estado: ativa

@@ -29,7 +29,7 @@ Mudança puramente interna (refactor sem efeito observável) **não** precisa de
 ## Fluxo
 
 1. **Testes automatizados**: rodar os testes **relevantes ao comportamento** via os comandos `quality.*` da ficha (`quality.test` com filtro do domínio; quando `quality.typecheck` existir, rode-o). **Não repita** a suíte que o `task-reviewer` já rodou no gate 2 — seu valor é o exercício funcional (verificação forte e única — QUALITY-CHARTER, régua de rigor). Capturar passa/total.
-2. **Pré-condição de ambiente**: checar se a app está disponível quando for exercitar de verdade (containers/serviço up, URL local). Se indisponível, registrar e seguir só com os testes — **não** falhar por ambiente ausente; reportar como `ambiente_indisponivel` **e preencher o `handoff_seed`** (roteiro do que você exercitaria — insumo do handoff de verificação).
+2. **Pré-condição de ambiente**: checar se a app está disponível quando for exercitar de verdade (containers/serviço up, URL local). **Indisponibilidade se prova, não se presume** (decisão 4.26): rode a sondagem barata — `keelson.local.json` presente e com o realm alvo? a `baseUrl` do realm responde (ex.: `curl -sI`)? o serviço sobe pelo método do projeto? — e registre **o que tentou e o que retornou**. Projeto multi-realm: sonde **cada realm** que o roteiro exige (um de pé e outro não → pendência só do indisponível). Se indisponível, seguir só com os testes — **não** falhar por ambiente ausente; reportar como `ambiente_indisponivel` com `evidencia_indisponibilidade` preenchida **e preencher o `handoff_seed`** (roteiro do que você exercitaria — insumo do handoff de verificação). Sem evidência de sondagem, `ambiente_indisponivel` não é aceito.
 3. **Exercício funcional** (quando há efeito observável e ambiente up):
    - **API/endpoint**: chamar o endpoint (ex.: `curl`), validar status e payload contra o AC.
    - **UI**: exercitar o fluxo **apenas quando `gates.screenVerify` está ligado** (verificação de tela) — senão registrar como não-coberto e semear o handoff.
@@ -52,6 +52,7 @@ testes:
 
 exercicio_funcional:
   ambiente: disponivel | ambiente_indisponivel
+  evidencia_indisponibilidade: <o que a sondagem tentou e o que retornou, por realm — OBRIGATÓRIO quando ambiente_indisponivel; senão null>
   evidencias:
     - ac: AC-NNN-XXX
       como: "<chamada/fluxo executado>"
@@ -73,6 +74,7 @@ handoff_seed:
   itens:
     - ac: AC-NNN-XXX             # ou "inline: <comportamento>" quando não há AC formal
       tela: <URL/rota da app, ou endpoint>
+      realm: <nome em screenVerify.realms do keelson.local.json — omitir se realm único>
       pre_condicoes: <login/permissão necessária, migrations/seeds desta branch, flags, dados>
       passos: [<passo 1>, <passo 2>, ...]
       esperado: <comportamento observável, específico o bastante para dar ✅/❌>

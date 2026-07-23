@@ -183,10 +183,11 @@ keelson/
 
 ## Status
 
-`0.8.0` — early. The engine and the PHP reference profile are the stable core; the
+`0.9.0` — early. The engine and the PHP reference profile are the stable core; the
 legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending drafts, and the
 profile generator and non-PHP profiles are evolving. The optional Jira integration
-(via the Atlassian MCP connector) is new. Feedback and profile contributions welcome.
+(via the Atlassian MCP connector) and multi-realm screen verification are new.
+Feedback and profile contributions welcome.
 
 ## Author & license
 

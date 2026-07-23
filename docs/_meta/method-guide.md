@@ -462,7 +462,7 @@ Quando o ciclo roda num ambiente **sem acesso a testes de tela** — worktree se
 
 ### 8.1 Ciclo de vida
 
-1. **Detecção**: na rota formal, o `task-verifier` reporta `PARCIAL` com o bloco `handoff_seed` (o roteiro do que ele não conseguiu exercitar). Na rota inline (bug/refactor), a auto-revisão do gate pela main session detecta o mesmo.
+1. **Detecção**: na rota formal, o `task-verifier` reporta `PARCIAL` com o bloco `handoff_seed` (o roteiro do que ele não conseguiu exercitar). Na rota inline (bug/refactor), a auto-revisão do gate pela main session detecta o mesmo. **Indisponibilidade de ambiente é provada, não presumida** (decisão 4.26): antes de declarar, roda-se uma **sondagem barata** — o `keelson.local.json` existe e tem os dados do(s) realm(s) envolvido(s)? a `baseUrl` do realm responde (ou a app sobe pelo método do projeto)? a sessão tem ferramenta de tela? — e a **evidência da sondagem que falhou** (o que foi tentado, o que retornou) acompanha a seed e entra no front-matter do handoff (`sonda:`). Projeto multi-realm: sonda **por realm** do roteiro — um realm de pé e outro não gera pendência só para o indisponível. Declarar "ambiente sem tela" sem sondagem registrada é usar o handoff como atalho — proibido.
 2. **Geração** (preparação da Entrega): a main session consolida as seeds e cria `<docsRoot>/<slug>/handoffs/HANDOFF-<id>.md` — `<id>` = `PLAN-MMM` na rota formal; `<yyyy-mm-dd>-<descrição-curta>` na inline. Um doc por entrega (consolida todas as tasks do PLAN). Registra **risco ativo** no INDEX do slug: `Verificação de tela pendente — HANDOFF-<id>`. Domínio **sem slug keelson** → não cria arquivo: o roteiro completo vai inline no prompt do report da Entrega.
 3. **Entrega**: o handoff entra no commit da branch e o report final traz a seção **"Verificação pendente (handoff)"** com o prompt copy-paste. A entrega é declarada **parcial** — nunca "totalmente verificada" — enquanto houver handoff `Pendente`.
 4. **Fechamento** (num ambiente com tela): o agente que recebe o prompt faz checkout da branch, lê o handoff, exercita cada item com a rotina de verificação de tela do projeto, registra a evidência no próprio doc, corrige divergências na própria branch (protocolo inline) e faz a closure — `status: Concluído`, risco removido do INDEX + linha no Histórico recente, commit `chore(<slug>): close verification handoff HANDOFF-<id>`, push. Merge e deploy continuam humanos.
@@ -481,6 +481,7 @@ criado: <ISO 8601>
 origem: PLAN-MMM | inline
 commits: [<SHAs curtos>]
 motivo: <ambiente sem acesso a testes de tela — worktree | nuvem | containers down>
+sonda: <evidência da sondagem de disponibilidade que falhou, por realm — o que foi tentado e o que retornou>
 ---
 
 # Handoff de verificação de tela — <título curto>
@@ -503,6 +504,7 @@ motivo: <ambiente sem acesso a testes de tela — worktree | nuvem | containers 
 
 ### V1 — <título> (<AC-NNN-XXX ou "inline: <comportamento>">)
 - **Tela/rota**: <URL/rota da app>
+- **Realm**: <nome em `screenVerify.realms` do `keelson.local.json` — omitir se o projeto tem um só>
 - **Passos**: 1) … 2) … 3) …
 - **Esperado**: <comportamento observável, específico o bastante para dar ✅/❌>
 - **Risco se falhar**: <impacto para o usuário/negócio>

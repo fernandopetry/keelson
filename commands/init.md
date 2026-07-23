@@ -43,6 +43,7 @@ Inspecione a raiz do projeto:
 Para cada valor que **não** inferiu com confiança, pergunte com opções fechadas e o efeito explícito. Exemplos:
 - *"Não encontrei frontend — confirma que é API-only?"* → **desliga** `gates.screenVerify` e o perfil de frontend.
 - **Se há frontend** — *"Como este projeto verifica tela? Detectei a skill `<x>` / Playwright / preview MCP / outro"* → define `gates.screenVerify.method`. A skill embarcada **`screen-verify`** dirige o browser lendo os dados de acesso do `keelson.local.json` (método `skill:screen-verify`); se o projeto tem um método próprio, registre-o.
+- **Se há frontend** — *"Quantas áreas logadas (realms) a aplicação tem?"* — ex.: só a admin; ou admin **+** portal de usuários finais, com URL e usuário distintos. Cada realm vira uma entrada em `screenVerify.realms` do `keelson.local.json` (Etapa 4.5), com `description` dizendo do que se trata o acesso, `baseUrl`, rota de login e usuário de dev próprios.
 - *"Detectei o script `test` — usar `<comando>` como `quality.test`?"*
 - *"O código de backend fica em `<path>`?"*
 
@@ -71,12 +72,13 @@ Grave na raiz do projeto. **Se a ficha já existe**, aplique a **Regra de merge*
 
 Se `gates.screenVerify.enabled` é `true` e o método precisa de credenciais (ex.: a skill `screen-verify`), a verificação exige URL + login de **desenvolvimento**. Produza **dois arquivos** na raiz (padrão `.env` / `.env.example`):
 
-1. **`keelson.local.example.json`** — **VERSIONADO** (vai para o git). É o template do projeto: preencha `baseUrl`, rota de login e `username` com os valores **deste projeto**, e deixe `password` como placeholder (`<PREENCHER: ...>`). **Nunca** contém senha real. É o que viaja entre máquinas — noutro clone, copia-se ele para `keelson.local.json` e preenche-se só a senha.
+1. **`keelson.local.example.json`** — **VERSIONADO** (vai para o git). É o template do projeto: preencha `screenVerify.realms` — **um realm por área logada** identificada na Etapa 2 (ex.: `admin`, `portal`), cada um com `description` (do que se trata o acesso), `baseUrl`, rota de login e `username` **deste projeto** — e deixe cada `password` como placeholder (`<PREENCHER: ...>`). **Nunca** contém senha real. É o que viaja entre máquinas — noutro clone, copia-se ele para `keelson.local.json` e preenchem-se só as senhas.
 2. **`keelson.local.json`** — **GITIGNORED** (nunca vai para o git): a cópia real, onde o humano põe a senha. **Garanta o `.gitignore` ANTES de criá-lo** (Etapa 5.5). Crie-o a partir do `.example` do projeto (se já existir) ou do template do plugin, com a senha em placeholder.
 
 Regras:
 - **Não escreva senha** você mesmo em nenhum dos dois. Deixe o placeholder e **instrua o humano** a preencher só o `keelson.local.json`, com credenciais de **DEV/teste descartáveis** — **nunca** produção nem conta real.
 - **Merge-preserving** (Regra de merge): se o `keelson.local.json` já existe, **não o sobrescreva** — preserva a senha já preenchida e completa só campos ausentes. O `.example` pode ganhar campos novos, sempre **sem** senha.
+- **Migração flat → realms**: arquivo antigo no formato flat (`baseUrl` + `login` direto sob `screenVerify`) → migre para `realms` **preservando os valores** (vira o realm único, nomeado pelo que ele é — ex.: `admin` — com `defaultRealm` apontando para ele). O flat segue aceito em runtime; o `.example` novo já nasce em `realms`.
 
 ## Etapa 4.6 — Integração com Jira (opcional, best-effort)
 
