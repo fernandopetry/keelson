@@ -1,6 +1,6 @@
 ---
 name: spec-validator
-description: Valida especificações SDD (arquivos sob {docsRoot}/*/specs/SPEC-*.md) contra princípios EARS, RFC 2119, verificabilidade, escopo e separação domínio/tecnologia. Ativar automaticamente após geração de SPEC pelo /keelson:specify (gate de qualidade), ou sob demanda quando o usuário pedir validação, revisão, auditoria, lint, qualidade ou check de uma SPEC. Reporta violações por severidade (ERROR/WARNING/INFO), aplica auto-fix em violações óbvias e bloqueia mudança de status para Approved quando houver ERROR ativo.
+description: Valida SPECs SDD ({docsRoot}/*/specs/SPEC-*.md) contra EARS, RFC 2119, verificabilidade e escopo. Ativar após /keelson:specify (gate de qualidade) ou sob demanda quando pedirem validação, revisão, auditoria, lint, qualidade ou check de uma SPEC.
 ---
 
 # Skill: spec-validator

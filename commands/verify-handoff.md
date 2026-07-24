@@ -1,5 +1,5 @@
 ---
-description: Fecha a verificação de tela/comportamento (gate screenVerify) de uma branch cuja entrega ficou com HANDOFF pendente — consolida a branch na mesa principal, exercita cada item do handoff no ambiente real (pelo método de verificação de tela do projeto), corrige divergências na própria branch e fecha o handoff. NÃO faz merge — para com a branch pronta e aponta para /keelson:integrate.
+description: Fecha o gate screenVerify de uma branch cuja entrega ficou com HANDOFF pendente — consolida a branch na mesa principal, exercita cada item no ambiente real e fecha o handoff. NÃO faz merge; aponta para /keelson:integrate.
 ---
 
 # /keelson:verify-handoff

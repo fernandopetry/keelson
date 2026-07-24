@@ -213,3 +213,13 @@ artefato_patchado: docs/_meta/method-guide.md (§8.1/§8.2) + agents/task-verifi
 patch: sondagem obrigatória e barata antes de `pendente_handoff` (local.json presente com o realm alvo? baseUrl responde ou app sobe pelo método do projeto? ferramenta de tela na sessão?); só sondagem falhando com evidência registrada (`evidencia_indisponibilidade` no report; `sonda:` no handoff) autoriza o handoff; seed sem evidência = report rejeitado. Critério de sucesso: nenhuma entrega futura declara handoff com keelson.local.json válido e ambiente de pé. Registrada como decisão 4.26.
 reincidencia: 0
 estado: ativa
+
+## LRN-020: comando sumia da lista por description > 250 caracteres — limite do harness não guardado
+data: 2026-07-24
+gatilho: correcao_humana
+origem: o humano notou que `/keelson:verify-handoff` não aparecia na lista de comandos onde o plugin está instalado, enquanto os outros 14 apareciam; achava que o comando tinha sido removido ou renomeado — na verdade continuava no repo, apenas invisível
+causa_raiz: o Claude Code (>= v2.1.86) impõe um teto de 250 caracteres na `description` de frontmatter de comandos/skills; acima disso o comando é OCULTADO da lista sem erro (skill tem a description truncada em /skills). A description do verify-handoff tinha 396 caracteres e cinco skills passavam de 250 (screen-verify: 894). Nenhum artefato do plugin guardava esse invariante, e o sintoma (comando invisível) aparece longe da causa (uma frase longa); o autor não tem sinal em tempo de edição
+artefato_patchado: commands/verify-handoff.md + skills/{spec,plan,task}-validator/SKILL.md + skills/screen-verify/SKILL.md + skills/status/SKILL.md (descriptions ≤ 250) + hooks/desc-guard.sh (novo) + hooks/hooks.json (registro)
+patch: toda description encurtada para ≤ 250 com termos-gatilho no início e detalhe no corpo (skills preservam auto-ativação; regras críticas já viviam no corpo). Guard mecânico desc-guard.sh (Stop hook, mede code points, bloqueia encerramento listando quem passou do teto) que só age no repo de dev do keelson e sai gracioso em consumidor. Critério de sucesso: nenhum comando/skill futuro entra acima de 250 sem o guard cutucar. Registrada como decisão 4.29.
+reincidencia: 0
+estado: ativa

@@ -1,6 +1,6 @@
 ---
 name: screen-verify
-description: Verificação visual autenticada de telas em ambiente LOCAL de desenvolvimento — o gate `screenVerify` do keelson. Dirige um navegador para logar, navegar e exercitar um roteiro de verificação com evidência (screenshot/payload/estado). Lê os dados de acesso (URL, usuário, senha de DEV) do arquivo LOCAL não-versionado `keelson.local.json`, que suporta múltiplos realms (áreas logadas distintas — ex.: admin e portal — com credencial e sessão isoladas por realm). Ativar sempre que precisar subir/abrir a app, LOGAR e navegar/inspecionar uma tela com dados reais — caminhada visual, screenshot de mudança de UI, dark mode/estados vazios/drill-down, reprodução de bug de tela, ou fechar um HANDOFF de gate 9. Ativar TAMBÉM quando uma verificação de tela esbarrar em LOGIN: as credenciais de dev vivem no `keelson.local.json`. NUNCA usar em produção nem com contas reais.
+description: Gate `screenVerify`: verificação visual autenticada de telas em ambiente LOCAL. Ativar para subir a app, LOGAR e navegar/inspecionar uma tela — screenshot de UI, repro de bug de tela ou fechar um HANDOFF. Credenciais DEV em keelson.local.json.
 ---
 
 # Skill: screen-verify

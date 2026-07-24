@@ -1,6 +1,6 @@
 ---
 name: plan-validator
-description: Valida PLANs SDD (arquivos sob {docsRoot}/*/plans/PLAN-*.md) contra princípios de cobertura explícita, DEC com alternativas, aderência à ficha/perfil, mapeamento FR-componente completo. Ativar automaticamente após /keelson:plan (gate de qualidade), ou sob demanda quando usuário pedir validação, revisão ou lint de PLAN. Reporta por severidade (ERROR/WARNING/INFO) e bloqueia mudança de Status para Approved enquanto houver ERROR.
+description: Valida PLANs SDD ({docsRoot}/*/plans/PLAN-*.md): cobertura explícita, DEC com alternativas, mapeamento FR-componente. Ativar após /keelson:plan (gate de qualidade) ou sob demanda quando pedirem validação, revisão ou lint de PLAN.
 ---
 
 # Skill: plan-validator

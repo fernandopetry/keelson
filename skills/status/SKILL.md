@@ -1,6 +1,6 @@
 ---
 name: status
-description: Produz um resumo executivo do estado atual de um slug do projeto. Ativar quando o usuário perguntar sobre o estado, status, situação atual, progresso, o que está implementado, o que está em desenvolvimento, ou pedir um overview de um slug ou capacidade do sistema. Lê INDEX.md e arquivos individuais sob demanda, sem persistir nenhum artefato novo.
+description: Resumo executivo do estado atual de um slug. Ativar quando perguntarem sobre estado, status, situação, progresso, o que está implementado ou em desenvolvimento, ou pedirem overview de um slug ou capacidade do sistema.
 ---
 
 # Skill: status

@@ -454,6 +454,21 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.29 Teto de 250 caracteres na `description` de comandos e skills + hook `desc-guard`
+
+**Problema**: dado real do repo. O `/keelson:verify-handoff` sumiu da lista de comandos onde o plugin está instalado — os outros 14 apareciam, só ele não. Causa: o Claude Code (>= v2.1.86) impõe um limite de **250 caracteres** na `description` de frontmatter de comandos e skills; acima disso o **comando é ocultado da lista sem erro** (ocultação silenciosa) e a **skill tem a description truncada** na tela `/skills`. A description do `verify-handoff` tinha 396 caracteres; cinco skills passavam de 250 (screen-verify chegava a 894). Nada no plugin guardava esse invariante, e o sintoma (comando invisível) aparece longe da causa (uma frase longa demais).
+
+**Decisão (do humano, com recomendação da sessão)**:
+- **Encurtar toda `description` para ≤ 250**, com os termos-gatilho no início (o que sobra é truncado de qualquer forma) e o detalhe completo no **corpo** do artefato. Para skills isso preserva a função de auto-ativação da description sem perder regra — as regras críticas (ex.: "nunca produção", multi-realm da `screen-verify`) já vivem no corpo.
+- **Guard mecânico** `hooks/desc-guard.sh` (Stop hook, mesma moldura dos demais: `set -euo pipefail`, parse via python3, `stop_hook_active` anti-loop, fallback gracioso). Mede em **code points** (igual ao `.length` de JS que o harness usa) e bloqueia o encerramento listando cada comando/skill acima de 250.
+- **Escopo do guard**: age **só no repo de desenvolvimento do keelson** (marcado por `.claude-plugin/plugin.json` com `name: keelson` + `commands/`). Em projeto consumidor o plugin é read-only e não vive no cwd → `exit 0`, nunca atrapalha o fluxo — coerente com o princípio de fallback gracioso dos hooks.
+
+**Custo assumido**: descriptions de skill ficam mais enxutas (menos prosa explicativa no gatilho), e o array de Stop hooks ganha um sexto membro. Aceito em troca de tornar impossível a regressão silenciosa de um comando invisível.
+
+**Aplicação**: `commands/verify-handoff.md` + `skills/{spec,plan,task}-validator/SKILL.md`, `skills/screen-verify/SKILL.md`, `skills/status/SKILL.md` (descriptions ≤ 250); `hooks/desc-guard.sh` (novo) + `hooks/hooks.json` (registro). Capacidade nova → minor: plugin 0.11.0 → 0.12.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
