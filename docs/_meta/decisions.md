@@ -2,7 +2,7 @@
 
 > Memória institucional das decisões sobre como o keelson (spec-driven development) é praticado. Diferente da doutrina de código (QUALITY-CHARTER + perfil ativo, que regem o **código**), este arquivo rege o **processo de desenvolvimento**.
 
-**Última revisão**: 2026-07-23
+**Última revisão**: 2026-07-24
 **Status do documento**: vivo, atualizado conforme decisões evoluem
 
 ---
@@ -466,6 +466,25 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 **Custo assumido**: descriptions de skill ficam mais enxutas (menos prosa explicativa no gatilho), e o array de Stop hooks ganha um sexto membro. Aceito em troca de tornar impossível a regressão silenciosa de um comando invisível.
 
 **Aplicação**: `commands/verify-handoff.md` + `skills/{spec,plan,task}-validator/SKILL.md`, `skills/screen-verify/SKILL.md`, `skills/status/SKILL.md` (descriptions ≤ 250); `hooks/desc-guard.sh` (novo) + `hooks/hooks.json` (registro). Capacidade nova → minor: plugin 0.11.0 → 0.12.0.
+
+---
+
+### 4.30 Gate 8 inescapável na Entrega + identidade do código provada (lições da 1ª rodada real do /auto)
+
+**Problema**: análise da cadeia de pensamento de uma rodada real do `/keelson:auto` (feature de 2FA — caso maximamente sensível). Quatro falhas de processo, duas estruturais: (a) o **gate 8 só rodou depois da Entrega**, por cobrança do humano — e reprovou com bypass crítico real (`/2fa/verify` gravava o fator sem a guarda que o `/2fa/setup` ganhou). A orquestração colapsou silenciosamente para "main session implementa e se auto-revisa": nenhuma menção a `task-implementer`/`task-reviewer` nas 5 waves, e nada detectou o desvio. A válvula do hook `security-guard` ("se você JÁ revisou a segurança, pode encerrar") aceitava a auto-certificação do gerador. (b) O ambiente de verificação executava **código diferente do diff** duas vezes na mesma sessão (dev server servindo a `main`; container do backend montando o repo principal) — produzindo um falso "bug de segurança" e ciclos perdidos; houve ainda o quase-acidente de editar o repo principal em vez da worktree. A decisão 4.26 prova *disponibilidade* do ambiente, mas nada provava *identidade* do código. Menores: (c) verificação de recusa enumerada pela superfície da UI, não pelos writers do dado (a raiz do bypass passar verde no gate 9); (d) três falsos bugs de UI por aba oculta pausando transições CSS (`document.hidden`) + viewport degenerado.
+
+**Decisão (do humano, com recomendação da sessão)**:
+- **Entrega exige evidência de gate, não lembrança de gate**: pré-check determinístico na Etapa 5 do `/keelson:auto` (antes do push) — diff sensível com `gates.security` ativo exige veredito do `security-reviewer` sobre o diff final, com `revisado_por ≠ implementado_por`; "verifiquei ao construir" não satisfaz (gerador ≠ avaliador). Vale para todas as rotas, inclusive a inline (auto-revisão cobre gates 1–7, nunca o 8 sensível).
+- **SINGLE_THREAD dispensa orquestração, não independência**: os gates de 3.3 do `/keelson:implement` continuam via subagents; o output final ganha **atribuição por task** (implementado_por/revisado_por/gate 8/gate 9) para tornar visível qualquer colapso.
+- **Hook `security-guard` sem válvula de auto-certificação**: a saída limpa passa a exigir que o `security-reviewer` tenha rodado (ou prova de que a mudança está fora dos gatilhos), não "já revisei".
+- **Identidade do código se prova, não se presume** (espelho da 4.26): antes de confiar em exercício funcional, provar que o processo de pé executa a worktree/branch do diff (path raiz do server, SHA/marcador, efeito de mudança já commitada). No `task-verifier` (passo 2) e na skill `screen-verify` (§1).
+- **Guarda no sink, não na superfície** (`core/SECURITY.md` + checklist): step-up mora no ponto que escreve o dado; enumerar **todos os writers** e provar a recusa em cada um — espelho de escrita do padrão "Acesso por registro". O `task-verifier` exercita AC de recusa por todos os writers, não só pelo endpoint da tela.
+- **Hook novo `worktree-guard`** (PreToolUse em Edit/Write/NotebookEdit): sessão numa worktree vinculada + alvo dentro do working tree principal → deny com instrução de usar o path da worktree. Repo normal, scratchpad e a própria worktree passam sem ruído; fallback gracioso padrão.
+- **Armadilhas do browser embutido** documentadas na `screen-verify`: aba oculta pausa transições/rAF (modal "presa", screenshot preto), viewport degenerado invalida medidas; sintoma só vira bug re-medido com aba visível e viewport são.
+
+**Custo assumido**: a Entrega ganha um passo de conferência e o array de hooks um sétimo membro (PreToolUse, o primeiro não-Stop); o output do implement fica mais longo (tabela de atribuição). Aceito em troca de fechar o buraco mais caro observado até agora: uma entrega "verde" com bypass crítico que só o avaliador independente pegou — e pegou **depois** do push.
+
+**Aplicação**: `commands/auto.md` (Etapa 5, pré-check de gates), `commands/implement.md` (0.1 SINGLE_THREAD; Etapa 5, atribuição por task), `hooks/security-guard.sh` (mensagem sem auto-certificação), `hooks/worktree-guard.sh` (novo) + `hooks/hooks.json` (bloco PreToolUse), `agents/task-verifier.md` (passo 2 identidade; passo 3 writers), `guidelines/core/SECURITY.md` (padrão "Guarda no sink" + item de checklist), `skills/screen-verify/SKILL.md` (identidade em §1; armadilhas do browser em §3). Capacidade nova (hook) → minor: plugin 0.12.0 → 0.13.0.
 
 ---
 

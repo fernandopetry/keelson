@@ -181,7 +181,7 @@ keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
 ├── agents/            # subagents: implementer, reviewers, profile-writer…
 ├── skills/            # spec / plan / task validators + state + screen-verify
-├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard
+├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard
 ├── guidelines/
 │   ├── _meta/         # QUALITY-CHARTER.md · PROFILE-OUTLINE.md
 │   ├── core/          # language-agnostic doctrine (always active)
@@ -193,12 +193,14 @@ keelson/
 
 ## Status
 
-`0.12.0` — early. The engine and the PHP reference profile are the stable core; the
+`0.13.0` — early. The engine and the PHP reference profile are the stable core; the
 legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending drafts, and the
 profile generator and non-PHP profiles are evolving. The optional Jira integration
-(via the Atlassian MCP connector), multi-realm screen verification and the optional
-feature layer (`FEAT-*`, the QA unit with 3-level Jira projection) are new.
-Feedback and profile contributions welcome.
+(via the Atlassian MCP connector), multi-realm screen verification, the optional
+feature layer (`FEAT-*`, the QA unit with 3-level Jira projection) and the
+delivery-time gate evidence checks (independent security verdict required before
+push, plus the `worktree-guard` hook) are new. Feedback and profile contributions
+welcome.
 
 ## Author & license
 

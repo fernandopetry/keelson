@@ -29,7 +29,7 @@ Você é um Engineering Manager especialista em orquestrar implementação assis
 
 1. **Padrão: `SUBAGENTS`** (subagents na main session). Não gaste turno detectando alternativas.
 2. `--force-mode=teams` habilita `AGENT_TEAMS` (worktrees/peer-to-peer) quando o ambiente suportar (ex.: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`).
-3. Wave única e sequencial de tasks pequenas → `SINGLE_THREAD` (main session direto) é aceitável.
+3. Wave única e sequencial de tasks pequenas → `SINGLE_THREAD` (main session direto) é aceitável. **SINGLE_THREAD dispensa a orquestração, não a independência**: os gates de 3.3 continuam rodando via subagents (`task-reviewer`, e `security-reviewer`/`task-verifier` quando o gatilho aplica) — a main session que implementou **nunca** aprova o próprio diff (decisão 4.30). Colapsar para SINGLE_THREAD com >1 wave ou task não-pequena é desvio: declare-o no output final.
 
 ### 0.2 Carregar guidelines e memo
 
@@ -266,6 +266,11 @@ E sugerir a integração (não executar):
 
 ## Quality gates
 - Aprovadas 1ª tentativa: N | retry: M | falhadas: 0
+- Por task (atribuição obrigatória — torna visível qualquer colapso de independência):
+  | Task | implementado_por | revisado_por | gate 8 | gate 9 |
+  |---|---|---|---|---|
+  | TASK-MMM-XXX | <id> | <id> | aprovado \| n/a | verificado \| pendente_handoff \| n/a |
+- Linha com `revisado_por` = `implementado_por`, ou gate 8 `n/a` em task que tocou área sensível → report **inválido**: rode o gate que falta antes de concluir.
 
 ## Closure
 - Tasks com closure completa: N/N

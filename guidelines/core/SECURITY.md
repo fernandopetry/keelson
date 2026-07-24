@@ -76,6 +76,13 @@ para qualquer stack:
   pelo **dado exposto** (procure toda consulta/junção/projeção da entidade), incluindo
   subsistemas com permissão própria (e-mail, export, relatórios) — não só a permissão de
   leitura principal.
+- **Guarda no sink, não na superfície:** exigência de step-up (senha, reautenticação,
+  MFA) para uma operação sensível mora no ponto que **escreve/efetiva** o dado (o use
+  case/endpoint de gravação), não na tela nem no passo que a UI chama primeiro. Ao
+  proteger a operação, enumere **todos os caminhos que gravam** o dado protegido (rotas,
+  use cases, jobs, comandos) e prove a recusa em **cada um** — a superfície que a UI
+  percorre é sempre subconjunto da superfície real. Espelho do "Acesso por registro"
+  acima, para o lado da **escrita**.
 
 ---
 
@@ -121,6 +128,7 @@ o CVE/NVD:
 - [ ] Toda saída é escapada no contexto de destino; nada de renderização crua de PII
 - [ ] Toda ação verifica autorização **antes** de executar, negando por padrão
 - [ ] Gate de autorização tem teste provando a **negação** sem a permissão
+- [ ] Step-up/reautenticação exigido no **ponto de escrita**, com recusa provada em **todos** os writers do dado (não só no caminho da UI)
 - [ ] Senhas com algoritmo de hash dedicado; sem MD5/SHA1 puros
 - [ ] Segredos e tokens fora do código, do log e da URL; sessão em transporte seguro
 - [ ] Sem dado sensível/PII em logs

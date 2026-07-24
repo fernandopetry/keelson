@@ -79,6 +79,13 @@ server já está de pé, **não suba nada** — só abra uma aba na `baseUrl` do
 a app cai na tela de login. Nenhum server rodando → suba pelo `launch.json`/método do
 projeto.
 
+**Identidade do código se prova, não se presume** (decisão 4.30): um server "já de pé"
+pode estar servindo **outra cópia** do código — o repo principal em vez da worktree, um
+container montando outro path, um build antigo. Antes de confiar em qualquer evidência,
+prove que o processo serve o código sob teste (path raiz do server, SHA/marcador exposto,
+ou o efeito de uma mudança já commitada na branch). Verificar contra código errado produz
+falso bug e falso verde — inclusive "falha de segurança" que não existe.
+
 ## 2. Login
 
 Na tela de login, preencha usuário e senha com os valores de `login` do **realm alvo**
@@ -100,6 +107,21 @@ Chegando à tela com dados reais, escolha os passos relevantes:
 
 Registre a evidência (screenshot/payload/o que foi visto) item a item. Ao fechar um
 `HANDOFF-*.md`, grave a evidência no próprio doc (`✅`/`❌`).
+
+### Armadilhas do browser embutido (cheque ANTES de diagnosticar "bug")
+
+Sintomas de ambiente que imitam bug de UI — cada um já custou ciclos de investigação
+reais:
+
+- **Aba em segundo plano** (`document.hidden === true`) pausa transições CSS e
+  requestAnimationFrame: modal que "não fecha", backdrop/véu "preso" e **screenshot
+  preto/em branco** são a mesma causa. Traga a aba para frente (`tabs_select`) e re-meça.
+- **Viewport degenerado** (`innerWidth`/`innerHeight` = 0) invalida qualquer medida de
+  layout. Redimensione com dimensões explícitas (`resize_window`) e re-meça.
+- **Estado de transição** se confere no **DOM** (posição/opacity computados via JS), não
+  no screenshot — a captura pode pegar o meio da animação.
+
+Um sintoma desses só vira bug depois de re-medido com a aba visível e o viewport são.
 
 ## 4. Regras de segurança (não-negociáveis)
 
