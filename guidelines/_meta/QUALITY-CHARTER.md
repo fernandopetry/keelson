@@ -7,7 +7,7 @@
 >
 > Palavras-chave conforme RFC 2119: **DEVE / NÃO DEVE / DEVERIA / PODE**.
 >
-> **Versão: 0.3.0** — é esta versão que o campo `charter:` do cabeçalho de
+> **Versão: 0.5.0** — é esta versão que o campo `charter:` do cabeçalho de
 > proveniência de cada perfil referencia.
 
 ---
@@ -89,8 +89,10 @@ Nomes **DEVEM** revelar propósito, não implementação. O nome **DEVE** cobrir
 **efeitos colaterais** da unidade: um `login()` que também envia e-mail ou limpa cache
 surpreende quem chama — é violação mesmo com o efeito isolado atrás de abstração (Art. 4).
 O idioma de código e o idioma de comentário **DEVEM** ser consistentes em toda a base.
-Código novo **DEVE** ler como o código vizinho — mesma convenção, mesma densidade de
-comentário, mesmo idioma.
+Código novo **DEVE** ler como o código vizinho em **convenção e idioma**. Densidade de
+comentário **NÃO** se herda do vizinho: segue o Art. 7 — base antiga verbosa não é
+licença para verbosidade nova. A verbosidade que já está lá segue a **regra do
+escoteiro** (Art. 6): no trecho que a mudança toca, limpe; no resto da base, deixe.
 
 - **Por quê:** o código é lido muito mais vezes do que escrito; o nome é a documentação
   que nunca desatualiza se disser a intenção.
@@ -104,25 +106,45 @@ Uma mudança **DEVE** alterar o mínimo necessário para o seu objetivo. Quanto 
 **difícil de reverter** o efeito (dado destruído, config de produção, contrato
 público), mais alto o rigor e mais necessária a **confirmação humana** antes de aplicar.
 
+**Regra do escoteiro** — o trecho que a mudança **já toca** DEVE ficar melhor do que
+foi encontrado: comentário que reprova no teste do Art. 7, comentário que **mente**
+sobre o código atual, código morto, nome local enganoso e barato de corrigir. Três
+condições tornam a limpeza legítima — e a distinguem de desvio de escopo: **distância
+de leitura** (a unidade editada e sua vizinhança no mesmo arquivo), **comportamento
+preservado**, **declarada item a item** no report. Faltou qualquer uma → não é
+escoteiro, é escopo novo: registre como pendência e siga.
+
 - **Por quê:** diffs pequenos são revisáveis e reversíveis; misturar objetivos esconde
-  o que importa e multiplica o risco.
-- **Régua:** o diff se explica por um objetivo; ações destrutivas ou de difícil reversão
-  passaram por decisão humana registrada antes de executar.
+  o que importa. E quem já está no trecho é o leitor mais barato que ele jamais terá —
+  limpeza adiada para "outra task" é adiada para nunca.
+- **Régua:** o diff se explica por um objetivo mais a limpeza declarada do trecho
+  tocado; ações destrutivas ou de difícil reversão passaram por decisão humana
+  registrada antes de executar.
 
 ## Art. 7 — Legível para o próximo humano
 
-Clareza **DEVE** vencer esperteza. Comentário **DEVE** explicar o *porquê* (a decisão,
-a armadilha), não parafrasear o *como*. Complexidade acidental **DEVE** ser removida
-antes de comentada. Condicional profundamente aninhada ou difícil de acompanhar é
-complexidade acidental: prefira **retorno antecipado** (guard clause) e **extração de
-método nomeado**; condicional que despacha pela mesma variante/tipo em vários pontos
-pede **polimorfismo** (o perfil dá a construção idiomática).
+Clareza **DEVE** vencer esperteza. Complexidade acidental **DEVE** ser removida antes
+de comentada: aninhamento profundo pede **guard clause** e **extração de método
+nomeado**; despacho repetido pela mesma variante/tipo pede **polimorfismo** (o perfil
+dá a construção idiomática).
 
-- **Por quê:** o próximo a manter isto — talvez você em seis meses, talvez um dos 70 —
-  paga o custo da esperteza sem o contexto que a gerou.
-- **Régua:** um dev do time, sem contexto prévio, entende a intenção do trecho em uma
-  leitura; os comentários respondem "por que", não "o que"; não há aninhamento profundo
-  onde um guard clause ou uma extração resolveria.
+Comentário obedece a **um único teste: apagá-lo perde informação que o código não
+devolve?**
+
+- **Perde → DEVE existir.** É o contexto irrecuperável pela leitura: o porquê de uma
+  decisão (uma linha, com âncora — `DEC-03`, `FR-07`), a armadilha ou workaround
+  (porquê + condição de remoção), o invariante que tipo e nome não expressam, o caminho
+  já tentado que falhou.
+- **Não perde → NÃO DEVE existir.** Paráfrase, assinatura repetida, template ritual.
+
+Exceção idiomática mora no perfil: onde a sintaxe não carrega tipo/contrato (ex.:
+docblock como única declaração de tipo), o comentário que o carrega é obrigatório.
+
+- **Por quê:** o próximo leitor — humano ou agente sem a conversa que gerou o código —
+  reconstrói o *como* lendo; a decisão e a armadilha, não. E comentário é afirmação que
+  ninguém compila: quando envelhece, vira mentira com cara de garantia.
+- **Régua:** intenção entendida em uma leitura; todo comentário passa no teste de
+  apagar; nenhum bloco de comentário maior que o trecho que explica.
 
 ## Art. 8 — Eficiência consciente, medida — não presumida
 

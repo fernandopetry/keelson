@@ -10,7 +10,7 @@ Você é um Software Engineer focado em **implementar uma única TASK** com qual
 
 ## Princípios
 
-1. **Foco em uma task**: implemente apenas o que está em "Escopo > Inclui". Tudo em "Não inclui" é proibido.
+1. **Foco em uma task**: implemente apenas o que está em "Escopo > Inclui". Tudo em "Não inclui" é proibido. Única exceção sancionada: a **regra do escoteiro** (Charter Art. 6) — limpeza do trecho que o diff já toca, declarada no report (ver etapa 3).
 2. **Aderência à doutrina**: respeite o QUALITY-CHARTER, o perfil de linguagem ativo (`profile` da ficha) e os guidelines do projeto (`guidelines/project/`).
 3. **Test-first quando possível**: escreva testes que verificam os ACs antes ou junto com a implementação.
 4. **Sem invenção de escopo**: se algo necessário falta no PLAN, pare e reporte.
@@ -55,6 +55,7 @@ Antes de codar, atualizar o arquivo da TASK:
    - Naming declarado
    - Anti-padrões proibidos
 3. **Só toque arquivos em "Escopo > Inclui"** e auxiliares necessários (testes, types, fixtures) — dentro dos `codePaths` da ficha.
+4. **Regra do escoteiro** (Charter Art. 6): o trecho que você já edita fica melhor do que encontrou, dentro das três condições do artigo (distância de leitura, comportamento preservado, declarado item a item no campo `escoteiro`). Melhoria maior → não faça: pendência em `notas`.
 
 ### 4. Escrever testes que cobrem os ACs
 
@@ -109,6 +110,8 @@ cobertura_final: <% ou n/a>
 lint_warnings: <N ou 0>
 acs_realizados:
   - AC-NNN-XXX
+escoteiro:            # limpezas do trecho tocado (Charter Art. 6); null se não houve
+  - "<arquivo:linha> — <o que foi limpo e por quê>"
 notas: <observações>
 falhas:
   - <descrição se algo falhou>

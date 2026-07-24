@@ -1,7 +1,7 @@
 ---
 lang: php
 version: "8.0"
-charter: 0.3.0
+charter: 0.5.0
 generated-by: profile-writer
 reviewed: false
 reviewer: null

@@ -488,6 +488,56 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.31 Comentário tem piso e teto; densidade não se herda do vizinho (Charter 0.4.0)
+
+**Problema**: dado real de uma entrega do `/keelson:auto` (marcar migrations como concluídas). O humano provocou: "3899 linhas só para isso?". A medição mostrou ~800 linhas de produção — mas mostrou também gordura real e **induzida pela própria doutrina**: 25–40% das linhas dos arquivos PHP novos eram comentário (`MigrationMarkService`: 95 linhas, 51 de código) e a migration trazia **98 linhas de cabeçalho comentado para 45 de SQL**. A justificativa do implementer foi citação literal do Art. 5 — *"mesma densidade de comentário"* do código vizinho. Em base legada verbosa, esse artigo **é** a fábrica de gordura: manda copiar o passivo. E os freios não existiam: o Art. 7 dava direção ("comentário explica o porquê") sem régua falsificável, e o `task-reviewer` tinha isenção explícita — *"comentário excessivo → não bloqueia"*. Faltava também o **piso**: comentário só era tratado como risco de excesso, nunca como obrigação — mas o que um leitor futuro (humano ou agente sem a conversa) não reconstrói lendo o diff é justamente a decisão e a armadilha.
+
+**Decisão (do humano, com recomendação da sessão)**:
+- **Art. 7 ganha piso e teto falsificáveis**. Piso: DEVE haver comentário onde o contexto é *irrecuperável pela leitura* — decisão não óbvia (com **âncora** ao artefato: `DEC-03`, `FR-07`, `AC-12`), workaround (porquê + **condição de remoção**), invariante que tipo/nome não expressam, efeito colateral não anunciado pelo nome. Teto: NÃO DEVE haver paráfrase do código, repetição de assinatura, narração do óbvio nem template ritual. Régua: **apagar o comentário perde informação** — se não perde, ele não deveria existir; nenhum bloco maior que o trecho que explica.
+- **Art. 5 para de herdar densidade**: código novo lê como o vizinho em **convenção e idioma**; densidade segue o Art. 7. Base antiga verbosa não é licença para verbosidade nova — nem motivo para reescrever a que já está lá (Art. 6).
+- **O gate 7 deixa de dar isenção**: comentário redundante sai de "não bloqueia" e vira **ação sugerida de remoção** com trechos apontados; passam a **bloquear** as três violações duras do Art. 7 (bloco maior que o código, workaround sem porquê/condição de remoção, DEC sem âncora no ponto do código).
+- **Exceção idiomática mora no perfil** (um dono por regra): onde a linguagem faz o comentário *carregar* informação que a sintaxe não tem — docblock como única declaração de tipo em PHP 5.6/7.0 — ele é **piso**, não teto. O `PROFILE-OUTLINE` §3 passa a pedir essa distinção explicitamente.
+- **A Entrega mede antes de perguntarem**: o report do `/keelson:auto` decompõe o diff em produção · teste · documentação · migration/config e declara o que entrou **fora do escopo do PLAN** (no caso real, 456 linhas de um guard de rotas promovido por achado de segurança — legítimo, mas invisível no total bruto). Total sem composição faz entrega correta parecer inchada e esconde inchaço quando ele é real.
+
+**Custo assumido**: o Charter sobe para 0.4.0 e os 7 perfis passam a referenciar a versão nova (o texto deles já era compatível — "comentadas com o porquê"); o `php.md` é `reviewed: true` e não foi tocado no corpo, só no `charter:`. O reviewer ganha três motivos novos de bloqueio, com risco de atrito em base legada — mitigado por só valerem sobre o **código novo do diff**.
+
+**Aplicação**: `guidelines/_meta/QUALITY-CHARTER.md` (versão 0.4.0; Art. 5 e Art. 7), `guidelines/_meta/PROFILE-OUTLINE.md` (§3), `guidelines/core/CODE-REVIEW.md` (tabela), `agents/task-reviewer.md` (calibração de severidade), `commands/auto.md` (Etapa 5, item 6.1), bump `charter:` nos 7 perfis. Doutrina nova → minor: plugin 0.13.0 → 0.14.0.
+
+---
+
+### 4.32 Regra do escoteiro sancionada e declarada (Charter 0.5.0)
+
+**Problema**: a §4.31 criou o teto de comentário para código **novo**, mas deixou a base legada intocável — o Art. 5 dizia explicitamente "nem motivo para reescrever a que já está lá", e o gate 4 do reviewer reprovava **qualquer** mudança colateral como violação de escopo. Resultado: o implementer que edita uma função cercada de paráfrase ritual, comentário mentiroso ou código morto é obrigado a **preservar o passivo** que está lendo naquele momento — e a limpeza fica adiada para uma task que nunca nasce. Pior caso: comentário que **mente** sobre o código atual, que um agente futuro lê como garantia e usa de fundação. O humano pediu a regra do escoteiro: quem toca, deixa melhor.
+
+**Decisão (do humano, com recomendação da sessão)**:
+- **Art. 6 ganha a regra do escoteiro**: o trecho que a mudança já toca fica melhor do que foi encontrado (comentário que reprova no teste do Art. 7, comentário mentiroso, código morto, nome enganoso barato de corrigir — exemplos-âncora, não enumeração). O alinhamento vem de **três condições falsificáveis**, que distinguem limpeza de desvio: distância de leitura, comportamento preservado, declarada item a item. Faltou uma → é escopo novo, vira pendência.
+- **Declarar é o que legitima**: report do `task-implementer` ganha o campo `escoteiro:` (lista `arquivo:linha — o quê e por quê`, ou null). O gate 4 do reviewer passa a distinguir três casos: escoteiro declarado e dentro da régua → **não é** violação de escopo; mudança colateral **não declarada** → FALHA (continua sendo desvio); "escoteiro" que muda comportamento ou esconde escopo novo sob o rótulo de limpeza → FALHA.
+- **Art. 5 reconciliado**: a frase "nem motivo para reescrever a que já está lá" virou "a verbosidade que já está lá segue a regra do escoteiro: no trecho que a mudança toca, limpe; no resto da base, deixe" — as duas doutrinas param de se contradizer.
+- **Revisão do Art. 7 com o olhar "o que ajuda um agente em código antigo"**: o piso ganhou o item **caminho já tentado que falhou** ("sem cache aqui: estourava X sob carga") — sem esse registro, o próximo implementer (humano ou agente) repropõe a solução descartada, com confiança. Era o único gap da lista da §4.31.
+- **Gate 7 fecha o ciclo**: trecho vizinho tocado que permaneceu sujo (escoteiro não aplicado) entra em `acoes_sugeridas` — mesma severidade do comentário redundante novo (sugestão, não bloqueio).
+
+**Custo assumido**: o gate 4 fica mais caro (distinguir limpeza de desvio exige julgamento, não só diff de paths) e há risco de o implementer esticar o rótulo "escoteiro" — mitigado pelas três condições e pela declaração item a item. Charter 0.4.0 → 0.5.0; a 0.4.0 não chegou a ser commitada, mas os artigos mudaram — versão é do conteúdo, não do release. **Forma das regras** (pedido do humano nesta mesma leva): instrução escrita como **teste falsificável + exemplos-âncora**, nunca enumeração defensiva nem prosa motivacional — enumeração convida pattern-matching e litígio de borda; o teste dá autonomia alinhada. O Art. 7 inteiro colapsou para um teste ("apagar perde informação?") e o dono da regra é único (Charter); implementer e reviewer apenas referenciam.
+
+**Aplicação**: `guidelines/_meta/QUALITY-CHARTER.md` (0.5.0; Art. 5, 6 e 7), `agents/task-implementer.md` (princípio 1, etapa 3.4, campo `escoteiro` do report), `agents/task-reviewer.md` (gate 4, calibração do gate 7), `guidelines/core/CODE-REVIEW.md` (tabela), bump `charter:` nos 7 perfis. Doutrina nova → minor: plugin 0.14.0 → 0.15.0.
+
+---
+
+### 4.33 Revisão de coerência: contradições de autonomia eliminadas + dedup por dono
+
+**Problema**: sweep de coerência pedido pelo humano encontrou três contradições ativas e duplicação de regra com dono errado. (a) `guidelines/core/WORKFLOW.md` §6 mandava "**sempre** pergunte antes de alterar schema/auth/config/exclusão" — congelado de antes do `/keelson:auto`; contradizia frontalmente a escada de reação e a calibração por reversibilidade (o auto manda seguir com coluna nullable registrada; o WORKFLOW mandava parar). (b) `specify.md`/`plan.md` — os primitivos que o auto executa — ordenavam "pare e faça até 5 perguntas" e "confirme com o humano" (slug novo, slice) sem cláusula de modo: pós-largada, com o humano ausente, isso ou trava o ciclo ou é ignorado por improviso; e "até 5" excede o limite de 4 do AskUserQuestion. (c) O gatilho do gate 9 divergia entre donos: WORKFLOW e template do CLAUDE diziam "quando `gates.screenVerify` e efeito observável"; o dono real (`implement`/`task-verifier`) diz "quando efeito observável — `screenVerify` condiciona só a parte de tela". (d) A mecânica do `process-tuner` (ledger, dedup, modo dev × consumidor) estava copiada por extenso em `auto.md` e `implement.md` — o agent é o dono.
+
+**Decisão (do humano: "revise contradições, alinhamento, autonomia; reduza caracteres")**:
+- **WORKFLOW §6 reescrito pela régua de reversibilidade** (Charter Art. 6): destrutivo/difícil reversão → sempre resposta humana; reversível simples em área sensível → decisão registrada + gates; *quando* perguntar depende do modo (presente → na hora; autônomo → escada do auto).
+- **Primitivos com consciência de modo**: `specify` (Etapa 1/0.2) e `plan` (Etapa 2/slice) ganham uma linha — pós-largada não pausa, aplica a escada; "até 5 perguntas" → "até 4".
+- **Gate 9 alinhado ao dono** em WORKFLOW e template: dispara por efeito observável; tela exige `screenVerify`.
+- **Dedup por dono**: auto/implement passam a referenciar a mecânica do `process-tuner` em vez de reproduzi-la; rota "Risco" do auto referencia a tabela de rigor do WORKFLOW; prosa motivacional dos blocos "Fôlego não é gatilho" e Etapa 4.5 comprimida (regra + referência às decisões, sem retórica).
+
+**Custo assumido**: nenhum comportamento novo — só remoção de conflito e de duplicata; o risco é alguma nuance da prosa longa ter carregado regra implícita não percebida (mitigado: cada corte manteve regra, exemplos-âncora e referência de decisão). Correção de coerência → sem bump (a leva 0.15.0 ainda não foi commitada).
+
+**Aplicação**: `guidelines/core/WORKFLOW.md` (§4, §6, gate 9), `templates/CLAUDE.keelson-block.md` (gate 9), `commands/specify.md` (Etapa 1), `commands/plan.md` (Etapa 2), `commands/auto.md` (Etapa 0 rota Risco, 4.5, "Fôlego"), `commands/implement.md` (3.4.2 item 5).
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

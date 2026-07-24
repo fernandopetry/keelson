@@ -57,6 +57,8 @@ Responde: *qual é o guia de estilo canônico e o que o impõe automaticamente?*
 Responde: *como se nomeia, e em que idioma?*
 - convenção por tipo de símbolo (classe, função, constante, arquivo);
 - idioma do código vs idioma do comentário;
+- qual comentário **carrega** o que a sintaxe não tem (→ obrigatório, Art. 7) e qual é
+  **ritual** nesta linguagem (o que o tipo/atributo já diz);
 - padrões de nome que sinalizam papel (interface, teste, DTO…).
 
 ## 4. Estrutura & arquitetura `[obrigatória]`  → Charter Art. 4, 7

@@ -59,12 +59,16 @@ Listar `PLAN-*.md` em `{docsRoot}/<slug>/plans/`. Próximo = maior + 1, zero-pad
 
 ## Etapa 2: triagem técnica
 
-Pare e faça até 5 perguntas apenas se houver ambiguidade técnica afetando:
+Pare e faça até 4 perguntas apenas se houver ambiguidade técnica afetando:
 - Stack ou padrão arquitetural irreversível
 - Integração externa com custo/risco operacional
 - Performance, SLO ou infra
 - Modelagem de dados com impacto em migração
 - Segurança, auth, criptografia, compliance
+
+**Modo autônomo** (pós-largada do `/keelson:auto`): esta etapa e a confirmação de slice
+(Caso B) não pausam — aplique a escada de reação do auto; a interpretação escolhida fica
+registrada no PLAN.
 
 ## Etapa 3: validação contra guidelines
 

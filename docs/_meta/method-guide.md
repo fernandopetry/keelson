@@ -91,7 +91,7 @@ Transforma uma demanda em especificação funcional (FRs em EARS, ACs em Given-W
 | Gate | `spec-validator` roda automaticamente ao final |
 | Próximo passo | `/keelson:plan SPEC-NNN` |
 
-Pode fazer até 5 perguntas se houver ambiguidade crítica (contrato externo, falha, segurança, decisão irreversível). Ambiguidade menor vira premissa `[assumido]` — revise-as no output.
+Pode fazer até 4 perguntas se houver ambiguidade crítica (contrato externo, falha, segurança, decisão irreversível); em fluxo autônomo pós-largada, não pausa (escada de reação do `/keelson:auto`). Ambiguidade menor vira premissa `[assumido]` — revise-as no output.
 
 SPEC com **2+ fluxos entregáveis** (unidades de teste do QA) agrupa os FRs da §5 sob headings `### FEAT-NNN-XXX: <nome>` — cada FR pertence a exatamente uma FEAT; os ACs derivam a filiação do FR que cobrem. Um fluxo só → **não** declare a camada (a funcionalidade colapsa na própria SPEC). Decisão 4.27.
 

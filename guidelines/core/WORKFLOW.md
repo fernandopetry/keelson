@@ -84,7 +84,7 @@ o caso específico).
 
 ### 4. Exija elegância (equilibrada)
 
-- Mudança não trivial: pause e pergunte *"existe uma forma mais elegante?"*.
+- Mudança não trivial: pergunte-se *"existe uma forma mais elegante?"*.
 - Se uma correção parecer gambiarra: *"sabendo tudo que sei agora, implemente a solução
   elegante"*.
 - **Pule** isso em correções simples e óbvias — não superengenharia.
@@ -99,17 +99,17 @@ o caso específico).
 
 ### 6. Quando escalar para o humano
 
-**Sempre pergunte antes de** (ações destrutivas ou de difícil reversão — Charter Art. 6):
+A régua é a **reversibilidade** (Charter Art. 6): ação destrutiva ou de difícil reversão
+(excluir dados/arquivos, `DROP`/`ALTER` destrutivo, config de produção, contrato público)
+**sempre** espera resposta humana antes de ser aplicada. Mudança simples e reversível —
+mesmo em área sensível (coluna nullable nova, permissão no padrão do catálogo) — segue
+com a decisão registrada e os gates aplicáveis. Escale também quando a solução exigir
+decisão de negócio ou trade-off significativo entre caminhos válidos.
 
-- Alterar schema de banco de dados
-- Mudar configuração de produção
-- Excluir arquivos ou dados
-- Alterar regras de autenticação/autorização
-
-**Escale quando** a solução exigir decisão de negócio, houver múltiplos caminhos válidos
-com trade-off significativo, ou o contexto for insuficiente.
-
-**Não adivinhe:** uma pergunta custa menos que um rollback.
+**Quando perguntar** depende do modo: humano presente (guiado/avulso) → na hora; fluxo
+autônomo pós-largada → escada de reação do `/keelson:auto` (decidir e registrar →
+estacionar p/ lote da Entrega → interromper em último caso). **Não adivinhe** no
+irreversível: uma pergunta custa menos que um rollback.
 
 ---
 
@@ -153,8 +153,8 @@ camadas continua sendo "bug/refactor pequeno" — roteie pela **calibração de 
 7. Code review (ver `./CODE-REVIEW.md`)
 8. **Segurança** (`security-reviewer`, `./SECURITY.md`, rejeição imediata) — quando
    `gates.security` e a mudança é sensível (toca `sensitiveGlobs`)
-9. **Comportamento verificado** (`task-verifier`) — quando `gates.screenVerify` e a
-   mudança tem efeito observável
+9. **Comportamento verificado** (`task-verifier`) — quando a mudança tem efeito
+   observável; a verificação **de tela** exige `gates.screenVerify`
 
 Para bug/refactor, o protocolo é o **modo de executar** — não exige criar SPEC/PLAN/TASK
 formais.

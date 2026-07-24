@@ -33,7 +33,7 @@ o que é específico deste projeto vive na **ficha** e nos guidelines locais.
 - **Definição de pronto (gates):** ACs cobertos por prova · testes passando · lint
   limpo · escopo respeitado · decisões respeitadas · aderência ao Charter + perfil ·
   code review · **segurança** (quando `gates.security` e a mudança é sensível) ·
-  **comportamento verificado** (quando `gates.screenVerify` e o efeito é observável).
+  **comportamento verificado** (quando o efeito é observável; tela exige `gates.screenVerify`).
 - A prova de pronto é **externa e falsificável** (um teste que cobre o comportamento),
   nunca um autochecklist — **gerador ≠ avaliador**.
 

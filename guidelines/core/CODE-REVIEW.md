@@ -20,8 +20,8 @@
 | Reúso / DRY (nada reimplementado) | Charter Art. 3 |
 | Limites e responsabilidade única (SOLID) | Charter Art. 4 · `./ARCHITECTURE.md` |
 | Nomes revelam intenção; idioma consistente | Charter Art. 5 |
-| Escopo restrito; reversibilidade calibra o rigor | Charter Art. 6 |
-| Legibilidade para o próximo humano | Charter Art. 7 |
+| Escopo restrito; escoteiro declarado no trecho tocado | Charter Art. 6 |
+| Legibilidade; comentário dentro do piso e do teto | Charter Art. 7 |
 | Performance (N+1, custo proporcional) | Charter Art. 8 · `./PERFORMANCE.md` |
 | Definição de pronto satisfeita | Charter Art. 9 |
 | Idiomas e armadilhas da stack | Perfil de linguagem ativo |

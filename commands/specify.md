@@ -55,7 +55,7 @@ O **glossário consolidado do INDEX** (lido na 0.3) é canônico para Ubiquitous
 
 ## Etapa 1: triagem de ambiguidade
 
-Pare e faça até 5 perguntas apenas se houver ambiguidade que afete:
+Pare e faça até 4 perguntas apenas se houver ambiguidade que afete:
 - Contrato com sistema externo
 - Comportamento em falha
 - Critério de aceitação
@@ -63,6 +63,10 @@ Pare e faça até 5 perguntas apenas se houver ambiguidade que afete:
 - Decisão arquitetural irreversível
 
 Ambiguidade não crítica vira premissa `[assumido]`.
+
+**Modo autônomo** (pós-largada do `/keelson:auto`): esta etapa e as confirmações da 0.2
+não pausam — aplique a escada de reação do auto (decidir e registrar → estacionar →
+interromper em último caso).
 
 ## Etapa 2: princípios obrigatórios
 

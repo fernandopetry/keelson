@@ -61,8 +61,11 @@ Rodar o `quality.lint` da ficha **escopado aos arquivos da task**, não o repo i
 
 - Arquivos modificados estão em "Escopo > Inclui" (e dentro dos `codePaths` da ficha)?
 - Nenhum arquivo em "Não inclui" foi tocado?
+- Mudança colateral (não realiza AC nem é auxiliar): legítima **somente** se declarada
+  no campo `escoteiro` do report e dentro das três condições do Charter Art. 6.
 
-**Falha**: arquivo fora do escopo foi tocado.
+**Falha**: arquivo fora do escopo; colateral não declarado; "escoteiro" fora das três
+condições (muda comportamento, atravessa arquivo, escopo novo rotulado de limpeza).
 
 ### Gate 5: Decisões DEC respeitadas
 
@@ -178,9 +181,9 @@ Smell minor não bloqueia:
 - Espaçamento, ordem de imports → não bloqueia.
 - Nome estranho mas legível → não bloqueia.
 - Nome genérico com nome de domínio disponível → aponta como sugestão; só bloqueia se esconder intenção ou efeito colateral.
-- Comentário excessivo → não bloqueia.
+- Comentário que reprova no teste do Art. 7 (apagar não perde informação) — no código novo ou no trecho tocado sem escoteiro → não bloqueia; entra em `acoes_sugeridas` como **remoção**, com os trechos apontados.
 
-**Bloqueia**: violação de regra explícita do Charter/perfil, AC sem teste, escopo violado.
+**Bloqueia**: violação de regra explícita do Charter/perfil, AC sem teste, escopo violado. Do Art. 7 bloqueiam: bloco de comentário maior que o código que explica; workaround sem condição de remoção; DEC sem âncora no ponto do código.
 
 ## Quando pedir retry
 
