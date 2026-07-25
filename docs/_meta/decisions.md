@@ -538,6 +538,21 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.34 Verificação executável pré-código + migração de schema faseada
+
+**Problema**: avaliação de uma carta externa sobre instrução de IA (workflow de cobertura: 7 leitores por área + crítico adversarial) mostrou 13 de 15 recomendações já cobertas com dono no keelson — e confirmou dois gaps parciais. (a) O keelson fixa ACs antes do código (Given-When-Then na SPEC) e verifica depois (verifier independente), mas **nenhum artefato exige que o critério exista em forma executável — comando + saída/efeito esperado — antes de o implementer começar**: o formato "esperado observável para dar ✅/❌" só aparece pós-código, e os testes nascem durante a implementação, olhando o diff — a mitigação era só o avaliador independente. (b) O WORKFLOW §6 gateia `DROP`/`ALTER` destrutivo com humano, mas decide *se* aplica — nada ensinava *como* fasear: a receita expand→migrate→contract não existia em nenhum vocabulário no repo.
+
+**Decisão (do humano, sobre proposta da sessão)**:
+- **Verificação executável na TASK** (último artefato pré-código; a SPEC segue agnóstica de tecnologia): cada critério de teste do template de "Critérios de pronto" **anexa** a verificação executável — `<comando> → <saída/efeito esperado>` — e o §Mapeamento a regra: todo item de gate 1 registra comando+esperado **antes** do código; o critério nasce do AC, nunca do diff (gerador ≠ avaliador). Check pareado no `task-validator` (ERROR; só TASK `Todo`/`In Progress` — `Done` legada não reprova retroativamente) — gerador e validator em par e com a mesma cardinalidade, lições do LRN-004 (critério fantasma) e LRN-007 (leitura mais fraca). "Testes pré-existentes seguem verdes" **não** entra no template: já tem dono (gate 2 do reviewer, escopado ao domínio tocado).
+- **Migração de schema faseada no WORKFLOW §6**, estendendo a régua de reversibilidade que já mora ali: adicionar → migrar dados → mudar consumo → remover em deploy posterior. Teste falsificável: mesmo PR/deploy com a remoção do legado **e** o código que parou de consumi-lo → reprova (Charter Art. 6).
+- **Não adotado da carta** (registro para não relitigar): esqueleto de prompt e "pare antes de implementar" já são o ciclo SDD; "não ensinar engenharia genérica" atacaria o Charter — que existe justamente para ser o árbitro, com orçamento gerido por 4.20/4.32/destilação.
+
+**Custo assumido**: TASK fica ~1 linha mais cara de gerar e o validator mais estrito (critério de teste sem comando+esperado agora é ERROR, acima do WARNING de cobertura genérica — intencional: o comando é o oráculo, a cobertura é o desejo). A receita de schema é agnóstica; perfis instanciam a ferramenta de migration se precisarem, sem duplicar a regra.
+
+**Aplicação**: `commands/tasks.md` (template Critérios de pronto + §Mapeamento), `skills/task-validator/SKILL.md` (Etapa 4, ERROR), `guidelines/core/WORKFLOW.md` (§6). Charter inalterado (0.5.0 — nenhum artigo mudou). Doutrina nova → minor: plugin 0.15.0 → 0.16.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

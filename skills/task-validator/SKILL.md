@@ -82,6 +82,7 @@ Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara valida
 - Seção "Critérios de pronto" vazia
 - Nenhum critério menciona AC
 - AC vinculado ao FR realizado não aparece
+- Critério de teste (gate 1) sem verificação executável anexada — comando + saída/efeito esperado (só TASK em `Todo`/`In Progress`; `Done` legada não reprova por isso)
 
 ### WARNING se:
 - Critério não-verificável ("usuário fica feliz")

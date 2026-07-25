@@ -106,6 +106,11 @@ mesmo em área sensível (coluna nullable nova, permissão no padrão do catálo
 com a decisão registrada e os gates aplicáveis. Escale também quando a solução exigir
 decisão de negócio ou trade-off significativo entre caminhos válidos.
 
+**Mudança de schema faseada** — remoção/renome de campo consumido vira sequência
+reversível: adicionar → migrar dados → mudar consumo → remover em deploy **posterior**.
+Teste: o mesmo PR/deploy contém a remoção do legado **e** o código que parou de
+consumi-lo → reprova (Charter Art. 6).
+
 **Quando perguntar** depende do modo: humano presente (guiado/avulso) → na hora; fluxo
 autônomo pós-largada → escada de reação do `/keelson:auto` (decidir e registrar →
 estacionar p/ lote da Entrega → interromper em último caso). **Não adivinhe** no
