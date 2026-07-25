@@ -28,14 +28,14 @@ Você é um Engineering Manager especialista em orquestrar implementação assis
 ### 0.1 Modo de orquestração
 
 1. **Padrão: `SUBAGENTS`** (subagents na main session). Não gaste turno detectando alternativas.
-2. `--force-mode=teams` habilita `AGENT_TEAMS` (worktrees/peer-to-peer) quando o ambiente suportar (ex.: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`).
+2. `--force-mode=teams` habilita `AGENT_TEAMS` quando o ambiente suportar → ler `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/agent-teams.md` (especificidades do modo; estrutura idêntica).
 3. Wave única e sequencial de tasks pequenas → `SINGLE_THREAD` (main session direto) é aceitável. **SINGLE_THREAD dispensa a orquestração, não a independência**: os gates de 3.3 continuam rodando via subagents (`task-reviewer`, e `security-reviewer`/`task-verifier` quando o gatilho aplica) — a main session que implementou **nunca** aprova o próprio diff (decisão 4.30). Colapsar para SINGLE_THREAD com >1 wave ou task não-pequena é desvio: declare-o no output final.
 
 ### 0.2 Carregar guidelines e memo
 
-1. Ler a **ficha** (`keelson.config.json`): `profile`, `codePaths`, comandos de qualidade, `gates`, `docsRoot`. Ler o `CLAUDE.md` do projeto se existir.
-2. Carregar a doutrina e o **perfil de linguagem ativo** (resolução e avisos: convenção comum — method-guide §3.0, `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`); em mudança sensível, some a seção de segurança do perfil e o `QUALITY-CHARTER` (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/`); em queries pesadas, a seção de performance.
-3. **Memo de exploração**: se existe, use-o como mapa do domínio e **passe o caminho aos subagents** (convenção comum — method-guide §3.0).
+1. Ler a **ficha** (`keelson.config.json`; campos: convenção comum — sdd-conventions.md) e o `CLAUDE.md` do projeto se existir.
+2. Carregar o **perfil de linguagem ativo** (doutrina `core/*`: vale sempre, carga conforme o mapa — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`, também dono da resolução e avisos do perfil); em mudança sensível, some a seção de segurança do perfil e o `QUALITY-CHARTER` (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/`); em queries pesadas, a seção de performance.
+3. **Memo de exploração**: se existe, use-o como mapa do domínio e **passe o caminho aos subagents** (convenção comum — sdd-conventions.md).
 4. Validar consistência guideline ↔ PLAN.
 
 ### 0.3 Identificar e ler artefatos SDD
@@ -57,25 +57,19 @@ Listar status. In Progress sem retomada: alertar. Blocked: parar.
 
 ## Etapa 1: análise de paralelizabilidade
 
-### PARALLEL_SAFE
-Todas verdadeiras:
-- Wave tem >1 task
-- Arquivos sem overlap
-- Sem TRISK declarado
-- Sem migração/config global/segurança/breaking change
-- COMP não compartilhado na wave
-- Sem decisão irreversível tocada
-
 ### SEQUENTIAL_FORCED
 Qualquer uma:
 - Wave com 1 task
 - Migração, schema, config global
 - Segurança, auth, criptografia, compliance
 - Breaking change de API
-- TRISK alto
+- TRISK declarado (qualquer severidade)
 - Overlap de arquivos
+- COMP compartilhado na wave
 - Decisão irreversível tocada
 - (modo SUBAGENTS) tasks tocando o **mesmo arquivo** — ou arquivos de registro compartilhados (container de injeção de dependência, arquivos de rotas, autoload/manifesto). Mesmo diretório com arquivos distintos **não** força sequencial.
+
+Wave com >1 task e **nenhuma** condição presente → paralela. Na dúvida, sequencial (princípio 1).
 
 ## Etapa 2: imprimir plano de execução
 
@@ -85,11 +79,10 @@ Se `--dry-run`, parar.
 
 ## Etapa 3: execução wave por wave
 
-**Antes da primeira wave**, grave o estado do run em `thoughts/local/run-state-<slug>.md` no formato canônico do method-guide §3.0 (`status: em_andamento`, `waves_concluidas: 0`). Ele é o sentinela do hook `wave-guard`: vive em disco, sobrevive à sumarização de contexto e bloqueia encerramento de turno no meio do run (decisões 4.23/4.24).
+**Antes da primeira wave**, grave o estado do run em `thoughts/local/run-state-<slug>.md` no formato canônico de sdd-conventions.md (`status: em_andamento`, `waves_concluidas: 0`) — sentinela do hook `wave-guard` (decisões 4.23/4.24).
 
 ### 3.1 Setup da wave
 
-**AGENT_TEAMS paralela**: worktrees por task, branches separadas, teammates com peer-to-peer.
 **SUBAGENTS paralela**: branch única para wave, subagents na main session.
 **Sequencial**: sem branches/worktrees extras, main session ou 1 subagent.
 
@@ -101,15 +94,7 @@ Se esses subagents não existirem, usar subagents genéricos com instruções in
 
 ### 3.2 Execução por task (via task-implementer)
 
-Cada agente executa:
-1. Ler contexto: TASK, PLAN, SPEC, ficha (`keelson.config.json`), INDEX.md e (se existir) o memo de exploração `thoughts/local/exploration-<slug>.md`.
-2. Atualizar Status para `In Progress` e `Data início` no arquivo TASK.
-3. Implementar conforme escopo, respeitando DEC e guidelines.
-4. Escrever testes que verificam ACs vinculados.
-5. Executar testes localmente.
-6. Rodar linter/formatter (comando `quality.lint` da ficha).
-7. Commit no padrão do projeto.
-8. Retornar o report próprio do agent (formato definido no agent `task-implementer` — **não** o 3.4.1, que é consolidado depois pela main session).
+Passe no prompt de cada agente os **inputs**: caminhos de TASK, PLAN, SPEC, ficha (`keelson.config.json`), INDEX.md e (se existir) do memo de exploração `thoughts/local/exploration-<slug>.md`. O fluxo de trabalho (status, implementação, testes, lint, commit) é o system prompt do `task-implementer` — não o repita. **Espere de volta** o report próprio do agent (formato definido no `task-implementer` — **não** o 3.4.1, que é consolidado depois pela main session).
 
 ### 3.3 Quality gates (revisão independente)
 
@@ -127,12 +112,14 @@ Revisão por agentes independentes (o implementer **nunca** revisa o próprio tr
 
 **Proporcional ao risco — gates dedicados, em paralelo ao reviewer:**
 
-8. **Segurança — via `security-reviewer`** (REJEIÇÃO IMEDIATA): obrigatório quando a mudança toca área sensível (auth, autorização, SQL/consulta, upload, dados pessoais, crypto, sessão/cookies, endpoints, redirect, exec, dependências) e o gate `gates.security` está ativo. Roda o checklist de segurança do `QUALITY-CHARTER` (Art. 2) mapeado na seção de segurança do perfil ativo. Fora desses casos, segurança é coberta pelo Gate 6.
-9. **Comportamento verificado — via `task-verifier`**: obrigatório quando a mudança tem efeito observável (endpoint, UI, regra exercitável). Roda os testes e exercita a app quando o ambiente está disponível. Refactor sem efeito observável dispensa (Gates 1/2 bastam). **Quando `gates.screenVerify` está ativo e o efeito é de tela** e o ambiente desta sessão **não permite exercitá-la** (worktree/nuvem, sem browser): o verifier reporta `PARCIAL` com `handoff_seed` **e a `evidencia_indisponibilidade` da sondagem que falhou** — indisponibilidade é provada, não presumida (method-guide §8.1, decisão 4.26); seed sem evidência de sondagem → rejeitar o report e refazer. Isso **não é falha de gate** (não consome retry, não bloqueia closure); o gate fica `pendente_handoff` e as seeds são consolidadas num **handoff de verificação** na Etapa 4 (ver `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`, §8). O que o verifier **conseguiu** exercitar (testes, chamadas de endpoint) continua bloqueante se divergir.
+8. **Segurança — via `security-reviewer`** (REJEIÇÃO IMEDIATA): obrigatório quando a mudança é **sensível** (lista canônica: `description` do `security-reviewer`) e o gate `gates.security` está ativo. Roda o checklist de `guidelines/core/SECURITY.md` (instancia o Art. 2 do Charter) mapeado na seção de segurança do perfil ativo. Fora desses casos, segurança é coberta pelo Gate 6.
+9. **Comportamento verificado — via `task-verifier`**: obrigatório quando a mudança tem efeito observável (endpoint, UI, regra exercitável). Roda os testes e exercita a app quando o ambiente está disponível. Refactor sem efeito observável dispensa (Gates 1/2 bastam). **Quando `gates.screenVerify` está ativo e o efeito é de tela** e o ambiente desta sessão **não permite exercitá-la** (worktree/nuvem, sem browser), o verifier reporta `PARCIAL` com `handoff_seed` — sondagem e mecânica são do `task-verifier`; evidência obrigatória (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`, §8.1, decisão 4.26). Aceite do report: `PARCIAL` com seed **e** `evidencia_indisponibilidade` → aceitar; seed **sem** evidência de sondagem → rejeitar e refazer; `pendente_handoff` **não é falha de gate** (não consome retry, não bloqueia closure) — as seeds são consolidadas num **handoff de verificação** na Etapa 4. O que o verifier **conseguiu** exercitar (testes, chamadas de endpoint) continua bloqueante se divergir.
 
 **Briefing destilado para os gates dedicados**: ao invocar `security-reviewer`/`task-verifier`, monte no prompt um briefing com o que eles de fato usam — ACs vinculados **copiados literalmente** da SPEC, DECs que tocam o escopo, arquivos da task (`git diff --name-only`), comandos `quality.*` da ficha — e aponte a **seção** do perfil a ler (segurança → seção de segurança; verificação → seção de testes). Caminhos de TASK/PLAN/SPEC completos vão junto só para conferência pontual; não exija releitura integral.
 
 Falha em qualquer gate: motivo específico, 1 retry, depois escala humano. Vulnerabilidade (Gate 8) é sempre bloqueante.
+
+**Modo autônomo** (pós-largada do `/keelson:auto`): "escalar humano" = escada de reação do auto (estacionar → degrau 3), nunca pergunta pendurada no meio do run.
 
 ### 3.4 Closure da task (OBRIGATÓRIA)
 
@@ -170,18 +157,18 @@ Report incompleto ou inválido: rejeitar, refazer.
 1. **Atualizar TASK-MMM-XXX-*.md**: preencher "Histórico de execução", Status: Done.
 2. **Atualizar TASK-MMM-INDEX.md**: marcar task concluída, atualizar agregados. Se a SPEC declara FEATs: atualizar a coluna `Done` da seção "Cobertura por funcionalidade".
 3. **Atualizar INDEX.md do slug**:
-   - Atualizar coluna `Tasks` na linha do PLAN-MMM: de `X/Y` para `(X+1)/Y`, com o marcador do contrato do INDEX (method-guide, §6): `🟡` enquanto parcial, `✅` quando todas Done.
+   - Atualizar coluna `Tasks` na linha do PLAN-MMM: de `X/Y` para `(X+1)/Y`, com o marcador do contrato do INDEX (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`): `🟡` enquanto parcial, `✅` quando todas Done.
    - Atualizar campo `Última atualização`.
    - Se a SPEC declara FEATs e esta closure **completou uma FEAT** (todos os FRs dela cobertos por PLANs e todas as TASKs que a listam em `Funcionalidade` — primária ou secundária, em qualquer PLAN do slug — Done): mover a capacidade da FEAT de "Em desenvolvimento" para "Implementadas", texto `<nome da FEAT> (SPEC-NNN/FEAT-NNN-XXX, PLAN-MMM, ✅ <data>)`.
    - Se esta é a última task do PLAN (todas Done) e a SPEC **não** declara FEATs:
      - Mover capacidade de "Em desenvolvimento" para "Implementadas".
      - Texto: `<capacidade> (SPEC-NNN, PLAN-MMM, ✅ <data>)`.
    - **Não** marcar Status do PLAN como Done automaticamente.
-4. **Sincronizar progresso com Jira (opcional)**: só quando `jira.enabled`. Aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §9) para registrar o progresso na sub-task correspondente — `transition:comment` (default) comenta o marco; `auto` transiciona validando em runtime; `off` não faz nada. O campo `Jira:` da closure (§10) identifica a sub-task; TASK **sem key** com `issueType.standalone` preenchido (TASK avulsa ou transversal sem primária) → criar a issue isolada agora (§7) e gravar a key. Se a closure completou uma FEAT (check do item 3) e a projeção de 3 níveis está ativa, aplicar também o **§6.1 item 5** na Story da FEAT (comentar/transicionar "pronta p/ QA"); tarefa isolada `Done` recebe o marco "pronta p/ QA" **na própria issue** (§9). Best-effort (§0): conector ausente/falha → aviso, **não** bloqueia a closure.
+4. **Sincronizar progresso com Jira (opcional)**: só quando `jira.enabled`. Aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`): closure → §9 na sub-task do campo `Jira:` (§10); TASK **sem key** com `issueType.standalone` preenchido → criar a issue isolada agora (§7) e gravar a key; closure completou uma FEAT (check do item 3) com o 3º nível ativo → aplicar também o item 5 de `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` na Story da FEAT. Leitura: §0–§1 + §7 + §9 + §10 (+ `jira-sync-feat.md` quando o 3º nível está ativo). Não leia o protocolo inteiro: localize os §§ com `grep -n "^## §"` e leia §0 + §1 + os §§ citados aqui + os que eles referenciarem. Best-effort (§0): conector ausente/falha → aviso, **não** bloqueia a closure.
 5. **Registrar lição durável (memória da equipe)**: se algum report (`task-reviewer`, `security-reviewer` ou `task-verifier`) trouxe `licao_candidata` não-nula (defeito com causa-raiz generalizável, ou a task exigiu retry por motivo que pode se repetir), rotear pelo campo `alvo`:
-   - **`alvo: projeto`** → persistir em `guidelines/project/lessons.md` no formato canônico (`## [Categoria] título` + **Erro/Causa/Solução**), abaixo do marcador `<!-- Adicionar lições abaixo desta linha -->`. **Deduplicar**: lição equivalente existente é atualizada, não duplicada. Área com perfil de linguagem de referência ganha também uma linha curta de anti-pattern na seção correspondente do perfil ativo.
+   - **`alvo: projeto`** → persistir em `guidelines/project/lessons.md` no formato canônico (`## [Área] título` + **Erro/Causa/Solução** — dono: `guidelines/core/WORKFLOW.md`), abaixo do marcador `<!-- Adicionar lições abaixo desta linha -->`. **Deduplicar**: lição equivalente existente é atualizada, não duplicada. Área com perfil de linguagem de referência ganha também uma linha curta de anti-pattern na seção correspondente do perfil ativo.
    - **`alvo: processo`** (um artefato do keelson induziu/não preveniu o erro — inclui `evento_aprendizado` de validator e retry por instrução ambígua) → invocar o **`process-tuner`** com o evento (mecânica — ledger, dedup, modo dev × consumidor — é doutrina dele). `PROPOSTA_PLUGIN`/`proposta_doutrina` do report vão ao humano na entrega, nunca auto-aplicadas.
-   - Como `guidelines/project/` e `<docsRoot>/` são versionados no projeto, o commit + push distribui a lição. Mencionar no output quais lições foram registradas/patcheadas (e quais viraram proposta).
+   - Mencionar no output quais lições foram registradas/patcheadas (e quais viraram proposta).
 6. **Em modo paralelo**: commit das atualizações com `chore(<slug>): close TASK-MMM-XXX` (incluir as mudanças em `guidelines/` se houver lição registrada).
 
 Closure falha se:
@@ -195,17 +182,15 @@ Falha: reportar específico, 1 retry, escalar.
 
 ### 3.5 Sincronização entre tasks da wave
 
-**AGENT_TEAMS**: task list compartilhado, peer-to-peer.
 **SUBAGENTS**: sem peer-to-peer. Subagent descobre necessidade de coordenação: para, reporta, main session decide.
 
 ### 3.6 Final da wave
 
 1. Todas as tasks Done com closure.
-2. Merge de worktrees (só AGENT_TEAMS).
-3. Rodar a suíte **relevante ao escopo da wave** no working tree principal — ampla o bastante para pegar regressão cross-task (não só os `--filter` de cada task), mas **não** a suíte completa a cada wave. A completa roda 1× na Etapa 4 (verificação forte e única).
-4. Regressão: parar e reportar.
-5. Atualizar `waves_concluidas` no `thoughts/local/run-state-<slug>.md` (o `status` continua `em_andamento` até a Entrega).
-6. **Iniciar a próxima wave imediatamente.** O loop da Etapa 3 só termina de dois jeitos: última wave fechada (→ Etapa 4) ou falha listada em "Comportamento em caso de falha". Duração da sessão, tamanho do contexto ou "ponto limpo" **não** encerram o loop — não termine o turno entre waves nem pergunte se deve continuar.
+2. Rodar a suíte **relevante ao escopo da wave** no working tree principal — ampla o bastante para pegar regressão cross-task (não só os `--filter` de cada task), mas **não** a suíte completa a cada wave. A completa roda 1× na Etapa 4 (verificação forte e única).
+3. Regressão: parar e reportar.
+4. Atualizar `waves_concluidas` no `thoughts/local/run-state-<slug>.md` (o `status` continua `em_andamento` até a Entrega).
+5. **Iniciar a próxima wave imediatamente** — o loop da Etapa 3 só termina com a última wave fechada (→ Etapa 4) ou falha listada em "Comportamento em caso de falha"; não termine o turno entre waves nem pergunte se deve continuar.
 
 ## Etapa 4: validação final contra DoD do PLAN
 
@@ -214,7 +199,7 @@ Falha: reportar específico, 1 retry, escalar.
 3. Validar cada item da DoD.
 4. Validar aderência global à ficha e ao perfil de linguagem ativo.
 5. **Remover o memo de exploração** (`thoughts/local/exploration-<slug>.md`), se existir — a closure do PLAN encerra o ciclo de exploração.
-6. **Handoff de verificação (gate 9 remoto)** — só quando `gates.screenVerify` está ativo: se alguma task fechou com `comportamento_gate9: pendente_handoff`, consolidar os `handoff_seed` de todas as tasks em **um** `{docsRoot}/<slug>/handoffs/HANDOFF-PLAN-MMM.md` no formato canônico do guia do método (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`, §8.2 — contexto, já-verificado, pré-requisitos, roteiro, riscos, protocolo de conclusão), preenchendo o `sonda:` do front-matter com as evidências de indisponibilidade e preservando o `realm` de cada item (projeto multi-realm). Deduplicar itens que exercitam o mesmo fluxo **no mesmo realm**. O doc entra no commit da entrega.
+6. **Handoff de verificação (gate 9 remoto)** — só quando `gates.screenVerify` está ativo: se alguma task fechou com `comportamento_gate9: pendente_handoff`, consolidar os `handoff_seed` de todas as tasks em **um** `{docsRoot}/<slug>/handoffs/HANDOFF-PLAN-MMM.md` no formato canônico do §8.2 (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`), preenchendo o `sonda:` do front-matter com as evidências de indisponibilidade e preservando o `realm` de cada item (projeto multi-realm). Deduplicar itens que exercitam o mesmo fluxo **no mesmo realm**. O doc entra no commit da entrega.
 7. **Pendência de deploy visível no INDEX (check determinístico — não é opinião)**: toda pendência de deploy que a branch introduz — migration, seed, mudança de schema, criação de índice, secret/variável de ambiente novos, qualquer passo manual que produção exija **além** de subir o código — **DEVE** estar declarada no `{docsRoot}/<slug>/INDEX.md`. Compare o que a branch **realmente acrescenta** com o que o INDEX **declara**:
 
    ```bash
@@ -232,7 +217,7 @@ Falha: reportar específico, 1 retry, escalar.
 
 Se todas tasks Done e DoD satisfeita:
 
-1. **Atualizar coluna Status na tabela "PLANs" do INDEX**: de Draft/Review para `Done (sugerido)`.
+1. **Atualizar coluna Status na tabela "PLANs" do INDEX**: de `Approved` para `Done (sugerido)`.
 2. **Adicionar entrada ao Histórico**: `<data>: PLAN-MMM implementado (N tasks), aguardando promoção manual de Status`.
 3. **Limpar Riscos ativos** mitigados por este PLAN.
 4. **Se gerou handoff (item 6 da Etapa 4)**: adicionar risco ativo `Verificação de tela pendente — HANDOFF-PLAN-MMM ({docsRoot}/<slug>/handoffs/)` — removido só na closure do handoff, pelo agente verificador.
@@ -243,9 +228,7 @@ Se todas condições verdadeiras (tasks Done com closure, DoD satisfeita, aderê
 
 > "Todas as condições para Status do PLAN = Done estão satisfeitas. A promoção a Done é decisão sua, na entrega: atualize o front-matter do PLAN-MMM-*.md para `Status: Done` ao concluir o merge."
 
-E sugerir a integração (não executar):
-
-> "Para preparar a entrega, rode `/keelson:integrate PLAN-MMM` — ele valida a DoD, roda a suíte completa e abre o PR. Merge e deploy permanecem decisão sua."
+E sugira `/keelson:integrate PLAN-MMM` para preparar a entrega (não execute; merge e deploy permanecem humanos).
 
 ## Etapa 5: output final ao usuário
 
@@ -298,13 +281,7 @@ E sugerir a integração (não executar):
 ## Verificação pendente (handoff)            # OMITIR se gate 9 foi verificado, n/a, ou gates.screenVerify inativo
 - Doc: {docsRoot}/<slug>/handoffs/HANDOFF-PLAN-MMM.md (N itens pendentes)
 - Motivo: <ambiente sem acesso a testes de tela>
-- Prompt para o agente com tela: <bloco do prompt canônico do guia do método (§8.3), preenchido>
-
-## Próximos passos
-1. Revisar mudanças no working tree
-2. Code review humano em mudanças sensíveis
-3. Atualizar Status do PLAN se aplicável
-4. Considerar próximo PLAN ou /keelson:triage para nova demanda
+- Prompt para o agente com tela: <bloco do prompt canônico (handoff-protocol.md, §8.3), preenchido>
 ```
 
 ## Comportamento em caso de falha

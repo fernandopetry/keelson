@@ -21,7 +21,7 @@
 | Limites e responsabilidade única (SOLID) | Charter Art. 4 · `./ARCHITECTURE.md` |
 | Nomes revelam intenção; idioma consistente | Charter Art. 5 |
 | Escopo restrito; escoteiro declarado no trecho tocado | Charter Art. 6 |
-| Legibilidade; comentário dentro do piso e do teto | Charter Art. 7 |
+| Legibilidade; todo comentário passa no teste de apagar (Perde/Não-perde) | Charter Art. 7 |
 | Performance (N+1, custo proporcional) | Charter Art. 8 · `./PERFORMANCE.md` |
 | Definição de pronto satisfeita | Charter Art. 9 |
 | Idiomas e armadilhas da stack | Perfil de linguagem ativo |
@@ -51,10 +51,8 @@ que também envia e-mail) é o mesmo smell, mais grave — viola a régua do Art
 
 ## Régua do revisor: gerador ≠ avaliador
 
-A revisão vale porque é feita com **contexto limpo**, por quem não escreveu o código. Ela
-**não substitui** a prova externa (o teste), e o autochecklist do autor **não substitui**
-a revisão. Onde não há teste possível (ex.: refactor de legibilidade), a revisão
-independente é a prova.
+A revisão vale pelo **contexto limpo** (Charter, régua geral); onde não há teste possível
+(ex.: refactor de legibilidade), a revisão independente **é** a prova.
 
 ---
 

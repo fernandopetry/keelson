@@ -6,7 +6,7 @@
 # longa (overnight), a regra "não pare entre waves" pode se perder do resumo e o
 # agente volta a encerrar o turno na wave 2 de 6 perguntando "continuo?". Este
 # guard não depende do contexto do modelo: lê o arquivo de estado em disco
-# (thoughts/local/run-state-<slug>.md, formato canônico no method-guide §3.0,
+# (thoughts/local/run-state-<slug>.md, formato canônico em docs/_meta/conventions/sdd-conventions.md,
 # escrito pelo /keelson:implement a cada wave) e renudgeia o agente se ele
 # tentar encerrar com `status: em_andamento`.
 #

@@ -5,23 +5,17 @@ argument-hint: <PLAN-MMM ou caminho> [--max-size=small|medium] [--only=COMP-MMM-
 
 # /keelson:tasks
 
-Você é um Tech Lead especialista em decompor planos arquiteturais em tarefas atômicas executáveis por agentes de IA. Cada TASK deve ser pequena, testável isoladamente, e ter critério de pronto inequívoco.
+Você é um Tech Lead especialista em decompor planos arquiteturais em tarefas atômicas executáveis por agentes de IA.
 
 **Princípio inviolável 1**: convenções de execução (branch, commit, granularidade, DoD) seguem o `CLAUDE.md` do projeto (ou Conventional Commits como padrão) e o perfil de linguagem ativo.
 
 **Princípio inviolável 2**: cada TASK contém **campos de closure vazios** que o `/keelson:implement` preencherá.
 
-**Princípio inviolável 3**: ao final, o `INDEX.md` do slug é atualizado.
-
 ## Input
-
-```
-/keelson:tasks <PLAN-MMM ou caminho> [--max-size=<tamanho>] [--only=COMP-MMM-XXX]
-```
 
 | Flag | Uso |
 |---|---|
-| `--max-size=<small\|medium>` | Teto de granularidade: nenhuma TASK gerada excede esse tamanho (sem a flag, vale a calibração da Etapa 1.7/1.8) |
+| `--max-size=<small\|medium>` | Teto de granularidade: nenhuma TASK gerada excede esse tamanho (sem a flag, vale a calibração dos itens 7-8 da Etapa 1) |
 | `--only=COMP-MMM-XXX` | Decompõe apenas o componente indicado; os demais COMPs do PLAN ficam para uma execução futura (reportar o gap no output) |
 
 ## Etapa 0: resolver PLAN, guidelines e localização
@@ -29,7 +23,7 @@ Você é um Tech Lead especialista em decompor planos arquiteturais em tarefas a
 ### 0.1 Carregar guidelines
 
 1. Ler a **ficha** (`keelson.config.json`) e o `CLAUDE.md` do projeto se existir.
-2. Carregar a doutrina e as convenções de teste do **perfil de linguagem ativo** (resolução e avisos: convenção comum — method-guide §3.0, `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`), mais as demais seções do perfil conforme a área.
+2. Carregar o **perfil de linguagem ativo** e suas convenções de teste (doutrina `core/*`: vale sempre, carga conforme o mapa da convenção comum — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`; resolução e avisos do perfil: mesma convenção), mais as demais seções do perfil conforme a área.
 3. Extrair: convenção de branch, padrão de commit, granularidade típica, DoD padrão, framework de teste (do perfil).
 
 ### 0.2 Resolver PLAN
@@ -63,18 +57,15 @@ Listar `TASK-MMM-*.md` em `{docsRoot}/<slug>/tasks/`. Próximo XXX = maior exist
    - `small`: 1 arquivo principal, 1 a 3 testes, 30 min a 2 h
    - `medium`: até 3 arquivos relacionados, 2 a 4 h
    (sobrescrito pela ficha/`CLAUDE.md` se declarado)
-8. **Corte por risco, não por camada** (anti-desperdício; par da calibração de esforço do
-   `QUALITY-CHARTER` / `guidelines/core/`). Cada TASK custa um ciclo implementer + reviewer —
+8. **Corte por risco, não por camada**. Cada TASK custa um ciclo implementer + reviewer —
    granularidade fina multiplica revisões, não qualidade:
    - **Fatia sensível** (seed de permissão, autorização, endpoint novo, migração,
      regra de negócio central) → TASK **própria**, mesmo que pequena, para receber
      `security-reviewer`/revisão focada.
    - **Fatias mecânicas do mesmo fluxo** (as várias classes/módulos de um mesmo caso
-     de uso; o serviço + a peça de UI do mesmo recurso) → **agrupe numa TASK `medium`**
-     com uma revisão só. NÃO crie uma TASK por classe/camada quando nada nelas
-     exige revisão dedicada.
+     de uso) → **agrupe numa TASK `medium`** com uma revisão só. NÃO crie uma TASK
+     por classe/camada quando nada nelas exige revisão dedicada.
    - Heurística: se duas tasks só fazem sentido revisadas juntas, elas são uma.
-9. **Aderência a convenções da ficha/perfil** herdadas em cada TASK.
 
 ## Etapa 2: ordenação
 
@@ -91,7 +82,7 @@ Um arquivo por task: `{docsRoot}/<slug>/tasks/TASK-MMM-XXX-<titulo-kebab>.md`.
 
 **Slug**: <slug>
 **Pertence a**: PLAN-MMM
-**Realiza (FRs)**: FR-NNN-XXX, FR-NNN-YYY
+**Realiza (FRs)**: FR-NNN-XXX, FR-NNN-YYY <!-- Tipo=bugfix → inclua também o AC violado (FR-NNN-XXX / AC-n) -->
 **Funcionalidade**: FEAT-NNN-XXX (primária)[, FEAT-NNN-YYY]
 **Componente**: COMP-MMM-XXX
 **Wave**: <número>
@@ -183,13 +174,10 @@ funcionalidade é a própria SPEC). Task `chore` sem FR realizado pode omitir. R
   menor ID). Julgamento pode sobrescrever a heurística, mas a primária deve pertencer
   ao conjunto derivado.
 - Task **transversal** (FRs de 2+ FEATs — ex.: um front único servindo login e
-  lançamento) lista todas; a primária define o parent no Jira (§7 do protocolo), as
-  demais viram links.
+  lançamento) lista todas.
 - **Sem primária honesta** (a task serve a todas/quase todas as FEATs e eleger uma seria
   arbitrário): use a forma `**Funcionalidade**: transversal (FEAT-NNN-XXX, FEAT-NNN-YYY)`
-  — sem `(primária)`. No Jira ela projeta como tarefa isolada (`issueType.standalone`,
-  §7 do protocolo), nunca replicada. O cálculo de "FEAT pronta" conta a task em **todas**
-  as FEATs listadas, em qualquer forma.
+  — sem `(primária)` (projeção Jira: `jira-sync-feat.md`).
 
 ### Mapeamento de cada AC — camada que enforça, gate que verifica
 
@@ -256,11 +244,11 @@ Após gerar todas as TASKs e o TASK-MMM-INDEX, invocar a skill `task-validator` 
 
 ## Etapa 6: atualização do INDEX.md do slug
 
-Aplicar a **receita de atualização do INDEX** (method-guide §6). Específico desta etapa: atualizar a coluna `Tasks` na linha do PLAN-MMM, no formato canônico do contrato — de `0/? ⏸` para `0/<total de tasks geradas> ⏸`.
+Aplicar a **receita de atualização do INDEX** (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`). Específico desta etapa: atualizar a coluna `Tasks` na linha do PLAN-MMM, no formato canônico do contrato — de `0/? ⏸` para `0/<total de tasks geradas> ⏸`.
 
 ## Etapa 7: sincronização com Jira (opcional)
 
-Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §7) para criar uma **sub-task** por TASK (idempotente — §4) e gravar a key no campo `Jira:` da closure de cada TASK. Com a projeção de 3 níveis ativa (SPEC declara FEATs ∧ `issueType.feature` preenchido), o `parent` da sub-task é a **Story da FEAT primária** — criar antes as Stories que faltarem (§6.1) — e as FEATs secundárias recebem link "relates to"; TASK na forma `transversal (...)` vira tarefa isolada (`issueType.standalone`, §7); sem FEATs ou sem `issueType.feature`, parent = issue principal da SPEC, como sempre. Best-effort (§0): conector indisponível/falha → aviso, sem bloquear a geração das TASKs.
+Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`) — ler §0-§5 + §7 + §8 + §10, mais `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` quando a projeção de 3 níveis está ativa (SPEC declara FEATs ∧ `issueType.feature` preenchido). Não leia o protocolo inteiro: localize os §§ com `grep -n "^## §"` e leia apenas os listados + os que eles referenciarem internamente. Criar uma **sub-task** por TASK e gravar a key no campo `Jira:` da closure de cada TASK (best-effort — §0).
 
 ## Output final ao usuário
 

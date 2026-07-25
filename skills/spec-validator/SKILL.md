@@ -5,14 +5,9 @@ description: Valida SPECs SDD ({docsRoot}/*/specs/SPEC-*.md) contra EARS, RFC 21
 
 # Skill: spec-validator
 
-Você é um Quality Engineer especialista em especificações funcionais para desenvolvimento assistido por IA. Sua função é validar uma SPEC contra os princípios SDD aplicados neste projeto: EARS, RFC 2119, verificabilidade absoluta, ubiquitous language, escopo simétrico, e separação rígida de "o quê" vs "como".
+Você é um Quality Engineer: valide a SPEC contra os checks abaixo.
 
 **Protocolo comum** (leia antes de validar): a moldura desta skill — calibração por exemplares, setup, severidades/auto-fix, gate de status/override, formato do relatório, evento de aprendizado e limites — vive em `${CLAUDE_PLUGIN_ROOT}/skills/_shared/validator-protocol.md`. Abaixo, só os checks próprios de SPEC. Exemplares (protocolo §1): SPECs aprovadas em `{docsRoot}/*/specs/`; comando gerador (protocolo §6): `commands/specify.md`.
-
-## Ativação
-
-1. **Automática**: ao final do `/keelson:specify`, antes de entregar a SPEC.
-2. **Manual**: quando o usuário pedir validação, revisão, lint, auditoria ou qualidade de uma SPEC.
 
 ## Input e contexto
 
@@ -87,6 +82,8 @@ Unwanted behavior: Se <gatilho indesejado>, então o <sistema> deve <resposta>.
 
 ## Etapa 4: checks de verificabilidade
 
+Construir os mapas `FR → AC` e `AC → FR` para os dois primeiros checks.
+
 ### ERROR se:
 - FR sem AC vinculado
 - AC referencia FR inexistente
@@ -107,8 +104,6 @@ os ACs derivam a filiação do FR que cobrem — não há vínculo AC→FEAT lit
 - FR fora de qualquer heading FEAT quando ao menos uma FEAT existe (partição parcial)
 - FEAT sem nenhum FR sob o heading
 - Heading `### FEAT-` fora da seção 5
-- FEAT sem AC derivado (nenhum AC cobre FR dela — na prática já coberto por "FR sem AC",
-  manter por robustez)
 
 ### WARNING se:
 - Exatamente 1 FEAT declarada (sugerir colapso: remover a camada, a funcionalidade é a SPEC)
@@ -164,12 +159,6 @@ Varrer seções 5, 6, 7 buscando palavras-bandeira:
 ### WARNING se:
 - Nenhuma premissa listada
 - Nenhum risco em seção 9
-
-## Etapa 9: cobertura cruzada
-
-Construir mapa `FR → AC`. Para cada FR sem AC: ERROR.
-Construir mapa `AC → FR`. Para cada AC referenciando FR inexistente: ERROR.
-Validar que todo FR coberto tem AC em Given-When-Then.
 
 ## Fechamento
 

@@ -1,7 +1,7 @@
 ---
 lang: php
 version: "7.4"
-charter: 0.5.0
+charter: 0.5.1
 generated-by: profile-writer
 reviewed: false
 reviewer: null
@@ -9,18 +9,12 @@ reviewer: null
 
 # PHP 7.4 — Perfil de linguagem
 
-> Instância do `QUALITY-CHARTER.md` para **PHP 7.4** — a versão onde a maior parte do
-> legado 7.x estacionou. Cada seção abaixo pega um artigo do charter e responde: *"em
-> PHP 7.4, isto se cumpre assim, com esta ferramenta, com esta armadilha a evitar"*.
-> Mesma espinha do exemplar 8.5 (seções 0–12), conteúdo específico desta versão.
->
-> **Escopo:** o que é idiomático de PHP 7.4. A arquitetura **específica do projeto**
-> (nomes de camadas próprios, caminhos reais) mora em `guidelines/project/` e na ficha
-> `keelson.config.json`; aqui, os nomes de pasta são placeholders genéricos (`src/`,
-> `tests/`) e os namespaces usam `App\` como raiz de exemplo.
->
-> ⚠️ Perfil **gerado** (`reviewed: false`): afirmações de segurança inferidas sem
-> confirmação documental estão marcadas `⚠️ CONFIRMAR:` para dirigir a revisão humana.
+> **Escopo:** o idiomático de PHP 7.4. A arquitetura **específica do projeto** mora em
+> `guidelines/project/` e na ficha `keelson.config.json` — aqui, paths (`src/`, `tests/`)
+> e o namespace `App\` são placeholders, não caminhos reais.
+> ⚠️ Perfil **gerado** (`reviewed: false`): afirmação inferida sem confirmação documental
+> leva a tag `⚠️ não confirmado`; o roteiro de verificação humana vive em
+> `_review/php-7.4.md`.
 
 ---
 
@@ -28,12 +22,9 @@ reviewer: null
 
 > **⚠️ PHP 7.4 está em fim de vida (EOL) desde 28/nov/2022.** Não recebe mais correção
 > de segurança do projeto PHP: toda CVE nova no runtime fica **sem patch oficial**.
-> Consequência para este perfil: (a) o **plano de upgrade para 8.x é recomendação
-> permanente** — toda decisão de arquitetura nova DEVERIA reduzir a distância até 8.x,
-> nunca aumentá-la; (b) a superfície exposta DEVE ser mínima e as mitigações da §6
-> ganham peso extra, porque o runtime por baixo não se defende mais sozinho.
-> ⚠️ CONFIRMAR: disponibilidade de backports de segurança pagos/da distro para 7.4
-> (ex.: Ubuntu Pro/ESM, RHEL, Freexian ELTS) no ambiente real do projeto.
+> Consequência: o **plano de upgrade para 8.x é recomendação permanente** — toda decisão
+> de arquitetura nova DEVERIA reduzir a distância até 8.x, nunca aumentá-la. Mitigações
+> operacionais: §6.
 
 O alvo é **PHP 7.4** (última minor da série 7, lançada em novembro de 2019), com
 `declare(strict_types=1)` obrigatório no topo de todo arquivo — sem coerção silenciosa
@@ -67,11 +58,6 @@ ternário aninhado **sem parênteses**; `create_function()`, `each()`; **mcrypt*
 (removido em 7.2 — sodium ou OpenSSL, ver §6.4); cast `(real)`; funções/métodos
 nomeados `fn` (virou palavra reservada em 7.4).
 
-**Por que a versão é seção de primeira classe:** "PHP" em 7.4 e em 8.x é quase outra
-linguagem — sem enums, sem `match`, sem promotion, com semântica de comparação frouxa
-diferente (ver §11). Código escrito para o alvo errado dá **parse error** no deploy —
-ou pior, roda com comportamento silenciosamente diferente (`#[...]` é comentário em 7.4).
-
 ---
 
 ## 2. Estilo, formatação & lint → Charter Art. 5, 7
@@ -83,7 +69,7 @@ estilo por gosto — o formatter decide.
 - **Formatter/linter:** `php-cs-fixer` **3.x** (exige PHP ≥ 7.4 para rodar — compatível
   com este alvo; config `.php-cs-fixer.dist.php` versionada na raiz) **ou**
   `phpcs`/`phpcbf` com ruleset PSR-12 (PHP_CodeSniffer 3.x roda em qualquer 7.x).
-  Escolha **uma** e cabeie na ficha. ⚠️ CONFIRMAR: se a release mais recente do
+  Escolha **uma** e cabeie na ficha. ⚠️ não confirmado: se a release mais recente do
   php-cs-fixer 3.x ainda instala sob PHP 7.4 — se não, **pinar** a última versão cujo
   `composer.json` aceite `^7.4`.
 - **É erro (bloqueia):** qualquer violação de PSR-12 reportada em `--dry-run`; ausência
@@ -126,10 +112,6 @@ O idioma dos **comentários** é decisão do projeto (registrada em `guidelines/
 mas **DEVE ser único e consistente** em toda a base — nunca metade em cada idioma no
 mesmo arquivo.
 
-**Armadilha comum:** nomear pela implementação (`$arrayDeUsers`, `processData`) em vez
-da intenção (`$activeUsers`, `deactivateExpiredContracts`). O nome que descreve o *como*
-mente assim que o *como* muda.
-
 ---
 
 ## 4. Estrutura & arquitetura → Charter Art. 4, 7
@@ -166,34 +148,13 @@ Presentation → Application → Domain ← Infrastructure
   entrada→DTO→UseCase e resultado→resposta.
 
 ```php
-<?php
+// Depende da ABSTRAÇÃO (interface), nunca do PDO concreto → testável sem banco.
+// 7.4: declaração tipada + atribuição no construtor (promotion é 8.0).
+private UserRepositoryInterface $repo;
 
-declare(strict_types=1);
-
-namespace App\Application\UseCases\User;
-
-use App\Domain\Entities\User\User;
-use App\Domain\Repositories\User\UserRepositoryInterface;
-
-final class CreateUserUseCase
+public function __construct(UserRepositoryInterface $repo)
 {
-    // Depende da ABSTRAÇÃO (interface), nunca do PDO concreto → testável sem banco.
-    // 7.4: declaração tipada + atribuição no construtor (promotion é 8.0).
-    private UserRepositoryInterface $repo;
-
-    public function __construct(UserRepositoryInterface $repo)
-    {
-        $this->repo = $repo;
-    }
-
-    public function execute(CreateUserDTO $dto): User
-    {
-        if ($this->repo->emailExists($dto->email)) {
-            throw new \DomainException('Email already registered');
-        }
-
-        return $this->repo->save(User::fromDto($dto));
-    }
+    $this->repo = $repo;
 }
 ```
 
@@ -255,20 +216,6 @@ encontrado" esperado) PODE ser `?T`/`null`; violação de regra é **exceção t
   **genérica** com o status HTTP correto. O `$e->getMessage()` **não** vai cru para a
   resposta.
 
-```php
-try {
-    $user = $this->useCase->execute($dto);
-    return $this->ok($response, $user->toArray());
-} catch (\InvalidArgumentException $e) {
-    return $this->error($response, 'Validation failed', 422); // campo, sem stack
-} catch (\DomainException $e) {
-    return $this->error($response, $e->getMessage(), 400);     // mensagem de negócio, curada
-} catch (\Throwable $e) {
-    $this->logger->error('user.create.failed', ['exception' => $e]); // detalhe no log
-    return $this->error($response, 'Internal error', 500);     // genérico para o cliente
-}
-```
-
 **O que logar (Art. 2):** identificadores e ação (`user_id`, `action`), a exceção com
 stack **do lado do servidor** — **nunca** senha, token, PII ou o corpo cru da
 requisição. `display_errors=Off` e `expose_php=Off` em produção — stack trace e versão
@@ -283,38 +230,26 @@ o `$e->getMessage()` cru na resposta (inclusive dentro de um `success:false` com
 
 ## 6. Segurança mapeada à linguagem → Charter Art. 2 `[CRÍTICA]`
 
-> **⚠️ Runtime EOL desde 28/nov/2022 — esta seção parte desse fato.** Rodar 7.4 em
-> produção significa que vulnerabilidade nova no **interpretador** não terá correção:
-> a postura é **mitigar e migrar**. Mitigações mínimas enquanto o upgrade não sai:
-> superfície exposta mínima (FPM atrás de proxy, sem porta direta), `display_errors=Off`
-> + `expose_php=Off`, dependências auditadas com rigor redobrado (§8) — e o **plano de
-> upgrade para 8.x registrado como recomendação permanente** em toda entrega.
-> ⚠️ CONFIRMAR: se o binário PHP do ambiente recebe backports de segurança de
-> distro/fornecedor (Ubuntu Pro/ESM, RHEL, ELTS) — isso muda o tamanho do risco.
+> **⚠️ Runtime EOL (fato e data: §1) — a postura é mitigar e migrar.** Mitigações
+> mínimas enquanto o upgrade não sai: superfície exposta mínima (FPM atrás de proxy,
+> sem porta direta), `display_errors=Off` + `expose_php=Off`, dependências auditadas
+> com rigor redobrado (§8). ⚠️ não confirmado: se o binário do ambiente recebe
+> backports de segurança de distro/fornecedor (Ubuntu Pro/ESM, RHEL, ELTS) — muda o
+> tamanho do risco.
 >
 > Cada item abaixo é um item da **Régua do Art. 2** traduzido para "como se faz e como
-> se erra em PHP 7.4". Vulnerabilidade aqui é **rejeição imediata** no review. Perfil
-> gerado: afirmações inferidas estão marcadas `⚠️ CONFIRMAR:`.
+> se erra em PHP 7.4". Vulnerabilidade aqui é **rejeição imediata** no review.
+> Afirmação inferida leva `⚠️ não confirmado` (perfil gerado).
 
 ### 6.1 Injeção → sempre parametrizar
 
-**SQL — PDO com parâmetros NOMEADOS**, nunca concatenação nem interpolação de entrada
-(o mecanismo PDO é idêntico ao de 8.x):
-
-```php
-// ✅ prepared statement, parâmetros nomeados
-$stmt = $pdo->prepare('SELECT id, name, email FROM users WHERE email = :email');
-$stmt->execute(['email' => $email]);
-
-// ❌ NUNCA — concatenar/interpolar entrada externa é SQL Injection
-$pdo->query("SELECT * FROM users WHERE email = '$email'");
-```
+**SQL — PDO com parâmetros NOMEADOS** (`:email` + `execute(['email' => $email])`),
+nunca concatenação nem interpolação de entrada (o mecanismo PDO é idêntico ao de 8.x).
 
 - Ligue `PDO::ATTR_EMULATE_PREPARES => false` (prepared statements reais no driver) e
   `PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION` — em 7.4 o modo de erro default do PDO
-  é **silencioso** (`ERRMODE_SILENT`; só virou exceção por default no PHP 8.0), então
-  sem essa flag a query que falha **não lança nada**. ⚠️ CONFIRMAR: default
-  `ERRMODE_SILENT` em 7.4 (mudança para `ERRMODE_EXCEPTION` documentada como 8.0).
+  é **silencioso** (`ERRMODE_SILENT`; só virou exceção por default no PHP 8.0 —
+  ⚠️ não confirmado), então sem essa flag a query que falha **não lança nada**.
 - O que **não** dá para bindar (nome de coluna/tabela em `ORDER BY`) valida-se contra
   uma **whitelist** — nunca interpolando o input.
 - **Command injection:** evite `exec/shell_exec/system/proc_open`; se inevitável,
@@ -339,11 +274,10 @@ echo json_encode($value, JSON_THROW_ON_ERROR);        // JSON (flag existe desde
 - **`ENT_QUOTES` explícito é inegociável em 7.4:** o default de `htmlspecialchars`
   nesta versão **não escapa aspas simples** (`ENT_COMPAT`) — o default só passou a
   incluir `ENT_QUOTES` no PHP 8.1. Chamada sem flags deixa XSS passar em atributo HTML
-  com aspas simples. ⚠️ CONFIRMAR: default `ENT_COMPAT | ENT_HTML401` em 7.4 e mudança
-  de default apenas em 8.1.
+  com aspas simples (⚠️ não confirmado).
 - Valor embutido dentro de `<script>` exige as flags
-  `JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP` no `json_encode`.
-  ⚠️ CONFIRMAR: conjunto de flags recomendado para contexto script.
+  `JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP` no `json_encode`
+  (⚠️ não confirmado).
 - Numa API JSON, `json_encode` já escapa; num template (Twig/Blade em versão compatível
   com 7.4), o autoescape cuida do HTML — **não** o desligue (`|raw`, `{!! !!}`) para
   dado de usuário. Template em PHP puro (`.phtml`, comum em legado): **todo** `echo` de
@@ -377,9 +311,8 @@ ser **inescapável** (front controller), não um include que cada script lembra 
 ### 6.4 Segredos & configuração → fora do código, fora do log
 
 - Segredos vêm de **variável de ambiente / secret store**, lidos via config — **nunca**
-  hardcoded no fonte, **nunca** commitados (`.env` no `.gitignore`).
-  ⚠️ CONFIRMAR: versão de `vlucas/phpdotenv` compatível com 7.4 (v4/v5), se o projeto
-  usar `.env`.
+  hardcoded no fonte, **nunca** commitados (`.env` no `.gitignore`; `vlucas/phpdotenv`
+  v4/v5 é a faixa compatível com 7.4 — ⚠️ não confirmado).
 - Segredo **nunca** em log, em mensagem de erro, nem em **query string de URL**.
 - **Senhas — `password_hash`, preferindo Argon2id quando o build oferecer:**
 
@@ -393,23 +326,15 @@ $hash = password_hash($password, $algo);
 ```
 
   **Nunca** MD5/SHA1, nunca hash caseiro, nunca `==` para comparar hash.
-  ⚠️ CONFIRMAR: `PASSWORD_ARGON2ID` só existe se o PHP foi **compilado** com libargon2
-  (≥ 20161029); em 7.4, o build com libsodium pode prover Argon2 mesmo sem libargon2 —
-  confirmar no binário real com `password_algos()`.
-  ⚠️ CONFIRMAR: parâmetros de custo (memory/time/threads para Argon2id; `cost` para
-  bcrypt) adequados à recomendação OWASP vigente.
+  ⚠️ não confirmado: `PASSWORD_ARGON2ID` só existe se o PHP foi **compilado** com
+  libargon2 (≥ 20161029); em 7.4, o build com libsodium pode prover Argon2 mesmo sem
+  libargon2 — cheque o binário real com `password_algos()`. Parâmetros de custo
+  (Argon2id/bcrypt) seguem a recomendação OWASP vigente (⚠️ não confirmado).
 - **Criptografia de dados:** **ext/sodium nativa** (desde 7.2) —
   `sodium_crypto_secretbox` (simétrica autenticada), `sodium_crypto_sign` (assinatura).
   **mcrypt foi removido em 7.2** — código legado que o usa DEVE migrar, não ser
-  reproduzido. ⚠️ CONFIRMAR: quando sodium não estiver no build, a alternativa é
+  reproduzido. ⚠️ não confirmado: quando sodium não estiver no build, a alternativa é
   `openssl_encrypt` com `aes-256-gcm` (autenticado, com tag) — nunca ECB/CBC sem MAC.
-
-```php
-// ❌ NUNCA
-error_log("password: $password");
-// ✅ apenas identificador e ação
-$logger->info('login_attempt', ['user_id' => $userId]);
-```
 
 ### 6.5 Sessão & estado de autenticação
 
@@ -424,13 +349,12 @@ setcookie('session', $value, [
 ]);
 ```
 
-  ⚠️ CONFIRMAR: assinatura com array de opções e diretiva ini
-  `session.cookie_samesite` disponíveis desde 7.3 (em 7.2 e antes o `samesite` exigia
-  gambiarra via `path` — não replicar esse padrão se aparecer no legado).
+  ⚠️ não confirmado: disponíveis desde 7.3; em 7.2 e antes o `samesite` exigia
+  gambiarra via `path` — não replicar esse padrão se aparecer no legado.
 - Sessão é a **fonte de verdade** de identidade e tenant — regenere o id no login
   (`session_regenerate_id(true)`), expire por inatividade, invalide no logout;
-  `session.use_strict_mode=1` para rejeitar id de sessão não iniciado pelo servidor.
-  ⚠️ CONFIRMAR: `use_strict_mode` como mitigação de session fixation nesta versão.
+  `session.use_strict_mode=1` para rejeitar id de sessão não iniciado pelo servidor
+  (mitigação de session fixation — ⚠️ não confirmado).
 - Token de autenticação **não** vai para `localStorage` (concern do front, mas o
   backend deve entregá-lo como cookie `httponly`).
 - **CSRF:** forms de estado (POST/PUT/DELETE) exigem token anti-CSRF — gerado com
@@ -494,21 +418,7 @@ final class CreateUserUseCaseTest extends TestCase
     }
 
     /** @test */
-    public function deveCriarUsuarioQuandoEmailInedito(): void
-    {
-        // ═══════════ Arrange ═══════════
-        $this->repo->method('emailExists')->willReturn(false);
-        $this->repo->method('save')->willReturnArgument(0);
-
-        // ═══════════ Act ═══════════
-        $user = $this->useCase->execute(new CreateUserDTO('John', 'john@example.com'));
-
-        // ═══════════ Assert ═══════════
-        $this->assertSame('John', $user->getName());
-    }
-
-    /** @test */
-    public function naoDeveCriarComEmailExistente(): void
+    public function naoDeveCriarComEmailExistente(): void // AAA; nome revela a regra
     {
         $this->repo->method('emailExists')->willReturn(true);
 
@@ -554,9 +464,9 @@ reprodutíveis.
   versão exata em CI/produção. `composer install` em CI (respeita o lock);
   `composer update` só deliberadamente. **Realidade EOL:** as versões atuais da maioria
   das libs exigem PHP 8 — o 7.4 vive de majors antigas (ex.: Symfony 5.4 LTS,
-  Laravel 8, PHPUnit 9). ⚠️ CONFIRMAR: essas majors ainda recebem correção de
-  **segurança** hoje? A maioria das LTS 7.4-compatíveis já encerrou o suporte — cada
-  dependência congelada é um item no inventário de risco do projeto.
+  Laravel 8, PHPUnit 9). ⚠️ não confirmado: a maioria dessas majors já encerrou o
+  suporte de segurança — cada dependência congelada é um item no inventário de risco
+  do projeto.
 - **Auditar vulnerabilidade conhecida:** `composer audit` no pipeline — o comando
   existe desde o **Composer 2.4** (que roda em 7.4, então é viável neste alvo).
   Ele consulta a **Packagist Security Advisories API**, que agrega o **GitHub Advisory
@@ -565,7 +475,7 @@ reprodutíveis.
   Alternativas quando o Composer do ambiente for < 2.4: o binário standalone
   `local-php-security-checker` (não depende do PHP do projeto) ou o pacote
   `roave/security-advisories` (`dev-latest` — bloqueia a **instalação** de versão
-  vulnerável via conflito). ⚠️ CONFIRMAR: `roave/security-advisories` instalável sob
+  vulnerável via conflito). ⚠️ não confirmado: `roave/security-advisories` instalável sob
   plataforma 7.4 sem conflitar com todo o lock congelado.
 - **Higiene:** `composer outdated` para atrasos; evite pacote **abandonado** (o
   Packagist marca `abandoned`) e confira **licença** compatível antes de adicionar.
@@ -594,8 +504,7 @@ mesmo que o código fique correto.
 - **Funções 8.x que fazem falta** (`str_contains`, `str_starts_with`, `str_ends_with`)
   → **`symfony/polyfill-php80`**, não um helper caseiro por dev — o polyfill é a fonte
   única e desaparece sozinho no upgrade para 8.x (duplo ganho: Art. 3 hoje, migração
-  amanhã). ⚠️ CONFIRMAR: `symfony/polyfill-php80` instalável sob PHP 7.4 (é o propósito
-  do pacote, mas confirmar a constraint).
+  amanhã). ⚠️ não confirmado: constraint de instalação do polyfill sob PHP 7.4.
 - **Prefira a stdlib e o framework** antes de rolar o seu: `filter_var`, `array_*`,
   `password_hash`, `DateTimeImmutable`, o QueryBuilder/HTTP client do framework.
 
@@ -603,31 +512,14 @@ mesmo que o código fique correto.
 **um guard determinístico** (teste de arquitetura) que **reprova** a reimplementação de
 um conversor canônico transforma "lembre de reusar" em falha de build.
 
-**Régua (Art. 3):** a mudança não introduz um **segundo caminho** para algo que já
-existia; quando o conceito se repetiu, ele foi **extraído**, não copiado.
+**Régua:** Charter Art. 3 (sem segundo caminho; conceito repetido → extraído).
 
 ---
 
 ## 10. Performance & armadilhas → Charter Art. 8
 
-O custo patológico mais comum em backend PHP é o **round-trip de banco em laço** (N+1):
-
-```php
-// ❌ N+1 — uma query POR item
-foreach ($this->orderRepo->findAll() as $order) {
-    $customer = $this->customerRepo->findById($order->getCustomerId());
-}
-
-// ✅ uma query com JOIN, no repositório PDO
-$stmt = $pdo->prepare(
-    'SELECT o.id, o.total, c.name AS customer_name
-       FROM orders o JOIN customers c ON c.id = o.customer_id
-      WHERE o.status = :status'
-);
-$stmt->execute(['status' => 'OPEN']);
-```
-
-Padrões a seguir:
+O custo patológico mais comum em backend PHP é o **round-trip de banco em laço** (N+1)
+— a correção é **uma** query com `JOIN` no repositório PDO. Padrões a seguir:
 
 - **`SELECT` só das colunas usadas** pelo `hydrate()` — nunca `SELECT *`.
 - **Paginação** (`LIMIT`/`OFFSET`) em toda listagem de tamanho variável; **índice** nas
@@ -642,12 +534,12 @@ Padrões a seguir:
   deploy do preload script.
 
 **Ferramenta de medição idiomática:** `EXPLAIN` no banco **real** (não no SQLite de
-teste) para plano de query; **Xdebug profiler** ou **SPX** para CPU/memória do PHP.
-⚠️ CONFIRMAR: última série do Xdebug com suporte a PHP 7.4 (3.1.x — as séries seguintes
-exigem PHP 8); Blackfire ainda oferece agente compatível com 7.4?
+teste) para plano de query; **Xdebug profiler** ou **SPX** para CPU/memória do PHP —
+a última série do Xdebug com suporte a 7.4 é a **3.1.x** (as seguintes exigem PHP 8;
+⚠️ não confirmado).
 
-**Régua (Art. 8):** não há query/round-trip dentro de laço sobre dados de tamanho
-variável; otimização não óbvia **cita a medição** que a justifica — nunca palpite.
+**Régua:** Charter Art. 8 (sem query em laço sobre volume variável; otimização não
+óbvia cita a medição).
 
 **Armadilha comum:** `fetchAll()` num resultado grande e depois iterar — dobra o pico
 de memória à toa; o `fetch()` em cursor faz o mesmo trabalho com pegada constante.
@@ -730,7 +622,5 @@ Exemplo de ficha correspondente:
 }
 ```
 
-**Por quê:** sem estes comandos declarados, o gate não sabe o que rodar — a régua do
-charter (prova externa e falsificável) fica sem executor. E num alvo EOL, o analisador
-estático configurado com `phpVersion: 70400` é também o guard que **reprova sintaxe
-8.x** antes de ela virar parse error em produção.
+Num alvo EOL, o analisador estático configurado com `phpVersion: 70400` é também o
+guard que **reprova sintaxe 8.x** antes de ela virar parse error em produção.

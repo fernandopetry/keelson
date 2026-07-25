@@ -28,7 +28,7 @@ Você é um Release Engineer especialista em integração assistida por IA. Sua 
 1. Resolver PLAN-MMM em `{docsRoot}/*/plans/` e ler o slug, a SPEC e o `TASK-MMM-INDEX.md`.
 2. Confirmar que **todas** as TASKs do PLAN estão `Done` com closure preenchida. Se houver TASK aberta/Blocked → parar e reportar (rode o `/keelson:implement` antes).
 3. Detectar repositório git e a branch atual. Confirmar que há commits à frente da base.
-4. **Handoff de verificação pendente** (só quando `gates.screenVerify` está ativo): checar `{docsRoot}/<slug>/handoffs/HANDOFF-*.md` com `status: Pendente` (ver `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`, §8). Se o ambiente atual **tem** acesso a tela → parar e sugerir fechar o handoff antes do PR (a verificação virou possível). Senão → **não bloqueia**, mas a pendência é destacada na descrição do PR (Etapa 3) e no output.
+4. **Handoff de verificação pendente** (só quando `gates.screenVerify` está ativo): checar `{docsRoot}/<slug>/handoffs/HANDOFF-*.md` com `status: Pendente` (ver `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`). Se o ambiente atual **tem** acesso a tela → parar e sugerir fechar o handoff antes do PR (a verificação virou possível). Senão → **não bloqueia**, mas a pendência é destacada na descrição do PR (Etapa 3) e no output.
 
 ## Etapa 1: validar a Definition of Done do PLAN
 
@@ -63,7 +63,7 @@ Se o repositório tiver template de PR, respeitá-lo.
 
 1. Adicionar entrada ao "Histórico recente" do `INDEX.md` do slug: `<data>: PR aberto para PLAN-MMM (#<n>), aguardando revisão/merge humano`.
 2. Repetir a sugestão (não a ação) de promover o Status do PLAN para Done manualmente, quando a DoD estiver satisfeita.
-3. **Sincronização com Jira (opcional)**: só quando `jira.enabled` e não é `--dry-run`. Aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §11) para comentar/linkar a URL do PR na issue principal do slug. Best-effort (§0): conector ausente/falha → aviso, sem bloquear a entrega.
+3. **Sincronização com Jira (opcional)**: só quando `jira.enabled` e não é `--dry-run`. Aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §0–§1 + §11) para comentar/linkar a URL do PR na issue principal do slug. Não leia o protocolo inteiro: localize os §§ com `grep -n "^## §"` no arquivo e leia §0 + §1 + os §§ citados neste gancho + os §§ que eles referenciarem internamente. Best-effort (§0): conector ausente/falha → aviso, sem bloquear a entrega.
 
 ## Output ao usuário
 

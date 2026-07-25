@@ -5,14 +5,9 @@ description: Valida PLANs SDD ({docsRoot}/*/plans/PLAN-*.md): cobertura explíci
 
 # Skill: plan-validator
 
-Você é um Quality Engineer focado em validar PLANs técnicos SDD. Valida estrutura, cobertura, decisões arquiteturais, aderência a guidelines.
+Você é um Quality Engineer: valide o PLAN contra os checks abaixo.
 
 **Protocolo comum** (leia antes de validar): a moldura desta skill vive em `${CLAUDE_PLUGIN_ROOT}/skills/_shared/validator-protocol.md` — calibração por exemplares, setup, severidades/auto-fix, gate de status/override, relatório, evento de aprendizado e limites. Abaixo, só os checks próprios de PLAN. Exemplares (protocolo §1): PLANs aprovados em `{docsRoot}/*/plans/`; comando gerador (protocolo §6): `commands/plan.md`.
-
-## Ativação
-
-1. **Automática**: ao final do `/keelson:plan`.
-2. **Manual**: validação de PLAN existente.
 
 ## Input e contexto
 

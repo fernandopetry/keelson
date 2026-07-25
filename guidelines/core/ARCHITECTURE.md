@@ -37,19 +37,9 @@ externo é sempre uma camada dedicada, atrás de uma abstração.
 
 ## SOLID (limites em cinco princípios)
 
-- **S — Responsabilidade única:** cada unidade tem **um** motivo para mudar. Se você
-  descreve o que ela faz usando "e", provavelmente são duas unidades.
-- **O — Aberto/fechado:** estenda comportamento por composição/novos tipos, não editando
-  o núcleo estável a cada variação.
-- **L — Substituição de Liskov:** um subtipo tem de honrar o contrato do supertipo — sem
-  enfraquecer garantias nem surpreender quem depende da abstração.
-- **I — Segregação de interface:** prefira contratos pequenos e focados a uma interface
-  gorda que obriga o cliente a depender do que não usa.
-- **D — Inversão de dependência:** dependa de **abstrações**, não de implementações
-  concretas; o domínio define a porta, a infraestrutura a implementa.
-
-O fio comum: cada princípio empurra a mudança para ser **local e barata de raciocinar** —
-é a mesma meta do Art. 4.
+Os cinco princípios SOLID se aplicam (conhecimento canônico — sem redefinição aqui). O
+fio comum: cada um empurra a mudança para ser **local e barata de raciocinar** — a mesma
+meta do Art. 4.
 
 ---
 
@@ -103,8 +93,7 @@ implícito" acima, com nome próprio); herança para reuso de código (prefira c
 camada ou abstração genérica "para o futuro" (viola o Art. 4).
 
 *Resiliência distribuída* (circuit breaker, retry + idempotência, saga, outbox) é domínio
-de `guidelines/project/` e de DECs enquanto não houver stack distribuída com perfil —
-quando houver, nasce `core/RESILIENCE.md`.
+de `guidelines/project/` e de DECs.
 
 ---
 
@@ -114,7 +103,3 @@ Antes de nomear um tipo, arquivo, tabela ou coluna, **leia 2–3 vizinhos do mes
 cluster** e copie o estilo. A pergunta nunca é "que nome eu prefiro?", é "como os
 vizinhos se chamam?". Convenção consistente é o que faz código novo **ler como** o código
 existente (Charter Art. 5).
-
-As convenções **concretas** (casing, prefixos de namespace, sufixos com semântica fixa,
-nomes de arquivo por papel) são específicas da linguagem e do projeto — vivem no perfil de
-linguagem e em `guidelines/project/`, não aqui.

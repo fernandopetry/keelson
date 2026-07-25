@@ -89,8 +89,8 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | Command | What it does |
 |---------|--------------|
 | `/keelson:auto` | The default: full cycle end-to-end — critical questions once at kickoff, then no per-step approval |
-| `/keelson:guided` | Opt-in paused cycle — checkpoints at SPEC and PLAN for your OK |
-| `/keelson:refine` | Polish a raw idea into a refined prompt before it becomes a demand |
+| `/keelson:guided` † | Opt-in paused cycle — checkpoints at SPEC and PLAN for your OK |
+| `/keelson:refine` † | Polish a raw idea into a refined prompt before it becomes a demand |
 | `/keelson:triage` | Triage a new demand — routes to SPEC, PLAN, TASK or direct action (classifies, doesn't execute) |
 
 **Support:**
@@ -100,11 +100,14 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:init` | Interactive setup — detects the stack, writes the ficha and the `CLAUDE.md` block |
 | `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
 | `/keelson:jira-sync` | Reconcile a slug with Jira via the Atlassian MCP connector — idempotent, best-effort (optional) |
-| `/keelson:audit` | On-demand dependency audit against known vulnerabilities (CVE/NVD); `full` adds hygiene (outdated, abandoned, licenses) |
+| `/keelson:audit` † | On-demand dependency audit against known vulnerabilities (CVE/NVD); `full` adds hygiene (outdated, abandoned, licenses) |
 | `/keelson:status` | Executive summary of a slug's current state — what's done, in flight, planned |
 | `/keelson:migrate-legacy` | Migrate a legacy slug (docs without `INDEX.md`) to the SDD layout |
 | `/keelson:rebuild-index` | Rebuild a slug's `INDEX.md` from scratch out of its artifacts |
-| `/keelson:verify-handoff` | Close a pending screen-verification handoff produced in an environment without display |
+| `/keelson:verify-handoff` † | Close a pending screen-verification `HANDOFF` — consolidates the branch, exercises each item in the real environment; no merge (points to `/keelson:integrate`) |
+
+† Human-only (`disable-model-invocation`): never triggered by the model — you invoke
+it by typing the slash command.
 
 ## How customization works
 
@@ -180,27 +183,31 @@ Governance: decisions 4.22, 4.27 and 4.28 in `docs/_meta/decisions.md`.
 keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
 ├── agents/            # subagents: implementer, reviewers, profile-writer…
-├── skills/            # spec / plan / task validators + state + screen-verify
+├── skills/            # spec / plan / task validators + status + screen-verify
 ├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard
 ├── guidelines/
 │   ├── _meta/         # QUALITY-CHARTER.md · PROFILE-OUTLINE.md
 │   ├── core/          # language-agnostic doctrine (always active)
-│   ├── backend/       # php.md (8.5 exemplar) · php-{5.6,7.0,7.4,8.0}.md (legacy ladder) · none.md
+│   ├── backend/       # php.md (8.5 exemplar) · php-{5.6,7.0,7.4,8.0}.md (legacy ladder) · none.md · _review/ (human-review backlogs)
 │   └── frontend/      # none.md (others generated on install)
 ├── templates/         # keelson.config.example.json · keelson.local.example.json · CLAUDE block
-└── docs/_meta/        # method guide, decisions, learning log
+└── docs/_meta/        # method guide · conventions/ (runtime contracts: SDD, INDEX, handoff, teams) · decisions · learning log
 ```
 
 ## Status
 
-`0.16.0` — early. The engine and the PHP reference profile are the stable core; the
-legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending drafts, and the
-profile generator and non-PHP profiles are evolving. The optional Jira integration
+`0.17.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
+drafts, and the profile generator and non-PHP profiles are evolving. New in this
+release: an instruction-compression pass across the plugin — runtime contracts
+extracted from the method guide into `docs/_meta/conventions/`, single-owner rules
+referenced by pointers instead of copies, and slimmer always-loaded descriptions
+(agents now capped at 350 chars by `desc-guard`). The optional Jira integration
 (via the Atlassian MCP connector), multi-realm screen verification, the optional
 feature layer (`FEAT-*`, the QA unit with 3-level Jira projection) and the
 delivery-time gate evidence checks (independent security verdict required before
-push, plus the `worktree-guard` hook) are new. Feedback and profile contributions
-welcome.
+push, plus the `worktree-guard` hook) remain recent. Feedback and profile
+contributions welcome.
 
 ## Author & license
 

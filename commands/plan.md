@@ -7,24 +7,16 @@ argument-hint: <SPEC-NNN ou caminho> [--covers=FR-NNN-XXX,...] [--slice="descri�
 
 Você é um Staff Engineer especialista em arquitetura de software e em desenvolvimento assistido por IA. Sua função é transformar uma SPEC aprovada em um PLAN técnico executável.
 
-**Princípio inviolável 1**: o PLAN respeita a stack, os padrões e as decisões irreversíveis declarados na **ficha** (`keelson.config.json`), no perfil de linguagem ativo e no `INDEX.md` do slug.
-
-**Princípio inviolável 2**: ao final, o `INDEX.md` do slug é atualizado automaticamente.
-
-## Input
-
-```
-/keelson:plan <SPEC-NNN ou caminho> [--covers=FR-NNN-XXX,FR-NNN-YYY] [--slice="descrição"]
-```
+**Princípio inviolável**: o PLAN respeita a stack, os padrões e as decisões irreversíveis declarados na **ficha** (`keelson.config.json`), no perfil de linguagem ativo e no `INDEX.md` do slug.
 
 ## Etapa 0: resolver SPEC, guidelines e localização
 
 ### 0.1 Carregar guidelines e memo
 
-1. Ler a **ficha** (`keelson.config.json`): `profile` (backend/frontend), `codePaths`, comandos de qualidade, `gates`, `docsRoot`.
-2. Carregar a doutrina e o **perfil de linguagem ativo** (resolução e avisos: convenção comum — method-guide §3.0, `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`). Em mudança sensível, some a seção de segurança do perfil e o `QUALITY-CHARTER` (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/`); em datasets/queries pesadas, a seção de performance do perfil.
+1. Ler a **ficha** (`keelson.config.json`) — convenção comum (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`).
+2. Carregar o **perfil de linguagem ativo** (doutrina `core/*`: vale sempre, carga conforme o mapa da convenção comum — sdd-conventions.md; resolução e avisos do perfil: mesma convenção). Em mudança sensível, some a seção de segurança do perfil e o `QUALITY-CHARTER` (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/`); em datasets/queries pesadas, a seção de performance do perfil.
 3. Extrair pontos críticos: stack autorizado, padrões arquiteturais, decisões irreversíveis globais, padrões de teste, anti-padrões.
-4. **Memo de exploração**: se existe, use-o como mapa do domínio (convenção comum — method-guide §3.0).
+4. **Memo de exploração**: se existe, use-o como mapa do domínio (convenção comum — sdd-conventions.md).
 
 ### 0.2 Resolver SPEC alvo
 
@@ -72,14 +64,7 @@ registrada no PLAN.
 
 ## Etapa 3: validação contra guidelines
 
-Antes de gerar o PLAN, verificar:
-
-1. **Stack proposto autorizado** pela ficha e pelo perfil de linguagem ativo.
-2. **Decisões irreversíveis** (perfil/`guidelines/core/` ou INDEX.md): se tocadas, parar e reportar.
-3. **Padrão arquitetural respeitado**.
-4. **Padrão de teste respeitado**.
-
-Conflito irresolvível: parar antes de escrever.
+Antes de gerar o PLAN: **stack proposto autorizado** pela ficha e pelo perfil de linguagem ativo; **decisões irreversíveis** (perfil/`guidelines/core/` ou INDEX.md) tocadas → parar e reportar. Conflito irresolvível: parar antes de escrever.
 
 ## Etapa 4: princípios obrigatórios
 
@@ -190,9 +175,9 @@ Após gerar o PLAN, invocar a skill `plan-validator` no arquivo.
 
 ## Etapa 7: atualização do INDEX.md
 
-Aplicar a **receita de atualização do INDEX** (method-guide §6). Específicos desta etapa:
+Aplicar a **receita de atualização do INDEX** (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`). Específicos desta etapa:
 
-1. **Linha nova na tabela "PLANs"** no formato canônico do contrato (method-guide §6 — não redefina header nem célula): `| PLAN-MMM | SPEC-NNN | <FRs cobertos resumidos> | 0/? ⏸ | Draft |`. (INDEX antigo sem tabela na seção → criar antes o header canônico de 5 colunas.)
+1. **Linha nova na tabela "PLANs"** no formato canônico do contrato (index-contract.md — não redefina header nem célula), com Tasks `0/? ⏸` e Status `Draft`. (INDEX antigo sem tabela na seção → criar antes o header canônico de 5 colunas.)
 2. **Mover capacidade entre seções**: PLAN cobre 100% dos FRs da SPEC → **remover** a entrada de "Especificadas, ainda não planejadas"; cobertura parcial → manter, reduzindo o escopo descrito. Adicionar entrada em "Em desenvolvimento" com a capacidade que este PLAN entrega.
 3. **Adicionar DEC com `Irreversível: sim`** ao bloco "Decisões irreversíveis" e **TRISK altos** à tabela "Riscos ativos".
 

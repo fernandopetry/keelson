@@ -4,11 +4,10 @@
 > `frontend/<lang>.md`). Cada seção existe para **instanciar** um ou mais artigos do
 > `QUALITY-CHARTER.md` na linguagem-alvo.
 >
-> Serve a três leitores:
+> Serve a dois leitores:
 > 1. **o gerador** (`profile-writer`): percorre estas seções ao escrever um perfil
 >    novo — assim um perfil de Node cobre o mesmo que o de PHP (paridade);
-> 2. **o revisor humano**: confere seção a seção que nada ficou de fora;
-> 3. **o agente de implementação**: sabe onde achar a regra concreta da stack.
+> 2. **o revisor humano**: confere seção a seção que nada ficou de fora.
 >
 > Um perfil **DEVE** conter todas as seções marcadas `[obrigatória]`. Seção sem
 > conteúdo aplicável **DEVE** dizer explicitamente "não se aplica a esta stack porque…"
@@ -41,9 +40,7 @@ Responde: *qual versão exata é o alvo, e o que muda em relação a versões vi
 - features da versão que se **DEVE** preferir; features de versões futuras que **NÃO**
   existem aqui; construções de versões antigas que **NÃO DEVEM** mais ser usadas.
 
-**Por que versão é seção de primeira classe:** o mesmo `lang` em versões diferentes é
-quase outra linguagem (recursos, sintaxe, runner de teste, libs padrão). É esta seção
-que o `/keelson:init` regenera quando detecta uma versão sem exemplar.
+É esta seção que o `/keelson:init` regenera quando detecta uma versão sem exemplar.
 
 ## 2. Estilo, formatação & lint `[obrigatória]`  → Charter Art. 5, 7
 
@@ -98,7 +95,10 @@ Cobrir, no mínimo:
   guardar token, expiração.
 
 > ⚠️ Perfil gerado por IA para linguagem que o autor não domina: cada afirmação de
-> segurança **DEVE** vir marcada `⚠️ CONFIRMAR:` para dirigir a revisão humana.
+> segurança não verificada **DEVE** carregar a tag inline `⚠️ não confirmado`; o roteiro
+> de conferência dirigido ao revisor humano (o que confirmar, onde) mora no arquivo
+> companheiro `_review/<lang>-<versão>.md` ao lado do perfil (ex.:
+> `guidelines/backend/_review/php-7.4.md`), não no corpo do perfil.
 
 ## 7. Testes `[obrigatória]`  → Charter Art. 1, 9
 

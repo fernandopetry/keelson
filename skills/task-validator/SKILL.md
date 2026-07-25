@@ -5,14 +5,9 @@ description: Valida TASKs SDD ({docsRoot}/*/tasks/TASK-*.md): vínculo ao PLAN, 
 
 # Skill: task-validator
 
-Você é um Quality Engineer focado em validar TASKs SDD. Valida vinculação, cobertura, atomicidade e prontidão para execução pelo `/keelson:implement`.
+Você é um Quality Engineer: valide a TASK contra os checks abaixo.
 
 **Protocolo comum** (leia antes de validar): a moldura desta skill vive em `${CLAUDE_PLUGIN_ROOT}/skills/_shared/validator-protocol.md` — calibração por exemplares, setup, severidades/auto-fix, gate de status/override, relatório, evento de aprendizado e limites. Abaixo, só os checks próprios de TASK. Exemplares (protocolo §1): TASKs **Done** de PLANs mergeados em `{docsRoot}/*/tasks/`; comando gerador (protocolo §6): `commands/tasks.md`.
-
-## Ativação
-
-1. **Automática**: ao final do `/keelson:tasks`.
-2. **Manual**: revisão de TASKs existentes.
 
 ## Input e contexto
 

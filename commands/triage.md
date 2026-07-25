@@ -25,17 +25,11 @@ A descrição pode ser uma frase ("mude o filtro de data para aceitar intervalo"
    - Procurar termos de domínio que apareçam em INDEX.md de algum slug.
 3. Se não conseguir inferir, perguntar: "Qual slug é afetado? <listar slugs existentes em {docsRoot}/>".
 
-A resolução de slug segue a regra canônica (Etapa 0.2 do `/keelson:specify`): faceta de um domínio que já tem pasta **pertence a esse slug**; slug novo só quando nenhum existente cobre o domínio; legado **primeiro migra** (`/keelson:migrate-legacy`), nunca ganha slug paralelo.
+A resolução de slug segue a regra canônica (Etapa 0.2 do `/keelson:specify`): faceta de domínio que já tem pasta **pertence a esse slug**; legado primeiro migra (`/keelson:migrate-legacy`).
 
 ## Etapa 1: carregar contexto
 
-1. Ler `{docsRoot}/<slug>/INDEX.md`:
-   - Capacidades implementadas
-   - Capacidades em desenvolvimento
-   - Capacidades especificadas, ainda não planejadas
-   - SPECs e PLANs existentes
-   - Decisões irreversíveis do slug
-   - Riscos ativos
+1. Ler `{docsRoot}/<slug>/INDEX.md` inteiro — capacidades (por estado), SPECs/PLANs, decisões irreversíveis e riscos ativos.
 
 2. Ler a ficha (`keelson.config.json`) e os guidelines ativos (Charter em `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/` + perfil de linguagem resolvido por `profile.<role>.file` da ficha).
 
@@ -67,7 +61,7 @@ Fazer até **3 perguntas** focadas para classificar a demanda. Adapte ao context
 
 ## Etapa 3: classificar e decidir o roteamento
 
-Classifique numa das categorias abaixo e componha você mesmo a mensagem de roteamento — classificação + motivo + comando pronto (com descrição/parâmetros sugeridos) + pedido de confirmação:
+Classifique numa das categorias abaixo e componha você mesmo a mensagem de roteamento — classificação + motivo + comando pronto (com descrição/parâmetros sugeridos) + pedido de confirmação. A tabela abaixo é a **dona única** do roteamento (o method-guide apenas a resume):
 
 | Categoria | Critérios | Roteamento proposto |
 |---|---|---|

@@ -1,14 +1,15 @@
 ---
 description: Fecha o gate screenVerify de uma branch cuja entrega ficou com HANDOFF pendente — consolida a branch na mesa principal, exercita cada item no ambiente real e fecha o handoff. NÃO faz merge; aponta para /keelson:integrate.
+disable-model-invocation: true
 ---
 
 # /keelson:verify-handoff
 
-Você é o executor da **verificação de tela remota** (gate `screenVerify`) do projeto. Quando uma entrega é feita num ambiente **sem tela** (worktree/nuvem, onde a app não sobe), esse gate fica pendente e a entrega gera um `{docsRoot}/<slug>/handoffs/HANDOFF-*.md` com o roteiro do que precisa ser conferido. Este comando é quem **fecha** esse roteiro: roda na **mesa principal** (onde a app efetivamente sobe), exercita cada item de verdade, corrige o que divergir e marca o handoff como concluído. `docsRoot` e o gate `screenVerify` vêm de `keelson.config.json`.
+Você é o executor da **verificação de tela remota** (gate `screenVerify`): fecha os `{docsRoot}/<slug>/handoffs/HANDOFF-*.md` deixados `Pendente` por uma entrega feita em ambiente sem tela — roda na **mesa principal** (onde a app efetivamente sobe), exercita cada item de verdade, corrige o que divergir e marca o handoff como concluído. `docsRoot` e o gate `screenVerify` vêm de `keelson.config.json`; o mecanismo do handoff (ciclo de vida, template) vive em `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`.
 
 **Princípio de fronteira**: a verificação de tela só acontece onde a app roda de verdade — a **mesa principal** (`<root>`, o working tree que o ambiente do projeto monta), não um worktree linkado. Por isso este comando **consolida a branch no `<root>`** antes de testar.
 
-**Princípio de autoridade**: este comando fecha o gate e **para**. Ele **não** faz merge nem deploy — o merge continua sendo decisão humana. Só roda por decisão humana: invocação direta, ou **encadeado pelo `/keelson:integrate`** quando este encontra handoff `Pendente` no pré-check (a invocação humana da integração é a autorização — quem pede a integração pede o gate fechado). Nenhum outro fluxo o chama.
+**Princípio de autoridade**: este comando fecha o gate e **para**. Ele **não** faz merge nem deploy — o merge continua sendo decisão humana. Só roda por decisão humana: invocação direta, ou **encadeado pelo `/keelson:integrate`** quando este encontra handoff `Pendente` no pré-check. Nenhum outro fluxo o chama.
 
 ## Input
 
@@ -26,8 +27,8 @@ Você é o executor da **verificação de tela remota** (gate `screenVerify`) do
 
 1. **Mesa principal**: `<root>` = primeira linha de `git worktree list`. Todos os comandos git rodam com `git -C <root>`. Este comando **precisa** operar sobre o `<root>` porque é o que o ambiente da app monta. Se a sessão atual roda dentro de um worktree linkado, opere via `git -C <root>` — mas avise que a **verificação exige o ambiente do `<root>`**.
 2. **`<root>` livre para receber a branch**: `git -C <root> status --porcelain`. Como vamos **trocar a branch do `<root>`**, ele precisa estar **limpo e sem trabalho de outra sessão**:
-   - Sujeira de código (staged/modificado/untracked sob os `codePaths` da ficha) → **parar** e pedir commit/stash (laboratório único: não dá para testar duas coisas ao mesmo tempo). Sujeira só de descartáveis (scratch, notas locais) → apontar e perguntar.
-   - `<root>` numa branch de trabalho (não a base, ex.: `main`) de outra sessão paralela → **parar** e pedir que guardem/pausem aquele trabalho antes (trocar a branch do `<root>` interromperia a outra sessão).
+   - Sujeira de código (staged/modificado/untracked sob os `codePaths` da ficha) → **parar** e pedir commit/stash (laboratório único). Sujeira só de descartáveis (scratch, notas locais) → apontar e perguntar.
+   - `<root>` numa branch de trabalho (não a base, ex.: `main`) de outra sessão paralela → **parar** e pedir que guardem/pausem aquele trabalho antes.
 3. **Base atualizada** (para as correções que possam surgir): `git -C <root> fetch origin`; se a base (`main`) está atrás → `git -C <root> pull --ff-only origin main`; divergida → relatar (não bloqueia, mas registre).
 4. **Resolver o alvo**:
    - **Com `[slug|branch]`**: localizar a branch e os `{docsRoot}/<slug>/handoffs/HANDOFF-*.md` com `status: Pendente`. Slug → a branch que carrega o trabalho (via `git worktree list`/`git branch`); branch → o slug sai do handoff que ela contém.
@@ -67,10 +68,8 @@ Para cada `HANDOFF-*.md` pendente do alvo:
 
 ## Etapa 4: fechar o handoff (só com todos os itens ✅)
 
-1. Front-matter do(s) handoff → `status: Concluído`.
-2. **INDEX do slug**: remover o risco ativo `Verificação de tela pendente — HANDOFF-<id>` e adicionar linha ao `## Histórico recente` (`<data>: gate screenVerify fechado via /keelson:verify-handoff — HANDOFF-<id>`). Se houve correções, refletir o estado.
-3. Commit no `<root>`: `chore(<slug>): close verification handoff HANDOFF-<id>` (as correções da Etapa 3 já vão em commits `fix(...)` próprios). `git -C <root> push`.
-4. **Parar aqui.** Não mergear.
+1. Siga o **protocolo de conclusão do próprio handoff** (seção "6. Protocolo de conclusão" de cada HANDOFF — dono do formato: template §8.2 do `handoff-protocol.md`): status, INDEX (risco + Histórico), commit e push no `<root>`. As correções da Etapa 3 já foram em commits `fix(...)` próprios; se houve, reflita o estado no INDEX.
+2. **Parar aqui.** Não mergear.
 
 ## Etapa 5: devolver o `<root>` e reportar
 

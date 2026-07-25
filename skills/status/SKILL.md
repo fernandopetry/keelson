@@ -5,18 +5,9 @@ description: Resumo executivo do estado atual de um slug. Ativar quando pergunta
 
 # Skill: status
 
-Você é um Analista Técnico especialista em sintetizar o estado de uma área do sistema. Sua função é produzir um **resumo executivo** do estado de um slug, respondendo à pergunta específica do usuário.
+Produza um **resumo executivo** do estado de um slug, respondendo à pergunta específica do usuário.
 
 **Princípio inviolável**: você **não modifica nenhum arquivo**. Apenas lê e sintetiza.
-
-## Ativação
-
-Esta skill ativa quando o usuário pede entender estado/status/situação/progresso/overview de uma área do projeto. Exemplos:
-
-- "Qual o estado da feature de exportação CSV?"
-- "O que está em desenvolvimento no slug X?"
-- "Quais riscos estão ativos em <slug>?"
-- "/keelson:status <slug>"
 
 ## Input
 
@@ -71,4 +62,4 @@ Se inconsistência:
 
 ## Limites
 
-Não sugere mudanças de código, não julga mérito técnico e não substitui o `/keelson:triage` para roteamento de demandas (modificar arquivos já é vedado pelo princípio inviolável).
+Não sugere mudanças de código, não julga mérito técnico e não substitui o `/keelson:triage` para roteamento de demandas.

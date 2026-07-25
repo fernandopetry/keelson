@@ -553,6 +553,26 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.35 — Compressão de instruções e modelo de carga
+
+**Problema**: auditoria de 14 agentes (modelo de carga por fluxo + varredura cruzada de duplicação + verificação adversarial das propostas) mediu o custo real das instruções: a main session do `/keelson:auto` paga ~166–233k chars de material do plugin antes de qualquer artefato SDD, e um PLAN de 6 tasks re-paga ~932k chars de doutrina nos spawns. Os maiores ofensores não eram regra ruim, e sim **modelo de carga**: o method-guide (35k) lido integral para usar §3.0/§6/§8 (~16k); o perfil de linguagem integral (38–41k) relido em cada spawn de implementer/reviewer quando §6/§8/§10/§12 só valem sob gatilho; a frase blanket "doutrina core/* está sempre ativa" induzindo ~40k de carga onde o fluxo usa ~2,5k; e consumidores re-narrando donos (jira-sync-protocol, sondagem §8.1, validator-protocol).
+
+**Decisão**:
+- **Donos de runtime saem do method-guide para `docs/_meta/conventions/`**: `sdd-conventions.md` (ex-§3.0), `index-contract.md` (ex-§6), `handoff-protocol.md` (ex-§8, com §8.1/§8.2/§8.3) e `agent-teams.md` (modo teams do implement). O method-guide segue guia humano, com os headings §3.0/§6/§8 preservados como ponteiros de 1 linha (numeração do contrato dos 4 lugares intacta); comandos e hooks apontam para os arquivos novos via `${CLAUDE_PLUGIN_ROOT}`.
+- **Jira em dois níveis**: `jira-sync-protocol.md` segue dono único do core; a camada FEAT (§6.1 + variantes do §7/§9) vira `skills/_shared/jira-sync-feat.md`, carregada só com o 3º nível ativo. Ganchos dos comandos ganham lista de leitura transitiva por § e leitura parcial via `grep -n "^## §"`; o `/keelson:jira-sync` continua lendo o arquivo inteiro (reconciliação §12).
+- **Validade ≠ carga no core/***: a doutrina core **vale sempre** (aderência é gate), mas a **carga** segue mapa explícito por consumidor (dono: `sdd-conventions.md`); `PERFORMANCE.md` ganha gatilho nomeado (consulta, laço sobre volume variável, renderização pesada).
+- **Leitura do perfil por seção nos spawns**: implementer/reviewer leem §§1–5, 7, 9 e 11 incondicionais; §6 (área sensível — lista canônica: description do `security-reviewer`), §8 (manifesto/lockfile), §10 (query/dataset pesado) e §12 (quality.* da ficha não basta) sob gatilho; perfil sem espinha 0–12 → ler inteiro. Perfis não são editados.
+- **Perfis gerados**: logística de revisão humana dos marcadores CONFIRMAR migra para companheiros `guidelines/backend/_review/php-<versão>.md`; a afirmação acionável fica inline com tag curto "⚠️ não confirmado".
+- **Charter 0.5.1**: passada de compressão nos "Por quês" redundantes (estilo regra = teste + âncora, §4.32), preservando Réguas e os contraintuitivos dos Arts. 6/7/8; perfis apontam `charter: 0.5.1`.
+- **Higiene**: descriptions de agents com teto 350 no `desc-guard`; `disable-model-invocation` em `/keelson:audit` e `/keelson:verify-handoff`; lista de área sensível do gate 8 com dono único na description do `security-reviewer`; formato canônico de lição com dono em `guidelines/core/WORKFLOW.md`; template de TASK tipo bugfix passa a incluir o AC violado no Realiza.
+- **Rejeitadas** (registro para não relitigar): digest do Charter para spawns (o gate 6 relê o Charter integral de qualquer forma — custo dobraria; a constituição tem dono único) e base+delta dos perfis PHP.
+
+**Custo assumido**: mais arquivos pequenos para navegar (conventions/ + jira-sync-feat + companheiros `_review/`) e disciplina de leitura parcial que depende de obediência — mitigada por ponteiro no ponto de uso e fallback "na dúvida, leia inteiro". Seção de perfil pulada pode esconder anti-padrão da área — observar na 1ª rodada real, como os gates 4/7 do Charter 0.5.0.
+
+**Aplicação**: `docs/_meta/conventions/*` (novos), `docs/_meta/method-guide.md` (§3.0/§6/§8 viram ponteiros; §4 severidades e roteamento da triagem viram resumo + ponteiro ao dono), `CLAUDE.md` (donos únicos), `skills/_shared/jira-sync-feat.md` (novo) + `jira-sync-protocol.md` + ganchos Jira dos comandos, `agents/task-implementer.md`/`task-reviewer.md` (leitura por seção), `guidelines/_meta/QUALITY-CHARTER.md` (0.5.0 → 0.5.1) + frontmatter `charter:` dos perfis, `guidelines/backend/_review/*` (novos), `hooks/desc-guard.sh` e `hooks/wave-guard.sh` (comentário), `commands/audit.md`/`verify-handoff.md` (`disable-model-invocation`), `commands/tasks.md` (template bugfix). Nota de roadmap preservada de `ARCHITECTURE.md`: quando houver doutrina de resiliência (retry/backoff, idempotência, timeout), nasce `core/RESILIENCE.md`.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

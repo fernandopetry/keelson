@@ -9,32 +9,26 @@ Você é um Senior Product Engineer especialista em escrever especificações fu
 
 **Princípio inviolável**: SPEC é agnóstica de tecnologia. Stack, framework e padrão técnico não entram aqui.
 
-**Princípio de visibilidade**: ao final, o `INDEX.md` do slug é atualizado automaticamente. Ele é a fonte única de "estado atual do slug". Humanos não editam o INDEX.
-
-## Input
-
-A pessoa fornecerá descrição em linguagem natural ou referência a arquivo (`@caminho`). Pode incluir flag `--slug=<nome>`.
+**Princípio de visibilidade**: ao final, o `INDEX.md` do slug é atualizado automaticamente.
 
 ## Etapa 0: resolver slug, guidelines e localização
 
 ### 0.1 Carregar guidelines e memo
 
-1. Ler a **ficha** (`keelson.config.json`) na raiz — dela vêm `docsRoot`, o `profile` de linguagem, `codePaths`, os comandos de qualidade e os gates ativos.
+1. Ler a **ficha** (`keelson.config.json`) na raiz — convenção comum (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`).
 2. Ler o `CLAUDE.md` do projeto se existir e extrair apenas o relevante para SPEC: glossário de domínio, convenções de linguagem, anti-padrões de spec.
-3. Ignorar, aqui, tudo que for stack, frameworks e padrões arquiteturais (isso é do PLAN).
-4. **Memo de exploração**: se a demanda exigiu explorar o código/domínio, salve/complemente o memo (convenção comum — method-guide §3.0).
+3. **Memo de exploração**: se a demanda exigiu explorar o código/domínio, salve/complemente o memo (convenção comum — sdd-conventions.md).
 
 ### 0.2 Resolver slug
 
 **Antes de criar qualquer slug novo, verifique se a demanda pertence a um slug já existente — inclusive legado.** Criar um slug paralelo para uma faceta de um domínio que já tem pasta em `{docsRoot}/` é um erro recorrente (ex.: criar `order-refund-window` quando já existe `{docsRoot}/orders/`).
 
-1. **Slug explícito**: se veio `--slug=<nome>` ou a origem é `@{docsRoot}/<slug>/...`, use esse slug — mas **cheque legado antes**: se `{docsRoot}/<slug>/` tem `.md` na raiz e **não** tem `INDEX.md`, pare e rode `/keelson:migrate-legacy <slug>` primeiro (a regra "legado primeiro migra, depois muda" vale também para slug explícito). Sem pendência de legado, vá para o passo 4.
-2. **Procurar slug de domínio existente**: liste as pastas de `{docsRoot}/` e procure um slug cujo domínio cubra a demanda — **inclusive legados** (pasta com `.md` na raiz mas **sem** `INDEX.md`). Há sobreposição quando a demanda incide sobre uma entidade/capacidade já representada por um slug (ex.: a demanda fala de "pedidos" e existe `{docsRoot}/orders/`).
+1. **Slug explícito**: se veio `--slug=<nome>` ou a origem é `@{docsRoot}/<slug>/...`, use esse slug — mas **cheque legado antes**: se `{docsRoot}/<slug>/` tem `.md` na raiz e **não** tem `INDEX.md`, pare e rode `/keelson:migrate-legacy <slug>` primeiro. Sem pendência de legado, vá para o passo 4.
+2. **Procurar slug de domínio existente**: liste as pastas de `{docsRoot}/` e procure um slug cujo domínio cubra a demanda — **inclusive legados** (pasta com `.md` na raiz mas **sem** `INDEX.md`). Há sobreposição quando a demanda incide sobre uma entidade/capacidade já representada por um slug.
 3. **Decidir o slug** — a SPEC entra no slug do domínio, nunca em um paralelo:
    - **Slug de domínio relacionado com `INDEX.md`** → use-o.
    - **Slug de domínio relacionado, porém legado (sem `INDEX.md`)** → **pare e rode `/keelson:migrate-legacy <slug>` primeiro** (regra de ouro: "legado primeiro migra, depois muda"); só então retome esta SPEC nesse slug. **Nunca** crie um slug novo para contornar o legado.
    - **Nenhum slug relacionado (domínio genuinamente novo)** → proponha um slug kebab-case e **confirme com o humano**, apresentando os slugs existentes mais próximos. Um slug próprio só se justifica para um **domínio/capacidade de alto nível distinto**, **não** para uma regra/faceta de um domínio já existente.
-   - **Na dúvida entre reusar e criar novo, pergunte ao humano** — não decida sozinho por slug novo.
 4. Garantir `{docsRoot}/<slug>/specs/`: criar se não existir.
 5. Próximo SPEC-NNN: maior em `specs/` + 1, zero-padded.
 6. Nome do arquivo: `SPEC-NNN-<titulo-kebab>.md`, máximo 5 palavras.
@@ -71,7 +65,7 @@ interromper em último caso).
 ## Etapa 2: princípios obrigatórios
 
 1. **Outcome-first**: comece pelo resultado esperado.
-2. **Ubiquitous Language**: defina termos no glossário, reutilize do INDEX.md e specs anteriores.
+2. **Ubiquitous Language**: defina termos no glossário, reutilize do glossário consolidado do INDEX.md (canônico — Etapa 0.4).
 3. **EARS para FRs**:
    - Ubiquitous: `O <sistema> deve <resposta>.`
    - Event-driven: `Quando <gatilho>, o <sistema> deve <resposta>.`
@@ -80,17 +74,9 @@ interromper em último caso).
    - Unwanted: `Se <gatilho indesejado>, então o <sistema> deve <resposta>.`
 4. **RFC 2119**: MUST, SHOULD, MAY em maiúsculas.
 5. **IDs escopados ao SPEC**: `FR-NNN-001`, `NFR-NNN-001`, `AC-NNN-001`, `RISK-NNN-001`, `FEAT-NNN-001`.
-6. **Funcionalidades (FEAT) — só quando há 2+ fluxos entregáveis**: se a SPEC contém dois ou
-   mais fluxos que o QA testa de ponta a ponta de forma independente (ex.: "login no portal"
-   e "lançamento de horas"), agrupe os FRs da §5 sob headings `### FEAT-NNN-XXX: <nome>` —
-   cada FR pertence a **exatamente uma** FEAT (partição total). Os ACs **não** redeclaram
-   filiação: derivam da FEAT do FR que cobrem. Um fluxo só → **não** declare a camada (a
-   funcionalidade é a própria SPEC e a §5 fica em lista plana).
-7. **Verificabilidade absoluta**.
-8. **Separação rígida o quê vs como**: proibido mencionar tecnologia.
-9. **Suposições explícitas**: `[confirmar]` ou `[assumido]`.
-10. **Escopo e não-escopo simétricos**.
-11. **Aderência à linguagem do projeto**: se o `CLAUDE.md` ou o INDEX declaram convenção de linguagem, seguir.
+6. **Funcionalidades (FEAT)** — só quando há 2+ fluxos entregáveis: regra completa no comentário do template da §5 (Etapa 3).
+7. **Suposições explícitas**: `[confirmar]` ou `[assumido]`.
+8. **Escopo e não-escopo simétricos**.
 
 ## Etapa 3: estrutura obrigatória do arquivo SPEC
 
@@ -118,9 +104,13 @@ interromper em último caso).
 ### 4.2 Out-of-scope
 
 ## 5. Requisitos funcionais (EARS)
-<!-- Com 1 único fluxo entregável, mantenha a lista plana (sem FEAT): -->
+<!-- Com 1 único fluxo entregável, mantenha a lista plana — NÃO declare a camada FEAT
+(a funcionalidade é a própria SPEC): -->
 - **FR-NNN-001** [MUST] ...
-<!-- Com 2+ fluxos entregáveis (unidades de teste do QA), agrupe TODOS os FRs sob headings FEAT:
+<!-- Com 2+ fluxos entregáveis (fluxos que o QA testa de ponta a ponta de forma independente,
+ex.: "login no portal" e "lançamento de horas"), agrupe TODOS os FRs sob headings FEAT —
+cada FR pertence a exatamente UMA FEAT (partição total); os ACs NÃO redeclaram filiação:
+derivam da FEAT do FR que cobrem. Forma:
 ### FEAT-NNN-001: <Nome do fluxo entregável>
 > <1–2 linhas: o fluxo do ponto de vista do QA — o que se testa de ponta a ponta>
 
@@ -157,21 +147,21 @@ Após gerar a SPEC, invocar a skill `spec-validator` no arquivo.
 
 Com a forma validada (errors == 0), invocar o agent `product-critic` na SPEC. Ele **não** checa forma — questiona **mérito**: problema vs solução, qualidade da métrica de sucesso, cenários faltantes, premissas arriscadas, conflito com capacidades/decisões do INDEX.
 
-A crítica **não bloqueia** a criação da SPEC nem a atualização do INDEX (a SPEC nasce em `Draft`). Seu resultado é reportado ao usuário, e a promoção para `Approved` — **decisão de produto, humana** — deve considerar os pontos levantados.
+A crítica **não bloqueia** a criação da SPEC nem a atualização do INDEX (a SPEC nasce em `Draft`); o resultado é reportado ao usuário.
 
 ## Etapa 5: atualização do INDEX.md
 
 ### 5.1 Criar INDEX se não existe
 
-Criar do zero seguindo o **template canônico do INDEX** (method-guide §6 — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`), preenchido com a SPEC recém-criada: linha na tabela "SPECs", capacidade em "Especificadas, ainda não planejadas" (derivada do outcome esperado), glossário e riscos da SPEC, Histórico recente com `SPEC-NNN criada via /keelson:specify`.
+Criar do zero seguindo o **template canônico do INDEX** (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`), preenchido com a SPEC recém-criada: linha na tabela "SPECs", capacidade em "Especificadas, ainda não planejadas" (derivada do outcome esperado), glossário e riscos da SPEC, Histórico recente com `SPEC-NNN criada via /keelson:specify`.
 
 ### 5.2 Atualizar INDEX se já existe
 
-Aplicar a **receita de atualização do INDEX** (method-guide §6). Específicos desta etapa: linha nova na tabela "SPECs"; capacidade nova em "Especificadas, ainda não planejadas" (texto curto do outcome); termos e riscos da SPEC mesclados.
+Aplicar a **receita de atualização do INDEX** (index-contract.md). Específicos desta etapa: linha nova na tabela "SPECs"; capacidade nova em "Especificadas, ainda não planejadas" (texto curto do outcome); termos e riscos da SPEC mesclados.
 
 ### 5.3 Sincronização com Jira (opcional)
 
-Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §6) para **criar** (modo `create`) **ou validar o vínculo** (modo `link`) da issue principal desta SPEC e gravar a key no front-matter `Jira:`. Se a SPEC declara FEATs e `issueType.feature` está preenchido, aplicar também o **§6.1** — criar/vincular a Story de cada FEAT e gravar a key na linha `**Jira**:` sob o heading. Best-effort (§0): conector indisponível/falha → aviso, sem bloquear a criação da SPEC.
+Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`) — ler §0-§6 + §8 + §10, mais `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` quando a SPEC declara FEATs ∧ `issueType.feature` preenchido. Não leia o protocolo inteiro: localize os §§ com `grep -n "^## §"` e leia apenas os listados + os que eles referenciarem internamente. Criar/vincular a issue principal desta SPEC e gravar a key no front-matter `Jira:`; com FEATs sincronizadas, gravar a key de cada Story na linha `**Jira**:` sob o heading da FEAT (best-effort — §0).
 
 ## Output final ao usuário
 

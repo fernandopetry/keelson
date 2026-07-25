@@ -8,24 +8,6 @@
 
 ---
 
-## Princípio: custo proporcional, medido
-
-O custo (tempo, memória, chamadas de I/O) **DEVE** ser proporcional ao trabalho. Padrões
-de custo patológico conhecidos **NÃO DEVEM** ser introduzidos. Otimização além disso
-**DEVE** ser guiada por **medição**, não por palpite — o gargalo real quase nunca é onde a
-intuição aponta, e otimizar no escuro troca legibilidade por nada.
-
-### Níveis de impacto
-
-| Nível | Descrição | Exemplos |
-|-------|-----------|----------|
-| **Crítico** | Timeouts, crashes, OOM | Operação acima do limite aceitável; vazamento de memória |
-| **Alto** | Degradação perceptível | N+1; carregamento lento de tela |
-| **Médio** | Oportunidade de melhoria | Falta de cache; payload grande |
-| **Baixo** | Micro-otimização | Ganhos incrementais |
-
----
-
 ## Backend / acesso a dados
 
 - **Sem N+1:** nunca uma consulta **dentro de um laço** sobre dados de tamanho variável.
@@ -67,16 +49,7 @@ Princípios agnósticos de renderização (o mecanismo idiomático está no perf
 
 ---
 
-## Régua e quick wins
+## Régua
 
 - **Régua (Art. 8):** não há consulta/round-trip dentro de laço sobre dados de tamanho
   variável; qualquer otimização não óbvia **cita a medição** que a justifica.
-
-| Impacto | Esforço | Ação |
-|---------|---------|------|
-| Alto | Baixo | Converter N+1 em uma consulta única |
-| Alto | Baixo | Implementar paginação |
-| Alto | Baixo | Debounce em buscas |
-| Médio | Baixo | Lazy-load de rotas/componentes e imagens |
-| Médio | Médio | Virtualizar listas longas |
-| Alto | Médio | Mover trabalho pesado para filas |

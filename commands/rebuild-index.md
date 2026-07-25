@@ -22,11 +22,7 @@ Você é um Engenheiro de Documentação especialista em reconstruir o estado ca
 
 ## Quando usar
 
-- INDEX.md deletado por engano.
-- INDEX.md corrompido ou em formato inválido.
-- Divergência detectada entre INDEX e arquivos individuais.
-- Múltiplas edições manuais em SPECs/PLANs dessincronizaram.
-- Migrando slug antigo que existia antes da convenção.
+INDEX.md deletado por engano, corrompido, divergente dos arquivos individuais (inclusive por edições manuais), ou slug antigo pré-convenção.
 
 ## Quando NÃO usar
 
@@ -90,7 +86,7 @@ Determinar **status efetivo** com base nas tasks:
 - **Implementado (aguardando confirmação)**: todas Done, mas Status do PLAN não é Done.
 - **Done**: todas Done E Status do PLAN é Done.
 
-O status efetivo posiciona a capacidade na seção "Capacidades". SPEC que declara FEATs (headings `### FEAT-` na §5) → derivar **uma capacidade por FEAT**, posicionada pelo estado real das TASKs que a listam em `Funcionalidade` (lendo os `TASK-MMM-INDEX`); SPEC sem FEATs → uma capacidade por SPEC, como sempre. A coluna `Status` da tabela PLANs usa o Status do **front-matter do PLAN, verbatim** (contrato do INDEX — method-guide, §6); o status efetivo nunca entra nela.
+O status efetivo posiciona a capacidade na seção "Capacidades". SPEC que declara FEATs (headings `### FEAT-` na §5) → derivar **uma capacidade por FEAT**, posicionada pelo estado real das TASKs que a listam em `Funcionalidade` (lendo os `TASK-MMM-INDEX`); SPEC sem FEATs → uma capacidade por SPEC, como sempre. A coluna `Status` da tabela PLANs usa o Status do **front-matter do PLAN, verbatim** (contrato do INDEX — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`); o status efetivo nunca entra nela.
 
 ## Etapa 2: validar consistência
 
@@ -109,7 +105,7 @@ Detectar e listar:
 
 ## Etapa 3: gerar o INDEX
 
-Construir o INDEX seguindo o **template canônico** (method-guide §6 — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/method-guide.md`), com a variação do rebuild descrita lá: linha extra no aviso (`> Última reconstrução completa via /keelson:rebuild-index: <ISO 8601>`) e, se houver, a seção final `## Inconsistências conhecidas` (descrição + ação sugerida).
+Construir o INDEX seguindo o **template canônico** (contrato do INDEX — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`), com a variação do rebuild descrita lá: linha extra no aviso (`> Última reconstrução completa via /keelson:rebuild-index: <ISO 8601>`) e, se houver, a seção final `## Inconsistências conhecidas` (descrição + ação sugerida).
 
 **Slug migrado**: as seções Resumo/Capacidades/Glossário/Decisões/Riscos incorporam os achados do TRIAGE (itens 📜 e `LEGACY-DEC-*`, abrindo com `> Fonte durável: legacy/TRIAGE-<data>.md`), mesclados com o que vier de SPECs/PLANs/TASKs.
 
@@ -153,7 +149,6 @@ Se `--dry-run`:
 ## Próximos passos
 1. Revise o novo INDEX.
 2. Se houver inconsistências, decida tratamento.
-3. Considere remover backup após confirmar: rm thoughts/local/INDEX-<slug>.backup-<timestamp>.md
 ```
 
 ## Limites

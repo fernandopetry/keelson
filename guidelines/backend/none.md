@@ -1,7 +1,7 @@
 ---
 lang: none
 version: null
-charter: 0.5.0
+charter: 0.5.1
 generated-by: exemplar
 reviewed: true
 reviewer: "Fernando Petry"

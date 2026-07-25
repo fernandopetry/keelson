@@ -53,28 +53,9 @@ Para consultar o estado a qualquer momento:
 
 ## 3. Comandos
 
-### 3.0 Convenções comuns (fonte única — os comandos apontam para cá)
+### 3.0 Convenções comuns
 
-Todo comando `/keelson:*` segue estas convenções sem redeclará-las:
-
-- **Ficha primeiro.** Ler `keelson.config.json` na raiz antes de qualquer coisa — dela vêm `docsRoot`, `codePaths`, `profile`, os comandos de qualidade (`quality.*`) e os `gates`. Nunca assumir caminhos ou comandos fixos.
-- **Perfil de linguagem ativo.** Resolvido pelo campo `profile.<role>.file` da ficha: prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/<resto>`; caminho simples → relativo à raiz do projeto; campo ausente → exemplar do plugin com a mesma `lang`, senão `guidelines/project/<role>/`. Perfil com `reviewed: false` no front-matter → avisar que está pendente de revisão humana. A doutrina `${CLAUDE_PLUGIN_ROOT}/guidelines/core/*` está sempre ativa; some as lições do projeto (`guidelines/project/`).
-- **Memo de exploração.** Exploração de código/domínio é salva em `thoughts/local/exploration-<slug>.md` (concisa: caminhos + mecanismo); as etapas seguintes leem o memo em vez de re-explorar e o complementam se faltar detalhe. O memo é snapshot — antes de editar, vale o arquivo real.
-- **Estado de run (guarda anti-parada).** Execução de waves mantém `thoughts/local/run-state-<slug>.md` — formato canônico (uma linha por campo, exatamente estas chaves):
-
-  ```md
-  status: em_andamento
-  slug: <slug>
-  plan: PLAN-MMM
-  waves_concluidas: <X>
-  waves_total: <N>
-  retomada: {docsRoot}/<slug>/INDEX.md + {docsRoot}/<slug>/tasks/TASK-MMM-INDEX.md
-  ```
-
-  O `/keelson:implement` cria antes da primeira wave e atualiza `waves_concluidas` a cada final de wave; a Entrega (Etapa 5 do `/keelson:auto`, ou o output final do implement avulso) encerra/remove. O hook `wave-guard` (Stop) lê este arquivo **fora do contexto do modelo** — imune à sumarização — e bloqueia encerramento de turno enquanto `status: em_andamento` (decisões 4.23/4.24). Parada legítima (Entrega feita, degrau 3 com pergunta já disparada, pedido explícito do humano) muda `status:` para `encerrado — <motivo>` antes de encerrar.
-- **Resolução de slug.** Dona é a Etapa 0.2 do `/keelson:specify`: reusar slug de domínio existente (inclusive legado — que primeiro migra) antes de criar novo; na dúvida, perguntar ao humano.
-- **Merge e deploy são humanos.** Nenhum comando faz merge nem deploy; a promoção de Status (`Draft → Approved → Done`) também é sempre humana.
-- **Falha de gate**: 1 retry; persistiu → escalar ao humano com o diagnóstico.
+Conteúdo canônico: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`.
 
 ### 3.1 `/keelson:specify` — criar SPEC
 
@@ -162,16 +143,7 @@ Quando você não sabe se uma demanda vira SPEC, PLAN ou TASK, este comando clas
 /keelson:triage <descrição em linguagem natural> [--slug=<nome>]
 ```
 
-Roteamento que ele aplica:
-
-| Natureza da demanda | Resultado |
-|---|---|
-| Muda o contrato (FR, AC, escopo novo) | Nova SPEC via `/keelson:specify` |
-| Contrato igual, estratégia técnica nova | Novo PLAN via `/keelson:plan --slice` |
-| Bug (implementação viola um AC) | TASK tipo `bugfix` pré-preenchida |
-| Refactor (comportamento idêntico) | TASK tipo `refactor` pré-preenchida |
-| Trivial (typo, copy, cor) | Direto no código, sem keelson |
-| Slug sem INDEX.md (legado) | Manda rodar `/keelson:migrate-legacy` antes |
+Roteamento em resumo: contrato novo → SPEC; contrato igual com estratégia nova → PLAN `--slice`; bug/refactor → TASK pré-preenchida; trivial → direto no código; slug legado sem INDEX → `/keelson:migrate-legacy` antes. A tabela e os critérios canônicos são do próprio comando: `${CLAUDE_PLUGIN_ROOT}/commands/triage.md`.
 
 **Quando NÃO usar**: se você já sabe o que fazer (vá direto ao comando), para triviais óbvios, ou em emergências.
 
@@ -266,7 +238,7 @@ Rede de segurança da integração opcional com Jira (via **conector MCP Atlassi
 | Gera | Issues, Stories de FEAT (quando a SPEC declara FEATs e `issueType.feature` está preenchido), sub-tasks e tarefas isoladas (`issueType.standalone` — TASK avulsa ou transversal sem primária) no Jira (via conector); grava o campo `Jira:` na SPEC, sob os headings FEAT e nas TASKs |
 | Atualiza | 1 linha no "Histórico recente" do `INDEX.md` (contrato da tabela "PLANs" intocado) |
 | Gate | — (best-effort; `jira.enabled:false` ou conector ausente → não faz nada) |
-| Lógica | Toda no `skills/_shared/jira-sync-protocol.md` — o comando só orquestra |
+| Lógica | Toda no `skills/_shared/jira-sync-protocol.md` (3º nível: `jira-sync-feat.md`) — o comando só orquestra |
 
 Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27 e 4.28 de `decisions.md`.
 
@@ -285,19 +257,7 @@ Skills não geram artefatos novos — validam ou consultam. As três validators 
 
 ### Severidades e gate de status
 
-- **ERROR**: bloqueia. SPEC/PLAN não pode ir para `Approved`; TASK com error vira `Blocked` e o `/keelson:implement` não a executa.
-- **WARNING**: não bloqueia, mas revise.
-- **INFO**: informativo.
-
-Violações triviais (RFC 2119 em minúsculo, zero-padding, acentuação de campo) recebem **auto-fix** sem confirmação. A promoção de Status (`Draft` → `Approved`/`Done`) é sempre **manual**, mesmo com zero errors.
-
-Para passar por cima de um ERROR conscientemente, adicione override no artefato:
-
-```yaml
-override-erros: <IDs>
-override-justificativa: <texto>
-override-aprovador: <nome>
-```
+ERROR bloqueia a promoção (SPEC/PLAN não vai a `Approved`; TASK vira `Blocked`); WARNING não bloqueia; violação trivial recebe auto-fix. A promoção de Status (`Draft` → `Approved`/`Done`) é sempre **manual**, mesmo com zero errors. Override consciente de ERROR: bloco declarado no próprio artefato — formato e regras no dono da moldura, `${CLAUDE_PLUGIN_ROOT}/skills/_shared/validator-protocol.md` (§3–§4).
 
 ### `/keelson:status` — consultar estado
 
@@ -315,135 +275,22 @@ Nunca modifica arquivos. Se detectar divergência entre INDEX e arquivos, sugere
 
 ## 5. Agents (uso interno dos comandos)
 
-Você normalmente não invoca estes diretamente — os comandos os orquestram:
+Você normalmente não invoca estes diretamente — os comandos os orquestram. O papel completo de cada um é a `description` do frontmatter do próprio agent (fonte única):
 
 | Agent | Papel | Invocado por |
 |---|---|---|
-| `task-implementer` | Implementa uma única TASK; não revisa nem fecha | `/keelson:implement` |
-| `task-reviewer` | Quality gates de código; gate obrigatório antes da closure; não escreve código | `/keelson:implement` |
-| `security-reviewer` | Gate de segurança (`guidelines/core/SECURITY.md` + seção de segurança do perfil ativo), rejeição imediata; em mudança sensível | `/keelson:implement` |
-| `task-verifier` | Gate de comportamento verificado (roda testes + exercita a app); em mudança observável | `/keelson:implement` |
-| `product-critic` | Crítica de mérito da SPEC; não decide (aprovação é humana) | `/keelson:specify` |
-| `process-tuner` | Auto-aprendizado do processo: patch cirúrgico no artefato keelson dono do erro (modo dev do plugin) ou `PROPOSTA_PLUGIN` (projeto consumidor) + ledger `<docsRoot>/_meta/learning-log.md`; anti-inchaço e modo destilação; a doutrina (Charter, hooks, guidelines) só propõe | closure do `/keelson:implement`, `/keelson:auto`, sob demanda |
+| `task-implementer` | Implementa uma única TASK | `/keelson:implement` |
+| `task-reviewer` | Quality gates de código antes da closure | `/keelson:implement` |
+| `security-reviewer` | Gate de segurança, em mudança sensível | `/keelson:implement` |
+| `task-verifier` | Gate de comportamento verificado | `/keelson:implement` |
+| `product-critic` | Crítica de mérito da SPEC | `/keelson:specify` |
+| `process-tuner` | Auto-aprendizado do processo | closure do `/keelson:implement`, `/keelson:auto`, sob demanda |
 
 ---
 
 ## 6. Artefatos e IDs
 
-```
-<docsRoot>/                    # docsRoot da ficha; "docs/" por padrão
-├── _meta/
-│   ├── decisions.md           # governança do processo
-│   ├── method-guide.md        # este guia
-│   └── learning-log.md        # ledger do auto-aprendizado (mantido pelo process-tuner)
-└── <slug>/
-    ├── INDEX.md               # estado atual (GERADO — não editar)
-    ├── specs/SPEC-NNN-*.md
-    ├── plans/PLAN-MMM-*.md
-    ├── tasks/
-    │   ├── TASK-MMM-INDEX.md
-    │   └── TASK-MMM-XXX-*.md
-    ├── handoffs/HANDOFF-*.md  # verificação de tela pendente (ver §8; vazio na maioria dos slugs)
-    └── legacy/                # docs pré-migração (quando aplicável)
-```
-
-| ID | Significado | Escopo da numeração |
-|---|---|---|
-| `FR-NNN-XXX` / `NFR-NNN-XXX` | Requisito funcional / não-funcional | NNN = nº da SPEC |
-| `AC-NNN-XXX` | Critério de aceitação (Given-When-Then) | NNN = nº da SPEC |
-| `RISK-NNN-XXX` / `A-NNN-XXX` / `Q-NNN-XXX` | Risco / premissa / questão aberta | NNN = nº da SPEC |
-| `FEAT-NNN-XXX` | Funcionalidade — fluxo entregável, unidade de teste do QA (camada opcional: só com 2+ fluxos na SPEC; decisão 4.27) | NNN = nº da SPEC |
-| `COMP-MMM-XXX` | Componente | MMM = nº do PLAN |
-| `DEC-MMM-XXX` | Decisão arquitetural (com alternativas e flag `Irreversível`) | MMM = nº do PLAN |
-| `TRISK-MMM-XXX` | Risco técnico | MMM = nº do PLAN |
-| `TASK-MMM-XXX` | Tarefa | MMM = PLAN ao qual pertence |
-
-Nomes de arquivo de TASK por tipo: `-fix-` (bugfix), `-refactor-` (refactor), `-chore-` (chore); sem sufixo = feature.
-
-### Contrato da tabela "PLANs" do INDEX (fonte única)
-
-Todo escritor do INDEX (`/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `/keelson:implement`, `/keelson:rebuild-index`) usa **exatamente** este formato — nenhum comando redefine header ou célula por conta própria:
-
-```markdown
-| ID | Cobre | FRs cobertos | Tasks | Status |
-|----|-------|--------------|-------|--------|
-| PLAN-MMM | SPEC-NNN | <resumo curto> | X/Y M | <Status> |
-```
-
-- **Header**: as 5 colunas acima, nesta ordem. O `/keelson:specify` já cria a seção "## PLANs" com o header (tabela vazia); quem adiciona a primeira linha **não** inventa header.
-- **Célula `Tasks`** = `X/Y M`: `X` tasks Done, `Y` total (`?` até o `/keelson:tasks` rodar), `M` marcador — `⏸` (nenhuma Done), `🟡` (parcial), `✅` (todas Done). Progressão: `0/? ⏸` (plan) → `0/N ⏸` (tasks) → `X/N 🟡` (implement, closure por task) → `N/N ✅` (última closure).
-- **Coluna `Status`** = o Status do front-matter do arquivo PLAN, **verbatim** (`Draft | Review | Approved | Done`), com um único sufixo permitido: `Done (sugerido)`, escrito pelo `/keelson:implement` quando a DoD está satisfeita mas a promoção humana ainda não aconteceu. O "status efetivo" que o `/keelson:rebuild-index` calcula serve **só** para posicionar a capacidade na seção "Capacidades" — nunca entra nesta coluna.
-
-### Template canônico do INDEX.md (fonte única)
-
-Todo comando que **cria** um INDEX (`/keelson:specify` na 1ª SPEC, `/keelson:rebuild-index`, `/keelson:migrate-legacy`) usa este esqueleto — nenhum comando redefine seções por conta própria:
-
-```markdown
-# <Nome do slug em formato título>
-
-> Arquivo gerado automaticamente. Não edite manualmente.
-> Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
-
-**Slug**: <slug>
-**Última atualização**: <ISO 8601 com timezone>
-
-## Resumo
-<2 a 3 linhas derivadas dos outcomes das SPECs — ou do legado, na migração>
-
-## Capacidades
-
-### Implementadas
-- <capacidade> (SPEC-NNN, PLAN-MMM, ✅ <data>)
-
-### Em desenvolvimento
-- <capacidade> (SPEC-NNN, PLAN-MMM, 🟡 X/Y tasks Done)
-
-### Especificadas, ainda não planejadas
-- <outcome> (SPEC-NNN, ⏸ aguardando /keelson:plan)
-
-## SPECs
-
-| ID | Título | Status | Data |
-|----|--------|--------|------|
-
-## PLANs
-
-| ID | Cobre | FRs cobertos | Tasks | Status |
-|----|-------|--------------|-------|--------|
-
-## Glossário consolidado
-
-| Termo | Definição | Origem |
-|-------|-----------|--------|
-
-## Decisões irreversíveis
-
-- **DEC-MMM-XXX** (PLAN-MMM): <texto curto>
-
-## Riscos ativos
-
-| ID | Risco | Mitigação | Origem |
-|----|-------|-----------|--------|
-
-## Histórico recente
-
-- <YYYY-MM-DD HH:MM>: <ação> via /keelson:<comando>
-```
-
-Seção ainda sem conteúdo leva nota curta do que a preenche (ex.: "(vazio até /keelson:plan)"). Variações por comando:
-
-- **`/keelson:rebuild-index`**: acrescenta ao aviso a linha `> Última reconstrução completa via /keelson:rebuild-index: <ISO 8601>` e, se houver, a seção final `## Inconsistências conhecidas` (descrição + ação sugerida).
-- **`/keelson:migrate-legacy`**: acrescenta `**Origem**: migrado de legado em <YYYY-MM-DD> via /keelson:migrate-legacy`; capacidades legadas entram em `### Implementadas (legado, sem rastreabilidade SDD)` com marcador 📜 e origem (`legacy/<arquivo>`); decisões extraídas viram `LEGACY-DEC-*`; "SPECs"/"PLANs" ficam vazios com nota de que não há artefatos retroativos; seção extra `## Documentação legada` lista os arquivos preservados.
-- **Slug migrado** (em qualquer rebuild): as seções espelhadas do legado abrem com `> Fonte durável: legacy/TRIAGE-<data>.md` — é do TRIAGE que o rebuild as reespelha.
-- **Granularidade das Capacidades**: SPEC que declara FEATs → **uma entrada de capacidade por FEAT**, no formato `<nome da FEAT> (SPEC-NNN/FEAT-NNN-XXX, PLAN-MMM, <marcador>)`, movida entre subseções quando a FEAT fica pronta (todas as TASKs que a listam Done); SPEC sem FEATs → uma entrada por SPEC, como sempre.
-
-### Receita de atualização do INDEX (fonte única)
-
-Todo comando que **atualiza** um INDEX existente aplica — mesclando, nunca sobrescrevendo:
-
-1. Atualizar `Última atualização`.
-2. Refletir o artefato na tabela correspondente (SPECs/PLANs — contrato acima) e nas seções que ele afeta: capacidades (movendo entre "Especificadas" → "Em desenvolvimento" → "Implementadas" conforme o ciclo; por FEAT quando a SPEC as declara), glossário (termo já existente com definição diferente → **parar e reportar conflito**), decisões irreversíveis, riscos ativos.
-3. Adicionar entrada ao "Histórico recente" com timestamp e ação — **máximo 10 entradas**.
+Conteúdo canônico (árvore de artefatos, IDs, contrato da tabela "PLANs", template e receita do INDEX): `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`.
 
 ---
 
@@ -462,94 +309,4 @@ Todo comando que **atualiza** um INDEX existente aplica — mesclando, nunca sob
 
 ## 8. Handoff de verificação de tela (gate de comportamento remoto)
 
-Quando o ciclo roda num ambiente **sem acesso a testes de tela** — worktree sem app/browser, execução na nuvem, containers indisponíveis — o gate de comportamento verificado não consegue exercitar a UI. Nesses casos a entrega **não engole o furo**: ela produz um **handoff de verificação** — documento com roteiro passo a passo e riscos + **prompt pronto** para um agente com acesso a tela fechar a verificação depois. O handoff é a diferença entre "não verifiquei e ninguém sabe" e "não verifiquei, e aqui está exatamente o que falta, como exercitar e o que está em risco".
-
-> Aplica-se a projetos cuja ficha declara `gates.screenVerify: true` (têm superfície visual a verificar). Onde não há tela, o gate se satisfaz por teste/execução sem UI e não há handoff.
-
-### 8.1 Ciclo de vida
-
-1. **Detecção**: na rota formal, o `task-verifier` reporta `PARCIAL` com o bloco `handoff_seed` (o roteiro do que ele não conseguiu exercitar). Na rota inline (bug/refactor), a auto-revisão do gate pela main session detecta o mesmo. **Indisponibilidade de ambiente é provada, não presumida** (decisão 4.26): antes de declarar, roda-se uma **sondagem barata** — o `keelson.local.json` existe e tem os dados do(s) realm(s) envolvido(s)? a `baseUrl` do realm responde (ou a app sobe pelo método do projeto)? a sessão tem ferramenta de tela? — e a **evidência da sondagem que falhou** (o que foi tentado, o que retornou) acompanha a seed e entra no front-matter do handoff (`sonda:`). Projeto multi-realm: sonda **por realm** do roteiro — um realm de pé e outro não gera pendência só para o indisponível. Declarar "ambiente sem tela" sem sondagem registrada é usar o handoff como atalho — proibido.
-2. **Geração** (preparação da Entrega): a main session consolida as seeds e cria `<docsRoot>/<slug>/handoffs/HANDOFF-<id>.md` — `<id>` = `PLAN-MMM` na rota formal; `<yyyy-mm-dd>-<descrição-curta>` na inline. Um doc por entrega (consolida todas as tasks do PLAN). Registra **risco ativo** no INDEX do slug: `Verificação de tela pendente — HANDOFF-<id>`. Domínio **sem slug keelson** → não cria arquivo: o roteiro completo vai inline no prompt do report da Entrega.
-3. **Entrega**: o handoff entra no commit da branch e o report final traz a seção **"Verificação pendente (handoff)"** com o prompt copy-paste. A entrega é declarada **parcial** — nunca "totalmente verificada" — enquanto houver handoff `Pendente`.
-4. **Fechamento** (num ambiente com tela): o agente que recebe o prompt faz checkout da branch, lê o handoff, exercita cada item com a rotina de verificação de tela do projeto, registra a evidência no próprio doc, corrige divergências na própria branch (protocolo inline) e faz a closure — `status: Concluído`, risco removido do INDEX + linha no Histórico recente, commit `chore(<slug>): close verification handoff HANDOFF-<id>`, push. Merge e deploy continuam humanos.
-
-O `/keelson:integrate` detecta handoffs `Pendente` do slug e os destaca na descrição do PR — mergear com verificação pendente passa a ser decisão consciente do humano, nunca desinformada.
-
-### 8.2 Template canônico do handoff
-
-```markdown
----
-id: HANDOFF-<id>
-slug: <slug>
-branch: <branch>
-status: Pendente               # Pendente | Concluído
-criado: <ISO 8601>
-origem: PLAN-MMM | inline
-commits: [<SHAs curtos>]
-motivo: <ambiente sem acesso a testes de tela — worktree | nuvem | containers down>
-sonda: <evidência da sondagem de disponibilidade que falhou, por realm — o que foi tentado e o que retornou>
----
-
-# Handoff de verificação de tela — <título curto>
-
-## 1. Contexto da entrega
-<2–5 linhas: o que foi entregue e por quê; refs SPEC-NNN / PLAN-MMM / TASKs.>
-
-## 2. Já verificado (não repetir)
-- Testes: <suíte/comando (quality.test da ficha), N/N>
-- Lint/type-check: <resultado (quality.lint / quality.typecheck)>
-- API exercitada sem tela: <chamadas feitas e resultados, ou "nenhuma">
-
-## 3. Pré-requisitos de ambiente
-- Subir app + login: <como subir a app deste projeto e autenticar; pegadinhas de permissão>
-- Migrações/seeds pendentes DESTA branch: <lista com comandos, ou "nenhuma">
-- Feature flags / permissões necessárias: <lista, ou "nenhuma">
-- Dados de teste: <como obter/criar o estado necessário>
-
-## 4. Roteiro de verificação (itens pendentes)
-
-### V1 — <título> (<AC-NNN-XXX ou "inline: <comportamento>">)
-- **Tela/rota**: <URL/rota da app>
-- **Realm**: <nome em `screenVerify.realms` do `keelson.local.json` — omitir se o projeto tem um só>
-- **Passos**: 1) … 2) … 3) …
-- **Esperado**: <comportamento observável, específico o bastante para dar ✅/❌>
-- **Risco se falhar**: <impacto para o usuário/negócio>
-- **Evidência**: _(preencher na verificação)_
-
-### V2 — …
-
-## 5. Riscos e pontos de atenção
-<O que o implementador sabe que é frágil e a tela pode revelar: tema claro/escuro, estados
-vazios/erro, permissões, responsividade, interação com dados reais, timing.>
-
-## 6. Protocolo de conclusão
-1. Exercitar cada item V* e preencher a Evidência (✅/❌ + o que foi observado).
-2. Divergência → corrigir na própria branch (protocolo inline: escopo restrito + testes +
-   gates) e re-exercitar o item.
-3. Tudo ✅ → `status: Concluído` no front-matter; atualizar INDEX do slug (remover o
-   risco ativo + linha no Histórico recente); commit
-   `chore(<slug>): close verification handoff HANDOFF-<id>`; push.
-4. Merge e deploy continuam decisão humana.
-```
-
-**Regras do roteiro (seção 4)**: cada item deve ser executável por quem **não participou da implementação** — sem "verifique se está ok"; passos concretos, dados concretos, resultado esperado observável. Cada AC observável não exercitado vira um item V*; fluxos de risco conhecido (tema escuro, estado vazio, permissão negada) entram mesmo sem AC formal quando o implementador sabe que são frágeis.
-
-### 8.3 Prompt canônico (emitido no report da Entrega)
-
-```text
-Você está num ambiente com acesso a testes de tela (app local + browser). Sua tarefa é
-fechar a verificação de comportamento (gate de comportamento verificado) de uma entrega
-feita em ambiente sem tela.
-
-1. `git fetch && git checkout <branch>` (e `git pull` se a branch já existir localmente).
-2. Leia `<docsRoot>/<slug>/handoffs/HANDOFF-<id>.md` — ele é a FONTE DA VERDADE desta tarefa:
-   pré-requisitos de ambiente (§3), roteiro passo a passo (§4), riscos (§5) e protocolo
-   de conclusão (§6). Consulte também SPEC/PLAN referenciados nele se precisar de contexto.
-3. Suba o ambiente e exercite CADA item pendente do roteiro com a rotina de verificação
-   de tela do projeto; registre a evidência item a item no próprio doc.
-4. Divergência → corrija na própria branch (protocolo inline) e re-exercite.
-5. Tudo verde → siga o protocolo de conclusão do doc (status, INDEX, commit, push).
-Não faça merge nem deploy — isso continua decisão humana.
-```
-
-(Domínio sem slug: substitua o passo 2 pelo roteiro inline incluído abaixo do prompt.)
+Conteúdo canônico (ciclo de vida §8.1, template canônico §8.2, prompt canônico §8.3): `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`.

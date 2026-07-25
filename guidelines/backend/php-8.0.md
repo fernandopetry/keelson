@@ -1,7 +1,7 @@
 ---
 lang: php
 version: "8.0"
-charter: 0.5.0
+charter: 0.5.1
 generated-by: profile-writer
 reviewed: false
 reviewer: null
@@ -9,20 +9,15 @@ reviewer: null
 
 # PHP 8.0 — Perfil de linguagem
 
-> Instância do `QUALITY-CHARTER.md` (v0.3.0) para **PHP 8.0** — perfil de **legado**:
-> a versão está fora de suporte (ver §1) e este perfil existe para manter o padrão de
-> qualidade **enquanto** o upgrade não acontece, não para legitimar a permanência nela.
-> Cada seção pega um artigo do charter e responde: *"em PHP 8.0, isto se cumpre assim,
-> com esta ferramenta, com esta armadilha a evitar"*.
+> Perfil de **legado** do `QUALITY-CHARTER.md` para **PHP 8.0** — a versão está fora de
+> suporte (ver §1); o perfil mantém o padrão de qualidade **enquanto** o upgrade não
+> acontece, não legitima a permanência nela. Perfil gerado (`reviewed: false`): afirmação
+> inferida e não validada leva o tag `⚠️ não confirmado`; o roteiro de verificação humana
+> vive no companheiro `_review/php-8.0.md`.
 >
-> **Escopo:** o que é idiomático de PHP 8.0. A arquitetura **específica do projeto**
-> (nomes de camadas próprios, caminhos reais) mora em `guidelines/project/` e na ficha
-> `keelson.config.json`; aqui, os nomes de pasta são placeholders genéricos (`src/`,
-> `tests/`) e os namespaces usam `App\` como raiz de exemplo.
->
-> **Proveniência:** gerado pelo `profile-writer` com base no exemplar PHP 8.5.
-> `reviewed: false` — pendente de revisão humana; as afirmações marcadas
-> `⚠️ CONFIRMAR:` são os alvos prioritários dessa revisão.
+> **Escopo:** o idiomático de PHP 8.0. Os nomes de pasta (`src/`, `tests/`) e o namespace
+> `App\` são **placeholders** — a arquitetura real do projeto mora em `guidelines/project/`
+> e na ficha `keelson.config.json`.
 
 ---
 
@@ -30,15 +25,14 @@ reviewer: null
 
 > **⚠️ PHP 8.0 está em fim de vida (EOL) desde 26 de novembro de 2023.** Não recebe
 > mais correções de segurança da comunidade: toda vulnerabilidade descoberta desde
-> então permanece **sem patch** no runtime. Consequência para este perfil:
->
-> 1. **Plano de upgrade é recomendação permanente** — cada entrega neste projeto
->    DEVERIA reduzir a distância para 8.1+ (evitar construções removidas/deprecadas
->    adiante, manter dependências compatíveis com as duas versões), nunca aumentá-la.
-> 2. A mitigação enquanto o upgrade não sai está na abertura do §6.
-> 3. ⚠️ CONFIRMAR: suporte estendido comercial existiu (ex.: Zend PHP LTS para 8.0,
->    anunciado até dezembro/2025; TuxCare ELS) — confirmar se o projeto tem algum
->    contrato desses ativo hoje; sem ele, assuma runtime sem patches.
+> então permanece **sem patch** no runtime. **Plano de upgrade é recomendação
+> permanente** — cada entrega neste projeto DEVERIA reduzir a distância para 8.1+
+> (evitar construções removidas/deprecadas adiante, manter dependências compatíveis
+> com as duas versões), nunca aumentá-la. Mitigação operacional enquanto o upgrade não
+> sai: abertura do §6.
+> ⚠️ não confirmado: suporte estendido comercial existiu (ex.: Zend PHP LTS para 8.0,
+> anunciado até dezembro/2025; TuxCare ELS) — sem contrato desses ativo, assuma
+> runtime sem patches.
 
 O alvo é **PHP 8.0** (lançado em novembro de 2020), com `declare(strict_types=1)`
 obrigatório no topo de todo arquivo — sem coerção silenciosa de tipo.
@@ -81,10 +75,6 @@ mesmo nome da classe como construtor (estilo PHP 4). E as que ainda rodam mas s�
 proibidas pelo padrão: `extract()` sobre entrada externa, `@` para silenciar erro,
 `strpos(...) !== false` onde `str_contains` resolve.
 
-**Por que a versão é seção de primeira classe:** "PHP" em 8.0 e em 8.1+ é quase outra
-linguagem — `enum`, `readonly` e first-class callables não existem aqui, e código
-gerado para o alvo errado **fatal-erra no parse/runtime** desta versão, não no lint.
-
 ---
 
 ## 2. Estilo, formatação & lint → Charter Art. 5, 7
@@ -109,10 +99,10 @@ decide.
   **reprovar**, não **corrigir** silenciosamente.
 - O php-cs-fixer **não roda em PHP 8.0.0 exato** (bug no tokenizer do PHP) — exige
   **8.0.1+**. Se o runtime está pinado em 8.0.0, atualize o patch release.
-- ⚠️ CONFIRMAR: releases recentes do php-cs-fixer 3.x podem ter subido o piso de PHP
-  acima de 8.0 — deixe o Composer resolver a última versão instalável sob
-  `config.platform.php: 8.0.x` (ver §8) e confirme qual série 3.x o projeto consegue
-  usar; não copie o constraint de um projeto em PHP 8.3+.
+- ⚠️ não confirmado: releases recentes do php-cs-fixer 3.x podem ter subido o piso de
+  PHP acima de 8.0 — deixe o Composer resolver a última versão instalável sob
+  `config.platform.php: 8.0.x` (ver §8); não copie o constraint de um projeto em
+  PHP 8.3+.
 
 ---
 
@@ -137,11 +127,9 @@ classe + constantes: `OrderStatus::OPEN`.)*
   `*DTO` (transporte, sem lógica) · `*Test` (teste da classe homônima).
 - Value Object nomeado pelo **conceito** (`Email`, `Cpf`), não pelo tipo primitivo.
 
-**Idioma:** identificadores em **inglês** — é a norma idiomática do ecossistema PHP
-(stdlib, PSR, libs são todas em inglês; misturar quebra a leitura). O idioma dos
-**comentários** é uma decisão do projeto (registrada em `guidelines/project/`), mas
-**DEVE ser único e consistente** em toda a base — nunca metade em inglês, metade em
-outro idioma dentro do mesmo arquivo.
+**Idioma:** identificadores em **inglês**; o idioma dos **comentários** é decisão do
+projeto (registrada em `guidelines/project/`) e **DEVE ser único e consistente** em
+toda a base.
 
 **Armadilha comum — específica de 8.0:** com **named arguments**, o **nome do
 parâmetro vira API pública**: renomear `$email` para `$emailAddress` numa função
@@ -185,29 +173,11 @@ promovida no construtor + getter, **sem setter**:
   entrada→DTO→UseCase e resultado→resposta.
 
 ```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Application\UseCases\User;
-
-use App\Domain\Entities\User\User;
-use App\Domain\Repositories\User\UserRepositoryInterface;
-
 final class CreateUserUseCase
 {
     // Promotion (8.0): depende da ABSTRAÇÃO, nunca do PDO concreto → testável sem banco.
     public function __construct(private UserRepositoryInterface $repo)
     {
-    }
-
-    public function execute(CreateUserDTO $dto): User
-    {
-        if ($this->repo->emailExists($dto->email())) {
-            throw new \DomainException('Email already registered');
-        }
-
-        return $this->repo->save(User::fromDto($dto));
     }
 }
 ```
@@ -279,11 +249,10 @@ boilerplate; violação de regra é **exceção tipada**.
   `InvalidArgumentException` (entrada inválida no DTO/VO). Nunca lance `\Exception` cru.
 - **8.0 endureceu o runtime a favor do padrão:** funções internas lançam `TypeError`/
   `ValueError` em argumento inválido (em vez de warning + `null`/`false`), e o **PDO
-  nasce com `ERRMODE_EXCEPTION` por padrão** — não escreva código que dependa de
-  retorno `false` silencioso dessas fontes. ⚠️ CONFIRMAR: o default `ERRMODE_EXCEPTION`
-  do PDO a partir de 8.0 (documentado no guia de migração 7.4→8.0); ainda assim,
-  declare o atributo **explicitamente** na criação da conexão (ver §6.1) para não
-  depender de default.
+  nasce com `ERRMODE_EXCEPTION` por padrão** (⚠️ não confirmado) — não escreva código
+  que dependa de retorno `false` silencioso dessas fontes; ainda assim, declare o
+  atributo **explicitamente** na criação da conexão (ver §6.1) para não depender de
+  default.
 - **Nunca engolir silenciosamente:** `catch (\Throwable) {}` vazio, ou o operador `@`,
   são proibidos — o erro some e o bug vira silencioso. (Em 8.0 o `@` deixou de
   silenciar erros fatais, mas segue escondendo warnings — segue proibido.) Se
@@ -292,21 +261,8 @@ boilerplate; violação de regra é **exceção tipada**.
 - **Fronteira de conversão:** um único ponto (Action + handler global) captura
   `\Throwable`, loga o detalhe internamente e devolve ao cliente uma mensagem
   **genérica** com o status HTTP correto. O `$e->getMessage()` **não** vai cru para a
-  resposta.
-
-```php
-try {
-    $user = $this->useCase->execute($dto);
-    return $this->ok($response, $user->toArray());
-} catch (\InvalidArgumentException $e) {
-    return $this->error($response, 'Validation failed', 422); // detalhe de campo, sem stack
-} catch (\DomainException $e) {
-    return $this->error($response, $e->getMessage(), 400);     // mensagem de negócio, curada
-} catch (\Throwable $e) {
-    $this->logger->error('user.create.failed', ['exception' => $e]); // detalhe fica no log
-    return $this->error($response, 'Internal error', 500);     // genérico para o cliente
-}
-```
+  resposta. (Cadeia canônica de catches — `\InvalidArgumentException` 422,
+  `\DomainException` 400, `\Throwable` 500 com log — como no exemplar.)
 
 **O que logar (Art. 2):** identificadores e ação (`user_id`, `action`), a exceção com
 stack **do lado do servidor** — **nunca** senha, token, PII ou o corpo cru da
@@ -322,25 +278,20 @@ versão/stack é ainda mais explorável. `display_errors=Off` em produção, sem
 
 ## 6. Segurança mapeada à linguagem → Charter Art. 2 `[CRÍTICA]`
 
-> **⚠️ Postura EOL primeiro (ver §1):** PHP 8.0 não recebe patch de segurança desde
-> 26/11/2023. Isso muda a régua desta seção: **não existe "o runtime corrige depois"**.
-> Mitigação permanente enquanto o upgrade não sai:
->
-> 1. **Plano de upgrade para versão suportada é o controle de segurança nº 1** — as
->    demais medidas abaixo são paliativas.
-> 2. Rode `composer audit` no pipeline (§8) — as **dependências** ainda recebem
->    advisories mesmo com o runtime congelado; mantenha-as atualizadas dentro do que
->    o `config.platform.php: 8.0.x` permite.
-> 3. Acompanhe CVEs publicados contra PHP ≤ 8.0 (NVD / `/keelson:audit` quando
->    disponível) e trate cada um como **sem correção disponível**: mitigue na camada
->    de aplicação/infra (WAF, desativar a feature afetada, validação extra).
-> 4. Reduza superfície: extensões não usadas desabilitadas, `expose_php=Off`,
->    `display_errors=Off`.
+> **⚠️ Postura EOL — mitigar e migrar (fato e datas: §1):** PHP 8.0 não recebe patch de
+> segurança desde 26/11/2023 (salvo suporte comercial estendido — §1, ⚠️ não confirmado);
+> **não existe "o runtime corrige depois"** e o **plano de upgrade é o controle de
+> segurança nº 1**. Enquanto ele não sai: `composer audit` no pipeline (§8), com
+> dependências atualizadas dentro do que `config.platform.php: 8.0.x` permite; CVE
+> publicado contra PHP ≤ 8.0 é tratado como **sem correção disponível** — mitigue na
+> camada de aplicação/infra (WAF, desativar a feature afetada, validação extra);
+> superfície reduzida: extensões não usadas desabilitadas, `expose_php=Off`,
+> `display_errors=Off`.
 >
 > Cada item abaixo é um item da **Régua do Art. 2** traduzido para "como se faz e como
-> se erra em PHP 8.0". Vulnerabilidade aqui é **rejeição imediata** no review. Este
-> perfil é **gerado** (`reviewed: false`): as afirmações marcadas `⚠️ CONFIRMAR:` devem
-> ser validadas pelo revisor humano antes de virarem doutrina.
+> se erra em PHP 8.0". Vulnerabilidade aqui é **rejeição imediata** no review. Perfil
+> **gerado** (`reviewed: false`): itens `⚠️ não confirmado` merecem atenção redobrada
+> (roteiro de verificação humana: `_review/php-8.0.md`).
 
 ### 6.1 Injeção → sempre parametrizar
 
@@ -352,13 +303,6 @@ $pdo = new \PDO($dsn, $user, $pass, [
     \PDO::ATTR_EMULATE_PREPARES   => false,                    // prepared statements reais no driver
     \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
 ]);
-
-// ✅ prepared statement, parâmetros nomeados
-$stmt = $pdo->prepare('SELECT id, name, email FROM users WHERE email = :email');
-$stmt->execute(['email' => $email]);
-
-// ❌ NUNCA — concatenar/interpolar entrada externa é SQL Injection
-$pdo->query("SELECT * FROM users WHERE email = '$email'");
 ```
 
 - O que **não** dá para bindar (nome de coluna/tabela em `ORDER BY`) valida-se contra
@@ -386,7 +330,7 @@ echo rawurlencode($value);                            // componente de URL
 echo json_encode($value, JSON_THROW_ON_ERROR);        // contexto JS/JSON
 ```
 
-- ⚠️ CONFIRMAR: em **PHP 8.0 o default de `htmlspecialchars()` ainda é `ENT_COMPAT`**
+- ⚠️ não confirmado: em **PHP 8.0 o default de `htmlspecialchars()` ainda é `ENT_COMPAT`**
   — **não escapa aspas simples**; o default só passou a incluir `ENT_QUOTES |
   ENT_SUBSTITUTE` no PHP 8.1. Em 8.0, chamar `htmlspecialchars($v)` sem flags deixa
   XSS passar em atributo HTML com aspas simples. **Sempre** passe `ENT_QUOTES, 'UTF-8'`
@@ -420,7 +364,7 @@ checagem vive num middleware/guard, não espalhada dentro da regra.
 comparações frouxas. Em 8.0, string não numérica comparada a número **não** vira `0`:
 `0 == "foo"` é `false`. Isso **fecha uma classe de bypass** ao migrar de 7.x — e é um
 argumento de segurança a favor do upgrade que trouxe o projeto até aqui.
-⚠️ CONFIRMAR: a mudança cobre **número vs string**; **duas strings numéricas** seguem
+⚠️ não confirmado: a mudança cobre **número vs string**; **duas strings numéricas** seguem
 comparadas numericamente (`'0e111' == '0e222'` continua `true` — o clássico "magic
 hash"). Logo a regra do padrão permanece: `===` sempre, e `hash_equals()` para
 comparar hashes/tokens (também elimina timing attack).
@@ -438,7 +382,7 @@ comparar hashes/tokens (também elimina timing attack).
 - **Senhas:** `password_hash($senha, PASSWORD_ARGON2ID)`; verificação com
   `password_verify()`; `password_needs_rehash()` no login para migrar hashes antigos.
   **Nunca** MD5/SHA1, nunca hash caseiro.
-  - ⚠️ CONFIRMAR: `PASSWORD_ARGON2ID` existe desde o PHP 7.3, **mas só se o binário
+  - ⚠️ não confirmado: `PASSWORD_ARGON2ID` existe desde o PHP 7.3, **mas só se o binário
     foi compilado com suporte a Argon2** (libargon2, ou via libsodium a partir do
     7.4). Confirme no ambiente-alvo com `defined('PASSWORD_ARGON2ID')`; se ausente,
     o fallback correto é `PASSWORD_BCRYPT` (o default `PASSWORD_DEFAULT` em 8.0) —
@@ -449,13 +393,6 @@ comparar hashes/tokens (também elimina timing attack).
   construção caseira sobre `openssl_*` sem necessidade documentada.
 - **Aleatoriedade:** tokens/nonces com `random_bytes()`/`random_int()` (CSPRNG) —
   nunca `rand()`/`mt_rand()`/`uniqid()` para valor de segurança.
-
-```php
-// ❌ NUNCA
-error_log("password: $password");
-// ✅ apenas identificador e ação
-$logger->info('login_attempt', ['user_id' => $userId]);
-```
 
 ### 6.5 Sessão & estado de autenticação
 
@@ -476,9 +413,8 @@ setcookie('session', $value, [
 - Sessão é a **fonte de verdade** de identidade e tenant — regenere o id no login
   (`session_regenerate_id(true)`), expire por inatividade, invalide no logout
   (`session_destroy()` + cookie expirado).
-- ⚠️ CONFIRMAR: `session.use_strict_mode=1` no `php.ini` (rejeita session id não
-  iniciado pelo servidor — mitiga session fixation) é prática recomendada
-  documentada para a era 8.0; validar a configuração do ambiente real.
+- ⚠️ não confirmado: `session.use_strict_mode=1` no `php.ini` (rejeita session id não
+  iniciado pelo servidor — mitiga session fixation).
 - Token de autenticação **não** vai para `localStorage` (concern do front, mas o
   backend deve entregá-lo como cookie `httponly`).
 - **CSRF:** forms de estado (POST/PUT/DELETE) exigem token anti-CSRF (gerado com
@@ -529,35 +465,15 @@ final class CreateUserUseCaseTest extends TestCase
     /** @var UserRepositoryInterface&MockObject */
     private MockObject $repo; // tipo simples: interseção declarada só no docblock (8.0!)
 
-    private CreateUserUseCase $useCase;
-
     protected function setUp(): void
     {
         $this->repo = $this->createMock(UserRepositoryInterface::class);
-        $this->useCase = new CreateUserUseCase($this->repo);
     }
 
     /** @test */
     public function deveCriarUsuarioQuandoEmailInedito(): void
     {
-        // ═══════════ Arrange ═══════════
-        $this->repo->method('emailExists')->willReturn(false);
-        $this->repo->method('save')->willReturnArgument(0);
-
-        // ═══════════ Act ═══════════
-        $user = $this->useCase->execute(new CreateUserDTO('John', 'john@example.com'));
-
-        // ═══════════ Assert ═══════════
-        $this->assertSame('John', $user->name());
-    }
-
-    /** @test */
-    public function naoDeveCriarComEmailExistente(): void
-    {
-        $this->repo->method('emailExists')->willReturn(true);
-
-        $this->expectException(\DomainException::class);
-        $this->useCase->execute(new CreateUserDTO('John', 'john@example.com'));
+        // Arrange → Act → Assert (AAA), blocos separados visualmente
     }
 }
 ```
@@ -603,10 +519,9 @@ lock é **commitado** para builds reprodutíveis. (Composer 1 é EOL — não us
   vulnerabilidade de severidade relevante, **citando o CVE/advisory ID** reportado.
   - O comando existe desde o **Composer 2.4**, que roda em PHP 7.2+ — logo
     **compatível com PHP 8.0**; garanta `composer --version` ≥ 2.4 no CI.
-  - ⚠️ CONFIRMAR: o advisory database consultado é o da **Packagist.org security
+  - ⚠️ não confirmado: o advisory database consultado é o da **Packagist.org security
     advisories API**, que agrega o **FriendsOfPHP/security-advisories** e advisories
-    do GitHub — confirmar a composição exata das fontes na documentação do Composer
-    da versão instalada.
+    do GitHub.
   - Alternativa/reforço: `roave/security-advisories` como dev-dependency (impede
     **instalar** versão vulnerável, no resolver) — complementa, não substitui, o
     `composer audit` (que detecta vulnerabilidade no que **já está** no lock).
@@ -647,29 +562,15 @@ mesmo que o código fique correto.
 de um conversor canônico é o mecanismo ideal — transforma "lembre de reusar" em falha
 de build.
 
-**Régua (Art. 3):** a mudança não introduz um **segundo caminho** para algo que já
-existia; quando o conceito se repetiu, ele foi **extraído**, não copiado.
+**Régua:** ver Charter Art. 3 — a mudança não introduz segundo caminho para o que já
+existia; conceito repetido é extraído, não copiado.
 
 ---
 
 ## 10. Performance & armadilhas → Charter Art. 8
 
-O custo patológico mais comum em backend PHP é o **round-trip de banco em laço** (N+1):
-
-```php
-// ❌ N+1 — uma query POR item
-foreach ($this->orderRepo->findAll() as $order) {
-    $customer = $this->customerRepo->findById($order->customerId());
-}
-
-// ✅ uma query com JOIN, no repositório PDO
-$stmt = $pdo->prepare(
-    'SELECT o.id, o.total, c.name AS customer_name
-       FROM orders o JOIN customers c ON c.id = o.customer_id
-      WHERE o.status = :status'
-);
-$stmt->execute(['status' => 'OPEN']);
-```
+O custo patológico mais comum em backend PHP é o **round-trip de banco em laço** (N+1)
+— a correção é **uma** query com JOIN no repositório PDO, nunca uma query por item.
 
 Padrões a seguir:
 
@@ -689,9 +590,8 @@ Padrões a seguir:
 
 **Ferramenta de medição idiomática:** `EXPLAIN` no banco **real** (não no SQLite de
 teste) para plano de query; **Xdebug profiler** ou **Blackfire** para CPU/memória do
-PHP. **Régua (Art. 8):** não há query/round-trip dentro de laço sobre dados de
-tamanho variável; otimização não óbvia **cita a medição** que a justifica — nunca
-palpite.
+PHP. **Régua:** ver Charter Art. 8 — sem query/round-trip em laço sobre volume
+variável; otimização não óbvia cita a medição.
 
 **Armadilha comum:** `fetchAll()` num resultado grande e depois iterar — dobra o pico
 de memória à toa; o `fetch()` em cursor faz o mesmo trabalho com pegada constante.
@@ -779,7 +679,5 @@ Exemplo de ficha correspondente:
 }
 ```
 
-**Por quê:** sem estes comandos declarados, o gate não sabe o que rodar — a régua do
-charter (prova externa e falsificável) fica sem executor. E num runtime EOL, o
-analisador estático com `phpVersion` pinado é também o guard que impede sintaxe de
-8.1+ de entrar na base (§11).
+Num runtime EOL, o analisador estático com `phpVersion` pinado é também o guard que
+impede sintaxe de 8.1+ de entrar na base (§11).

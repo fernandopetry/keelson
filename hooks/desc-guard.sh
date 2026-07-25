@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 # desc-guard — hook Stop que impede encerrar o turno com uma description de
-# comando ou skill do plugin acima do teto de 250 caracteres.
+# comando/skill acima de 250 caracteres ou de agent acima de 350.
 #
 # Por que existe: o Claude Code (>= v2.1.86) impõe um limite de 250 caracteres na
 # `description` de frontmatter de comandos e skills. Comando acima do teto some da
 # lista de comandos SEM erro (ocultação silenciosa); skill acima do teto tem a
 # description truncada na tela /skills. Um `/keelson:verify-handoff` ficou invisível
-# por isso (LRN sobre o teto de 250). Este guard não depende do contexto do modelo:
-# lê os .md do plugin em disco e cutuca se algum passar do teto.
+# por isso (LRN sobre o teto de 250). Agents não somem, mas a description entra
+# sempre-carregada no listing de subagents de todo consumidor — o teto de 350 é
+# orçamento anti-reinchaço do plugin (auditoria de compressão, v0.17.0).
+# Este guard não depende do contexto do modelo: lê os .md do plugin em disco e
+# cutuca se algum passar do teto.
 #
 # Escopo: só age no REPOSITÓRIO DE DESENVOLVIMENTO do keelson (onde os .md do plugin
 # são editados — marcado por .claude-plugin/plugin.json com name "keelson" + commands/).
@@ -40,7 +43,8 @@ viol="$(cwd="$cwd" python3 - <<'PY' 2>/dev/null || true
 import os, glob, re
 
 cwd = os.environ["cwd"]
-LIMIT = 250
+LIMIT = 250        # commands/*.md e skills/*/SKILL.md (teto do Claude Code)
+AGENT_LIMIT = 350  # agents/*.md (orçamento do plugin, não teto da ferramenta)
 
 
 def desc_len(path):
@@ -64,12 +68,13 @@ def desc_len(path):
     return None
 
 
-targets = sorted(glob.glob(os.path.join(cwd, "commands", "*.md")))
-targets += sorted(glob.glob(os.path.join(cwd, "skills", "*", "SKILL.md")))
-for p in targets:
+targets = [(p, LIMIT) for p in sorted(glob.glob(os.path.join(cwd, "commands", "*.md")))]
+targets += [(p, LIMIT) for p in sorted(glob.glob(os.path.join(cwd, "skills", "*", "SKILL.md")))]
+targets += [(p, AGENT_LIMIT) for p in sorted(glob.glob(os.path.join(cwd, "agents", "*.md")))]
+for p, lim in targets:
     n = desc_len(p)
-    if n is not None and n > LIMIT:
-        print(f"{n}\t{os.path.relpath(p, cwd)}")
+    if n is not None and n > lim:
+        print(f"{n}\t{lim}\t{os.path.relpath(p, cwd)}")
 PY
 )"
 
@@ -77,15 +82,15 @@ if [ -z "$viol" ]; then
   exit 0
 fi
 
-lista="$(printf '%s\n' "$viol" | while IFS="$(printf '\t')" read -r n rel; do
+lista="$(printf '%s\n' "$viol" | while IFS="$(printf '\t')" read -r n lim rel; do
   [ -n "$rel" ] || continue
-  printf '    — %s (%s caracteres)\n' "$rel" "$n"
+  printf '    — %s (%s caracteres; teto %s)\n' "$rel" "$n" "$lim"
 done)"
 
-reason="Guarda de description (teto de 250): há artefato(s) do plugin cuja description de frontmatter passa de 250 caracteres. O Claude Code (>= v2.1.86) OCULTA da lista o comando nessa condição (sem erro) e trunca a description da skill na tela /skills.
+reason="Guarda de description (teto: 250 para commands/skills, 350 para agents): há artefato(s) do plugin cuja description de frontmatter passa do teto. O Claude Code (>= v2.1.86) OCULTA da lista o comando acima de 250 (sem erro) e trunca a description da skill na tela /skills; agents acima de 350 estouram o orçamento sempre-carregado do plugin.
 ${lista}
 
-Encurte cada description para no máximo 250 caracteres, com os termos-gatilho no início; o detalhe completo fica no corpo do artefato. Depois encerre."
+Encurte cada description para o teto indicado, com os termos-gatilho no início; o detalhe completo fica no corpo do artefato. Depois encerre."
 
 printf '%s' "$reason" | python3 -c 'import sys,json; print(json.dumps({"decision": "block", "reason": sys.stdin.read()}))' 2>/dev/null || exit 0
 

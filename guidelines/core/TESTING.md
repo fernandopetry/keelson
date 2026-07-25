@@ -15,8 +15,7 @@ pergunte: **"qual regra este teste valida?"** Se você não sabe responder, **n�
 teste** — ele só vai travar a refatoração sem proteger nada.
 
 A prova precisa ser **externa e falsificável**: um teste que **falharia** se o
-comportamento regredisse. Um checklist preenchido por quem escreveu o código **não** é
-prova (Charter — régua "gerador ≠ avaliador").
+comportamento regredisse (Charter — régua "gerador ≠ avaliador").
 
 | ✅ Testar | ❌ Não testar |
 |-----------|--------------|
@@ -81,9 +80,8 @@ contra o ambiente real (o gate de comportamento observável, quando aplicável).
 |---------|----------|----------|
 | Domínio (entidades, regras, cálculos) | Adaptadores/repositórios | Camada de entrega e UI |
 
-**Exceção que sobe de prioridade:** todo **gate de autorização** exige teste de
-integração provando a **negação sem a permissão** (não só o sucesso com ela),
-exercitando a pilha real na ordem de produção. Ver `./SECURITY.md`.
+**Exceção que sobe de prioridade — gate de autorização:** teste de integração provando
+a **negação sem a permissão**, na pilha real (detalhe: `./SECURITY.md`, *Prova do 403*).
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 lang: php
 version: "7.0"
-charter: 0.5.0
+charter: 0.5.1
 generated-by: profile-writer
 reviewed: false
 reviewer: null
@@ -9,16 +9,13 @@ reviewer: null
 
 # PHP 7.0 — Perfil de linguagem
 
-> Instância do `QUALITY-CHARTER.md` (v0.3.0) para **PHP 7.0** — perfil de **legado**,
-> gerado pelo `profile-writer` e **pendente de revisão humana** (`reviewed: false`).
-> Cada seção pega um artigo do charter e responde: *"em PHP 7.0, isto se cumpre assim,
-> com esta ferramenta, com esta armadilha a evitar"*. Mesma espinha (seções 0–12) do
-> exemplar PHP 8.5, conteúdo restrito ao que **existe** em 7.0.
->
-> **Escopo:** o que é idiomático de PHP 7.0. A arquitetura **específica do projeto**
-> (nomes de camadas próprios, caminhos reais) mora em `guidelines/project/` e na ficha
-> `keelson.config.json`; aqui, os nomes de pasta são placeholders genéricos (`src/`,
-> `tests/`) e os namespaces usam `App\` como raiz de exemplo.
+> **Escopo:** o idiomático de PHP 7.0, restrito ao que **existe** nesta versão. A
+> arquitetura **específica do projeto** mora em `guidelines/project/` e na ficha
+> `keelson.config.json` — aqui, paths (`src/`, `tests/`) e o namespace `App\` são
+> placeholders, não caminhos reais.
+> ⚠️ Perfil **gerado** (`reviewed: false`): afirmação inferida sem confirmação documental
+> leva a tag `⚠️ não confirmado`; o roteiro de verificação humana vive em
+> `_review/php-7.0.md`.
 
 ---
 
@@ -77,10 +74,6 @@ todo arquivo novo — sem coerção silenciosa de tipo.
 - `each()`, `create_function()`, `@` (supressor de erro), variáveis globais de
   request (`$HTTP_RAW_POST_DATA` foi **removida** — use `php://input`).
 
-**Por que a versão é seção de primeira classe:** código escrito "para PHP 7" genérico
-com `?T` ou `void` **não parseia** em 7.0 — quebra no deploy, não no lint. O alvo é
-7.0 exato, e o gate deve rodar sobre um binário 7.0.
-
 ---
 
 ## 2. Estilo, formatação & lint → Charter Art. 5, 7
@@ -90,10 +83,10 @@ da era e continua aceitável se o projeto já o usa — escolha **um** e cabeie 
 
 - **Formatter/linter viáveis em runtime 7.0:**
   - `squizlabs/php_codesniffer` **3.x** (`phpcs`/`phpcbf`) — roda em PHP antigo e traz
-    o ruleset `PSR12` a partir da 3.5. ⚠️ CONFIRMAR: faixa exata de PHP suportada pelo
-    phpcs 3.x (documentação indica PHP 5.4+) e a versão mínima 3.5 para o ruleset PSR12.
+    o ruleset `PSR12` a partir da 3.5 (⚠️ não confirmado; a documentação indica
+    PHP 5.4+).
   - `friendsofphp/php-cs-fixer` **^2** — a série 2.x suporta PHP 5.6–7.4 (confirmado na
-    documentação de instalação). ⚠️ CONFIRMAR: em qual release 2.x entrou o ruleset
+    documentação de instalação). ⚠️ não confirmado: em qual release 2.x entrou o ruleset
     `@PSR12` (a série começou com `@PSR2`); se a 2.x instalada não tiver `@PSR12`,
     use `@PSR2` + fixers avulsos.
 - **É erro (bloqueia):** violação do ruleset escolhido; ausência de
@@ -109,8 +102,7 @@ da era e continua aceitável se o projeto já o usa — escolha **um** e cabeie 
 tem na máquina" e o runtime de produção ser 7.0 — o lint passa e o parse de produção
 quebra (ou vice-versa). O **sniff de compatibilidade de versão**
 (`PHPCompatibility/PHPCompatibility` com `testVersion 7.0`) transforma "não use ?T"
-em falha de build. ⚠️ CONFIRMAR: faixa de instalação do PHPCompatibility compatível com
-phpcs 3.x em runtime 7.0.
+em falha de build (⚠️ não confirmado: instalável com phpcs 3.x em runtime 7.0).
 
 ---
 
@@ -143,10 +135,9 @@ mas **DEVE ser único e consistente** na base — legados 5.x→7.0 costumam mis
 novo segue a convenção registrada, e a unificação do restante entra no plano de
 migração, não no diff da feature.
 
-**Armadilha comum:** nomear pela implementação (`$arrayDeUsers`, `processData`) em vez
-da intenção (`$activeUsers`, `deactivateExpiredContracts`). Em legado isso se agrava:
-o nome herdado que mente (`save()` que também envia e-mail) **DEVE** ser renomeado ou
-ter o efeito extraído quando tocado (Art. 5 — o nome cobre os efeitos colaterais).
+**Armadilha comum:** o nome herdado que mente (`save()` que também envia e-mail)
+**DEVE** ser renomeado ou ter o efeito extraído quando tocado (Art. 5 — o nome cobre
+os efeitos colaterais).
 
 ---
 
@@ -183,14 +174,6 @@ a disciplina que em 8.x é sintaxe aqui é **convenção + validação no constr
 - **Action/Controller** — zero lógica; mapeia entrada→DTO→UseCase e resultado→resposta.
 
 ```php
-<?php
-declare(strict_types=1);
-
-namespace App\Application\UseCases\User;
-
-use App\Domain\Entities\User\User;
-use App\Domain\Repositories\User\UserRepositoryInterface;
-
 final class CreateUserUseCase
 {
     /** @var UserRepositoryInterface */
@@ -199,15 +182,6 @@ final class CreateUserUseCase
     public function __construct(UserRepositoryInterface $repo)
     {
         $this->repo = $repo; // depende da ABSTRAÇÃO, nunca do PDO concreto
-    }
-
-    public function execute(CreateUserDTO $dto): User
-    {
-        if ($this->repo->emailExists($dto->getEmail())) {
-            throw new \DomainException('Email already registered');
-        }
-
-        return $this->repo->save(User::fromDto($dto));
     }
 }
 ```
@@ -235,7 +209,7 @@ parâmetro resolve.
   classe-fábrica; fábrica dedicada quando a construção tem variantes reais (é onde o
   único `switch` de despacho mora).
 - **Observer** → eventos do framework, ou uma lib de eventos compatível com a era.
-  ⚠️ CONFIRMAR: `psr/event-dispatcher` (PSR-14) requer PHP 7.2 — em 7.0, usar o event
+  ⚠️ não confirmado: `psr/event-dispatcher` (PSR-14) requer PHP 7.2 — em 7.0, usar o event
   dispatcher do próprio framework ou lib compatível (ex.: `league/event` 2.x).
 - **Builder** → em 7.0 tem **mais** justificativa que em 8.x: sem named arguments,
   construção com muitos opcionais fica ilegível — builder ou objeto de parâmetro são a
@@ -269,20 +243,6 @@ e documente, ou modele um objeto de resultado); violação de regra é **exceç�
   captura `\Throwable`, loga o detalhe internamente e devolve ao cliente mensagem
   **genérica** com o status HTTP correto. `$e->getMessage()` **não** vai cru na resposta.
 
-```php
-try {
-    $user = $this->useCase->execute($dto);
-    return $this->ok($response, $user->toArray());
-} catch (\InvalidArgumentException $e) {
-    return $this->error($response, 'Validation failed', 422); // sem stack, sem interno
-} catch (\DomainException $e) {
-    return $this->error($response, $e->getMessage(), 400);    // mensagem de negócio, curada
-} catch (\Throwable $e) {                                     // pega Exception E Error (7.0+)
-    $this->logger->error('user.create.failed', ['exception' => $e]); // detalhe no log
-    return $this->error($response, 'Internal error', 500);    // genérico para o cliente
-}
-```
-
 **O que logar (Art. 2):** identificadores e ação (`user_id`, `action`), exceção com
 stack **do lado do servidor** — **nunca** senha, token, PII ou corpo cru da requisição.
 Em produção: `display_errors=Off`, `log_errors=On` — legado 7.0 com `display_errors`
@@ -296,33 +256,21 @@ saneamento é **no sink de resposta**, não só no de log.
 
 ## 6. Segurança mapeada à linguagem → Charter Art. 2 `[CRÍTICA]`
 
-> ⚠️ **Postura EOL primeiro:** PHP 7.0 não recebe patch de segurança desde
-> **10/01/2019**. Toda CVE do interpretador/extensões desde então está **aberta** num
-> runtime 7.0 puro. Mitigação mínima enquanto o upgrade não sai: (a) **plano de
-> upgrade registrado como recomendação permanente** deste perfil; (b) superfície
-> reduzida — extensões não usadas desabilitadas, `expose_php=Off`; (c) camadas
-> externas compensando (WAF/proxy, rede segregada); (d) ⚠️ CONFIRMAR: se o runtime é
-> de distro enterprise (RHEL/Debian LTS/Ubuntu ESM), verificar se o pacote recebe
-> **backports** de segurança do distribuidor — isso muda a avaliação de risco, mas
-> não elimina a recomendação de upgrade.
+> ⚠️ **Runtime EOL (fato e datas: §1) — a postura é mitigar e migrar.** Mitigações
+> mínimas enquanto o upgrade não sai: superfície reduzida (extensões não usadas
+> desabilitadas, `expose_php=Off`) e camadas externas compensando (WAF/proxy, rede
+> segregada). ⚠️ não confirmado: se o runtime é de distro enterprise (RHEL/Debian
+> LTS/Ubuntu ESM) que recebe **backports** do distribuidor — muda a avaliação de
+> risco, não a recomendação de upgrade.
 >
 > Cada item abaixo traduz a **Régua do Art. 2** para "como se faz e como se erra em
-> PHP 7.0". Vulnerabilidade aqui é **rejeição imediata** no review. Perfil gerado por
-> IA: afirmações inferidas estão marcadas `⚠️ CONFIRMAR:` para dirigir a revisão.
+> PHP 7.0". Vulnerabilidade aqui é **rejeição imediata** no review. Afirmação
+> inferida leva `⚠️ não confirmado` (perfil gerado).
 
 ### 6.1 Injeção → sempre parametrizar
 
-**SQL — PDO com parâmetros nomeados** (disponível e idiomático em 7.0), nunca
-concatenação nem interpolação de entrada:
-
-```php
-// ✅ prepared statement, parâmetros nomeados
-$stmt = $pdo->prepare('SELECT id, name, email FROM users WHERE email = :email');
-$stmt->execute(['email' => $email]);
-
-// ❌ NUNCA — concatenar/interpolar entrada externa é SQL Injection
-$pdo->query("SELECT * FROM users WHERE email = '$email'");
-```
+**SQL — PDO com parâmetros nomeados** (`:email` + `execute(['email' => $email])` —
+disponível e idiomático em 7.0), nunca concatenação nem interpolação de entrada.
 
 - Ligue `PDO::ATTR_EMULATE_PREPARES => false` (prepared statements reais no driver) e
   `PDO::ERRMODE_EXCEPTION`.
@@ -364,8 +312,8 @@ if ($json === false) {                                // 7.0 NÃO tem JSON_THROW
   `echo`/HTML misturado, **todo** `echo` de dado externo passa por
   `htmlspecialchars(..., ENT_QUOTES, 'UTF-8')` — sem exceção.
 - Header injection: valores de `header()` derivados de input validados/normalizados
-  (⚠️ CONFIRMAR: PHP ≥ 5.1.2 já bloqueia CR/LF em `header()` — confirmar que o cheque
-  cobre os vetores no build 7.0 em uso; não confiar só nele).
+  (o PHP bloqueia CR/LF em `header()` desde 5.1.2 — ⚠️ não confirmado; não confiar
+  só nele).
 
 **Armadilha comum:** sanear o valor no log/persistência e devolver cru na resposta —
 o escaping acontece em **cada** sink de saída, independentemente.
@@ -394,7 +342,7 @@ vive num middleware/front controller, não espalhada dentro da regra.
 
 - Segredos vêm de **variável de ambiente / secret store**, lidos via config — nunca
   hardcoded, nunca commitados (`.env` no `.gitignore`; `vlucas/phpdotenv` 2.x é
-  compatível com a era. ⚠️ CONFIRMAR: faixa de versão do phpdotenv instalável em 7.0).
+  compatível com a era — ⚠️ não confirmado).
 - Segredo **nunca** em log, em mensagem de erro, nem em **query string de URL**.
 - **Senhas:** `password_hash($senha, PASSWORD_DEFAULT)` + `password_verify()` +
   `password_needs_rehash()` no login. Em 7.0, `PASSWORD_DEFAULT` = **bcrypt** —
@@ -405,20 +353,12 @@ vive num middleware/front controller, não espalhada dentro da regra.
   `rand()`, `mt_rand()`, `uniqid()` para valor de segurança. Comparação de segredo com
   `hash_equals()` (timing-safe), nunca `===` sobre token.
 - **Criptografia simétrica — mcrypt PROIBIDO** (ver §1). Em 7.0:
-  - ⚠️ CONFIRMAR: `openssl_encrypt()` em 7.0 **não tem os parâmetros de AEAD**
+  - ⚠️ não confirmado: `openssl_encrypt()` em 7.0 **não tem os parâmetros de AEAD**
     (`$tag` para GCM chega em **7.1**) — logo, cifra autenticada "na mão" com
     openssl em 7.0 exige compor AES-CTR/CBC + HMAC corretamente, o que é terreno de
     erro. A recomendação é **biblioteca auditada**: `defuse/php-encryption` v2
     (compatível com a era) ou libsodium (`paragonie/sodium_compat`, compatível com
-    PHP antigo, ou a extensão PECL `libsodium`). ⚠️ CONFIRMAR: faixas exatas de
-    instalação dessas libs num runtime 7.0 com Composer da era.
-
-```php
-// ❌ NUNCA
-error_log("password: $password");
-// ✅ apenas identificador e ação
-$logger->info('login_attempt', ['user_id' => $userId]);
-```
+    PHP antigo, ou a extensão PECL `libsodium`).
 
 ### 6.5 Sessão & estado de autenticação
 
@@ -438,7 +378,7 @@ session_start([
   - a proteção anti-CSRF **não pode** depender de SameSite: **token anti-CSRF é
     obrigatório** em todo form/endpoint de estado (POST/PUT/DELETE) — token por
     sessão via `random_bytes()`, comparado com `hash_equals()`;
-  - ⚠️ CONFIRMAR: o workaround documentado para emitir `SameSite` em PHP < 7.3 é
+  - ⚠️ não confirmado: o workaround documentado para emitir `SameSite` em PHP < 7.3 é
     montar o header manualmente (`header('Set-Cookie: ...; SameSite=Lax', false)`) —
     validar se vale o risco/complexidade no projeto ou se o token CSRF basta.
 - Sessão é a **fonte de verdade** de identidade e tenant — regenere o id no login
@@ -446,7 +386,7 @@ session_start([
   (`session_destroy` + cookie expirado).
 - Token de autenticação **não** vai para `localStorage` (concern do front; o backend
   entrega como cookie `httponly`).
-- ⚠️ CONFIRMAR: em 7.0, garanta `session.use_strict_mode=1` e
+- ⚠️ não confirmado: em 7.0, garanta `session.use_strict_mode=1` e
   `session.use_only_cookies=1` no ini de produção — defaults de builds antigos podem
   permitir session id via URL (session fixation).
 
@@ -473,9 +413,8 @@ session_start([
 - **Annotations, não atributos:** `@test`, `@dataProvider`, `@group` em docblock —
   atributos `#[Test]` são PHP 8 / PHPUnit 10, **não existem aqui**.
 - **Base namespaced:** `PHPUnit\Framework\TestCase` (o PHPUnit 6 já usa o namespace).
-  ⚠️ CONFIRMAR: no PHPUnit 6, o type do mock em docblock é
-  `\PHPUnit_Framework_MockObject_MockObject` (nome legado) — confirmar o FQCN correto
-  da série 6.5 antes de padronizar o docblock.
+  ⚠️ não confirmado: no PHPUnit 6, o type do mock em docblock é
+  `\PHPUnit_Framework_MockObject_MockObject` (nome legado).
 - **Mocks:** `$this->createMock(Interface::class)` (disponível na série 6) — um único
   mecanismo de mock na base; não misturar com Mockery.
 - **Exceções:** `$this->expectException(DomainException::class)` **antes** do Act.
@@ -485,11 +424,6 @@ session_start([
 - **Sem typed properties** na classe de teste (7.4) — docblock `@var`.
 
 ```php
-<?php
-declare(strict_types=1);
-
-use PHPUnit\Framework\TestCase;
-
 /**
  * @group unit
  */
@@ -508,21 +442,7 @@ final class CreateUserUseCaseTest extends TestCase
     }
 
     /** @test */
-    public function deveCriarUsuarioQuandoEmailInedito()
-    {
-        // ═══════ Arrange ═══════
-        $this->repo->method('emailExists')->willReturn(false);
-        $this->repo->method('save')->willReturnArgument(0);
-
-        // ═══════ Act ═══════
-        $user = $this->useCase->execute(new CreateUserDTO('John', 'john@example.com'));
-
-        // ═══════ Assert ═══════
-        $this->assertSame('John', $user->getName());
-    }
-
-    /** @test */
-    public function naoDeveCriarComEmailExistente()
+    public function naoDeveCriarComEmailExistente() // AAA; nome revela a regra
     {
         $this->repo->method('emailExists')->willReturn(true);
 
@@ -531,10 +451,6 @@ final class CreateUserUseCaseTest extends TestCase
     }
 }
 ```
-
-> Nota: em PHPUnit 6/PHP 7.0, `setUp()` **sem** `: void` — o return type `void` não
-> parseia em 7.0. (Séries novas do PHPUnit exigem `setUp(): void`; é um dos pontos de
-> atrito do upgrade — registre no plano de migração.)
 
 **Testar comportamento, não implementação:** prove regra de negócio, cálculos críticos,
 validações de domínio e edge cases. Não teste getter trivial nem "a classe instanciou".
@@ -562,7 +478,7 @@ middlewares de produção.
 **Gerenciador:** **Composer**. `composer.json` declara, `composer.lock` **fixa** — o
 lock é **commitado** para builds reprodutíveis.
 
-- ⚠️ CONFIRMAR: num runtime 7.0, a versão máxima do Composer que **roda** é a série
+- ⚠️ não confirmado: num runtime 7.0, a versão máxima do Composer que **roda** é a série
   **2.2 LTS** (Composer ≥ 2.3 exige PHP 7.2.5+). Consequência direta:
   **`composer audit` NÃO existe** (foi adicionado no Composer **2.4**).
 - **Auditoria de vulnerabilidade na era — duas ferramentas complementares, ambas
@@ -575,9 +491,9 @@ lock é **commitado** para builds reprodutíveis.
   - **`local-php-security-checker`** — binário standalone (Go) que **escaneia o
     `composer.lock` existente** contra o advisory database, **sem depender da versão
     do PHP** da máquina. É a ferramenta certa para o pipeline de um legado 7.0.
-    ⚠️ CONFIRMAR: o projeto (`fabpot/local-php-security-checker`) segue mantido; se
-    arquivado, o substituto atual (ex.: `symfony security:check` do Symfony CLI, também
-    local e sem dependência do runtime PHP).
+    ⚠️ não confirmado: o projeto segue mantido; se arquivado, o substituto é o
+    `symfony security:check` do Symfony CLI (também local, sem dependência do runtime
+    PHP).
   - **NÃO usar** `sensiolabs/security-checker` — abandonado; a API
     `security.symfony.com` que ele consultava foi **desligada em janeiro de 2021**.
 - **Política de versão:** constraints com caret e **pin da era** — muitas libs atuais
@@ -614,17 +530,16 @@ adiciona a quarta.
   `array_*`, `password_hash`, `random_bytes`, `DateTimeImmutable` (5.5+ — prefira à
   `DateTime` mutável), `intdiv`, `hash_equals`.
 - **Polyfills em vez de gambiarra:** função de versão futura que faz falta
-  (`str_contains`, `array_key_first`) entra via `symfony/polyfill-php7x`/`php80` —
-  ⚠️ CONFIRMAR: faixa dos pacotes de polyfill instalável em runtime 7.0 — nunca
-  reimplementada à mão com outro nome.
+  (`str_contains`, `array_key_first`) entra via `symfony/polyfill-php7x`/`php80`
+  (⚠️ não confirmado: faixa instalável em runtime 7.0) — nunca reimplementada à mão
+  com outro nome.
 
 **Como descobrir o que já existe:** busca por nome/conceito nos `codePaths` da ficha;
 **um guard determinístico** (teste de arquitetura/lint custom) que **reprova** a
 reimplementação de um conversor canônico transforma "lembre de reusar" em falha de
 build.
 
-**Régua (Art. 3):** a mudança não introduz um **segundo caminho** para algo que já
-existia; quando o conceito se repetiu, ele foi **extraído**, não copiado.
+**Régua:** Charter Art. 3 (sem segundo caminho; conceito repetido → extraído).
 
 ---
 
@@ -634,24 +549,8 @@ Contexto de versão: o 7.0 (phpng) já entrega ~2× o throughput do 5.6 — a mi
 5.x→7.0 em si é o maior ganho de performance disponível; não "otimize" reintroduzindo
 ilegibilidade que o engine novo tornou desnecessária.
 
-O custo patológico mais comum continua o **round-trip de banco em laço** (N+1):
-
-```php
-// ❌ N+1 — uma query POR item
-foreach ($this->orderRepo->findAll() as $order) {
-    $customer = $this->customerRepo->findById($order->getCustomerId());
-}
-
-// ✅ uma query com JOIN, no repositório PDO
-$stmt = $pdo->prepare(
-    'SELECT o.id, o.total, c.name AS customer_name
-       FROM orders o JOIN customers c ON c.id = o.customer_id
-      WHERE o.status = :status'
-);
-$stmt->execute(['status' => 'OPEN']);
-```
-
-Padrões a seguir:
+O custo patológico mais comum continua o **round-trip de banco em laço** (N+1) — a
+correção é **uma** query com `JOIN` no repositório PDO. Padrões a seguir:
 
 - **`SELECT` só das colunas usadas** pelo `hydrate()` — nunca `SELECT *`.
 - **Paginação** (`LIMIT`/`OFFSET`) em toda listagem de tamanho variável; **índice**
@@ -663,12 +562,11 @@ Padrões a seguir:
 - **OPcache ligado em produção** (bundled desde 5.5; *preloading* é 7.4 — não existe).
 
 **Ferramenta de medição idiomática:** `EXPLAIN` no banco **real** (não no SQLite de
-teste) para plano de query; para CPU/memória do PHP, ⚠️ CONFIRMAR: a série do
-**Xdebug compatível com PHP 7.0 é a 2.5/2.6** (Xdebug 3 não suporta 7.0) — profiler
-via cachegrind; **Blackfire** e **Tideways/XHProf** tinham suporte à era, confirmar
-disponibilidade atual de agente para 7.0. **Régua (Art. 8):** não há query/round-trip
-dentro de laço sobre dados de tamanho variável; otimização não óbvia **cita a medição**
-que a justifica — nunca palpite.
+teste) para plano de query; para CPU/memória do PHP, a série do **Xdebug compatível
+com PHP 7.0 é a 2.5/2.6** (Xdebug 3 não suporta 7.0 — ⚠️ não confirmado) — profiler
+via cachegrind; **Blackfire** e **Tideways/XHProf** tinham suporte à era
+(⚠️ não confirmado). **Régua:** Charter Art. 8 (sem query em laço sobre volume
+variável; otimização não óbvia cita a medição).
 
 **Armadilha comum:** `fetchAll()` num resultado grande e depois iterar — dobra o pico
 de memória; `fetch()` em cursor (ou generator no repositório) faz o mesmo trabalho com
@@ -739,7 +637,7 @@ a ficha). Cada linha alimenta `keelson.config.json → quality.*`. Todos rodam s
 |-------|--------------------|-------|
 | **test** | `composer test` (embrulha `vendor/bin/phpunit` — PHPUnit **^6.5**) | `quality.test` |
 | **lint** | `vendor/bin/phpcs --standard=PSR12 src tests` (ou `vendor/bin/php-cs-fixer fix --dry-run --diff` na série **2.x**) | `quality.lint` |
-| **typecheck** | ⚠️ CONFIRMAR: PHPStan/Psalm atuais **não rodam** em PHP 7.0 (PHPStan 1.x exige 7.2+). Opções: (a) rodar um PHPStan antigo (série **0.9.x**, última a suportar runtime 7.0 — confirmar); (b) rodar PHPStan moderno **noutro binário PHP** no CI, analisando o código 7.0 (confirmar suporte do `phpVersion` alvo). Se nenhum for viável, `null`. | `quality.typecheck` |
+| **typecheck** | ⚠️ não confirmado: PHPStan/Psalm atuais **não rodam** em PHP 7.0 (PHPStan 1.x exige 7.2+). Opções: (a) rodar um PHPStan antigo (série **0.9.x**, última a suportar runtime 7.0); (b) rodar PHPStan moderno **noutro binário PHP** no CI, analisando o código 7.0 (confirmar suporte do `phpVersion` alvo). Se nenhum for viável, `null`. | `quality.typecheck` |
 | **build** | **não se aplica** — PHP é interpretado. O "build" de deploy é `composer install --no-dev --optimize-autoloader` + OPcache, não um passo de gate. | `quality.build` (`null`) |
 
 Auditoria de dependências (fora da tabela por não ser gate `quality.*`, mas parte do
@@ -761,6 +659,5 @@ Exemplo de ficha correspondente:
 }
 ```
 
-**Por quê:** sem estes comandos declarados, o gate não sabe o que rodar — a régua do
-charter (prova externa e falsificável) fica sem executor. E num legado EOL, o gate que
-roda **na versão certa** é a única coisa que impede sintaxe 7.1+ de chegar ao deploy.
+Num legado EOL, o gate que roda **na versão certa** é a única coisa que impede sintaxe
+7.1+ de chegar ao deploy.

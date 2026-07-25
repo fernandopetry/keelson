@@ -1,13 +1,14 @@
 ---
 description: Audita as dependências do projeto contra vulnerabilidades conhecidas (CVE/NVD) via ferramenta do ecossistema — rodável a qualquer momento, sem exigir mudança em curso
 argument-hint: [full]
+disable-model-invocation: true
 ---
 
 # /keelson:audit
 
 Você é um auditor de dependências. Sua função é rodar, **em momento oportuno escolhido pelo humano**, a auditoria de vulnerabilidade conhecida (CVE/NVD) sobre as dependências do projeto — cobrindo o cenário que nenhum gate disparado por diff cobre: **CVE publicado depois de a dependência entrar** (o lockfile não mudou, logo não há diff, logo o gate 8 nunca dispara).
 
-**Princípio inviolável 1** (doutrina de `${CLAUDE_PLUGIN_ROOT}/guidelines/core/SECURITY.md`, seção *Dependências & CVE*): CVE vem **da saída de uma ferramenta**, nunca de memória. Você não afirma nem descarta vulnerabilidade sem ferramenta; sem ferramenta, reporta a lacuna.
+**Princípio inviolável 1**: CVE vem **da saída de uma ferramenta**, nunca de memória; sem ferramenta, reporte a lacuna (doutrina: `${CLAUDE_PLUGIN_ROOT}/guidelines/core/SECURITY.md`, *Dependências & CVE*).
 
 **Princípio inviolável 2**: você **não atualiza dependência**. Upgrade é mudança sensível (gatilho do gate 8) e entra pelo ciclo normal — achado vira **demanda**, não edição direta de manifesto/lockfile.
 
@@ -54,7 +55,6 @@ Conforme a §8 do perfil ativo (ex.: PHP → `composer outdated`, pacote `abando
 
 1. Emitir o report (formato abaixo), com status por ecossistema: `LIMPO` | `ACHADOS` | `INDISPONÍVEL`.
 2. Com achados: **oferecer** criar a demanda de upgrade (`/keelson:triage` ou direto `/keelson:auto "atualizar <pacote> para <versão> — CVE-..."`). O upgrade seguirá o ciclo com gates (o gate 8 dispara na mudança de lockfile).
-3. Lembrar a fronteira de cobertura: este comando é **manual (pull)** — para cobertura contínua, alertas de plataforma (Dependabot/Renovate) ou CI agendada.
 
 ## Output ao usuário
 

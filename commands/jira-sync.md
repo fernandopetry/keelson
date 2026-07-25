@@ -11,8 +11,9 @@ conector Atlassian está indisponível ou uma operação falha, a sincronizaçã
 comando é a **rede de segurança**: reprocessa o slug e cria/vincula/comenta/transiciona o
 que ficou para trás, de forma **idempotente** (não duplica).
 
-**Toda a lógica é do protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`).
-Este comando só o orquestra sobre um slug inteiro.
+**Toda a lógica é do protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`;
+3º nível: `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md`). Este comando só o orquestra sobre um
+slug inteiro — a reconciliação usa quase todos os §§: leia o protocolo **inteiro**.
 
 ## Input
 
@@ -39,7 +40,7 @@ Aplicar o protocolo de sync Jira sobre o slug, na ordem:
 
 1. **Issue da SPEC** (§4–§6): criar (modo `create`) ou validar o vínculo (modo `link`); gravar
    a key no front-matter se criada.
-2. **Stories das FEATs** (§6.1): quando a SPEC declara FEATs e `issueType.feature` está
+2. **Stories das FEATs** (`jira-sync-feat.md` §6.1): quando a SPEC declara FEATs e `issueType.feature` está
    preenchido, criar/vincular as que faltam (idempotência por key sob o heading); gravar as
    keys na SPEC. Estado misto (sub-tasks legadas sob a issue da SPEC) → reportar, nunca
    re-parentar (§4).
@@ -48,7 +49,7 @@ Aplicar o protocolo de sync Jira sobre o slug, na ordem:
 4. **Status** (§9): só com `transition:comment`/`auto`. Em `auto`, alinhar cada sub-task ao
    status-alvo correspondente ao estado real da TASK (ex.: TASK Done → status-alvo de
    "concluída"), sempre validando a transição em runtime — e aplicar o gatilho
-   "Funcionalidade pronta p/ QA" (§6.1 item 5) às FEATs já completas.
+   "Funcionalidade pronta p/ QA" (`jira-sync-feat.md` §6.1 item 5) às FEATs já completas.
 5. **Persistência** (§10): keys gravadas; 1 linha no "Histórico recente" do INDEX.
 
 `--dry-run` → apenas imprimir o plano de reconciliação (o que seria criado/vinculado/movido),

@@ -4,10 +4,6 @@
 > `../_meta/QUALITY-CHARTER.md`: o Charter diz *o que é qualidade*; este documento diz
 > *como trabalhar* para chegar lá. O **fluxo de artefatos** (spec → plan → tasks →
 > código) é o **spec-driven development (SDD)** do keelson.
->
-> Referências à stack (paths, comandos) vêm de `keelson.config.json`: caminhos de código
-> em `codePaths`, caminhos sensíveis em `sensitiveGlobs`, comandos em `quality.*`, gates
-> em `gates.*`, raiz de docs em `docsRoot`. **Nunca** assuma paths ou comandos fixos.
 
 ---
 
@@ -17,28 +13,12 @@
   de código.
 - **Sem preguiça:** encontre a causa raiz. Sem correção temporária, sem gambiarra —
   padrão de desenvolvedor sênior.
-- **Impacto mínimo:** a mudança toca só o necessário (Charter Art. 6). Evite introduzir
-  regressão.
-- **Esforço proporcional:** calibre a profundidade de exploração, planejamento e
-  verificação por **complexidade × risco**, não só por risco. Cortar redundância (provar
-  a mesma coisa 2×, re-explorar o mesmo domínio, planejar em dobro) é cortar
-  **desperdício**, não qualidade.
-- **Reúso antes de criar:** antes de escrever helper, validação, conversão, componente ou
-  abstração, procure o equivalente existente e reúse (Charter Art. 3). Reimplementar o que
-  já existe — ou duplicar entre variações próximas (ex.: criar/atualizar) — é proibido.
-
----
-
-## Comportamento do assistente (uso de ferramentas)
-
-Ferramentas são para **descobrir o desconhecido**, não para confirmar o óbvio.
-
-| Situação | Ação |
-|----------|------|
-| Pergunta conceitual | Responder direto |
-| Informação já documentada (instruções do projeto, guidelines, mensagens anteriores) | Responder direto |
-| Implementar feature | Ler guidelines primeiro; explorar código só se necessário |
-| Corrigir bug | Ler o código relacionado |
+- **Impacto mínimo:** a mudança toca só o necessário (Charter Art. 6).
+- **Esforço proporcional** a **complexidade × risco** (Charter, régua geral) — cortar
+  redundância (provar a mesma coisa 2×, re-explorar o mesmo domínio, planejar em dobro)
+  é cortar **desperdício**, não qualidade.
+- **Reúso antes de criar** (Charter Art. 3) — inclusive entre variações próximas
+  (ex.: criar/atualizar): reimplementar o que já existe é proibido.
 
 **Hierarquia de consulta:** 1) instruções críticas do projeto → 2) Charter + perfil de
 linguagem + doutrina de `core/` → 3) código existente (só quando os guidelines não cobrem
@@ -64,21 +44,17 @@ o caso específico).
 
 - Use subagentes para manter o contexto principal limpo; **uma tarefa por subagente**.
 - **Exploração em uma onda, concisa:** peça **caminhos + mecanismo**, não relatório
-  extenso. Não re-explore o mesmo domínio em rodadas separadas.
-- **Memo de exploração:** salve o resultado num arquivo local (gitignored) e reúse-o nas
-  etapas seguintes em vez de re-explorar. Faltou um detalhe → **complemente** o memo.
-  **Remova-o na closure** da tarefa.
-- O memo é um **snapshot**: antes de **editar** um arquivo, releia o arquivo real
-  (símbolos/linhas podem ter mudado).
+  extenso; salve o resultado num **memo de exploração** e reúse-o nas etapas seguintes
+  em vez de re-explorar (mecânica do memo: convenções comuns do SDD,
+  `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`).
 - Para problemas **genuinamente complexos**, aí sim invista mais poder computacional
   (mais exploradores, verificação adversarial).
 
 ### 3. Verificação antes de concluir
 
 - Nunca marque uma tarefa como concluída sem **provar** que funciona.
-- **Forte e única, não redundante:** escolha a verificação que **prova o comportamento**
-  (integração/E2E) e rode a suíte relevante (`quality.test`) **uma vez** ao final. Não
-  prove a mesma coisa em várias ferramentas — escolha a mais forte e pare.
+- **Forte e única, não redundante** — regra completa no dono: `./TESTING.md`
+  ("Verificação forte e única").
 - Compare o comportamento entre a versão base e a sua mudança quando relevante.
 - Pergunte-se: *"um engenheiro sênior aprovaria isto?"*
 
@@ -156,19 +132,19 @@ camadas continua sendo "bug/refactor pequeno" — roteie pela **calibração de 
 5. Decisões (DEC) respeitadas
 6. Aderência ao Charter + perfil de linguagem + instruções do projeto
 7. Code review (ver `./CODE-REVIEW.md`)
-8. **Segurança** (`security-reviewer`, `./SECURITY.md`, rejeição imediata) — quando
-   `gates.security` e a mudança é sensível (toca `sensitiveGlobs`)
+8. **Segurança** (`security-reviewer`, `./SECURITY.md`, rejeição imediata) — quando a
+   mudança toca área sensível (lista canônica: description do `security-reviewer`)
 9. **Comportamento verificado** (`task-verifier`) — quando a mudança tem efeito
-   observável; a verificação **de tela** exige `gates.screenVerify`
+   observável
+
+Gatilhos e condições dos gates 8–9: detalhe operacional do `/keelson:implement`.
 
 Para bug/refactor, o protocolo é o **modo de executar** — não exige criar SPEC/PLAN/TASK
 formais.
 
-**Gerador ≠ avaliador também na rota inline:** a auto-revisão pelos gates de julgamento
-(escopo, aderência, review qualitativo) tende à autoindulgência. A prova de pronto é
-**externa e falsificável** — teste cobrindo o comportamento; o auto-checklist não a
-substitui. Mudança qualitativa sem teste possível (ex.: refactor de legibilidade) → 1
-passada de **revisão independente com contexto limpo**, não o auto-checklist.
+**Gerador ≠ avaliador também na rota inline** (Charter, régua geral): mudança
+qualitativa sem teste possível (ex.: refactor de legibilidade) → 1 passada de **revisão
+independente com contexto limpo**, não o auto-checklist.
 
 **Garantia determinística:** um hook de encerramento (`security-guard`) reforça o gate 8
 — detecta mudança sensível (por conteúdo/path em `sensitiveGlobs`) e cutuca, uma vez,
@@ -176,27 +152,11 @@ antes de encerrar. É heurístico (não prova a revisão). Par do `doc-guard`.
 
 ### Papéis do fluxo (o time SDD)
 
-O fluxo modela um time de engenharia — a separação de poderes é intencional:
-
-| Papel | Onde | IA / humano |
-|---|---|---|
-| Especificador de produto | `/keelson:specify` | IA |
-| Crítico de produto (mérito da SPEC) | `product-critic` | IA assiste; **humano aprova** |
-| Arquiteto | `/keelson:plan` | IA |
-| Tech Lead (decomposição) | `/keelson:tasks` | IA |
-| Orquestrador | `/keelson:implement` | IA |
-| Programador | `task-implementer` | IA |
-| Revisor de código (gates 1–7) | `task-reviewer` | IA |
-| Revisor de segurança (gate 8) | `security-reviewer` | IA |
-| Verificador funcional (gate 9) | `task-verifier` | IA |
-| QA de artefatos (lint) | `spec/plan/task-validator` | IA |
-| Integrador (suíte + PR) | `/keelson:integrate` | IA até o PR; **humano mergeia/deploya** |
-| Analista de estado | `status` | IA (read-only) |
-| Triador de demandas | `/keelson:triage` | IA |
-| Aprovador / dono / escalonamento | — | **humano** |
-
-Separação de poderes: quem implementa ≠ quem revisa código ≠ quem revisa segurança ≠ quem
-verifica ≠ quem aprova produto ≠ quem integra/deploya.
+O fluxo modela um time de engenharia — os papéis operacionais vivem nas descriptions dos
+comandos e agents. Separação de poderes: quem implementa ≠ quem revisa código ≠ quem
+revisa segurança ≠ quem verifica ≠ quem aprova produto ≠ quem integra/deploya. Três
+fronteiras são **humanas**: aprovar produto (SPEC), mergear/deployar (pós-PR) e ser o
+destino de escalonamento.
 
 ### Regras do modelo de tarefas
 
@@ -238,13 +198,8 @@ nenhuma atualização em `docsRoot`.
 Após **qualquer** correção do usuário, registre o padrão aprendido no arquivo de lições
 do projeto (`guidelines/project/lessons.md`), para que o mesmo erro não se repita.
 
-1. Identifique o erro ou a correção recebida.
-2. Escreva uma regra que previna o mesmo erro no futuro.
-3. Categorize pela área (linguagem, arquitetura, config, banco, segurança, testes…).
-4. Revise as lições no início de cada sessão.
-
-**Formato** — uma lição por bloco, deduplicada (se já existe equivalente, **atualize** em
-vez de duplicar):
+**Formato canônico** — uma lição por bloco, deduplicada (se já existe equivalente,
+**atualize** em vez de duplicar):
 
 ```markdown
 ## [Área] Descrição curta
@@ -256,16 +211,3 @@ vez de duplicar):
 
 Quando a regra for de uma área com guideline de referência (perfil de linguagem, `core/`),
 adicione também uma linha curta de anti-padrão lá.
-
----
-
-## Checklist rápido
-
-Antes de marcar qualquer tarefa como concluída:
-
-- [ ] Plano foi seguido ou desvios foram documentados?
-- [ ] Testes passam (`quality.test`)?
-- [ ] Comportamento foi verificado (quando observável)?
-- [ ] Um engenheiro sênior aprovaria isto?
-- [ ] Closure SDD feita e `INDEX.md` do slug atualizado (quando a tarefa for SDD)?
-- [ ] Há algo que deveria virar lição?

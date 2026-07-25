@@ -1,7 +1,7 @@
 ---
 lang: php
 version: "8.5"
-charter: 0.5.0
+charter: 0.5.1
 generated-by: exemplar
 reviewed: true
 reviewer: "Fernando Petry"
@@ -9,16 +9,14 @@ reviewer: "Fernando Petry"
 
 # PHP 8.5 — Perfil de linguagem
 
-> A **instância de referência** do `QUALITY-CHARTER.md` para PHP 8.5. Cada seção abaixo
-> pega um artigo do charter e responde: *"em PHP 8.5, isto se cumpre assim, com esta
-> ferramenta, com esta armadilha a evitar"*. É o padrão de qualidade que os demais
-> perfis (outras linguagens/versões) replicam — mesma espinha (seções 0–12), conteúdo
-> específico da stack.
+> A **instância de referência** do `QUALITY-CHARTER.md` para PHP 8.5 — exemplar revisado
+> (`reviewed: true`); perfis **gerados** marcam afirmação não validada com o tag
+> `⚠️ não confirmado` e mantêm o roteiro de verificação humana no companheiro
+> `_review/php-<versão>.md`.
 >
-> **Escopo:** o que é idiomático de PHP 8.5. A arquitetura **específica do projeto**
-> (nomes de camadas próprios, caminhos reais) mora em `guidelines/project/` e na ficha
-> `keelson.config.json`; aqui, os nomes de pasta são placeholders genéricos (`src/`,
-> `tests/`) e os namespaces usam `App\` como raiz de exemplo.
+> **Escopo:** o idiomático de PHP 8.5. Os nomes de pasta (`src/`, `tests/`) e o namespace
+> `App\` são **placeholders** — a arquitetura real do projeto mora em `guidelines/project/`
+> e na ficha `keelson.config.json`.
 
 ---
 
@@ -46,11 +44,6 @@ para pegar o primeiro/último elemento (use `array_first`/`array_last`); getters
 manuais quando um property hook resolve; `each()`, `create_function()`, `${var}` em
 strings (removidos/deprecados); propriedades dinâmicas não declaradas (deprecadas desde
 8.2 — declare a propriedade ou promova via construtor).
-
-**Por que a versão é seção de primeira classe:** o mesmo "PHP" em 8.1 e 8.5 é quase outra
-linguagem — pipe, clone-with e `#[\NoDiscard]` não existem antes de 8.5, e property hooks
-não existem antes de 8.4. Código escrito para o alvo errado passa no lint e falha no
-runtime da versão real.
 
 ---
 
@@ -97,10 +90,6 @@ autor entregou fora do padrão.
 **comentários** é uma decisão do projeto (registrada em `guidelines/project/`), mas
 **DEVE ser único e consistente** em toda a base — nunca metade em inglês, metade em outro
 idioma dentro do mesmo arquivo.
-
-**Armadilha comum:** nomear pela implementação (`$arrayDeUsers`, `processData`) em vez da
-intenção (`$activeUsers`, `deactivateExpiredContracts`). O nome que descreve o *como*
-mente assim que o *como* muda.
 
 ---
 
@@ -230,11 +219,6 @@ cliente em produção é vazamento.
 > A seção mais importante do perfil. Cada item abaixo é um item da **Régua do Art. 2**
 > traduzido para "como se faz e como se erra em PHP 8.5". Vulnerabilidade aqui é
 > **rejeição imediata** no review.
->
-> *(Este é o exemplar curado e revisado por humano — `reviewed: true`. Perfis
-> **gerados** para linguagens que o autor não domina devem marcar cada afirmação de
-> segurança com `⚠️ CONFIRMAR:` para dirigir a revisão; aqui as afirmações já foram
-> validadas.)*
 
 ### 6.1 Injeção → sempre parametrizar
 
@@ -305,13 +289,6 @@ do roteamento).
 - Segredo **nunca** em log, em mensagem de erro, nem em **query string de URL**.
 - **Senhas:** `password_hash($senha, PASSWORD_ARGON2ID)` (ou bcrypt); verificação com
   `password_verify`. **Nunca** MD5/SHA1, nunca hash caseiro.
-
-```php
-// ❌ NUNCA
-error_log("password: $password");
-// ✅ apenas identificador e ação
-$logger->info('login_attempt', ['user_id' => $userId]);
-```
 
 ### 6.5 Sessão & estado de autenticação
 
@@ -463,8 +440,7 @@ que o código fique correto.
 **um guard determinístico** (teste de arquitetura) que **reprova** a reimplementação de um
 conversor canônico é o mecanismo ideal — transforma "lembre de reusar" em falha de build.
 
-**Régua (Art. 3):** a mudança não introduz um **segundo caminho** para algo que já existia;
-quando o conceito se repetiu, ele foi **extraído**, não copiado.
+**Régua:** ver Charter Art. 3 — a mudança não introduz segundo caminho para o que já existia; conceito repetido é extraído, não copiado.
 
 ---
 
@@ -500,9 +476,8 @@ Padrões a seguir:
 
 **Ferramenta de medição idiomática:** `EXPLAIN` no banco **real** (não no SQLite de teste)
 para plano de query; **Xdebug profiler**, **Blackfire** ou **SPX** para CPU/memória do PHP;
-**OPcache** (e *preloading*) ligados em produção. **Régua (Art. 8):** não há query/round-trip
-dentro de laço sobre dados de tamanho variável; otimização não óbvia **cita a medição** que a
-justifica — nunca palpite.
+**OPcache** (e *preloading*) ligados em produção. **Régua:** ver Charter Art. 8 — sem
+query/round-trip em laço sobre volume variável; otimização não óbvia cita a medição.
 
 **Armadilha comum:** `fetchAll()` num resultado grande e depois iterar — dobra o pico de
 memória à toa; o `fetch()` em cursor faz o mesmo trabalho com pegada constante.
@@ -560,6 +535,3 @@ Exemplo de ficha correspondente:
   }
 }
 ```
-
-**Por quê:** sem estes comandos declarados, o gate não sabe o que rodar — a régua do
-charter (prova externa e falsificável) fica sem executor.

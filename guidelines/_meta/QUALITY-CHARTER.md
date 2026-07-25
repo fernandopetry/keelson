@@ -1,13 +1,12 @@
 # QUALITY-CHARTER
 
-> A constituição de qualidade — **agnóstica de linguagem**.
-> Nada aqui menciona PHP, Vue, Node ou qualquer stack. Cada perfil de linguagem
-> (`backend/*.md`, `frontend/*.md`) é uma **instância** destes princípios: pega cada
-> artigo abaixo e responde "como isto se cumpre na minha linguagem/versão".
+> A constituição de qualidade — **agnóstica de linguagem**: nada aqui menciona stack;
+> cada perfil de linguagem é uma **instância** destes princípios (ver rodapé *Como um
+> perfil usa este charter*).
 >
 > Palavras-chave conforme RFC 2119: **DEVE / NÃO DEVE / DEVERIA / PODE**.
 >
-> **Versão: 0.5.0** — é esta versão que o campo `charter:` do cabeçalho de
+> **Versão: 0.5.1** — é esta versão que o campo `charter:` do cabeçalho de
 > proveniência de cada perfil referencia.
 
 ---
@@ -31,8 +30,6 @@ Todo comportamento novo ou alterado **DEVE** ter uma prova externa que falharia 
 o comportamento regredisse. Quando a mudança tem efeito observável, ela **DEVE** ser
 exercitada no ambiente real, não só em teste unitário.
 
-- **Por quê:** quem escreve o código é o pior juiz de que ele funciona; a confiança
-  vem de um oráculo independente, não da intenção do autor.
 - **Régua:** existe um teste que cobre o comportamento e que **falha** se o código
   for revertido. Mudança sem teste possível (ex.: refactor de legibilidade) → uma
   passada de revisão independente com contexto limpo.
@@ -43,8 +40,6 @@ Toda entrada vinda de fora do processo é **não confiável**. Acesso, permissã
 capacidade **DEVEM** ser negados por padrão e liberados explicitamente. Segredos
 **NÃO DEVEM** aparecer em código-fonte, em log ou em URL.
 
-- **Por quê:** a falha de segurança padrão-inseguro é silenciosa até virar incidente;
-  o custo de negar-por-padrão é baixo e o de vazar é irreversível.
 - **Régua (o perfil mapeia cada item à linguagem):**
   - toda consulta a dados externos é **parametrizada** (nunca concatenação de entrada);
   - toda saída para outro contexto (HTML, shell, SQL, log) é **escapada** no destino;
@@ -58,8 +53,6 @@ Antes de escrever helper, validação, conversão, componente ou abstração, vo
 **DEVE** procurar o equivalente existente e reusá-lo. Um conceito **DEVE** ter uma
 única fonte de verdade.
 
-- **Por quê:** duplicação é dívida que diverge — o bug corrigido num lugar sobrevive
-  nos outros; a regra mudada num lugar mente nos demais.
 - **Régua:** a mudança não introduz um segundo caminho para algo que já existia;
   quando o conceito se repete, ele foi **extraído**, não copiado. Idealmente um guard
   determinístico reprova a reimplementação de um canônico.
@@ -75,8 +68,6 @@ Abstração e indireção (interface, fábrica, camada, padrão de projeto) se j
 dor **presente** — variação real, isolamento de efeito colateral, testabilidade — nunca por
 antecipação. Padrão é vocabulário para uma solução, não um objetivo.
 
-- **Por quê:** limites nítidos tornam a mudança local, o teste possível e o raciocínio
-  barato; acoplamento difuso faz o oposto.
 - **Régua:** a unidade pode ser testada sem levantar o mundo inteiro; trocar um detalhe
   (driver, framework, view) não obriga a reescrever a regra de negócio; a assinatura não
   carrega uma lista longa de parâmetros soltos onde um conceito nomeado os agruparia; toda
@@ -94,8 +85,6 @@ comentário **NÃO** se herda do vizinho: segue o Art. 7 — base antiga verbosa
 licença para verbosidade nova. A verbosidade que já está lá segue a **regra do
 escoteiro** (Art. 6): no trecho que a mudança toca, limpe; no resto da base, deixe.
 
-- **Por quê:** o código é lido muito mais vezes do que escrito; o nome é a documentação
-  que nunca desatualiza se disser a intenção.
 - **Régua:** um revisor entende o que a unidade faz pelo nome, sem ler o corpo; nenhum
   efeito colateral relevante fica fora do que o nome anuncia; não há mistura de
   convenções/idiomas dentro do mesmo arquivo.
@@ -114,8 +103,7 @@ de leitura** (a unidade editada e sua vizinhança no mesmo arquivo), **comportam
 preservado**, **declarada item a item** no report. Faltou qualquer uma → não é
 escoteiro, é escopo novo: registre como pendência e siga.
 
-- **Por quê:** diffs pequenos são revisáveis e reversíveis; misturar objetivos esconde
-  o que importa. E quem já está no trecho é o leitor mais barato que ele jamais terá —
+- **Por quê:** quem já está no trecho é o leitor mais barato que ele jamais terá —
   limpeza adiada para "outra task" é adiada para nunca.
 - **Régua:** o diff se explica por um objetivo mais a limpeza declarada do trecho
   tocado; ações destrutivas ou de difícil reversão passaram por decisão humana
@@ -165,8 +153,6 @@ Uma tarefa só está **pronta** quando: os critérios de aceite estão cobertos 
 avaliada quando aplicável (Art. 2), o comportamento foi verificado quando observável, e
 a mudança está **documentada** onde o próximo vai procurar.
 
-- **Por quê:** código sem prova, sem revisão e sem registro é trabalho não terminado
-  que parece terminado — a pior categoria.
 - **Régua:** existe a definição de pronto (os gates) e ela foi satisfeita de forma
   verificável; a documentação canônica reflete a mudança.
 

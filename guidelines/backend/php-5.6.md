@@ -1,7 +1,7 @@
 ---
 lang: php
 version: "5.6"
-charter: 0.5.0
+charter: 0.5.1
 generated-by: profile-writer
 reviewed: false
 reviewer: null
@@ -9,32 +9,22 @@ reviewer: null
 
 # PHP 5.6 — Perfil de linguagem (legado)
 
-> Instância do `QUALITY-CHARTER.md` (v0.3.0) para **PHP 5.6 legado**. Cada seção pega um
-> artigo do charter e responde: *"em PHP 5.6, isto se cumpre assim, com esta ferramenta,
-> com esta armadilha a evitar"*. Mesma espinha do exemplar PHP 8.5 (seções 0–12),
-> conteúdo específico da versão.
->
-> **Este perfil é um rascunho gerado (`reviewed: false`).** Afirmações de segurança
-> inferidas sem confirmação documental estão marcadas `⚠️ CONFIRMAR:` para dirigir a
-> revisão humana.
->
-> **Escopo:** o que é idiomático — e o que é *possível* — em PHP 5.6. A arquitetura
-> específica do projeto mora em `guidelines/project/` e na ficha `keelson.config.json`;
-> aqui os caminhos são placeholders (`src/`, `tests/`).
+> **Rascunho gerado (`reviewed: false`).** Afirmação inferida sem confirmação documental
+> leva a tag **`⚠️ não confirmado`**; os roteiros de verificação humana vivem no
+> companheiro `${CLAUDE_PLUGIN_ROOT}/guidelines/backend/_review/php-5.6.md`.
+> **Escopo:** o que é idiomático — e o que é *possível* — em PHP 5.6. Caminhos aqui são
+> placeholders (`src/`, `tests/`); a arquitetura real mora em `guidelines/project/` e na
+> ficha `keelson.config.json`.
 
 ---
 
 ## 1. Identidade & versão
 
 > **⛔ PHP 5.6 está em fim de vida (EOL) desde 31/12/2018.** Não recebe patch de
-> segurança do PHP.net há anos; vulnerabilidades descobertas desde então permanecem
-> abertas no runtime. Todo trabalho neste perfil convive com esse fato: a postura é
-> **mitigar** (superfície reduzida, isolamento de rede, WAF na frente, dependências
-> auditadas) e manter o **plano de upgrade para PHP suportado como recomendação
-> permanente** — registrado como dívida, não esquecido.
-> ⚠️ CONFIRMAR: se o servidor usa pacote de distro com backport (RHEL, Debian ELTS,
-> Ubuntu ESM), verificar **quais** CVEs o backport realmente cobre — cobertura é parcial
-> e varia por distro.
+> segurança do PHP.net; vulnerabilidades descobertas desde então permanecem abertas no
+> runtime. Postura: **mitigar** (mitigações concretas no §6) e manter o **plano de
+> upgrade para PHP suportado como recomendação permanente** — registrado como dívida,
+> não esquecido.
 
 O alvo é **PHP 5.6** (última minor da série 5.x). O teto de sintaxe é rígido: código
 com construção de 7.x/8.x **não passa do parser** (ver §11).
@@ -69,11 +59,6 @@ ver §6.6), `preg_replace` com modificador `/e` (injeção de código — use
 `preg_replace_callback`), construtor estilo PHP 4 (método com nome da classe — use
 `__construct`), `ereg_*`, `split()`, o operador `@`.
 
-**Por que a versão é seção de primeira classe:** "PHP" em 5.6 e em 8.x é quase outra
-linguagem. Quem escreve com memória muscular de 8.x produz código que **nem parseia**
-em 5.6 — e o erro só aparece no servidor. O guard disso é lint de parse com o binário
-5.6 real + PHPCompatibility (§11, §12).
-
 ---
 
 ## 2. Estilo, formatação & lint → Charter Art. 5, 7
@@ -81,17 +66,17 @@ em 5.6 — e o erro só aparece no servidor. O guard disso é lint de parse com 
 **Guia canônico: PSR-2** — o padrão de estilo da era 5.x. PSR-12/PER pressupõem
 construções de PHP 7+ (`declare(strict_types)`, return types) e as ferramentas que os
 impõem exigem runtime mais novo.
-⚠️ CONFIRMAR: viabilidade prática de ruleset PSR-12 nas versões de ferramenta que
+⚠️ não confirmado: viabilidade prática de ruleset PSR-12 nas versões de ferramenta que
 rodam em 5.6 — a recomendação segura é PSR-2.
 
 - **Linter de estilo:** `phpcs`/`phpcbf` (PHP_CodeSniffer 3.x) com `--standard=PSR2`.
-  ⚠️ CONFIRMAR: PHP_CodeSniffer 3.x roda em PHP 5.4+ (portanto no próprio 5.6).
+  ⚠️ não confirmado: PHP_CodeSniffer 3.x roda em PHP 5.4+ (portanto no próprio 5.6).
 - **Formatter alternativo:** **PHP-CS-Fixer 2.19** (última linha 2.x; suporta PHP
   5.6–7.4 — confirmado). Config da era 2.x é **`.php_cs.dist`** na raiz (o nome
   `.php-cs-fixer.dist.php` é da linha 3.x, que não roda em 5.6).
 - **Lint de parse (obrigatório):** `php -l` com o **binário 5.6 real** em todo arquivo
   tocado — é o único guard barato contra sintaxe 7.x/8.x acidental. Em lote:
-  PHP Parallel Lint. ⚠️ CONFIRMAR: versão do parallel-lint que roda em PHP 5.6 (a
+  PHP Parallel Lint. ⚠️ não confirmado: versão do parallel-lint que roda em PHP 5.6 (a
   linha antiga `jakub-onderka/php-parallel-lint`; o fork atual
   `php-parallel-lint/php-parallel-lint` declara suporte a PHP antigo).
 - **É erro (bloqueia):** violação PSR-2 reportada pelo phpcs; qualquer parse error no
@@ -133,10 +118,6 @@ na base — nunca misturado no mesmo arquivo.
 docblock (`@param string $email`, `@return User|null`) é **a única declaração de tipo
 que o leitor e o IDE têm**. Docblock ausente ou mentiroso em API pública é violação do
 Art. 5 — o nome + docblock precisam contar a verdade que a assinatura não consegue.
-
-**Armadilha comum:** nomear pela implementação (`$arrayDeUsers`, `processData`) em vez
-da intenção (`$activeUsers`, `deactivateExpiredContracts`) — em 5.6, sem tipos na
-assinatura, o nome ruim custa dobrado.
 
 ---
 
@@ -269,14 +250,9 @@ Consequências práticas:
   resposta.
 
 ```php
-try {
-    $user = $this->useCase->execute($dto);
-    return $this->ok($response, $user->toArray());
-} catch (\InvalidArgumentException $e) {
-    return $this->error($response, 'Validation failed', 422);
 } catch (\DomainException $e) {
     return $this->error($response, $e->getMessage(), 400); // mensagem de negócio, curada
-} catch (\Exception $e) {
+} catch (\Exception $e) { // topo da hierarquia capturável em 5.6 — \Throwable não existe
     $this->logger->error('user.create.failed', array('exception' => $e->getMessage()));
     return $this->error($response, 'Internal error', 500);  // genérico para o cliente
 }
@@ -294,15 +270,12 @@ usuário vê a tela branca (ou o stack, se `display_errors` estiver ligado).
 
 ## 6. Segurança mapeada à linguagem → Charter Art. 2 `[CRÍTICA]`
 
-> **⛔ Runtime EOL: a primeira mitigação é reduzir a exposição.** PHP 5.6 não recebe
-> patch — vulnerabilidade no interpretador/extensões fica aberta. Postura obrigatória
-> enquanto o upgrade não acontece: **superfície mínima** (desabilitar extensões e
-> endpoints não usados, `expose_php=Off`), **isolamento** (segmentação de rede, o
-> app 5.6 não fala com o que não precisa), **WAF/proxy reverso** na frente filtrando o
-> grosso (e escondendo o banner de versão), **auditoria de dependências** (§8) e o
-> **plano de upgrade como recomendação permanente** em toda entrega relevante.
-> ⚠️ CONFIRMAR: inventário real de CVEs abertos contra a build 5.6 específica do
-> servidor (via NVD/`/keelson:audit`) — a lista muda conforme a minor/backport.
+> **⛔ Runtime EOL (§1) — mitigar e migrar:** **superfície mínima** (desabilitar
+> extensões e endpoints não usados, `expose_php=Off`), **isolamento** de rede,
+> **WAF/proxy reverso** na frente (escondendo o banner de versão), **auditoria de
+> dependências** (§8) e o plano de upgrade em toda entrega relevante.
+> ⚠️ não confirmado: cobertura de backport da distro e inventário de CVEs abertos da
+> build (roteiros no companheiro `_review/php-5.6.md`).
 >
 > Cada item abaixo é um item da **Régua do Art. 2** traduzido para "como se faz e como
 > se erra em PHP 5.6". Vulnerabilidade aqui é **rejeição imediata** no review.
@@ -385,7 +358,7 @@ esquecimento = endpoint aberto; é negar-por-padrão invertido).
 - **Prova:** gate de autorização exige teste provando **403 sem a permissão** (não só
   200 com ela).
 
-⚠️ CONFIRMAR: no framework legado real do projeto (CodeIgniter 2/3, CakePHP 2, Zend 1,
+⚠️ não confirmado: no framework legado real do projeto (CodeIgniter 2/3, CakePHP 2, Zend 1,
 app procedural…), **onde** é o ponto único de autorização e se a ordem
 bootstrap→auth→ação é garantida — cada um da era faz diferente.
 
@@ -393,7 +366,7 @@ bootstrap→auth→ação é garantida — cada um da era faz diferente.
 
 - Segredos vêm de **variável de ambiente / arquivo de config fora do webroot** —
   nunca hardcoded, nunca commitados. `.env` no `.gitignore`.
-  ⚠️ CONFIRMAR: versão de `vlucas/phpdotenv` compatível com 5.6 (linha 2.x), se o
+  ⚠️ não confirmado: versão de `vlucas/phpdotenv` compatível com 5.6 (linha 2.x), se o
   projeto usar `.env`.
 - Segredo **nunca** em log, mensagem de erro, nem query string de URL.
 - **Senhas: `password_hash($senha, PASSWORD_DEFAULT)`** (bcrypt em 5.6) +
@@ -402,13 +375,6 @@ bootstrap→auth→ação é garantida — cada um da era faz diferente.
   para senha é rejeição imediata.
 - Comparação de token/HMAC com **`hash_equals()`** (existe em 5.6) — `==`/`===` em
   segredo é vulnerável a timing.
-
-```php
-// ❌ NUNCA
-error_log("password: $password");
-// ✅ apenas identificador e ação
-$logger->info('login_attempt', array('user_id' => $userId));
-```
 
 ### 6.5 Sessão & estado de autenticação
 
@@ -419,7 +385,7 @@ $logger->info('login_attempt', array('user_id' => $userId));
   Consequência direta: **a proteção CSRF não pode se apoiar em cookie — token
   anti-CSRF é obrigatório** em todo POST/PUT/DELETE, gerado com CSPRNG (§6.6) e
   comparado com `hash_equals()`.
-  ⚠️ CONFIRMAR: se optarem por emitir `SameSite` manualmente via `header('Set-Cookie: ...')`,
+  ⚠️ não confirmado: se optarem por emitir `SameSite` manualmente via `header('Set-Cookie: ...')`,
   validar o comportamento (duplicação de header de sessão, compat de navegador) — é
   workaround frágil, não substitui o token CSRF.
 - `session_regenerate_id(true)` **no login** (anti session fixation); expiração por
@@ -442,11 +408,11 @@ $logger->info('login_attempt', array('user_id' => $userId));
   **GCM não é utilizável** — o padrão é **AES-256-CBC + HMAC (encrypt-then-MAC)** com
   chaves separadas, ou a biblioteca **`defuse/php-encryption` v2** (suporta PHP 5.6+,
   OpenSSL 1.0.1+), que encapsula isso corretamente.
-  ⚠️ CONFIRMAR: qual release da linha 2.x do defuse/php-encryption ainda instala
+  ⚠️ não confirmado: qual release da linha 2.x do defuse/php-encryption ainda instala
   limpo sob Composer com `platform.php = 5.6`.
 - **TLS de saída:** PHP 5.6 foi a versão que passou a **verificar peer por padrão**
   nos stream wrappers — não desligue (`verify_peer=false` / `CURLOPT_SSL_VERIFYPEER=false`
-  são rejeição imediata). ⚠️ CONFIRMAR: a build de OpenSSL do servidor legado suporta
+  são rejeição imediata). ⚠️ não confirmado: a build de OpenSSL do servidor legado suporta
   TLS 1.2 — builds da era param em TLS 1.0/1.1, hoje rejeitados por APIs externas.
 - **Mass assignment:** Entity montada de **DTO com campos whitelistados** — nunca
   `fromArray($_POST)` direto.
@@ -470,57 +436,29 @@ PHPUnit 4.8 é o fallback se alguma dependência travar a resolução). Comando 
 - **`setUp()` sem `: void`** — return type é sintaxe 7.x; escrever
   `protected function setUp(): void` quebra o parse do arquivo inteiro.
 - **Mocks:** `$this->createMock(Interface::class)`.
-  ⚠️ CONFIRMAR: `createMock()` entrou na linha 5.x do PHPUnit (por volta de 5.4);
+  ⚠️ não confirmado: `createMock()` entrou na linha 5.x do PHPUnit (por volta de 5.4);
   em PHPUnit 4.8 o equivalente é `getMockBuilder(...)->getMock()`.
 - **Exceções:** `$this->expectException(\DomainException::class)`.
-  ⚠️ CONFIRMAR: disponível a partir de PHPUnit 5.2; em 4.8, `setExpectedException()`.
+  ⚠️ não confirmado: disponível a partir de PHPUnit 5.2; em 4.8, `setExpectedException()`.
 - Um único mecanismo de mock na base (sem misturar Mockery).
 
 ```php
-<?php
-
-use App\Application\UseCases\User\CreateUserUseCase;
-use App\Application\DTOs\User\CreateUserDTO;
-use App\Domain\Repositories\User\UserRepositoryInterface;
-
-/**
- * @group skip-migration
- */
+/** @group skip-migration */
 final class CreateUserUseCaseTest extends PHPUnit_Framework_TestCase
 {
     /** @var UserRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject */
     private $repo;
 
-    /** @var CreateUserUseCase */
-    private $useCase;
-
     protected function setUp() // sem ": void" — sintaxe 7.1 não parseia em 5.6
     {
         $this->repo = $this->createMock('App\Domain\Repositories\User\UserRepositoryInterface');
-        $this->useCase = new CreateUserUseCase($this->repo);
-    }
-
-    /** @test */
-    public function deveCriarUsuarioQuandoEmailInedito()
-    {
-        // ═══════════ Arrange ═══════════
-        $this->repo->method('emailExists')->willReturn(false);
-        $this->repo->method('save')->willReturnArgument(0);
-
-        // ═══════════ Act ═══════════
-        $user = $this->useCase->execute(new CreateUserDTO('John', 'john@example.com'));
-
-        // ═══════════ Assert ═══════════
-        $this->assertSame('John', $user->getName());
     }
 
     /** @test */
     public function naoDeveCriarComEmailExistente()
     {
-        $this->repo->method('emailExists')->willReturn(true);
-
         $this->expectException('DomainException');
-        $this->useCase->execute(new CreateUserDTO('John', 'john@example.com'));
+        // ...
     }
 }
 ```
@@ -566,12 +504,12 @@ importante:
 2. **`roave/security-advisories` (`dev-latest`)** como `require-dev` — metapacote de
    `conflict` que **impede instalar/atualizar** para versão vulnerável (não escaneia o
    lock existente, previne daqui para frente).
-   ⚠️ CONFIRMAR: instalação limpa sob Composer 2.2 com `platform.php = 5.6` — o
+   ⚠️ não confirmado: instalação limpa sob Composer 2.2 com `platform.php = 5.6` — o
    pacote é só metadata, mas os conflitos podem travar libs legadas já vulneráveis
    (o que, a rigor, é o aviso funcionando).
 3. **`local-php-security-checker`** (binário Go, independente do PHP do servidor) —
-   escaneia o `composer.lock` contra o mesmo advisory database.
-   ⚠️ CONFIRMAR: estado de manutenção atual do projeto e cobertura do database.
+   escaneia o `composer.lock` contra o mesmo advisory database. ⚠️ não confirmado
+   (roteiro de manutenção/cobertura no companheiro `_review/php-5.6.md`).
 
 **Política de versão:** `composer.lock` **commitado**; `composer install` em CI
 (respeita o lock), `composer update` só deliberado. Constraints com caret. Realidade
@@ -602,7 +540,7 @@ equivalente** — reimplementar o que existe é proibido, mesmo correto.
   `array_*`, `password_hash`, `DateTimeImmutable` (existe desde 5.5), `finfo`,
   `hash_equals`.
 - **Polyfills canônicos antes de gambiarra:** `paragonie/random_compat`
-  (`random_bytes`); ⚠️ CONFIRMAR: `symfony/polyfill-php70` como fonte de outras
+  (`random_bytes`); ⚠️ não confirmado: `symfony/polyfill-php70` como fonte de outras
   funções de 7.0 (`intdiv`, `error_clear_last`) em 5.6 — verificar a versão da linha
   polyfill que ainda suporta instalar sob 5.6.
 
@@ -610,29 +548,12 @@ equivalente** — reimplementar o que existe é proibido, mesmo correto.
 um guard determinístico que reprova a reimplementação de um conversor canônico
 transforma "lembre de reusar" em falha de build.
 
-**Régua (Art. 3):** a mudança não introduz um **segundo caminho** para algo que já
-existia; conceito repetido foi **extraído**, não copiado.
-
 ---
 
 ## 10. Performance & armadilhas → Charter Art. 8
 
-O custo patológico número um continua o **round-trip de banco em laço** (N+1):
-
-```php
-// ❌ N+1 — uma query POR item
-foreach ($this->orderRepo->findAll() as $order) {
-    $customer = $this->customerRepo->findById($order->getCustomerId());
-}
-
-// ✅ uma query com JOIN, no repositório PDO
-$stmt = $pdo->prepare(
-    'SELECT o.id, o.total, c.name AS customer_name
-       FROM orders o JOIN customers c ON c.id = o.customer_id
-      WHERE o.status = :status'
-);
-$stmt->execute(array('status' => 'OPEN'));
-```
+O custo patológico número um continua o **round-trip de banco em laço** (N+1) — a
+correção é a query única com `JOIN` no repositório PDO, nunca uma query por item.
 
 Padrões a seguir — com o agravante de que **o runtime 5.6 é ~2× mais lento que o 7.x**
 (a migração de versão é a maior otimização disponível, e entra no argumento do plano
@@ -649,12 +570,9 @@ de upgrade):
   request.
 
 **Ferramenta de medição idiomática:** `EXPLAIN` no banco **real**; para CPU/memória do
-PHP, **Xdebug 2.x** (profiler cachegrind) — ⚠️ CONFIRMAR: a última versão da linha 2.x
+PHP, **Xdebug 2.x** (profiler cachegrind) — ⚠️ não confirmado: a última versão da linha 2.x
 compatível com PHP 5.6 (a linha 3.x não suporta PHP 5). `microtime(true)` + log para
 medições pontuais quando instalar profiler no legado não for viável.
-
-**Régua (Art. 8):** não há query/round-trip dentro de laço sobre dados de tamanho
-variável; otimização não óbvia **cita a medição** — nunca palpite.
 
 ---
 
@@ -672,7 +590,7 @@ no servidor:
   constante de classe (`private const`) · **vírgula final em chamada de função**
   (7.3+) · first-class callable (`strlen(...)`). O guard disso é `php -l` com binário
   5.6 + **PHPCompatibility** (ruleset do phpcs) com `testVersion 5.6`.
-  ⚠️ CONFIRMAR: requisitos de runtime da versão atual do PHPCompatibility (se roda no
+  ⚠️ não confirmado: requisitos de runtime da versão atual do PHPCompatibility (se roda no
   binário 5.6 ou precisa rodar num PHP moderno apontando para o código legado).
 - **O que parseia mas mente:** `catch (\Throwable $e)` compila e **nunca captura**
   (§5); `random_bytes()`/`random_int()`/`intdiv()` parseiam e explodem em runtime como
@@ -710,7 +628,7 @@ e a automação. Ferramental **de época**, compatível com o runtime 5.6:
 |-------|--------------------|-------|
 | **test** | `vendor/bin/phpunit` (PHPUnit **5.7**; 4.8 como fallback) | `quality.test` |
 | **lint** | `vendor/bin/phpcs --standard=PSR2 src/ tests/` **+** lint de parse com o binário 5.6 (`vendor/bin/parallel-lint src/ tests/` ou `php -l`) — os dois papéis são distintos e ambos bloqueiam | `quality.lint` |
-| **typecheck** | **Limitado nesta versão.** PHPStan/Psalm exigem runtime PHP 7+ e ⚠️ CONFIRMAR: não aceitam `phpVersion` alvo 5.6 — análise com eles gera falsos positivos/negativos. O papel prático de "typecheck" aqui é o **parse-check com binário 5.6 + PHPCompatibility (`testVersion 5.6`)**; se não adotado, `null`. | `quality.typecheck` |
+| **typecheck** | **Limitado nesta versão.** PHPStan/Psalm exigem runtime PHP 7+ e ⚠️ não confirmado: não aceitam `phpVersion` alvo 5.6 — análise com eles gera falsos positivos/negativos. O papel prático de "typecheck" aqui é o **parse-check com binário 5.6 + PHPCompatibility (`testVersion 5.6`)**; se não adotado, `null`. | `quality.typecheck` |
 | **build** | **não se aplica** — PHP é interpretado. O deploy é `composer install --no-dev --optimize-autoloader` (Composer 2.2 LTS no servidor, ou moderno com `platform.php` no CI) — não é passo de gate. | `quality.build` (`null`) |
 
 Exemplo de ficha correspondente:
@@ -736,6 +654,5 @@ E o `composer.json` do projeto DEVE fixar a plataforma para resolução reprodut
 }
 ```
 
-**Por quê:** sem estes comandos declarados, o gate não sabe o que rodar — e neste
-perfil o lint de **parse com o binário 5.6 real** é o guard mais importante de todos:
-é ele que impede a sintaxe 7.x/8.x de chegar viva ao servidor.
+O lint de **parse com o binário 5.6 real** é o guard mais importante deste perfil: é
+ele que impede a sintaxe 7.x/8.x de chegar viva ao servidor.

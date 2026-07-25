@@ -1,7 +1,6 @@
 # keelson — repo de desenvolvimento do plugin
 
-Este repositório **é** o plugin (a raiz é o pacote: `commands/`, `agents/`, `skills/`,
-`hooks/`, `guidelines/`, `templates/`). Não é um projeto consumidor — aqui se desenvolve
+Este repositório **é** o plugin (a raiz é o pacote). Não é um projeto consumidor — aqui se desenvolve
 o keelson; a doutrina que os consumidores recebem vive em `guidelines/` e o bloco
 injetado neles em `templates/CLAUDE.keelson-block.md`.
 
@@ -17,16 +16,18 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 
 ## Ao mudar comando ou doutrina
 
-- Comando novo/renomeado → sincronizar **4 lugares**: `commands/*.md` · tabela *Commands*
-  do `README.md` · §3.x do `docs/_meta/method-guide.md` · lista de comandos do
-  `templates/CLAUDE.keelson-block.md`.
+- Comando novo/renomeado → sincronizar **3 lugares**: `commands/*.md` · tabela *Commands*
+  do `README.md` · §3.x do `docs/_meta/method-guide.md`. Comando humano-only
+  (`disable-model-invocation`) → também a nota do `templates/CLAUDE.keelson-block.md`.
 - **Um dono por regra**: o core (`guidelines/core/`) diz *o quê* (agnóstico); o perfil diz
   *como* na linguagem. Não duplicar regra entre eles. Blocos compartilhados dos comandos
-  (convenções comuns, template/receita do INDEX) têm dono único no
-  `docs/_meta/method-guide.md` (§3.0/§6); a moldura dos validators, em
-  `skills/_shared/validator-protocol.md`; o `security-reviewer` **lê** o checklist de
-  `guidelines/core/SECURITY.md` em runtime, não o replica (decisão 4.20) — mudou a regra,
-  mude no dono, nunca copie no consumidor.
+  têm dono único em `docs/_meta/conventions/` — `sdd-conventions.md` (convenções comuns,
+  ex-§3.0), `index-contract.md` (artefatos/IDs + contrato/template/receita do INDEX, ex-§6)
+  e `handoff-protocol.md` (handoff de verificação de tela, ex-§8); o `method-guide.md`
+  segue guia humano, com os headings §3.0/§6/§8 preservados como ponteiros. A moldura dos
+  validators vive em `skills/_shared/validator-protocol.md`; o `security-reviewer` **lê** o
+  checklist de `guidelines/core/SECURITY.md` em runtime, não o replica (decisão 4.20) —
+  mudou a regra, mude no dono, nunca copie no consumidor.
 - Perfil com `reviewed: true` (ex.: `backend/php.md`) é revisado por humano: edição nele
   deve ser sinalizada na entrega para re-olhada humana.
 
@@ -42,7 +43,5 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 ## Convenções
 
 - Commits: conventional commits **em inglês** (`feat(scope): …`), referenciando a
-  decisão quando houver (ex.: `(4.16)`). Histórico anterior a 0.4.0 está em português —
-  não reescrever.
+  decisão quando houver (ex.: `(4.16)`).
 - Docs e doutrina em **português**; `README.md` em **inglês**.
-- Commit e push só quando o humano pedir.

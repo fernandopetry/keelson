@@ -6,10 +6,9 @@ description: Gate `screenVerify`: verificação visual autenticada de telas em a
 # Skill: screen-verify
 
 Você vai **autenticar e navegar** a aplicação do projeto em ambiente **local de
-desenvolvimento** para verificar uma tela visualmente — o gate `screenVerify`. O **como**
-(dirigir o browser, logar, exercitar) é genérico e está aqui; os **dados de acesso** (URL,
-usuário, senha de dev) vêm do `keelson.local.json`; o **que** verificar vem do roteiro (um
-`HANDOFF-*.md` ou o pedido do humano).
+desenvolvimento** para verificar uma tela visualmente — o gate `screenVerify`. Dados de
+acesso: `keelson.local.json` (abaixo); o **que** verificar: o roteiro (um `HANDOFF-*.md`
+ou o pedido do humano).
 
 **Fronteira de segurança (não-negociável):** só ambiente **local**. Dados locais são
 fictícios — logar localmente é seguro. **Nunca** aplique nada desta skill contra produção,
@@ -19,26 +18,8 @@ nem com conta real de usuário.
 
 As credenciais e a URL de teste vêm do `keelson.local.json` na raiz do projeto — arquivo
 **gitignored**, criado pelo `/keelson:init`. Um **realm** por área logada da aplicação
-(ex.: `admin`, `portal`), cada um com sua URL, sua rota de login e seu usuário de dev:
-
-```jsonc
-{
-  "screenVerify": {
-    "realms": {
-      "<nome-do-realm>": {
-        "description": "<do que se trata este acesso — ex.: área administrativa>",
-        "baseUrl": "http://localhost:<porta>/<base>/",
-        "login": {
-          "path": "/<rota-de-login>",
-          "username": "<usuário/email de dev>",
-          "password": "<senha de dev — só ambiente de testes>"
-        }
-      }
-    },
-    "defaultRealm": "<nome>"
-  }
-}
-```
+(ex.: `admin`, `portal`); chaves: `screenVerify.realms.<nome>.{baseUrl, login: {path,
+username, password}}` + `screenVerify.defaultRealm` — o arquivo real é lido em runtime.
 
 - **Formato flat legado** (`baseUrl` + `login` direto sob `screenVerify`, sem `realms`)
   segue válido: equivale a um único realm implícito.
@@ -79,12 +60,9 @@ server já está de pé, **não suba nada** — só abra uma aba na `baseUrl` do
 a app cai na tela de login. Nenhum server rodando → suba pelo `launch.json`/método do
 projeto.
 
-**Identidade do código se prova, não se presume** (decisão 4.30): um server "já de pé"
-pode estar servindo **outra cópia** do código — o repo principal em vez da worktree, um
-container montando outro path, um build antigo. Antes de confiar em qualquer evidência,
-prove que o processo serve o código sob teste (path raiz do server, SHA/marcador exposto,
-ou o efeito de uma mudança já commitada na branch). Verificar contra código errado produz
-falso bug e falso verde — inclusive "falha de segurança" que não existe.
+**Identidade do código se prova, não se presume** (decisão 4.30): antes de confiar em
+qualquer evidência, prove que o processo serve o código sob teste — path raiz do server,
+SHA/marcador exposto, ou o efeito de uma mudança já commitada na branch.
 
 ## 2. Login
 

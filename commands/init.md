@@ -8,7 +8,7 @@ Você configura (ou repara) a adoção do **keelson** num projeto. Seu trabalho 
 
 **Princípio**: as perguntas que você faz são **decisões de produto** (tem frontend? qual o comando de teste?), nunca "digite este glob". Detecte o que der; pergunte só o que não conseguir inferir, sempre explicando o **efeito** da escolha.
 
-**Idempotente e preservador**: rodar de novo **completa e repara, nunca destrói**. Preserva tudo o que o humano personalizou (valores da ficha, perfis revisados, o `keelson.local.json`) e **só acrescenta o que falta** — inclusive campos e arquivos que uma versão mais nova do keelson passou a exigir. Por isso **atualizar o plugin e rodar `/keelson:init` de novo é o caminho de migração de versão**: o projeto ganha o que a versão nova trouxe sem perder o que já era seu. Ver a **Regra de merge** abaixo.
+**Idempotente e preservador**: rodar de novo **completa e repara, nunca destrói** (ver a **Regra de merge** abaixo). Por isso **atualizar o plugin e rodar `/keelson:init` de novo é o caminho de migração de versão**: o projeto ganha o que a versão nova trouxe sem perder o que já era seu.
 
 ## Resultado esperado
 
@@ -58,7 +58,7 @@ Para backend e (se houver) frontend:
 
 Em todos os casos, **grave o caminho resolvido no campo `profile.<role>.file` da ficha**: prefixo `plugin:` para exemplar embarcado (ex.: `plugin:backend/php.md`, resolvido em `${CLAUDE_PLUGIN_ROOT}/guidelines/`); caminho relativo à raiz do projeto para perfil gerado (ex.: `guidelines/project/backend/node-20.md`). É esse campo que os demais comandos usam para carregar o perfil.
 
-Perfis gerados nascem **pendentes de revisão** e podem trazer marcas `⚠️ CONFIRMAR:` — colete-as para o relatório.
+Perfis gerados nascem **pendentes de revisão**: afirmações não confirmadas levam a tag inline `⚠️ não confirmado` e a logística de revisão humana vive no arquivo companheiro `_review/<lang>-<versão>.md` ao lado do perfil (embarcados: `${CLAUDE_PLUGIN_ROOT}/guidelines/backend/_review/php-<versão>.md`) — colete os itens do companheiro para o relatório.
 
 ## Etapa 4 — Escrever a ficha `keelson.config.json`
 
@@ -66,18 +66,18 @@ Parta de `${CLAUDE_PLUGIN_ROOT}/templates/keelson.config.example.json` e preench
 - `security` (bool);
 - `screenVerify` = objeto `{ "enabled": <há frontend?>, "method": <o da Etapa 2, ex. "skill:screen-verify"> }`. (Aceita também o atalho booleano `true`/`false` = `{enabled, method:null}`.)
 
-Grave na raiz do projeto. **Se a ficha já existe**, aplique a **Regra de merge**: carregue a atual, preserve os valores personalizados e complete só os campos ausentes (ex.: migrar um `screenVerify` booleano antigo para o objeto `{enabled, method}` mantendo o valor) — não reescreva por cima.
+Grave na raiz do projeto. **Se a ficha já existe** → Regra de merge; específico deste passo: migrar um `screenVerify` booleano antigo para o objeto `{enabled, method}` mantendo o valor.
 
 ## Etapa 4.5 — Dados de acesso locais para verificação de tela (só se `screenVerify.enabled`)
 
 Se `gates.screenVerify.enabled` é `true` e o método precisa de credenciais (ex.: a skill `screen-verify`), a verificação exige URL + login de **desenvolvimento**. Produza **dois arquivos** na raiz (padrão `.env` / `.env.example`):
 
-1. **`keelson.local.example.json`** — **VERSIONADO** (vai para o git). É o template do projeto: preencha `screenVerify.realms` — **um realm por área logada** identificada na Etapa 2 (ex.: `admin`, `portal`), cada um com `description` (do que se trata o acesso), `baseUrl`, rota de login e `username` **deste projeto** — e deixe cada `password` como placeholder (`<PREENCHER: ...>`). **Nunca** contém senha real. É o que viaja entre máquinas — noutro clone, copia-se ele para `keelson.local.json` e preenchem-se só as senhas.
+1. **`keelson.local.example.json`** — **VERSIONADO** (vai para o git). É o template do projeto: preencha `screenVerify.realms` — **um realm por área logada** identificada na Etapa 2 (ex.: `admin`, `portal`), cada um com `description` (do que se trata o acesso), `baseUrl`, rota de login e `username` **deste projeto** — e deixe cada `password` como placeholder (`<PREENCHER: ...>`). **Nunca** contém senha real.
 2. **`keelson.local.json`** — **GITIGNORED** (nunca vai para o git): a cópia real, onde o humano põe a senha. **Garanta o `.gitignore` ANTES de criá-lo** (Etapa 5.5). Crie-o a partir do `.example` do projeto (se já existir) ou do template do plugin, com a senha em placeholder.
 
 Regras:
 - **Não escreva senha** você mesmo em nenhum dos dois. Deixe o placeholder e **instrua o humano** a preencher só o `keelson.local.json`, com credenciais de **DEV/teste descartáveis** — **nunca** produção nem conta real.
-- **Merge-preserving** (Regra de merge): se o `keelson.local.json` já existe, **não o sobrescreva** — preserva a senha já preenchida e completa só campos ausentes. O `.example` pode ganhar campos novos, sempre **sem** senha.
+- **Regra de merge** vale aqui; específico deste passo: o `.example` pode ganhar campos novos, sempre **sem** senha.
 - **Migração flat → realms**: arquivo antigo no formato flat (`baseUrl` + `login` direto sob `screenVerify`) → migre para `realms` **preservando os valores** (vira o realm único, nomeado pelo que ele é — ex.: `admin` — com `defaultRealm` apontando para ele). O flat segue aceito em runtime; o `.example` novo já nasce em `realms`.
 
 ## Etapa 4.6 — Integração com Jira (opcional, best-effort)
@@ -89,14 +89,9 @@ Se o humano optar por ligar (requer o **conector Atlassian** autorizado — sem 
 1. **Perguntas de produto** (opções fechadas): `site` (hostname Atlassian), `projectKey`, e `mode` — `create` (o keelson cria a issue da SPEC + sub-tasks; ideal para projeto limpo/team-managed) ou `link` (pendura numa issue existente; ideal para projeto governado/company-managed).
 2. **Resolver por descoberta** (protocolo §1, sempre por **ID**, nunca por nome): `getAccessibleAtlassianResources`/`site` → `cloudId`; `getJiraProjectIssueTypesMetadata` → escolher `issueType.spec` e `issueType.task` (se houver mais de um tipo de sub-task, **pergunte** qual); confirmar que `issueType.task` é `subtask:true` (senão, avise o fallback para issue linkada — §7). **Se o humano quiser a hierarquia de 3 níveis** (Epic ▸ Story de funcionalidade ▸ sub-task — só faz sentido quando as SPECs declaram FEATs): identificar via `hierarchyLevel` o tipo epic-level para `issueType.spec` e o tipo standard (Story) para `issueType.feature`. Ofereça também `issueType.standalone` — um tipo **nível 0** (Tarefa/Bug) para a tarefa isolada, o card de QA de bugfix/chore pontual fora do aninhamento (§7); não querer → `null`, tasks isoladas não sincronizam. Não querer o 3º nível → `issueType.feature: null` e nada muda.
 
-   **Guardrail de hierarquia (aviso, nunca bloqueio — §0)**: antes de gravar, validar com `hierarchyLevel`/`subtask` do createmeta que cada perna do mapeamento aninha de verdade — o Jira só liga pai→filho entre níveis **estritamente descendentes e adjacentes**:
-   - 3 níveis: `spec`(1) ▸ `feature`(0) ▸ `task`(-1, `subtask:true`);
-   - 2 níveis: `spec`(0) ▸ `task`(-1) — com `task` subtask, `spec` **não** pode ser epic-level (Epic ▸ Subtarefa não existe);
-   - `standalone`: nível 0 (pendura sob epic-level ou fica sem pai — nunca é subtask);
-   - `subtask:true` exige pai nível 0 — sub-task órfã falha na criação.
-   Perna inválida → **aviso claro dizendo qual perna não aninha e sugerindo o tipo correto do próprio projeto** (ex.: "História(0) não cabe sob Tarefa(0) — são irmãos, o Jira só liga com 'relates to'; o tipo epic-level deste projeto é Epic(<id>)"). Grave o que o humano confirmar: em runtime a escada de degradação (§6.1/§7) cobre, mas configurar certo evita cards soltos.
+   **Guardrail de hierarquia (aviso, nunca bloqueio — §0)**: antes de gravar, validar com `hierarchyLevel`/`subtask` do createmeta que cada perna do mapeamento aninha de verdade — a regra de adjacência é a do **pré-check de hierarquia** de `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` (contratos do 3º nível). Perna inválida → **aviso claro dizendo qual perna não aninha e sugerindo o tipo correto do próprio projeto** (ex.: "História(0) não cabe sob Tarefa(0) — são irmãos, o Jira só liga com 'relates to'; o tipo epic-level deste projeto é Epic(<id>)"). Grave o que o humano confirmar: em runtime a escada de degradação do `jira-sync-feat.md` cobre, mas configurar certo evita cards soltos.
 3. **Status/transição**: `getJiraIssueTypeMetaWithFields` + amostragem de status (`searchJiraIssuesUsingJql`/`getTransitionsForJiraIssue`) para conhecer o workflow. Default seguro `transition:comment` (não move card); só proponha `auto` se houver caminho de transição claro.
-4. **Gerar o esqueleto do mapa `.md`** em `{docsRoot}/_meta/jira.<PROJECT>.md` e apontar `jira.mapFile` para ele. Abrir com um cabeçalho de referência legível do mapeamento de tipos resolvido — uma linha por chave (`spec`/`feature`/`task`/`standalone`), com nome, ID e `hierarchyLevel` de cada (ex.: `spec: Epic (11169, nível 1)`), e nota de qual perna não aninha, se houver. Duas seções (protocolo §3): **Campos** (uma linha por campo relevante do createmeta — `ID | Nome | Tipo | Direção | Estratégia | Valor` — com `allowedValues` como referência em comentário; o humano preenche Direção/Estratégia/Valor) e **Etapas/Colunas** (`Etapa | Coluna | Status-alvo (ID) | Gatilho`, pré-preenchida por `statusCategory` — semear também a linha `Funcionalidade pronta p/ QA | <coluna> | <status-id> | todas as TASKs da FEAT Done`, comentada quando `issueType.feature: null`). Avise que o `.md` pode conter nomes de pessoas (via `allowedValues`) — é config de projeto, versionável, **não segredo**.
+4. **Gerar o esqueleto do mapa `.md`** em `{docsRoot}/_meta/jira.<PROJECT>.md` e apontar `jira.mapFile` para ele. Abrir com um cabeçalho de referência legível do mapeamento de tipos resolvido — uma linha por chave (`spec`/`feature`/`task`/`standalone`), com nome, ID e `hierarchyLevel` de cada (ex.: `spec: Epic (11169, nível 1)`), e nota de qual perna não aninha, se houver. Gerar as duas seções (**Campos** e **Etapas/Colunas**) no formato do protocolo §3, pré-preenchendo Etapas/Colunas por `statusCategory`, anotando `allowedValues` como referência em comentário (o humano preenche Direção/Estratégia/Valor) e semeando a linha-gatilho "Funcionalidade pronta p/ QA" do §3 (comentada quando `issueType.feature: null`). Avise que o `.md` pode conter nomes de pessoas (via `allowedValues`) — é config de projeto, versionável, **não segredo**.
 5. **Gravar o bloco `jira`** na ficha (campos por ID). **Nenhum token/segredo** — o conector é o único canal; nada vai para `keelson.local.json`.
 
 Merge-preserving (Regra de merge): bloco `jira` já presente → preserva; ficha antiga sem o bloco → acrescenta com `enabled:false`; bloco presente sem `issueType.feature`/`issueType.standalone` → acrescenta a(s) chave(s) como `null` sem tocar no resto; map file antigo sem o gatilho "Funcionalidade pronta p/ QA" → linha adicionada como sugestão comentada, nunca sobrescrevendo a tabela do humano.
@@ -114,14 +109,14 @@ Memos de exploração e backups do keelson vivem em `thoughts/local/` no projeto
 Prove que a ficha funciona:
 - `quality.test`/`quality.lint` declarados **existem/rodam** (execução rápida ou `--help`/dry-run);
 - os `codePaths` existem no disco;
-- os guidelines do perfil ativo resolvem: cada `profile.<role>.file` da ficha aponta para um arquivo existente (regra de resolução da Etapa 3); perfil com `reviewed: false` no front-matter vira instrução de revisão no relatório; perfil cujo `charter:` no front-matter é **menor** que a versão atual do `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md` vira aviso de re-derivação/revisão no relatório (o perfil instancia doutrina desatualizada);
+- os guidelines do perfil ativo resolvem: cada `profile.<role>.file` da ficha aponta para um arquivo existente (regra de resolução da Etapa 3); perfil com `reviewed: false` no front-matter vira instrução de revisão no relatório; perfil cujo `charter:` no front-matter é **menor** que a versão atual do `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md` vira aviso de re-derivação/revisão no relatório;
 - se `screenVerify.enabled`: `keelson.local.example.json` existe e está **versionado** (sem senha real); `keelson.local.json` existe **e** está no `.gitignore` (confirme que **não** aparece em `git status`/`git ls-files`); campos ainda em placeholder (`<...>`) viram instrução de preenchimento no relatório (com o aviso dev-only).
 - se `jira.enabled`: `jira.projectKey` e os IDs de `issueType.spec`/`issueType.task` estão preenchidos; se `issueType.feature`/`issueType.standalone` estão preenchidos, os IDs existem no projeto e **não** são `subtask:true`; re-rodar o **guardrail de hierarquia** da Etapa 4.6 (perna não-adjacente → aviso com a sugestão, não `✗`); se `jira.mapFile` aponta um caminho, o arquivo existe. Conector indisponível não é `✗` (best-effort) — vira aviso "sync Jira pulado até autorizar o conector".
 Reporte cada item como ✓/✗. `✗` vira ação no relatório, não é silenciado.
 
 ## Etapa 7 — Relatório
 
-Resuma: o que foi **detectado**, o que foi **perguntado**, o perfil de cada camada (exemplar ou gerado), a contagem de `⚠️ CONFIRMAR:` por perfil gerado, e o resultado do self-check. Se houver perfil `reviewed: false`, instrua: **revise-o antes do primeiro `/keelson:specify`**.
+Resuma: o que foi **detectado**, o que foi **perguntado**, o perfil de cada camada (exemplar ou gerado), a contagem de pendências `⚠️ não confirmado` por perfil gerado (coletadas do companheiro `_review/<lang>-<versão>.md`), e o resultado do self-check. Se houver perfil `reviewed: false`, instrua: **revise-o antes do primeiro `/keelson:specify`**.
 
 ## Config incremental (durante o uso)
 
