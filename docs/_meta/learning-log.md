@@ -1,6 +1,7 @@
 # Ledger de aprendizado do processo keelson
 
-> Mantido pelo agent `process-tuner`. **Não editar manualmente** (exceto revisão humana de uma entrada).
+> Mantido pelo agent `agile-coach`. **Não editar manualmente** (exceto revisão humana de uma entrada).
+> **Nota de rename (decisão 4.40, 2026-07-26)**: entradas registradas antes da 0.21.0 citam agents pelos IDs antigos (`task-implementer`, `task-reviewer`, `task-verifier`, `security-reviewer`, `product-critic`, `process-tuner`, `profile-writer`). Histórico não se reescreve — o de-para vive na decisão 4.40 do `decisions.md`.
 > Cada entrada é um erro de PROCESSO (um artefato do keelson induziu/permitiu/não preveniu) e o patch que o corrigiu.
 > Lições de CÓDIGO/projeto não entram aqui — vão para o registro de lições do projeto (ex.: `guidelines/project/`).
 

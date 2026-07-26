@@ -5,6 +5,8 @@
 **Última revisão**: 2026-07-26
 **Status do documento**: vivo, atualizado conforme decisões evoluem
 
+> **Nota de rename (decisão 4.40, 2026-07-26)**: entradas anteriores à 0.21.0 citam agents pelos IDs antigos (`task-implementer`, `task-reviewer`, `task-verifier`, `security-reviewer`, `product-critic`, `process-tuner`, `profile-writer`). Histórico não se reescreve — o de-para completo está na decisão 4.40.
+
 ---
 
 ## 1. Visão geral
@@ -639,6 +641,23 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 **Custo assumido**: mais um comando e um agente no elenco; a fila de demandas depende do Diretor para avançar (deliberado — evita sessão-monstro multi-ciclo e preserva "1 demanda = 1 ciclo"). Qualidade da decomposição do PM só se prova em rodada real.
 
 **Aplicação**: `agents/pm.md` (novo), `commands/specify-epic.md` (novo), `commands/{triage,auto,rebuild-index}.md`, `docs/_meta/conventions/index-contract.md` (variação épico + campo `Epico:`), `docs/_meta/method-guide.md` (§3.15 novo + linha `pm` no §5), `README.md` (tabela *Commands* + Status). Comando novo → minor: plugin 0.19.0 → 0.20.0.
+
+---
+
+### 4.40 — Rename dos IDs dos agents para os nomes dos papéis (fase 3 do modelo de time)
+
+**Problema**: com o elenco da 4.37 em vigor, conviviam dois vocabulários — a narração falava por papel ("Developer", "QA") enquanto artefatos e invocações usavam os IDs técnicos (`task-implementer`, `task-verifier`). A 4.37 condicionara o rename a "se a linguagem colar" numa rodada real; **o Diretor revogou a condição explicitamente** e mandou executar as 3 fases do modelo de time na mesma leva.
+
+**Decisão**:
+- **De-para**: `task-implementer→developer` · `task-reviewer→code-reviewer` · `task-verifier→qa` · `security-reviewer→security-engineer` · `product-critic→product-analyst` · `process-tuner→agile-coach` · `profile-writer→staff-engineer` (`po` e `pm` já nasceram como papéis, 4.38/4.39).
+- **Rename atômico**: `git mv` + frontmatter `name:` + heading `# Subagent:` + todas as referências vivas num único commit — commands, skills, hooks (comentários **e** textos de nudge), `guidelines/core/`, `PROFILE-OUTLINE.md`, conventions, method-guide, `CLAUDE.md`, `README.md`. Rename parcial deixaria command invocando agent inexistente.
+- **Histórico não se reescreve**: `decisions.md` e `learning-log.md` mantêm os IDs antigos nas entradas, com nota de rename no topo de cada — esta entrada é a fonte do de-para. Referência viva em cabeçalho de doc (ex.: "mantido pelo agent X") **é** atualizada: viva ≠ histórica.
+- **`generated-by:` é fato histórico, não referência viva**: os perfis gerados `guidelines/backend/php-*.md` mantêm `generated-by: profile-writer` (carimbo de proveniência da geração passada); gerações futuras carimbam `staff-engineer`.
+- **Template do consumidor**: zero IDs de agent → **sem re-init**; o bump minor no marketplace cobre a atualização do plugin.
+
+**Custo assumido**: leitor de histórico precisa do de-para para ligar entradas antigas aos agents atuais; risco residual de invocação por nome antigo vinda de prompt/contexto externo ao repo — a observar na 1ª rodada real com o plugin recarregado.
+
+**Aplicação**: `agents/*` (7 renomeados; elenco final com 9), referências vivas em `commands/`, `skills/`, `hooks/`, `guidelines/`, `docs/_meta/`, `CLAUDE.md`, `README.md`; notas de topo em `decisions.md` e `learning-log.md`. Rename → minor: plugin 0.20.0 → 0.21.0.
 
 ---
 
