@@ -47,7 +47,7 @@ Com a triagem e a exploração em mãos, feche o entendimento **enquanto o Diret
    - **Trivial**: sem brief — vá direto.
    - **Demanda vinda do `/keelson:refine`**: o entendimento já foi confirmado lá — persista o BRIEF direto do prompt refinado, sem reapresentar nem perguntar.
 
-3. **O brief é o contrato**: ele **substitui o pedido original** como fonte da demanda — a SPEC nasce dele (e grava `Brief: BRIEF-NNN` no front-matter), suas premissas alimentam o `product-critic`, e o **PO valida SPEC e entrega contra ele** (nunca contra a própria opinião).
+3. **O brief é o contrato**: ele **substitui o pedido original** como fonte da demanda — a SPEC nasce dele (e grava `Brief: BRIEF-NNN` no front-matter), suas premissas alimentam o `product-analyst`, e o **PO valida SPEC e entrega contra ele** (nunca contra a própria opinião).
 
 4. **Anuncie a largada**: *"Deixa com o time — vou conduzir a implementação da sua solicitação."* — mais 1–2 linhas: dificuldades viram decisão registrada no "Caminho tomado" (decisões em nome do Diretor) ou pendência estacionada no report final; você só interrompe se o ciclo inteiro estiver em risco. O Diretor pode sair.
 
@@ -58,7 +58,7 @@ Execute `/keelson:specify` (incluindo a Etapa 0.2 dele).
 - Ambiguidade **não** crítica → vira premissa `[assumido]` e segue (destacada no "Caminho tomado" da Entrega).
 - Ambiguidade **crítica** que escapou à última chamada (as opções levam a caminhos muito distintos ou a consequência de difícil reversão) → **escada de reação** (ver Exceções).
 - `ERROR` do validator → tente auto-fix/correção do artefato; sem solução e bloqueando o restante → degrau 3 da escada (interromper com diagnóstico).
-- Crítica do `product-critic` emitida → o `/keelson:specify` já invocou o **`po` (modo aprovação)** com BRIEF + SPEC + crítica. Aja pelo veredito:
+- Crítica do `product-analyst` emitida → o `/keelson:specify` já invocou o **`po` (modo aprovação)** com BRIEF + SPEC + crítica. Aja pelo veredito:
   - `decisao: APROVAR` → aplique as `resolucoes` (viram premissas `[assumido]` na SPEC quando couber), registre as `decisoes_em_nome_do_diretor` (alimentam o "Caminho tomado" da Entrega), **promova a SPEC para `Approved`** e siga. (Não peça aprovação de etapa.)
   - `decisao: ESCALAR` → cada escalação já vem com **proposta + default**: escada de reação — em geral degrau 2 (siga pelo default do PO, isole o que depende da resposta e pergunte em lote na Entrega); degrau 3 só se a direção contaminar todo o ciclo.
 
@@ -76,7 +76,7 @@ Execute `/keelson:tasks` para decompor o PLAN. Sem bloqueio → siga direto para
 
 ## Etapa 3.5: verificabilidade pré-código (sinal QA → PO; só feature/risco)
 
-Antes de implementar, despache o `task-verifier` (QA) em **modo pré-código** sobre as TASKs geradas: AC não verificável, caso de borda sem resposta, verificação executável (4.34) que não prova o AC vinculado. Com achados → invoque o `po` (**modo resolução**) para respondê-los pelo brief; cada resposta vira nota na TASK afetada + entrada nas decisões em nome do Diretor; achado irresolvível pelo brief → escada (pelos critérios de escalação do PO). Sem achados → siga direto. Esta é a pergunta mais barata do ciclo — acontece antes de existir código. (Bug/refactor/trivial: esta etapa não existe.)
+Antes de implementar, despache o `qa` (QA) em **modo pré-código** sobre as TASKs geradas: AC não verificável, caso de borda sem resposta, verificação executável (4.34) que não prova o AC vinculado. Com achados → invoque o `po` (**modo resolução**) para respondê-los pelo brief; cada resposta vira nota na TASK afetada + entrada nas decisões em nome do Diretor; achado irresolvível pelo brief → escada (pelos critérios de escalação do PO). Sem achados → siga direto. Esta é a pergunta mais barata do ciclo — acontece antes de existir código. (Bug/refactor/trivial: esta etapa não existe.)
 
 ## Etapa 4: IMPLEMENT
 
@@ -89,11 +89,11 @@ Execute `/keelson:implement` (ou o protocolo inline, para bug/refactor). Aplique
 
 ## Etapa 4.5: Auto-aprendizado do processo
 
-Antes da Entrega: houve erro de **processo** no ciclo (validator reprovou artefato recém-gerado, retry por instrução ambígua, humano corrigiu seu comportamento de fluxo)? → invoque o `process-tuner` com o evento (a mecânica — ledger, dedup, modo dev × consumidor — é doutrina dele). Patch aplicado entra como **commit separado** na Entrega (`chore(keelson): tune ...`); `PROPOSTA_PLUGIN`/`proposta_doutrina` você **nunca aplica** sozinho — vão ao lote da Entrega. Não pausa o fluxo; ciclo sem erro → siga direto (não invente lição).
+Antes da Entrega: houve erro de **processo** no ciclo (validator reprovou artefato recém-gerado, retry por instrução ambígua, humano corrigiu seu comportamento de fluxo)? → invoque o `agile-coach` com o evento (a mecânica — ledger, dedup, modo dev × consumidor — é doutrina dele). Patch aplicado entra como **commit separado** na Entrega (`chore(keelson): tune ...`); `PROPOSTA_PLUGIN`/`proposta_doutrina` você **nunca aplica** sozinho — vão ao lote da Entrega. Não pausa o fluxo; ciclo sem erro → siga direto (não invente lição).
 
 ## Etapa 4.6: Handoff de verificação de tela (gate 9 remoto)
 
-**Só se aplica quando `gates.screenVerify` está ativo.** **Gatilho**: a mudança tem efeito observável em tela e o ambiente desta sessão **não permite exercitá-la** (worktree sem app/browser, execução na nuvem, containers indisponíveis). **Indisponibilidade é provada, não presumida** (decisão 4.26): só a sondagem barata do §8.1 (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`) **falhando, com evidência registrada** (vai no `sonda:` do handoff), autoriza esta etapa; multi-realm sonda **por realm** do roteiro. Vale para **todas as rotas** — na formal o `/keelson:implement` já consolidou os `handoff_seed` do `task-verifier` (com as evidências); na inline, **você mesmo roda a sondagem** e identifica o que não conseguiu exercitar na auto-revisão.
+**Só se aplica quando `gates.screenVerify` está ativo.** **Gatilho**: a mudança tem efeito observável em tela e o ambiente desta sessão **não permite exercitá-la** (worktree sem app/browser, execução na nuvem, containers indisponíveis). **Indisponibilidade é provada, não presumida** (decisão 4.26): só a sondagem barata do §8.1 (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`) **falhando, com evidência registrada** (vai no `sonda:` do handoff), autoriza esta etapa; multi-realm sonda **por realm** do roteiro. Vale para **todas as rotas** — na formal o `/keelson:implement` já consolidou os `handoff_seed` do `qa` (com as evidências); na inline, **você mesmo roda a sondagem** e identifica o que não conseguiu exercitar na auto-revisão.
 
 Uma entrega com gate 9 furado **nunca é silenciosa**. Antes da Entrega:
 
@@ -106,9 +106,9 @@ Uma entrega com gate 9 furado **nunca é silenciosa**. Antes da Entrega:
 
 1. **Branch**: se estiver em `main` (ou na branch default), crie `feat/<slug>-<descrição-curta>` (kebab-case) e use-a. Se já estiver numa branch de trabalho, use-a. **Nunca** trabalhe direto na `main`.
 2. **Pré-check de gates (determinístico — não é opinião)**: a Entrega exige **evidência** de gate, não lembrança de gate. Confira contra o **diff da branch**, em qualquer rota (formal ou inline):
-   - Diff toca área sensível (gatilhos do gate 8) com `gates.security` ativo → o report da Entrega **DEVE** citar o veredito do `security-reviewer` sobre o **diff final**, com `revisado_por ≠ implementado_por`. "Verifiquei a segurança ao construir" **não satisfaz** — gerador não é avaliador (decisão 4.30); a auto-revisão da rota inline cobre os gates 1–7, nunca o gate 8 sensível. Veredito ausente → rode o gate **agora**, antes do push; reprovou → o achado **não entra na branch** (Etapa 4).
+   - Diff toca área sensível (gatilhos do gate 8) com `gates.security` ativo → o report da Entrega **DEVE** citar o veredito do `security-engineer` sobre o **diff final**, com `revisado_por ≠ implementado_por`. "Verifiquei a segurança ao construir" **não satisfaz** — gerador não é avaliador (decisão 4.30); a auto-revisão da rota inline cobre os gates 1–7, nunca o gate 8 sensível. Veredito ausente → rode o gate **agora**, antes do push; reprovou → o achado **não entra na branch** (Etapa 4).
    - Mudança com efeito observável → gate 9 registrado como `verificado` ou `pendente_handoff` com sondagem (Etapa 4.6) — nunca ausente.
-3. **Commit**: mensagem em inglês, descritiva, no padrão do projeto. Patch do `process-tuner` (se houver) vai em **commit separado** `chore(keelson): tune ...`.
+3. **Commit**: mensagem em inglês, descritiva, no padrão do projeto. Patch do `agile-coach` (se houver) vai em **commit separado** `chore(keelson): tune ...`.
 4. **Push**: `git push` da branch para o remoto (`-u` na primeira vez). Após o push, **remova** `thoughts/local/run-state-<slug>.md` (guarda anti-parada — o run está entregue). **Sem abrir PR** (o dev revisa a branch e decide o merge). Se `jira.enabled`, aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §11) para comentar a branch/push na issue principal. Leitura: §0–§1 + §11. Não leia o protocolo inteiro: localize os §§ com `grep -n "^## §"` e leia §0 + §1 + os §§ citados aqui + os que eles referenciarem. Best-effort (§0); criação de issues e progresso já foram cobertos pelos ganchos de `specify`/`tasks`/`implement`.
 5. **Não** faça merge em `main` nem deploy.
 6. Reporte ao Diretor, **narrado em linguagem de time** (PO, Tech Lead, Developer, QA — IDs técnicos ficam nos artefatos): branch criada, resumo do que foi feito, testes/gates, lições de processo aplicadas (se houver), e o que falta (revisão + merge dele). Se houve Etapa 4.6, declare a entrega como **parcial — verificação de tela pendente** (nunca "totalmente verificada").

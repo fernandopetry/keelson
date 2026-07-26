@@ -10,7 +10,7 @@
 # independente dos sensitiveGlobs.
 # Detecta mudança SENSÍVEL na BRANCH e bloqueia o encerramento UMA vez,
 # lembrando de aplicar o gate de segurança: mudança sensível → o agent
-# `security-reviewer` (avaliador independente — auto-revisão do gerador não fecha
+# `security-engineer` (avaliador independente — auto-revisão do gerador não fecha
 # o gate); só mudança fora dos gatilhos do gate 8 pode se resolver pelo checklist
 # de `guidelines/core/SECURITY.md` + a seção de segurança do perfil ativo.
 #
@@ -121,7 +121,7 @@ sensitive_files="$(printf '%s' "$sensitive_files" | sed '/^$/d')"
 # Padrões sensíveis — heurística multi-linguagem derivada das categorias de
 # guidelines/core/SECURITY.md, composta por categoria (PHP/JS/Python/Go/Java/Ruby).
 # Falso-positivo apenas nudga a revisão (lado seguro); a prova de verdade é o
-# security-reviewer + o perfil ativo. Grep roda com -i (case-insensitive).
+# security-engineer + o perfil ativo. Grep roda com -i (case-insensitive).
 P_SECRET='password|passwd|senha|token|secret|api[_-]?key|credential|jwt|argon2|bcrypt|scrypt|pbkdf2|password_hash|hash_equals|hmac'
 P_AUTHZ='csrf|session|cookie|permission|authoriz|redirect'
 P_SQL='SELECT |INSERT |UPDATE |DELETE |->prepare|->query|->exec\(|\bpdo\b|mysqli|cursor\.execute|prepareStatement|createStatement|executeQuery|\bjdbc\b|db\.Query|db\.Exec|database/sql|find_by_sql|ActiveRecord|\.raw\('
@@ -176,11 +176,11 @@ if [ -n "$content_sensitive" ] || [ -n "$path_sensitive" ] || [ -n "$dep_changed
 Gate de Segurança (keelson, gate 8): há mudança no código sensível (sensitiveGlobs da ficha) com indícios de auth, SQL, crypto, upload, cookies, exec, I/O de request, redirect ou dependências.
 
 Antes de encerrar, aplique o gate de segurança:
-- Mudança de fato sensível (gatilhos do gate 8) com gates.security ativo → rode o agent security-reviewer sobre o diff final. Auto-revisão do gerador NÃO fecha este gate: quem implementou não pode ser quem aprova ("verifiquei ao construir" não vale como veredito).
+- Mudança de fato sensível (gatilhos do gate 8) com gates.security ativo → rode o agent security-engineer sobre o diff final. Auto-revisão do gerador NÃO fecha este gate: quem implementou não pode ser quem aprova ("verifiquei ao construir" não vale como veredito).
 - Só quando a mudança está FORA dos gatilhos do gate 8 (este aviso é heurístico e pode ser falso-positivo) → basta o checklist de guidelines/core/SECURITY.md + a seção de segurança do perfil ativo.
 - Confirme: consultas parametrizadas; saída escapada no destino; autorização verificada (negar por padrão); guarda de step-up no ponto que ESCREVE o dado (todos os writers, não só o caminho da tela); sem segredo/PII em log; cookies httponly/secure/samesite; sem token em storage do cliente; sem renderização crua de dado de usuário.
 
-Se o security-reviewer JÁ rodou sobre este diff (ou a mudança está comprovadamente fora dos gatilhos), pode encerrar — este aviso não se repetirá para esta mesma mudança.${dep_note}${base_note}
+Se o security-engineer JÁ rodou sobre este diff (ou a mudança está comprovadamente fora dos gatilhos), pode encerrar — este aviso não se repetirá para esta mesma mudança.${dep_note}${base_note}
 EOF
 )"
   if [ -n "$marker" ] && [ -n "$fingerprint" ]; then

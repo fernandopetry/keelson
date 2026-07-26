@@ -83,7 +83,7 @@ Múltiplos artefatos no input → validar em sequência e consolidar num relató
 
 Se o artefato validado foi **recém-gerado por um comando do keelson** (não escrito/editado
 por humano) e restou ERROR não auto-corrigível, acrescente ao relatório um bloco para a
-main session rotear ao `process-tuner`:
+main session rotear ao `agile-coach`:
 
 ```yaml
 evento_aprendizado:

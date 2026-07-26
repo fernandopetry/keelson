@@ -61,7 +61,7 @@ Listar `TASK-MMM-*.md` em `{docsRoot}/<slug>/tasks/`. Próximo XXX = maior exist
    granularidade fina multiplica revisões, não qualidade:
    - **Fatia sensível** (seed de permissão, autorização, endpoint novo, migração,
      regra de negócio central) → TASK **própria**, mesmo que pequena, para receber
-     `security-reviewer`/revisão focada.
+     `security-engineer`/revisão focada.
    - **Fatias mecânicas do mesmo fluxo** (as várias classes/módulos de um mesmo caso
      de uso) → **agrupe numa TASK `medium`** com uma revisão só. NÃO crie uma TASK
      por classe/camada quando nada nelas exige revisão dedicada.
@@ -158,8 +158,8 @@ mais fraca).>
 - [ ] Aderência à ficha/perfil
 - [ ] Code review aprovado
 - [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-reviewer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <task-verifier ou motivo do n/a>
+- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
+- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
 
 **Notas**: 
 ```

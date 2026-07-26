@@ -184,7 +184,7 @@ Governance: decisions 4.22, 4.27 and 4.28 in `docs/_meta/decisions.md`.
 ```
 keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
-├── agents/            # subagents (the team): po, implementer, reviewers, verifier, profile-writer…
+├── agents/            # subagents (the team): po, implementer, reviewers, verifier, staff-engineer…
 ├── skills/            # spec / plan / task validators + status + screen-verify
 ├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard
 ├── guidelines/

@@ -8,7 +8,7 @@
 #   - gates.reviewThreshold → limiar opcional { files, lines } (default: 2 / 30).
 # Detecta mudança de código NA BRANCH acima do limiar e bloqueia o encerramento
 # UMA vez, lembrando de aplicar o code review (/keelson:review, o agent
-# `task-reviewer` OU o checklist de `guidelines/core/CODE-REVIEW.md` + o perfil ativo).
+# `code-reviewer` OU o checklist de `guidelines/core/CODE-REVIEW.md` + o perfil ativo).
 #
 # Limiar (Charter Art. 6 — rigor proporcional): mudança trivial passa sem cutucar.
 # Dispara quando arquivos de código alterados ≥ `files` OU linhas adicionadas ≥ `lines`.
@@ -156,7 +156,7 @@ reason="$(cat <<EOF
 Gate de Code Review (keelson, gate 7): há mudança de código acima do limiar (${file_count} arquivo(s) de código, ~${added_lines} linha(s) adicionada(s); limiar: ${th_files} arquivos ou ${th_lines} linhas) nos codePaths da ficha.
 
 Antes de encerrar, aplique o code review:
-- Rode /keelson:review (revisores independentes sobre este diff) OU o task-reviewer sobre o diff OU aplique o checklist de guidelines/core/CODE-REVIEW.md (e o perfil de linguagem ativo).
+- Rode /keelson:review (revisores independentes sobre este diff) OU o code-reviewer sobre o diff OU aplique o checklist de guidelines/core/CODE-REVIEW.md (e o perfil de linguagem ativo).
 - Confirme: limites/responsabilidade única respeitados; sem reimplementação de utilitário existente (DRY); nomes pela intenção; sem abstração especulativa; condicionais e assinaturas saudáveis; tratamento de erro presente; sem código morto.
 
 Se esta mudança JÁ passou por code review (ex.: fluxo /keelson:implement com reviewer), pode encerrar — este aviso não se repetirá para esta mesma mudança.${base_note}

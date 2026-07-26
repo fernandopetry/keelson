@@ -1,13 +1,13 @@
 # Code Review (core)
 
 > **Dono único da régua dos gates 1–7** — o que cada gate exige, o que o faz falhar e como
-> ele degrada quando não há artefato SDD. Quem a executa é sempre o **`task-reviewer`**, em
+> ele degrada quando não há artefato SDD. Quem a executa é sempre o **`code-reviewer`**, em
 > dois fluxos: dentro do ciclo (via `/keelson:implement`, com TASK/PLAN/SPEC) e sobre um
 > diff avulso (via `/keelson:review`, modo degradado). Os fluxos trazem o próprio
 > protocolo — input, output, retry —, nunca uma segunda cópia da régua.
 >
 > A **segurança** (gate 8) e o **comportamento verificado** (gate 9) têm revisores dedicados
-> (`security-reviewer`, `task-verifier`) e doutrina própria — ver `./WORKFLOW.md`.
+> (`security-engineer`, `qa`) e doutrina própria — ver `./WORKFLOW.md`.
 >
 > A revisão confere o código contra a **constituição** (`../_meta/QUALITY-CHARTER.md`), a
 > doutrina de `core/` e o **perfil de linguagem** ativo. Detalhes idiomáticos da stack
@@ -33,7 +33,7 @@ Execute localmente os testes **filtrados ao escopo** — não confie no report d
 implementou. **Não** rode a suíte completa aqui (verificação forte e única —
 `./TESTING.md`). Valor ou constante compartilhada alterada → amplie o filtro para os
 consumidores. Você é o dono da rodada escopada: **registre o comando/filtro executado**,
-porque o `task-verifier` decide por ele se precisa re-rodar.
+porque o `qa` decide por ele se precisa re-rodar.
 
 **Falha**: qualquer teste vermelho.
 

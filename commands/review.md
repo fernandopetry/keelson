@@ -54,7 +54,7 @@ Você é o **tech lead** desta revisão. Não revisa e não corrige com as próp
 
 1. Ler a **ficha** (`keelson.config.json`; campos: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`) — `codePaths`, `quality.*`, `gates`, `profile`.
 2. **Inferir o slug** pelos arquivos tocados (domínio, `codePaths`, termos nos `INDEX.md`). Inferiu → ler o `INDEX.md` para as **decisões irreversíveis** e riscos ativos (é o que salva o gate 5). Não inferiu → gate 5 `n/a`, declarado.
-3. Classificar **área sensível** para decidir o gate 8: lista canônica na `description` do `security-reviewer`.
+3. Classificar **área sensível** para decidir o gate 8: lista canônica na `description` do `security-engineer`.
 4. Classificar **efeito observável** (endpoint, UI, regra exercitável) — decide o gate 9 na Etapa 7.
 
 Não leia a régua nem o perfil integralmente: quem os lê são os revisores (modelo de carga — decisão 4.35).
@@ -69,8 +69,8 @@ E o que é específico deste comando — **declare explicitamente**:
 
 ## Etapa 3: despachar os revisores (em paralelo)
 
-- **`task-reviewer`** — sempre. Gates 1–7 sobre o diff, na régua degradada.
-- **`security-reviewer`** — quando a área é sensível e `gates.security` está ativo (`--no-security` desliga; a decisão de desligar entra no output).
+- **`code-reviewer`** — sempre. Gates 1–7 sobre o diff, na régua degradada.
+- **`security-engineer`** — quando a área é sensível e `gates.security` está ativo (`--no-security` desliga; a decisão de desligar entra no output).
 
 Ambos no mesmo turno, em paralelo (como a Etapa 3.3 do `/keelson:implement`). Espere os reports; não antecipe conclusão.
 
@@ -97,9 +97,9 @@ Sem `--fix`: apresentar o report e pedir **um** OK para a leva de correções da
 
 Nada corrigível → encerre na Etapa 9; achados estruturais seguem para a Etapa 8 de qualquer forma.
 
-## Etapa 6: correção via `task-implementer`
+## Etapa 6: correção via `developer`
 
-Despache o `task-implementer` em **modo revisão avulsa** (definido no próprio agente: sem
+Despache o `developer` em **modo revisão avulsa** (definido no próprio agente: sem
 TASK em disco, sem commit) com um briefing efêmero:
 
 - Cada achado é um critério de pronto: *o achado deixa de existir e nenhum teste quebra*.
@@ -109,9 +109,9 @@ TASK em disco, sem commit) com um briefing efêmero:
 
 ## Etapa 7: re-revisão (gate, não formalidade)
 
-1. Despache o **`task-reviewer` de novo** sobre o diff da correção. Report anterior não vale como aprovação do código novo — o que foi corrigido é código não revisado.
-2. Houve achado de segurança corrigido → o **`security-reviewer`** também roda de novo.
-3. Correção com **efeito observável** → **`task-verifier`** (gate 9): prova o comportamento rodando os testes e exercitando a app quando o ambiente permite. Ambiente sem tela com `gates.screenVerify` ativo → o verifier reporta `PARCIAL` com `handoff_seed` e evidência de sondagem (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`); aqui isso vira **pendência declarada no output**, não handoff em disco (revisão avulsa não tem PLAN para ancorar o doc).
+1. Despache o **`code-reviewer` de novo** sobre o diff da correção. Report anterior não vale como aprovação do código novo — o que foi corrigido é código não revisado.
+2. Houve achado de segurança corrigido → o **`security-engineer`** também roda de novo.
+3. Correção com **efeito observável** → **`qa`** (gate 9): prova o comportamento rodando os testes e exercitando a app quando o ambiente permite. Ambiente sem tela com `gates.screenVerify` ativo → o verifier reporta `PARCIAL` com `handoff_seed` e evidência de sondagem (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`); aqui isso vira **pendência declarada no output**, não handoff em disco (revisão avulsa não tem PLAN para ancorar o doc).
 4. REPROVADO: 1 retry com instruções precisas, depois escala ao humano com o diagnóstico.
 
 ## Etapa 8: achados estruturais viram demanda
@@ -130,7 +130,7 @@ Para cada estrutural, proponha o roteamento — **sem executar** (a régua é a 
 ## Escopo
 - Diff: <comando usado> — N arquivo(s), ~M linha(s) adicionada(s)
 - Slug inferido: <slug ou "não inferível">
-- Revisores: task-reviewer <id> | security-reviewer <id ou n/a> | task-verifier <id ou n/a>
+- Revisores: code-reviewer <id> | security-engineer <id ou n/a> | qa <id ou n/a>
 
 ## Gates
 | Gate | Resultado | Nota |
@@ -156,7 +156,7 @@ Para cada estrutural, proponha o roteamento — **sem executar** (a régua é a 
 - <gate degradado, n/a, verificação de tela sem ambiente, dívida sem dono>
 ```
 
-Se algum report trouxe `licao_candidata` não-nula, roteie pelo campo `alvo` — `projeto` → `guidelines/project/lessons.md` (formato canônico e dedup: dono em `${CLAUDE_PLUGIN_ROOT}/guidelines/core/WORKFLOW.md`); `processo` → `process-tuner` — e mencione no output. Mecânica idêntica à closure do `/keelson:implement` (etapa 3.4.2, item 5).
+Se algum report trouxe `licao_candidata` não-nula, roteie pelo campo `alvo` — `projeto` → `guidelines/project/lessons.md` (formato canônico e dedup: dono em `${CLAUDE_PLUGIN_ROOT}/guidelines/core/WORKFLOW.md`); `processo` → `agile-coach` — e mencione no output. Mecânica idêntica à closure do `/keelson:implement` (etapa 3.4.2, item 5).
 
 ## Limites
 

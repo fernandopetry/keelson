@@ -115,7 +115,7 @@ Aplicado em rigor **proporcional ao risco** da mudança:
 | Mudança | Como executar |
 |---|---|
 | Feature nova / mudança de contrato | Ciclo SDD completo: `specify → plan → tasks → implement` |
-| Risco (auth, segurança, migração/schema, breaking) ou que toque um slug com PLAN ativo | Protocolo formal: TASK avulsa + subagents (`task-implementer` → `task-reviewer`, mais `security-reviewer`/`task-verifier` quando aplicável) + closure no INDEX |
+| Risco (auth, segurança, migração/schema, breaking) ou que toque um slug com PLAN ativo | Protocolo formal: TASK avulsa + subagents (`developer` → `code-reviewer`, mais `security-engineer`/`qa` quando aplicável) + closure no INDEX |
 | Bug / refactor pequeno | Inline: implementa (escopo restrito) + testes + auto-revisão pelos gates + 1 linha no INDEX. Sem subagent nem TASK |
 | Trivial (typo, copy, cor, espaçamento) | Direto no código, sem SDD |
 
@@ -132,9 +132,9 @@ camadas continua sendo "bug/refactor pequeno" — roteie pela **calibração de 
 5. Decisões (DEC) respeitadas
 6. Aderência ao Charter + perfil de linguagem + instruções do projeto
 7. Code review (ver `./CODE-REVIEW.md`)
-8. **Segurança** (`security-reviewer`, `./SECURITY.md`, rejeição imediata) — quando a
-   mudança toca área sensível (lista canônica: description do `security-reviewer`)
-9. **Comportamento verificado** (`task-verifier`) — quando a mudança tem efeito
+8. **Segurança** (`security-engineer`, `./SECURITY.md`, rejeição imediata) — quando a
+   mudança toca área sensível (lista canônica: description do `security-engineer`)
+9. **Comportamento verificado** (`qa`) — quando a mudança tem efeito
    observável
 
 Gatilhos e condições dos gates 8–9: detalhe operacional do `/keelson:implement`.

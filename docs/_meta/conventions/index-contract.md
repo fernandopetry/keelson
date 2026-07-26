@@ -8,7 +8,7 @@
 ├── _meta/
 │   ├── decisions.md           # governança do processo
 │   ├── method-guide.md        # guia humano do método
-│   └── learning-log.md        # ledger do auto-aprendizado (mantido pelo process-tuner)
+│   └── learning-log.md        # ledger do auto-aprendizado (mantido pelo agile-coach)
 └── <slug>/
     ├── INDEX.md               # estado atual (GERADO — não editar)
     ├── briefs/BRIEF-NNN.md    # intenção do Diretor + interpretação do PO (contrato abaixo; vazio na maioria dos slugs)

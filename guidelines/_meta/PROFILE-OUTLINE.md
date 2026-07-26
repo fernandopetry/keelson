@@ -5,7 +5,7 @@
 > `QUALITY-CHARTER.md` na linguagem-alvo.
 >
 > Serve a dois leitores:
-> 1. **o gerador** (`profile-writer`): percorre estas seções ao escrever um perfil
+> 1. **o gerador** (`staff-engineer`): percorre estas seções ao escrever um perfil
 >    novo — assim um perfil de Node cobre o mesmo que o de PHP (paridade);
 > 2. **o revisor humano**: confere seção a seção que nada ficou de fora.
 >
@@ -26,7 +26,7 @@ Metadados no topo do arquivo:
 lang: <linguagem>
 version: <versão-alvo>          # ex.: "8.5", "18 LTS", "17"
 charter: <versão do QUALITY-CHARTER que este perfil instancia>
-generated-by: <exemplar | profile-writer>
+generated-by: <exemplar | staff-engineer>
 reviewed: <true | false>        # false até um humano validar
 reviewer: <nome>                # preenchido na revisão
 ```

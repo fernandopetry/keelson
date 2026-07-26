@@ -146,7 +146,7 @@ Após gerar a SPEC, invocar a skill `spec-validator` no arquivo.
 
 ## Etapa 4.1: crítica de produto (mérito)
 
-Com a forma validada (errors == 0), invocar o agent `product-critic` na SPEC. Ele **não** checa forma — questiona **mérito**: problema vs solução, qualidade da métrica de sucesso, cenários faltantes, premissas arriscadas, conflito com capacidades/decisões do INDEX.
+Com a forma validada (errors == 0), invocar o agent `product-analyst` na SPEC. Ele **não** checa forma — questiona **mérito**: problema vs solução, qualidade da métrica de sucesso, cenários faltantes, premissas arriscadas, conflito com capacidades/decisões do INDEX.
 
 A crítica **não bloqueia** a criação da SPEC nem a atualização do INDEX (a SPEC nasce em `Draft`); o resultado é reportado ao usuário.
 
@@ -176,7 +176,7 @@ Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira*
    - Auto-fixes aplicados
    - Errors pendentes (se houver)
    - Warnings relevantes
-   - Crítica de produto (`product-critic`): riscos de mérito e perguntas a decidir antes de `Approved`
+   - Crítica de produto (`product-analyst`): riscos de mérito e perguntas a decidir antes de `Approved`
    - Veredito do PO (quando há BRIEF): decisão, resoluções pelo brief e escalações com proposta + default
 6. Premissas `[assumido]` que precisam confirmação.
 7. Estado do INDEX após esta operação.

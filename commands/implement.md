@@ -29,7 +29,7 @@ Você é um Engineering Manager especialista em orquestrar implementação assis
 
 1. **Padrão: `SUBAGENTS`** (subagents na main session). Não gaste turno detectando alternativas.
 2. `--force-mode=teams` habilita `AGENT_TEAMS` quando o ambiente suportar → ler `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/agent-teams.md` (especificidades do modo; estrutura idêntica).
-3. Wave única e sequencial de tasks pequenas → `SINGLE_THREAD` (main session direto) é aceitável. **SINGLE_THREAD dispensa a orquestração, não a independência**: os gates de 3.3 continuam rodando via subagents (`task-reviewer`, e `security-reviewer`/`task-verifier` quando o gatilho aplica) — a main session que implementou **nunca** aprova o próprio diff (decisão 4.30). Colapsar para SINGLE_THREAD com >1 wave ou task não-pequena é desvio: declare-o no output final.
+3. Wave única e sequencial de tasks pequenas → `SINGLE_THREAD` (main session direto) é aceitável. **SINGLE_THREAD dispensa a orquestração, não a independência**: os gates de 3.3 continuam rodando via subagents (`code-reviewer`, e `security-engineer`/`qa` quando o gatilho aplica) — a main session que implementou **nunca** aprova o próprio diff (decisão 4.30). Colapsar para SINGLE_THREAD com >1 wave ou task não-pequena é desvio: declare-o no output final.
 
 ### 0.2 Carregar guidelines e memo
 
@@ -87,20 +87,20 @@ Se `--dry-run`, parar.
 **Sequencial**: sem branches/worktrees extras, main session ou 1 subagent.
 
 **Subagents reutilizáveis do keelson** (pasta `agents/` do plugin):
-- `task-implementer`: executor da task
-- `task-reviewer`: revisor com quality gates
+- `developer`: executor da task
+- `code-reviewer`: revisor com quality gates
 
 Se esses subagents não existirem, usar subagents genéricos com instruções inline.
 
-### 3.2 Execução por task (via task-implementer)
+### 3.2 Execução por task (via developer)
 
-Passe no prompt de cada agente os **inputs**: caminhos de TASK, PLAN, SPEC, ficha (`keelson.config.json`), INDEX.md e (se existir) do memo de exploração `thoughts/local/exploration-<slug>.md`. O fluxo de trabalho (status, implementação, testes, lint, commit) é o system prompt do `task-implementer` — não o repita. **Espere de volta** o report próprio do agent (formato definido no `task-implementer` — **não** o 3.4.1, que é consolidado depois pela main session).
+Passe no prompt de cada agente os **inputs**: caminhos de TASK, PLAN, SPEC, ficha (`keelson.config.json`), INDEX.md e (se existir) do memo de exploração `thoughts/local/exploration-<slug>.md`. O fluxo de trabalho (status, implementação, testes, lint, commit) é o system prompt do `developer` — não o repita. **Espere de volta** o report próprio do agent (formato definido no `developer` — **não** o 3.4.1, que é consolidado depois pela main session).
 
 ### 3.3 Quality gates (revisão independente)
 
 Revisão por agentes independentes (o implementer **nunca** revisa o próprio trabalho), com os guidelines ativos em contexto.
 
-**Sempre — via `task-reviewer`:**
+**Sempre — via `code-reviewer`:**
 
 1. Cobertura de ACs
 2. Testes passando
@@ -112,10 +112,10 @@ Revisão por agentes independentes (o implementer **nunca** revisa o próprio tr
 
 **Proporcional ao risco — gates dedicados, em paralelo ao reviewer:**
 
-8. **Segurança — via `security-reviewer`** (REJEIÇÃO IMEDIATA): obrigatório quando a mudança é **sensível** (lista canônica: `description` do `security-reviewer`) e o gate `gates.security` está ativo. Roda o checklist de `guidelines/core/SECURITY.md` (instancia o Art. 2 do Charter) mapeado na seção de segurança do perfil ativo. Fora desses casos, segurança é coberta pelo Gate 6.
-9. **Comportamento verificado — via `task-verifier`**: obrigatório quando a mudança tem efeito observável (endpoint, UI, regra exercitável). Roda os testes e exercita a app quando o ambiente está disponível. Refactor sem efeito observável dispensa (Gates 1/2 bastam). **Quando `gates.screenVerify` está ativo e o efeito é de tela** e o ambiente desta sessão **não permite exercitá-la** (worktree/nuvem, sem browser), o verifier reporta `PARCIAL` com `handoff_seed` — sondagem e mecânica são do `task-verifier`; evidência obrigatória (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`, §8.1, decisão 4.26). Aceite do report: `PARCIAL` com seed **e** `evidencia_indisponibilidade` → aceitar; seed **sem** evidência de sondagem → rejeitar e refazer; `pendente_handoff` **não é falha de gate** (não consome retry, não bloqueia closure) — as seeds são consolidadas num **handoff de verificação** na Etapa 4. O que o verifier **conseguiu** exercitar (testes, chamadas de endpoint) continua bloqueante se divergir.
+8. **Segurança — via `security-engineer`** (REJEIÇÃO IMEDIATA): obrigatório quando a mudança é **sensível** (lista canônica: `description` do `security-engineer`) e o gate `gates.security` está ativo. Roda o checklist de `guidelines/core/SECURITY.md` (instancia o Art. 2 do Charter) mapeado na seção de segurança do perfil ativo. Fora desses casos, segurança é coberta pelo Gate 6.
+9. **Comportamento verificado — via `qa`**: obrigatório quando a mudança tem efeito observável (endpoint, UI, regra exercitável). Roda os testes e exercita a app quando o ambiente está disponível. Refactor sem efeito observável dispensa (Gates 1/2 bastam). **Quando `gates.screenVerify` está ativo e o efeito é de tela** e o ambiente desta sessão **não permite exercitá-la** (worktree/nuvem, sem browser), o verifier reporta `PARCIAL` com `handoff_seed` — sondagem e mecânica são do `qa`; evidência obrigatória (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`, §8.1, decisão 4.26). Aceite do report: `PARCIAL` com seed **e** `evidencia_indisponibilidade` → aceitar; seed **sem** evidência de sondagem → rejeitar e refazer; `pendente_handoff` **não é falha de gate** (não consome retry, não bloqueia closure) — as seeds são consolidadas num **handoff de verificação** na Etapa 4. O que o verifier **conseguiu** exercitar (testes, chamadas de endpoint) continua bloqueante se divergir.
 
-**Briefing destilado para os gates dedicados**: ao invocar `security-reviewer`/`task-verifier`, monte no prompt um briefing com o que eles de fato usam — ACs vinculados **copiados literalmente** da SPEC, DECs que tocam o escopo, arquivos da task (`git diff --name-only`), comandos `quality.*` da ficha — e aponte a **seção** do perfil a ler (segurança → seção de segurança; verificação → seção de testes). Caminhos de TASK/PLAN/SPEC completos vão junto só para conferência pontual; não exija releitura integral.
+**Briefing destilado para os gates dedicados**: ao invocar `security-engineer`/`qa`, monte no prompt um briefing com o que eles de fato usam — ACs vinculados **copiados literalmente** da SPEC, DECs que tocam o escopo, arquivos da task (`git diff --name-only`), comandos `quality.*` da ficha — e aponte a **seção** do perfil a ler (segurança → seção de segurança; verificação → seção de testes). Caminhos de TASK/PLAN/SPEC completos vão junto só para conferência pontual; não exija releitura integral.
 
 Falha em qualquer gate: motivo específico, 1 retry, depois escala humano. Vulnerabilidade (Gate 8) é sempre bloqueante.
 
@@ -145,8 +145,8 @@ quality_gates:
   aderencia_ficha_perfil: true
   code_review_aprovado: true
   acs_verificados: [AC-NNN-XXX]
-  seguranca_gate8: aprovado | n/a          # via security-reviewer, quando mudança sensível e gates.security ativo
-  comportamento_gate9: verificado | pendente_handoff | n/a   # via task-verifier; pendente_handoff = ambiente sem tela (gates.screenVerify), seeds guardadas p/ Etapa 4
+  seguranca_gate8: aprovado | n/a          # via security-engineer, quando mudança sensível e gates.security ativo
+  comportamento_gate9: verificado | pendente_handoff | n/a   # via qa; pendente_handoff = ambiente sem tela (gates.screenVerify), seeds guardadas p/ Etapa 4
 notas: <opcional>
 ```
 
@@ -165,9 +165,9 @@ Report incompleto ou inválido: rejeitar, refazer.
      - Texto: `<capacidade> (SPEC-NNN, PLAN-MMM, ✅ <data>)`.
    - **Não** marcar Status do PLAN como Done automaticamente.
 4. **Sincronizar progresso com Jira (opcional)**: só quando `jira.enabled`. Aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`): closure → §9 na sub-task do campo `Jira:` (§10); TASK **sem key** com `issueType.standalone` preenchido → criar a issue isolada agora (§7) e gravar a key; closure completou uma FEAT (check do item 3) com o 3º nível ativo → aplicar também o item 5 de `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` na Story da FEAT. Leitura: §0–§1 + §7 + §9 + §10 (+ `jira-sync-feat.md` quando o 3º nível está ativo). Não leia o protocolo inteiro: localize os §§ com `grep -n "^## §"` e leia §0 + §1 + os §§ citados aqui + os que eles referenciarem. Best-effort (§0): conector ausente/falha → aviso, **não** bloqueia a closure.
-5. **Registrar lição durável (memória da equipe)**: se algum report (`task-reviewer`, `security-reviewer` ou `task-verifier`) trouxe `licao_candidata` não-nula (defeito com causa-raiz generalizável, ou a task exigiu retry por motivo que pode se repetir), rotear pelo campo `alvo`:
+5. **Registrar lição durável (memória da equipe)**: se algum report (`code-reviewer`, `security-engineer` ou `qa`) trouxe `licao_candidata` não-nula (defeito com causa-raiz generalizável, ou a task exigiu retry por motivo que pode se repetir), rotear pelo campo `alvo`:
    - **`alvo: projeto`** → persistir em `guidelines/project/lessons.md` no formato canônico (`## [Área] título` + **Erro/Causa/Solução** — dono: `guidelines/core/WORKFLOW.md`), abaixo do marcador `<!-- Adicionar lições abaixo desta linha -->`. **Deduplicar**: lição equivalente existente é atualizada, não duplicada. Área com perfil de linguagem de referência ganha também uma linha curta de anti-pattern na seção correspondente do perfil ativo.
-   - **`alvo: processo`** (um artefato do keelson induziu/não preveniu o erro — inclui `evento_aprendizado` de validator e retry por instrução ambígua) → invocar o **`process-tuner`** com o evento (mecânica — ledger, dedup, modo dev × consumidor — é doutrina dele). `PROPOSTA_PLUGIN`/`proposta_doutrina` do report vão ao humano na entrega, nunca auto-aplicadas.
+   - **`alvo: processo`** (um artefato do keelson induziu/não preveniu o erro — inclui `evento_aprendizado` de validator e retry por instrução ambígua) → invocar o **`agile-coach`** com o evento (mecânica — ledger, dedup, modo dev × consumidor — é doutrina dele). `PROPOSTA_PLUGIN`/`proposta_doutrina` do report vão ao humano na entrega, nunca auto-aplicadas.
    - Mencionar no output quais lições foram registradas/patcheadas (e quais viraram proposta).
 6. **Em modo paralelo**: commit das atualizações com `chore(<slug>): close TASK-MMM-XXX` (incluir as mudanças em `guidelines/` se houver lição registrada).
 
@@ -184,7 +184,7 @@ Falha: reportar específico, 1 retry, escalar.
 
 **SUBAGENTS**: sem peer-to-peer. Subagent descobre necessidade de coordenação: para, reporta, main session decide.
 
-**Furo no plano (sinal Developer → Tech Lead — decisão 4.38)**: report do implementer com `status_proposto: Blocked` e `falhas[].categoria: furo_no_plano` — a TASK revelou premissa errada do PLAN/SPEC (casos na seção "Furo no plano" do `agents/task-implementer.md`). **Contornar em silêncio é violação de gate; sinalizar é o comportamento esperado.** Quem decide o destino é a main session (Tech Lead) — nunca o Developer:
+**Furo no plano (sinal Developer → Tech Lead — decisão 4.38)**: report do implementer com `status_proposto: Blocked` e `falhas[].categoria: furo_no_plano` — a TASK revelou premissa errada do PLAN/SPEC (casos na seção "Furo no plano" do `agents/developer.md`). **Contornar em silêncio é violação de gate; sinalizar é o comportamento esperado.** Quem decide o destino é a main session (Tech Lead) — nunca o Developer:
 - Ajuste **localizado** da TASK (contrato intacto) → re-emitir a task ajustada;
 - O furo muda o **PLAN** (componente, DEC, fluxo) → tratar como mudança de plano (ajustar o PLAN e as TASKs afetadas antes de re-emitir);
 - O furo é de **produto** (contradiz SPEC/brief) → `po` em modo resolução quando há BRIEF; sem brief, escalar ao humano (ou escada, no `/keelson:auto`).

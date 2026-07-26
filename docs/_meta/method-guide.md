@@ -118,7 +118,7 @@ Quando a SPEC declara FEATs, cada TASK ganha o campo `**Funcionalidade**:` (FEAT
 
 ### 3.4 `/keelson:implement` — executar PLAN
 
-Orquestra a implementação wave por wave, usando subagents (`task-implementer` + `task-reviewer`) ou Agent Teams. Cada task passa pelos quality gates e closure obrigatória antes de Done.
+Orquestra a implementação wave por wave, usando subagents (`developer` + `code-reviewer`) ou Agent Teams. Cada task passa pelos quality gates e closure obrigatória antes de Done.
 
 ```
 /keelson:implement <PLAN-MMM ou caminho> [--max-parallel=<N>] [--dry-run] [--only-wave=<N>] [--force-mode=<teams|subagents>]
@@ -244,7 +244,7 @@ Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisõe
 
 ### 3.14 `/keelson:review` — code review de um diff avulso (sem artefato SDD)
 
-Porta de entrada da doutrina para o código que **entrou fora do ciclo**: hotfix, código herdado, contribuição externa, mudança feita à mão. Você aponta um diff — working tree, `staged`, `last`, `-N` commits, um `<sha>`, um range `<a>..<b>` ou `branch` — e o comando age como **tech lead**: despacha `task-reviewer` (gates 1–7) e, em área sensível, `security-reviewer` (gate 8) **em paralelo**; consolida e classifica cada achado; pede **um** OK; e então despacha a correção ao `task-implementer`, com **re-revisão obrigatória** do que foi corrigido (mais `task-verifier` quando a correção tem efeito observável).
+Porta de entrada da doutrina para o código que **entrou fora do ciclo**: hotfix, código herdado, contribuição externa, mudança feita à mão. Você aponta um diff — working tree, `staged`, `last`, `-N` commits, um `<sha>`, um range `<a>..<b>` ou `branch` — e o comando age como **tech lead**: despacha `code-reviewer` (gates 1–7) e, em área sensível, `security-engineer` (gate 8) **em paralelo**; consolida e classifica cada achado; pede **um** OK; e então despacha a correção ao `developer`, com **re-revisão obrigatória** do que foi corrigido (mais `qa` quando a correção tem efeito observável).
 
 ```
 /keelson:review [alvo] [--fix] [--no-security] [--paths=<a,b>]
@@ -301,13 +301,13 @@ Os agents formam o **time** do keelson (modelo de time e contrato Diretor–PO �
 |---|---|---|
 | `po` | **PO** — dono da demanda; valida SPEC e entrega contra o brief | `/keelson:auto`, `/keelson:specify`, `/keelson:guided` |
 | `pm` | **PM** — decompõe brief épico em demandas priorizadas | `/keelson:specify-epic` |
-| `task-implementer` | **Developer** — implementa uma única TASK | `/keelson:implement` |
-| `task-reviewer` | **Code Reviewer** — quality gates 1–7 antes da closure | `/keelson:implement`, `/keelson:review` |
-| `security-reviewer` | **Security Engineer** — gate 8, em mudança sensível | `/keelson:implement`, `/keelson:review` |
-| `task-verifier` | **QA** — gate 9 + verificabilidade pré-código | `/keelson:implement`, `/keelson:auto`, `/keelson:review` |
-| `product-critic` | **Product Analyst** — crítica de mérito da SPEC (o PO a resolve) | `/keelson:specify` |
-| `process-tuner` | **Agile Coach** — auto-aprendizado do processo | closure do `/keelson:implement`, `/keelson:auto`, sob demanda |
-| `profile-writer` | **Staff Engineer** — gera perfis de linguagem | `/keelson:init`, sob demanda |
+| `developer` | **Developer** — implementa uma única TASK | `/keelson:implement` |
+| `code-reviewer` | **Code Reviewer** — quality gates 1–7 antes da closure | `/keelson:implement`, `/keelson:review` |
+| `security-engineer` | **Security Engineer** — gate 8, em mudança sensível | `/keelson:implement`, `/keelson:review` |
+| `qa` | **QA** — gate 9 + verificabilidade pré-código | `/keelson:implement`, `/keelson:auto`, `/keelson:review` |
+| `product-analyst` | **Product Analyst** — crítica de mérito da SPEC (o PO a resolve) | `/keelson:specify` |
+| `agile-coach` | **Agile Coach** — auto-aprendizado do processo | closure do `/keelson:implement`, `/keelson:auto`, sob demanda |
+| `staff-engineer` | **Staff Engineer** — gera perfis de linguagem | `/keelson:init`, sob demanda |
 
 Os validators (`spec-validator`, `plan-validator`, `task-validator`) ficam **fora do elenco de propósito**: são ferramentas do time, não papéis (decisão 4.37).
 
