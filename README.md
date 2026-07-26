@@ -186,7 +186,7 @@ keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
 ├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer…
 ├── skills/            # spec / plan / task validators + status + screen-verify
-├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard
+├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard
 ├── guidelines/
 │   ├── _meta/         # QUALITY-CHARTER.md · PROFILE-OUTLINE.md
 │   ├── core/          # language-agnostic doctrine (always active)
@@ -198,7 +198,7 @@ keelson/
 
 ## Status
 
-`0.22.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.23.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving. New in this
 release: a **coherence sweep** (decision 4.41) aligning every living rule with the team

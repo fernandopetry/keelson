@@ -686,6 +686,20 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.42 — agent-guard: trabalho do ciclo só com o elenco + regra de execução dos validators
+
+**Problema**: transcript de rodada real (consumidor `aav-backoffice`) mostrou a validação de SPEC despachada a um subagent `general-purpose` com prompt improvisado. A escolha do `subagent_type` é do modelo a cada spawn e nada a corrigia: um agent genérico não carrega a doutrina do papel (input esperado, gates, formato de report), e um validator executado "de memória" usa outra régua. No mesmo transcript o elenco funcionou onde há agent (crítica via `keelson:product-critic` confirmada) — o furo era a ausência de garantia mecânica e de regra para onde a *skill* de validação roda.
+
+**Decisão**:
+- **Regra de execução das skills validator** (dono: `validator-protocol.md` §2): a skill roda na main session **ou** num subagent executor cujo briefing **cita o caminho do SKILL.md canônico**, com instrução de aplicá-lo integralmente e devolver o output no formato do protocolo. Subagent genérico validando sem ler o SKILL.md é desvio.
+- **Hook novo `hooks/agent-guard.sh`** (PreToolUse, matcher `Task|Agent`): `keelson:*` passa sempre; spawn genérico cujo prompt tem **fingerprint de trabalho de papel** (verbos de papel — gates, crítica de mérito, modos do po/qa, implementar TASK —, nunca a mera menção a um artefato: exploração/pesquisa passam) → `deny` único com instrução de refazer a chamada com o agent do elenco; validator genérico **sem** a citação de SKILL.md → `deny` único com a regra do §2. Anti-renudge por fingerprint (`git hash-object` de tipo+texto; a **segunda tentativa idêntica passa** — válvula para uso genérico intencional). Gate de contexto: só age em projeto com ficha ou no repo dev do plugin. Fallback gracioso (sem `jq`/input parseável → `exit 0`).
+
+**Custo assumido**: heurística por regex — falso positivo custa 1 deny + retry (a segunda passa); falso negativo deixa o desvio passar. O guard **reduz** o desvio deterministicamente, não o elimina: garantia absoluta não existe, o `subagent_type` é escolha do modelo. Validado com teste sintético de 8 casos (elenco, trabalho de papel, anti-renudge, validator sem/com SKILL.md, exploração, fora de projeto keelson, input lixo) + `bash -n`.
+
+**Aplicação**: `hooks/agent-guard.sh` (novo), `hooks/hooks.json` (matcher `Task|Agent`), `skills/_shared/validator-protocol.md` (§2), `README.md` (linha de hooks). Capacidade nova → minor: plugin 0.22.1 → 0.23.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

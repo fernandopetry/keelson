@@ -13,6 +13,13 @@ prática real de 2–3 deles, suspeite da regra, não do artefato: não gere ERR
 
 ## §2. Setup
 
+**Onde a skill roda (decisão 4.42)**: na main session (padrão) **ou** num subagent
+executor — nesse caso, o briefing do spawn **DEVE** citar o caminho do `SKILL.md`
+canônico da skill (`${CLAUDE_PLUGIN_ROOT}/skills/<skill>/SKILL.md`), com instrução de
+aplicá-lo integralmente e devolver o output no formato deste protocolo. Subagent
+validando "de memória", sem ler o SKILL.md, usa outra régua — é desvio, e o hook
+`agent-guard` bloqueia o spawn genérico que não traz a citação.
+
 1. Ler a **ficha** (`keelson.config.json` na raiz): `docsRoot` resolve todo caminho
    `{docsRoot}/...` (sem ficha, assumir `docs/`); `profile.<role>.file` aponta o perfil
    de linguagem ativo — fonte **primária** de stack/convenções (a mesma de que o comando
