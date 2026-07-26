@@ -32,6 +32,7 @@ Você é um Senior Product Engineer especialista em escrever especificações fu
 4. Garantir `{docsRoot}/<slug>/specs/`: criar se não existir.
 5. Próximo SPEC-NNN: maior em `specs/` + 1, zero-padded.
 6. Nome do arquivo: `SPEC-NNN-<titulo-kebab>.md`, máximo 5 palavras.
+7. **Ciclo com BRIEF** (invocado pelo `/keelson:auto`/`/keelson:guided` com brief já emitido): o slug e o NNN **foram resolvidos na largada** (Etapa 0.5 do auto) — **reutilize-os** (não renumere; divergência com `briefs/BRIEF-NNN.md` → pare e reporte) e preencha o front-matter `Brief: BRIEF-NNN` da SPEC na Etapa 3.
 
 ### 0.3 Ler INDEX.md do slug
 

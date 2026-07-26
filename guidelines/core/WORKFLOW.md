@@ -152,11 +152,14 @@ antes de encerrar. É heurístico (não prova a revisão). Par do `doc-guard`.
 
 ### Papéis do fluxo (o time SDD)
 
-O fluxo modela um time de engenharia — os papéis operacionais vivem nas descriptions dos
-comandos e agents. Separação de poderes: quem implementa ≠ quem revisa código ≠ quem
-revisa segurança ≠ quem verifica ≠ quem aprova produto ≠ quem integra/deploya. Três
-fronteiras são **humanas**: aprovar produto (SPEC), mergear/deployar (pós-PR) e ser o
-destino de escalonamento.
+O fluxo modela um time de engenharia (contrato Diretor–PO, decisões 4.37/4.38) — os
+papéis operacionais vivem nas descriptions dos comandos e agents; a main session é o
+**Tech Lead** e o humano é o **Diretor**. Separação de poderes: quem implementa ≠ quem
+revisa código ≠ quem revisa segurança ≠ quem verifica ≠ quem aprova produto ≠ quem
+integra/deploya. **Aprovação de produto**: no ciclo com BRIEF, é do `po` — contra o
+brief, nunca contra a própria opinião; sem brief (fluxo avulso) ou no `/keelson:guided`,
+é humana. As fronteiras **sempre humanas**: veto e escalação (o Diretor), abrir PR,
+mergear e deployar — a autonomia termina no push da branch de trabalho.
 
 ### Regras do modelo de tarefas
 
@@ -165,8 +168,10 @@ destino de escalonamento.
 - **Nomenclatura de tarefa:** `TASK-MMM-XXX-<titulo>.md` (escopada por PLAN), gerada pelo
   `/keelson:tasks`. Não use numeração sequencial por feature.
 - **SPEC é agnóstica de tecnologia;** stack e arquitetura entram apenas no PLAN.
-- **Promoção de status (`Draft → Approved → Done`) é sempre manual;** os validators
-  bloqueiam apenas ERROR.
+- **Promoção de status (`Draft → Approved → Done`) nunca é feita por validator** — ele
+  apenas bloqueia ERROR. Quem promove: no ciclo com BRIEF (modo autônomo), a main
+  session, pelo veredito `APROVAR` do `po` (decisão 4.38); sem brief ou no
+  `/keelson:guided`, o humano.
 - **Closure é obrigatória:** nenhuma TASK é Done sem o histórico de execução preenchido
   pelo `/keelson:implement`.
 

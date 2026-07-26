@@ -26,6 +26,16 @@ Cada etapa gera artefatos em `<docsRoot>/<slug>/` (a raiz vem de `docsRoot` na f
 
 ## 2. Fluxo típico (exemplo completo)
 
+**O caminho do dia a dia é o autônomo** — você pede, o time conduz (contrato Diretor–PO, §3.9):
+
+```bash
+/keelson:auto "Exportação de relatórios em CSV com filtro de período"
+# brief emitido (janela de veto) → SPEC → PLAN → TASKs → implement
+# → entrega com relatório de aceitação do PO. Você revisa a branch e decide o merge.
+```
+
+Por dentro, o ciclo que o auto atravessa — e que você pode dirigir etapa a etapa quando quiser (`/keelson:guided`, ou os comandos avulsos):
+
 ```bash
 # 1. Especificar o QUÊ (sem tecnologia)
 /keelson:specify "Exportação de relatórios em CSV com filtro de período" --slug=relatorios
@@ -244,7 +254,7 @@ Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisõe
 
 ### 3.14 `/keelson:review` — code review de um diff avulso (sem artefato SDD)
 
-Porta de entrada da doutrina para o código que **entrou fora do ciclo**: hotfix, código herdado, contribuição externa, mudança feita à mão. Você aponta um diff — working tree, `staged`, `last`, `-N` commits, um `<sha>`, um range `<a>..<b>` ou `branch` — e o comando age como **tech lead**: despacha `code-reviewer` (gates 1–7) e, em área sensível, `security-engineer` (gate 8) **em paralelo**; consolida e classifica cada achado; pede **um** OK; e então despacha a correção ao `developer`, com **re-revisão obrigatória** do que foi corrigido (mais `qa` quando a correção tem efeito observável).
+Porta de entrada da doutrina para o código que **entrou fora do ciclo**: hotfix, código herdado, contribuição externa, mudança feita à mão. Você aponta um diff — working tree, `staged`, `last`, `-N` commits, um `<sha>`, um range `<a>..<b>` ou `branch` — e a main session assume seu papel de **Tech Lead**: despacha `code-reviewer` (gates 1–7) e, em área sensível, `security-engineer` (gate 8) **em paralelo**; consolida e classifica cada achado; pede **um** OK; e então despacha a correção ao `developer`, com **re-revisão obrigatória** do que foi corrigido (mais `qa` quando a correção tem efeito observável).
 
 ```
 /keelson:review [alvo] [--fix] [--no-security] [--paths=<a,b>]
@@ -277,7 +287,7 @@ Skills não geram artefatos novos — validam ou consultam. As três validators 
 
 ### Severidades e gate de status
 
-ERROR bloqueia a promoção (SPEC/PLAN não vai a `Approved`; TASK vira `Blocked`); WARNING não bloqueia; violação trivial recebe auto-fix. A promoção de Status (`Draft` → `Approved`/`Done`) é sempre **manual**, mesmo com zero errors. Override consciente de ERROR: bloco declarado no próprio artefato — formato e regras no dono da moldura, `${CLAUDE_PLUGIN_ROOT}/skills/_shared/validator-protocol.md` (§3–§4).
+ERROR bloqueia a promoção (SPEC/PLAN não vai a `Approved`; TASK vira `Blocked`); WARNING não bloqueia; violação trivial recebe auto-fix. A promoção de Status (`Draft` → `Approved`/`Done`) **nunca é do validator**, mesmo com zero errors — no ciclo com brief a main session promove pelo veredito do `po` (4.38); sem brief ou no guided, é humana. Override consciente de ERROR: bloco declarado no próprio artefato — formato e regras no dono da moldura, `${CLAUDE_PLUGIN_ROOT}/skills/_shared/validator-protocol.md` (§3–§4).
 
 ### `/keelson:status` — consultar estado
 
@@ -299,14 +309,14 @@ Os agents formam o **time** do keelson (modelo de time e contrato Diretor–PO �
 
 | Agent | Papel no time | Invocado por |
 |---|---|---|
-| `po` | **PO** — dono da demanda; valida SPEC e entrega contra o brief | `/keelson:auto`, `/keelson:specify`, `/keelson:guided` |
+| `po` | **PO** — dono da demanda; valida SPEC e entrega contra o brief | `/keelson:specify`, `/keelson:auto`, `/keelson:implement` |
 | `pm` | **PM** — decompõe brief épico em demandas priorizadas | `/keelson:specify-epic` |
-| `developer` | **Developer** — implementa uma única TASK | `/keelson:implement` |
+| `developer` | **Developer** — implementa uma única TASK | `/keelson:implement`, `/keelson:review` |
 | `code-reviewer` | **Code Reviewer** — quality gates 1–7 antes da closure | `/keelson:implement`, `/keelson:review` |
 | `security-engineer` | **Security Engineer** — gate 8, em mudança sensível | `/keelson:implement`, `/keelson:review` |
 | `qa` | **QA** — gate 9 + verificabilidade pré-código | `/keelson:implement`, `/keelson:auto`, `/keelson:review` |
 | `product-analyst` | **Product Analyst** — crítica de mérito da SPEC (o PO a resolve) | `/keelson:specify` |
-| `agile-coach` | **Agile Coach** — auto-aprendizado do processo | closure do `/keelson:implement`, `/keelson:auto`, sob demanda |
+| `agile-coach` | **Agile Coach** — auto-aprendizado do processo | closure do `/keelson:implement`, `/keelson:auto`, `/keelson:review`, sob demanda |
 | `staff-engineer` | **Staff Engineer** — gera perfis de linguagem | `/keelson:init`, sob demanda |
 
 Os validators (`spec-validator`, `plan-validator`, `task-validator`) ficam **fora do elenco de propósito**: são ferramentas do time, não papéis (decisão 4.37).
@@ -323,7 +333,7 @@ Conteúdo canônico (árvore de artefatos, IDs, contrato da tabela "PLANs", temp
 
 1. **INDEX.md é gerado** — nunca edite. Errou? `/keelson:rebuild-index <slug>`.
 2. **SPEC não fala de tecnologia.** Linguagem, framework, banco, protocolo etc. só entram no PLAN.
-3. **Promoção de Status é manual.** Validators bloqueiam errors, mas quem promove `Draft → Approved → Done` é você, no front-matter do artefato.
+3. **Promoção de Status nunca é do validator.** Ele bloqueia errors; quem promove `Draft → Approved → Done` é o PO/main session no ciclo com brief (modo autônomo, 4.38), ou **você** no fluxo avulso e no `/keelson:guided`.
 4. **Closure é inegociável.** Task sem "Histórico de execução" preenchido não é Done, mesmo com código pronto.
 5. **Trivial pula o ciclo.** Typo, copy, cor: commit direto no padrão do perfil ativo.
 6. **Legado primeiro migra, depois muda.** Slug sem INDEX.md → `/keelson:migrate-legacy` antes de qualquer `/keelson:triage`.

@@ -9,4 +9,4 @@ A estrutura do `/keelson:implement` (etapas, análise de paralelizabilidade, gat
 - **Final da wave (Etapa 3.6)**: **merge das worktrees** na branch principal da wave **antes** de rodar a suíte da wave; os commits de closure feitos por worktree (`chore(<slug>): close TASK-MMM-XXX`) chegam nesse merge. Conflito de merge → regra do implement: pausar, reportar, resolução manual.
 - **Output final (Etapa 5)**: reportar `Orquestração: AGENT_TEAMS` (o enum `AGENT_TEAMS | SUBAGENTS | SINGLE_THREAD` do template permanece no comando).
 
-O que **não** muda: critérios SEQUENTIAL_FORCED da Etapa 1 (worktrees não relaxam nenhum), independência gerador ≠ avaliador (o implementer nunca revisa o próprio diff — decisão 4.30), closure obrigatória por task e o sentinela `run-state`/`wave-guard`.
+O que **não** muda: critérios SEQUENTIAL_FORCED da Etapa 1 (worktrees não relaxam nenhum), independência gerador ≠ avaliador (o developer nunca revisa o próprio diff — decisão 4.30), closure obrigatória por task e o sentinela `run-state`/`wave-guard`.

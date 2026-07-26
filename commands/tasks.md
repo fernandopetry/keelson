@@ -57,7 +57,7 @@ Listar `TASK-MMM-*.md` em `{docsRoot}/<slug>/tasks/`. Próximo XXX = maior exist
    - `small`: 1 arquivo principal, 1 a 3 testes, 30 min a 2 h
    - `medium`: até 3 arquivos relacionados, 2 a 4 h
    (sobrescrito pela ficha/`CLAUDE.md` se declarado)
-8. **Corte por risco, não por camada**. Cada TASK custa um ciclo implementer + reviewer —
+8. **Corte por risco, não por camada**. Cada TASK custa um ciclo developer + code-reviewer —
    granularidade fina multiplica revisões, não qualidade:
    - **Fatia sensível** (seed de permissão, autorização, endpoint novo, migração,
      regra de negócio central) → TASK **própria**, mesmo que pequena, para receber
@@ -183,7 +183,7 @@ funcionalidade é a própria SPEC). Task `chore` sem FR realizado pode omitir. R
 
 Primeiro decida **qual camada enforça** o AC e liste-o nos "Critérios de pronto" **dessa** task, não de uma vizinha: recusa por **estado prévio** (ex.: registro já vinculado) é guard da camada de regra de negócio; unicidade por **corrida/persistência** (violação de restrição → conflito) é da camada de persistência; **autorização/borda** é da camada de entrada; **comportamento de tela** é do frontend (gate de tela, quando `gates.screenVerify`). AC não enforçável na camada da task (ex.: uma escrita idempotente que delega a unicidade ao armazenamento) não é testável ali — realoque para a task que o impõe.
 
-Depois, cada AC mapeia para **exatamente um** gate de verificação. NÃO liste o mesmo AC em dois gates com exigências distintas (ex.: "testes cobrem AC-X" **e** "gate 9 cobre AC-X"): a ambiguidade faz o implementer escolher a verificação mais fraca e um MUST fica sem teste falsificável (uma mutação passaria os testes verdes). Regra: **MUST testável em unidade → teste no gate 1**; o gate 9 (comportamento verificado / caminhada de tela quando `gates.screenVerify`) só **confirma** o fluxo ponta-a-ponta, nunca substitui o teste. Respeite o gate que a DoD do PLAN atribui ao AC — nunca rebaixe de gate 1 (teste) para gate 9 (manual).
+Depois, cada AC mapeia para **exatamente um** gate de verificação. NÃO liste o mesmo AC em dois gates com exigências distintas (ex.: "testes cobrem AC-X" **e** "gate 9 cobre AC-X"): a ambiguidade faz o developer escolher a verificação mais fraca e um MUST fica sem teste falsificável (uma mutação passaria os testes verdes). Regra: **MUST testável em unidade → teste no gate 1**; o gate 9 (comportamento verificado / caminhada de tela quando `gates.screenVerify`) só **confirma** o fluxo ponta-a-ponta, nunca substitui o teste. Respeite o gate que a DoD do PLAN atribui ao AC — nunca rebaixe de gate 1 (teste) para gate 9 (manual).
 
 Todo item de **gate 1** registra a **verificação executável** — comando + saída/efeito esperado — **antes** do código: o critério nasce do AC, nunca do diff (gerador ≠ avaliador). Critério de teste sem comando+esperado → `task-validator` reprova (ERROR).
 

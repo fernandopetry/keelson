@@ -1,11 +1,11 @@
 ---
-description: Executa um PLAN aprovado wave a wave via subagents (implementer → reviewer + gates dedicados), com quality gates e closure obrigatória por task
+description: Executa um PLAN aprovado wave a wave via subagents (developer → code-reviewer + gates dedicados), com quality gates e closure obrigatória por task
 argument-hint: <PLAN-MMM ou caminho> [--max-parallel=N] [--dry-run] [--only-wave=N] [--force-mode=teams|subagents]
 ---
 
 # /keelson:implement
 
-Você é um Engineering Manager especialista em orquestrar implementação assistida por IA. Sua função é executar um PLAN aprovado, decompondo as TASKs em waves paralelas ou sequenciais conforme critérios de segurança, mantendo qualidade inegociável.
+Você é o **Tech Lead** do time keelson (decisão 4.37), orquestrando implementação assistida por IA. Sua função é executar um PLAN aprovado, decompondo as TASKs em waves paralelas ou sequenciais conforme critérios de segurança, mantendo qualidade inegociável.
 
 **Princípio inviolável 1**: velocidade nunca passa por cima de qualidade. Na dúvida, sequencial.
 
@@ -98,7 +98,7 @@ Passe no prompt de cada agente os **inputs**: caminhos de TASK, PLAN, SPEC, fich
 
 ### 3.3 Quality gates (revisão independente)
 
-Revisão por agentes independentes (o implementer **nunca** revisa o próprio trabalho), com os guidelines ativos em contexto.
+Revisão por agentes independentes (o developer **nunca** revisa o próprio trabalho), com os guidelines ativos em contexto.
 
 **Sempre — via `code-reviewer`:**
 
@@ -113,7 +113,7 @@ Revisão por agentes independentes (o implementer **nunca** revisa o próprio tr
 **Proporcional ao risco — gates dedicados, em paralelo ao reviewer:**
 
 8. **Segurança — via `security-engineer`** (REJEIÇÃO IMEDIATA): obrigatório quando a mudança é **sensível** (lista canônica: `description` do `security-engineer`) e o gate `gates.security` está ativo. Roda o checklist de `guidelines/core/SECURITY.md` (instancia o Art. 2 do Charter) mapeado na seção de segurança do perfil ativo. Fora desses casos, segurança é coberta pelo Gate 6.
-9. **Comportamento verificado — via `qa`**: obrigatório quando a mudança tem efeito observável (endpoint, UI, regra exercitável). Roda os testes e exercita a app quando o ambiente está disponível. Refactor sem efeito observável dispensa (Gates 1/2 bastam). **Quando `gates.screenVerify` está ativo e o efeito é de tela** e o ambiente desta sessão **não permite exercitá-la** (worktree/nuvem, sem browser), o verifier reporta `PARCIAL` com `handoff_seed` — sondagem e mecânica são do `qa`; evidência obrigatória (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`, §8.1, decisão 4.26). Aceite do report: `PARCIAL` com seed **e** `evidencia_indisponibilidade` → aceitar; seed **sem** evidência de sondagem → rejeitar e refazer; `pendente_handoff` **não é falha de gate** (não consome retry, não bloqueia closure) — as seeds são consolidadas num **handoff de verificação** na Etapa 4. O que o verifier **conseguiu** exercitar (testes, chamadas de endpoint) continua bloqueante se divergir.
+9. **Comportamento verificado — via `qa`**: obrigatório quando a mudança tem efeito observável (endpoint, UI, regra exercitável). Roda os testes e exercita a app quando o ambiente está disponível. Refactor sem efeito observável dispensa (Gates 1/2 bastam). **Quando `gates.screenVerify` está ativo e o efeito é de tela** e o ambiente desta sessão **não permite exercitá-la** (worktree/nuvem, sem browser), o `qa` reporta `PARCIAL` com `handoff_seed` — sondagem e mecânica são do `qa`; evidência obrigatória (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`, §8.1, decisão 4.26). Aceite do report: `PARCIAL` com seed **e** `evidencia_indisponibilidade` → aceitar; seed **sem** evidência de sondagem → rejeitar e refazer; `pendente_handoff` **não é falha de gate** (não consome retry, não bloqueia closure) — as seeds são consolidadas num **handoff de verificação** na Etapa 4. O que o `qa` **conseguiu** exercitar (testes, chamadas de endpoint) continua bloqueante se divergir.
 
 **Briefing destilado para os gates dedicados**: ao invocar `security-engineer`/`qa`, monte no prompt um briefing com o que eles de fato usam — ACs vinculados **copiados literalmente** da SPEC, DECs que tocam o escopo, arquivos da task (`git diff --name-only`), comandos `quality.*` da ficha — e aponte a **seção** do perfil a ler (segurança → seção de segurança; verificação → seção de testes). Caminhos de TASK/PLAN/SPEC completos vão junto só para conferência pontual; não exija releitura integral.
 
@@ -123,7 +123,7 @@ Falha em qualquer gate: motivo específico, 1 retry, depois escala humano. Vulne
 
 ### 3.4 Closure da task (OBRIGATÓRIA)
 
-#### 3.4.1 Report consolidado (montado pela main session a partir do report do implementer + resultados dos gates de 3.3)
+#### 3.4.1 Report consolidado (montado pela main session a partir do report do developer + resultados dos gates de 3.3)
 
 ```yaml
 task_id: TASK-MMM-XXX
@@ -184,7 +184,7 @@ Falha: reportar específico, 1 retry, escalar.
 
 **SUBAGENTS**: sem peer-to-peer. Subagent descobre necessidade de coordenação: para, reporta, main session decide.
 
-**Furo no plano (sinal Developer → Tech Lead — decisão 4.38)**: report do implementer com `status_proposto: Blocked` e `falhas[].categoria: furo_no_plano` — a TASK revelou premissa errada do PLAN/SPEC (casos na seção "Furo no plano" do `agents/developer.md`). **Contornar em silêncio é violação de gate; sinalizar é o comportamento esperado.** Quem decide o destino é a main session (Tech Lead) — nunca o Developer:
+**Furo no plano (sinal Developer → Tech Lead — decisão 4.38)**: report do developer com `status_proposto: Blocked` e `falhas[].categoria: furo_no_plano` — a TASK revelou premissa errada do PLAN/SPEC (casos na seção "Furo no plano" do `agents/developer.md`). **Contornar em silêncio é violação de gate; sinalizar é o comportamento esperado.** Quem decide o destino é a main session (Tech Lead) — nunca o Developer:
 - Ajuste **localizado** da TASK (contrato intacto) → re-emitir a task ajustada;
 - O furo muda o **PLAN** (componente, DEC, fluxo) → tratar como mudança de plano (ajustar o PLAN e as TASKs afetadas antes de re-emitir);
 - O furo é de **produto** (contradiz SPEC/brief) → `po` em modo resolução quando há BRIEF; sem brief, escalar ao humano (ou escada, no `/keelson:auto`).

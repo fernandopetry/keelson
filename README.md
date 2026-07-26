@@ -82,7 +82,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:specify` | Capture a functional SPEC (EARS requirements, Given-When-Then ACs), tech-agnostic |
 | `/keelson:plan` | Turn an approved SPEC into a technical PLAN (components, DEC decisions with alternatives) |
 | `/keelson:tasks` | Break a PLAN into atomic TASKs ordered in waves, closure fields prepared |
-| `/keelson:implement` | Execute the PLAN wave by wave via subagents (implementer → reviewer + dedicated gates) |
+| `/keelson:implement` | Execute the PLAN wave by wave via subagents (developer → code-reviewer + dedicated gates) |
 
 **Orchestration** — how you enter the cycle:
 
@@ -101,7 +101,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:init` | Interactive setup — detects the stack, writes the ficha and the `CLAUDE.md` block |
 | `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
 | `/keelson:jira-sync` | Reconcile a slug with Jira via the Atlassian MCP connector — idempotent, best-effort (optional) |
-| `/keelson:review` † | Review an arbitrary diff (working tree, last commit, N commits, range, branch) against the keelson doctrine via independent reviewers; on your OK, dispatches the fix to an implementer and re-reviews — for code that arrived without an SDD artifact |
+| `/keelson:review` † | Review an arbitrary diff (working tree, last commit, N commits, range, branch) against the keelson doctrine via independent reviewers; on your OK, dispatches the fix to the developer agent and re-reviews — for code that arrived without an SDD artifact |
 | `/keelson:audit` † | On-demand dependency audit against known vulnerabilities (CVE/NVD); `full` adds hygiene (outdated, abandoned, licenses) |
 | `/keelson:status` | Executive summary of a slug's current state — what's done, in flight, planned |
 | `/keelson:migrate-legacy` | Migrate a legacy slug (docs without `INDEX.md`) to the SDD layout |
@@ -184,7 +184,7 @@ Governance: decisions 4.22, 4.27 and 4.28 in `docs/_meta/decisions.md`.
 ```
 keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
-├── agents/            # subagents (the team): po, implementer, reviewers, verifier, staff-engineer…
+├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer…
 ├── skills/            # spec / plan / task validators + status + screen-verify
 ├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard
 ├── guidelines/
@@ -198,10 +198,15 @@ keelson/
 
 ## Status
 
-`0.21.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.22.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving. New in this
-release: the **team model** (Director–PO contract, decisions 4.37–4.40) — the human
+release: a **coherence sweep** (decision 4.41) aligning every living rule with the team
+model — the PO acceptance report now gates the delivery *before* commit and push,
+status-promotion rules carry explicit mode clauses (po/main session in the autonomous
+cycle, human otherwise), and the consumer `CLAUDE.md` block now teaches the autonomous
+default with the Director–PO contract (**re-run `/keelson:init`** to refresh the
+block). All on top of the **team model** (decisions 4.37–4.40) — the human
 becomes the Director issuing a durable BRIEF; a new `po` agent owns each demand
 (validates SPEC and delivery against the brief, produces the acceptance report,
 escalates only by exception with proposal + default), lateral team signals get named

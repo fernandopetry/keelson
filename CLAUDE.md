@@ -19,6 +19,9 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 - Comando novo/renomeado → sincronizar **3 lugares**: `commands/*.md` · tabela *Commands*
   do `README.md` · §3.x do `docs/_meta/method-guide.md`. Comando humano-only
   (`disable-model-invocation`) → também a nota do `templates/CLAUDE.keelson-block.md`.
+- Agent novo/renomeado → sincronizar: `agents/*.md` (arquivo + `name:` + `# Subagent:`) ·
+  tabela §5 do `method-guide.md` · comentário de `agents/` no `README.md` · §2/§3 do
+  `decisions.md` (convenção de nomes) — e a description declara **todos** os invocadores.
 - **Um dono por regra**: o core (`guidelines/core/`) diz *o quê* (agnóstico); o perfil diz
   *como* na linguagem. Não duplicar regra entre eles. Blocos compartilhados dos comandos
   têm dono único em `docs/_meta/conventions/` — `sdd-conventions.md` (convenções comuns,
@@ -34,7 +37,7 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 - Perfil com `reviewed: true` (ex.: `backend/php.md`) é revisado por humano: edição nele
   deve ser sinalizada na entrega para re-olhada humana.
 
-## Modelo de time e contrato do Diretor (decisão 4.37 — dono do detalhe: `docs/_meta/decisions.md`)
+## Modelo de time e contrato do Diretor (decisões 4.37–4.41 — dono do detalhe: `docs/_meta/decisions.md`)
 
 - O keelson simula um **time real** — desde a 4.40, os IDs dos agents **são** os nomes
   dos papéis. Elenco: **Diretor** = humano · **Tech Lead** = main session · agents

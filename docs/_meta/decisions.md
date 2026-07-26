@@ -55,10 +55,10 @@ projeto/
 
 ```
 keelson/
-├── commands/                   # /keelson:* (specify, plan, tasks, implement, ...)
-├── skills/                     # spec-validator, plan-validator, task-validator, state
-├── agents/                     # task-implementer, task-reviewer, security-reviewer, ...
-├── hooks/                      # doc-guard.sh, security-guard.sh (leem a ficha)
+├── commands/                   # /keelson:* (specify, plan, tasks, implement, auto, review, specify-epic, ...)
+├── skills/                     # spec-validator, plan-validator, task-validator, status, screen-verify
+├── agents/                     # o time: po, pm, developer, code-reviewer, qa, security-engineer, ...
+├── hooks/                      # doc-guard.sh, security-guard.sh, review-guard.sh, wave-guard.sh, ... (leem a ficha)
 └── guidelines/
     ├── _meta/                  # QUALITY-CHARTER.md, PROFILE-OUTLINE.md
     ├── core/                   # doutrina agnóstica (SECURITY.md, ...)
@@ -72,12 +72,12 @@ keelson/
 
 **Decisão**: os comandos do keelson são expostos sob o namespace do plugin — `/keelson:<cmd>` — e as skills e agents que acompanham o plugin **não** levam prefixo redundante (o próprio plugin já os agrupa).
 
-**Motivo**: `/keelson:*` agrupa visualmente no tab completion, comunica o intent (é o keelson agindo) e separa dos demais comandos do projeto, sem precisar inventar prefixo. Dentro do plugin, skills e agents ficam com nomes curtos (`spec-validator`, `task-implementer`, `security-reviewer`) porque o pacote já dá o escopo.
+**Motivo**: `/keelson:*` agrupa visualmente no tab completion, comunica o intent (é o keelson agindo) e separa dos demais comandos do projeto, sem precisar inventar prefixo. Dentro do plugin, skills e agents ficam com nomes curtos (`spec-validator`, `developer`, `security-engineer`) porque o pacote já dá o escopo.
 
-**Aplicação**:
-- Commands: `/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `/keelson:implement`, `/keelson:triage`, `/keelson:rebuild-index`, `/keelson:migrate-legacy`, `/keelson:auto`, `/keelson:guided`, `/keelson:refine`, `/keelson:integrate`, `/keelson:jira-sync`, `/keelson:verify-handoff`, `/keelson:audit`
-- Skills: `spec-validator`, `plan-validator`, `task-validator`, `status`
-- Agents: `task-implementer`, `task-reviewer`, `security-reviewer`, `task-verifier`, `product-critic`, `process-tuner`
+**Aplicação** *(elenco de agents atualizado pela 4.40 — IDs = nomes dos papéis)*:
+- Commands: `/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `/keelson:implement`, `/keelson:triage`, `/keelson:rebuild-index`, `/keelson:migrate-legacy`, `/keelson:auto`, `/keelson:guided`, `/keelson:refine`, `/keelson:integrate`, `/keelson:jira-sync`, `/keelson:verify-handoff`, `/keelson:audit`, `/keelson:review`, `/keelson:specify-epic`
+- Skills: `spec-validator`, `plan-validator`, `task-validator`, `status`, `screen-verify`
+- Agents: `po`, `pm`, `developer`, `code-reviewer`, `qa`, `security-engineer`, `product-analyst`, `agile-coach`, `staff-engineer`
 
 **Docs de governança**: `decisions.md`, `method-guide.md` e `learning-log.md` moram em `<docsRoot>/_meta/` (fora do plugin) e não são invocáveis.
 
@@ -188,6 +188,8 @@ A distinção-chave: "esta *mudança* precisa de doc?" (trivial → não) ≠ "e
 
 ### 4.8 Papéis adicionais no fluxo: segurança, verificação, integração e crítica de produto
 
+*(Emendada pelas decisões 4.10 e 4.38: a promoção de Status foi delegada ao agente — 4.10 — e a aprovação de produto passou ao `po`, contra o BRIEF, no ciclo autônomo — 4.38. Permanecem humanos: merge, deploy e config de produção; o Diretor mantém veto e escalação. IDs dos agents citados abaixo são pré-4.40.)*
+
 **Decisão**: o fluxo ganha quatro papéis para fechar gaps de qualidade, todos em rigor proporcional ao risco:
 - **Revisor de Segurança** (`security-reviewer`): gate de segurança, **REJEIÇÃO IMEDIATA**, checklist de `guidelines/core/SECURITY.md` + a seção de segurança do perfil ativo. Gate dedicado em mudança sensível (auth, SQL, upload, dados pessoais, crypto, endpoints, deps); embutido no code review no restante.
 - **Verificador Funcional** (`task-verifier`): gate "comportamento verificado" — roda testes e exercita a app quando há efeito observável e ambiente disponível.
@@ -276,6 +278,8 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 **Aplicação**: `commands/auto.md` (Etapa 0.5 + escada em Exceções — fonte de verdade) e `commands/guided.md` (explicita a régua estrita própria).
 
 ### 4.14 Espelho do entendimento: o prompt confirmado é o contrato (complementa 4.13)
+
+*(Recalibrada pela 4.38: no modo autônomo, a confirmação do espelho foi substituída pela **janela de veto** — o contrato passa a ser o BRIEF **emitido**, validado pelo `po`; a confirmação na hora permanece só no `/keelson:guided`. O formato canônico e a calibração por rota seguem válidos, com o contrato do BRIEF morando no `index-contract.md`.)*
 
 **Decisão (do humano)**: na largada do `/keelson:auto`, além das perguntas da última chamada, o agente **reescreve o pedido** de forma organizada e acessível — formato canônico do prompt refinado do `/keelson:refine` (Contexto / Pedido / Premissas decididas / Fora de escopo), na linguagem do solicitante, legível em ~30 segundos — e **valida o entendimento** antes de seguir. O espelho confirmado **substitui o pedido original** como fonte da demanda: a SPEC nasce dele.
 
@@ -602,7 +606,7 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 - **Elenco com nomes da vida real** — fase 1: a metáfora entra na linguagem (doutrina, narração dos comandos, descriptions), **IDs técnicos mantidos**; rename duro dos agents só numa fase 2, se a linguagem colar. Mapeamento: **Diretor** = humano; **PO** = agente novo (dono da demanda); **Tech Lead** = main session (`/keelson:implement`, `/keelson:review`, `/keelson:auto` — formaliza o que a 4.36 já dizia); **Developer** = `task-implementer`; **Code Reviewer** = `task-reviewer`; **QA** = `task-verifier`; **Security Engineer** = `security-reviewer`; **Agile Coach** = `process-tuner`; **Staff Engineer** = `profile-writer`. Os validators (`spec-validator`, `plan-validator`, `task-validator`) ficam **deliberadamente fora da metáfora**: são ferramentas do time, não pessoas — vestir crachá em linter enfraquece a metáfora onde ela funciona.
 - **PM (Product Manager) — cadeira reservada, não instanciada**: na empresa do humano o PM fica **acima** do PO; no keelson o espaço acima do PO pertence ao Diretor (intenção). O que caberia a um PM é a camada de **portfólio**: brief que abrange várias demandas (épico, roadmap, FEATs da 4.27) sendo decomposto e priorizado em demandas individuais, cada uma entregue ao PO. Essa camada ainda não existe no fluxo (`/keelson:specify-epic` é decisão em aberto, §8) — criar o agente agora seria cadeira vazia. **Gatilho de instanciação**: quando a camada épico/roadmap entrar, o PM nasce como dono da decomposição do brief multi-demanda. Registrado também o porquê de o `product-critic` **não** virar PM: o critic prepara crítica que o PO resolve — batizá-lo de PM colocaria um PM hierarquicamente abaixo do PO, invertendo o modelo mental da vida real que a metáfora quer aproveitar.
 - **Contrato Diretor–PO**: o humano deixa de aprovar artefatos de rotina e passa a emitir intenção. (a) O pedido do Diretor vira **brief**, artefato-âncora da demanda: pedido capturado como dito + interpretação do PO. O PO **nunca valida contra a própria opinião; valida contra o brief** — mitigação de o sistema aprovar a si mesmo. (b) **Checkpoint único e barato**: o PO devolve a interpretação do brief em ~5 linhas e segue **sem esperar resposta** — janela de veto, não aprovação (coerente com 4.23/4.24: fôlego não é gatilho). (c) **Escalação por exceção**, sempre com proposta + default ("sigo com A a menos que diga o contrário"), só em 4 casos: ambiguidade que muda o resultado; expansão/conflito de escopo; ação irreversível/externa; conflito com diretriz anterior do Diretor. (d) Decisão do PO não derivável do brief entra no registro de **decisões tomadas em nome do Diretor**, auditável na entrega. (e) Na entrega, o PO produz **relatório de aceitação** (pedido vs entregue, evidência de alinhamento ao brief — distinto do QA, que prova que *funciona* —, decisões em nome do Diretor, o que ficou de fora e por quê). O `product-critic` passa a operar sob o PO: o analyst critica, o PO resolve pelas lentes do brief e escala só o que não consegue resolver (fazedor ≠ aprovador preservado).
-- **Merge e deploy permanecem do Diretor** — motivo registrado: pode haver outras sessões trabalhando na mesma base de código, e nem sempre o merge imediato é o melhor caminho. A autonomia termina nos **commits** da demanda (comportamento que já existe); abrir PR, merge e deploy são atos do Diretor (PR sob demanda via `/keelson:integrate`, que segue humano-only).
+- **Merge e deploy permanecem do Diretor** — motivo registrado: pode haver outras sessões trabalhando na mesma base de código, e nem sempre o merge imediato é o melhor caminho. A autonomia termina nos **commits** da demanda (comportamento que já existe); abrir PR, merge e deploy são atos do Diretor (PR sob demanda via `/keelson:integrate`, que segue humano-only). *(Emenda 4.41: leia-se "termina no **push da branch de trabalho**, sem PR" — o comportamento que já existia, fixado na 4.10, inclui o push.)*
 - **Sinais laterais com contrato** (gatilho, rota e registro definidos — sem contrato, comunicação lateral é ruído): **escalação** (PO → Diretor, critérios acima); **furo no plano** (Developer → Tech Lead: task revelou premissa errada do PLAN — sinalizar é o comportamento premiado, contornar em silêncio é violação de gate; quem decide o destino do furo é o Tech Lead, nunca o dev); **cenário ambíguo** (QA → PO, *antes* do código: AC não verificável ou borda sem resposta — completa a 4.34; a rota é o PO, que responde pelo brief e só sobe pelos critérios de escalação); **achado fora de escopo** (Reviewer/QA → Tech Lead: registro para triagem sem inchar a task); **alerta de segurança** (já existe: rejeição imediata); **aceitação** (PO → Diretor). O boletim entre waves passa a ser narrado em linguagem de time, endereçado ao Diretor, fechando com o estado de pendência ("nada pendente de você" é a experiência-alvo).
 
 **Custo assumido**: um agente novo (PO) no caminho quente de toda demanda; a aprovação de produto deixa de ser humana por rotina — o preço é confiar o alinhamento ao par brief + auditoria na aceitação, com o veto como rede. A metáfora cria expectativa de continuidade/memória que agentes por-invocação não têm — a doutrina deve ser honesta sobre isso. Fase 1 sem rename evita a sincronização cara (commands, README, method-guide, template, consumidores re-rodando init), mas convive com dois vocabulários (nome de papel na narração, ID técnico nos artefatos) até a fase 2.
@@ -661,6 +665,27 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.41 — Varredura de coerência do modelo de time: promoção com cláusula de modo, aceitação pré-commit, rota risco, bloco do consumidor
+
+**Problema**: revisão de coerência pós-4.37–4.40 (3 lentes independentes: espinha do `/auto`, papéis, conflitos de decisão — mesmo espírito da 4.33) achou 7 conflitos reais e um rastro de seções/frases pré-modelo: (a) "promoção de Status é sempre humana/manual" sobrevivia em 6 donos vivos (sdd-conventions, WORKFLOW, validator-protocol, method-guide ×2, product-analyst), contradizendo a 4.38; (b) o `specify` não tinha canal de entrada do BRIEF (front-matter `Brief:` sem preenchedor; NNN renumerado em vez de reutilizado); (c) o relatório de aceitação estava posicionado **depois** do commit/push — `RECUSADA` chegava tarde; (d) a aceitação bug/refactor era inexecutável (po exigia arquivo de BRIEF); (e) a rota risco gerava BRIEF órfão (pareamento 1:1 exige SPEC) e a Etapa 3.5 a incluía sem ela ter TASKs do `/keelson:tasks`; (f) a resposta do PO virava "nota na TASK" no único campo proibido (closure) — ERROR de task-validator; (g) contratos de input incompletos (po modo resolução × furo de produto; qa pré-código sem input declarado). Mais: guided sem a correção de slug/NNN do f639fec, fronteira "termina nos commits" contradita pelo push da Etapa 5, seções normativas do próprio decisions.md (§2/§3/§5.4/§6.1/§7/§8) com elenco antigo, 4.8/4.14 sem nota de emenda, bloco do consumidor ensinando o fluxo pré-modelo (garantia da 4.10 furada), e ~30 resíduos cosméticos de vocabulário/persona.
+
+**Decisão (o Diretor mandou aplicar tudo)**:
+- **Promoção com cláusula de modo** em todos os donos: nunca é do validator; ciclo com BRIEF (autônomo) → main session promove pelo veredito `APROVAR` do `po`; sem brief ou guided → humana.
+- **Aceitação do PO vira item 2.5 da Entrega** (antes do commit/push): composição do diff montada ali e reusada no report; `RECUSADA` reprova antes de commitar. 6.1/6.2 passam a referenciar o 2.5.
+- **Espelho inline vale como brief para o po** (rotas bug/refactor e TASK avulsa de risco) — input do agent relaxado; **rota risco sem SPEC usa espelho inline** (arquivo de BRIEF só com SPEC, preservando o pareamento 1:1) e fica **fora** da Etapa 3.5 (restrita a TASKs geradas pelo `/keelson:tasks`).
+- **Resposta do PO pré-código reescreve o critério/AC ambíguo na TASK** (nunca campo de closure) — o critério fica verificável, o task-validator fica verde.
+- **Contratos fechados**: `specify` Etapa 0.2 ganha o passo 7 (reutilizar slug/NNN da largada + preencher `Brief:`); guided resolve slug/NNN antes de gravar o brief; po modo resolução aceita furo de produto do developer (devolve resolução de produto; o como técnico é do Tech Lead); qa pré-código declara input (TASKs + ACs literais + BRIEF) e output YAML `achados[]`; degrau 3 encerra o `run-state` antes de terminar turno sem resposta; Etapa 4.6 não regenera handoff da rota formal; refine preserva o pedido cru (`> Pedido original:`) para o "Pedido como dito" e cede o dono do artefato ao index-contract (mantendo o das 4 seções).
+- **Fronteira reescrita**: "a autonomia termina no **push da branch de trabalho**, sem PR" (emenda registrada na 4.37; CLAUDE.md, WORKFLOW, sdd-conventions alinhados).
+- **decisions.md normativo atualizado**: §2/§3 (elenco novo + commands/skills completos), §5.4 (IDs novos + os 2 bloqueios da 4.38 fora da numeração), §6.1, §7 (rota épico), §8 (specify-epic/PM e request-mirror resolvidos); notas de emenda em 4.8 e 4.14.
+- **Bloco do consumidor ensina o modelo real** (o uso principal do plugin é o autônomo — diretriz do Diretor): modo padrão autônomo, contrato Diretor–PO em 1 parágrafo, aceitação do PO na definição de pronto. Repara a garantia da 4.10. **Exige re-rodar `/keelson:init` nos consumidores.**
+- **Personas alinhadas ao elenco**: main session abre como Tech Lead em implement/guided/triage/review; agents abrem com o papel (Code Reviewer, QA, Product Analyst, Agile Coach); `plan.md` vira "Arquiteto de Software" (colisão com o crachá `staff-engineer`); regra nova de sincronização de **agent** no CLAUDE.md (o buraco pelo qual os resíduos passaram).
+
+**Custo assumido**: o bloco novo do consumidor só vale após re-init; a promoção condicionada ao veredito do po depende de os donos serem lidos com a cláusula completa (frase mais longa em 6 lugares — preço de não ter duas verdades). Cosméticos de vocabulário varridos por grep com allowlist de histórico.
+
+**Aplicação**: `guidelines/core/WORKFLOW.md`, `docs/_meta/conventions/{sdd-conventions,agent-teams}.md`, `skills/_shared/validator-protocol.md`, `commands/{auto,specify,guided,implement,tasks,plan,triage,review,refine}.md`, `agents/{po,qa,product-analyst,code-reviewer,agile-coach}.md`, `docs/_meta/method-guide.md` (§2/§4/§5/§7/3.9/3.14), este arquivo (§2/§3/§5.4/§6.1/§7/§8 + notas 4.8/4.14/4.37), `templates/CLAUDE.keelson-block.md`, `CLAUDE.md`, `README.md`. Doutrina + bloco novo → minor: plugin 0.21.1 → 0.22.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
@@ -684,9 +709,11 @@ Gates por task antes de Done — sempre + proporcionais ao risco:
 4. Escopo respeitado
 5. Decisões DEC respeitadas
 6. Aderência ao Charter + perfil ativo (e `guidelines/project/`)
-7. Code review por reviewer agent (`task-reviewer`)
-8. Segurança (`security-reviewer`, REJEIÇÃO IMEDIATA) — em mudança sensível
-9. Comportamento verificado (`task-verifier`) — em mudança com efeito observável
+7. Code review por reviewer agent (`code-reviewer`)
+8. Segurança (`security-engineer`, REJEIÇÃO IMEDIATA) — em mudança sensível
+9. Comportamento verificado (`qa`) — em mudança com efeito observável
+
+A 4.38 acrescenta dois bloqueios fora desta numeração, no ciclo com BRIEF: a **verificabilidade pré-código** (Etapa 3.5 do `/keelson:auto` — achados do `qa` resolvidos pelo `po`) e o **relatório de aceitação do PO** (`RECUSADA` reprova a entrega antes do commit).
 
 ### 5.5 Closure: gate independente
 
@@ -704,7 +731,7 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 - Branch única por wave
 - Custo: 1.5-2x tokens
 - Coordenação via main session
-- Usa `task-implementer` e `task-reviewer` por referência
+- Usa `developer` e `code-reviewer` por referência
 
 ### 6.2 Modo AGENT_TEAMS (opt-in via `--force-mode=teams`)
 
@@ -732,18 +759,19 @@ Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir man
 | Bug (implementação ≠ AC) | TASK do tipo bugfix |
 | Refactor sem mudança de comportamento | TASK do tipo refactor |
 | Trivial (typo, copy, cor) | Direto no código |
+| Épico / multi-demanda (2+ capacidades independentes, 2+ slugs, roadmap) | `/keelson:specify-epic` (o `pm` decompõe; cada demanda volta ao ciclo normal) |
 | Mexer em slug legado pela primeira vez | `/keelson:migrate-legacy` antes, depois `/keelson:triage` |
 
 ---
 
 ## 8. Decisões em aberto (por resolver)
 
-- Variantes `/keelson:specify-small` e `/keelson:specify-epic` para tarefas micro e roadmap — quando a variante epic entrar, instancia-se o papel de **PM** (cadeira reservada na 4.37: decomposição do brief multi-demanda em demandas por PO).
+- Variante `/keelson:specify-small` para tarefas micro. *(A variante `specify-epic` e o papel de PM foram implementados pela 4.39 — não estão mais em aberto.)*
 - Hook de pre-commit bloqueando merge sem closure.
 - Convenção de UX-FRs (como escrever requisito de comportamento de interface em EARS).
 - Como integrar com ferramentas de wireframe externas referenciadas pelo PLAN.
 - Skill validadora do próprio bloco keelson do `CLAUDE.md`.
-- Agente dedicado `request-mirror` para o espelho do entendimento (decisão 4.14), caso a qualidade do espelho inline se mostre inconsistente na prática.
+- ~~Agente dedicado `request-mirror` para o espelho do entendimento~~ — resolvido pela 4.38: a redação ficou com o Tech Lead, a validação independente com o `po`, e o corretor é a janela de veto do Diretor; a pendência perdeu a premissa (o espelho não é mais confirmado).
 - Política de arquivamento de slugs concluídos.
 - Política de aposentadoria do `/keelson:migrate-legacy` quando não houver mais slug legado no projeto.
 

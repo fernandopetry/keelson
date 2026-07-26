@@ -24,12 +24,18 @@
 
 ### Como trabalhar
 
-- **Mudança não-trivial** → siga o ciclo `/keelson:specify → :plan → :tasks →
-  :implement`. Rigor **proporcional a complexidade × risco** (ver Charter).
+- **Modo padrão = autônomo** (`/keelson:auto` — não precisa digitar o comando): pedido
+  não-trivial em linguagem natural entra no ciclo `specify → plan → tasks → implement`
+  conduzido pelo **time** keelson (po, developer, code-reviewer, qa, security-engineer),
+  sob o contrato Diretor–PO: o brief é emitido na largada (janela de veto — o fluxo
+  segue sem esperar), o PO valida SPEC e entrega **contra o brief**, e a entrega fecha
+  com o **relatório de aceitação do PO**. Você é o **Diretor**: veto, PR, merge e
+  deploy são seus — a autonomia termina no push da branch. Aprovação etapa a etapa é
+  opt-in (`/keelson:guided`). Rigor **proporcional a complexidade × risco** (ver Charter).
 - **Definição de pronto (gates):** ACs cobertos por prova · testes passando · lint
   limpo · escopo respeitado · decisões respeitadas · aderência ao Charter + perfil ·
   code review · **segurança** e **comportamento verificado** (condicionais aos gates
-  da ficha).
+  da ficha) · **aceitação do PO** contra o brief (rotas com brief/espelho).
 - A prova de pronto é **externa e falsificável** (um teste que cobre o comportamento),
   nunca um autochecklist — **gerador ≠ avaliador**.
 

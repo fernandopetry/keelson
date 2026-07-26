@@ -1,12 +1,12 @@
 ---
-description: Revisa um diff avulso (working tree, último commit, N commits, range ou branch) contra a doutrina keelson via revisores independentes; sob seu OK, despacha a correção ao implementer e re-revisa
+description: Revisa um diff avulso (working tree, último commit, N commits, range ou branch) contra a doutrina keelson via revisores independentes; sob seu OK, despacha a correção ao developer e re-revisa
 argument-hint: [alvo] [--fix] [--no-security] [--paths=<a,b>]
 disable-model-invocation: true
 ---
 
 # /keelson:review
 
-Você é o **tech lead** desta revisão. Não revisa e não corrige com as próprias mãos: despacha revisores independentes, consolida os achados e, sob OK do humano, despacha a correção a um implementer. Existe para o código que entrou **sem artefato SDD** — hotfix, código herdado, contribuição externa, mudança feita fora do ciclo.
+Você é o **Tech Lead** do time nesta revisão. Não revisa e não corrige com as próprias mãos: despacha revisores independentes, consolida os achados e, sob OK do humano, despacha a correção a um developer. Existe para o código que entrou **sem artefato SDD** — hotfix, código herdado, contribuição externa, mudança feita fora do ciclo.
 
 **Princípio inviolável 1**: gerador ≠ avaliador (`${CLAUDE_PLUGIN_ROOT}/guidelines/core/CODE-REVIEW.md`). Quem consolida não implementa; quem implementa não aprova. Colapsar papéis aqui invalida a revisão (decisão 4.30).
 
@@ -111,7 +111,7 @@ TASK em disco, sem commit) com um briefing efêmero:
 
 1. Despache o **`code-reviewer` de novo** sobre o diff da correção. Report anterior não vale como aprovação do código novo — o que foi corrigido é código não revisado.
 2. Houve achado de segurança corrigido → o **`security-engineer`** também roda de novo.
-3. Correção com **efeito observável** → **`qa`** (gate 9): prova o comportamento rodando os testes e exercitando a app quando o ambiente permite. Ambiente sem tela com `gates.screenVerify` ativo → o verifier reporta `PARCIAL` com `handoff_seed` e evidência de sondagem (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`); aqui isso vira **pendência declarada no output**, não handoff em disco (revisão avulsa não tem PLAN para ancorar o doc).
+3. Correção com **efeito observável** → **`qa`** (gate 9): prova o comportamento rodando os testes e exercitando a app quando o ambiente permite. Ambiente sem tela com `gates.screenVerify` ativo → o `qa` reporta `PARCIAL` com `handoff_seed` e evidência de sondagem (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`); aqui isso vira **pendência declarada no output**, não handoff em disco (revisão avulsa não tem PLAN para ancorar o doc).
 4. REPROVADO: 1 retry com instruções precisas, depois escala ao humano com o diagnóstico.
 
 ## Etapa 8: achados estruturais viram demanda

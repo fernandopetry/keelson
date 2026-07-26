@@ -37,8 +37,9 @@ Após os auto-fixes, recontar `errors`:
 - `errors` não-vazia e Status `Approved` → forçar Status para `Draft` e registrar no
   artefato uma seção `## Histórico de validação` com data e motivo. (TASK: com ERROR ela
   não é executável pelo `/keelson:implement`; Status `Todo` é forçado para `Blocked`.)
-- `errors` vazia → o artefato **pode** ser promovido; a promoção de Status é sempre
-  **manual**.
+- `errors` vazia → o artefato **pode** ser promovido. A promoção **nunca é do validator**:
+  no ciclo com BRIEF (modo autônomo), quem promove é a main session, pelo veredito
+  `APROVAR` do `po` (decisão 4.38); sem brief ou no `/keelson:guided`, é o humano.
 
 Override consciente, declarado no próprio artefato:
 
@@ -74,7 +75,7 @@ Respeite o override com justificativa; mantenha o ERROR no relatório com flag `
 
 ## Próximos passos
 1. Resolver errors pendentes e validar novamente
-2. Quando errors == 0, promover Status manualmente
+2. Quando errors == 0, promover Status (quem promove: regra do §3 — po/main session no ciclo com BRIEF; humano no avulso/guided)
 ```
 
 Múltiplos artefatos no input → validar em sequência e consolidar num relatório só.
