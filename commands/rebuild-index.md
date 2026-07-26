@@ -34,6 +34,7 @@ INDEX.md deletado por engano, corrompido, divergente dos arquivos individuais (i
 1. Validar que `{docsRoot}/<slug>/` existe. Se não, parar.
 2. **Fazer backup** do INDEX atual (se existir): copiar para `thoughts/local/INDEX-<slug>.backup-<timestamp>.md` (fora da árvore versionada — um backup em `{docsRoot}/` acabaria commitado por engano). Avisar.
 3. Listar arquivos a serem lidos:
+   - `{docsRoot}/<slug>/briefs/BRIEF-*.md` (quando existirem — contrato do BRIEF no index-contract.md)
    - `{docsRoot}/<slug>/specs/SPEC-*.md`
    - `{docsRoot}/<slug>/plans/PLAN-*.md`
    - `{docsRoot}/<slug>/tasks/TASK-*.md` (exceto TASK-*-INDEX.md)
@@ -98,10 +99,11 @@ Detectar e listar:
 4. **DECs irreversíveis conflitantes** (decisões opostas marcadas como irreversíveis).
 5. **Glossário com definições conflitantes**.
 6. **Status incoerente**: PLAN Done com tasks Todo.
+7. **Par brief ↔ SPEC órfão**: SPEC com front-matter `Brief:` apontando para BRIEF inexistente, ou BRIEF cuja SPEC pareada não existe.
 
 **Inconsistências críticas (1, 2, 3, 6)**: listar e **perguntar antes de prosseguir**.
 
-**Inconsistências de alerta (4, 5)**: incluir seção "Inconsistências conhecidas" no INDEX.
+**Inconsistências de alerta (4, 5, 7)**: incluir seção "Inconsistências conhecidas" no INDEX.
 
 ## Etapa 3: gerar o INDEX
 

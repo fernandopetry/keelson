@@ -11,6 +11,7 @@
 │   └── learning-log.md        # ledger do auto-aprendizado (mantido pelo process-tuner)
 └── <slug>/
     ├── INDEX.md               # estado atual (GERADO — não editar)
+    ├── briefs/BRIEF-NNN.md    # intenção do Diretor + interpretação do PO (contrato abaixo; vazio na maioria dos slugs)
     ├── specs/SPEC-NNN-*.md
     ├── plans/PLAN-MMM-*.md
     ├── tasks/
@@ -22,6 +23,7 @@
 
 | ID | Significado | Escopo da numeração |
 |---|---|---|
+| `BRIEF-NNN` | Brief da demanda — pedido do Diretor + interpretação do PO (contrato Diretor–PO, decisões 4.37/4.38) | NNN = nº da SPEC pareada (1:1) |
 | `FR-NNN-XXX` / `NFR-NNN-XXX` | Requisito funcional / não-funcional | NNN = nº da SPEC |
 | `AC-NNN-XXX` | Critério de aceitação (Given-When-Then) | NNN = nº da SPEC |
 | `RISK-NNN-XXX` / `A-NNN-XXX` / `Q-NNN-XXX` | Risco / premissa / questão aberta | NNN = nº da SPEC |
@@ -32,6 +34,39 @@
 | `TASK-MMM-XXX` | Tarefa | MMM = PLAN ao qual pertence |
 
 Nomes de arquivo de TASK por tipo: `-fix-` (bugfix), `-refactor-` (refactor), `-chore-` (chore); sem sufixo = feature.
+
+### Contrato do BRIEF (fonte única — decisão 4.38)
+
+O BRIEF é o artefato-âncora do contrato Diretor–PO (4.37): o pedido do Diretor capturado
+**como dito** + a interpretação do PO. O PO valida SPEC e entrega **contra ele** — nunca
+contra a própria opinião. Só existe no **ciclo formal** (rota feature/risco do
+`/keelson:auto` e do `/keelson:guided`, pareado 1:1 com a SPEC que nasce dele — o NNN é
+alocado pela mesma varredura que numera a SPEC); bug/refactor usam espelho inline sem
+arquivo, e trivial não tem brief.
+
+```markdown
+# BRIEF-NNN: <título curto da demanda>
+
+**Slug**: <slug>
+**Status**: Emitido | Aceito | Vetado
+**Data**: <YYYY-MM-DD>
+**SPEC**: SPEC-NNN
+
+## Pedido como dito
+<verbatim do Diretor — sem reescrita>
+
+## Interpretação do PO
+<~5 linhas, na linguagem do Diretor>
+
+## Premissas decididas
+
+## Fora de escopo
+```
+
+Ciclo de vida: `Emitido` na largada (antes da SPEC) → `Aceito` na Entrega, junto do
+relatório de aceitação do PO. Veto do Diretor → o brief é **reescrito e re-emitido**,
+nunca apagado. A SPEC pareada grava `**Brief**: BRIEF-NNN` no front-matter; o par
+brief ↔ SPEC é a trilha de auditoria da aceitação.
 
 ### Contrato da tabela "PLANs" do INDEX (fonte única)
 
