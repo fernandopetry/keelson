@@ -180,9 +180,18 @@ Closure falha se:
 
 Falha: reportar específico, 1 retry, escalar.
 
-### 3.5 Sincronização entre tasks da wave
+### 3.5 Sinais laterais na wave (coordenação, furo no plano, fora de escopo)
 
 **SUBAGENTS**: sem peer-to-peer. Subagent descobre necessidade de coordenação: para, reporta, main session decide.
+
+**Furo no plano (sinal Developer → Tech Lead — decisão 4.38)**: report do implementer com `status_proposto: Blocked` e `falhas[].categoria: furo_no_plano` — a TASK revelou premissa errada do PLAN/SPEC (casos na seção "Furo no plano" do `agents/task-implementer.md`). **Contornar em silêncio é violação de gate; sinalizar é o comportamento esperado.** Quem decide o destino é a main session (Tech Lead) — nunca o Developer:
+- Ajuste **localizado** da TASK (contrato intacto) → re-emitir a task ajustada;
+- O furo muda o **PLAN** (componente, DEC, fluxo) → tratar como mudança de plano (ajustar o PLAN e as TASKs afetadas antes de re-emitir);
+- O furo é de **produto** (contradiz SPEC/brief) → `po` em modo resolução quando há BRIEF; sem brief, escalar ao humano (ou escada, no `/keelson:auto`).
+
+**Registro obrigatório** do furo: linha no `## Histórico recente` do INDEX — `<data>: furo no plano em TASK-MMM-XXX — <resumo> — destino: <decisão>`.
+
+**Fora de escopo (sinal Reviewer/QA → Tech Lead)**: achado real, porém fora da task (campo `fora_de_escopo[]` dos reports), **não** infla a task atual: a main session registra 1 linha no Histórico do INDEX e estaciona — desagua nas perguntas/report da Entrega ou vira sugestão de `/keelson:triage`.
 
 ### 3.6 Final da wave
 
@@ -190,7 +199,8 @@ Falha: reportar específico, 1 retry, escalar.
 2. Rodar a suíte **relevante ao escopo da wave** no working tree principal — ampla o bastante para pegar regressão cross-task (não só os `--filter` de cada task), mas **não** a suíte completa a cada wave. A completa roda 1× na Etapa 4 (verificação forte e única).
 3. Regressão: parar e reportar.
 4. Atualizar `waves_concluidas` no `thoughts/local/run-state-<slug>.md` (o `status` continua `em_andamento` até a Entrega).
-5. **Iniciar a próxima wave imediatamente** — o loop da Etapa 3 só termina com a última wave fechada (→ Etapa 4) ou falha listada em "Comportamento em caso de falha"; não termine o turno entre waves nem pergunte se deve continuar.
+5. **Boletim de wave (ao Diretor)**: 3–6 linhas em linguagem de time (Developer, Code Reviewer, QA, Security, PO), cobrindo o que fechou, sinais laterais tratados e decisões tomadas, fechando com o estado de pendência do Diretor (ex.: *"nada pendente de você"*). O boletim é **narração na mesma mensagem em que a próxima wave inicia** — nunca uma parada nem fim de turno (4.23/4.24; o `wave-guard` reforça).
+6. **Iniciar a próxima wave imediatamente** — o loop da Etapa 3 só termina com a última wave fechada (→ Etapa 4) ou falha listada em "Comportamento em caso de falha"; não termine o turno entre waves nem pergunte se deve continuar.
 
 ## Etapa 4: validação final contra DoD do PLAN
 

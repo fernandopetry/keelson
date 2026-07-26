@@ -98,6 +98,9 @@ gates:
 acoes_sugeridas:
   - <ação para corrigir falha>
 
+fora_de_escopo:       # problema real visto no entorno, fora desta task — sinal ao Tech Lead; null se não houve
+  - "<arquivo/área> — <o que foi visto>"
+
 notas: <observações qualitativas>
 
 # Preencher SOMENTE quando o defeito tem causa-raiz GENERALIZÁVEL; senão null.
