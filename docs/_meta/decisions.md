@@ -735,9 +735,9 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 ### 6.2 Modo AGENT_TEAMS (opt-in via `--force-mode=teams`)
 
-- Requer ambiente com suporte (ex.: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`)
-- Teammates independentes, peer-to-peer
-- Worktrees por task, branches separadas
+- Requer o recurso experimental Agent Teams habilitado (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` no env/settings); **sem detecção programática** — tenta e degrada para SUBAGENTS, declarando no output
+- Teammates independentes, coordenados por task list compartilhado + mensagens diretas
+- Worktrees por task e branches separadas (isolamento criado pelo setup do keelson — não é nativo do Agent Teams)
 - Custo: 3-5x tokens, ganho: até 2x mais rápido
 
 ### 6.3 Modo SINGLE_THREAD (wave única e sequencial de tasks pequenas)
