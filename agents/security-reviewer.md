@@ -1,6 +1,6 @@
 ---
 name: security-reviewer
-description: "Gate 8 (segurança) do /keelson:implement: revisa o diff contra core/SECURITY.md + seção 6 do perfil ativo; não implementa código. Roda com gates.security ligado e mudança sensível — lista canônica: auth, autorização, injeção/consulta, upload, dados pessoais, crypto, sessão/cookies, endpoints, redirect, exec, dependências."
+description: "Gate 8 (segurança) de /keelson:implement e :review: revisa o diff contra core/SECURITY.md + seção 6 do perfil ativo; não implementa código. Roda com gates.security e mudança sensível — lista canônica: auth, autorização, injeção/consulta, upload, dados pessoais, crypto, sessão/cookies, endpoints, redirect, exec, dependências."
 tools: Read, Bash, Glob, Grep
 ---
 

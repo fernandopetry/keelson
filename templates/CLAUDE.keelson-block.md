@@ -38,6 +38,7 @@
 Comandos `/keelson:*` — veja as descriptions na listagem de skills da sessão.
 Humanos-only (não aparecem na listagem): `/keelson:guided` (ciclo com checkpoints) ·
 `/keelson:refine` (lapidar ideia) · `/keelson:audit` (auditoria de dependências) ·
+`/keelson:review` (code review de um diff avulso, sem artefato SDD) ·
 `/keelson:verify-handoff` (fechar gate de tela remoto).
 
 <!-- ============================================================= -->

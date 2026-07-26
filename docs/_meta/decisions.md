@@ -573,6 +573,25 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.36 — Code review de diff avulso: `/keelson:review` + régua dos gates 1–7 com dono único
+
+**Problema**: código que entrou **fora do ciclo** — hotfix, código herdado, contribuição externa, mudança feita à mão — não tinha porta de entrada para a doutrina. A régua existia, mas só era alcançável dentro do ciclo: o `task-reviewer` exige TASK/PLAN/SPEC + report do implementer; o `/keelson:audit` cobre só CVE de dependência; o `/keelson:integrate` só valida DoD de PLAN concluído. O hook `review-guard` cutucava ("rode o task-reviewer OU aplique o checklist") sem existir comando que fizesse isso. Resultado prático: revisão avulsa acabava feita pela própria sessão que escreveu o código — colapso de gerador ≠ avaliador, exatamente o que a 4.30 fechou na Entrega.
+
+**Decisão**:
+- **`/keelson:review [alvo]`** (humano-only): revisa um diff resolvido de working tree, `staged`, `last`, `-N` commits, `<sha>`, range `<a>..<b>` ou `branch`. Diff vazio → para; par (alvo resolvido, SHA) registrado no report (identidade do código — 4.30).
+- **Coreografia de tech lead, não de revisor**: a main session **não revisa e não corrige**. Despacha `task-reviewer` (gates 1–7) e `security-reviewer` (gate 8, área sensível + `gates.security`) **em paralelo**; consolida, deduplica e classifica; despacha a correção ao `task-implementer` com **briefing efêmero** (cada achado é um AC: deixa de existir sem quebrar teste); **re-revisa** obrigatoriamente o código corrigido, mais `task-verifier` (gate 9) quando a correção tem efeito observável. Report anterior nunca aprova código novo.
+- **Classificação binária do achado**: *corrigível agora* (localizado, sem decisão de produto/arquitetura) → correção no ato; *estrutural* (arquitetura, contrato público, modelo de dados, comportamento observável, decisão de produto) → **demanda** (`/keelson:triage` ou TASK de bugfix), nunca edição no ato — mesma régua do `/keelson:audit`. Na dúvida, estrutural. Achado de segurança crítica/alta com correção estrutural é bloqueio explícito no output, não adiamento silencioso.
+- **Autonomia**: reporta, pede **um** OK para a leva de correções e depois não para mais (4.23/4.24). `--fix` dispensa até esse OK.
+- **Régua dos gates 1–7 com dono único em `guidelines/core/CODE-REVIEW.md`**: o que cada gate exige, o que o faz falhar, a mecânica escopada de teste/lint e a **calibração de severidade** (migrada do `task-reviewer`). O `task-reviewer` fica só com o protocolo (input, fluxo, output YAML, retry, limites) + o que é específico de revisar uma TASK; o novo comando consome a mesma régua. Sem isso, os gates existiriam em dois arquivos e divergiriam.
+- **Degradação declarada**: sem artefato SDD, o gate 1 exige prova para toda lógica de negócio nova/alterada (a exigência não depende de AC escrito), o gate 4 vira coerência do diff + Art. 6, e o gate 5 se ancora nas decisões irreversíveis do INDEX quando o slug é inferível (senão `n/a`). Gates 2, 3, 6 e 7 valem integralmente. **Gate degradado ou `n/a` é sempre declarado** — silêncio sobre um gate lê-se como aprovação.
+- **Sem rastro durável**: não commita (o commit é do humano), não gera artefato em `{docsRoot}` e não promove Status. Revisão avulsa não é etapa do ciclo.
+
+**Custo assumido**: um comando novo com coreografia própria (mais um lugar onde a independência dos papéis pode colapsar se a main session tomar atalho) e a régua dos gates passando a exigir uma leitura a mais no caminho quente do `task-reviewer` — mitigado por ele já referenciar o `CODE-REVIEW.md` no gate 7. Correção sem TASK também significa mudança sem rastro em `{docsRoot}`: aceito porque o alvo é justamente código que já estava fora do ciclo, e o achado estrutural continua obrigado a virar demanda.
+
+**Aplicação**: `commands/review.md` (novo) + os 4 lugares de comando (README tabela *Commands*, method-guide §3.14, `templates/CLAUDE.keelson-block.md` — humano-only, este arquivo), `guidelines/core/CODE-REVIEW.md` (dono único da régua 1–7 + degradação sem artefato + calibração de severidade), `agents/task-reviewer.md` (gates viram ponteiro; calibração removida; modo revisão avulsa), `agents/task-implementer.md` (modo revisão avulsa: sem TASK, sem commit), descriptions de `task-reviewer`/`task-implementer`/`task-verifier`/`security-reviewer` (citam o novo invocador), `hooks/review-guard.sh` (mensagem passa a citar o comando). Capacidade nova → minor: plugin 0.17.0 → 0.18.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

@@ -242,6 +242,16 @@ Rede de segurança da integração opcional com Jira (via **conector MCP Atlassi
 
 Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27 e 4.28 de `decisions.md`.
 
+### 3.14 `/keelson:review` — code review de um diff avulso (sem artefato SDD)
+
+Porta de entrada da doutrina para o código que **entrou fora do ciclo**: hotfix, código herdado, contribuição externa, mudança feita à mão. Você aponta um diff — working tree, `staged`, `last`, `-N` commits, um `<sha>`, um range `<a>..<b>` ou `branch` — e o comando age como **tech lead**: despacha `task-reviewer` (gates 1–7) e, em área sensível, `security-reviewer` (gate 8) **em paralelo**; consolida e classifica cada achado; pede **um** OK; e então despacha a correção ao `task-implementer`, com **re-revisão obrigatória** do que foi corrigido (mais `task-verifier` quando a correção tem efeito observável).
+
+```
+/keelson:review [alvo] [--fix] [--no-security] [--paths=<a,b>]
+```
+
+Sem TASK não há AC, escopo declarado nem DEC: os gates 1, 4 e 5 **degradam** (prova exigida para toda lógica nova; coerência do diff no lugar do escopo; decisões irreversíveis do INDEX quando o slug é inferível) e todo gate degradado ou `n/a` é **declarado** — a régua da degradação tem dono único em `guidelines/core/CODE-REVIEW.md`. Achado **estrutural** vira demanda (`/keelson:triage` ou TASK de bugfix), nunca edição no ato; nada é commitado e nenhum artefato durável é criado. Governança: decisão 4.36 de `decisions.md`.
+
 ---
 
 ## 4. Skills

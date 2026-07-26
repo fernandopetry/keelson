@@ -100,6 +100,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:init` | Interactive setup — detects the stack, writes the ficha and the `CLAUDE.md` block |
 | `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
 | `/keelson:jira-sync` | Reconcile a slug with Jira via the Atlassian MCP connector — idempotent, best-effort (optional) |
+| `/keelson:review` † | Review an arbitrary diff (working tree, last commit, N commits, range, branch) against the keelson doctrine via independent reviewers; on your OK, dispatches the fix to an implementer and re-reviews — for code that arrived without an SDD artifact |
 | `/keelson:audit` † | On-demand dependency audit against known vulnerabilities (CVE/NVD); `full` adds hygiene (outdated, abandoned, licenses) |
 | `/keelson:status` | Executive summary of a slug's current state — what's done, in flight, planned |
 | `/keelson:migrate-legacy` | Migrate a legacy slug (docs without `INDEX.md`) to the SDD layout |
@@ -196,12 +197,16 @@ keelson/
 
 ## Status
 
-`0.17.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.18.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving. New in this
-release: an instruction-compression pass across the plugin — runtime contracts
-extracted from the method guide into `docs/_meta/conventions/`, single-owner rules
-referenced by pointers instead of copies, and slimmer always-loaded descriptions
+release: `/keelson:review` — a standalone code review for code that arrived without an
+SDD artifact, orchestrated as tech lead (independent reviewers → consolidation → fix by
+an implementer → re-review), with the 1–7 gate ruleset now single-owned by
+`guidelines/core/CODE-REVIEW.md`. Recent: an instruction-compression pass across the
+plugin — runtime contracts extracted from the method guide into
+`docs/_meta/conventions/`, single-owner rules referenced by pointers instead of copies,
+and slimmer always-loaded descriptions
 (agents now capped at 350 chars by `desc-guard`). The optional Jira integration
 (via the Atlassian MCP connector), multi-realm screen verification, the optional
 feature layer (`FEAT-*`, the QA unit with 3-level Jira projection) and the
