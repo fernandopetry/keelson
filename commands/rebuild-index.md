@@ -99,7 +99,7 @@ Detectar e listar:
 4. **DECs irreversíveis conflitantes** (decisões opostas marcadas como irreversíveis).
 5. **Glossário com definições conflitantes**.
 6. **Status incoerente**: PLAN Done com tasks Todo.
-7. **Par brief ↔ SPEC órfão**: SPEC com front-matter `Brief:` apontando para BRIEF inexistente, ou BRIEF cuja SPEC pareada não existe.
+7. **Par brief ↔ SPEC órfão**: SPEC com front-matter `Brief:` apontando para BRIEF inexistente, ou BRIEF cuja SPEC pareada não existe. Brief **épico** (sufixo `-epic`) não pareia com SPEC — nunca é órfão por isso; demandas-filhas dele podem viver em outros slugs e são conferidas **best-effort** (jamais falham o rebuild deste slug).
 
 **Inconsistências críticas (1, 2, 3, 6)**: listar e **perguntar antes de prosseguir**.
 

@@ -71,6 +71,7 @@ Classifique numa das categorias abaixo e componha você mesmo a mensagem de rote
 | **4. TASK de refactor** | Comportamento observável não muda; objetivo é melhorar código | TASK `TASK-MMM-XXX-refactor-<descrição>.md` pré-preenchida; alertar: testes verdes antes, verdes depois |
 | **5. Trivial** | Texto, copy, cor, espaçamento; sem impacto em contrato | Direto no código, commit no padrão do projeto, sem SDD (se crescer, nova triagem) |
 | **6. Inconclusivo** | Demanda mistura naturezas distintas | Listar os pontos a decidir e pedir refinamento antes de nova triagem |
+| **7. Épico / multi-demanda** | 2+ capacidades independentes, 2+ slugs prováveis, ou um roadmap numa frase — grande demais para uma SPEC | `/keelson:specify-epic` com o pedido íntegro (o PM decompõe em demandas priorizadas; cada uma volta ao ciclo normal) |
 
 ## Etapa 4: confirmação e execução opcional
 

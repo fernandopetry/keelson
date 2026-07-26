@@ -51,6 +51,7 @@ arquivo, e trivial não tem brief.
 **Status**: Emitido | Aceito | Vetado
 **Data**: <YYYY-MM-DD>
 **SPEC**: SPEC-NNN
+**Epico**: <caminho do BRIEF épico pai — só quando a demanda veio de uma decomposição; omita a linha caso contrário>
 
 ## Pedido como dito
 <verbatim do Diretor — sem reescrita>
@@ -67,6 +68,14 @@ Ciclo de vida: `Emitido` na largada (antes da SPEC) → `Aceito` na Entrega, jun
 relatório de aceitação do PO. Veto do Diretor → o brief é **reescrito e re-emitido**,
 nunca apagado. A SPEC pareada grava `**Brief**: BRIEF-NNN` no front-matter; o par
 brief ↔ SPEC é a trilha de auditoria da aceitação.
+
+**Variação épico (decisão 4.39)**: brief de nível portfólio, gravado pelo
+`/keelson:specify-epic` no slug-âncora como `briefs/BRIEF-<yyyy-mm-dd>-<descricao>-epic.md`
+(id por data, precedente dos handoffs — o épico **não pareia com SPEC**, então não usa a
+numeração NNN nem a linha `**SPEC**:`). Conteúdo: pedido épico verbatim + decomposição
+confirmada do PM (demandas-filhas: prioridade, título, resumo, slug de destino,
+dependências, riscos). Cada filha ganha seu `BRIEF-NNN` normal **no slug de destino**
+quando o ciclo dela começa, com a linha `**Epico**:` apontando ao pai.
 
 ### Contrato da tabela "PLANs" do INDEX (fonte única)
 

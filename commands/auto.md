@@ -31,6 +31,7 @@ Classifique a demanda (critérios de calibração de esforço em `guidelines/cor
 - **Bug / refactor pequeno**: protocolo inline (implementa + testes + auto-revisão pelos gates + 1 linha no `## Histórico recente` do INDEX). Sem SPEC/PLAN/TASK formais. Vá para a Etapa 4.
 - **Feature nova / mudança de contrato**: ciclo completo (Etapas 1→4).
 - **Risco** (auth/autorização, segurança, migração/schema, breaking change) ou slug com PLAN ativo: **protocolo formal** — TASK avulsa + subagents + closure no INDEX. Risco define **gates extras**, não SPEC/PLAN formais; **multi-arquivo sozinho não é risco**. Mudança de risco **reversível simples** (ex.: coluna nullable nova) → siga com a decisão registrada; **destrutiva/difícil reversão** (`DROP`/`ALTER` destrutivo, exclusão de dados, config de produção) → princípio 2: previsível → última chamada; descoberta depois → estacionar.
+- **Épico / multi-demanda** (2+ capacidades independentes, 2+ slugs prováveis, roadmap numa frase): não force numa SPEC — proponha a rota `/keelson:specify-epic` via AskUserQuestion (proposta + default; pré-largada, com o Diretor presente). **Pós-largada você nunca "descobre" épico**: expansão de escopo no meio do ciclo é escalação do PO (4.38), jamais decomposição silenciosa.
 
 **Exploração (todas as rotas não-triviais)**: uma onda, concisa, salva no memo de exploração (convenção comum — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`) e reusada nas etapas seguintes; **remova-o na closure**.
 
