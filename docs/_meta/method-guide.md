@@ -252,6 +252,16 @@ Porta de entrada da doutrina para o código que **entrou fora do ciclo**: hotfix
 
 Sem TASK não há AC, escopo declarado nem DEC: os gates 1, 4 e 5 **degradam** (prova exigida para toda lógica nova; coerência do diff no lugar do escopo; decisões irreversíveis do INDEX quando o slug é inferível) e todo gate degradado ou `n/a` é **declarado** — a régua da degradação tem dono único em `guidelines/core/CODE-REVIEW.md`. Achado **estrutural** vira demanda (`/keelson:triage` ou TASK de bugfix), nunca edição no ato; nada é commitado e nenhum artefato durável é criado. Governança: decisão 4.36 de `decisions.md`.
 
+### 3.15 `/keelson:specify-epic` — decompor um pedido grande (épico)
+
+Quando o pedido é grande demais para uma demanda (2+ capacidades independentes, 2+ slugs prováveis, um roadmap numa frase), o **PM** do time decompõe em demandas independentes e priorizadas — cada uma segue depois o ciclo normal (`/keelson:auto`) com o seu PO. Você (Diretor) **confirma a decomposição** — é a única parada, e é intencional: decomposição errada contamina N ciclos. O comando grava o **BRIEF épico** no slug-âncora e devolve a fila com o comando pronto para a demanda 1; **disparar cada ciclo é decisão sua** (nada roda sozinho).
+
+```
+/keelson:specify-epic <pedido épico ou @arquivo> [--slug=<âncora>]
+```
+
+Rotas de chegada: direto, pela categoria 7 do `/keelson:triage`, ou proposto pelo `/keelson:auto` na triagem de rigor (pré-largada; pós-largada, expansão de escopo é escalação do PO, nunca re-decomposição). Governança: decisões 4.37 e 4.39 de `decisions.md`.
+
 ---
 
 ## 4. Skills
@@ -290,6 +300,7 @@ Os agents formam o **time** do keelson (modelo de time e contrato Diretor–PO �
 | Agent | Papel no time | Invocado por |
 |---|---|---|
 | `po` | **PO** — dono da demanda; valida SPEC e entrega contra o brief | `/keelson:auto`, `/keelson:specify`, `/keelson:guided` |
+| `pm` | **PM** — decompõe brief épico em demandas priorizadas | `/keelson:specify-epic` |
 | `task-implementer` | **Developer** — implementa uma única TASK | `/keelson:implement` |
 | `task-reviewer` | **Code Reviewer** — quality gates 1–7 antes da closure | `/keelson:implement`, `/keelson:review` |
 | `security-reviewer` | **Security Engineer** — gate 8, em mudança sensível | `/keelson:implement`, `/keelson:review` |

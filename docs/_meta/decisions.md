@@ -626,6 +626,22 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.39 — PM instanciado + `/keelson:specify-epic` (fase 2 do modelo de time)
+
+**Problema**: a 4.37 reservou a cadeira do PM com gatilho definido ("quando a camada épico/roadmap entrar"), e o Diretor disparou o gatilho: um pedido grande pode chegar a qualquer momento e não tinha rota — a triagem não conhecia "épico" (a categoria mais próxima, Inconclusivo, trata mistura de naturezas, não tamanho), a camada FEAT (4.27) agrupa **dentro** de uma SPEC, e nada decompunha um pedido multi-demanda em ciclos.
+
+**Decisão**:
+- **Agente `pm`** (read-only): decompõe o pedido épico em demandas **independentes, priorizadas e roteáveis** (título, resumo, slug de destino pela regra canônica de slug, prioridade, dependências, riscos) + `perguntas_ao_diretor` com proposta + default. Não conduz ciclos nem decide produto de demanda individual (isso é do PO de cada ciclo).
+- **`/keelson:specify-epic`** (modo humano presente): resolve o slug-âncora (iniciativa que merece épico merece slug — sem "slug portfólio"), invoca o `pm`, apresenta a decomposição **no corpo da conversa** e confirma com o Diretor via AskUserQuestion binária (a tabela nunca embutida na pergunta — lição do espelho, 4.14). A confirmação é a **única parada, e é intencional**: decomposição errada contamina N ciclos ("ambiguidade que muda o resultado" em escala). Persiste o **BRIEF épico** e devolve a fila com o comando pronto para a demanda 1; **disparar cada ciclo é ato do Diretor** — o comando nunca invoca `/keelson:auto`.
+- **BRIEF épico com id por data** — `briefs/BRIEF-<yyyy-mm-dd>-<descricao>-epic.md` (variação no `index-contract.md`): desvio deliberado do `BRIEF-NNN` planejado, porque o épico **não pareia com SPEC** e a numeração NNN é definida como "nº da SPEC pareada" — usar NNN colidiria com o par 1:1 das filhas; o precedente de id por data é o dos handoffs. Cada filha ganha seu `BRIEF-NNN` normal no slug de destino quando o ciclo dela começa, com `**Epico**:` apontando ao pai; `rebuild-index` confere filhas cross-slug **best-effort** (nunca falha o rebuild do slug).
+- **Rotas de chegada**: categoria **7. Épico / multi-demanda** na tabela do `/keelson:triage` (2+ capacidades independentes, 2+ slugs prováveis, roadmap numa frase) e proposta na triagem de rigor do `/keelson:auto` — **só pré-largada**; pós-largada, expansão de escopo é escalação do PO (4.38), jamais decomposição silenciosa (sem loop auto → specify-epic → auto automático).
+
+**Custo assumido**: mais um comando e um agente no elenco; a fila de demandas depende do Diretor para avançar (deliberado — evita sessão-monstro multi-ciclo e preserva "1 demanda = 1 ciclo"). Qualidade da decomposição do PM só se prova em rodada real.
+
+**Aplicação**: `agents/pm.md` (novo), `commands/specify-epic.md` (novo), `commands/{triage,auto,rebuild-index}.md`, `docs/_meta/conventions/index-contract.md` (variação épico + campo `Epico:`), `docs/_meta/method-guide.md` (§3.15 novo + linha `pm` no §5), `README.md` (tabela *Commands* + Status). Comando novo → minor: plugin 0.19.0 → 0.20.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

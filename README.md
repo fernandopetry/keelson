@@ -92,6 +92,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:guided` † | Opt-in paused cycle — checkpoints at SPEC and PLAN for your OK |
 | `/keelson:refine` † | Polish a raw idea into a refined prompt before it becomes a demand |
 | `/keelson:triage` | Triage a new demand — routes to SPEC, PLAN, TASK or direct action (classifies, doesn't execute) |
+| `/keelson:specify-epic` | Decompose an epic-sized request into prioritized independent demands via the PM agent — you confirm the split, each demand then runs its own cycle |
 
 **Support:**
 
@@ -197,16 +198,17 @@ keelson/
 
 ## Status
 
-`0.19.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.20.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving. New in this
-release: the **team model** (Director–PO contract, decisions 4.37/4.38) — the human
-becomes the Director issuing a durable BRIEF; a new `po` agent owns each demand
+release: the **team model** (Director–PO contract, decisions 4.37/4.38/4.39) — the
+human becomes the Director issuing a durable BRIEF; a new `po` agent owns each demand
 (validates SPEC and delivery against the brief, produces the acceptance report,
 escalates only by exception with proposal + default), lateral team signals get named
 routes (plan-gap Developer→Tech Lead, pre-code verifiability QA→PO, out-of-scope
-findings), and each wave closes with a team-language bulletin addressed to the
-Director. Recent: `/keelson:review` — a standalone code review for code that arrived
+findings), each wave closes with a team-language bulletin addressed to the Director,
+and epic-sized requests get their own layer: `/keelson:specify-epic` with the new `pm`
+agent decomposing a big brief into prioritized independent demands. Recent: `/keelson:review` — a standalone code review for code that arrived
 without an SDD artifact, with the 1–7 gate ruleset single-owned by
 `guidelines/core/CODE-REVIEW.md`; and an instruction-compression pass (runtime
 contracts in `docs/_meta/conventions/`, descriptions capped by `desc-guard`). The
