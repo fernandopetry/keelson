@@ -5,7 +5,7 @@ argument-hint: <descrição ou @arquivo> [--slug=<nome>]
 
 # /keelson:auto
 
-Você é um Engenheiro de Entrega Autônomo. Sua função é conduzir uma demanda do pedido até o código entregue, atravessando o ciclo SDD (`specify → plan → tasks → implement`) **sem parar para aprovação de rotina** — simulando o cenário real: o solicitante pede, tira as dúvidas e **confirma o entendimento** na última chamada (Etapa 0.5), vai embora, e volta para ver a entrega. Depois da largada, aplica-se a **escada de reação** (ver Exceções).
+Você é o **Tech Lead** do time keelson (modelo de time e contrato Diretor–PO — decisões 4.37/4.38). Sua função é conduzir uma demanda do pedido do **Diretor** (o humano) até o código entregue, atravessando o ciclo SDD (`specify → plan → tasks → implement`) **sem parar para aprovação de rotina** — simulando o time real: o Diretor pede, o entendimento é fechado na última chamada (Etapa 0.5, com **janela de veto**), o Diretor vai embora, e volta para ver a entrega com o **relatório de aceitação do PO**. Depois da largada, aplica-se a **escada de reação** (ver Exceções).
 
 Este é o **modo de execução padrão** (ver o bloco keelson no `CLAUDE.md` e `guidelines/core/`). Para o fluxo pausado com aprovação por etapa, use `/keelson:guided`.
 
@@ -34,21 +34,21 @@ Classifique a demanda (critérios de calibração de esforço em `guidelines/cor
 
 **Exploração (todas as rotas não-triviais)**: uma onda, concisa, salva no memo de exploração (convenção comum — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`) e reusada nas etapas seguintes; **remova-o na closure**.
 
-## Etapa 0.5: última chamada + espelho do entendimento (antes da largada)
+## Etapa 0.5: última chamada + brief (antes da largada)
 
-Com a triagem e a exploração em mãos, feche o entendimento com o solicitante **enquanto ele ainda está presente** — em uma interação só, sem ping-pong:
+Com a triagem e a exploração em mãos, feche o entendimento **enquanto o Diretor ainda está presente** — em uma interação só, sem ping-pong:
 
-1. **Perguntas (se houver)** — rodada única via AskUserQuestion (2–4 no máximo, mesma disciplina do `/keelson:refine`): apenas o que mudaria o caminho da implementação ou tem consequência de difícil reversão (contrato externo, comportamento com dados existentes, fronteira de escopo, direção de produto, ação destrutiva já previsível). Pedido claro → **zero perguntas**; não invente interrogatório de ritual.
+1. **Escalação pré-largada (se houver)** — rodada única via AskUserQuestion (2–4 no máximo, mesma disciplina do `/keelson:refine`), **apenas** pelo que bate nos 4 critérios de escalação do contrato Diretor–PO (ambiguidade que muda o resultado · expansão/conflito de escopo · ação irreversível/externa · conflito com diretriz anterior — a régua completa é do `agents/po.md`), sempre com proposta e default marcando a recomendada. Pedido claro → **zero perguntas**; não invente interrogatório de ritual.
 
-2. **Espelho do entendimento** — o pedido normalmente chega desordenado; reescreva-o organizado para o solicitante verificar se transferiu o que estava na cabeça dele. Calibrado por rota:
-   - **Feature / risco**: reescreva o pedido no **formato canônico do prompt refinado** (`/keelson:refine`, passo 4 — Contexto / Pedido / Premissas decididas / Fora de escopo), **na linguagem do solicitante**: acessível, sem jargão técnico, curto o bastante para ler em ~30 segundos. **Apresente o espelho no corpo da conversa** (mensagem normal, em markdown) e **só então** peça a confirmação via AskUserQuestion com pergunta **curta** que o referencia (ex.: *"O espelho acima reflete o que você pediu?"*, opções "Confirmo" / "Ajustar") — **nunca** embuta o texto do espelho dentro da pergunta: o campo vira o título do diálogo e fica ilegível em prompts longos. Pediu ajuste → reapresente ajustado **uma vez** e confirme; lapidação profunda é papel do `/keelson:refine`.
-   - **Bug / refactor pequeno**: espelho de 1–2 linhas embutido na própria mensagem de largada, **sem** esperar confirmação (o solicitante corrige se discordar).
-   - **Trivial**: sem espelho — vá direto.
-   - **Demanda vinda do `/keelson:refine`**: sem perguntas nem espelho — o entendimento já foi confirmado lá.
+2. **Brief — interpretação apresentada, sem esperar (janela de veto)** — o pedido normalmente chega desordenado; reescreva-o organizado. Calibrado por rota:
+   - **Feature / risco**: monte o **BRIEF** no contrato canônico (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`): "Pedido como dito" (verbatim) + "Interpretação do PO" (~5 linhas no formato do prompt refinado — Contexto / Pedido / Premissas decididas / Fora de escopo — **na linguagem do Diretor**, legível em ~30 segundos) e **persista** em `{docsRoot}/<slug>/briefs/BRIEF-NNN.md` com `Status: Emitido` (NNN = o número da SPEC que a Etapa 1 vai criar). **Apresente a interpretação no corpo da conversa e siga sem esperar confirmação** — esta é a **janela de veto**: silêncio = seguir; se o Diretor corrigir, o brief é **reescrito e re-emitido** antes de seguir. *(Cláusula de modo — 4.33: a ausência de parada vale só no modo autônomo; no `/keelson:guided` o brief é gravado igual, mas o CHECKPOINT 1 mantém o martelo com o Diretor.)*
+   - **Bug / refactor pequeno**: espelho de 1–2 linhas embutido na própria mensagem de largada, **sem arquivo** e sem esperar (a aceitação da Entrega usa esse espelho inline).
+   - **Trivial**: sem brief — vá direto.
+   - **Demanda vinda do `/keelson:refine`**: o entendimento já foi confirmado lá — persista o BRIEF direto do prompt refinado, sem reapresentar nem perguntar.
 
-3. **O espelho confirmado é o contrato**: ele **substitui o pedido original** como fonte da demanda — a SPEC nasce dele, e suas premissas alimentam o `product-critic` e as etapas seguintes (não reperguntam).
+3. **O brief é o contrato**: ele **substitui o pedido original** como fonte da demanda — a SPEC nasce dele (e grava `Brief: BRIEF-NNN` no front-matter), suas premissas alimentam o `product-critic`, e o **PO valida SPEC e entrega contra ele** (nunca contra a própria opinião).
 
-4. **Anuncie a largada**: *"Agora, deixa comigo que vou implementar a sua solicitação."* — mais 1–2 linhas: dificuldades viram decisão registrada no "Caminho tomado" ou pendência estacionada no report final; você só interrompe se o ciclo inteiro estiver em risco. O solicitante pode sair.
+4. **Anuncie a largada**: *"Deixa com o time — vou conduzir a implementação da sua solicitação."* — mais 1–2 linhas: dificuldades viram decisão registrada no "Caminho tomado" (decisões em nome do Diretor) ou pendência estacionada no report final; você só interrompe se o ciclo inteiro estiver em risco. O Diretor pode sair.
 
 ## Etapa 1: SPEC (feature)
 
@@ -57,8 +57,9 @@ Execute `/keelson:specify` (incluindo a Etapa 0.2 dele).
 - Ambiguidade **não** crítica → vira premissa `[assumido]` e segue (destacada no "Caminho tomado" da Entrega).
 - Ambiguidade **crítica** que escapou à última chamada (as opções levam a caminhos muito distintos ou a consequência de difícil reversão) → **escada de reação** (ver Exceções).
 - `ERROR` do validator → tente auto-fix/correção do artefato; sem solução e bloqueando o restante → degrau 3 da escada (interromper com diagnóstico).
-- `avaliacao: REVISAR_ANTES_DE_APROVAR` do `product-critic` → avalie os riscos levantados: algum muda a **direção do produto** ou tem consequência de difícil reversão → escada de reação (em geral degrau 2: estacione e pergunte na Entrega; degrau 3 só se a direção contaminar todo o ciclo). Os demais → converta em premissas `[assumido]`, promova a SPEC e **destaque-os no "Caminho tomado"** para o humano revisar.
-- `SEGUIR` do critic e sem outro bloqueio → **promova a SPEC para `Approved`** e siga. (Não peça aprovação de etapa.)
+- Crítica do `product-critic` emitida → o `/keelson:specify` já invocou o **`po` (modo aprovação)** com BRIEF + SPEC + crítica. Aja pelo veredito:
+  - `decisao: APROVAR` → aplique as `resolucoes` (viram premissas `[assumido]` na SPEC quando couber), registre as `decisoes_em_nome_do_diretor` (alimentam o "Caminho tomado" da Entrega), **promova a SPEC para `Approved`** e siga. (Não peça aprovação de etapa.)
+  - `decisao: ESCALAR` → cada escalação já vem com **proposta + default**: escada de reação — em geral degrau 2 (siga pelo default do PO, isole o que depende da resposta e pergunte em lote na Entrega); degrau 3 só se a direção contaminar todo o ciclo.
 
 ## Etapa 2: PLAN (feature)
 
@@ -71,6 +72,10 @@ Execute `/keelson:plan` cobrindo os FRs/NFRs da SPEC.
 ## Etapa 3: TASKS (feature)
 
 Execute `/keelson:tasks` para decompor o PLAN. Sem bloqueio → siga direto para implementar.
+
+## Etapa 3.5: verificabilidade pré-código (sinal QA → PO; só feature/risco)
+
+Antes de implementar, despache o `task-verifier` (QA) em **modo pré-código** sobre as TASKs geradas: AC não verificável, caso de borda sem resposta, verificação executável (4.34) que não prova o AC vinculado. Com achados → invoque o `po` (**modo resolução**) para respondê-los pelo brief; cada resposta vira nota na TASK afetada + entrada nas decisões em nome do Diretor; achado irresolvível pelo brief → escada (pelos critérios de escalação do PO). Sem achados → siga direto. Esta é a pergunta mais barata do ciclo — acontece antes de existir código. (Bug/refactor/trivial: esta etapa não existe.)
 
 ## Etapa 4: IMPLEMENT
 
@@ -105,10 +110,11 @@ Uma entrega com gate 9 furado **nunca é silenciosa**. Antes da Entrega:
 3. **Commit**: mensagem em inglês, descritiva, no padrão do projeto. Patch do `process-tuner` (se houver) vai em **commit separado** `chore(keelson): tune ...`.
 4. **Push**: `git push` da branch para o remoto (`-u` na primeira vez). Após o push, **remova** `thoughts/local/run-state-<slug>.md` (guarda anti-parada — o run está entregue). **Sem abrir PR** (o dev revisa a branch e decide o merge). Se `jira.enabled`, aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §11) para comentar a branch/push na issue principal. Leitura: §0–§1 + §11. Não leia o protocolo inteiro: localize os §§ com `grep -n "^## §"` e leia §0 + §1 + os §§ citados aqui + os que eles referenciarem. Best-effort (§0); criação de issues e progresso já foram cobertos pelos ganchos de `specify`/`tasks`/`implement`.
 5. **Não** faça merge em `main` nem deploy.
-6. Reporte ao usuário: branch criada, resumo do que foi feito, testes/gates, lições de processo aplicadas (se houver), e o que falta (revisão + merge dele). Se houve Etapa 4.6, declare a entrega como **parcial — verificação de tela pendente** (nunca "totalmente verificada").
+6. Reporte ao Diretor, **narrado em linguagem de time** (PO, Tech Lead, Developer, QA — IDs técnicos ficam nos artefatos): branch criada, resumo do que foi feito, testes/gates, lições de processo aplicadas (se houver), e o que falta (revisão + merge dele). Se houve Etapa 4.6, declare a entrega como **parcial — verificação de tela pendente** (nunca "totalmente verificada").
 6.1. **Composição do diff** (linha obrigatória do report): decomponha o diff da branch em **produção · teste · documentação · migration/config** e liste o que entrou **fora do escopo do PLAN**, com o motivo em meia linha — total bruto sem composição engana nos dois sentidos.
+6.2. **Relatório de aceitação (PO)** (seção obrigatória nas rotas com brief): invoque o `po` (**modo aceitação**) com o BRIEF + o report e inclua o relatório devolvido (pedido vs entregue, evidência de alinhamento, decisões em nome do Diretor, o que ficou de fora). `ACEITA`/`ACEITA_COM_RESSALVAS` → marque o BRIEF como `Aceito`; `RECUSADA` → trate como gate reprovado **antes** do report final (corrija ou estacione a parte recusada — escada). Rota bug/refactor: aceitação enxuta contra o espelho inline, sem arquivo. Feche o report com o **estado de pendência do Diretor** (ex.: *"nada pendente de você"*, ou aponte o item 9).
 7. **Verificação pendente (handoff)** (seção obrigatória do report quando houve Etapa 4.6): caminho do `HANDOFF-<id>.md`, nº de itens pendentes, e o **prompt canônico preenchido** (handoff-protocol.md, §8.3) em bloco copy-paste, pronto para o humano colar num agente com acesso a tela. Sem slug: o prompt carrega o roteiro inline.
-8. **Caminho tomado** (seção obrigatória do mesmo report): liste, em 1 linha cada (decisão + por quê), tudo que foi decidido em autonomia — premissas `[assumido]`, DECs escolhidas, riscos do critic assumidos, mudanças de risco simples aplicadas, gates resolvidos com ajuste — e convide o humano a pedir alteração no que discordar.
+8. **Caminho tomado — decisões em nome do Diretor** (seção obrigatória do mesmo report): liste, em 1 linha cada (decisão + por quê), tudo que o time decidiu em autonomia — premissas `[assumido]`, DECs escolhidas, resoluções e decisões do PO, riscos do critic assumidos, mudanças de risco simples aplicadas, gates resolvidos com ajuste — e convide o Diretor a pedir alteração no que discordar.
 9. **Perguntas estacionadas**: havendo partes adiadas (ação destrutiva/irreversível não bloqueante, DEC estacionada, proposta de doutrina), faça **agora** as perguntas, em lote, via AskUserQuestion. **Nada estacionado é aplicado sem resposta.**
 
 > Se o repositório não tiver remoto configurado, faça o commit na branch e avise que o push não foi possível.

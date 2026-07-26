@@ -89,6 +89,7 @@ interromper em último caso).
 **Autor**: <preencher>
 **Data**: <YYYY-MM-DD>
 **Jira**: <KEY — só quando a integração Jira está ativa; no modo `link`, preencha com a issue existente; omita a linha se `jira.enabled` for false>
+**Brief**: <BRIEF-NNN — quando a SPEC nasce de um brief (contrato Diretor–PO, decisão 4.38); omita a linha sem brief>
 
 ## 1. Contexto e objetivo
 ### 1.1 Problema
@@ -149,6 +150,8 @@ Com a forma validada (errors == 0), invocar o agent `product-critic` na SPEC. El
 
 A crítica **não bloqueia** a criação da SPEC nem a atualização do INDEX (a SPEC nasce em `Draft`); o resultado é reportado ao usuário.
 
+**Com BRIEF pareado** (front-matter `Brief:` preenchido — a demanda entrou pelo ciclo com brief): após a crítica, invocar o agent `po` em **modo aprovação** (BRIEF + SPEC + crítica + INDEX). O veredito (`APROVAR | ESCALAR`, com resoluções e decisões em nome do Diretor) entra no output final; quem age sobre ele é o invocador — `/keelson:auto` promove ou aplica a escada; `/keelson:guided` o apresenta como recomendação no CHECKPOINT 1. **Sem BRIEF** (specify avulso): não invocar o `po` — a promoção a `Approved` permanece com o humano.
+
 ## Etapa 5: atualização do INDEX.md
 
 ### 5.1 Criar INDEX se não existe
@@ -174,6 +177,7 @@ Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira*
    - Errors pendentes (se houver)
    - Warnings relevantes
    - Crítica de produto (`product-critic`): riscos de mérito e perguntas a decidir antes de `Approved`
+   - Veredito do PO (quando há BRIEF): decisão, resoluções pelo brief e escalações com proposta + default
 6. Premissas `[assumido]` que precisam confirmação.
 7. Estado do INDEX após esta operação.
 8. Próximo comando: `/keelson:plan SPEC-NNN` ou `/keelson:plan SPEC-NNN --slice="..."` se errors == 0.
