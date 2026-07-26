@@ -183,7 +183,7 @@ Governance: decisions 4.22, 4.27 and 4.28 in `docs/_meta/decisions.md`.
 ```
 keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
-├── agents/            # subagents: implementer, reviewers, profile-writer…
+├── agents/            # subagents (the team): po, implementer, reviewers, verifier, profile-writer…
 ├── skills/            # spec / plan / task validators + status + screen-verify
 ├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard
 ├── guidelines/
@@ -197,22 +197,21 @@ keelson/
 
 ## Status
 
-`0.18.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.19.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving. New in this
-release: `/keelson:review` — a standalone code review for code that arrived without an
-SDD artifact, orchestrated as tech lead (independent reviewers → consolidation → fix by
-an implementer → re-review), with the 1–7 gate ruleset now single-owned by
-`guidelines/core/CODE-REVIEW.md`. Recent: an instruction-compression pass across the
-plugin — runtime contracts extracted from the method guide into
-`docs/_meta/conventions/`, single-owner rules referenced by pointers instead of copies,
-and slimmer always-loaded descriptions
-(agents now capped at 350 chars by `desc-guard`). The optional Jira integration
-(via the Atlassian MCP connector), multi-realm screen verification, the optional
-feature layer (`FEAT-*`, the QA unit with 3-level Jira projection) and the
-delivery-time gate evidence checks (independent security verdict required before
-push, plus the `worktree-guard` hook) remain recent. Feedback and profile
-contributions welcome.
+release: the **team model** (Director–PO contract, decisions 4.37/4.38) — the human
+becomes the Director issuing a durable BRIEF; a new `po` agent owns each demand
+(validates SPEC and delivery against the brief, produces the acceptance report,
+escalates only by exception with proposal + default), lateral team signals get named
+routes (plan-gap Developer→Tech Lead, pre-code verifiability QA→PO, out-of-scope
+findings), and each wave closes with a team-language bulletin addressed to the
+Director. Recent: `/keelson:review` — a standalone code review for code that arrived
+without an SDD artifact, with the 1–7 gate ruleset single-owned by
+`guidelines/core/CODE-REVIEW.md`; and an instruction-compression pass (runtime
+contracts in `docs/_meta/conventions/`, descriptions capped by `desc-guard`). The
+optional Jira integration, multi-realm screen verification and the optional feature
+layer (`FEAT-*`) remain recent. Feedback and profile contributions welcome.
 
 ## Author & license
 

@@ -189,7 +189,7 @@ Após a implementação de um PLAN concluída (TASKs Done, DoD satisfeita), vali
 
 ### 3.9 `/keelson:auto` — ciclo completo autônomo (modo padrão)
 
-Conduz `specify → plan → tasks → implement → entrega` de ponta a ponta **sem aprovação de etapa**, simulando "o solicitante pede e vai embora". Abre com a **última chamada**: rodada única de até 4 perguntas críticas (pedido claro → nenhuma) + **espelho do entendimento** — o pedido reescrito de forma estruturada e acessível (formato do prompt refinado do `/keelson:refine`) para o solicitante confirmar; o espelho confirmado **vira a fonte da demanda**. Então anuncia a largada ("Agora, deixa comigo que vou implementar a sua solicitação"). Depois disso, não deixa pergunta pendurada: dificuldade vira decisão registrada ou parte estacionada perguntada em lote na entrega; interrupção no meio só em **último caso** (errar custaria o ciclo inteiro). É o **default**: basta pedir a tarefa em linguagem natural, sem digitar o comando. Governança: decisões 4.10, 4.11, 4.13 e 4.14 de `decisions.md`.
+Conduz `specify → plan → tasks → implement → entrega` de ponta a ponta **sem aprovação de etapa**, sob o **contrato Diretor–PO** (decisões 4.37/4.38): você é o **Diretor**. Abre com a **última chamada**: escalação pré-largada só pelos 4 critérios do contrato (pedido claro → nenhuma pergunta) + **brief** — o pedido como dito + a interpretação do PO, persistidos em `briefs/BRIEF-NNN.md`; a interpretação é apresentada e o fluxo **segue sem esperar** (janela de veto: silêncio = seguir; correção sua → brief re-emitido). O brief **vira a fonte da demanda**: a SPEC nasce dele e o PO valida SPEC e entrega contra ele. Depois da largada, não deixa pergunta pendurada: dificuldade vira decisão em nome do Diretor ou parte estacionada perguntada em lote na entrega; interrupção no meio só em **último caso** (errar custaria o ciclo inteiro). A entrega fecha com o **relatório de aceitação do PO** e o estado de pendência do Diretor. É o **default**: basta pedir a tarefa em linguagem natural, sem digitar o comando. Governança: decisões 4.10, 4.11, 4.13, 4.14, 4.37 e 4.38 de `decisions.md`.
 
 ```
 /keelson:auto <descrição ou @arquivo> [--slug=<nome>]
@@ -201,7 +201,7 @@ Rigor proporcional preservado (trivial → direto; bug/refactor → inline; feat
 
 ### 3.10 `/keelson:guided` — ciclo com checkpoints (opt-in pausado)
 
-O oposto opt-in do `/keelson:auto`: roda o ciclo **pausando em 2 marcos** (SPEC pronta, PLAN pronto) para o seu OK, e com a **régua estrita** de perguntar na hora em qualquer exceção (você está acompanhando — a escada de estacionamento do auto não se aplica). Use quando quer revisar o contrato e o desenho antes do desenvolvimento.
+O oposto opt-in do `/keelson:auto`: roda o ciclo **pausando em 2 marcos** (SPEC pronta, PLAN pronto) para o seu OK, e com a **régua estrita** de perguntar na hora em qualquer exceção (você está acompanhando — a escada de estacionamento do auto não se aplica). O brief é gravado igual, mas **confirmado na hora** (sem janela de veto); no CHECKPOINT 1 o **PO recomenda e você bate o martelo**. Use quando quer revisar o contrato e o desenho antes do desenvolvimento.
 
 ```
 /keelson:guided <descrição ou @arquivo> [--slug=<nome>]
@@ -283,18 +283,22 @@ Nunca modifica arquivos. Se detectar divergência entre INDEX e arquivos, sugere
 
 ---
 
-## 5. Agents (uso interno dos comandos)
+## 5. Agents (o time — uso interno dos comandos)
 
-Você normalmente não invoca estes diretamente — os comandos os orquestram. O papel completo de cada um é a `description` do frontmatter do próprio agent (fonte única):
+Os agents formam o **time** do keelson (modelo de time e contrato Diretor–PO — decisões 4.37/4.38): a main session atua como **Tech Lead** e o humano é o **Diretor** (emite o brief, mantém o veto; PR, merge e deploy são dele). Você normalmente não invoca estes diretamente — os comandos os orquestram. O papel completo de cada um é a `description` do frontmatter do próprio agent (fonte única):
 
-| Agent | Papel | Invocado por |
+| Agent | Papel no time | Invocado por |
 |---|---|---|
-| `task-implementer` | Implementa uma única TASK | `/keelson:implement` |
-| `task-reviewer` | Quality gates de código antes da closure | `/keelson:implement` |
-| `security-reviewer` | Gate de segurança, em mudança sensível | `/keelson:implement` |
-| `task-verifier` | Gate de comportamento verificado | `/keelson:implement` |
-| `product-critic` | Crítica de mérito da SPEC | `/keelson:specify` |
-| `process-tuner` | Auto-aprendizado do processo | closure do `/keelson:implement`, `/keelson:auto`, sob demanda |
+| `po` | **PO** — dono da demanda; valida SPEC e entrega contra o brief | `/keelson:auto`, `/keelson:specify`, `/keelson:guided` |
+| `task-implementer` | **Developer** — implementa uma única TASK | `/keelson:implement` |
+| `task-reviewer` | **Code Reviewer** — quality gates 1–7 antes da closure | `/keelson:implement`, `/keelson:review` |
+| `security-reviewer` | **Security Engineer** — gate 8, em mudança sensível | `/keelson:implement`, `/keelson:review` |
+| `task-verifier` | **QA** — gate 9 + verificabilidade pré-código | `/keelson:implement`, `/keelson:auto`, `/keelson:review` |
+| `product-critic` | **Product Analyst** — crítica de mérito da SPEC (o PO a resolve) | `/keelson:specify` |
+| `process-tuner` | **Agile Coach** — auto-aprendizado do processo | closure do `/keelson:implement`, `/keelson:auto`, sob demanda |
+| `profile-writer` | **Staff Engineer** — gera perfis de linguagem | `/keelson:init`, sob demanda |
+
+Os validators (`spec-validator`, `plan-validator`, `task-validator`) ficam **fora do elenco de propósito**: são ferramentas do time, não papéis (decisão 4.37).
 
 ---
 

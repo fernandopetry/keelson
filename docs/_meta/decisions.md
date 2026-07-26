@@ -2,7 +2,7 @@
 
 > Memória institucional das decisões sobre como o keelson (spec-driven development) é praticado. Diferente da doutrina de código (QUALITY-CHARTER + perfil ativo, que regem o **código**), este arquivo rege o **processo de desenvolvimento**.
 
-**Última revisão**: 2026-07-24
+**Última revisão**: 2026-07-26
 **Status do documento**: vivo, atualizado conforme decisões evoluem
 
 ---
@@ -592,6 +592,40 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.37 — Modelo de time: elenco com nomes da vida real + contrato Diretor–PO + sinais laterais
+
+**Problema**: os papéis do keelson já formam estruturalmente um time (implementer, reviewer, verifier, gates com donos distintos), mas a nomenclatura técnica esconde isso — o modelo mental de quem usa não conversa com o de um time real. Além disso, o humano ocupava o papel de PO (aprovação de produto na SPEC, aceitação da entrega), o que o mantém como aprovador de artefatos em vez de emissor de intenção; e a comunicação entre agentes era só vertical (implementer → reviewer → gates) — as interações que fazem um time parecer time (QA apontando ambiguidade antes do código, dev sinalizando furo no plano em vez de contornar) não tinham nome, rota nem registro.
+
+**Decisão (do humano, em conversa de design)**:
+- **Elenco com nomes da vida real** — fase 1: a metáfora entra na linguagem (doutrina, narração dos comandos, descriptions), **IDs técnicos mantidos**; rename duro dos agents só numa fase 2, se a linguagem colar. Mapeamento: **Diretor** = humano; **PO** = agente novo (dono da demanda); **Tech Lead** = main session (`/keelson:implement`, `/keelson:review`, `/keelson:auto` — formaliza o que a 4.36 já dizia); **Developer** = `task-implementer`; **Code Reviewer** = `task-reviewer`; **QA** = `task-verifier`; **Security Engineer** = `security-reviewer`; **Agile Coach** = `process-tuner`; **Staff Engineer** = `profile-writer`. Os validators (`spec-validator`, `plan-validator`, `task-validator`) ficam **deliberadamente fora da metáfora**: são ferramentas do time, não pessoas — vestir crachá em linter enfraquece a metáfora onde ela funciona.
+- **PM (Product Manager) — cadeira reservada, não instanciada**: na empresa do humano o PM fica **acima** do PO; no keelson o espaço acima do PO pertence ao Diretor (intenção). O que caberia a um PM é a camada de **portfólio**: brief que abrange várias demandas (épico, roadmap, FEATs da 4.27) sendo decomposto e priorizado em demandas individuais, cada uma entregue ao PO. Essa camada ainda não existe no fluxo (`/keelson:specify-epic` é decisão em aberto, §8) — criar o agente agora seria cadeira vazia. **Gatilho de instanciação**: quando a camada épico/roadmap entrar, o PM nasce como dono da decomposição do brief multi-demanda. Registrado também o porquê de o `product-critic` **não** virar PM: o critic prepara crítica que o PO resolve — batizá-lo de PM colocaria um PM hierarquicamente abaixo do PO, invertendo o modelo mental da vida real que a metáfora quer aproveitar.
+- **Contrato Diretor–PO**: o humano deixa de aprovar artefatos de rotina e passa a emitir intenção. (a) O pedido do Diretor vira **brief**, artefato-âncora da demanda: pedido capturado como dito + interpretação do PO. O PO **nunca valida contra a própria opinião; valida contra o brief** — mitigação de o sistema aprovar a si mesmo. (b) **Checkpoint único e barato**: o PO devolve a interpretação do brief em ~5 linhas e segue **sem esperar resposta** — janela de veto, não aprovação (coerente com 4.23/4.24: fôlego não é gatilho). (c) **Escalação por exceção**, sempre com proposta + default ("sigo com A a menos que diga o contrário"), só em 4 casos: ambiguidade que muda o resultado; expansão/conflito de escopo; ação irreversível/externa; conflito com diretriz anterior do Diretor. (d) Decisão do PO não derivável do brief entra no registro de **decisões tomadas em nome do Diretor**, auditável na entrega. (e) Na entrega, o PO produz **relatório de aceitação** (pedido vs entregue, evidência de alinhamento ao brief — distinto do QA, que prova que *funciona* —, decisões em nome do Diretor, o que ficou de fora e por quê). O `product-critic` passa a operar sob o PO: o analyst critica, o PO resolve pelas lentes do brief e escala só o que não consegue resolver (fazedor ≠ aprovador preservado).
+- **Merge e deploy permanecem do Diretor** — motivo registrado: pode haver outras sessões trabalhando na mesma base de código, e nem sempre o merge imediato é o melhor caminho. A autonomia termina nos **commits** da demanda (comportamento que já existe); abrir PR, merge e deploy são atos do Diretor (PR sob demanda via `/keelson:integrate`, que segue humano-only).
+- **Sinais laterais com contrato** (gatilho, rota e registro definidos — sem contrato, comunicação lateral é ruído): **escalação** (PO → Diretor, critérios acima); **furo no plano** (Developer → Tech Lead: task revelou premissa errada do PLAN — sinalizar é o comportamento premiado, contornar em silêncio é violação de gate; quem decide o destino do furo é o Tech Lead, nunca o dev); **cenário ambíguo** (QA → PO, *antes* do código: AC não verificável ou borda sem resposta — completa a 4.34; a rota é o PO, que responde pelo brief e só sobe pelos critérios de escalação); **achado fora de escopo** (Reviewer/QA → Tech Lead: registro para triagem sem inchar a task); **alerta de segurança** (já existe: rejeição imediata); **aceitação** (PO → Diretor). O boletim entre waves passa a ser narrado em linguagem de time, endereçado ao Diretor, fechando com o estado de pendência ("nada pendente de você" é a experiência-alvo).
+
+**Custo assumido**: um agente novo (PO) no caminho quente de toda demanda; a aprovação de produto deixa de ser humana por rotina — o preço é confiar o alinhamento ao par brief + auditoria na aceitação, com o veto como rede. A metáfora cria expectativa de continuidade/memória que agentes por-invocação não têm — a doutrina deve ser honesta sobre isso. Fase 1 sem rename evita a sincronização cara (commands, README, method-guide, template, consumidores re-rodando init), mas convive com dois vocabulários (nome de papel na narração, ID técnico nos artefatos) até a fase 2.
+
+**Aplicação**: nesta leva, registro do contrato — este arquivo + `CLAUDE.md` do repo (seção "Modelo de time e contrato do Diretor"). Implementação na doutrina é trabalho subsequente (candidatos: agente PO novo, brief como artefato, ganchos dos sinais laterais em `commands/*`, narração dos boletins, `product-critic` sob o PO); cada peça implementada referencia esta decisão.
+
+---
+
+### 4.38 — Operacionalização do contrato Diretor–PO (fase 1 do modelo de time)
+
+**Problema**: a 4.37 ratificou o contrato (brief, PO, sinais laterais, boletim), mas nada o implementava: o espelho do entendimento (4.14) era confirmado por AskUserQuestion e morria na conversa; a aprovação de produto era declarada "gate humano" no `product-critic`; os embriões dos sinais laterais (o parar-e-reportar do implementer, o campo `notas` livre) não tinham nome, rota nem registro durável; e nenhum artefato ancorava a aceitação da entrega.
+
+**Decisão**:
+- **BRIEF artefato durável**, dono único no `index-contract.md` (template, ciclo de vida `Emitido → Aceito`, veto → re-emissão, nunca apagar): `{docsRoot}/<slug>/briefs/BRIEF-NNN.md`, NNN pareado 1:1 com a SPEC que nasce dele. Só no **ciclo formal** (feature/risco); bug/refactor usam espelho inline sem arquivo; trivial sem brief. SPEC ganha front-matter `Brief:`; `rebuild-index` lê `briefs/` e alerta par brief↔SPEC órfão (alerta, não bloqueio).
+- **Janela de veto substitui a confirmação do espelho** no autônomo (opção B escolhida pelo Diretor): a interpretação é apresentada no corpo da conversa e o fluxo segue sem esperar; silêncio = seguir. Perguntas pré-largada só pelos **4 critérios de escalação** (régua no `agents/po.md`), com proposta + default. Guided: brief confirmado na hora; CHECKPOINT 1 = PO recomenda, Diretor decide (cláusulas de modo explícitas nos dois lados — 4.33).
+- **Agente `po`** (read-only; modos aprovação/aceitação/resolução): resolve a crítica do `product-critic` contra o brief; `APROVAR` → a main session promove a SPEC no autônomo; `ESCALAR` → escada com a proposta+default do PO. Quem **redige** a interpretação na largada é a main session (Tech Lead): a independência do PO é exigida na **validação**, não na redação — o corretor da redação é a janela de veto. `product-critic` vira **Product Analyst** sob o PO; `/keelson:specify` avulso (sem BRIEF) mantém a promoção com o humano.
+- **Sinais laterais nomeados**: **furo no plano** (`falhas[].categoria: furo_no_plano` no report do implementer; contornar em silêncio = violação de gate; destino decidido pelo Tech Lead — ajuste de TASK, mudança de PLAN ou PO/humano quando é produto; registro no Histórico do INDEX); **fora de escopo** (campo estruturado `fora_de_escopo[]` nos reports de implementer/reviewer/verifier, roteado ao Tech Lead — estaciona, não infla a task); **cenário ambíguo pré-código** (modo pré-código do `task-verifier` na Etapa 3.5 do auto, só feature/risco — completa a 4.34; quem resolve pelo brief é o `po`).
+- **Entrega**: relatório de aceitação do PO como seção obrigatória (`RECUSADA` = gate reprovado antes do report final; `ACEITA` → BRIEF marcado `Aceito`); "Caminho tomado" reintitulado **"decisões em nome do Diretor"**; boletim de wave em linguagem de time, emitido inline com o início da wave seguinte (nunca parada — 4.23/4.24, `wave-guard`).
+
+**Custo assumido**: 1–3 spawns novos por ciclo formal (po nas aprovações/aceitação + verifier pré-código em feature/risco). A promoção de SPEC deixa de ter confirmação humana no autônomo — a rede é o trio brief + janela de veto + auditoria na aceitação, com o veto do Diretor como corte final. Bug/refactor sem arquivo de brief: aceitação contra o espelho inline, menos auditável — aceito pelo custo.
+
+**Aplicação**: `agents/po.md` (novo), `agents/{product-critic,task-implementer,task-reviewer,task-verifier}.md`, `commands/{auto,specify,guided,implement,rebuild-index}.md`, `docs/_meta/conventions/index-contract.md` (contrato do BRIEF), `docs/_meta/method-guide.md` (§3.9, §3.10, §5 com o elenco do time), `CLAUDE.md`, `README.md`. Capacidade nova → minor: plugin 0.18.0 → 0.19.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
@@ -669,7 +703,7 @@ Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir man
 
 ## 8. Decisões em aberto (por resolver)
 
-- Variantes `/keelson:specify-small` e `/keelson:specify-epic` para tarefas micro e roadmap.
+- Variantes `/keelson:specify-small` e `/keelson:specify-epic` para tarefas micro e roadmap — quando a variante epic entrar, instancia-se o papel de **PM** (cadeira reservada na 4.37: decomposição do brief multi-demanda em demandas por PO).
 - Hook de pre-commit bloqueando merge sem closure.
 - Convenção de UX-FRs (como escrever requisito de comportamento de interface em EARS).
 - Como integrar com ferramentas de wireframe externas referenciadas pelo PLAN.
