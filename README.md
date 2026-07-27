@@ -158,11 +158,15 @@ transitions). It's **off by default** and **best-effort**: it never blocks the c
   `/keelson:init` validates that your type mapping actually nests (Jira only links
   strictly adjacent hierarchy levels) and warns with the correct type when a leg doesn't.
 - **Feasibility first.** Before creating anything, the sync resolves the projection once
-  against the live hierarchy: 3-level, 2-level, 2-level-via-standalone, or infeasible.
-  An epic-level SPEC type over sub-task TASKs with no feature layer is structurally
-  impossible in Jira — it degrades to standalone cards under the Epic, or stops with the
-  offending leg named. No orphan Epics, no per-issue rejections. `/keelson:jira-sync`
-  reports the projection (and any duplicate found by the JQL probe) in its `--dry-run`.
+  against the live hierarchy. An epic-level SPEC type over sub-task TASKs with no feature
+  layer is structurally impossible in Jira, so it degrades in order: a **Story mirroring the
+  SPEC** (a SPEC that declares no features *is* a single feature — QA keeps a flow-level
+  card), then standalone cards under the Epic, then a stop with the offending leg named.
+  No orphan Epics, no per-issue rejections. `/keelson:jira-sync` reports the projection —
+  and any duplicate found by the JQL probe — in its `--dry-run`.
+- **Backfill aware.** Reconciling a slug whose work already shipped would otherwise fill the
+  board with "to do" cards: the sync says so up front and shows both ways out, without
+  touching your transition policy on its own.
 - **Custom fields & board columns** live in a per-project map file (`jira.mapFile`, a Markdown
   table) that `init` scaffolds and you fill in — write-enrichment (`fixed`/`from`) and, in
   `link` mode, read-seeding of the SPEC.
@@ -204,15 +208,18 @@ keelson/
 
 ## Status
 
-`0.24.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.25.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving. New in this
-release: the Jira sync now **resolves feasibility before it creates anything**
-(decision 4.43) — the hierarchy-adjacency ruler moved to the core protocol, so an
-epic-level SPEC type with sub-task TASKs and no feature layer degrades to standalone
-cards (or stops with a clear diagnosis) instead of leaving orphan Epics and rejected
-sub-tasks behind; plus a duplicate probe before bulk creation and key lookup that names
-the real place (the SPEC's `**Jira**:` header line — there is no YAML front matter).
+release: the Jira sync **resolves feasibility before it creates anything** and now
+degrades with the right semantics (decisions 4.43–4.44) — the hierarchy-adjacency ruler
+lives in the core protocol, and an epic-level SPEC type over sub-task TASKs with no
+feature layer projects a **Story mirroring the SPEC** (a SPEC declaring no features *is*
+a single feature, so QA keeps a flow-level card) before falling back to standalone cards
+or stopping with a clear diagnosis — no more orphan Epics and rejected sub-tasks. Plus a
+duplicate probe before bulk creation, a **backfill warning** when a finished slug would
+fill the board with "to do" cards, and key lookup that names the real place (the SPEC's
+`**Jira**:` header line — there is no YAML front matter).
 Previously: a **coherence sweep** (decision 4.41) aligning every living rule with the team
 model — the PO acceptance report now gates the delivery *before* commit and push,
 status-promotion rules carry explicit mode clauses (po/main session in the autonomous

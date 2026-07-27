@@ -720,6 +720,24 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.44 — Story implícita da SPEC sem FEAT + backfill de slug já concluído
+
+**Problema**: segundo dry-run real do mesmo slug (`professional-portal`/OPS), já com a 4.43 aplicada. O comando executou limpo — projeção classificada na largada, sondagem anti-duplicata, zero tateio — e **por isso** expôs dois problemas de mérito que o tateio anterior escondia. (a) O degrau (i) da 4.43 (tarefas isoladas) resolve a *hierarquia* mas erra a *semântica*: projetou 70 Tarefas de nível 0 soltas sob 7 Epics, quando o mapa do próprio projeto declara que **a História é a unidade de QA** e a Subtarefa é quebra de dev. O QA ganharia 70 cards com granularidade de dev em vez de cards de fluxo — e a 4.27 já dizia a resposta certa sem que ninguém a tivesse ligado ao degrau: *SPEC que não declara FEAT é uma funcionalidade única (a funcionalidade é a própria SPEC)*. (b) O aviso mais útil do output foi **improvisado** pelo agente: as 77 issues nasceriam em "a fazer" sobre trabalho já mergeado na `main`, porque `transition: comment` não move card. O §12 assumia trabalho em andamento e não tinha regra para o caso mais comum da reconciliação — o slug que já terminou.
+
+**Decisão (do humano, escolhendo entre 3 opções apresentadas)**:
+- **Degrau (0) "Story implícita"**, antes do standalone: `spec` epic-level ∧ `task` subtask ∧ SPEC sem FEAT ∧ `issueType.feature` preenchido → criar **uma Story espelhando a SPEC** sob o Epic (`summary` = título da SPEC), com as TASKs como sub-tasks **dela**. Preserva a Story como unidade de QA e a hierarquia desenhada, sem exigir retrabalho de produto nas SPECs. A escada do §7.0 fica: **(0)** Story implícita → **(i)** `standalone` sob o Epic (sem `feature`, ou Story falhou) → **(ii)** parar com diagnóstico.
+- **Não é substituto de declarar FEATs**: numa SPEC com vários fluxos a Story implícita é um card grosso demais para o QA. O sync **reporta isso em 1 linha e segue** — declarar FEAT é decisão de produto do humano, nunca do tracker.
+- **Key própria**: `**Jira Story**:` no cabeçalho da SPEC, abaixo do `**Jira**:` do Epic — as duas issues coexistem e representam camadas diferentes (roadmap × unidade de QA). Tolerada e ignorada pelo `spec-validator`, como as demais linhas de tracker.
+- **Marco de QA**: a Story implícita recebe "pronta p/ QA" quando **todas** as TASKs da SPEC estão `Done` (mesma semântica da FEAT completa).
+- **Backfill de slug concluído** (§12): antes de criar em lote, medir o estado real das TASKs; maioria `Done` com `transition: comment`/`off` → **reportar antes do plano** que o quadro nasceria mentindo, com as duas saídas (mudar para `auto` na ficha × alinhar manualmente). O sync **nunca** altera a ficha nem força transição por conta própria — política de transição é decisão do projeto (§0/§9).
+- **Panorama pelo INDEX**: a Etapa 0 do comando manda ler o `INDEX.md` do slug e coletar o resto em uma passada; varrer `{docsRoot}/` inteiro ou `ls -R` do slug é desperdício (o dry-run listou 37 pastas antes de abrir o artefato que já tinha o panorama).
+
+**Custo assumido**: a projeção degradada passa a criar 1 issue a mais por SPEC (Epic + Story com títulos espelhados), aceito porque a alternativa é o QA perder o card de fluxo; o cabeçalho da SPEC ganha uma quarta linha possível de tracker.
+
+**Aplicação**: `skills/_shared/jira-sync-protocol.md` (§6.1, §7.0 escada (0)/(i)/(ii), §9, §10, §12 backfill), `commands/jira-sync.md` (Etapa 0 passos 2/4/5, Etapa 1 item 2, Output), `commands/specify.md` (template do cabeçalho + Etapa 5.3), `skills/spec-validator/SKILL.md` (tolerância), `docs/_meta/method-guide.md` (§3.13), `README.md` (Jira integration + Status). Doutrina nova → minor: plugin 0.24.0 → 0.25.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

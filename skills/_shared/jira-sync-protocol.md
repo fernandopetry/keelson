@@ -108,7 +108,9 @@ descrição).
 
 3º nível ativo — SPEC declara FEATs (headings `### FEAT-` na §5) ∧ `issueType.feature`
 preenchido → leia `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md`; qualquer um
-ausente → no-op (projeção em 2 níveis).
+ausente → no-op (projeção em 2 níveis). **SPEC sem FEAT mas com `issueType.feature`
+preenchido**: não é no-op puro — vale o degrau (0) do §7.0 (Story implícita espelhando a
+SPEC), que preserva a Story como unidade de QA sem ativar este arquivo.
 
 ## §7. Criar sub-tasks das TASKs
 
@@ -131,20 +133,38 @@ descendentes e adjacentes** (pai exatamente um nível acima). Combinações reai
 próprio projeto (ex.: "Subtarefa(-1) não cabe sob Epic(1) — falta o nível 0").
 
 **Degradação em 2 níveis** (`spec` epic-level ∧ `task` subtask, sem FEAT — o caso "Epic ▸
-Subtarefa"), na ordem: (i) `issueType.standalone` preenchido e adjacente ao `spec`
-(Epic(1) ▸ Tarefa(0)) → as TASKs projetam como **isoladas** sob o Epic, cada uma sendo sua
-própria unidade de QA (§9); (ii) sem `standalone` → issue de `issueType.task` **sem parent**
-não é possível (sub-task exige pai) → **não criar**, avisar que o slug precisa declarar FEATs
-(3º nível) ou reconfigurar `issueType`. Nunca criar sub-task órfã nem sob nível não-adjacente.
+Subtarefa"), **nesta ordem**:
+
+- **(0) Story implícita da SPEC** — `issueType.feature` preenchido e standard (nível 0). A
+  SPEC que **não** declara FEATs é, por definição, uma funcionalidade única (a camada FEAT é
+  colapsável: sem declaração, *a funcionalidade é a própria SPEC*). Então projete-a como tal:
+  `createJiraIssue` com `issueType.feature`, `parent` = Epic da SPEC, `summary` = título da
+  SPEC, `description` = resumo/outcome + a nota de que esta Story representa a SPEC inteira
+  como funcionalidade única. As TASKs viram sub-tasks **sob ela** (§7.1), e ela é a unidade de
+  QA do slug (§9 — marco "pronta p/ QA" quando **todas** as TASKs da SPEC estão Done).
+  Idempotência pela linha `**Jira Story**:` do cabeçalho (§10). Isto **não** ativa o
+  `jira-sync-feat.md`: não há FEAT declarada, há uma Story só, espelhando a SPEC.
+- **(i) Tarefas isoladas** — sem `issueType.feature`, ou a Story do degrau (0) falhou:
+  `issueType.standalone` preenchido e adjacente ao `spec` (Epic(1) ▸ Tarefa(0)) → as TASKs
+  projetam como **isoladas** sob o Epic, cada uma sendo sua própria unidade de QA (§9). Avise
+  que a granularidade de QA cai para tarefa de dev.
+- **(ii) Parar** — sem `feature` nem `standalone`: issue de `issueType.task` **sem parent**
+  não é possível (sub-task exige pai) → **não criar**, avisar que o slug precisa declarar FEATs
+  (3º nível) ou reconfigurar `issueType`.
+
+Nunca criar sub-task órfã nem sob nível não-adjacente. **Não recomende o degrau (0) como
+substituto de declarar FEATs**: numa SPEC grande com vários fluxos, a Story implícita é um card
+de QA grosso demais — reporte isso em 1 linha e siga (declarar FEATs é decisão de produto do
+humano, não do sync).
 
 ### §7.1 Criação
 
-Para cada TASK sem key, respeitada a projeção resolvida no §7.0: `createJiraIssue` com
-`issueType.task` e `parent` = key da issue da SPEC; `summary` = título da TASK; aplicar campos
-`write`. Gravar a key na closure (§10). **Robustez**: se `issueType.task` não for
-`subtask:true` no projeto, fazer fallback para issue normal + `createIssueLink` ("relates to")
-em vez de sub-task. **Com §6.1 ativo**: parenting na Story da FEAT primária — ver
-`jira-sync-feat.md`.
+Para cada TASK sem key: `createJiraIssue` com `issueType.task`, `summary` = título da TASK,
+campos `write` aplicados, e `parent` = **o pai resolvido no §7.0** — a Story da FEAT primária
+(3º nível ativo, `jira-sync-feat.md`) · a **Story implícita** da SPEC (degrau (0)) · a issue da
+SPEC quando ela é nível 0 (2 níveis válido). Gravar a key na closure (§10). **Robustez**: se
+`issueType.task` não for `subtask:true` no projeto, fazer fallback para issue normal +
+`createIssueLink` ("relates to") em vez de sub-task.
 
 **Tarefa isolada (`issueType.standalone`)** — o card de QA fora do aninhamento; `null` →
 tasks isoladas não sincronizam (nem avisa). Origem avulsa (abaixo); origem transversal —
@@ -179,7 +199,9 @@ Conforme `jira.transition`:
   (não força, não erra). O mapa é intenção; a transição real é sempre validada em runtime.
 
 O marco de closure atua na **sub-task**; o marco de funcionalidade pronta na Story —
-`jira-sync-feat.md`, quando ativo. **Tarefa isolada** (§7) é a própria unidade de QA: na closure
+`jira-sync-feat.md`, quando ativo. **Story implícita** (degrau (0) do §7.0): mesma semântica,
+com a SPEC no lugar da FEAT — marco "pronta p/ QA" nela quando **todas** as TASKs da SPEC
+estão `Done`. **Tarefa isolada** (§7) é a própria unidade de QA: na closure
 `Done`, além do marco normal, aplicar o marco "pronta p/ QA" (gatilho do mapa / política de
 `transition`) **na própria issue** — equivalente ao que a Story recebe quando a FEAT completa.
 
@@ -189,6 +211,9 @@ O marco de closure atua na **sub-task**; o marco de funcionalidade pronta na Sto
   `**Status**` (a SPEC **não** tem YAML front-matter; linha ausente = ainda não sincronizada).
 - **FEAT** → linha `**Jira**: <KEY>` imediatamente sob o heading `### FEAT-NNN-XXX` na SPEC
   (ausente = Story ainda não sincronizada).
+- **Story implícita** (degrau (0) do §7.0 — SPEC sem FEAT) → linha `**Jira Story**: <KEY>` no
+  cabeçalho da SPEC, logo abaixo do `**Jira**:` do Epic. Chave distinta porque as duas issues
+  coexistem e representam camadas diferentes (roadmap × unidade de QA).
 - **TASK** → campo `Jira: <KEY>` no bloco "Histórico de execução" da closure, ao lado de
   `Commit SHA`.
 - **INDEX** → apenas 1 linha no "Histórico recente" (`issues Jira: <KEY> + N sub-tasks`); o
@@ -204,8 +229,18 @@ Best-effort (§0).
 ## §12. Reconciliação (`/keelson:jira-sync`)
 
 Reprocessa um slug de forma idempotente (§4), na ordem: issue da SPEC (§6) → Stories das
-FEATs (`jira-sync-feat.md`, quando ativo) → sub-tasks (§7) → status (§9, incluindo o
-gatilho "Funcionalidade pronta p/ QA" para FEATs já completas). Aplica campos e — se
-`transition:auto` — alinha o status ao estado real das TASKs (Done → status-alvo de
-"concluída"). Estado misto (sub-tasks legadas sob a issue da SPEC com o 3º nível ativo) é
-**reportado no output**, nunca re-parentado (§4).
+FEATs (`jira-sync-feat.md`, quando ativo) **ou** Story implícita (degrau (0) do §7.0) →
+sub-tasks (§7) → status (§9, incluindo o gatilho "Funcionalidade pronta p/ QA" para FEATs já
+completas). Aplica campos e — se `transition:auto` — alinha o status ao estado real das TASKs
+(Done → status-alvo de "concluída"). Estado misto (sub-tasks legadas sob a issue da SPEC com o
+3º nível ativo) é **reportado no output**, nunca re-parentado (§4).
+
+**Backfill de slug já concluído** (o caso mais comum da reconciliação: o sync nunca rodou e o
+trabalho já foi entregue). Antes de criar em lote, medir o estado real das TASKs do slug. Se a
+maioria está `Done` **e** `transition` é `comment`/`off`, o quadro **nasceria mentindo** —
+dezenas de cards em "a fazer" sobre trabalho em produção. Nesse caso, **reportar antes de
+criar** (no `--dry-run`, na seção de avisos; sem a flag, como primeira linha do output) que:
+(a) `transition: auto` na ficha faria os cards nascerem no status-alvo correspondente ao estado
+real; (b) em `comment`, o marco de cada closure vira comentário e o alinhamento do quadro fica
+manual. **Não** mudar a ficha nem forçar transição por conta própria — a política de transição
+é decisão do projeto (§0, §9).

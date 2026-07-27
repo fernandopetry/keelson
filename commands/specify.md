@@ -90,6 +90,7 @@ interromper em último caso).
 **Autor**: <preencher>
 **Data**: <YYYY-MM-DD>
 **Jira**: <KEY — só quando a integração Jira está ativa; no modo `link`, preencha com a issue existente; omita a linha se `jira.enabled` for false>
+**Jira Story**: <KEY da Story implícita — só quando a SPEC não declara FEATs e `issueType.feature` está preenchido (degrau (0) do §7.0 do protocolo de sync); omita a linha nos demais casos>
 **Brief**: <BRIEF-NNN — quando a SPEC nasce de um brief (contrato Diretor–PO, decisão 4.38); omita a linha sem brief>
 
 ## 1. Contexto e objetivo
@@ -165,7 +166,7 @@ Aplicar a **receita de atualização do INDEX** (index-contract.md). Específico
 
 ### 5.3 Sincronização com Jira (opcional)
 
-Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`) — ler §0-§6 + §7.0 (pré-check de hierarquia — resolve se as TASKs desta SPEC terão onde aninhar) + §8 + §10, mais `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` quando a SPEC declara FEATs ∧ `issueType.feature` preenchido. Não leia o protocolo inteiro: localize os §§ com `grep -nE "^#+ §"` e leia apenas os listados + os que eles referenciarem internamente. Criar/vincular a issue principal desta SPEC e gravar a key na linha `**Jira**:` do **cabeçalho** da SPEC (não há YAML front-matter); com FEATs sincronizadas, gravar a key de cada Story na linha `**Jira**:` sob o heading da FEAT (best-effort — §0).
+Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`) — ler §0-§6 + §7.0 (pré-check de hierarquia — resolve se as TASKs desta SPEC terão onde aninhar) + §8 + §10, mais `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` quando a SPEC declara FEATs ∧ `issueType.feature` preenchido. Não leia o protocolo inteiro: localize os §§ com `grep -nE "^#+ §"` e leia apenas os listados + os que eles referenciarem internamente. Criar/vincular a issue principal desta SPEC e gravar a key na linha `**Jira**:` do **cabeçalho** da SPEC (não há YAML front-matter); com FEATs sincronizadas, gravar a key de cada Story na linha `**Jira**:` sob o heading da FEAT; **sem FEATs ∧ `issueType.feature` preenchido**, criar a Story implícita do degrau (0) do §7.0 (a SPEC é a funcionalidade única) e gravar a key em `**Jira Story**:` (best-effort — §0).
 
 ## Output final ao usuário
 

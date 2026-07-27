@@ -110,8 +110,9 @@ os ACs derivam a filiação do FR que cobrem — não há vínculo AC→FEAT lit
 - FEAT sem a linha de descrição `>` (o QA não sabe o que testar de ponta a ponta)
 - Nome de FEAT que não é um fluxo verificável (ex.: "melhorias gerais", "ajustes")
 
-A linha `**Jira**:` sob o heading da FEAT é tolerada e ignorada pelos checks (mesma semântica
-do `Jira:` do front-matter).
+As linhas `**Jira**:` (sob o heading da FEAT ou no cabeçalho da SPEC) e `**Jira Story**:` (no
+cabeçalho — Story implícita da SPEC sem FEAT) são **toleradas e ignoradas** pelos checks: são
+rastro do tracker, não conteúdo de especificação.
 
 ## Etapa 5: checks de domínio vs tecnologia
 
