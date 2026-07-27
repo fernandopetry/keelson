@@ -167,6 +167,10 @@ transitions). It's **off by default** and **best-effort**: it never blocks the c
 - **Backfill aware.** Reconciling a slug whose work already shipped would otherwise fill the
   board with "to do" cards: the sync says so up front and shows both ways out, without
   touching your transition policy on its own.
+- **Required fields checked first.** Before a bulk creation, the sync asks createmeta which
+  fields are mandatory for the issue types it is about to use. A missing required field is a
+  rejected issue, not a skipped field — you hear about it before the first create, not on the
+  fortieth.
 - **Custom fields & board columns** live in a per-project map file (`jira.mapFile`, a Markdown
   table) that `init` scaffolds and you fill in — write-enrichment (`fixed`/`from`) and, in
   `link` mode, read-seeding of the SPEC.
@@ -208,7 +212,7 @@ keelson/
 
 ## Status
 
-`0.25.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.26.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving. New in this
 release: the Jira sync **resolves feasibility before it creates anything** and now

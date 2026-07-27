@@ -52,6 +52,9 @@ slug inteiro — a reconciliação usa quase todos os §§: leia o protocolo **i
    com `transition: comment`/`off` → o quadro nasceria em "a fazer" sobre trabalho entregue;
    isso vai no output **antes** do plano de criação, com as duas saídas (mudar para `auto` na
    ficha × alinhar manualmente). Não altere a ficha por conta própria.
+6. **Campos obrigatórios** (protocolo §8) — antes de planejar criação em lote, uma
+   `getJiraIssueTypeMetaWithFields` por tipo usado. Obrigatório não coberto → entra nos avisos;
+   criar 80 issues para descobrir na 40ª que falta um campo deixa o slug pela metade.
 
 ## Etapa 1: reconciliação (protocolo §12)
 
@@ -91,7 +94,7 @@ sem chamar as ferramentas de escrita.
 - Stories: <N criadas>, <M já existiam> (de FEAT | implícitas) | n/a
 - Sub-tasks: <N criadas>, <M já existiam>
 - Status alinhado: <K movidas | só comentado | n/a>
-- Pulado/avisos: <itens best-effort que falharam, se houver>
+- Pulado/avisos: <itens best-effort que falharam · obrigatórios não cobertos (§8) · divergência TASK-INDEX × arquivos (§4) · Story implícita grossa (§7.0)>
 ```
 
 ## Limites

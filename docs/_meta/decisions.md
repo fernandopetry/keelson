@@ -738,6 +738,21 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.45 — Pré-check de campos obrigatórios + formas canônicas de contar IDs SDD
+
+**Problema**: terceiro dry-run do mesmo slug (`professional-portal`/OPS), com 4.43+4.44 aplicadas. O comando produziu o plano certo (84 issues: 7 Epics + 7 Histórias implícitas + 70 sub-tasks), com o backfill na frente e dois achados de artefato do consumidor levantados por conta própria. Sobraram três defeitos, dois deles no *modo de contar*: (a) **nenhum pré-check de campos obrigatórios** — o plano autoriza 84 criações sem nunca ter perguntado ao createmeta se algum campo `required` fica descoberto; um obrigatório faltando não é "campo pulado" (§0/§8, que trata rejeição de campo), o Jira **recusa a issue inteira**, e a descoberta chegaria na enésima criação, deixando o slug pela metade; (b) o glob `tasks/TASK-*.md` contou os `TASK-NNN-INDEX.md` como tarefas e inflou a distribuição por SPEC (77 em vez de 70) — reconciliado depois na tabela final, mas por sorte, não por regra; (c) a contagem de FRs por SPEC usou `grep -c '^\*\*FR-'`, que devolve **zero** porque a lista da SPEC é bullet (`- **FR-...**`), e o fallback contou ocorrências em vez de requisitos — os números do output vieram do INDEX, não do comando que ele mesmo rodou.
+
+**Decisão**:
+- **Pré-check de obrigatórios (§8)**: antes de criar em lote, uma `getJiraIssueTypeMetaWithFields` **por tipo que o plano usa**; campo `required: true` não coberto por `summary`/`description`/`parent` nem por linha `write` do mapa entra nos avisos **antes** da primeira criação. Best-effort como o resto (§0) — a chamada falha, avisa e segue.
+- **Fonte de verdade do conjunto de TASKs (§4)**: os **arquivos** `tasks/TASK-*.md` menos `*-INDEX.md`. O `TASK-NNN-INDEX` é panorama; divergência entre a contagem dele e os arquivos (tasks acrescentadas depois da geração) é **aviso**, não bloqueio, e o sync segue pelos arquivos.
+- **Formas canônicas de contar/localizar IDs** (dono: `sdd-conventions.md`, ao lado de "Cabeçalho ≠ front-matter"): FR/NFR/AC são bullets (`^- \*\*FR-`), FEAT é heading (`^### FEAT-`), TASKs vêm do glob sem INDEX — com a regra de leitura que faltava: **contagem `0` num artefato notoriamente populado é sinal de padrão errado, não de artefato vazio**.
+
+**Custo assumido**: uma chamada MCP a mais por tipo usado (4 no pior caso), paga uma vez por execução e só quando há criação planejada.
+
+**Aplicação**: `skills/_shared/jira-sync-protocol.md` (§4 conjunto de TASKs + receita do `**Jira Story**`, §8 pré-check), `commands/jira-sync.md` (Etapa 0 passo 6, Output), `docs/_meta/conventions/sdd-conventions.md` (bullet das formas canônicas), `README.md` (Status). Capacidade nova → minor: plugin 0.25.0 → 0.26.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

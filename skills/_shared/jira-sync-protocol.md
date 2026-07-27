@@ -66,9 +66,16 @@ localização (não invente parser de front-matter):
 
 ```bash
 grep -n '^\*\*Jira\*\*:' <SPEC>          # issue principal (cabeçalho, ao lado de **Slug**)
+grep -n '^\*\*Jira Story\*\*:' <SPEC>    # Story implícita (§7.0 degrau (0))
 grep -n -A2 '^### FEAT-' <SPEC>          # Story da FEAT (§6.1) — a linha vem sob o heading
 grep -n 'Jira' <TASK>                    # sub-task — bloco "Histórico de execução" da closure
 ```
+
+**Conjunto de TASKs a sincronizar** = os **arquivos** `<slug>/tasks/TASK-*.md` **menos** os
+`*-INDEX.md` (`ls tasks/TASK-*.md | grep -v INDEX`) — um glob ingênuo conta cada `TASK-NNN-INDEX`
+como se fosse tarefa e infla o plano. O `TASK-NNN-INDEX` é **panorama, não fonte de verdade**:
+divergência entre a contagem dele e os arquivos (tasks acrescentadas depois da geração) vira
+**aviso no output**, e o sync segue pelos arquivos.
 
 Se a key existe e resolve (`getJiraIssue` ok) → **atualizar/no-op**, nunca recriar.
 
@@ -179,6 +186,13 @@ Key persistida na closure da TASK (§10), como qualquer sub-task.
 
 ## §8. Campos personalizados (§3, seção Campos)
 
+- **Pré-check de obrigatórios (antes de criar em lote)**: uma chamada
+  `getJiraIssueTypeMetaWithFields` **por tipo que o plano vai usar** (spec/feature/task/
+  standalone). Campo com `required: true` que **não** é coberto por `summary`/`description`/
+  `parent` nem por uma linha `write` do mapa → **listar no plano/aviso antes de criar**. Um
+  obrigatório faltando não é "campo pulado" (o Jira **recusa a issue inteira**), e descobrir
+  isso na 40ª de 84 criações deixa o slug pela metade. Sem obrigatório descoberto → seguir sem
+  ruído. Best-effort como todo o resto (§0): a chamada falhou → avisar e seguir.
 - **Escrita** (`write`/`both`): montar `additional_fields`/`fields` a partir das linhas com
   `Estratégia` resolvida — `fixed` usa o valor/ID literal; `from` deriva da fonte SDD. Campo
   rejeitado pelo Jira → **pula esse campo e avisa**, não aborta a criação (§0).
