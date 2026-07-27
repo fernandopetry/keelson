@@ -140,8 +140,12 @@ becomes a Story, its TASKs become sub-tasks, and progress flows back as comments
 transitions). It's **off by default** and **best-effort**: it never blocks the cycle.
 
 - **Connector, not tokens.** It works through the **Atlassian MCP connector** — no API token,
-  no SDK, nothing in `keelson.local.json`. If the connector isn't authorized, the sync is
-  simply skipped with a note.
+  no SDK, nothing in `keelson.local.json`.
+- **Skips are proven and recorded.** "The connector is unavailable" has to be *proven* — the
+  tools get loaded (MCP tools arrive deferred; not seeing them is not evidence) and a cheap
+  probe call runs first. Whatever the outcome, a skipped sync writes one line into the slug's
+  INDEX with the reason and the probe evidence, so "why did Jira never hear about this?" has
+  an answer in the repository weeks later, not just in a lost session log.
 - **Discovered, never hardcoded.** `/keelson:init` learns your project's issue types, statuses
   and custom fields at runtime (Jira metadata) and stores **IDs** in the ficha's `jira` block.
   No Atlassian site, project key or field ID ever ships in the plugin.
@@ -212,10 +216,14 @@ keelson/
 
 ## Status
 
-`0.26.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.27.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving. New in this
-release: the Jira sync **resolves feasibility before it creates anything** and now
+release: a skipped Jira sync now has to **prove** the connector is unavailable and
+**leaves a durable trace** in the slug's INDEX (decision 4.46) — the same ruler decision
+4.26 set for screen verification, after a consumer ran the whole cycle for weeks with
+`jira.enabled: true` and nothing ever reached the board, with no record of why. Also:
+the Jira sync **resolves feasibility before it creates anything** and now
 degrades with the right semantics (decisions 4.43–4.44) — the hierarchy-adjacency ruler
 lives in the core protocol, and an epic-level SPEC type over sub-task TASKs with no
 feature layer projects a **Story mirroring the SPEC** (a SPEC declaring no features *is*

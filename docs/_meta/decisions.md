@@ -753,6 +753,22 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.46 — Indisponibilidade do conector é provada, e o pulo do sync deixa rastro durável
+
+**Problema**: caso real, e o mais caro de todos porque passou meses sem ser notado. O consumidor `aav-backoffice` rodou o ciclo com `jira.enabled: true` desde 2026-07-23 e **nenhuma** das 7 SPECs recebeu key — três delas criadas depois da configuração. Investigando, duas coisas ficaram claras: (a) o conector **estava ativo e funcionando** (há chamadas Jira reais nos transcripts das mesmas datas) — a primeira hipótese da sessão, "conector ausente", nasceu de evidência ruim: procurou-se `mcp__*Atlassian*` nos transcripts e concluiu-se ausência, mas ferramentas MCP chegam **deferred** e só aparecem quando buscadas; **"não vi as ferramentas na lista" não é evidência de indisponibilidade**, e um agente aplicando o §0 pode cometer exatamente o mesmo erro de inferência; (b) a causa concreta do pulo **não é mais recuperável** — o §0 mandava "avisar em 1 linha e seguir", e um aviso volátil no meio do output de um `/keelson:auto` é indistinguível de nunca ter acontecido; fechada a sessão, não sobra nada no repositório. O best-effort funcionou como projetado (nunca travou o ciclo) e, justamente por isso, degradou em silêncio por semanas.
+
+**Decisão** — transplantar para o Jira a régua que a 4.26 já estabeleceu para a verificação de tela:
+- **Indisponibilidade é provada, não presumida** (§0): antes de concluir que o conector não está disponível, **carregar as ferramentas** (deferred não aparecem até serem buscadas) e fazer **uma** chamada barata de prova (`atlassianUserInfo` / `getAccessibleAtlassianResources`). Só o retorno autoriza a conclusão; o resultado vale para a execução inteira (não se repete a prova por gancho). Corolário no §1: nome de servidor MCP varia por instalação — resolver a ferramenta pelo **sufixo**, nunca por prefixo fixo.
+- **Rastro durável do pulo** (§0 + §10): sync pulado ou falho grava **1 linha no "Histórico recente" do INDEX do slug** — data, o que seria sincronizado, motivo e **a evidência da prova** (o que foi tentado, o que retornou). O INDEX passa a registrar as duas pontas (sucesso e pulo), uma linha por execução; o contrato da tabela "PLANs" segue intocado. Sem slug resolvido, a linha vai no relatório final do comando.
+- **A reconciliação lê o rastro**: se o "Histórico recente" traz pulos anteriores, o `/keelson:jira-sync` os lista no output — vira o histórico do que ficou para trás e por quê.
+- **O `init` prova também**: o self-check da Etapa 6 só pode reportar "sync Jira pulado até autorizar o conector" com a evidência da prova junto.
+
+**Custo assumido**: uma chamada MCP de prova por execução em que há sync a fazer, e uma linha a mais no INDEX quando o sync falha — preço baixo diante de um modo de falha que custou semanas de silêncio. O rastro é **por execução**, não por artefato: não polui o INDEX com uma linha por TASK.
+
+**Aplicação**: `skills/_shared/jira-sync-protocol.md` (§0 prova + rastro, §1 resolução por sufixo, §10 registro do pulo), `commands/jira-sync.md` (Etapa 0 passo 3), `commands/init.md` (self-check da Etapa 6), `README.md` (Jira integration + Status). Doutrina nova → minor: plugin 0.26.0 → 0.27.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

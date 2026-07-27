@@ -39,8 +39,12 @@ slug inteiro — a reconciliação usa quase todos os §§: leia o protocolo **i
    `TASK-MMM-INDEX` e as TASKs do slug, e colete o que o plano precisa em **uma** passada
    (títulos, `**Status**`, keys — um `grep` por campo sobre `tasks/*.md`, não arquivo a
    arquivo).
-3. Verificar disponibilidade do conector (protocolo §0/§1). Indisponível → parar com aviso
-   claro (é justamente o cenário que este comando existe para recuperar mais tarde); não é erro.
+3. Verificar disponibilidade do conector **provando** (protocolo §0/§1): carregar as
+   ferramentas (deferred não aparecem na lista até serem buscadas) e fazer a chamada de prova.
+   Indisponível → parar com aviso claro **e** gravar o rastro durável (§0); não é erro — é
+   justamente o cenário que este comando existe para recuperar mais tarde. Se o "Histórico
+   recente" do INDEX já traz **pulos anteriores**, liste-os no output: eles são o histórico do
+   que ficou para trás e por quê.
 4. **Viabilidade da projeção** (protocolo §7.0) — resolver **antes** de montar o plano, não
    descobrir na criação: cruzar os `hierarchyLevel` dos `issueType` configurados com o fato de
    as SPECs do slug declararem ou não FEATs (`grep -n '^### FEAT-'`). Classifique em uma linha:

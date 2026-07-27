@@ -10,8 +10,22 @@
   `enabled: false` → o protocolo **não faz nada** e o comando segue idêntico ao de hoje.
 - **Nunca bloqueia**: ferramentas do conector Atlassian indisponíveis (não autorizado,
   ambiente headless) **ou** qualquer chamada MCP que falhe (permissão, campo obrigatório,
-  transição inexistente) → **avisa em 1 linha no output e segue**. O ciclo SDD nunca trava
+  transição inexistente) → **avisa e segue** (com o rastro abaixo). O ciclo SDD nunca trava
   por causa do Jira.
+- **Indisponibilidade é provada, não presumida** (mesma régua da verificação de tela,
+  decisão 4.26). Antes de concluir que o conector não está disponível: **carregue as
+  ferramentas** — num harness que as entrega *deferred*, elas não aparecem na lista até serem
+  buscadas, e "não vi as ferramentas" **não é evidência** — e faça **uma** chamada barata de
+  prova (`atlassianUserInfo`, ou `getAccessibleAtlassianResources`). Só o retorno dessa
+  tentativa autoriza a conclusão; o resultado vale para a execução inteira (não repita a
+  prova a cada gancho).
+- **Rastro durável do pulo**: sync pulado ou falho **não** pode viver só no output da sessão —
+  num ciclo longo isso é indistinguível de nunca ter acontecido, e some quando a sessão fecha.
+  Registre **1 linha no "Histórico recente" do `INDEX.md` do slug** (§10): data, o que seria
+  sincronizado, o motivo e **a evidência da prova** (o que foi tentado e o que retornou). Ex.:
+  `2026-07-26: sync Jira pulado (SPEC-005 + 8 TASKs) — atlassianUserInfo: not authorized`.
+  Sem slug resolvido, a linha vai no relatório final do comando. É esse rastro que responde,
+  semanas depois, "por que o Jira não recebeu nada?".
 - **Zero segredo**: o conector é o único canal; **nunca** peça/leia token ou credencial, e
   nada de Jira vai para `keelson.local.json`.
 - **Público/agnóstico**: nenhum ID, nome, site ou componente real entra em artefato do
@@ -19,10 +33,13 @@
 
 ## §1. Ferramentas do conector e resolução de `cloudId`
 
-Ferramentas MCP usadas (todas do conector Atlassian): `getAccessibleAtlassianResources`,
-`getVisibleJiraProjects`, `getJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFields`,
+Ferramentas MCP usadas (todas do conector Atlassian): `atlassianUserInfo` (prova de
+disponibilidade, §0), `getAccessibleAtlassianResources`, `getVisibleJiraProjects`,
+`getJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFields`,
 `searchJiraIssuesUsingJql`, `getTransitionsForJiraIssue`, `getJiraIssue`, `createJiraIssue`,
 `editJiraIssue`, `addCommentToJiraIssue`, `transitionJiraIssue`, `createIssueLink`.
+Nomes de servidor variam por instalação (`mcp__<servidor>__<ferramenta>`) — resolva pelo
+**sufixo** da ferramenta, nunca por um prefixo fixo.
 
 `cloudId`: usar `jira.cloudId` se presente; senão passar `jira.site` (hostname) direto às
 ferramentas; se ainda falhar, `getAccessibleAtlassianResources` e usar o recurso do site.
@@ -230,9 +247,10 @@ estão `Done`. **Tarefa isolada** (§7) é a própria unidade de QA: na closure
   coexistem e representam camadas diferentes (roadmap × unidade de QA).
 - **TASK** → campo `Jira: <KEY>` no bloco "Histórico de execução" da closure, ao lado de
   `Commit SHA`.
-- **INDEX** → apenas 1 linha no "Histórico recente" (`issues Jira: <KEY> + N sub-tasks`); o
-  contrato da tabela "PLANs" (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`)
-  **não** muda.
+- **INDEX** → apenas 1 linha no "Histórico recente" — **do sucesso**
+  (`issues Jira: <KEY> + N sub-tasks`) **ou do pulo**, com motivo e evidência da prova (§0). Só
+  uma linha por execução nos dois casos; o contrato da tabela "PLANs"
+  (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`) **não** muda.
 
 ## §11. Link do PR / push (integrate, auto)
 
