@@ -700,6 +700,26 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.43 — Sync Jira: viabilidade antes da criação, régua de hierarquia no core e fim do "front-matter" fantasma
+
+**Problema**: transcript de um `/keelson:jira-sync <slug> --dry-run` real (consumidor `aav-backoffice`, projeto OPS) mostrou o agente tateando por quatro furos da própria doutrina, todos convergindo no mesmo meio-estado ruim. (a) **"front-matter" fantasma**: o protocolo mandava gravar/ler a key da SPEC "no front-matter" (§4, §5, §6, §10 + 2 pontos do comando), mas a SPEC do keelson **não tem YAML front-matter** — a key mora na linha `**Jira**:` do cabeçalho markdown (template do `specify`); o agente rodou um `awk` de front-matter, voltou vazio e teve que descobrir a estrutura por inspeção. (b) **Régua de adjacência no arquivo errado**: o pré-check de `hierarchyLevel` (4.28) vivia só no `jira-sync-feat.md`, que é **no-op quando o 3º nível está inativo** — exatamente o cenário do slug (7 SPECs sem FEAT); o core §7 só cobria o caso `subtask:false`, e a combinação `spec`=Epic(1) + `task`=Subtarefa(-1) **sem** nível 0 no meio não existia em lugar nenhum. Resultado de um sync real: 7 Epics órfãos criados e 70 sub-tasks rejeitadas uma a uma pelo Jira. (c) **Sem pré-condição de viabilidade**: a Etapa 0 do comando validava ficha, slug e conector, mas não se a projeção era possível — o bloqueio só apareceu depois do panorama das 70 TASKs montado. (d) **Idempotência ancorada só em key local**: o agente improvisou uma sondagem JQL anti-duplicata (passo sensato, que cobre o sync que criou a issue e falhou ao gravar a key) sem nenhum respaldo no protocolo — cada sessão inventaria a sua.
+
+**Decisão**:
+- **Nomear o lugar certo**: some "front-matter" da doutrina de Jira; a key da SPEC é a **linha `**Jira**:` do cabeçalho markdown**, com **receita de localização** explícita (`grep -n '^\*\*Jira\*\*:'`, `grep -n -A2 '^### FEAT-'`) no §4 — mesma filosofia do `grep -n "^## §"` que os ganchos já usam para navegar o protocolo.
+- **Régua de adjacência promovida ao core** (§7.0, dono único): tabela das combinações reais (3 níveis pleno · 2 níveis válido · 2 níveis inviável · fallback `subtask:false`), resolvida **uma vez no início**, nunca issue a issue. O `jira-sync-feat.md` passa a **referenciar** o §7.0 em vez de duplicar a régua (decisão 4.20).
+- **Degradação em 2 níveis** para o caso Epic(1) ▸ Subtarefa(-1): (i) `issueType.standalone` adjacente ao `spec` → as TASKs projetam como isoladas sob o Epic, cada uma sua própria unidade de QA (é a mesma saída do degrau (iii) da 4.28, agora disponível **sem** o 3º nível); (ii) sem `standalone` → **não criar** e avisar que o slug precisa declarar FEATs ou reconfigurar `issueType`. Sub-task órfã ou sob nível não-adjacente nunca é tentada. Corolário no §6: issue-mãe **não** é criada quando nenhuma projeção de filhos é possível — Epic órfão não é progresso.
+- **Viabilidade é pré-condição**, não descoberta: nova Etapa 0.4 do `/keelson:jira-sync` cruza `hierarchyLevel` × declaração de FEATs e classifica a projeção em 1 linha (também no Output); inviável → o plano vira diagnóstico + recomendação, sem listar criações que o Jira rejeitaria. O gancho do `specify` passa a ler o §7.0 pelo mesmo motivo (avisar na primeira SPEC, não na centésima TASK).
+- **Sondagem anti-duplicata** documentada no §4: recomendada antes de criar em lote sem nenhuma key local, **obrigatória** no `--dry-run` — `searchJiraIssuesUsingJql` por `summary` correspondente; correspondência plausível → reportar e não criar.
+- **Ficha ausente ≠ desligada**: a Etapa 0 do comando separa os dois casos e manda rodar de dentro do consumidor, em vez de deixar a sessão procurar o projeto pelo disco.
+
+**Custo assumido**: o §7 ganha um sub-heading (§7.0/§7.1) — primeira subdivisão do protocolo core, aceita porque a régua precisa ser alcançável por quem lê só o §7; o pré-check custa uma chamada `getJiraProjectIssueTypesMetadata` por execução (já era feita, agora mais cedo) e a sondagem JQL custa uma busca por slug no dry-run, em troca de não criar duplicata nem meio-estado.
+
+- **Generalização do furo (a)**: "front-matter" virou jargão interno para dois formatos diferentes — YAML real (HANDOFF, perfis, frontmatter de commands/agents/skills) e cabeçalho markdown `**Chave**: valor` (SPEC, PLAN, TASK). A distinção ganha dono único em `sdd-conventions.md`, com a receita de `grep`; as menções remanescentes nos demais comandos passam a ser lidas por ela em vez de exigirem varredura textual.
+
+**Aplicação**: `skills/_shared/jira-sync-protocol.md` (§4 receita + sondagem, §5, §6 item 0, §7.0 novo + §7.1, §10), `skills/_shared/jira-sync-feat.md` (item 2 → referência ao §7.0), `commands/jira-sync.md` (Etapa 0 passos 1 e 4, Etapa 1 item 1, Output, Limites), `commands/specify.md` (Etapa 5.3), `docs/_meta/conventions/sdd-conventions.md` (bullet "Cabeçalho ≠ front-matter"), `docs/_meta/method-guide.md` (§3.13), os 5 ganchos (receita `grep -n "^#\+ §"`, que agora alcança sub-headings), `README.md` (Jira integration + Status). Doutrina nova → minor: plugin 0.23.0 → 0.24.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

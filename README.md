@@ -157,6 +157,12 @@ transitions). It's **off by default** and **best-effort**: it never blocks the c
   a level-0 card QA can test on its own, hung under the Epic when the hierarchy allows.
   `/keelson:init` validates that your type mapping actually nests (Jira only links
   strictly adjacent hierarchy levels) and warns with the correct type when a leg doesn't.
+- **Feasibility first.** Before creating anything, the sync resolves the projection once
+  against the live hierarchy: 3-level, 2-level, 2-level-via-standalone, or infeasible.
+  An epic-level SPEC type over sub-task TASKs with no feature layer is structurally
+  impossible in Jira — it degrades to standalone cards under the Epic, or stops with the
+  offending leg named. No orphan Epics, no per-issue rejections. `/keelson:jira-sync`
+  reports the projection (and any duplicate found by the JQL probe) in its `--dry-run`.
 - **Custom fields & board columns** live in a per-project map file (`jira.mapFile`, a Markdown
   table) that `init` scaffolds and you fill in — write-enrichment (`fixed`/`from`) and, in
   `link` mode, read-seeding of the SPEC.
@@ -198,10 +204,16 @@ keelson/
 
 ## Status
 
-`0.23.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.24.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving. New in this
-release: a **coherence sweep** (decision 4.41) aligning every living rule with the team
+release: the Jira sync now **resolves feasibility before it creates anything**
+(decision 4.43) — the hierarchy-adjacency ruler moved to the core protocol, so an
+epic-level SPEC type with sub-task TASKs and no feature layer degrades to standalone
+cards (or stops with a clear diagnosis) instead of leaving orphan Epics and rejected
+sub-tasks behind; plus a duplicate probe before bulk creation and key lookup that names
+the real place (the SPEC's `**Jira**:` header line — there is no YAML front matter).
+Previously: a **coherence sweep** (decision 4.41) aligning every living rule with the team
 model — the PO acceptance report now gates the delivery *before* commit and push,
 status-promotion rules carry explicit mode clauses (po/main session in the autonomous
 cycle, human otherwise), and the consumer `CLAUDE.md` block now teaches the autonomous

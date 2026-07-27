@@ -8,13 +8,12 @@
 1. **Ativação (duplo opt-in)**: a SPEC declara FEATs (headings `### FEAT-` na §5) **e**
    `issueType.feature` está preenchido. Qualquer um ausente → este arquivo inteiro é no-op e
    a projeção segue em 2 níveis, idêntica à de hoje.
-2. **Pré-check de hierarquia** (operar por ID, §1): via `getJiraProjectIssueTypesMetadata`,
-   conferir `hierarchyLevel` — o Jira só aninha pai→filho entre níveis **estritamente
-   descendentes e adjacentes** (pai exatamente um nível acima do filho). O caminho pleno
-   exige `issueType.spec` epic-level (1), `issueType.feature` standard (0) e
-   `issueType.task` `subtask:true` (-1). Perna não-adjacente (ex.: Story(0) sob Tarefa(0)
-   — irmãos; sub-task(-1) sob Epic(1)) → não tentar o `parent`, ir direto ao degrau de
-   degradação correspondente, com aviso.
+2. **Pré-check de hierarquia**: a régua de adjacência tem dono único no **§7.0 do protocolo
+   core** — aplique-a lá (uma vez, no início) e traga o resultado para cá. Para o 3º nível, o
+   caminho pleno é `issueType.spec` epic-level (1) ▸ `issueType.feature` standard (0) ▸
+   `issueType.task` `subtask:true` (-1). Perna não-adjacente (ex.: Story(0) sob Tarefa(0) —
+   irmãos) → não tentar o `parent`, ir direto ao degrau de degradação correspondente (item 4),
+   com aviso.
 3. **Criação** (modo `create`, por FEAT sem key — idempotência §4): `createJiraIssue` com
    `projectKey`, `issueType.feature`, `parent` = key da issue da SPEC, `summary` = nome da
    FEAT, `description` = descrição (`>`) + lista dos ACs derivados

@@ -165,7 +165,7 @@ Aplicar a **receita de atualização do INDEX** (index-contract.md). Específico
 
 ### 5.3 Sincronização com Jira (opcional)
 
-Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`) — ler §0-§6 + §8 + §10, mais `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` quando a SPEC declara FEATs ∧ `issueType.feature` preenchido. Não leia o protocolo inteiro: localize os §§ com `grep -n "^## §"` e leia apenas os listados + os que eles referenciarem internamente. Criar/vincular a issue principal desta SPEC e gravar a key no front-matter `Jira:`; com FEATs sincronizadas, gravar a key de cada Story na linha `**Jira**:` sob o heading da FEAT (best-effort — §0).
+Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`) — ler §0-§6 + §7.0 (pré-check de hierarquia — resolve se as TASKs desta SPEC terão onde aninhar) + §8 + §10, mais `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` quando a SPEC declara FEATs ∧ `issueType.feature` preenchido. Não leia o protocolo inteiro: localize os §§ com `grep -nE "^#+ §"` e leia apenas os listados + os que eles referenciarem internamente. Criar/vincular a issue principal desta SPEC e gravar a key na linha `**Jira**:` do **cabeçalho** da SPEC (não há YAML front-matter); com FEATs sincronizadas, gravar a key de cada Story na linha `**Jira**:` sob o heading da FEAT (best-effort — §0).
 
 ## Output final ao usuário
 

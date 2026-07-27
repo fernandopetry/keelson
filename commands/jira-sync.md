@@ -27,19 +27,30 @@ slug inteiro — a reconciliação usa quase todos os §§: leia o protocolo **i
 
 ## Etapa 0: pré-condições
 
-1. Ler a **ficha** (`keelson.config.json`). Se `jira.enabled` é ausente/`false` → parar e
-   informar que a integração está desligada (nada a fazer).
+1. Ler a **ficha** (`keelson.config.json`) **no cwd**. Distinga os dois casos:
+   - **Ficha ausente** → você não está num projeto keelson. **Pare** e instrua a rodar de
+     dentro do repo consumidor (os caminhos da ficha, do `mapFile` e a escrita nos artefatos
+     são relativos à raiz dele). **Não** saia procurando o projeto em outros diretórios.
+   - Ficha presente com `jira.enabled` ausente/`false` → parar e informar que a integração
+     está desligada (nada a fazer).
 2. Resolver o slug (aceita nome do slug ou um `PLAN-MMM` → slug pela pasta-pai). Ler o
    `INDEX.md`, a(s) SPEC(s), os `TASK-MMM-INDEX` e as TASKs do slug.
 3. Verificar disponibilidade do conector (protocolo §0/§1). Indisponível → parar com aviso
    claro (é justamente o cenário que este comando existe para recuperar mais tarde); não é erro.
+4. **Viabilidade da projeção** (protocolo §7.0) — resolver **antes** de montar o plano, não
+   descobrir na criação: cruzar os `hierarchyLevel` dos `issueType` configurados com o fato de
+   as SPECs do slug declararem ou não FEATs (`grep -n '^### FEAT-'`). Classifique em uma linha:
+   **3 níveis pleno** · **2 níveis válido** · **2 níveis degradado para `standalone`** ·
+   **inviável** (com a perna que não aninha e o tipo correto do projeto). Inviável → o plano
+   vira diagnóstico + recomendação; não liste criações que o Jira rejeitaria.
 
 ## Etapa 1: reconciliação (protocolo §12)
 
 Aplicar o protocolo de sync Jira sobre o slug, na ordem:
 
-1. **Issue da SPEC** (§4–§6): criar (modo `create`) ou validar o vínculo (modo `link`); gravar
-   a key no front-matter se criada.
+1. **Issue da SPEC** (§4–§6): sondagem anti-duplicata (§4, obrigatória no `--dry-run`); criar
+   (modo `create`) ou validar o vínculo (modo `link`); gravar a key na linha `**Jira**:` do
+   cabeçalho da SPEC se criada.
 2. **Stories das FEATs** (`jira-sync-feat.md` §6.1): quando a SPEC declara FEATs e `issueType.feature` está
    preenchido, criar/vincular as que faltam (idempotência por key sob o heading); gravar as
    keys na SPEC. Estado misto (sub-tasks legadas sob a issue da SPEC) → reportar, nunca
@@ -60,6 +71,7 @@ sem chamar as ferramentas de escrita.
 ```markdown
 # Reconciliação Jira: <slug>
 
+- Projeção: <3 níveis pleno | 2 níveis válido | 2 níveis via standalone | inviável: <perna>>
 - Issue da SPEC: <KEY> (criada | vinculada | já existia)
 - Stories de FEAT: <N criadas>, <M já existiam> | n/a
 - Sub-tasks: <N criadas>, <M já existiam>
@@ -69,6 +81,6 @@ sem chamar as ferramentas de escrita.
 
 ## Limites
 
-Não cria PR nem faz merge/deploy; não altera SPEC/PLAN/TASK além dos campos `Jira:`
-(front-matter da SPEC, linha sob o heading da FEAT, closure da TASK); nunca bloqueia
-(best-effort — protocolo §0). Governança: decisões 4.22 e 4.27 de `decisions.md`.
+Não cria PR nem faz merge/deploy; não altera SPEC/PLAN/TASK além das linhas `**Jira**:`
+(cabeçalho da SPEC, sob o heading da FEAT, closure da TASK); nunca bloqueia
+(best-effort — protocolo §0). Governança: decisões 4.22, 4.27, 4.28 e 4.43 de `decisions.md`.

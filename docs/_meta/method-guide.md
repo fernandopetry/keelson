@@ -245,12 +245,13 @@ Rede de segurança da integração opcional com Jira (via **conector MCP Atlassi
 
 | Aspecto | Detalhe |
 |---|---|
-| Gera | Issues, Stories de FEAT (quando a SPEC declara FEATs e `issueType.feature` está preenchido), sub-tasks e tarefas isoladas (`issueType.standalone` — TASK avulsa ou transversal sem primária) no Jira (via conector); grava o campo `Jira:` na SPEC, sob os headings FEAT e nas TASKs |
+| Gera | Issues, Stories de FEAT (quando a SPEC declara FEATs e `issueType.feature` está preenchido), sub-tasks e tarefas isoladas (`issueType.standalone` — TASK avulsa ou transversal sem primária) no Jira (via conector); grava a linha `**Jira**:` no cabeçalho da SPEC, sob os headings FEAT e na closure das TASKs |
 | Atualiza | 1 linha no "Histórico recente" do `INDEX.md` (contrato da tabela "PLANs" intocado) |
 | Gate | — (best-effort; `jira.enabled:false` ou conector ausente → não faz nada) |
-| Lógica | Toda no `skills/_shared/jira-sync-protocol.md` (3º nível: `jira-sync-feat.md`) — o comando só orquestra |
+| Pré-condição | Rodar **de dentro do repo consumidor** (ficha no cwd). A Etapa 0 resolve a **viabilidade da projeção** antes de planejar — 3 níveis · 2 níveis · 2 níveis via `standalone` · inviável (com a perna que não aninha) |
+| Lógica | Toda no `skills/_shared/jira-sync-protocol.md` (régua de hierarquia: §7.0; 3º nível: `jira-sync-feat.md`) — o comando só orquestra |
 
-Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27 e 4.28 de `decisions.md`.
+Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27, 4.28 e 4.43 de `decisions.md`.
 
 ### 3.14 `/keelson:review` — code review de um diff avulso (sem artefato SDD)
 

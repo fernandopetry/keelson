@@ -248,7 +248,7 @@ Aplicar a **receita de atualização do INDEX** (`${CLAUDE_PLUGIN_ROOT}/docs/_me
 
 ## Etapa 7: sincronização com Jira (opcional)
 
-Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`) — ler §0-§5 + §7 + §8 + §10, mais `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` quando a projeção de 3 níveis está ativa (SPEC declara FEATs ∧ `issueType.feature` preenchido). Não leia o protocolo inteiro: localize os §§ com `grep -n "^## §"` e leia apenas os listados + os que eles referenciarem internamente. Criar uma **sub-task** por TASK e gravar a key no campo `Jira:` da closure de cada TASK (best-effort — §0).
+Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`) — ler §0-§5 + §7 + §8 + §10, mais `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` quando a projeção de 3 níveis está ativa (SPEC declara FEATs ∧ `issueType.feature` preenchido). Não leia o protocolo inteiro: localize os §§ com `grep -nE "^#+ §"` e leia apenas os listados + os que eles referenciarem internamente. Criar uma **sub-task** por TASK e gravar a key no campo `Jira:` da closure de cada TASK (best-effort — §0).
 
 ## Output final ao usuário
 
