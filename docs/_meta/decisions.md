@@ -769,6 +769,21 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.47 — `jira-guard`: o gancho de sync deixa de depender de o modelo lembrar
+
+**Problema**: diagnóstico definitivo do silêncio que as 4.43–4.46 vinham perseguindo, obtido lendo **uma sessão em execução** do consumidor (2026-07-26, `aav-backoffice`). Todas as hipóteses anteriores caíram por evidência direta: plugin carregado **0.27.0** (não versão velha), corpo do `/keelson:specify` **com** a Etapa 5.3, corpo do `/keelson:tasks` **com** a Etapa 7, ferramentas Atlassian **presentes no toolset** (nem deferred), `jira.enabled` lido — e **zero** chamadas reais a qualquer ferramenta do Jira, com a SPEC já criada. Nada estava quebrado: **o agente simplesmente não executou o passo**. É o comportamento esperado de um gancho que é a *última* sub-etapa, é *condicional* (`só quando jira.enabled`), custa reler a ficha + abrir um protocolo longo + fazer chamadas MCP, e roda no meio de um `/keelson:auto` cuja missão é entregar código. Texto mandando fazer já existia em dois comandos e foi ignorado; **nada verificava depois** — os gates têm validators, o sync não tinha nada. A 4.46 não cobre este caso: o rastro durável só é escrito por quem **entra** no protocolo; quem nunca o abre não deixa rastro nenhum — que é exatamente o que aconteceu durante semanas.
+
+**Decisão** — a correção precisa ser **mecânica**, no padrão que o keelson já usa para instrução que não sobrevive ao contexto (`wave-guard` 4.23, `agent-guard` 4.42): hook **`jira-guard`** (Stop), que bloqueia o encerramento do turno quando a ficha tem `jira.enabled: true` e há artefato SDD **sem key** do Jira. Regras que o definem:
+- **Escopo estreito por branch**: só artefatos **tocados nesta branch** (working tree + diff contra a base). Passivo histórico já mergeado não é problema deste turno e transformaria o guard em renudge perpétuo — no consumidor real seriam 7 SPECs e 70 TASKs legadas cutucando para sempre.
+- **Duas saídas, nunca uma só**: sincronizar **ou** registrar o pulo com a prova (§0/§10). O registro no INDEX **dispensa** o guard nas próximas vezes — é o par que fecha a 4.46: quem não abre o protocolo agora é obrigado a abrir ou a declarar por escrito por que não abriu.
+- **Moldura dos hooks do keelson**: bash 3.2, `set -euo pipefail`, fallback gracioso (sem `python3`, sem ficha, `enabled:false`, input não parseável → `exit 0`), `stop_hook_active` anti-loop e anti-renudge por fingerprint do conjunto pendente.
+
+**Custo assumido**: um hook a mais no Stop (7 no total) e o risco de falso positivo quando a SPEC nasce numa sessão e o sync acontece na seguinte — mitigado pelo fingerprint (cutuca 1×) e pela saída de registro. Validado com `bash -n` + **12 casos sintéticos** (bloqueio por SPEC, por TASK, anti-renudge, keys presentes, pulo registrado no INDEX, `enabled:false`, sem ficha, input lixo, cwd inexistente, `stop_hook_active`, `TASK-*-INDEX` ignorado, artefato antigo fora da branch). Dois bugs reais morreram no teste: o padrão `[ cond ] && exit 0` **aborta o script** sob `set -e` quando a condição é falsa (o `wave-guard` já usava `if/fi` por isso), e `git status --porcelain` **resume diretório novo numa linha** (`?? docs/slug/tasks/`) — sem `-uall`, as TASKs recém-criadas pelo `/keelson:tasks` passariam inteiras despercebidas.
+
+**Aplicação**: `hooks/jira-guard.sh` (novo), `hooks/hooks.json` (Stop), `README.md` (linha de hooks + Status). Capacidade nova → minor: plugin 0.27.0 → 0.28.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

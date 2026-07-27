@@ -204,7 +204,7 @@ keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
 ├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer…
 ├── skills/            # spec / plan / task validators + status + screen-verify
-├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard
+├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard, jira-guard
 ├── guidelines/
 │   ├── _meta/         # QUALITY-CHARTER.md · PROFILE-OUTLINE.md
 │   ├── core/          # language-agnostic doctrine (always active)
@@ -216,10 +216,16 @@ keelson/
 
 ## Status
 
-`0.27.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.28.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving. New in this
-release: a skipped Jira sync now has to **prove** the connector is unavailable and
+release: **`jira-guard`** (decision 4.47) — reading a live session proved the sync was
+never broken, just *skipped*: right plugin version, hooks present, connector in the
+toolset, and zero Jira calls with the SPEC already written. Text telling the model to
+sync existed in two commands and lost to a code-focused autonomous run, and nothing
+checked afterwards. Now a Stop hook blocks the turn when a branch has SDD artifacts
+without a Jira key, accepting either a sync or a written, proven reason. Also: a
+skipped Jira sync has to **prove** the connector is unavailable and
 **leaves a durable trace** in the slug's INDEX (decision 4.46) — the same ruler decision
 4.26 set for screen verification, after a consumer ran the whole cycle for weeks with
 `jira.enabled: true` and nothing ever reached the board, with no record of why. Also:
