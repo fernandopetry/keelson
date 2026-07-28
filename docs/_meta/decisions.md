@@ -784,6 +784,22 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.48 — `CHANGELOG.md`: o histórico de releases sai da prosa do README e vira artefato
+
+**Problema**: o keelson chegou a 28 versões sem changelog. O histórico existia em três formas, todas ruins para quem consome o plugin: (a) o `git log`, que registra *commits*, não releases — a fronteira de versão só é recuperável rodando `git log -p` no `plugin.json` (não há tags: `git tag -l` volta vazio); (b) a seção *Status* do `README.md`, que virou changelog acidental em prosa acumulativa ("New in this release… Previously… Recent…") — 45 linhas para 3 releases, sem data, sem versão nos parágrafos antigos e sempre reescrita por cima, de modo que o texto da versão anterior é **perdido**, não arquivado; (c) `decisions.md`, que é dono do *porquê* e não do *o quê mudou por versão* — a linha "plugin 0.27.0 → 0.28.0" no fim de cada decisão é o único mapeamento versão↔mudança, e não existe caminho inverso (dada a versão, o que entrou nela). Consequência prática: quem roda `/plugin update keelson` não tem como saber o que mudou, e a §*Status* pagava um custo crescente de manutenção para fazer mal um trabalho que um arquivo dedicado faz bem.
+
+**Decisão**:
+- **`CHANGELOG.md` na raiz**, no formato Keep a Changelog, **retroativo até a 0.1.0** — 38 entradas reconstruídas a partir dos bumps do `plugin.json`, das mensagens de commit e das decisões correspondentes. Detalhe proporcional à idade: releases recentes com os bullets completos, releases antigas em 1–3 linhas. Anomalias ficam registradas em vez de corrigidas (a **0.14.0 nunca existiu** — a leva 4.31–4.33 pulou de 0.13.0 para 0.15.0 acompanhando o Charter).
+- **Bump exige entrada** (dono da regra: `CLAUDE.md`, seção *Versionamento*): a mesma leva que sincroniza os 3 lugares da versão escreve a entrada. Cada uma traz `## [X.Y.Z] — AAAA-MM-DD`, linha de âncora (decisão · hash do commit de bump · versão do Charter quando mudou) e bullets sob `Added`/`Changed`/`Fixed`/`Removed`.
+- **Idioma inglês**, como o `README.md`: o CHANGELOG é face pública do pacote, não doutrina interna (que segue em português). O bullet do `CLAUDE.md` diz isso explicitamente para não virar dúvida a cada release.
+- **Divisão de donos**: o CHANGELOG diz *o que mudou por versão*, em linguagem de efeito no consumidor; `decisions.md` continua dono do *porquê*, e cada entrada referencia a §4.x em vez de repetir o argumento (decisão 4.20). O *Status* do README encolhe para a manchete da versão corrente + ponteiro, e **não volta a acumular prosa histórica**.
+
+**Custo assumido**: mais um artefato a manter por release, mitigado pelo tamanho (a entrada é derivável das decisões da leva). A regra é **textual, não mecânica** — no padrão das 4.23/4.42/4.47, um `changelog-guard` (Stop, bloqueando quando o diff da branch altera `version` no `plugin.json` sem tocar o `CHANGELOG.md`) é a evolução natural se o esquecimento se repetir; fica de fora agora porque a leva de release é um ato deliberado do Diretor, não um passo condicional no meio de uma corrida autônoma — o perfil de risco que motivou aqueles hooks.
+
+**Aplicação**: `CHANGELOG.md` (novo), `CLAUDE.md` (seção *Versionamento*), `README.md` (*Status* enxugado + ponteiro). Doutrina nova → minor: plugin 0.28.0 → 0.29.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

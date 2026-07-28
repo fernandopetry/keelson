@@ -216,48 +216,27 @@ keelson/
 
 ## Status
 
-`0.28.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.29.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
-drafts, and the profile generator and non-PHP profiles are evolving. New in this
-release: **`jira-guard`** (decision 4.47) — reading a live session proved the sync was
-never broken, just *skipped*: right plugin version, hooks present, connector in the
-toolset, and zero Jira calls with the SPEC already written. Text telling the model to
-sync existed in two commands and lost to a code-focused autonomous run, and nothing
-checked afterwards. Now a Stop hook blocks the turn when a branch has SDD artifacts
-without a Jira key, accepting either a sync or a written, proven reason. Also: a
-skipped Jira sync has to **prove** the connector is unavailable and
-**leaves a durable trace** in the slug's INDEX (decision 4.46) — the same ruler decision
-4.26 set for screen verification, after a consumer ran the whole cycle for weeks with
-`jira.enabled: true` and nothing ever reached the board, with no record of why. Also:
-the Jira sync **resolves feasibility before it creates anything** and now
-degrades with the right semantics (decisions 4.43–4.44) — the hierarchy-adjacency ruler
-lives in the core protocol, and an epic-level SPEC type over sub-task TASKs with no
-feature layer projects a **Story mirroring the SPEC** (a SPEC declaring no features *is*
-a single feature, so QA keeps a flow-level card) before falling back to standalone cards
-or stopping with a clear diagnosis — no more orphan Epics and rejected sub-tasks. Plus a
-duplicate probe before bulk creation, a **backfill warning** when a finished slug would
-fill the board with "to do" cards, and key lookup that names the real place (the SPEC's
-`**Jira**:` header line — there is no YAML front matter).
-Previously: a **coherence sweep** (decision 4.41) aligning every living rule with the team
-model — the PO acceptance report now gates the delivery *before* commit and push,
-status-promotion rules carry explicit mode clauses (po/main session in the autonomous
-cycle, human otherwise), and the consumer `CLAUDE.md` block now teaches the autonomous
-default with the Director–PO contract (**re-run `/keelson:init`** to refresh the
-block). All on top of the **team model** (decisions 4.37–4.40) — the human
-becomes the Director issuing a durable BRIEF; a new `po` agent owns each demand
-(validates SPEC and delivery against the brief, produces the acceptance report,
-escalates only by exception with proposal + default), lateral team signals get named
-routes (plan-gap developer→tech lead, pre-code verifiability qa→po, out-of-scope
-findings), each wave closes with a team-language bulletin addressed to the Director,
-epic-sized requests get their own layer (`/keelson:specify-epic` with the new `pm`
-agent decomposing a big brief into prioritized independent demands), and the agents
-now carry real-life role ids: `developer`, `code-reviewer`, `qa`, `security-engineer`,
-`product-analyst`, `agile-coach`, `staff-engineer`. Recent: `/keelson:review` — a standalone code review for code that arrived
-without an SDD artifact, with the 1–7 gate ruleset single-owned by
-`guidelines/core/CODE-REVIEW.md`; and an instruction-compression pass (runtime
-contracts in `docs/_meta/conventions/`, descriptions capped by `desc-guard`). The
-optional Jira integration, multi-realm screen verification and the optional feature
-layer (`FEAT-*`) remain recent. Feedback and profile contributions welcome.
+drafts, and the profile generator and non-PHP profiles are evolving.
+
+New in this release: a **[CHANGELOG](CHANGELOG.md)** (decision 4.48), backfilled to
+`0.1.0` — the release history used to live in this section's ever-rewritten prose and in
+`git log`, so `/plugin update keelson` told you nothing about what changed. From now on a
+version bump is incomplete without its entry, and this section keeps only the headline.
+
+Recent releases, in short: **`jira-guard`** and the Jira reliability batch (decisions
+4.43–4.47) — feasibility resolved before anything is created, a Story mirroring a
+FEAT-less SPEC so QA keeps a flow-level card, required-field and duplicate pre-checks, a
+backfill warning, proven connector unavailability with a durable trace in the slug INDEX,
+and a Stop hook that blocks the turn when a branch carries SDD artifacts without a Jira
+key. Before that, the **team model** (decisions 4.37–4.42): the human becomes the Director
+issuing a durable BRIEF, a `po` agent owns each demand, a `pm` agent decomposes epics via
+`/keelson:specify-epic`, lateral signals get named routes, and the agents carry real-life
+role ids (`developer`, `code-reviewer`, `qa`, `security-engineer`, `product-analyst`,
+`agile-coach`, `staff-engineer`) — **re-run `/keelson:init`** to refresh the consumer
+block. Full history in the [changelog](CHANGELOG.md); the reasoning behind each change in
+`docs/_meta/decisions.md`. Feedback and profile contributions welcome.
 
 ## Author & license
 

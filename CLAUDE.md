@@ -11,6 +11,13 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   seção *Status* do `README.md`.
 - Regra (0.x): capacidade nova ou quebra (comando novo, rename, doutrina nova) → **minor**;
   correção/ajuste fino → **patch**. Bump uma vez por leva de release, não por commit.
+- **Bump sem entrada no `CHANGELOG.md` é release incompleto** (decisão 4.48): a mesma leva
+  que mexe nos 3 lugares escreve a entrada. Formato: `## [X.Y.Z] — AAAA-MM-DD`, linha de
+  âncora (`Decisão 4.x · <hash do commit de bump>`; `Charter A.B.C` quando ele mudou) e
+  bullets sob `Added` / `Changed` / `Fixed` / `Removed`, em **inglês** (é a face pública do
+  pacote, como o `README.md`). Escreva pelo efeito no consumidor — o *porquê* fica na
+  decisão, a uma referência de distância. O `Status` do README traz só a manchete atual e
+  aponta para o CHANGELOG; não volta a acumular prosa histórica.
 - **Charter é versionado à parte** (`guidelines/_meta/QUALITY-CHARTER.md`): só muda quando
   os artigos mudam; cada perfil referencia a versão no frontmatter `charter:`.
 
