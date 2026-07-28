@@ -18,7 +18,7 @@
     "security": true,
     "review": true,
     "reviewThreshold": { "files": 2, "lines": 30 },
-    "screenVerify": { "enabled": false, "method": null }
+    "screenVerify": { "enabled": false, "method": null, "artifactsDir": "thoughts/screen-verify" }
   },
   "docsRoot": "docs",
   "jira": {

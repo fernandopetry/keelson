@@ -17,6 +17,42 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.30.0] — 2026-07-27
+
+Decision 4.49
+
+### Changed — **breaking for screen verification**
+- **Screen verification now drives Playwright through MCP**, replacing the embedded browser
+  as the single engine. The skill keeps its name and `method: "skill:screen-verify"` keeps
+  working — no consumer ficha breaks — but the gate now needs the `@playwright/mcp` server.
+  - **Headless by default**: no window steals focus, and the gate works on a machine with no
+    display. The mode lives only in the MCP server config (`.mcp.json` or personal scope) —
+    deliberately not mirrored into the ficha, since the server is what actually controls it.
+  - **Realm isolation actually isolates**: one realm at a time with `browser_close` between
+    them (tabs in one context share cookies, so the old "one tab per realm" rule guaranteed
+    nothing). Cross-realm negative items stay inside the origin session.
+  - The Playwright-as-a-library route is recorded as **rejected** for the default path (it
+    would force Node onto a PHP project) but stays declarable in `gates.screenVerify.method`.
+
+### Added
+- **`/keelson:init` step 4.4** guarantees the browser runtime — proves the tools respond
+  (MCP tools arrive deferred; not seeing them is not evidence), checks Node ≥ 18, writes the
+  `.mcp.json` block after showing it (or hands you the `claude mcp add` command for personal
+  scope), and offers to install the browser binary, always saying what it installed and
+  where. Missing Node is reported as a pending item, never worked around.
+- **Screen artifacts on disk**: screenshots and console/network dumps go to
+  `gates.screenVerify.artifactsDir` (default `thoughts/screen-verify/<slug>/`, gitignored),
+  with relative, speaking filenames. The artifact is never the proof — durable evidence
+  stays textual in the HANDOFF and the slug INDEX.
+- **Named unavailability diagnosis** (`handoff-protocol.md` §8.1): the probe distinguishes
+  **missing browser runtime** × **missing credential** × **app down**, each with the command
+  that fixes it. `qa` reports `causa_indisponibilidade`, `implement` rejects a generic cause
+  when the probe knew which one it was, and no engine is silently swapped in as a fallback.
+- README section covering requirements, macOS/Linux setup, the config block, artifacts, and
+  the opt-in capabilities (`--caps devtools` for trace/video, `--allowed-origins`).
+
+---
+
 ## [0.29.0] — 2026-07-27
 
 Charter `0.5.1` · decision 4.48

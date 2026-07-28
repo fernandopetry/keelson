@@ -9,7 +9,17 @@ Quando o ciclo roda num ambiente **sem acesso a testes de tela** — worktree se
 
 ### 8.1 Ciclo de vida
 
-1. **Detecção**: na rota formal, o `qa` reporta `PARCIAL` com o bloco `handoff_seed` (o roteiro do que ele não conseguiu exercitar). Na rota inline (bug/refactor), a auto-revisão do gate pela main session detecta o mesmo. **Indisponibilidade de ambiente é provada, não presumida** (decisão 4.26): antes de declarar, roda-se uma **sondagem barata** — o `keelson.local.json` existe e tem os dados do(s) realm(s) envolvido(s)? a `baseUrl` do realm responde (ou a app sobe pelo método do projeto)? a sessão tem ferramenta de tela? — e a **evidência da sondagem que falhou** (o que foi tentado, o que retornou) acompanha a seed e entra no front-matter do handoff (`sonda:`). Projeto multi-realm: sonda **por realm** do roteiro — um realm de pé e outro não gera pendência só para o indisponível. Declarar "ambiente sem tela" sem sondagem registrada é usar o handoff como atalho — proibido.
+1. **Detecção**: na rota formal, o `qa` reporta `PARCIAL` com o bloco `handoff_seed` (o roteiro do que ele não conseguiu exercitar). Na rota inline (bug/refactor), a auto-revisão do gate pela main session detecta o mesmo. **Indisponibilidade de ambiente é provada, não presumida** (decisão 4.26): antes de declarar, roda-se uma **sondagem barata**, e a **evidência do que falhou** (o que foi tentado, o que retornou) acompanha a seed e entra no front-matter do handoff (`sonda:`). Projeto multi-realm: sonda **por realm** do roteiro — um realm de pé e outro não gera pendência só para o indisponível. Declarar "ambiente sem tela" sem sondagem registrada é usar o handoff como atalho — proibido.
+
+**A causa se nomeia** (decisão 4.49): "ambiente sem tela" é diagnóstico genérico demais para quem vai ler isso depois — manda o desenvolvedor investigar do zero o que a sondagem já sabia. Cada causa tem sua saída, e é ela que vai no `sonda:`:
+
+| A sondagem checa | Falhou → causa | O que o registro tem que dizer |
+|---|---|---|
+| Ferramentas `mcp__playwright__*` carregadas e respondendo (deferred: carregue antes de concluir) | **runtime de browser ausente** | o comando que resolve — `claude mcp add playwright npx @playwright/mcp@latest -- --headless` e/ou `npx playwright install chromium` (Linux: `--with-deps`); Node < 18 é sub-causa e se diz por extenso |
+| `keelson.local.json` existe e tem o realm alvo preenchido (sem placeholder) | **credencial ausente** | qual realm, qual campo — e que o caminho é `/keelson:init` ou preencher o arquivo; **nunca** chutar credencial |
+| `baseUrl` do realm responde (ex.: `curl -sI`), ou a app sobe pelo método do projeto | **app fora do ar** | o que foi tentado e o retorno (código HTTP, erro de conexão) |
+
+Uma causa não encobre a outra: app no ar com runtime ausente é `runtime de browser ausente`, não "ambiente sem tela". E **runtime ausente não vira fallback silencioso** para outro browser — o método é único por decisão de projeto (4.49); trocar de motor por conta própria produz evidência que ninguém consegue reproduzir.
 2. **Geração** (preparação da Entrega): a main session consolida as seeds e cria `<docsRoot>/<slug>/handoffs/HANDOFF-<id>.md` — `<id>` = `PLAN-MMM` na rota formal; `<yyyy-mm-dd>-<descrição-curta>` na inline. Um doc por entrega (consolida todas as tasks do PLAN). Registra **risco ativo** no INDEX do slug: `Verificação de tela pendente — HANDOFF-<id>`. Domínio **sem slug keelson** → não cria arquivo: o roteiro completo vai inline no prompt do report da Entrega.
 3. **Entrega**: o handoff entra no commit da branch e o report final traz a seção **"Verificação pendente (handoff)"** com o prompt copy-paste. A entrega é declarada **parcial** — nunca "totalmente verificada" — enquanto houver handoff `Pendente`.
 4. **Fechamento** (num ambiente com tela): o agente que recebe o prompt faz checkout da branch, lê o handoff, exercita cada item com a rotina de verificação de tela do projeto, registra a evidência no próprio doc, corrige divergências na própria branch (protocolo inline) e faz a closure — `status: Concluído`, risco removido do INDEX + linha no Histórico recente, commit `chore(<slug>): close verification handoff HANDOFF-<id>`, push. Merge e deploy continuam humanos.
@@ -27,8 +37,8 @@ status: Pendente               # Pendente | Concluído
 criado: <ISO 8601>
 origem: PLAN-MMM | inline
 commits: [<SHAs curtos>]
-motivo: <ambiente sem acesso a testes de tela — worktree | nuvem | containers down>
-sonda: <evidência da sondagem de disponibilidade que falhou, por realm — o que foi tentado e o que retornou>
+motivo: <causa nomeada — runtime_browser | credencial | app_fora_do_ar (§8.1)>
+sonda: <evidência da sondagem que falhou, por realm — o que foi tentado, o que retornou e a saída que resolve>
 ---
 
 # Handoff de verificação de tela — <título curto>

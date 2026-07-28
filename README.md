@@ -132,6 +132,81 @@ below** the project's and writes only the delta — never from a higher version,
 recommendations wouldn't exist in your runtime. Profiles you refine can be
 contributed back to the plugin — that's how it grows, by curation, not by empty stubs.
 
+## Screen verification (Playwright MCP)
+
+When `gates.screenVerify` is on, the behavior gate isn't satisfied by tests alone: the
+`screen-verify` skill logs into your **local** app and exercises the screen for real. It
+drives the browser through the **Playwright MCP** server — one engine, one place to
+maintain (decision 4.49). It runs **headless by default**: no window steals your focus, and
+the same gate works in a worktree or on a machine with no display.
+
+### What it needs
+
+| Requirement | Notes |
+|---|---|
+| **Node.js ≥ 18** | Required by `@playwright/mcp`. keelson never installs Node for you — a missing runtime is reported as a pending item, not worked around. |
+| **The MCP server** | `@playwright/mcp`, configured either in the project's `.mcp.json` or in your personal scope. |
+| **A browser binary** | Downloaded into a **per-user cache** (`~/Library/Caches/ms-playwright` on macOS, `~/.cache/ms-playwright` on Linux) — outside the repository, disposable. |
+
+macOS and Linux both work. On Linux the browsers need system libraries, so install with
+`--with-deps` (it uses `apt`, so Ubuntu/Debian are the supported path; other distros need
+the libraries installed by hand, or the official Playwright Docker image). Headless needs
+no Xvfb.
+
+### Setup
+
+`/keelson:init` does this for you and **tells you what it did** — but never in silence.
+It asks before writing to a versioned file, and offers two scopes:
+
+**Project scope** (default) — a `mcpServers.playwright` block merged into `.mcp.json`,
+versioned, so the whole team inherits the same configuration:
+
+```jsonc
+{ "mcpServers": { "playwright": { "command": "npx", "args": [
+    "@playwright/mcp@latest", "--headless",
+    "--output-dir", "thoughts/screen-verify",   // = gates.screenVerify.artifactsDir
+    "--isolated"                                 // in-memory profile: every run starts clean
+] } } }
+```
+
+**Personal scope** — nothing touches the repository:
+
+```bash
+claude mcp add playwright npx @playwright/mcp@latest -- --headless --output-dir thoughts/screen-verify
+```
+
+Then the browser binary, in either case:
+
+```bash
+npx playwright install chromium
+```
+
+Drop `--headless` from the args when you want to watch the run in a real window. The mode
+lives **only** in the server config — deliberately *not* mirrored into the ficha, because a
+second copy of a setting the server actually owns is a field that lies (the lesson of
+decision 4.43). Re-run `/keelson:init` to change it.
+
+### Artifacts
+
+Screenshots and console/network dumps are written under
+`gates.screenVerify.artifactsDir` (default `thoughts/screen-verify/<slug>/`), which is the
+server's `--output-dir`. `thoughts/` is gitignored — these files are for the developer
+looking at the problem now, and **never the proof**: the durable evidence stays textual, in
+the HANDOFF and the slug INDEX, so a fresh clone doesn't lose the gate.
+
+Tracing and video are available behind `--caps devtools`, and origin allowlisting behind
+`--allowed-origins`. Both are opt-in: extra capabilities add tools to every session's
+context, and blocking external origins makes fonts and CDN assets vanish in a way that
+reads exactly like a CSS bug.
+
+### When it can't run
+
+The gate never pretends. Unavailability is **proven, then named** — `runtime de browser
+ausente`, `credencial ausente` or `app fora do ar` — and the reason travels into the
+verification HANDOFF along with the exact command that fixes it. A missing browser runtime
+is never silently swapped for another engine: evidence nobody can reproduce is worse than
+an honest pending item.
+
 ## Jira integration (optional)
 
 If your team runs work on Jira, keelson can mirror the SDD cycle onto it — a SPEC becomes
@@ -216,14 +291,19 @@ keelson/
 
 ## Status
 
-`0.29.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.30.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a **[CHANGELOG](CHANGELOG.md)** (decision 4.48), backfilled to
-`0.1.0` — the release history used to live in this section's ever-rewritten prose and in
-`git log`, so `/plugin update keelson` told you nothing about what changed. From now on a
-version bump is incomplete without its entry, and this section keeps only the headline.
+New in this release: **screen verification moves to Playwright MCP** (decision 4.49) —
+one engine, **headless by default**, artifacts written to `thoughts/screen-verify/<slug>/`,
+and unavailability that names its cause instead of shrugging "no screen available". See
+[Screen verification](#screen-verification-playwright-mcp) for requirements and setup;
+`/keelson:init` guarantees the runtime and tells you exactly what it did.
+Previously: a **[CHANGELOG](CHANGELOG.md)** (decision 4.48), backfilled to `0.1.0` — the
+release history used to live in this section's ever-rewritten prose and in `git log`, so
+`/plugin update keelson` told you nothing about what changed. A version bump is now
+incomplete without its entry, and this section keeps only the headline.
 
 Recent releases, in short: **`jira-guard`** and the Jira reliability batch (decisions
 4.43–4.47) — feasibility resolved before anything is created, a Story mirroring a

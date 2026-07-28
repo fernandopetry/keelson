@@ -42,7 +42,8 @@ Inspecione a raiz do projeto:
 
 Para cada valor que **não** inferiu com confiança, pergunte com opções fechadas e o efeito explícito. Exemplos:
 - *"Não encontrei frontend — confirma que é API-only?"* → **desliga** `gates.screenVerify` e o perfil de frontend.
-- **Se há frontend** — *"Como este projeto verifica tela? Detectei a skill `<x>` / Playwright / preview MCP / outro"* → define `gates.screenVerify.method`. A skill embarcada **`screen-verify`** dirige o browser lendo os dados de acesso do `keelson.local.json` (método `skill:screen-verify`); se o projeto tem um método próprio, registre-o.
+- **Se há frontend** — *"Como este projeto verifica tela? A skill embarcada `screen-verify` (Playwright MCP) / um método próprio do projeto"* → define `gates.screenVerify.method`. A skill embarcada **`screen-verify`** dirige o browser via **Playwright MCP** lendo os dados de acesso do `keelson.local.json` (método `skill:screen-verify`, o default); método próprio do projeto → registre-o e **pule a Etapa 4.4**.
+- **Se o método é a skill embarcada** — *"Rodar o browser em headless (padrão, sem janela) ou com janela visível?"* → vira a flag `--headless` da Etapa 4.4. Headless é o default; janela visível só quando o humano quer acompanhar a verificação com os próprios olhos.
 - **Se há frontend** — *"Quantas áreas logadas (realms) a aplicação tem?"* — ex.: só a admin; ou admin **+** portal de usuários finais, com URL e usuário distintos. Cada realm vira uma entrada em `screenVerify.realms` do `keelson.local.json` (Etapa 4.5), com `description` dizendo do que se trata o acesso, `baseUrl`, rota de login e usuário de dev próprios.
 - *"Detectei o script `test` — usar `<comando>` como `quality.test`?"*
 - *"O código de backend fica em `<path>`?"*
@@ -64,9 +65,35 @@ Perfis gerados nascem **pendentes de revisão**: afirmações não confirmadas l
 
 Parta de `${CLAUDE_PLUGIN_ROOT}/templates/keelson.config.example.json` e preencha com os valores resolvidos: `profile` (backend/frontend com `lang`+`version`+`file` da Etapa 3), `codePaths`, `sensitiveGlobs`, `quality`, `docsRoot`, e `gates`:
 - `security` (bool);
-- `screenVerify` = objeto `{ "enabled": <há frontend?>, "method": <o da Etapa 2, ex. "skill:screen-verify"> }`. (Aceita também o atalho booleano `true`/`false` = `{enabled, method:null}`.)
+- `screenVerify` = objeto `{ "enabled": <há frontend?>, "method": <o da Etapa 2, ex. "skill:screen-verify">, "artifactsDir": <default "thoughts/screen-verify"> }`. (Aceita também o atalho booleano `true`/`false` = `{enabled, method:null}`.) **O modo do browser NÃO vive aqui** — headless é flag do servidor MCP (Etapa 4.4), que é quem de fato controla; duas fontes de verdade divergiriam em silêncio.
 
-Grave na raiz do projeto. **Se a ficha já existe** → Regra de merge; específico deste passo: migrar um `screenVerify` booleano antigo para o objeto `{enabled, method}` mantendo o valor.
+Grave na raiz do projeto. **Se a ficha já existe** → Regra de merge; específico deste passo: migrar um `screenVerify` booleano antigo para o objeto `{enabled, method, artifactsDir}` mantendo o valor; ficha sem `artifactsDir` → acrescentar o default.
+
+## Etapa 4.4 — Runtime de browser para a verificação de tela (só se `method: skill:screen-verify`)
+
+A skill `screen-verify` dirige o browser pelo **Playwright MCP** (decisão 4.49). Sem esse servidor não há gate de tela — e o modo de falha caro é o desenvolvedor descobrir isso semanas depois, no meio de uma entrega. Então **garanta o runtime aqui, nunca em silêncio**:
+
+1. **Provar antes de concluir** (mesma régua da 4.26): as ferramentas MCP chegam **deferred** — "não vi `mcp__playwright__*` na lista" **não é** evidência de ausência. Carregue-as e só então conclua. Presentes → registre no relatório qual servidor respondeu e siga para o passo 4.
+2. **Pré-requisito**: `node --version` ≥ 18 (o pacote exige). Ausente ou abaixo → **não instale Node**: reporte como pendência com o que falta, deixe `screenVerify.enabled` como está e diga que o gate de tela fica indisponível até resolver.
+3. **Configurar o servidor** — pergunte qual escopo (opções fechadas, com o efeito):
+   - **Projeto** (default, recomendado): bloco `mcpServers.playwright` no `.mcp.json` da raiz — **arquivo versionado**, o time inteiro herda a mesma configuração. É mudança em arquivo do projeto: mostre o bloco que vai escrever **antes** de escrever e aplique a **Regra de merge** (outros servidores no arquivo são preservados; um `playwright` já existente **não** é sobrescrito — proponha o ajuste e pergunte).
+   - **Pessoal**: entregue o comando para o humano rodar, sem tocar no repositório —
+     `claude mcp add playwright npx @playwright/mcp@latest -- --headless --output-dir <artifactsDir>`.
+
+   Bloco canônico do `.mcp.json` (omita `--headless` se o humano escolheu janela visível na Etapa 2):
+
+   ```jsonc
+   { "mcpServers": { "playwright": { "command": "npx", "args": [
+       "@playwright/mcp@latest", "--headless",
+       "--output-dir", "thoughts/screen-verify",   // = gates.screenVerify.artifactsDir
+       "--isolated"                                 // perfil em memória: cada run começa limpo
+   ] } } }
+   ```
+
+   `--isolated` é o que torna honesto o isolamento por realm da skill (`browser_close` entre realms descarta a sessão de verdade). **Não** adicione `--allowed-origins` por conta própria: bloquear origem externa faz fonte/CDN sumirem e imita bug de UI — é endurecimento opcional, decisão do humano. Trace e vídeo (`--caps devtools`) também são opt-in: só ofereça se o humano quiser artefato de investigação, porque cada capability acrescenta ferramentas ao contexto de toda sessão.
+4. **Binários do navegador**: o Playwright baixa o browser num cache **do usuário** (`~/Library/Caches/ms-playwright` no macOS, `~/.cache/ms-playwright` no Linux) — fora do repositório, descartável. Instalar isso é seguro; **instalar em silêncio, não**. Ofereça rodar `npx playwright install chromium` (Linux: `npx playwright install --with-deps chromium`, que usa `apt` — em distro não-Debian, instrua as libs manualmente) e **diga o que foi instalado e onde**. Recusa do humano → registre a pendência com o comando exato no relatório.
+
+Idempotente: servidor já configurado e respondendo → **não reescreva nada**, só confirme no relatório.
 
 ## Etapa 4.5 — Dados de acesso locais para verificação de tela (só se `screenVerify.enabled`)
 
@@ -102,7 +129,7 @@ Insira o conteúdo de `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.keelson-block.md` 
 
 ## Etapa 5.5 — Garantir `thoughts/` fora do versionamento
 
-Memos de exploração e backups do keelson vivem em `thoughts/local/` no projeto (nunca versionados). Garanta que o `.gitignore` do projeto contém `thoughts/` **e** `keelson.local.json` (dados de acesso locais — credenciais de dev, nunca versionadas) — adicione as linhas que faltarem. **Atenção**: só o `keelson.local.json` fica de fora; o `keelson.local.example.json` **é versionado** (não o adicione ao `.gitignore`).
+Memos de exploração e backups do keelson vivem em `thoughts/local/`; os artefatos da verificação de tela (screenshot, dump de console/rede), em `thoughts/screen-verify/<slug>/` — nada disso é versionado. Garanta que o `.gitignore` do projeto contém `thoughts/` **e** `keelson.local.json` (dados de acesso locais — credenciais de dev, nunca versionadas) — adicione as linhas que faltarem. A linha `thoughts/` já cobre a pasta de artefatos; `artifactsDir` apontado para **fora** de `thoughts/` exige a sua própria linha no `.gitignore` (artefato de tela nunca entra no git). **Atenção**: só o `keelson.local.json` fica de fora; o `keelson.local.example.json` **é versionado** (não o adicione ao `.gitignore`).
 
 ## Etapa 6 — Self-check (falsificável, não confie na configuração)
 
@@ -110,7 +137,8 @@ Prove que a ficha funciona:
 - `quality.test`/`quality.lint` declarados **existem/rodam** (execução rápida ou `--help`/dry-run);
 - os `codePaths` existem no disco;
 - os guidelines do perfil ativo resolvem: cada `profile.<role>.file` da ficha aponta para um arquivo existente (regra de resolução da Etapa 3); perfil com `reviewed: false` no front-matter vira instrução de revisão no relatório; perfil cujo `charter:` no front-matter é **menor** que a versão atual do `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md` vira aviso de re-derivação/revisão no relatório;
-- se `screenVerify.enabled`: `keelson.local.example.json` existe e está **versionado** (sem senha real); `keelson.local.json` existe **e** está no `.gitignore` (confirme que **não** aparece em `git status`/`git ls-files`); campos ainda em placeholder (`<...>`) viram instrução de preenchimento no relatório (com o aviso dev-only).
+- se `screenVerify.enabled`: `keelson.local.example.json` existe e está **versionado** (sem senha real); `keelson.local.json` existe **e** está no `.gitignore` (confirme que **não** aparece em `git status`/`git ls-files`); campos ainda em placeholder (`<...>`) viram instrução de preenchimento no relatório (com o aviso dev-only); o `artifactsDir` está coberto pelo `.gitignore`.
+- se `method: skill:screen-verify`: o **runtime de browser responde** — ferramentas `mcp__playwright__*` carregadas (deferred não aparecem até serem buscadas) e uma navegação de prova barata (`browser_navigate` para `about:blank`, ou a `baseUrl` do realm default quando a app está de pé). Falhou → **não** é `✓` silencioso nem `✗` genérico: o relatório nomeia a causa (servidor não configurado · pacote não baixado · binário do navegador ausente · Node < 18) **e o comando exato** que resolve. O modo em vigor (headless × janela) também vai no relatório, lido do `.mcp.json`/escopo configurado — o humano precisa saber em que modo o gate vai rodar sem ter que adivinhar.
 - se `jira.enabled`: `jira.projectKey` e os IDs de `issueType.spec`/`issueType.task` estão preenchidos; se `issueType.feature`/`issueType.standalone` estão preenchidos, os IDs existem no projeto e **não** são `subtask:true`; re-rodar o **guardrail de hierarquia** da Etapa 4.6 (perna não-adjacente → aviso com a sugestão, não `✗`); se `jira.mapFile` aponta um caminho, o arquivo existe. Conector indisponível não é `✗` (best-effort) — vira aviso "sync Jira pulado até autorizar o conector", **com a evidência da prova** (protocolo §0: carregar as ferramentas — deferred não aparecem na lista até serem buscadas — e uma chamada de prova; "não vi as ferramentas" não é evidência).
 Reporte cada item como ✓/✗. `✗` vira ação no relatório, não é silenciado.
 

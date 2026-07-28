@@ -207,7 +207,7 @@ Conduz `specify → plan → tasks → implement → entrega` de ponta a ponta *
 
 Rigor proporcional preservado (trivial → direto; bug/refactor → inline; feature → ciclo completo). **Entrega**: branch + commit + push, **sem PR**. Merge e deploy continuam humanos. Governança: decisão 4.10 de `decisions.md`.
 
-**Ambiente sem tela** (worktree/nuvem, ou `gates.screenVerify` sem app disponível): o gate 9 não exercitável gera **handoff de verificação** — doc com roteiro + prompt copy-paste no report para um agente com tela fechar a verificação (ver §8). A entrega é declarada parcial até lá.
+**Ambiente sem tela** (worktree/nuvem, ou `gates.screenVerify` sem app disponível): o gate 9 não exercitável gera **handoff de verificação** — doc com roteiro + prompt copy-paste no report para um agente com tela fechar a verificação (ver §8). A entrega é declarada parcial até lá. A verificação em si roda pela skill `screen-verify` (Playwright MCP, headless por padrão — decisão 4.49), e a indisponibilidade que gera o handoff é **provada e nomeada** por causa; a régua é do §8.
 
 ### 3.10 `/keelson:guided` — ciclo com checkpoints (opt-in pausado)
 
