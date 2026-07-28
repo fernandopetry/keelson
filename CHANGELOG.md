@@ -17,6 +17,35 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.33.0] — 2026-07-28
+
+Decision 4.54
+
+### Added
+- **`PROPOSTA_PLUGIN` findings now come with a message written for the plugin
+  maintainer.** The `agile-coach` already did the hard part — detecting process errors,
+  deduplicating against the ledger, picking the rule's owner, computing the line budget,
+  even rejecting proposals that were project lessons — but its output was a YAML block
+  for the session that invoked it, illegible to a maintainer who wasn't there; proposals
+  died in a log file inside a repository the maintainer never reads. The agent now
+  composes a second output per proposal, `mensagem_mantenedor`: the concrete scene
+  (stack, active gates, the command that ran, expected vs. happened, and the real cost
+  of the failure — a retry, a review round, a gate that passed vacuously — which only
+  the end of the cycle knows), the diagnosis and the minimal diff — never the
+  generalized rule, which is the maintainer's job (generalizing from a sample of one is
+  not the agent's). Each finding is explicitly addressed: **local** (fixed in the
+  project, mentioned only as context) × **process** (the proposal itself) × the easy-to-
+  miss third case — a local cause that reveals a question `/keelson:init` never asked,
+  reported to both destinations. If an agent caused the failure, the first line says so
+  before arguing why the design made it silent.
+- **`/keelson:auto`'s delivery report gains a conditional section (item 7.5)**: with at
+  least one `PROPOSTA_PLUGIN` in the cycle, the maintainer message(s) appear as a
+  copy-paste block, ready for the Director to forward — the same mechanism as the
+  handoff prompt, pointed at another recipient. No proposal → no section; it never
+  blocks, and nobody invents a report to fill a form.
+
+---
+
 ## [0.32.0] — 2026-07-28
 
 Decision 4.53

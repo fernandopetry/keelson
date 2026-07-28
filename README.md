@@ -327,24 +327,28 @@ keelson/
 
 ## Status
 
-`0.32.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.33.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the Jira sync can no longer end incoherent in silence**
-(decision 4.53) — `/keelson:auto`'s delivery step now runs the idempotent reconciliation
-(the per-command hooks become three attempts *plus a net*, not three independent chances
-to fail silently), the delivery report carries a mandatory tracker-state line (best-effort
-never blocks, but it always reports), the method pins the end-of-cycle tracker state
-(sub-tasks Done, Story waiting for the human, Epic untouched), and a map file whose prose
-contradicts the ficha gets flagged — the ficha wins.
+New in this release: **plugin proposals learn to speak to the maintainer**
+(decision 4.54) — when a cycle in a consumer project produces a `PROPOSTA_PLUGIN`, the
+`agile-coach` now also writes the message for whoever maintains the plugin and wasn't
+there: the concrete scene (reconstructible without repo access), the real cost of the
+failure, the diagnosis and the minimal diff — never the generalized rule, which stays
+the maintainer's job. Each finding is addressed local × process × "a question `init`
+never asked", and `/keelson:auto`'s delivery report surfaces the message as a
+copy-paste block, ready to forward. No proposal → no section.
+Previously: **the Jira sync can no longer end incoherent in silence**
+(decision 4.53) — `/keelson:auto`'s delivery step runs the idempotent reconciliation
+(the per-command hooks become three attempts *plus a net*), the delivery report carries
+a mandatory tracker-state line (best-effort never blocks, but it always reports), and
+the method pins the end-of-cycle tracker state.
 Previously: **the TASK generator learns two rulers from the first full real
-cycle** (decision 4.52) — gate-1 verification pairs must be *falsifiable* ("what state
-makes this command FAIL?"; absence-shaped expectations need an explicit anchor, e.g.
-`git diff --name-only main...HEAD`, never the bare form that returns empty after commit),
-and the **gate-9 walkthrough script is fixed with the TASK, before any code**: typeable
-URLs plus realm, a concrete subject with its credential, preconditions with a recipe,
-one step per AC, and previous handoffs as required reading.
+cycle** (decision 4.52) — gate-1 verification pairs must be *falsifiable*, and the
+**gate-9 walkthrough script is fixed with the TASK, before any code**: typeable URLs
+plus realm, a concrete subject, preconditions with a recipe, one step per AC, previous
+handoffs as required reading.
 Recent releases, in short: **screen verification on Playwright MCP** (decisions 4.49/4.51)
 — one engine, headless by default, artifacts under `thoughts/screen-verify/<slug>/`, and a
 server that *answers* is no longer taken for one that is *configured* —

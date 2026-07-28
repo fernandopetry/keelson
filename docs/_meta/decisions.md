@@ -876,6 +876,21 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.54 — A `PROPOSTA_PLUGIN` ganha destinatário: a mensagem ao mantenedor no fecho do ciclo
+
+**Problema**: carta do Diretor após três ciclos em consumidor. O `agile-coach` fez a parte difícil em todos — detectou os erros de processo, checou reincidência no ledger, decidiu o dono da regra, calculou orçamento, classificou `PROPOSTA_PLUGIN`, e até **rejeitou** uma das três propostas por ser lição de projeto — mas o processo parava aí: a saída dele é um YAML (`resultado`, `artefato`, `saldo_linhas`, `ledger`) perfeito para a sessão que o invocou e **ilegível para quem mantém o plugin e não estava lá**. As mensagens que chegaram ao mantenedor (e viraram as 4.52 e 4.53) foram escritas à mão porque o Diretor pediu; sem esse pedido, as propostas teriam morrido num log dentro de um repositório que o mantenedor não lê. O desenho não tinha o destinatário.
+
+**Decisão** — segunda saída do `agile-coach` + seção condicional no fecho do `/keelson:auto`:
+- **`mensagem_mantenedor`** (dono do conteúdo: `agents/agile-coach.md`, passo 7 novo): quando há `PROPOSTA_PLUGIN`, o agent compõe também a mensagem ao mantenedor — uma por problema, com o diff proposto e o orçamento anexados. Requisitos: **cena reconstituível sem acesso ao repo** (stack, gates, comando, esperado × acontecido, custo real da falha — que só o fim do ciclo conhece; vocabulário interno explicado em meia linha na primeira aparição); **caso + diagnóstico, nunca a regra genérica** (quem abstrai é o mantenedor, que vê os outros consumidores — generalizar de amostra de um não é trabalho do agent); **endereço de cada achado** — local (conserto no projeto, citado só como contexto) × processo (a proposta) × o terceiro caso fácil de perder: causa local que denuncia **pergunta que o `/keelson:init` não fez** → os dois destinos, separados; **autoria honesta** — agent errou → a primeira linha diz, e só então argumenta por que o desenho silenciou o erro.
+- **Item 7.5 da Etapa 5 do `/keelson:auto`**: com ≥1 `PROPOSTA_PLUGIN` na Etapa 4.5, o report da Entrega traz a(s) mensagem(ns) em **bloco copy-paste** — o mesmo mecanismo do prompt de handoff (item 7), apontado para outro destinatário. Sem proposta → a seção não existe (**não bloqueia**; ninguém inventa relato para preencher formulário). Nasce no fim do ciclo, não na detecção: é lá que se sabe o custo.
+- **Efeito colateral desejado**: obrigar o endereçamento (local × processo × init) é um filtro que não existia — sem ele, a tentação é mandar ao plugin tudo que incomodou no ciclo, inclusive config malfeita do projeto.
+
+**Custo assumido**: ~15 linhas no agent e ~4 no comando; nenhum campo novo obrigatório quando não há proposta. Detecção, dedup, dono e orçamento **não mudam** — a lacuna era só a escrita para fora.
+
+**Aplicação**: `agents/agile-coach.md` (passo 7 + campo `mensagem_mantenedor` no report), `commands/auto.md` (Etapa 4.5 meia linha + item 7.5 da Etapa 5). Os demais invocadores do `agile-coach` (`/keelson:implement`, `/keelson:review`) recebem o campo no report por consequência; ancorar a exibição nos seus fechos fica para quando a necessidade aparecer em rodada real. Capacidade nova → minor: plugin 0.32.0 → 0.33.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

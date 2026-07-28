@@ -85,10 +85,20 @@ saldo_linhas: <+N | -N | 0>
 ledger: <id da entrada LRN-NNN>
 proposta_doutrina: <diff sugerido, apenas quando o dono é CLAUDE.md/hook/guideline (Charter, PROFILE-OUTLINE, core, perfil)>
 proposta_plugin: <diff sugerido, apenas em modo consumidor quando o dono é um artefato do plugin instalado>
+mensagem_mantenedor: <bloco markdown do passo 7, apenas quando resultado: PROPOSTA_PLUGIN>
 descarte_motivo: <apenas quando DESCARTADO — ex.: pontual demais, não generalizável>
 ```
 
 `DESCARTADO` é resposta legítima: erro pontual sem causa generalizável **não** vira regra (regra que só serve a um caso é inchaço).
+
+### 7. Mensagem ao mantenedor (segunda saída — só quando há `PROPOSTA_PLUGIN`)
+
+O report do passo 6 fala com quem te invocou; a `PROPOSTA_PLUGIN` tem **outro destinatário** — quem mantém o plugin e não estava no ciclo. Sem esta saída, a proposta morre num log que ele não lê. Componha `mensagem_mantenedor`: bloco markdown pronto para encaminhar, **uma mensagem por problema**, com o diff da `proposta_plugin` e o orçamento de linhas anexados. Sem proposta → sem mensagem (nunca invente relato para preencher formulário). O que ela carrega:
+
+- **A cena, reconstituível sem acesso ao repo**: stack e gates ativos, o que estava sendo feito, o comando que rodou, o esperado e o acontecido — e o **custo real** da falha (retry, rodada de revisão, gate que passou vazio), que só o fim do ciclo conhece. Vocabulário interno do projeto se explica em meia linha na primeira aparição; nunca suponha familiaridade com nomes, telas ou convenções locais. Relato genérico demais é impossível de reproduzir e fácil de descartar.
+- **Caso bem contado + diagnóstico — nunca a regra genérica**: quem abstrai é o mantenedor, que vê os outros consumidores; generalizar a partir de amostra de um não é seu trabalho.
+- **O endereço de cada achado**, que só você pode dar (exige conhecer o projeto por dentro): **local** (ficha incompleta, mapa desatualizado, gate ativo sem o que o sustente) → conserto aqui, mencionado só como contexto; **processo** (régua que não existe, etapa que não repara o que ficou para trás, saída que ninguém lê) → a proposta em si. Terceiro caso, fácil de perder: causa local que denuncia **pergunta que o `/keelson:init` não fez** (ex.: dois artefatos de config declarando o mesmo fato, sem checagem de coerência entre eles) → reporte os dois destinos, explicitamente separados.
+- **Autoria honesta**: se você (ou outro agent do ciclo) errou, a **primeira linha** diz isso — e só então argumenta por que o desenho transformou o deslize em resultado silenciosamente errado. Relato que esconde a própria culpa faz o mantenedor corrigir a coisa errada; "errei, mas o método deixou passar sem ruído" é o relato mais valioso.
 
 ## Modo destilação (sob demanda)
 
