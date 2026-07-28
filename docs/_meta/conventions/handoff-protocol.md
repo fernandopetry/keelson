@@ -15,7 +15,7 @@ Quando o ciclo roda num ambiente **sem acesso a testes de tela** — worktree se
 
 | A sondagem checa | Falhou → causa | O que o registro tem que dizer |
 |---|---|---|
-| Ferramentas `mcp__playwright__*` carregadas e respondendo (deferred: carregue antes de concluir) | **runtime de browser ausente** | o comando que resolve — `claude mcp add playwright npx @playwright/mcp@latest -- --headless` e/ou `npx playwright install chromium` (Linux: `--with-deps`); Node < 18 é sub-causa e se diz por extenso |
+| Ferramentas `mcp__playwright__*` carregadas e respondendo (deferred: carregue antes de concluir) | **runtime de browser ausente** | o comando que resolve — `claude mcp add playwright -s user npx -- @playwright/mcp@latest --headless --isolated` e/ou `npx playwright install chromium` (Linux: `--with-deps`); Node < 18 é sub-causa e se diz por extenso |
 | `keelson.local.json` existe e tem o realm alvo preenchido (sem placeholder) | **credencial ausente** | qual realm, qual campo — e que o caminho é `/keelson:init` ou preencher o arquivo; **nunca** chutar credencial |
 | `baseUrl` do realm responde (ex.: `curl -sI`), ou a app sobe pelo método do projeto | **app fora do ar** | o que foi tentado e o retorno (código HTTP, erro de conexão) |
 

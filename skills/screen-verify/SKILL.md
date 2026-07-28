@@ -122,7 +122,9 @@ esses arquivos são material transitório para o desenvolvedor, nunca vão para 
   aceitam `filename` do mesmo jeito — use quando o dump for longo demais para o report.
 - **Registre o caminho que a ferramenta devolveu**, não o que você pediu: se o servidor
   estiver com outro `--output-dir`, o arquivo caiu em outro lugar e o report tem que dizer
-  onde.
+  onde. Arquivo em **`.playwright-mcp/`** é o sinal de que o servidor está sem
+  `--output-dir` — reporte como config divergente (`/keelson:init` conserta), porque essa
+  pasta pode não estar coberta pelo `.gitignore` do projeto.
 - **O arquivo nunca é a prova.** A prova durável é o **texto**: o que foi observado, no
   HANDOFF e no INDEX. O artefato é conveniência local — um clone limpo não o tem, e a
   verificação precisa continuar de pé sem ele (decisões 4.26/4.46).

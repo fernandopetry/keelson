@@ -829,6 +829,23 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.51 — Primeira rodada real da 4.49: responder ≠ estar configurado
+
+**Problema**: primeiro `/keelson:init` real com a 4.49 aplicada (consumidor `aav-backoffice`, dois realms). O comando se comportou bem — provou o runtime com navegação de verdade, checou Node, completou a ficha sem regenerar nada — e **por isso** expôs cinco furos da doutrina recém-escrita, quatro deles no mesmo padrão: a regra media a coisa errada, e o acerto veio da iniciativa do agente, não do texto. (a) A Etapa 4.4 dizia *"servidor já configurado e respondendo → não reescreva nada"*; o servidor respondia e estava **errado** (`npx -y @playwright/mcp@latest`, sem flag alguma) — o `✓` foi dado e a divergência só apareceu depois, por investigação ad-hoc. (b) O self-check tratou como **aviso** o que é falso verde: projeto com **dois realms** e servidor **sem `--isolated`** significa que o `browser_close` entre realms não descarta a sessão — a verificação do portal roda logada como admin, exatamente o bug de isolamento que o gate existe para pegar. (c) Sem `--output-dir`, o servidor grava no default **`.playwright-mcp/`** na raiz do projeto — diretório que a doutrina não citava em lugar nenhum e que **não estava no `.gitignore`**: a própria navegação de prova do `init` criou a pasta, que apareceu no `git status` (screenshot de sessão autenticada a um `git add .` do repositório) e teve de ser removida à mão. (d) A Etapa 5.5 afirmava que *"a linha `thoughts/` já cobre a pasta de artefatos"* — falso neste consumidor, que versiona `thoughts/shared/` de propósito. (e) O self-check mandava reportar o modo *"lido do `.mcp.json`/escopo configurado"*, vago o bastante para o agente ter de improvisar um script varrendo o `~/.claude.json` — onde havia **duas** entradas `playwright`, em escopos diferentes.
+
+**Decisão** — o critério de aceite passa a ser o **estado efetivo**, não a resposta:
+- **Flags conferem, não o ping** (Etapa 4.4, passos 2–3): ler a config efetiva nos lugares nomeados, **em ordem de precedência** (`.mcp.json` do projeto · `projects."<path>".mcpServers` do `~/.claude.json` · `mcpServers` global), reportar quais entradas existem e **qual vale**, e conferir `--output-dir` = `artifactsDir`, `--isolated` quando multi-realm, e o modo escolhido. Divergência em escopo do projeto → ajusta; em escopo pessoal/global → **o keelson não edita config pessoal**: entrega o comando e registra pendência.
+- **`✗`, não `⚠️`, no caso que produz falso verde**: multi-realm sem `--isolated` reprova o self-check; `--output-dir` divergente também. Realm único → aviso basta.
+- **`.playwright-mcp/` entra no `.gitignore`** sempre que o método é a skill (é o default do servidor, independe da config), e as linhas são garantidas **antes** da navegação de prova — a ordem estava invertida. O rastro da prova é limpo pelo próprio `init`.
+- **Cobertura de `.gitignore` se prova** com `git check-ignore` no caminho real, nunca se infere de uma linha-pai: `thoughts/` parcialmente versionado é escolha legítima do projeto.
+- **Sintaxe do comando corrigida pelo uso real**: a forma que funcionou é `claude mcp add playwright -s user npx -- @playwright/mcp@latest --headless --output-dir <dir> --isolated` (o `--` separa os args do `npx` dos flags do servidor); o README trazia o `--` no lugar errado. Junto: `add` não sobrescreve entrada existente (remover antes) e a sessão precisa reiniciar.
+
+**Custo assumido**: a Etapa 4.4 cresce de 4 para 6 passos e o self-check ganha dois `✗` possíveis — mais atrito no `init` de projeto multi-realm, em troca de não entregar um gate de tela que **parece** ligado e não isola nada. Nenhuma capacidade nova: é a 4.49 medindo o que deveria ter medido desde o começo.
+
+**Aplicação**: `commands/init.md` (Etapa 4.4 reescrita, Etapa 5.5, self-check da Etapa 6), `skills/screen-verify/SKILL.md` (`.playwright-mcp/` como sinal de config divergente), `docs/_meta/conventions/handoff-protocol.md` (§8.1, comando corrigido), `README.md` (setup pessoal corrigido). Correção → patch: plugin 0.30.1 → 0.30.2.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

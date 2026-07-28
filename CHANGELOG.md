@@ -17,6 +17,37 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.30.2] — 2026-07-28
+
+Decision 4.51
+
+### Fixed
+- **A responding MCP server is no longer taken for a configured one.** The first real
+  `/keelson:init` under 0.30.0 found a server that answered fine and was wrong (`npx -y
+  @playwright/mcp@latest`, no flags at all), and step 4.4 said to leave it alone. It now
+  reads the effective config in named precedence order (project `.mcp.json` → per-project
+  entry in `~/.claude.json` → global) and checks the flags that matter: `--output-dir`
+  matching the ficha's `artifactsDir`, `--isolated`, and the chosen browser mode. Personal
+  and global scopes are never edited by keelson — it hands you the command instead.
+- **Multi-realm without `--isolated` now fails the self-check** instead of warning. With a
+  persistent profile, `browser_close` between realms doesn't drop the session, so the
+  second realm gets verified while still logged in as the first — the exact isolation bug
+  the gate exists to catch. A divergent `--output-dir` fails too. Single-realm projects
+  still get a warning.
+- **`.playwright-mcp/` is gitignored.** Without `--output-dir` the server writes there, and
+  `init`'s own probe navigation created the directory in a real run — an authenticated
+  screenshot one `git add .` away from the repository. The ignore lines are now guaranteed
+  **before** the probe runs, and `init` cleans up after itself.
+- **Ignore coverage is proven, not inferred.** A `thoughts/` line no longer counts as
+  covering `artifactsDir`: projects legitimately version part of `thoughts/`, so the check
+  runs `git check-ignore` against the real path.
+- **Corrected the personal-scope command** to the form verified in real use — the `--` goes
+  after `npx`, separating its arguments from the server's own flags. Also documented that
+  `add` won't overwrite an existing entry (remove it first) and that the session must be
+  restarted.
+
+---
+
 ## [0.30.1] — 2026-07-28
 
 Decision 4.50

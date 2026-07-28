@@ -73,12 +73,25 @@ Grave na raiz do projeto. **Se a ficha já existe** → Regra de merge; específ
 
 A skill `screen-verify` dirige o browser pelo **Playwright MCP** (decisão 4.49). Sem esse servidor não há gate de tela — e o modo de falha caro é o desenvolvedor descobrir isso semanas depois, no meio de uma entrega. Então **garanta o runtime aqui, nunca em silêncio**:
 
-1. **Provar antes de concluir** (mesma régua da 4.26): as ferramentas MCP chegam **deferred** — "não vi `mcp__playwright__*` na lista" **não é** evidência de ausência. Carregue-as e só então conclua. Presentes → registre no relatório qual servidor respondeu e siga para o passo 4.
-2. **Pré-requisito**: `node --version` ≥ 18 (o pacote exige). Ausente ou abaixo → **não instale Node**: reporte como pendência com o que falta, deixe `screenVerify.enabled` como está e diga que o gate de tela fica indisponível até resolver.
-3. **Configurar o servidor** — pergunte qual escopo (opções fechadas, com o efeito):
+**Ordem importa**: garanta as linhas de `.gitignore` da Etapa 5.5 **antes** do passo 1 — a navegação de prova escreve no `--output-dir` em vigor, e com o servidor mal configurado isso é `.playwright-mcp/` na raiz do projeto. Provar primeiro e limpar depois já deixou pasta não-ignorada no `git status` de uma rodada real (decisão 4.51).
+
+1. **Provar antes de concluir** (mesma régua da 4.26): as ferramentas MCP chegam **deferred** — "não vi `mcp__playwright__*` na lista" **não é** evidência de ausência. Carregue-as e faça uma navegação barata (`browser_navigate` para `about:blank`). **Responder não é aprovar**: siga para o passo 2 mesmo com o servidor de pé.
+2. **Ler a configuração efetiva** — o servidor que responde pode não ser o que você espera, e pode estar em escopo que este comando não gerencia. Procure `mcpServers.playwright` **nestes lugares, nesta ordem**: `.mcp.json` da raiz do projeto · `projects."<path do projeto>".mcpServers` do `~/.claude.json` · `mcpServers` do `~/.claude.json` (global). Mais de uma entrada é comum e **não** é erro por si — reporte quais existem e **qual delas vale para este projeto**.
+3. **Conferir as flags, não a resposta** — servidor de pé com flag errada é reparo pendente, nunca `✓` (decisão 4.51). Confira, contra a ficha e a Etapa 2:
+   - `--output-dir` **igual** a `gates.screenVerify.artifactsDir`. Divergente ou ausente → os artefatos caem no default `.playwright-mcp/`, fora do lugar que a skill declara.
+   - `--isolated` **presente** quando o `keelson.local.json` tem **mais de um realm** — sem ele o perfil é persistente e o `browser_close` entre realms não descarta a sessão: a verificação do segundo realm herda o login do primeiro, que é o falso verde que o gate existe para evitar.
+   - modo do browser (`--headless` presente ou não) igual ao escolhido na Etapa 2.
+
+   Divergência em escopo **do projeto** → proponha o ajuste e aplique. Divergência em escopo **pessoal/global** → o keelson **não** edita config pessoal do humano: entregue o comando exato de correção e registre a pendência no relatório.
+4. **Configurar o servidor** (ausente, ou aceito o ajuste do passo 3) — pergunte qual escopo (opções fechadas, com o efeito):
    - **Projeto** (default, recomendado): bloco `mcpServers.playwright` no `.mcp.json` da raiz — **arquivo versionado**, o time inteiro herda a mesma configuração. É mudança em arquivo do projeto: mostre o bloco que vai escrever **antes** de escrever e aplique a **Regra de merge** (outros servidores no arquivo são preservados; um `playwright` já existente **não** é sobrescrito — proponha o ajuste e pergunte).
-   - **Pessoal**: entregue o comando para o humano rodar, sem tocar no repositório —
-     `claude mcp add playwright npx @playwright/mcp@latest -- --headless --output-dir <artifactsDir>`.
+   - **Pessoal**: entregue o comando para o humano rodar, sem tocar no repositório — forma verificada em uso real (o `--` separa os argumentos do `npx` dos flags do servidor):
+
+     ```
+     claude mcp add playwright -s user npx -- @playwright/mcp@latest --headless --output-dir <artifactsDir> --isolated
+     ```
+
+     Substituir uma entrada pessoal existente exige removê-la antes (`claude mcp remove playwright -s user`); o `add` não sobrescreve. Diga ao humano que a sessão precisa ser reiniciada para o servidor novo valer.
 
    Bloco canônico do `.mcp.json` (omita `--headless` se o humano escolheu janela visível na Etapa 2):
 
@@ -91,9 +104,10 @@ A skill `screen-verify` dirige o browser pelo **Playwright MCP** (decisão 4.49)
    ```
 
    `--isolated` é o que torna honesto o isolamento por realm da skill (`browser_close` entre realms descarta a sessão de verdade). **Não** adicione `--allowed-origins` por conta própria: bloquear origem externa faz fonte/CDN sumirem e imita bug de UI — é endurecimento opcional, decisão do humano. Trace e vídeo (`--caps devtools`) também são opt-in: só ofereça se o humano quiser artefato de investigação, porque cada capability acrescenta ferramentas ao contexto de toda sessão.
-4. **Binários do navegador**: o Playwright baixa o browser num cache **do usuário** (`~/Library/Caches/ms-playwright` no macOS, `~/.cache/ms-playwright` no Linux) — fora do repositório, descartável. Instalar isso é seguro; **instalar em silêncio, não**. Ofereça rodar `npx playwright install chromium` (Linux: `npx playwright install --with-deps chromium`, que usa `apt` — em distro não-Debian, instrua as libs manualmente) e **diga o que foi instalado e onde**. Recusa do humano → registre a pendência com o comando exato no relatório.
+5. **Binários do navegador**: o Playwright baixa o browser num cache **do usuário** (`~/Library/Caches/ms-playwright` no macOS, `~/.cache/ms-playwright` no Linux) — fora do repositório, descartável. Instalar isso é seguro; **instalar em silêncio, não**. Ofereça rodar `npx playwright install chromium` (Linux: `npx playwright install --with-deps chromium`, que usa `apt` — em distro não-Debian, instrua as libs manualmente) e **diga o que foi instalado e onde**. Recusa do humano → registre a pendência com o comando exato no relatório.
+6. **Limpar o rastro da prova**: artefato gerado pela navegação do passo 1 (ex.: `.playwright-mcp/`) é lixo de diagnóstico — remova-o e diga que removeu. Nunca deixe pasta nova no `git status` como efeito colateral do `init`.
 
-Idempotente: servidor já configurado e respondendo → **não reescreva nada**, só confirme no relatório.
+Idempotente: servidor já configurado **e com as flags do passo 3 conferindo** → **não reescreva nada**, só confirme no relatório qual escopo respondeu e em que modo.
 
 ## Etapa 4.5 — Dados de acesso locais para verificação de tela (só se `screenVerify.enabled`)
 
@@ -129,7 +143,11 @@ Insira o conteúdo de `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.keelson-block.md` 
 
 ## Etapa 5.5 — Garantir `thoughts/` fora do versionamento
 
-Memos de exploração e backups do keelson vivem em `thoughts/local/`; os artefatos da verificação de tela (screenshot, dump de console/rede), em `thoughts/screen-verify/<slug>/` — nada disso é versionado. Garanta que o `.gitignore` do projeto contém `thoughts/` **e** `keelson.local.json` (dados de acesso locais — credenciais de dev, nunca versionadas) — adicione as linhas que faltarem. A linha `thoughts/` já cobre a pasta de artefatos; `artifactsDir` apontado para **fora** de `thoughts/` exige a sua própria linha no `.gitignore` (artefato de tela nunca entra no git). **Atenção**: só o `keelson.local.json` fica de fora; o `keelson.local.example.json` **é versionado** (não o adicione ao `.gitignore`).
+Memos de exploração e backups do keelson vivem em `thoughts/local/`; os artefatos da verificação de tela (screenshot, dump de console/rede), em `thoughts/screen-verify/<slug>/` — nada disso é versionado. Garanta que o `.gitignore` do projeto contém `thoughts/` **e** `keelson.local.json` (dados de acesso locais — credenciais de dev, nunca versionadas) — adicione as linhas que faltarem.
+
+**Cobertura se verifica, não se infere** (decisão 4.51): não conclua que o `artifactsDir` está ignorado porque existe uma linha `thoughts/` — o projeto pode versionar parte de `thoughts/` de propósito (um consumidor real versiona `thoughts/shared/`). Prove com `git check-ignore -v <artifactsDir>/x.png`; sem cobertura, acrescente a linha do caminho exato.
+
+Com `method: skill:screen-verify`, garanta **também** a linha `.playwright-mcp/`: é o diretório de saída **default** do servidor, usado sempre que o `--output-dir` estiver ausente ou divergente — e screenshot de sessão autenticada não pode ficar a um `git add .` de distância do repositório. **Atenção**: só o `keelson.local.json` fica de fora; o `keelson.local.example.json` **é versionado** (não o adicione ao `.gitignore`).
 
 ## Etapa 6 — Self-check (falsificável, não confie na configuração)
 
@@ -137,8 +155,12 @@ Prove que a ficha funciona:
 - `quality.test`/`quality.lint` declarados **existem/rodam** (execução rápida ou `--help`/dry-run);
 - os `codePaths` existem no disco;
 - os guidelines do perfil ativo resolvem: cada `profile.<role>.file` da ficha aponta para um arquivo existente (regra de resolução da Etapa 3); perfil com `reviewed: false` no front-matter vira instrução de revisão no relatório; perfil cujo `charter:` no front-matter é **menor** que a versão atual do `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md` vira aviso de re-derivação/revisão no relatório;
-- se `screenVerify.enabled`: `keelson.local.example.json` existe e está **versionado** (sem senha real); `keelson.local.json` existe **e** está no `.gitignore` (confirme que **não** aparece em `git status`/`git ls-files`); campos ainda em placeholder (`<...>`) viram instrução de preenchimento no relatório (com o aviso dev-only); o `artifactsDir` está coberto pelo `.gitignore`.
-- se `method: skill:screen-verify`: o **runtime de browser responde** — ferramentas `mcp__playwright__*` carregadas (deferred não aparecem até serem buscadas) e uma navegação de prova barata (`browser_navigate` para `about:blank`, ou a `baseUrl` do realm default quando a app está de pé). Falhou → **não** é `✓` silencioso nem `✗` genérico: o relatório nomeia a causa (servidor não configurado · pacote não baixado · binário do navegador ausente · Node < 18) **e o comando exato** que resolve. O modo em vigor (headless × janela) também vai no relatório, lido do `.mcp.json`/escopo configurado — o humano precisa saber em que modo o gate vai rodar sem ter que adivinhar.
+- se `screenVerify.enabled`: `keelson.local.example.json` existe e está **versionado** (sem senha real); `keelson.local.json` existe **e** está no `.gitignore` (confirme que **não** aparece em `git status`/`git ls-files`); campos ainda em placeholder (`<...>`) viram instrução de preenchimento no relatório (com o aviso dev-only); `artifactsDir` e `.playwright-mcp/` **provados** cobertos por `git check-ignore` (Etapa 5.5) — inferir da linha `thoughts/` não vale.
+- se `method: skill:screen-verify`: o **runtime de browser responde** — ferramentas `mcp__playwright__*` carregadas (deferred não aparecem até serem buscadas) e uma navegação de prova barata (`browser_navigate` para `about:blank`, ou a `baseUrl` do realm default quando a app está de pé). Falhou → **não** é `✓` silencioso nem `✗` genérico: o relatório nomeia a causa (servidor não configurado · pacote não baixado · binário do navegador ausente · Node < 18) **e o comando exato** que resolve.
+- se `method: skill:screen-verify`: as **flags efetivas** conferem (Etapa 4.4, passos 2–3). Responder não basta:
+  - `--output-dir` ≠ `artifactsDir`, ou ausente → **`✗`** (os artefatos caem em `.playwright-mcp/`, fora do que a skill declara).
+  - **mais de um realm** no `keelson.local.json` **e** servidor sem `--isolated` → **`✗`**, não aviso: o isolamento por realm que o gate promete não existe, e a verificação do segundo realm roda com a sessão do primeiro. Realm único → aviso basta.
+  - O relatório diz **qual escopo respondeu** (projeto · pessoal · global), **em que modo** (headless × janela) e, quando há mais de uma entrada `playwright` configurada, quais são e qual vale — o humano não deveria precisar caçar isso.
 - se `jira.enabled`: `jira.projectKey` e os IDs de `issueType.spec`/`issueType.task` estão preenchidos; se `issueType.feature`/`issueType.standalone` estão preenchidos, os IDs existem no projeto e **não** são `subtask:true`; re-rodar o **guardrail de hierarquia** da Etapa 4.6 (perna não-adjacente → aviso com a sugestão, não `✗`); se `jira.mapFile` aponta um caminho, o arquivo existe. Conector indisponível não é `✗` (best-effort) — vira aviso "sync Jira pulado até autorizar o conector", **com a evidência da prova** (protocolo §0: carregar as ferramentas — deferred não aparecem na lista até serem buscadas — e uma chamada de prova; "não vi as ferramentas" não é evidência).
 Reporte cada item como ✓/✗. `✗` vira ação no relatório, não é silenciado.
 

@@ -189,10 +189,17 @@ versioned, so the whole team inherits the same configuration:
 ] } } }
 ```
 
-**Personal scope** — nothing touches the repository:
+**Personal scope** — nothing touches the repository. The `--` separates the `npx` arguments
+from the server's own flags:
 
 ```bash
-claude mcp add playwright npx @playwright/mcp@latest -- --headless --output-dir thoughts/screen-verify
+claude mcp add playwright -s user npx -- @playwright/mcp@latest --headless --output-dir thoughts/screen-verify --isolated
+```
+
+Replacing an existing personal entry means removing it first — `add` won't overwrite it:
+
+```bash
+claude mcp remove playwright -s user
 ```
 
 Then the browser binary, in either case:
@@ -200,6 +207,8 @@ Then the browser binary, in either case:
 ```bash
 npx playwright install chromium
 ```
+
+Restart the session after configuring the server, so the new one is picked up.
 
 Drop `--headless` from the args when you want to watch the run in a real window. The mode
 lives **only** in the server config — deliberately *not* mirrored into the ficha, because a
@@ -311,11 +320,17 @@ keelson/
 
 ## Status
 
-`0.30.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.30.2` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the PHP profile now spells out the docblock rule** (decision 4.50)
+New in this release: **fixes from the first real run of the Playwright migration**
+(decision 4.51) — a server that *answers* is no longer taken for one that is *configured*,
+multi-realm without `--isolated` now fails the self-check instead of warning (it silently
+verified the second realm still logged in as the first), `.playwright-mcp/` is gitignored
+before the probe runs, and the personal-scope command is corrected to the form that
+actually works.
+Previously: **the PHP profile now spells out the docblock rule** (decision 4.50)
 — a docblock exists only when it carries type information native syntax can't express;
 restating a typed signature is forbidden. See the new
 [Comments in generated code](#comments-in-generated-code) section for the doctrine.
