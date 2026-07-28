@@ -9,7 +9,10 @@ Você reconcilia o estado de um slug do keelson com o Jira. Os ganchos automáti
 (`/keelson:specify`, `:tasks`, `:implement`, `:integrate`) são **best-effort** — quando o
 conector Atlassian está indisponível ou uma operação falha, a sincronização é pulada. Este
 comando é a **rede de segurança**: reprocessa o slug e cria/vincula/comenta/transiciona o
-que ficou para trás, de forma **idempotente** (não duplica).
+que ficou para trás, de forma **idempotente** (não duplica). A mesma reconciliação roda
+automaticamente no **fecho do `/keelson:auto`** (protocolo §12) — este comando avulso cobre o
+resto: backfill de slug antigo, ciclo interrompido antes da Entrega, conector que só ficou
+disponível depois.
 
 **Toda a lógica é do protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`;
 3º nível: `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md`). Este comando só o orquestra sobre um
@@ -105,4 +108,5 @@ sem chamar as ferramentas de escrita.
 
 Não cria PR nem faz merge/deploy; não altera SPEC/PLAN/TASK além das linhas `**Jira**:`
 (cabeçalho da SPEC, sob o heading da FEAT, closure da TASK); nunca bloqueia
-(best-effort — protocolo §0). Governança: decisões 4.22, 4.27, 4.28 e 4.43 de `decisions.md`.
+(best-effort — protocolo §0). Governança: decisões 4.22, 4.27, 4.28, 4.43 e 4.53 de
+`decisions.md`.

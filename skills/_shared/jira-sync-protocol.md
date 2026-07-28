@@ -75,6 +75,12 @@ editado pelo humano. Ausente → o protocolo usa só `summary`+`description` e n
   `Funcionalidade pronta p/ QA | <coluna> | <status-id> | todas as TASKs da FEAT Done` —
   status-alvo aplicado **na Story** da FEAT; ausente → o marco vira comentário.
 
+**A ficha é a fonte da política.** Prosa ou cabeçalho do mapa que afirmar o contrário da
+ficha (ex.: o mapa diz em texto corrido "a ficha usa `transition: comment`" e a ficha declara
+`auto`) → **aviso de mapa desatualizado, e a ficha vale** — o comportamento nunca pode depender
+de qual dos dois arquivos o agente leu. A comparação é barata e acontece onde os dois já são
+lidos juntos: qualquer gancho que abre o mapa, e o self-check do `/keelson:init`.
+
 ## §4. Idempotência (obrigatória)
 
 Antes de **criar** qualquer issue, checar a key já persistida (§10) — **os artefatos SDD não
@@ -236,6 +242,16 @@ estão `Done`. **Tarefa isolada** (§7) é a própria unidade de QA: na closure
 `Done`, além do marco normal, aplicar o marco "pronta p/ QA" (gatilho do mapa / política de
 `transition`) **na própria issue** — equivalente ao que a Story recebe quando a FEAT completa.
 
+**Estado final do ciclo automático** (fecho do `/keelson:auto`): o fecho é, por definição do
+método, um **gatilho do marco "pronta p/ QA"** — não um efeito que só emerge se todos os
+ganchos anteriores tiverem rodado. Ao fim do ciclo, o estado-alvo do tracker é: **sub-tasks**
+no marco de closure (`Done`) · a **unidade de QA** (Story da FEAT, Story implícita ou tarefa
+isolada) no status-alvo de "pronta p/ QA" do mapa — o estado de espera-do-humano, coerente com
+o contrato Diretor–PO (o ciclo termina no push; revisão e merge são do Diretor) · **Epic
+intocado** (roadmap é do humano). A política `transition` continua valendo como em qualquer
+marco (`comment` → o estado-alvo vira comentário; `off` → nada); a reconciliação do fecho
+(§12) é quem garante esse estado quando algum gancho não rodou.
+
 ## §10. Persistência das keys
 
 - **SPEC** → linha `**Jira**: <KEY>` no **cabeçalho markdown** da SPEC, ao lado de `**Slug**`/
@@ -258,7 +274,7 @@ Após o PR aberto (`/keelson:integrate`) ou o push (`/keelson:auto`): `addCommen
 na issue principal com a URL do PR/branch (e, quando útil, `createIssueLink`/remote link).
 Best-effort (§0).
 
-## §12. Reconciliação (`/keelson:jira-sync`)
+## §12. Reconciliação (`/keelson:jira-sync` · fecho do `/keelson:auto`)
 
 Reprocessa um slug de forma idempotente (§4), na ordem: issue da SPEC (§6) → Stories das
 FEATs (`jira-sync-feat.md`, quando ativo) **ou** Story implícita (degrau (0) do §7.0) →
@@ -266,6 +282,16 @@ sub-tasks (§7) → status (§9, incluindo o gatilho "Funcionalidade pronta p/ Q
 completas). Aplica campos e — se `transition:auto` — alinha o status ao estado real das TASKs
 (Done → status-alvo de "concluída"). Estado misto (sub-tasks legadas sob a issue da SPEC com o
 3º nível ativo) é **reportado no output**, nunca re-parentado (§4).
+
+**Dois invocadores, a mesma reconciliação**: o comando avulso `/keelson:jira-sync` (rede de
+segurança sob demanda, com `--dry-run` e backfill abaixo) e o **fecho do `/keelson:auto`**
+(Etapa 5), que a roda antes do relatório de entrega. Como o sync inteiro é idempotente por
+exigência do §4, rodá-la no fecho é **no-op barato quando os ganchos de
+`specify`/`tasks`/`implement` funcionaram** e conserta o ciclo quando algum não rodou — os
+ganchos deixam de ser três oportunidades independentes de falhar em silêncio e viram três
+tentativas mais uma rede. A passada do fecho também **mede o estado final do tracker** (Epic ·
+Story/unidade de QA · sub-tasks K/N · transições aplicadas), que alimenta a linha obrigatória
+do relatório de entrega do `/keelson:auto`.
 
 **Backfill de slug já concluído** (o caso mais comum da reconciliação: o sync nunca rodou e o
 trabalho já foi entregue). Antes de criar em lote, medir o estado real das TASKs do slug. Se a

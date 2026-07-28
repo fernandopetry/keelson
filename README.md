@@ -284,6 +284,13 @@ transitions). It's **off by default** and **best-effort**: it never blocks the c
   `link` mode, read-seeding of the SPEC.
 - **Status policy.** Default `comment` posts progress without moving the card; moving cards is
   opt-in per project (`transition: auto`), always validated against the live workflow.
+- **The cycle ends reconciled — and the report says so.** `/keelson:auto`'s delivery step runs
+  the same idempotent reconciliation as `/keelson:jira-sync` (a cheap no-op when the per-command
+  hooks all fired, a repair pass when one didn't), and the delivery report carries a mandatory
+  tracker-state line (`Jira: <KEY> (Epic) · Story · sub-tasks K/N · transitions`) measured by
+  that pass. Best-effort means it never blocks — it never means it doesn't report. The method
+  also pins the end-of-cycle target state: sub-tasks Done, the QA unit (Story) at the
+  "ready for QA" status waiting for the human, Epic untouched.
 
 The ficha's `jira` block (all IDs, zero secrets):
 
@@ -299,7 +306,7 @@ The ficha's `jira` block (all IDs, zero secrets):
 ```
 
 Re-run `/keelson:jira-sync <slug>` any time to reconcile what a best-effort run skipped.
-Governance: decisions 4.22, 4.27 and 4.28 in `docs/_meta/decisions.md`.
+Governance: decisions 4.22, 4.27, 4.28 and 4.53 in `docs/_meta/decisions.md`.
 
 ## Repository layout
 
@@ -320,29 +327,30 @@ keelson/
 
 ## Status
 
-`0.31.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.32.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the TASK generator learns two rulers from the first full real
+New in this release: **the Jira sync can no longer end incoherent in silence**
+(decision 4.53) — `/keelson:auto`'s delivery step now runs the idempotent reconciliation
+(the per-command hooks become three attempts *plus a net*, not three independent chances
+to fail silently), the delivery report carries a mandatory tracker-state line (best-effort
+never blocks, but it always reports), the method pins the end-of-cycle tracker state
+(sub-tasks Done, Story waiting for the human, Epic untouched), and a map file whose prose
+contradicts the ficha gets flagged — the ficha wins.
+Previously: **the TASK generator learns two rulers from the first full real
 cycle** (decision 4.52) — gate-1 verification pairs must be *falsifiable* ("what state
 makes this command FAIL?"; absence-shaped expectations need an explicit anchor, e.g.
 `git diff --name-only main...HEAD`, never the bare form that returns empty after commit),
 and the **gate-9 walkthrough script is fixed with the TASK, before any code**: typeable
 URLs plus realm, a concrete subject with its credential, preconditions with a recipe,
 one step per AC, and previous handoffs as required reading.
-Previously: **fixes from the first real run of the Playwright migration**
-(decision 4.51) — a server that *answers* is no longer taken for one that is *configured*,
-multi-realm without `--isolated` now fails the self-check instead of warning, and
-`.playwright-mcp/` is gitignored before the probe runs.
-Previously: **the PHP profile now spells out the docblock rule** (decision 4.50)
-— a docblock exists only when it carries type information native syntax can't express;
-restating a typed signature is forbidden. See the
-[Comments in generated code](#comments-in-generated-code) section for the doctrine.
-
-Recent releases, in short: **screen verification on Playwright MCP** (decision 4.49) —
-one engine, headless by default, artifacts under `thoughts/screen-verify/<slug>/` — and
-a **[CHANGELOG](CHANGELOG.md)** (decision 4.48), backfilled to `0.1.0`, so a version
+Recent releases, in short: **screen verification on Playwright MCP** (decisions 4.49/4.51)
+— one engine, headless by default, artifacts under `thoughts/screen-verify/<slug>/`, and a
+server that *answers* is no longer taken for one that is *configured* —
+the **PHP docblock rule** (decision 4.50, see
+[Comments in generated code](#comments-in-generated-code)), and a
+**[CHANGELOG](CHANGELOG.md)** (decision 4.48), backfilled to `0.1.0`, so a version
 bump is incomplete without its entry and this section keeps only the headline. Before
 that, **`jira-guard`** and the Jira reliability batch (decisions
 4.43–4.47) — feasibility resolved before anything is created, a Story mirroring a

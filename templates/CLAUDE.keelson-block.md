@@ -20,7 +20,9 @@
   sobre os perfis do plugin no mesmo nome; caso contrário, somam).
 - **Integração com Jira (opcional):** se a ficha tem `jira.enabled: true`, o ciclo espelha
   SPEC/funcionalidades/TASKs em issues via conector MCP Atlassian — config por ID no bloco
-  `jira` e no mapa `jira.mapFile`. É **best-effort** (nunca bloqueia) e **sem segredos**.
+  `jira` e no mapa `jira.mapFile`. É **best-effort** (nunca bloqueia — mas sempre conta:
+  o fecho do ciclo reconcilia o slug e o relatório de entrega traz a linha de estado do
+  tracker) e **sem segredos**.
 
 ### Como trabalhar
 

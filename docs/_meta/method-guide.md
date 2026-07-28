@@ -205,7 +205,7 @@ Conduz `specify → plan → tasks → implement → entrega` de ponta a ponta *
 /keelson:auto <descrição ou @arquivo> [--slug=<nome>]
 ```
 
-Rigor proporcional preservado (trivial → direto; bug/refactor → inline; feature → ciclo completo). **Entrega**: branch + commit + push, **sem PR**. Merge e deploy continuam humanos. Governança: decisão 4.10 de `decisions.md`.
+Rigor proporcional preservado (trivial → direto; bug/refactor → inline; feature → ciclo completo). **Entrega**: branch + commit + push, **sem PR**. Merge e deploy continuam humanos. Com Jira ativo, o fecho roda a **reconciliação** do protocolo de sync (idempotente — rede para ganchos que não rodaram) e o report traz a **linha de estado do tracker** (Epic · Story · sub-tarefas K/N · transições) — best-effort não bloqueia, mas sempre conta. Governança: decisões 4.10 e 4.53 de `decisions.md`.
 
 **Ambiente sem tela** (worktree/nuvem, ou `gates.screenVerify` sem app disponível): o gate 9 não exercitável gera **handoff de verificação** — doc com roteiro + prompt copy-paste no report para um agente com tela fechar a verificação (ver §8). A entrega é declarada parcial até lá. A verificação em si roda pela skill `screen-verify` (Playwright MCP, headless por padrão — decisão 4.49), e a indisponibilidade que gera o handoff é **provada e nomeada** por causa; a régua é do §8.
 
@@ -237,7 +237,7 @@ Roda a auditoria de vulnerabilidade conhecida sobre as dependências, **em momen
 
 ### 3.13 `/keelson:jira-sync` — reconciliar um slug com o Jira (opcional)
 
-Rede de segurança da integração opcional com Jira (via **conector MCP Atlassian**, ligada em `jira.enabled` na ficha). Os comandos do ciclo já sincronizam **best-effort**; quando o conector esteve indisponível ou uma operação falhou, este comando reprocessa o slug e cria/vincula/comenta/transiciona o que ficou para trás, de forma **idempotente**.
+Rede de segurança da integração opcional com Jira (via **conector MCP Atlassian**, ligada em `jira.enabled` na ficha). Os comandos do ciclo já sincronizam **best-effort**, e o fecho do `/keelson:auto` roda a mesma reconciliação automaticamente (decisão 4.53); este comando avulso cobre o resto — backfill de slug antigo, ciclo interrompido antes da entrega, conector que só ficou disponível depois — reprocessando o slug e criando/vinculando/comentando/transicionando o que ficou para trás, de forma **idempotente**.
 
 ```
 /keelson:jira-sync <slug ou PLAN-MMM> [--dry-run]
@@ -251,7 +251,7 @@ Rede de segurança da integração opcional com Jira (via **conector MCP Atlassi
 | Pré-condição | Rodar **de dentro do repo consumidor** (ficha no cwd). A Etapa 0 resolve a **viabilidade da projeção** antes de planejar — 3 níveis · 2 níveis · 2 níveis via Story implícita · 2 níveis via `standalone` · inviável (com a perna que não aninha) — e sinaliza **backfill** quando o slug já está concluído e `transition` não move card |
 | Lógica | Toda no `skills/_shared/jira-sync-protocol.md` (régua de hierarquia: §7.0; 3º nível: `jira-sync-feat.md`) — o comando só orquestra |
 
-Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27, 4.28 e 4.43 de `decisions.md`.
+Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27, 4.28, 4.43 e 4.53 de `decisions.md`.
 
 ### 3.14 `/keelson:review` — code review de um diff avulso (sem artefato SDD)
 

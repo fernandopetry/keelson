@@ -17,6 +17,38 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.32.0] — 2026-07-28
+
+Decision 4.53
+
+### Added
+- **`/keelson:auto`'s delivery step now reconciles the slug with Jira before reporting.**
+  The per-command sync hooks (`specify` creates the Epic and Story, `tasks` the sub-tasks,
+  `implement` transitions) were three independent chances to fail silently: no hook repaired
+  the one before it, and the delivery hook only commented the push. The delivery step now
+  runs the same idempotent reconciliation as `/keelson:jira-sync` — a cheap no-op when every
+  hook fired, a repair pass when one didn't. Three attempts plus a net. Motivated by a real
+  end-to-end run that ended with only the Epic on the board — no Story, no sub-tasks, no
+  transitions — and a delivery report that never mentioned it.
+- **Mandatory tracker-state line in the delivery report**, next to the diff composition:
+  `Jira: <KEY> (Epic) · Story: <KEY|—> · sub-tasks: K/N · transitions: <n|none>
+  (transition: <mode>)`, measured by the closing reconciliation, never recalled from the
+  hooks. One line is enough for the Director to spot an incoherent board without opening
+  Jira. New doctrine ruler: **best-effort means it never blocks — never that it doesn't
+  report.** A skipped or failed sync shows up on this line with its reason.
+- **The end-of-cycle tracker state is now defined by the method**, not emergent from a chain
+  of triggers: the close of `/keelson:auto` is a trigger of the "ready for QA" milestone —
+  sub-tasks Done, the QA unit (Story) at the human-wait status, Epic untouched (protocol §9).
+
+### Fixed
+- **A map file whose prose contradicts the ficha gets flagged.** When `jira.mapFile` states a
+  policy (e.g. `transition: comment`) that the ficha contradicts (`auto`), behavior used to
+  depend on which file the agent happened to read. The ficha wins; the sync and
+  `/keelson:init`'s self-check warn "map out of date" wherever both files are already read
+  together.
+
+---
+
 ## [0.31.0] — 2026-07-28
 
 Decision 4.52
