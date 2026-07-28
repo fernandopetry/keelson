@@ -17,6 +17,29 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.30.1] — 2026-07-28
+
+Decision 4.50
+
+### Added
+- **README section "Comments in generated code"** stating the comment doctrine publicly:
+  the default is no comments; a comment exists only if deleting it would lose information
+  the code can't give back (Charter Art. 7). The surviving comments are one-line
+  `DEC-xx`/`FR-xx` anchors — a navigation graph from code to the decision behind it, not
+  prose.
+
+### Fixed
+- **The PHP profile now materializes the docblock rule** the profile outline already
+  required (§3): a docblock is mandatory only when it carries type information native
+  syntax can't express — array shapes (`list<User>`, `array{id: int}`), generics for
+  static analysis, actionable `@throws` — and must not exist when it restates a typed
+  signature or is a ritual file/class header. This closes the gap that let community
+  habit (full PHPDoc on every class and method) fill the silence, the main source of
+  comment noise in generated PHP. The profile is `reviewed: true`, so the edit is
+  flagged for human re-review.
+
+---
+
 ## [0.30.0] — 2026-07-27
 
 Decision 4.49

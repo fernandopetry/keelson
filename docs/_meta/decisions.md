@@ -816,6 +816,17 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **Aplicação**: `skills/screen-verify/SKILL.md` (motor, isolamento, artefatos, armadilhas reescritas), `commands/init.md` (Etapa 2 perguntas, Etapa 4 ficha, **Etapa 4.4 nova**, Etapa 5.5, self-check da Etapa 6), `docs/_meta/conventions/handoff-protocol.md` (§8.1 tabela de causas + `motivo:`/`sonda:` do template), `agents/qa.md` (sondagem + `causa_indisponibilidade` no report), `commands/implement.md` (aceite do report), `commands/verify-handoff.md` (Etapa 2.4 e 3.2), `templates/keelson.config.example.json` (`artifactsDir`), `README.md` (seção nova + Status). Capacidade nova → minor: plugin 0.29.0 → 0.30.0.
 
+### 4.50 — Perfil PHP materializa a regra de docblock; a doutrina de comentário ganha face pública no README
+
+**Problema**: o Diretor observou comentário demais no código que o keelson produz — e pediu o inverso: default sem comentário, comentando só a decisão que o código não consegue dizer. A doutrina **já responde isso** (4.31/4.32: Art. 7 = teste de apagar, âncoras `DEC-xx`/`FR-xx` de uma linha, gate 7 bloqueia excesso), mas havia um furo objetivo: o `PROFILE-OUTLINE.md` §3 exige que cada perfil diga qual comentário **carrega** o que a sintaxe não tem (→ obrigatório) e qual é **ritual** nesta linguagem — e o `php.md` não materializava isso em lugar nenhum. No vácuo, o hábito da comunidade PHP preenche: PHPDoc completo em toda classe/método, `@param`/`@return` repetindo a assinatura que o PHP 8.5 já tipa nativamente — exatamente o template ritual que o Art. 7 proíbe, só que dito por ninguém na língua do developer.
+
+**Decisão**:
+- **§3 do `php.md` ganha a regra de docblock** pelo mesmo teste do Art. 7 (perde/não perde), com exemplos-âncora: obrigatório quando carrega tipo que a sintaxe nativa não expressa (shape de array, generics para análise estática, `@throws` acionável); proibido quando repete assinatura tipada ou é cabeçalho-template de arquivo/classe. Forma canônica da 4.32: teste falsificável + âncoras, sem enumeração defensiva.
+- **O README ganha seção pública sobre a doutrina de comentário** — "quase nenhum comentário; os que existem são âncoras de navegação" é postura de produto que o consumidor deve conhecer antes da primeira rodada, não detalhe interno enterrado no Charter.
+- **Nenhuma regra nova de doutrina**: é o outline sendo cumprido. O dono continua o Charter (Art. 7); o perfil só fala a língua — um dono por regra preservado.
+
+**Aplicação**: `guidelines/backend/php.md` §3 (perfil `reviewed: true` — edição **sinalizada para re-olhada humana**), `README.md` (seção nova "Comments in generated code" + Status). Correção/ajuste fino → patch: plugin 0.30.0 → 0.30.1.
+
 ---
 
 ## 5. Quality gates inegociáveis

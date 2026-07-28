@@ -91,6 +91,18 @@ autor entregou fora do padrão.
 **DEVE ser único e consistente** em toda a base — nunca metade em inglês, metade em outro
 idioma dentro do mesmo arquivo.
 
+**Docblock (Art. 7):** em PHP 8.5 a sintaxe nativa carrega o tipo, então o docblock
+obedece ao mesmo teste do comentário — **apagá-lo perde informação que a assinatura não
+devolve?**
+
+- **Perde → obrigatório.** O tipo que o PHP não expressa: shape de array
+  (`@param list<User> $users`, `@return array{id: int, email: string}`), generics para
+  o analisador estático (`@template T`), `@throws` que o chamador precisa tratar.
+- **Não perde → NÃO DEVE existir.** `@param string $email` sobre `string $email`,
+  `@return void` sobre `: void`, cabeçalho-template de arquivo/classe, docblock ritual
+  "toda classe/método tem um". Assinatura tipada + nome pela intenção **são** a
+  documentação.
+
 ---
 
 ## 4. Estrutura & arquitetura → Charter Art. 4, 7

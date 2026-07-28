@@ -132,6 +132,26 @@ below** the project's and writes only the delta — never from a higher version,
 recommendations wouldn't exist in your runtime. Profiles you refine can be
 contributed back to the plugin — that's how it grows, by curation, not by empty stubs.
 
+## Comments in generated code
+
+keelson's default is **no comments**. Every comment the agents write must pass a single
+falsifiable test (Quality Charter, Art. 7): *would deleting it lose information the code
+can't give back?*
+
+- **Lost → must exist.** The *why* of a decision — one line, anchored to the artifact
+  that holds the reasoning (`// DEC-03: …`, `// FR-07: …`) — a trap or workaround (with
+  its removal condition), an invariant that types and names can't express, a path
+  already tried that failed.
+- **Not lost → must not exist.** Paraphrase, restated signatures, ritual file/class
+  headers, docblocks that repeat what native types already say.
+
+The one-line anchors are deliberate: they are the **navigation graph** a future agent
+(or human) follows from the code to the decision that shaped it — maximum context per
+line, no prose. Comment density is never inherited from verbose legacy neighbors, and
+the review gate **blocks** excess instead of excusing it. The only exceptions are
+idiomatic and live in the language profile — e.g. a PHP docblock that is the only place
+an array shape or a generic can be declared.
+
 ## Screen verification (Playwright MCP)
 
 When `gates.screenVerify` is on, the behavior gate isn't satisfied by tests alone: the
@@ -291,16 +311,18 @@ keelson/
 
 ## Status
 
-`0.30.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.30.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **screen verification moves to Playwright MCP** (decision 4.49) —
+New in this release: **the PHP profile now spells out the docblock rule** (decision 4.50)
+— a docblock exists only when it carries type information native syntax can't express;
+restating a typed signature is forbidden. See the new
+[Comments in generated code](#comments-in-generated-code) section for the doctrine.
+Previously: **screen verification on Playwright MCP** (decision 4.49) —
 one engine, **headless by default**, artifacts written to `thoughts/screen-verify/<slug>/`,
-and unavailability that names its cause instead of shrugging "no screen available". See
-[Screen verification](#screen-verification-playwright-mcp) for requirements and setup;
-`/keelson:init` guarantees the runtime and tells you exactly what it did.
-Previously: a **[CHANGELOG](CHANGELOG.md)** (decision 4.48), backfilled to `0.1.0` — the
+and unavailability that names its cause instead of shrugging "no screen available"; and
+a **[CHANGELOG](CHANGELOG.md)** (decision 4.48), backfilled to `0.1.0` — the
 release history used to live in this section's ever-rewritten prose and in `git log`, so
 `/plugin update keelson` told you nothing about what changed. A version bump is now
 incomplete without its entry, and this section keeps only the headline.
