@@ -17,6 +17,41 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.31.0] — 2026-07-28
+
+Decision 4.52
+
+### Added
+- **The gate-9 walkthrough script is authored with the TASK, before any code exists.**
+  With `gates.screenVerify` on and an AC assigned to gate 9, the TASK now carries a
+  "Roteiro do gate 9" section: environment (typeable URLs — with the app's real route
+  base — plus realm), a concrete subject (which identity logs in, with which credential),
+  preconditions with a recipe (how to build the state and how to restore it afterwards
+  — "a user without permission" is a wish, not a precondition), and one step per AC: a
+  gate-9 AC without a step is an AC without a gate. Previous handoffs of the slug are
+  required reading — a scenario already recorded there as non-exercisable doesn't become
+  a step by inheritance: reuse the accepted substitute proof, or prescribe a new attempt
+  naming what changed since ("non-exercisable" is a dated record, not a permanent
+  verdict). Motivated by a real full cycle where the pre-code QA pass returned 16
+  findings on freshly generated TASKs, all four recurring shapes traced back to the
+  generator having no ruler for the gate-9 script.
+
+### Changed
+- **Gate-1 verification pairs must be falsifiable.** The command+expected pair fixed
+  before the code (4.34) now has to answer "what state makes this command FAIL?" —
+  without an answer, the criterion approves anything. Absence-shaped expectations
+  (empty output, path not in the output) get called out as the dangerous pattern:
+  absence is the default state of a poorly anchored command, so the command needs an
+  explicit anchor — `git diff --name-only main...HEAD`, never bare `git diff
+  --name-only`, which compares against the index and returns empty after the commit,
+  approving any diff. "Didn't get worse" expectations (suite, type baseline) require
+  the baseline captured up front, inside the criterion. A real criterion passed
+  vacuously this way; the code reviewer caught it, the `task-validator` can't (its
+  check is syntactic by design) — if the error recurs, the answer is a mechanical
+  validator check, not a second rule.
+
+---
+
 ## [0.30.2] — 2026-07-28
 
 Decision 4.51

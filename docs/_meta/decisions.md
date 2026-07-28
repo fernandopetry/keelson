@@ -846,6 +846,20 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.52 — Falsificabilidade no gate 1 e roteiro do gate 9 nascem no gerador de TASKs
+
+**Problema**: primeiro `/keelson:auto` completo num consumidor Vue/PHP (frontend sem runner de testes, `screenVerify` ativo) expôs dois furos do `/keelson:tasks` — ambos de régua ausente no comando, não de descuido na execução, e reprodutíveis em qualquer projeto. (a) A 4.34 exige comando+esperado fixados antes do código, mas **não exige que o par seja falsificável**: um critério real (`git diff --name-only` → "nenhum desses caminhos na saída") aprovava vacuamente — sem ref, o comando compara a árvore de trabalho com o índice e, depois do commit, devolve saída vazia, exatamente o que o critério tratava como aprovação; ele aprovaria qualquer diff, inclusive um que tocasse todos os arquivos que existia para proteger. O `code-reviewer` pegou; o `task-validator` não, porque o check dele é sintático **por construção** ("existe comando? existe esperado?"). O detalhe que prova que faltava régua, não informação: a TASK seguinte do mesmo PLAN trazia a forma correta (`main...HEAD`). O padrão perigoso é o **esperado por ausência** (saída vazia, caminho que não aparece): ausência é o estado default de um comando mal ancorado, então esses critérios passam sozinhos. (b) A Etapa 3.5 do `/keelson:auto` (QA pré-código) devolveu **16 achados** sobre TASKs recém-geradas — a etapa funcionou (é a pergunta mais barata do ciclo), mas o volume aponta para o gerador: nada no `/keelson:tasks` cobria o roteiro do gate 9 (a régua da 4.34 só alcança o gate 1). Quatro formas repetidas: AC sem passo algum (inclusive o AC da métrica de sucesso da SPEC) · pré-condição sem sujeito nem receita ("um profissional sem permissão" é desejo, não pré-condição) · URLs não digitáveis (duas grafias para a mesma tela num app com base de rota própria) · cenário já documentado como não-exercitável em handoff sendo prescrito de novo.
+
+**Decisão**:
+- **Falsificabilidade no gate 1** (§Mapeamento do `tasks.md`): o par comando+esperado responde "que estado faz este comando FALHAR?" — sem resposta, aprova qualquer coisa. Esperado por ausência exige âncora explícita (`git diff --name-only main...HEAD`, nunca sem ref); esperado "não piorou" exige baseline capturada antes de começar, dentro do próprio critério. **Reincidência → check mecânico no `task-validator`, não uma segunda regra.**
+- **Roteiro do gate 9 fixado antes do código** (sub-seção nova na Etapa 3 + seção condicional no template da TASK): com `screenVerify` ativo e AC atribuído ao gate 9, a TASK carrega ambiente (URLs digitáveis + realm), sujeito concreto (identidade + credencial), pré-condição com receita (montar **e** restaurar o estado) e um passo por AC — AC de gate 9 sem passo é AC sem gate. Handoffs anteriores do slug são leitura obrigatória; cenário não-exercitável não vira passo **por herança**: reaproveita a receita/prova substitutiva aceitas, ou prescreve nova tentativa nomeando o que mudou. A ressalva vem do próprio ciclo: o `qa` achou a terceira via de um cenário duas vezes registrado como beco (interceptar a chamada na carga fria da aplicação) — "não exercitável" é registro datado, não veredicto permanente.
+
+**Custo assumido**: ~12 linhas num comando de ~260; **nenhum check novo de validator** — deliberado: a régua entra no gerador, e só vira check mecânico se o erro reincidir (mesma escada da 4.45).
+
+**Aplicação**: `commands/tasks.md` (§Mapeamento estendido, sub-seção "Roteiro do gate 9 — fixado antes do código", seção condicional no template). Doutrina nova no gerador → minor: plugin 0.30.2 → 0.31.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

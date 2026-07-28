@@ -224,3 +224,13 @@ artefato_patchado: commands/verify-handoff.md + skills/{spec,plan,task}-validato
 patch: toda description encurtada para ≤ 250 com termos-gatilho no início e detalhe no corpo (skills preservam auto-ativação; regras críticas já viviam no corpo). Guard mecânico desc-guard.sh (Stop hook, mede code points, bloqueia encerramento listando quem passou do teto) que só age no repo de dev do keelson e sai gracioso em consumidor. Critério de sucesso: nenhum comando/skill futuro entra acima de 250 sem o guard cutucar. Registrada como decisão 4.29.
 reincidencia: 0
 estado: ativa
+
+## LRN-021: "não exercitável" herdado como veredicto permanente — a terceira via estava no MOMENTO da interceptação
+data: 2026-07-28
+gatilho: verificacao_falhou
+origem: ciclo /keelson:auto completo em projeto consumidor (Vue/PHP), gate 9 do qa
+causa_raiz: critério de verificação marcado "não exercitável neste ambiente" há semanas, com 2 tentativas registradas em handoff, era herdado automaticamente a cada ciclo como se fosse veredicto — mas "não exercitável" é registro DATADO das vias já tentadas, não prova de impossibilidade; o processo não pedia revisita deliberada quando o cenário reaparecia
+artefato_patchado: commands/tasks.md (decisão 4.52, já aplicada — sem patch novo nesta entrada)
+patch: lado gerador coberto pela 4.52 (o /keelson:tasks não repete às cegas um beco documentado, mas pode prescrever nova tentativa nomeando o que mudou); esta entrada registra o lado humano/qa — ao reencontrar um "não exercitável", formular nova hipótese de exercício nomeando O QUE MUDA desta vez, em vez de herdar o handoff antigo. Contra-exemplo real que destravou o caso: interceptar a chamada na CARGA FRIA da aplicação em vez de com a app já montada — as 2 tentativas anteriores variavam o método; a terceira via só apareceu variando o momento da interceptação. Saldo 0 (sem edição de artefato).
+reincidencia: 0
+estado: ativa

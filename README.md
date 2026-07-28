@@ -320,34 +320,36 @@ keelson/
 
 ## Status
 
-`0.30.2` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.31.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **fixes from the first real run of the Playwright migration**
+New in this release: **the TASK generator learns two rulers from the first full real
+cycle** (decision 4.52) — gate-1 verification pairs must be *falsifiable* ("what state
+makes this command FAIL?"; absence-shaped expectations need an explicit anchor, e.g.
+`git diff --name-only main...HEAD`, never the bare form that returns empty after commit),
+and the **gate-9 walkthrough script is fixed with the TASK, before any code**: typeable
+URLs plus realm, a concrete subject with its credential, preconditions with a recipe,
+one step per AC, and previous handoffs as required reading.
+Previously: **fixes from the first real run of the Playwright migration**
 (decision 4.51) — a server that *answers* is no longer taken for one that is *configured*,
-multi-realm without `--isolated` now fails the self-check instead of warning (it silently
-verified the second realm still logged in as the first), `.playwright-mcp/` is gitignored
-before the probe runs, and the personal-scope command is corrected to the form that
-actually works.
+multi-realm without `--isolated` now fails the self-check instead of warning, and
+`.playwright-mcp/` is gitignored before the probe runs.
 Previously: **the PHP profile now spells out the docblock rule** (decision 4.50)
 — a docblock exists only when it carries type information native syntax can't express;
-restating a typed signature is forbidden. See the new
+restating a typed signature is forbidden. See the
 [Comments in generated code](#comments-in-generated-code) section for the doctrine.
-Previously: **screen verification on Playwright MCP** (decision 4.49) —
-one engine, **headless by default**, artifacts written to `thoughts/screen-verify/<slug>/`,
-and unavailability that names its cause instead of shrugging "no screen available"; and
-a **[CHANGELOG](CHANGELOG.md)** (decision 4.48), backfilled to `0.1.0` — the
-release history used to live in this section's ever-rewritten prose and in `git log`, so
-`/plugin update keelson` told you nothing about what changed. A version bump is now
-incomplete without its entry, and this section keeps only the headline.
 
-Recent releases, in short: **`jira-guard`** and the Jira reliability batch (decisions
+Recent releases, in short: **screen verification on Playwright MCP** (decision 4.49) —
+one engine, headless by default, artifacts under `thoughts/screen-verify/<slug>/` — and
+a **[CHANGELOG](CHANGELOG.md)** (decision 4.48), backfilled to `0.1.0`, so a version
+bump is incomplete without its entry and this section keeps only the headline. Before
+that, **`jira-guard`** and the Jira reliability batch (decisions
 4.43–4.47) — feasibility resolved before anything is created, a Story mirroring a
 FEAT-less SPEC so QA keeps a flow-level card, required-field and duplicate pre-checks, a
 backfill warning, proven connector unavailability with a durable trace in the slug INDEX,
 and a Stop hook that blocks the turn when a branch carries SDD artifacts without a Jira
-key. Before that, the **team model** (decisions 4.37–4.42): the human becomes the Director
+key. Earlier, the **team model** (decisions 4.37–4.42): the human becomes the Director
 issuing a durable BRIEF, a `po` agent owns each demand, a `pm` agent decomposes epics via
 `/keelson:specify-epic`, lateral signals get named routes, and the agents carry real-life
 role ids (`developer`, `code-reviewer`, `qa`, `security-engineer`, `product-analyst`,

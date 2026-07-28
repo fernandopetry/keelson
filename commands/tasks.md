@@ -129,6 +129,10 @@ mais fraca).>
 - [ ] Aderência à stack/padrões da ficha e do perfil de linguagem
 - [ ] Code review aprovado
 
+## Roteiro do gate 9 (fixado ANTES do código)
+
+<!-- Só com gates.screenVerify ativo e AC atribuído ao gate 9 — régua na seção "Roteiro do gate 9" abaixo; sem gate 9, omitir. Ambiente (URLs digitáveis + realm) · sujeito concreto (identidade + credencial) · pré-condição com receita (montar + restaurar) · um passo por AC. -->
+
 ## Riscos específicos
 
 - <opcional>
@@ -186,6 +190,12 @@ Primeiro decida **qual camada enforça** o AC e liste-o nos "Critérios de pront
 Depois, cada AC mapeia para **exatamente um** gate de verificação. NÃO liste o mesmo AC em dois gates com exigências distintas (ex.: "testes cobrem AC-X" **e** "gate 9 cobre AC-X"): a ambiguidade faz o developer escolher a verificação mais fraca e um MUST fica sem teste falsificável (uma mutação passaria os testes verdes). Regra: **MUST testável em unidade → teste no gate 1**; o gate 9 (comportamento verificado / caminhada de tela quando `gates.screenVerify`) só **confirma** o fluxo ponta-a-ponta, nunca substitui o teste. Respeite o gate que a DoD do PLAN atribui ao AC — nunca rebaixe de gate 1 (teste) para gate 9 (manual).
 
 Todo item de **gate 1** registra a **verificação executável** — comando + saída/efeito esperado — **antes** do código: o critério nasce do AC, nunca do diff (gerador ≠ avaliador). Critério de teste sem comando+esperado → `task-validator` reprova (ERROR).
+
+O par comando+esperado tem de ser **falsificável**: pergunte "que estado faz este comando FALHAR?" — sem resposta, o critério aprova qualquer coisa. Atenção ao **esperado por ausência** (saída vazia, caminho que não aparece, nenhum resultado): ausência é o estado default de um comando mal ancorado, então o comando precisa de âncora explícita — `git diff --name-only main...HEAD`, nunca `git diff --name-only`, que compara com o índice e devolve vazio depois do commit, aprovando qualquer diff. Esperado do tipo "não piorou" (suíte, baseline de tipos) exige a baseline capturada **antes** de começar, dentro do próprio critério.
+
+### Roteiro do gate 9 — fixado antes do código
+
+Com `gates.screenVerify` ativo e algum AC atribuído ao gate 9, a TASK carrega a seção `## Roteiro do gate 9 (fixado ANTES do código)` (ver template). Ela abre com **ambiente** (URLs digitáveis — com a base de rota real do app — + realm), **sujeito concreto** (qual identidade loga, com que credencial) e **pré-condição com receita** — como montar o estado e como restaurá-lo ao fim; "com um usuário sem permissão" não é pré-condição, é desejo. **Um passo por AC**: AC de gate 9 sem passo é AC sem gate. Antes de escrever, leia os handoffs anteriores do slug (`{docsRoot}/<slug>/handoffs/`): cenário já registrado ali como não-exercitável neste ambiente **não vira passo por herança** — reaproveite a receita e a prova substitutiva já aceitas, ou prescreva nova tentativa **nomeando o que mudou** desde o registro ("não exercitável" é registro datado, não veredicto permanente; a revisita é decisão consciente, nunca desconhecimento do handoff).
 
 ## Etapa 4: índice de tasks do PLAN
 
