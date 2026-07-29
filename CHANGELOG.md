@@ -37,7 +37,13 @@ Decision 4.59
   exercise rendering a real consumer SPEC: ACs with no reasonable manual path
   (atomicity, forged requests, ownership) are grouped under an "automated checks" line
   instead of becoming theater steps, and the feature's NFR criteria (dark mode,
-  viewport, screen reader) join the story's test script rather than being orphaned.
+  viewport, screen reader) join the story's test script rather than being orphaned —
+  including verifiable NFRs that have no covering AC at all (idempotency,
+  reversibility, auto-refresh), which the AC-based formula would silently drop. A
+  second field exercise also hardened key persistence: the SPEC header carrying the
+  same key on both `**Jira**:` and `**Jira Story**:` lines (found in the wild) is now
+  treated as inconsistent persistence — the implicit Story is considered missing,
+  probed for duplicates and recreated with a warning, never accepted as valid state.
 - **Do-not-edit notice, marker footer and re-render policy.** Every generated
   description opens with a notice telling humans not to edit the text and to register a
   comment instead (sync never touches comments), and ends with

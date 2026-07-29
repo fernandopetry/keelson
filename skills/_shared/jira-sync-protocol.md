@@ -170,7 +170,9 @@ Templates por papel da issue (todos os tipos nivelados — nenhuma issue nasce s
   rico, porque é o card que o QA humano testa:
   - **O que esta funcionalidade faz** — narrativa de negócio em 2–6 frases, nos termos do
     glossário da SPEC (persona, ação, resultado — não arquitetura);
-  - **Como testar** — roteiro imperativo derivado dos ACs: cada AC vira um cenário com
+  - **Como testar** — roteiro imperativo derivado dos ACs — e dos **NFRs verificáveis sem
+    AC próprio** (idempotência, reversibilidade, refresh: cenários que o QA testa e que a
+    fórmula por ACs deixaria fora): cada um vira um cenário com
     passos numerados (preparação ← Given · ação ← When · resultado esperado ← Then), sem
     citar o jargão. Duas regras de honestidade do roteiro: **(a)** AC sem caminho manual
     razoável (atomicidade, requisição forjada, ownership, contrato de servidor) **não vira
@@ -326,7 +328,10 @@ marco (`comment` → o estado-alvo vira comentário; `off` → nada); a reconcil
   (ausente = Story ainda não sincronizada).
 - **Story implícita** (degrau (0) do §7.0 — SPEC sem FEAT) → linha `**Jira Story**: <KEY>` no
   cabeçalho da SPEC, logo abaixo do `**Jira**:` do Epic. Chave distinta porque as duas issues
-  coexistem e representam camadas diferentes (roadmap × unidade de QA).
+  coexistem e representam camadas diferentes (roadmap × unidade de QA). **As duas linhas com
+  a mesma key = persistência inconsistente** (a mesma issue não pode ser Epic e Story):
+  tratar a Story como **ausente** — sondagem anti-duplicata (§4), criar/corrigir e avisar no
+  output; nunca aceitar a key duplicada como estado válido.
 - **TASK** → campo `Jira: <KEY>` no bloco "Histórico de execução" da closure, ao lado de
   `Commit SHA`.
 - **INDEX** → apenas 1 linha no "Histórico recente" — **do sucesso**
