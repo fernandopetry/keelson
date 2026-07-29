@@ -329,11 +329,17 @@ keelson/
 
 ## Status
 
-`0.34.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.35.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **plugin proposals learn to speak to the maintainer**
+New in this release: **the delivery report tells you how long the session took**
+(decision 4.56) — a measured cycle clock (`TZ=America/Sao_Paulo date`, never an
+estimate): kickoff timestamp in the BRIEF front-matter, one mark per completed stage
+in its `Cronologia`, and a mandatory report line with the total plus the per-stage
+breakdown (specify · plan · tasks · implement) in Brasília time. Wall-clock by
+design, and never a stop trigger.
+Previously: **plugin proposals learn to speak to the maintainer**
 (decision 4.54) — when a cycle in a consumer project produces a `PROPOSTA_PLUGIN`, the
 `agile-coach` now also writes the message for whoever maintains the plugin and wasn't
 there: the concrete scene (reconstructible without repo access), the real cost of the

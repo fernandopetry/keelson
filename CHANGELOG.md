@@ -17,6 +17,28 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.35.0] — 2026-07-28
+
+Decision 4.56
+
+### Added
+- **`/keelson:auto`'s delivery report now shows how long the session took.** The cycle
+  gains a measured clock: at kickoff the Tech Lead runs `TZ=America/Sao_Paulo date` and
+  records the timestamp in the BRIEF front-matter (`Largada`); as each stage completes,
+  a mark is appended to the BRIEF's `Cronologia` section; the delivery report gains a
+  mandatory line with the total wall-clock duration plus the per-stage breakdown
+  (specify · plan · tasks · implement), displayed in Brasília time. Routes without a
+  BRIEF file carry the kickoff mark inline and report the total only; a missing mark is
+  reported as a named gap — never estimated. The timezone is pinned so behavior is
+  identical on a UTC server/CI. Duration is transparency for the Director, never a stop
+  trigger ("stamina is not a trigger" stays intact).
+
+### Changed
+- The canonical BRIEF contract (`docs/_meta/conventions/index-contract.md`) gains the
+  `Largada` front-matter field and the `Cronologia` section that back the duration line.
+
+---
+
 ## [0.34.0] — 2026-07-28
 
 Decision 4.55

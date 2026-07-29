@@ -50,6 +50,7 @@ arquivo, e trivial não tem brief.
 **Slug**: <slug>
 **Status**: Emitido | Aceito | Vetado
 **Data**: <YYYY-MM-DD>
+**Largada**: <YYYY-MM-DDTHH:MM:SS-0300 — medida com `TZ=America/Sao_Paulo date`, nunca estimada>
 **SPEC**: SPEC-NNN
 **Epico**: <caminho do BRIEF épico pai — só quando a demanda veio de uma decomposição; omita a linha caso contrário>
 
@@ -62,10 +63,16 @@ arquivo, e trivial não tem brief.
 ## Premissas decididas
 
 ## Fora de escopo
+
+## Cronologia
+<anexada pelo condutor do ciclo — uma linha `- <etapa>: <timestamp>` ao concluir cada etapa>
 ```
 
 Ciclo de vida: `Emitido` na largada (antes da SPEC) → `Aceito` na Entrega, junto do
-relatório de aceitação do PO. Veto do Diretor → o brief é **reescrito e re-emitido**,
+relatório de aceitação do PO. As marcas de `Largada` e `Cronologia` são **medidas**
+(`TZ=America/Sao_Paulo date`) e alimentam a linha de duração do report da Entrega —
+a regra (formato, degradação sem marca) é do `/keelson:auto`, Etapa 5 item 6.3
+(decisão 4.56). Veto do Diretor → o brief é **reescrito e re-emitido**,
 nunca apagado. A SPEC pareada grava `**Brief**: BRIEF-NNN` no front-matter; o par
 brief ↔ SPEC é a trilha de auditoria da aceitação.
 

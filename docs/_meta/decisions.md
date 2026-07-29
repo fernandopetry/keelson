@@ -901,6 +901,16 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **Aplicação**: `commands/jira-sync.md` (frontmatter, Input, Etapa 0.2, Etapa 1, Output, Limites), `skills/_shared/jira-sync-protocol.md` (§12, parágrafo "Escopo por SPEC"), `docs/_meta/method-guide.md` (§3.13), `README.md` (tabela Commands + seção Jira). Capacidade nova → minor: plugin 0.33.0 → 0.34.0.
 
+### 4.56 — Duração da sessão no report da Entrega: relógio medido, por etapa, horário de Brasília
+
+**Problema**: pedido do Diretor — ao final de um ciclo do `/keelson:auto` não há como saber quanto tempo a sessão durou nem onde ele foi gasto. Duas armadilhas no caminho: o modelo não tem relógio interno confiável (qualquer duração "lembrada" é estimativa, não medida), e um timestamp que viva só na memória da conversa se perde quando a sessão cai e é retomada — os artefatos SDD são o checkpoint, então o relógio precisa morar neles.
+
+**Decisão**: o ciclo ganha um **relógio medido**. Na largada, o Tech Lead roda `TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z` e grava a marca no front-matter do BRIEF (`**Largada**:`); ao concluir cada etapa (1–4), anexa uma linha ao `## Cronologia` do mesmo BRIEF; na Entrega, uma nova **linha obrigatória do report** (item 6.3) traz o total e a quebra por etapa (specify · plan · tasks · implement), exibidos em horário de Brasília. Rotas sem arquivo (bug/refactor inline, trivial, TASK avulsa) carregam a marca de largada na própria mensagem e reportam só o total; marca ausente → reporta-se o que foi medido, com a lacuna nomeada — nunca se inventa número. O fuso é **fixado** em `America/Sao_Paulo` (não o da máquina) para o comportamento ser idêntico num servidor/CI em UTC. O `/keelson:guided` herda pela Entrega compartilhada ("igual ao `/keelson:auto`") e pela regra de degradação. **Duração é transparência, não sinal**: "fôlego não é gatilho" (4.23/4.24) permanece intacta — o relógio jamais justifica parar, acelerar ou estacionar.
+
+**Custo assumido**: duas linhas a mais no contrato do BRIEF e uma passada de `date` por fronteira de etapa. Limite aceito e nomeado: é relógio de parede — inclui esperas (rate limit, máquina suspensa, ausência do humano no guided); o report chama de "duração da sessão", sem prometer "tempo de trabalho do time".
+
+**Aplicação**: `commands/auto.md` (Etapa 0.5 item 5 "Relógio do ciclo" + Etapa 5 item 6.3), `docs/_meta/conventions/index-contract.md` (contrato do BRIEF: `Largada` + `Cronologia`), `docs/_meta/method-guide.md` (§3.9). Capacidade nova → minor: plugin 0.34.0 → 0.35.0.
+
 ---
 
 ## 5. Quality gates inegociáveis
