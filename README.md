@@ -107,6 +107,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:migrate-legacy` | Migrate a legacy slug (docs without `INDEX.md`) to the SDD layout |
 | `/keelson:rebuild-index` | Rebuild a slug's `INDEX.md` from scratch out of its artifacts |
 | `/keelson:verify-handoff` † | Close a pending screen-verification `HANDOFF` — consolidates the branch, exercises each item in the real environment; no merge (points to `/keelson:integrate`) |
+| `/keelson:update` † | Update the installed plugin to the latest marketplace version via the Claude Code CLI (marketplace refresh + plugin update, in that order); the running session keeps the old version until restarted |
 
 † Human-only (`disable-model-invocation`): never triggered by the model — you invoke
 it by typing the slash command.
@@ -329,11 +330,16 @@ keelson/
 
 ## Status
 
-`0.35.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.36.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the delivery report tells you how long the session took**
+New in this release: **`/keelson:update` updates the installed plugin in one step**
+(decision 4.57) — a human-only command backed by a bundled script that drives the
+Claude Code CLI in the order that matters (marketplace refresh *then* plugin update),
+reports the before/after version best-effort, and always ends with the reminder that
+the running session keeps the old version until restarted.
+Previously: **the delivery report tells you how long the session took**
 (decision 4.56) — a measured cycle clock (`TZ=America/Sao_Paulo date`, never an
 estimate): kickoff timestamp in the BRIEF front-matter, one mark per completed stage
 in its `Cronologia`, and a mandatory report line with the total plus the per-stage
@@ -352,11 +358,6 @@ Previously: **the Jira sync can no longer end incoherent in silence**
 (the per-command hooks become three attempts *plus a net*), the delivery report carries
 a mandatory tracker-state line (best-effort never blocks, but it always reports), and
 the method pins the end-of-cycle tracker state.
-Previously: **the TASK generator learns two rulers from the first full real
-cycle** (decision 4.52) — gate-1 verification pairs must be *falsifiable*, and the
-**gate-9 walkthrough script is fixed with the TASK, before any code**: typeable URLs
-plus realm, a concrete subject, preconditions with a recipe, one step per AC, previous
-handoffs as required reading.
 Recent releases, in short: **screen verification on Playwright MCP** (decisions 4.49/4.51)
 — one engine, headless by default, artifacts under `thoughts/screen-verify/<slug>/`, and a
 server that *answers* is no longer taken for one that is *configured* —

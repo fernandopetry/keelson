@@ -17,6 +17,28 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.36.0] — 2026-07-28
+
+Decision 4.57
+
+### Added
+- **`/keelson:update` — update the installed plugin in one step.** A new human-only
+  command (`disable-model-invocation`) runs the bundled `scripts/update.sh`, which
+  drives the Claude Code CLI in the order that matters: `claude plugin marketplace
+  update keelson` *then* `claude plugin update keelson` (refreshing the marketplace
+  alone does **not** update the installed plugin — and a failed refresh aborts, since
+  proceeding on a stale cache would report "already up to date" untruthfully). Takes
+  an optional `--scope user|project|local` pass-through; reads the before/after
+  version from the CLI's plugin manifest (`installed_plugins.json` via `jq`, selected
+  by scope) with a best-effort fallback on `claude plugin list`, and says "nothing to
+  do" when the version didn't move. Failures are named errors (CLI missing from PATH,
+  plugin not installed in that scope, development install), never silently worked
+  around, and every applied update ends with the mandatory reminder that the running
+  session keeps the old version until restarted (*restart required to apply*).
+  Field-validated on a real consumer before landing.
+
+---
+
 ## [0.35.0] — 2026-07-28
 
 Decision 4.56

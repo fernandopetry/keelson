@@ -911,6 +911,16 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **Aplicação**: `commands/auto.md` (Etapa 0.5 item 5 "Relógio do ciclo" + Etapa 5 item 6.3), `docs/_meta/conventions/index-contract.md` (contrato do BRIEF: `Largada` + `Cronologia`), `docs/_meta/method-guide.md` (§3.9). Capacidade nova → minor: plugin 0.34.0 → 0.35.0.
 
+### 4.57 — `/keelson:update`: atualizar o plugin instalado por comando, com o restart nomeado
+
+**Problema**: pedido do Diretor — atualizar o keelson num consumidor exige lembrar dois comandos interativos na ordem certa (`/plugin marketplace update` e depois `/plugin update`; só o primeiro **não** atualiza o plugin instalado — armadilha já documentada no README). Não havia caminho de um passo, e um update disparado sem aviso esconde a segunda armadilha: a sessão corrente continua rodando a versão antiga até reiniciar.
+
+**Decisão**: nasce o `/keelson:update`, **humano-only** (`disable-model-invocation` — atualizar o plugin é ato do Diretor, nunca do time). O motor é um script embarcado (`scripts/update.sh`, referenciado via `${CLAUDE_PLUGIN_ROOT}`), viável porque a CLI expõe os comandos não-interativos `claude plugin marketplace update` e `claude plugin update` (com `--scope`): refresh do marketplace e update do plugin, nesta ordem — e refresh falho **aborta** (seguir com o cache velho faria o passo seguinte reportar "já atualizado" sem estar). A versão antes/depois vem da **ficha de plugins da CLI** (`~/.claude/plugins/installed_plugins.json`, via `jq`, selecionada pelo scope — o array carrega uma entrada por scope), com fallback best-effort no parse de `claude plugin list`; versões iguais → "nada a fazer", sem lembrete de restart. Plugin ausente no scope é **gate**, mas só quando a leitura é confiável (ficha + `jq`) — no fallback, vazio significa "não sei ler", e o update segue best-effort. O comando é fino — executa o script e **reporta fielmente**: falha é erro nomeado (CLI ausente no PATH · plugin fora do marketplace no scope · instalação de desenvolvimento), e todo report de update aplicado termina com o lembrete obrigatório de reiniciar a sessão (*restart required to apply*) — nunca se promete que a versão nova já está ativa. Mecanismo validado em campo: rodado num consumidor real pelo Diretor antes de consolidar.
+
+**Custo assumido**: dependência de dois contratos internos da CLI — os comandos `claude plugin ...` e o formato da ficha `installed_plugins.json` (não documentado); mitigada por o caminho da ficha ser só leitura de versão (formato mudou → cai no fallback do `list`; os dois falharam → update segue com "versão não exibida") e por falha da CLI virar erro reproduzido, nunca contornado. O script segue o padrão bash 3.2 dos hooks, mas **falha alto** — aqui o humano pediu o update; silêncio é que seria falha.
+
+**Aplicação**: `commands/update.md` (novo), `scripts/update.sh` (novo), tabela *Commands* do `README.md`, `docs/_meta/method-guide.md` (§3.16), nota humanos-only do `templates/CLAUDE.keelson-block.md`. Capacidade nova → minor: plugin 0.35.0 → 0.36.0.
+
 ---
 
 ## 5. Quality gates inegociáveis

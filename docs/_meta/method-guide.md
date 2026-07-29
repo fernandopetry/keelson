@@ -278,6 +278,16 @@ Quando o pedido é grande demais para uma demanda (2+ capacidades independentes,
 
 Rotas de chegada: direto, pela categoria 7 do `/keelson:triage`, ou proposto pelo `/keelson:auto` na triagem de rigor (pré-largada; pós-largada, expansão de escopo é escalação do PO, nunca re-decomposição). Governança: decisões 4.37 e 4.39 de `decisions.md`.
 
+### 3.16 `/keelson:update` — atualizar o plugin instalado
+
+Atualiza o keelson para a última versão do marketplace, **quando você decidir** (é humano-only). O motor é o script embarcado (`scripts/update.sh`), que roda a CLI do Claude Code na ordem que importa: `claude plugin marketplace update keelson` **e depois** `claude plugin update keelson` — refresh do marketplace sozinho não atualiza o plugin instalado, e refresh falho aborta (seguir com cache velho reportaria "já atualizado" sem estar). A versão antes/depois vem da ficha de plugins da CLI (com fallback no `claude plugin list`; nunca se inventa número); versão que não se moveu → "nada a fazer".
+
+```
+/keelson:update [--scope user|project|local]
+```
+
+**O update não vale para a sessão corrente** — a CLI exige restart para aplicar; o report sempre termina lembrando de reiniciar a sessão. Falha é erro nomeado (CLI ausente, plugin não instalado via marketplace no scope, instalação de desenvolvimento), nunca contornada em silêncio. Governança: decisão 4.57 de `decisions.md`.
+
 ---
 
 ## 4. Skills
