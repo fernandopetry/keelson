@@ -15,7 +15,9 @@
    irmãos) → não tentar o `parent`, ir direto ao degrau de degradação correspondente (item 4),
    com aviso.
 3. **Criação** (modo `create`, por FEAT sem key — idempotência §4): `createJiraIssue` com
-   `projectKey`, `issueType.feature`, `parent` = key da issue da SPEC, `summary` = nome da
+   `projectKey`, `issueType.feature`, `parent` = key da issue da SPEC — **exceto** na
+   projeção compacta do §7.0 (`epicPolicy: multi-feature` ∧ FEAT única): a Story da FEAT é
+   a **raiz** da árvore e nasce **sem `parent`** —, `summary` = nome da
    FEAT, `description` = template **unidade de QA** da receita §6.2 — narrativa a partir da
    descrição (`>`) da FEAT, roteiro e lista formal a partir dos ACs derivados
    (`ACs(FEAT) = ACs que cobrem FRs da FEAT`), marcador com o caminho relativo da SPEC +

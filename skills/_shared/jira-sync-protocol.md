@@ -55,6 +55,7 @@ variam por projeto.
 | `projectKey` | projeto-alvo das criações |
 | `mode` | `create` (cria hierarquia) \| `link` (pendura em issue existente) — §5 |
 | `issueType.spec` / `issueType.feature` / `issueType.task` / `issueType.standalone` | **IDs** do tipo da issue da SPEC, da Story de funcionalidade (opcional — `null` desliga o 3º nível, §6.1), da sub-task da TASK, e do tipo **nível 0** da tarefa isolada (opcional — `null` = tasks isoladas não sincronizam, §7) |
+| `epicPolicy` | `always` (default — SPEC → Epic sempre) \| `multi-feature` (0–1 FEAT → projeção **compacta**, sem Epic — §7.0) |
 | `transition` | `off` \| `comment` (default) \| `auto` — §9 |
 | `mapFile` | caminho do mapa `.md` do projeto (§3); `null` → só `summary`+`description`, sem mover card |
 | `boardId` | opcional, só para compor link "ver no board" em comentário |
@@ -138,7 +139,9 @@ estado misto é **reportado**, não corrigido.
 0. **Pré-check de viabilidade da projeção (§7)** — antes de criar a issue principal, resolver
 se as TASKs deste slug terão onde aninhar. Inviável → criar a issue da SPEC **assim mesmo**
 só quando a projeção degradada do §7 for possível; senão avisar e **não criar** (issue-mãe
-órfã sem filhos possíveis é meio-estado ruim, não progresso).
+órfã sem filhos possíveis é meio-estado ruim, não progresso). **Projeção compacta**
+(`epicPolicy: multi-feature` ∧ 0–1 FEAT — §7.0) → a issue da SPEC **não é criada**: a raiz
+da árvore é a Story única, e este § inteiro é no-op para a SPEC.
 1. Idempotência (§4). 2. `create` + sem key → `createJiraIssue` (projectKey, `issueType.spec`,
 `summary` = título da SPEC, `description` = template **Epic** da receita §6.2), aplicar campos `write` (§8),
 gravar a key na linha `**Jira**:` do cabeçalho (§10). 3. `link` → validar a key existente e
@@ -222,6 +225,21 @@ sabe que aqueles cards são gerados. Os ganchos automáticos do ciclo **nunca** 
 ## §7. Criar sub-tasks das TASKs
 
 ### §7.0 Pré-check de hierarquia (dono único da régua de adjacência)
+
+**Política de Epic (`epicPolicy`, decisão 4.61) — pré-filtro da régua.** Com
+`epicPolicy: multi-feature`, contar as FEATs da SPEC (`grep -c '^### FEAT-'`): **2+** →
+projeção plena (abaixo, como sempre — há o que agrupar); **0 ou 1** (o mesmo caso:
+funcionalidade única) → **projeção compacta** — nenhum Epic; a raiz é a **Story única**
+(a Story implícita espelhando a SPEC, ou a Story da FEAT única), criada **sem pai** com
+`issueType.feature`, e as sub-tasks aninham sob ela (0 ▸ -1, o mesmo padrão da tarefa
+isolada). Regras: a política é avaliada **uma vez, na primeira criação** — o registro é o
+conjunto de keys persistidas (§10: `**Jira**:` presente = plena; key de Story **sem**
+`**Jira**:` = compacta) e a reconciliação **respeita a projeção registrada**, nunca a
+recalcula; SPEC compacta que ganha a 2ª FEAT depois **não re-parenta** (§4) — a Story nova
+nasce irmã sem pai + link "relates to" com a raiz, estado misto reportado (criar Epic e
+reorganizar é ato do Diretor no Jira); `issueType.feature: null` → compacta inviável,
+degradar para a projeção plena/de hoje com aviso (§0). `epicPolicy` ausente/`always` → tudo
+abaixo vale inalterado.
 
 **Antes de criar qualquer coisa** (vale para 2 e 3 níveis; o `jira-sync-feat.md` referencia
 esta régua, não a duplica): via `getJiraProjectIssueTypesMetadata`, ler `hierarchyLevel` e
@@ -350,7 +368,10 @@ marco (`comment` → o estado-alvo vira comentário; `off` → nada); a reconcil
   (ausente = Story ainda não sincronizada).
 - **Story implícita** (degrau (0) do §7.0 — SPEC sem FEAT) → linha `**Jira Story**: <KEY>` no
   cabeçalho da SPEC, logo abaixo do `**Jira**:` do Epic. Chave distinta porque as duas issues
-  coexistem e representam camadas diferentes (roadmap × unidade de QA). **As duas linhas com
+  coexistem e representam camadas diferentes (roadmap × unidade de QA). **Projeção compacta**
+  (§7.0): a raiz usa a **mesma** linha (`**Jira Story**:`, ou a key sob o heading da FEAT
+  única) e o `**Jira**:` fica **ausente por design** — a combinação de keys é o registro
+  durável de qual projeção foi escolhida; não é estado inconsistente. **As duas linhas com
   a mesma key = persistência inconsistente** (a mesma issue não pode ser Epic e Story):
   tratar a Story como **ausente** — sondagem anti-duplicata (§4), criar/corrigir e avisar no
   output; nunca aceitar a key duplicada como estado válido.
@@ -369,7 +390,8 @@ Best-effort (§0).
 
 ## §12. Reconciliação (`/keelson:jira-sync` · fecho do `/keelson:auto`)
 
-Reprocessa um slug de forma idempotente (§4), na ordem: issue da SPEC (§6) → Stories das
+Reprocessa um slug de forma idempotente (§4), na ordem: issue da SPEC (§6 — pulada na
+projeção compacta do §7.0, cuja raiz é a Story única) → Stories das
 FEATs (`jira-sync-feat.md`, quando ativo) **ou** Story implícita (degrau (0) do §7.0) →
 sub-tasks (§7) → **descrições das issues existentes** (§6.2 — re-render conforme a política
 do marcador; descrição sem marcador é do humano e fica intocada) → status (§9, incluindo o
@@ -428,7 +450,8 @@ barato quando a árvore já existe; cria o que faltar quando não) e então apli
   comenta: em `off` nada toca a issue; o aviso fica no output do comando.
 - **Epic — duplo opt-in**: a doutrina "Epic intocado" (§9) vale para todo gancho automático,
   inclusive a reconciliação; o Epic só se move **por verbo de fase** e **com linha `epic`**
-  declarada para o verbo no mapa.
+  declarada para o verbo no mapa. **Projeção compacta** (§7.0): não há Epic — a linha `epic`
+  é no-op silencioso; a raiz da árvore anda pela linha `story`.
 - **Mecânica de cada movimento**: a do §9 — transição direta quando existe; senão o **walker
   multi-hop** pelo Trilho do board (§3), nunca regredindo, parando-e-comentando em salto
   bloqueado. **Idempotente**: card já no alvo ou além dele no trilho → no-op; rodar o mesmo

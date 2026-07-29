@@ -28,6 +28,7 @@
     "projectKey": null,
     "mode": "create",
     "issueType": { "spec": null, "feature": null, "task": null, "standalone": null },
+    "epicPolicy": "always",
     "transition": "comment",
     "mapFile": null,
     "boardId": null

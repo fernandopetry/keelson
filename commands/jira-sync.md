@@ -60,8 +60,11 @@ TASKs dos PLANs que a cobrem.
    que ficou para trás e por quê.
 4. **Viabilidade da projeção** (protocolo §7.0) — resolver **antes** de montar o plano, não
    descobrir na criação: cruzar os `hierarchyLevel` dos `issueType` configurados com o fato de
-   as SPECs do slug declararem ou não FEATs (`grep -n '^### FEAT-'`). Classifique em uma linha:
-   **3 níveis pleno** · **2 níveis válido** · **2 níveis via Story implícita** (degrau (0)) ·
+   as SPECs do slug declararem ou não FEATs (`grep -n '^### FEAT-'`) — e com a `epicPolicy`
+   da ficha (§7.0: `multi-feature` ∧ 0–1 FEAT → projeção **compacta**, sem Epic; a projeção
+   já registrada pelas keys persistidas prevalece sobre o recálculo). Classifique em uma linha:
+   **3 níveis pleno** · **compacta (Story raiz + sub-tasks)** · **2 níveis válido** ·
+   **2 níveis via Story implícita** (degrau (0)) ·
    **2 níveis via `standalone`** (degrau (i)) · **inviável** (com a perna que não aninha e o
    tipo correto do projeto). Inviável → o plano vira diagnóstico + recomendação; não liste
    criações que o Jira rejeitaria.
@@ -129,7 +132,7 @@ sem tocar no Jira.
 ```markdown
 # Reconciliação Jira: <slug>[ · escopo: SPEC-NNN]
 
-- Projeção: <3 níveis pleno | 2 níveis válido | 2 níveis via Story implícita | 2 níveis via standalone | inviável: <perna>>
+- Projeção: <3 níveis pleno | compacta (epicPolicy, sem Epic) | 2 níveis válido | 2 níveis via Story implícita | 2 níveis via standalone | inviável: <perna>>
 - Backfill: <n/a | K de N TASKs Done com transition:<modo> — o quadro nasce desalinhado>
 - Issue da SPEC: <KEY> (criada | vinculada | já existia)
 - Stories: <N criadas>, <M já existiam> (de FEAT | implícitas) | n/a
@@ -145,4 +148,4 @@ sem tocar no Jira.
 Não cria PR nem faz merge/deploy; não altera SPEC/PLAN/TASK além das linhas `**Jira**:`
 (cabeçalho da SPEC, sob o heading da FEAT, closure da TASK); nunca bloqueia
 (best-effort — protocolo §0). Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53, 4.55,
-4.59 e 4.60 de `decisions.md`.
+4.59, 4.60 e 4.61 de `decisions.md`.

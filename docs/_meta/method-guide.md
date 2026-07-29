@@ -259,6 +259,15 @@ cada salto em runtime — nunca regride, e salto bloqueado para-e-comenta. Por s
 explícita sua, o verbo move mesmo com `transition: comment` (só `off` bloqueia); os ganchos
 automáticos continuam regidos pela política da ficha.
 
+A quantidade de Epics é política declarada (decisão 4.61): com `jira.epicPolicy:
+"multi-feature"`, SPEC com **0–1 FEAT** (funcionalidade única) projeta **sem Epic** — a
+Story única é a raiz, com as sub-tasks embaixo; Epic só nasce com 2+ FEATs (há o que
+agrupar). O sinal é a contagem de headings `### FEAT-` da SPEC — declaração de produto,
+mecânica, nunca "a IA achou pequeno". A projeção é avaliada na primeira criação e
+registrada pelas próprias keys; SPEC compacta que ganhar FEATs depois não é re-parentada
+(a Story nova nasce irmã + link, e o estado misto é reportado — reorganizar é ato seu no
+Jira). Default `"always"` mantém o comportamento clássico: toda SPEC vira Epic.
+
 | Aspecto | Detalhe |
 |---|---|
 | Gera | Issues, Stories de FEAT (quando a SPEC declara FEATs e `issueType.feature` está preenchido), sub-tasks e tarefas isoladas (`issueType.standalone` — TASK avulsa ou transversal sem primária) no Jira (via conector); grava a linha `**Jira**:` no cabeçalho da SPEC, sob os headings FEAT e na closure das TASKs |
@@ -277,7 +286,7 @@ descrição vazia ou com marcador; descrição editada por humano nunca é sobre
 `--refresh-descriptions` força o re-render sem marcador (backfill de cards da receita
 antiga, decisão explícita sua).
 
-Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53, 4.55, 4.59 e 4.60 de `decisions.md`.
+Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53, 4.55, 4.59, 4.60 e 4.61 de `decisions.md`.
 
 ### 3.14 `/keelson:review` — code review de um diff avulso (sem artefato SDD)
 

@@ -261,6 +261,14 @@ transitions). It's **off by default** and **best-effort**: it never blocks the c
   (SPEC issue ▸ sub-tasks). SPECs that declare features (`FEAT-*` headings) plus a configured
   `issueType.feature` get the full Epic ▸ Story ▸ Sub-task hierarchy, with a
   "feature ready for QA" milestone per Story. Both opt-ins missing → nothing changes.
+- **Epics only where they group something.** With `epicPolicy: "multi-feature"`, a SPEC
+  declaring 0–1 features projects **without an Epic**: the single Story is the root, sub-tasks
+  under it — no one-child grouping card polluting the roadmap. The signal is the declared
+  feature count (a product statement in the SPEC, mechanically countable — never the AI
+  guessing "this looks small"). Evaluated once at first creation and recorded by the persisted
+  keys; a SPEC that later gains features is never re-parented (the new Story is created as a
+  sibling with a link, and the mixed state is reported). Default `"always"` keeps the classic
+  one-Epic-per-SPEC behavior.
 - **Standalone tasks.** One-off work (a bugfix or chore routed straight to a TASK, or a
   cross-cutting task with no honest primary feature) projects as `issueType.standalone` —
   a level-0 card QA can test on its own, hung under the Epic when the hierarchy allows.
@@ -312,6 +320,7 @@ The ficha's `jira` block (all IDs, zero secrets):
   "site": null, "cloudId": null, "projectKey": null,
   "mode": "create",                       // "create" | "link"
   "issueType": { "spec": null, "feature": null, "task": null, "standalone": null },
+  "epicPolicy": "always",                 // "always" | "multi-feature" (0–1 FEAT → no Epic)
   "transition": "comment",                // "off" | "comment" | "auto"
   "mapFile": null, "boardId": null
 }
@@ -320,7 +329,7 @@ The ficha's `jira` block (all IDs, zero secrets):
 Re-run `/keelson:jira-sync <slug>` any time to reconcile what a best-effort run skipped —
 or point it at a single SPEC (`SPEC-NNN` or its file path) to create/repair just that
 subtree (Epic, Stories, sub-tasks).
-Governance: decisions 4.22, 4.27, 4.28, 4.53, 4.55, 4.59 and 4.60 in `docs/_meta/decisions.md`.
+Governance: decisions 4.22, 4.27, 4.28, 4.53, 4.55, 4.59, 4.60 and 4.61 in `docs/_meta/decisions.md`.
 
 ## Repository layout
 
@@ -341,11 +350,19 @@ keelson/
 
 ## Status
 
-`0.39.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.40.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **phase verbs move the board** (decision 4.60) —
+New in this release: **Epics only where they group something** (decision 4.61) — with
+`jira.epicPolicy: "multi-feature"`, a SPEC declaring 0–1 features projects without an
+Epic: the single Story is the root of the tree, sub-tasks under it. The signal is the
+declared feature count in the SPEC — a product statement, mechanically countable, never
+the AI inferring "this looks small". Evaluated once at first creation, recorded by the
+persisted keys, never re-parented when the SPEC later grows (sibling Story + link, mixed
+state reported). Default `"always"` keeps one Epic per SPEC. See the full history in
+[CHANGELOG.md](CHANGELOG.md).
+Previously: **phase verbs move the board** (decision 4.60) —
 `/keelson:jira-sync <target> --phase start-dev|finish-dev` is the human's imperative act on
 the Jira board: `start-dev` walks Epic/Story/sub-tasks into the development columns,
 `finish-dev` completes the sub-tasks and moves the Story to the review column. Targets are
@@ -353,21 +370,11 @@ declared per hierarchy level in the project map (real boards run different workf
 issue type), a new ordered "board rail" section lets the sync walk multi-hop transitions —
 validated live at every hop, never regressing, stopping-and-commenting when blocked — and
 the Epic moves only via a phase verb plus a declared `epic` row (automatic hooks still never
-touch it). See the full history in [CHANGELOG.md](CHANGELOG.md).
-Previously: **Jira cards are now written for humans** (decision 4.59) — a
-single description recipe in the sync protocol, leveled across every issue type: the
-Epic carries context, outcome and scope; the QA unit (feature Story, implicit Story or
-standalone task) gets the richest card — a business narrative, a "how to test" script
-with the acceptance criteria translated from Given-When-Then into imperative steps, the
-formal AC list and the out-of-scope notes — and sub-tasks state their goal plus the ACs
-they cover. Every generated description ends with a marker footer naming the source
-artifact by its repo-relative path (spec numbers repeat across slugs; only the path
-disambiguates), and reconciliation re-renders empty or marker-bearing descriptions
-while never touching one a human edited. Every card opens with a do-not-edit notice
-pointing humans to comments (which sync never touches), test scripts fold in the
-feature's NFR criteria and label purely-automated checks honestly, and
-`--refresh-descriptions` backfills pre-marker cards on explicit request.
-Recent releases, in short: **"verified, not deduced" task generation** plus a
+touch it). The verb reconciles first, so on a virgin slug one call creates the tree and
+walks it into development.
+Recent releases, in short: **Jira cards written for humans** — one leveled description
+recipe per issue role, marker-gated re-render, `--refresh-descriptions` backfill
+(decision 4.59) — **"verified, not deduced" task generation** plus a
 task-validator check for orphan scope items (decision 4.58), **`/keelson:update`** for
 one-step plugin updates (4.57), a **measured session clock** in the delivery report
 (4.56), the **per-SPEC sync scope** (4.55), **maintainer-facing plugin proposals**

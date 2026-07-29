@@ -17,6 +17,37 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.40.0] — 2026-07-29
+
+Decision 4.61
+
+### Added
+- **`jira.epicPolicy` — Epics only where they group something.** Every SPEC used to
+  project an Epic, even a small single-feature demand — a grouping card with exactly one
+  child, polluting the roadmap (observed in a real dry-run: 1 FEAT-less SPEC, 2 tasks →
+  Epic + implicit Story + 2 sub-tasks). With `epicPolicy: "multi-feature"`, the declared
+  feature count in the SPEC decides the projection: **2+ FEATs** → full Epic ▸ Stories ▸
+  sub-tasks (there is something to group); **0 or 1 FEAT** (the same case — a single
+  feature) → **compact projection**: the single Story (implicit-Story mirror, or the one
+  declared FEAT's Story) is the parentless root, sub-tasks nest under it — the same
+  level-0 ▸ subtask shape standalone tasks already use. The signal is a product statement
+  written in the SPEC and mechanically countable — never the AI inferring "this looks
+  small". A task-count threshold was considered and rejected: task count is an engineering
+  signal that fluctuates; feature count is a stable product one.
+- **The persisted keys are the record of the chosen projection.** `**Jira**:` present =
+  full projection; a Story key without `**Jira**:` = compact — no new field, and
+  reconciliation respects the recorded projection instead of recomputing it. A compact
+  SPEC that later gains a second FEAT is never re-parented: the new Story is created as a
+  parentless sibling with a "relates to" link, and the mixed state is reported —
+  creating an Epic and reorganizing is the Director's act in Jira. `issueType.feature:
+  null` makes the compact root impossible → degrades to today's projection with a
+  warning. Phase verbs adapt: the `epic` row is a silent no-op on a compact tree.
+- `/keelson:init` now asks the `epicPolicy` question (closed options, default
+  `"always"`), and the merge rule adds `"always"` to older fichas without the key —
+  consumers that touch nothing see zero change.
+
+---
+
 ## [0.39.0] — 2026-07-29
 
 Decision 4.60
