@@ -330,11 +330,19 @@ keelson/
 
 ## Status
 
-`0.36.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.37.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **`/keelson:update` updates the installed plugin in one step**
+New in this release: **task generation writes only what it verified** (decision 4.58) —
+the first automated maintainer message (4.54 mechanism) reported a four-finding cluster
+in `/keelson:tasks`' scope/criteria generation, consolidated here as one named principle,
+"verified, not deduced": paths cited in a TASK's scope are confirmed through the data
+chain (never deduced from a similar-looking name), every scope item carries its own
+executable done-criterion even without an AC (the oracle is the item's own contract),
+and the `task-validator` now fails a TASK whose scope has unreferenced items — the
+"recurrence becomes a mechanical check" ladder from 4.52, honored.
+Previously: **`/keelson:update` updates the installed plugin in one step**
 (decision 4.57) — a human-only command backed by a bundled script that drives the
 Claude Code CLI in the order that matters (marketplace refresh *then* plugin update),
 reports the before/after version best-effort, and always ends with the reminder that
@@ -353,11 +361,6 @@ failure, the diagnosis and the minimal diff — never the generalized rule, whic
 the maintainer's job. Each finding is addressed local × process × "a question `init`
 never asked", and `/keelson:auto`'s delivery report surfaces the message as a
 copy-paste block, ready to forward. No proposal → no section.
-Previously: **the Jira sync can no longer end incoherent in silence**
-(decision 4.53) — `/keelson:auto`'s delivery step runs the idempotent reconciliation
-(the per-command hooks become three attempts *plus a net*), the delivery report carries
-a mandatory tracker-state line (best-effort never blocks, but it always reports), and
-the method pins the end-of-cycle tracker state.
 Recent releases, in short: **screen verification on Playwright MCP** (decisions 4.49/4.51)
 — one engine, headless by default, artifacts under `thoughts/screen-verify/<slug>/`, and a
 server that *answers* is no longer taken for one that is *configured* —

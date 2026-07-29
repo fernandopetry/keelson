@@ -89,6 +89,7 @@ Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara valida
 ### ERROR se:
 - Escopo > Inclui vazio
 - Escopo > Não inclui vazio
+- **Cobertura reversa**: item do Inclui que nenhum critério de pronto referencia — critério genérico ("testes de tudo acima", "tudo coberto") não conta como referência; item sem AC exige critério ancorado no contrato do próprio item (só TASK em `Todo`/`In Progress`; `Done` legada não reprova por isso)
 
 ### WARNING se:
 - Inclui menciona conceitos não mapeados no PLAN

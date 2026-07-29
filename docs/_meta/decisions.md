@@ -921,6 +921,19 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 **Aplicação**: `commands/update.md` (novo), `scripts/update.sh` (novo), tabela *Commands* do `README.md`, `docs/_meta/method-guide.md` (§3.16), nota humanos-only do `templates/CLAUDE.keelson-block.md`. Capacidade nova → minor: plugin 0.35.0 → 0.36.0.
 
+### 4.58 — "Verificado, não deduzido": a abstração do cluster de escopo/critérios do `/keelson:tasks`, e a reincidência vira check
+
+**Problema**: primeira mensagem ao mantenedor gerada pelo mecanismo da 4.54 (o desenho funcionou: diffs prontos, endereçamento local × plugin feito, lições de projeto retidas no consumidor). Ela traz dois achados novos do mesmo consumidor — e um sinal do coach: são **quatro achados consecutivos, em três PLANs, todos na geração de critérios/escopo do `/keelson:tasks`** (dois já aplicados na 4.52). Os dois novos: (a) **cobertura órfã** — o mapeamento AC→critério não alcança item do "Escopo > Inclui" sem AC (contrato criado nesta wave para ser lido em wave posterior: VO, porta, chave de serialização); o developer escreve "testes de tudo acima" e nenhum teste exercita o contrato de verdade; (b) **caminho deduzido do nome** — a TASK citou `components/<domínio>/` porque o nome parecia certo, mas a tela alvo era `views/<domínio>/<Tela>View.vue` com outra leitura; o developer obedeceu ao pé da letra e entregou a funcionalidade onde ela nunca renderiza. O coach pergunta o que a 4.32 obriga a perguntar: quatro regras ou uma abstração? Os quatro achados compartilham a mesma causa — **conteúdo da TASK nascendo de dedução, não de verificação**: critério deduzido do diff (4.52a), passo de gate 9 sem sujeito/receita (4.52b), cobertura deduzida do "testes de tudo" (a), caminho deduzido do nome (b). Aplicar os dois diffs do consumidor ao pé da letra seria acumular prosa num comando já denso — exatamente a enumeração defensiva que a 4.32 veta.
+
+**Decisão** — consolidar sob um princípio nomeado + honrar a escada da 4.52:
+- **A abstração ganha nome no gerador**: o princípio 6 da Etapa 1 vira "Sem invenção de escopo — **nem por dedução**: a TASK só afirma o que **verificou**", com o caso do caminho como âncora (confirmar pela cadeia do dado — *quem consome a consulta/endpoint alterado?* — e, sem confirmação, descrever o consumidor em vez de chutar o caminho). Fica no gerador, sem check de validator: "caminho certo vs. tela errada" não é mecanicamente verificável — o arquivo vizinho existe e compila.
+- **Cobertura reversa na Etapa 3** (§Mapeamento): todo item do Inclui carrega ao menos um critério **próprio e executável** — "testes de tudo acima" não é critério; sem AC, o oráculo é o **contrato do próprio item** (cada método público e cada chave nova exercitados com valor não-nulo, mesmo que nesta wave o valor real nasça sempre nulo).
+- **Reincidência → check, como a 4.52 pré-comprometeu**: o `task-validator` ganha ERROR na Etapa 5 (escopo) — item do Inclui que nenhum critério referencia reprova; critério genérico não conta como referência; TASK `Done` legada não reprova por isso (mesma carência do check de comando+esperado). É o quarto achado da mesma área: a régua "reincidência vira check mecânico, não segunda regra" deixa de ser promessa.
+
+**Custo assumido**: ~10 linhas no comando e 1 check no validator. Observação pendente da 4.54 registrada de passagem: a mensagem chegou completa mas o Diretor não a entendeu de primeira — ela assume fluência no jargão interno; se repetir, o passo 7 do `agile-coach` ganha uma linha de abertura "o que é isto e o que fazer com isto" (fica para o segundo relato, amostra de um não vira regra).
+
+**Aplicação**: `commands/tasks.md` (Etapa 1 princípio 6, Etapa 3 §Mapeamento), `skills/task-validator/SKILL.md` (Etapa 5). Doutrina nova → minor: plugin 0.36.0 → 0.37.0.
+
 ---
 
 ## 5. Quality gates inegociáveis

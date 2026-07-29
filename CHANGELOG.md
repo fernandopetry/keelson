@@ -17,6 +17,30 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.37.0] — 2026-07-28
+
+Decision 4.58
+
+### Changed
+- **`/keelson:tasks` now writes only what it verified — "verified, not deduced".**
+  Consolidation of a four-finding cluster (three PLANs, same command) reported by the
+  first automated maintainer message (4.54 mechanism). Two new rules under one named
+  principle: (a) a file path cited in a TASK's "Escopo > Inclui" must be confirmed
+  through the data chain (*who consumes the query/endpoint this change touches?*),
+  never deduced from a similar-looking name — when unconfirmed, the TASK describes
+  the consumer instead of guessing the path; (b) **reverse coverage**: every "Inclui"
+  item carries at least one own, executable done-criterion — "tests for all of the
+  above" doesn't count, and for items without an AC (contracts created in this wave
+  to be read in a later one) the oracle is the item's own contract, exercised with
+  non-null values.
+- **`task-validator` enforces reverse coverage.** New ERROR in the scope checks: an
+  "Inclui" item that no done-criterion references fails validation (generic criteria
+  don't count as a reference; legacy `Done` TASKs are exempt). This honors the ladder
+  pre-committed in 4.52: recurrence in the same area becomes a mechanical check, not
+  a second prose rule.
+
+---
+
 ## [0.36.0] — 2026-07-28
 
 Decision 4.57

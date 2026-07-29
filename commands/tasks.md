@@ -52,7 +52,11 @@ Listar `TASK-MMM-*.md` em `{docsRoot}/<slug>/tasks/`. Próximo XXX = maior exist
 3. **Verificabilidade**: critério de pronto observável.
 4. **Vertical slicing**.
 5. **Setup-first**: scaffolding/migration com IDs baixos.
-6. **Sem invenção de escopo**.
+6. **Sem invenção de escopo — nem por dedução**: a TASK só afirma o que **verificou**.
+   Caminho citado no "Inclui" foi confirmado pela **cadeia do dado** (*quem consome a
+   consulta/endpoint que esta entrega altera?*), nunca deduzido do nome — vizinhança de
+   nome aponta a tela errada e entrega a funcionalidade onde ela não renderiza. Sem
+   confirmar, descreva o consumidor ("a view que lista X") em vez de chutar o caminho.
 7. **Granularidade**:
    - `small`: 1 arquivo principal, 1 a 3 testes, 30 min a 2 h
    - `medium`: até 3 arquivos relacionados, 2 a 4 h
@@ -192,6 +196,8 @@ Depois, cada AC mapeia para **exatamente um** gate de verificação. NÃO liste 
 Todo item de **gate 1** registra a **verificação executável** — comando + saída/efeito esperado — **antes** do código: o critério nasce do AC, nunca do diff (gerador ≠ avaliador). Critério de teste sem comando+esperado → `task-validator` reprova (ERROR).
 
 O par comando+esperado tem de ser **falsificável**: pergunte "que estado faz este comando FALHAR?" — sem resposta, o critério aprova qualquer coisa. Atenção ao **esperado por ausência** (saída vazia, caminho que não aparece, nenhum resultado): ausência é o estado default de um comando mal ancorado, então o comando precisa de âncora explícita — `git diff --name-only main...HEAD`, nunca `git diff --name-only`, que compara com o índice e devolve vazio depois do commit, aprovando qualquer diff. Esperado do tipo "não piorou" (suíte, baseline de tipos) exige a baseline capturada **antes** de começar, dentro do próprio critério.
+
+E a cobertura fecha **de trás para frente**: o mapeamento AC→critério não alcança item do "Escopo > Inclui" **sem AC** — contrato criado nesta wave e lido só em wave posterior (VO, porta, chave de serialização). Todo item do Inclui carrega ao menos um critério **próprio e executável**; "testes de tudo acima" não é critério. Sem AC, o oráculo é o **contrato do próprio item** — cada método público e cada chave nova exercitados com valor **não-nulo**, mesmo que nesta wave o valor real nasça sempre nulo. Item do Inclui que nenhum critério referencia → `task-validator` reprova (ERROR).
 
 ### Roteiro do gate 9 — fixado antes do código
 
