@@ -17,6 +17,23 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.34.0] — 2026-07-28
+
+Decision 4.55
+
+### Added
+- **`/keelson:jira-sync` now accepts a single SPEC as its target.** Passing `SPEC-NNN`
+  (or the SPEC's file path) scopes the reconciliation to that SPEC's subtree — the Epic,
+  its Stories (declared FEATs or the implicit Story) and the sub-tasks of the TASKs whose
+  covering PLAN includes the SPEC — leaving sibling SPECs untouched. Since the whole sync
+  is idempotent, running it against a virgin SPEC *is* the bulk creation: this is the
+  manual fallback for a cycle that finished with an empty tracker, while the `/keelson:auto`
+  closure reconciliation (4.53) is still being proven in real runs. No new command and no
+  second owner of the sync logic: the scope rule lives in the protocol's §12 and the
+  command only orchestrates it.
+
+---
+
 ## [0.33.0] — 2026-07-28
 
 Decision 4.54

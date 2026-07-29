@@ -1,6 +1,6 @@
 ---
-description: Reconcilia um slug com o Jira via conector MCP Atlassian — cria/vincula o que faltou e alinha o status, de forma idempotente (opcional, best-effort)
-argument-hint: <slug ou PLAN-MMM> [--dry-run]
+description: Reconcilia um slug — ou uma SPEC dele — com o Jira via conector MCP Atlassian: cria/vincula o que faltou (épico, stories, sub-tasks) e alinha o status, de forma idempotente (opcional, best-effort)
+argument-hint: <slug | PLAN-MMM | SPEC-NNN ou caminho da SPEC> [--dry-run]
 ---
 
 # /keelson:jira-sync
@@ -21,12 +21,17 @@ slug inteiro — a reconciliação usa quase todos os §§: leia o protocolo **i
 ## Input
 
 ```
-/keelson:jira-sync <slug ou PLAN-MMM> [--dry-run]
+/keelson:jira-sync <slug | PLAN-MMM | SPEC-NNN | caminho da SPEC> [--dry-run]
 ```
 
 | Flag | Uso |
 |---|---|
 | `--dry-run` | Lista o que criaria/vincularia/moveria, sem tocar no Jira |
+
+Slug ou `PLAN-MMM` → reconcilia o **slug inteiro**. `SPEC-NNN` (ou o caminho do arquivo da
+SPEC) → reconcilia **só a árvore daquela SPEC** — o fallback manual para quando o ciclo
+terminou com o tracker vazio (decisão 4.55): issue da SPEC, Stories dela e sub-tasks das
+TASKs dos PLANs que a cobrem.
 
 ## Etapa 0: pré-condições
 
@@ -36,12 +41,15 @@ slug inteiro — a reconciliação usa quase todos os §§: leia o protocolo **i
      são relativos à raiz dele). **Não** saia procurando o projeto em outros diretórios.
    - Ficha presente com `jira.enabled` ausente/`false` → parar e informar que a integração
      está desligada (nada a fazer).
-2. Resolver o slug (aceita nome do slug ou um `PLAN-MMM` → slug pela pasta-pai). O panorama
-   vem do **`INDEX.md` do slug** — leia-o primeiro; ele já traz SPECs, PLANs e estado. Não
-   varra `{docsRoot}/` inteiro nem rode `ls -R`: depois do INDEX, leia a(s) SPEC(s), os
-   `TASK-MMM-INDEX` e as TASKs do slug, e colete o que o plano precisa em **uma** passada
-   (títulos, `**Status**`, keys — um `grep` por campo sobre `tasks/*.md`, não arquivo a
-   arquivo).
+2. Resolver o alvo (aceita nome do slug, um `PLAN-MMM` → slug pela pasta-pai, ou um
+   `SPEC-NNN`/caminho da SPEC → slug pela pasta-pai, com **escopo reduzido à SPEC**). O
+   panorama vem do **`INDEX.md` do slug** — leia-o primeiro; ele já traz SPECs, PLANs e
+   estado. Não varra `{docsRoot}/` inteiro nem rode `ls -R`: depois do INDEX, leia a(s)
+   SPEC(s), os `TASK-MMM-INDEX` e as TASKs do slug, e colete o que o plano precisa em
+   **uma** passada (títulos, `**Status**`, keys — um `grep` por campo sobre `tasks/*.md`,
+   não arquivo a arquivo). Com escopo de SPEC, o conjunto é o recorte do protocolo §12:
+   a própria SPEC, suas FEATs e as TASKs dos PLANs cuja coluna **Cobre** do INDEX inclui
+   a SPEC — as demais SPECs do slug ficam fora do plano (e do output).
 3. Verificar disponibilidade do conector **provando** (protocolo §0/§1): carregar as
    ferramentas (deferred não aparecem na lista até serem buscadas) e fazer a chamada de prova.
    Indisponível → parar com aviso claro **e** gravar o rastro durável (§0); não é erro — é
@@ -65,7 +73,7 @@ slug inteiro — a reconciliação usa quase todos os §§: leia o protocolo **i
 
 ## Etapa 1: reconciliação (protocolo §12)
 
-Aplicar o protocolo de sync Jira sobre o slug, na ordem:
+Aplicar o protocolo de sync Jira sobre o alvo (slug inteiro ou a árvore da SPEC), na ordem:
 
 1. **Issue da SPEC** (§4–§6): sondagem anti-duplicata (§4, obrigatória no `--dry-run`); criar
    (modo `create`) ou validar o vínculo (modo `link`); gravar a key na linha `**Jira**:` do
@@ -93,7 +101,7 @@ sem chamar as ferramentas de escrita.
 ## Output
 
 ```markdown
-# Reconciliação Jira: <slug>
+# Reconciliação Jira: <slug>[ · escopo: SPEC-NNN]
 
 - Projeção: <3 níveis pleno | 2 níveis válido | 2 níveis via Story implícita | 2 níveis via standalone | inviável: <perna>>
 - Backfill: <n/a | K de N TASKs Done com transition:<modo> — o quadro nasce desalinhado>
@@ -108,5 +116,5 @@ sem chamar as ferramentas de escrita.
 
 Não cria PR nem faz merge/deploy; não altera SPEC/PLAN/TASK além das linhas `**Jira**:`
 (cabeçalho da SPEC, sob o heading da FEAT, closure da TASK); nunca bloqueia
-(best-effort — protocolo §0). Governança: decisões 4.22, 4.27, 4.28, 4.43 e 4.53 de
+(best-effort — protocolo §0). Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53 e 4.55 de
 `decisions.md`.

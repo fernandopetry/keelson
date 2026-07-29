@@ -283,9 +283,17 @@ completas). Aplica campos e — se `transition:auto` — alinha o status ao esta
 (Done → status-alvo de "concluída"). Estado misto (sub-tasks legadas sob a issue da SPEC com o
 3º nível ativo) é **reportado no output**, nunca re-parentado (§4).
 
+**Escopo por SPEC** (decisão 4.55): quando o invocador aponta uma SPEC específica
+(`SPEC-NNN` ou caminho do arquivo) em vez do slug, a mesma reconciliação roda sobre a
+**árvore daquela SPEC** — issue da SPEC (§6) → Stories dela (§6.1 ou degrau (0) do §7.0) →
+sub-tasks das TASKs dos PLANs que a cobrem (coluna "Cobre" do INDEX do slug) — e nada além.
+Nenhuma regra muda: idempotência (§4), régua de hierarquia (§7.0), campos (§8) e
+persistência (§10) valem idênticas; a única diferença é o recorte do conjunto. É o
+fallback manual de menor superfície quando um ciclo terminou com o tracker vazio.
+
 **Dois invocadores, a mesma reconciliação**: o comando avulso `/keelson:jira-sync` (rede de
-segurança sob demanda, com `--dry-run` e backfill abaixo) e o **fecho do `/keelson:auto`**
-(Etapa 5), que a roda antes do relatório de entrega. Como o sync inteiro é idempotente por
+segurança sob demanda, com `--dry-run`, escopo por SPEC e backfill abaixo) e o **fecho do
+`/keelson:auto`** (Etapa 5), que a roda antes do relatório de entrega. Como o sync inteiro é idempotente por
 exigência do §4, rodá-la no fecho é **no-op barato quando os ganchos de
 `specify`/`tasks`/`implement` funcionaram** e conserta o ciclo quando algum não rodou — os
 ganchos deixam de ser três oportunidades independentes de falhar em silêncio e viram três

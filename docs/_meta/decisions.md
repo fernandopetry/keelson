@@ -891,6 +891,18 @@ Slug próprio só se justifica para domínio distinto; faceta/regra de um domín
 
 ---
 
+### 4.55 — Escopo por SPEC no `/keelson:jira-sync`: o fallback manual enquanto o fecho do auto não se prova
+
+**Problema**: relato do Diretor pós-4.53 — na prática, o `/keelson:auto` **continua não criando as issues no Jira**; a passada de reconciliação do fecho (§12), desenhada exatamente para consertar os ganchos que falharam, ainda não se comprovou em rodada real (a observação pendente da 4.53 tem agora a primeira resposta, e é negativa). Enquanto a causa não é diagnosticada e refinada, o Diretor precisa de um **fallback manual confiável**: com o ciclo pronto (SPEC, PLAN e TASKs criados), apontar **uma SPEC** e ter Epic, Story/FEATs e sub-tasks criados no Jira. O pedido original era um comando novo (`/keelson:jira-create <spec>`), mas a sobreposição com o `/keelson:jira-sync` é quase total — a criação em lote *é* a primeira reconciliação de um alvo virgem (§4: idempotência faz "create" e "sync" diferirem só pelo estado prévio) — e a 4.27 já vetou comando novo para isso. O delta genuíno é só o **escopo do input**: o comando aceitava slug ou `PLAN-MMM` (slug inteiro), não uma SPEC individual.
+
+**Decisão**: estender o argumento do `/keelson:jira-sync` para aceitar `SPEC-NNN` ou o caminho do arquivo da SPEC. Nesse caso a reconciliação do §12 roda **escopada à árvore da SPEC**: issue da SPEC (§6) → Stories (§6.1/degrau (0) do §7.0) → sub-tasks das TASKs dos PLANs cuja coluna **Cobre** do INDEX inclui a SPEC — e nada além; as demais SPECs do slug ficam fora do plano e do output. Nenhuma regra muda de dono nem de conteúdo: idempotência (§4), régua de hierarquia (§7.0), campos (§8), persistência (§10) e `--dry-run` valem idênticos — a única diferença é o recorte do conjunto. Nenhum comando novo (4.27 mantida); o dono da lógica segue único (4.20/4.22): o recorte é declarado no §12 do protocolo e o comando só o orquestra. A observação da 4.53 (fecho do auto executa a passada §12?) **continua aberta** — este fallback alivia o sintoma, não substitui o diagnóstico; quando o relato do próximo ciclo real chegar, a causa de o fecho não reconciliar vira decisão própria.
+
+**Custo assumido**: uma regra de resolução de alvo a mais na Etapa 0 do comando e um parágrafo no §12. Risco aceito: escopo por SPEC pode deixar irmãs do mesmo slug defasadas no tracker — mitigado pelo próprio comando (rodar depois com o slug é no-op sobre o que o escopo já criou).
+
+**Aplicação**: `commands/jira-sync.md` (frontmatter, Input, Etapa 0.2, Etapa 1, Output, Limites), `skills/_shared/jira-sync-protocol.md` (§12, parágrafo "Escopo por SPEC"), `docs/_meta/method-guide.md` (§3.13), `README.md` (tabela Commands + seção Jira). Capacidade nova → minor: plugin 0.33.0 → 0.34.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

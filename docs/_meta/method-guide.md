@@ -240,8 +240,13 @@ Roda a auditoria de vulnerabilidade conhecida sobre as dependências, **em momen
 Rede de segurança da integração opcional com Jira (via **conector MCP Atlassian**, ligada em `jira.enabled` na ficha). Os comandos do ciclo já sincronizam **best-effort**, e o fecho do `/keelson:auto` roda a mesma reconciliação automaticamente (decisão 4.53); este comando avulso cobre o resto — backfill de slug antigo, ciclo interrompido antes da entrega, conector que só ficou disponível depois — reprocessando o slug e criando/vinculando/comentando/transicionando o que ficou para trás, de forma **idempotente**.
 
 ```
-/keelson:jira-sync <slug ou PLAN-MMM> [--dry-run]
+/keelson:jira-sync <slug | PLAN-MMM | SPEC-NNN ou caminho da SPEC> [--dry-run]
 ```
+
+Com slug ou `PLAN-MMM` reconcilia o slug inteiro; apontando uma **SPEC** (`SPEC-NNN` ou o
+caminho do arquivo), a reconciliação fica **escopada à árvore dela** — Epic, Stories e
+sub-tasks das TASKs dos PLANs que a cobrem (coluna "Cobre" do INDEX) — o fallback manual
+para o ciclo que terminou com o tracker vazio (decisão 4.55).
 
 | Aspecto | Detalhe |
 |---|---|
@@ -251,7 +256,7 @@ Rede de segurança da integração opcional com Jira (via **conector MCP Atlassi
 | Pré-condição | Rodar **de dentro do repo consumidor** (ficha no cwd). A Etapa 0 resolve a **viabilidade da projeção** antes de planejar — 3 níveis · 2 níveis · 2 níveis via Story implícita · 2 níveis via `standalone` · inviável (com a perna que não aninha) — e sinaliza **backfill** quando o slug já está concluído e `transition` não move card |
 | Lógica | Toda no `skills/_shared/jira-sync-protocol.md` (régua de hierarquia: §7.0; 3º nível: `jira-sync-feat.md`) — o comando só orquestra |
 
-Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27, 4.28, 4.43 e 4.53 de `decisions.md`.
+Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53 e 4.55 de `decisions.md`.
 
 ### 3.14 `/keelson:review` — code review de um diff avulso (sem artefato SDD)
 

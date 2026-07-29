@@ -100,7 +100,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 |---------|--------------|
 | `/keelson:init` | Interactive setup — detects the stack, writes the ficha and the `CLAUDE.md` block |
 | `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
-| `/keelson:jira-sync` | Reconcile a slug with Jira via the Atlassian MCP connector — idempotent, best-effort (optional) |
+| `/keelson:jira-sync` | Reconcile a slug — or a single SPEC subtree — with Jira via the Atlassian MCP connector — idempotent, best-effort (optional) |
 | `/keelson:review` † | Review an arbitrary diff (working tree, last commit, N commits, range, branch) against the keelson doctrine via independent reviewers; on your OK, dispatches the fix to the developer agent and re-reviews — for code that arrived without an SDD artifact |
 | `/keelson:audit` † | On-demand dependency audit against known vulnerabilities (CVE/NVD); `full` adds hygiene (outdated, abandoned, licenses) |
 | `/keelson:status` | Executive summary of a slug's current state — what's done, in flight, planned |
@@ -305,8 +305,10 @@ The ficha's `jira` block (all IDs, zero secrets):
 }
 ```
 
-Re-run `/keelson:jira-sync <slug>` any time to reconcile what a best-effort run skipped.
-Governance: decisions 4.22, 4.27, 4.28 and 4.53 in `docs/_meta/decisions.md`.
+Re-run `/keelson:jira-sync <slug>` any time to reconcile what a best-effort run skipped —
+or point it at a single SPEC (`SPEC-NNN` or its file path) to create/repair just that
+subtree (Epic, Stories, sub-tasks).
+Governance: decisions 4.22, 4.27, 4.28, 4.53 and 4.55 in `docs/_meta/decisions.md`.
 
 ## Repository layout
 
@@ -327,7 +329,7 @@ keelson/
 
 ## Status
 
-`0.33.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.34.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
