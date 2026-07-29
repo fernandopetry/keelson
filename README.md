@@ -288,7 +288,9 @@ transitions). It's **off by default** and **best-effort**: it never blocks the c
 - **Phase verbs.** `/keelson:jira-sync <target> --phase start-dev|finish-dev` is your
   imperative act on the board, outside the cycle's automatic milestones: `start-dev` walks
   Epic/Story/sub-tasks into the development columns, `finish-dev` completes the sub-tasks and
-  moves the Story to the review column. Targets are declared **per hierarchy level** in the map
+  moves the Story to the review column. The verb runs the normal reconciliation first, so
+  missing issues are created before anything moves — on a virgin slug, one call creates the
+  tree and walks it into development. Targets are declared **per hierarchy level** in the map
   (real boards run different workflows per issue type), and when no direct transition exists
   the sync walks the map's ordered **board rail** status by status — validating every hop live,
   never regressing, stopping-and-commenting on a blocked hop. Because the verb is your explicit
