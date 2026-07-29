@@ -1,6 +1,6 @@
 ---
-description: Reconcilia um slug — ou uma SPEC dele — com o Jira via conector MCP Atlassian: cria/vincula o que faltou (épico, stories, sub-tasks) e alinha o status, de forma idempotente (opcional, best-effort)
-argument-hint: <slug | PLAN-MMM | SPEC-NNN ou caminho da SPEC> [--dry-run] [--refresh-descriptions]
+description: Reconcilia um slug (ou uma SPEC dele) com o Jira via conector MCP Atlassian: cria/vincula épico, stories e sub-tasks, alinha o status e, com --phase (start-dev/finish-dev), move a árvore no quadro — idempotente (opcional, best-effort)
+argument-hint: <slug | PLAN-MMM | SPEC-NNN ou caminho da SPEC> [--dry-run] [--refresh-descriptions] [--phase start-dev|finish-dev]
 ---
 
 # /keelson:jira-sync
@@ -21,13 +21,14 @@ slug inteiro — a reconciliação usa quase todos os §§: leia o protocolo **i
 ## Input
 
 ```
-/keelson:jira-sync <slug | PLAN-MMM | SPEC-NNN | caminho da SPEC> [--dry-run] [--refresh-descriptions]
+/keelson:jira-sync <slug | PLAN-MMM | SPEC-NNN | caminho da SPEC> [--dry-run] [--refresh-descriptions] [--phase start-dev|finish-dev]
 ```
 
 | Flag | Uso |
 |---|---|
 | `--dry-run` | Lista o que criaria/vincularia/moveria, sem tocar no Jira |
 | `--refresh-descriptions` | Força o re-render de descrições **sem** marcador (backfill de cards da receita antiga — protocolo §6.2); sem a flag, descrição sem marcador é tratada como editada por humano e preservada |
+| `--phase start-dev\|finish-dev` | Verbo de fase (protocolo §13): após a reconciliação, **move a árvore no quadro** — `start-dev` leva Epic/Story/sub-tasks às colunas de desenvolvimento; `finish-dev` conclui as sub-tasks e leva a Story à coluna de revisão. Alvos por nível nas linhas `--phase` do mapa; ordem exigida pelo Diretor — move com `transition: comment`/`auto` (só `off` bloqueia) |
 
 Slug ou `PLAN-MMM` → reconcilia o **slug inteiro**. `SPEC-NNN` (ou o caminho do arquivo da
 SPEC) → reconcilia **só a árvore daquela SPEC** — o fallback manual para quando o ciclo
@@ -103,6 +104,26 @@ Aplicar o protocolo de sync Jira sobre o alvo (slug inteiro ou a árvore da SPEC
 `--dry-run` → apenas imprimir o plano de reconciliação (o que seria criado/vinculado/movido),
 sem chamar as ferramentas de escrita.
 
+## Etapa 2: verbo de fase (só com `--phase` — protocolo §13)
+
+Após a reconciliação (que garante a árvore no Jira), aplicar a fase sobre o mesmo alvo:
+
+1. **Resolver os alvos por nível** nas linhas da tabela Etapas/Colunas cujo `Gatilho` é
+   `--phase <verbo>` (§3/§13). Nenhuma linha para o verbo → parar com aviso claro (o mapa não
+   declara a fase); nível sem linha → aquele nível não se move (opt-out, sem erro). Checar a
+   política: `transition: off` → avisar e não mover (§13); `comment`/`auto` → o verbo move.
+2. **Mover na ordem coerente** (§13): `start-dev` de cima para baixo (Epic → Stories →
+   sub-tasks); `finish-dev` de baixo para cima. Epic só se move com linha `epic` declarada
+   (duplo opt-in — §13). Cada movimento segue o §9: transição direta ou walker multi-hop pelo
+   Trilho do board; card já no alvo ou além → no-op; salto bloqueado → para, comenta na issue
+   e reporta a posição.
+3. **Registrar** (§10): 1 linha no "Histórico recente" do INDEX — verbo, K cards movidos,
+   no-ops e bloqueios.
+
+`--dry-run` → imprime o plano de movimentação por card
+(`KEY: <status atual> → <intermediários> → <alvo>` · `no-op` · `bloqueado em <status>`)
+sem tocar no Jira.
+
 ## Output
 
 ```markdown
@@ -115,12 +136,13 @@ sem chamar as ferramentas de escrita.
 - Sub-tasks: <N criadas>, <M já existiam>
 - Descrições: <N renderizadas/re-renderizadas>, <M preservadas (editadas por humano)> | n/a
 - Status alinhado: <K movidas | só comentado | n/a>
-- Pulado/avisos: <itens best-effort que falharam · obrigatórios não cobertos (§8) · divergência TASK-INDEX × arquivos (§4) · Story implícita grossa (§7.0)>
+- Fase: <n/a | start-dev/finish-dev — K cards movidos, M no-op, B bloqueados em <status>>
+- Pulado/avisos: <itens best-effort que falharam · obrigatórios não cobertos (§8) · divergência TASK-INDEX × arquivos (§4) · Story implícita grossa (§7.0) · fase sem linha no mapa / `transition: off` (§13)>
 ```
 
 ## Limites
 
 Não cria PR nem faz merge/deploy; não altera SPEC/PLAN/TASK além das linhas `**Jira**:`
 (cabeçalho da SPEC, sob o heading da FEAT, closure da TASK); nunca bloqueia
-(best-effort — protocolo §0). Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53, 4.55 e
-4.59 de `decisions.md`.
+(best-effort — protocolo §0). Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53, 4.55,
+4.59 e 4.60 de `decisions.md`.

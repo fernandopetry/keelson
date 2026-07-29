@@ -59,7 +59,7 @@ variam por projeto.
 | `mapFile` | caminho do mapa `.md` do projeto (§3); `null` → só `summary`+`description`, sem mover card |
 | `boardId` | opcional, só para compor link "ver no board" em comentário |
 
-## §3. Mapa do projeto (`mapFile`) — duas seções
+## §3. Mapa do projeto (`mapFile`) — três seções
 
 Arquivo `.md` **no repo do consumidor** (não no plugin), gerado pelo `/keelson:init` e
 editado pelo humano. Ausente → o protocolo usa só `summary`+`description` e não move card.
@@ -69,11 +69,22 @@ editado pelo humano. Ausente → o protocolo usa só `summary`+`description` e n
   - `Estratégia` (write): `fixed` (valor/ID constante em `Valor`) · `from` (fonte SDD em
     `Valor`, ex.: ACs da SPEC, resumo, `pr.url`) · vazio = ignorar.
   - Campos `option`/`array` guardam o **ID** da opção em `Valor`, nunca o texto.
-- **Seção "Etapas/Colunas"** — tabela `Etapa | Coluna | Status-alvo (ID) | Gatilho`: mapeia
-  cada marco do ciclo a um status-alvo (§9). `Coluna` é só rótulo legível. Com o 3º nível
-  ativo (§6.1), a tabela pode declarar a linha
-  `Funcionalidade pronta p/ QA | <coluna> | <status-id> | todas as TASKs da FEAT Done` —
+- **Seção "Etapas/Colunas"** — tabela `Etapa | Nível | Coluna | Status-alvo (ID) | Gatilho`:
+  mapeia cada marco do ciclo — e cada fase (§13) — a um status-alvo (§9). `Coluna` é só rótulo
+  legível. `Nível` ∈ `epic` | `story` | `subtask` (`story` cobre Story de FEAT, Story implícita
+  e tarefa isolada) e diz **em qual issue da árvore** o alvo atua; nas linhas de **fase**
+  (`Gatilho` = `--phase <verbo>`, §13) a coluna é obrigatória — linha ausente para um nível =
+  aquele nível não se move (opt-out declarado). Mapa legado sem a coluna → os marcos do ciclo
+  seguem valendo (o nível deles já era implícito no gatilho). Com o 3º nível ativo (§6.1), a
+  tabela pode declarar a linha
+  `Funcionalidade pronta p/ QA | story | <coluna> | <status-id> | todas as TASKs da FEAT Done` —
   status-alvo aplicado **na Story** da FEAT; ausente → o marco vira comentário.
+- **Seção "Trilho do board"** (opcional; exigida pelo walker multi-hop do §9) — por nível, a
+  lista **ordenada** de status-IDs das colunas do quadro, do início ao fim do fluxo (ex.:
+  `story: 1 → 11606 → 10599 → … → 10001`). Workflows diferem por tipo — um trilho por nível,
+  só dos níveis que se movem. É declaração do humano (o `/keelson:init` semeia pela amostragem
+  do workflow); board reordenado sem atualizar o trilho → o walker para num salto bloqueado e
+  reporta (§9), nunca erra em silêncio. Seção ausente → só transição direta (sem walk).
 
 **A ficha é a fonte da política.** Prosa ou cabeçalho do mapa que afirmar o contrário da
 ficha (ex.: o mapa diz em texto corrido "a ficha usa `transition: comment`" e a ficha declara
@@ -303,6 +314,16 @@ Conforme `jira.transition`:
   satisfazê-las; aplicar via `transitionJiraIssue`. **Sem caminho seguro → cai para comentar**
   (não força, não erra). O mapa é intenção; a transição real é sempre validada em runtime.
 
+**Walker multi-hop** (usado pelos verbos de fase do §13 e por qualquer status-alvo sem
+transição direta): quando `getTransitionsForJiraIssue` não oferece transição cujo destino é o
+alvo, consultar o **Trilho do board** do nível (§3). Localizar o status atual e o alvo no
+trilho: atual já **no alvo ou depois** dele → no-op (**nunca regredir** — rodar de novo é
+seguro); antes → avançar **um status por vez** na ordem do trilho, revalidando as transições a
+cada salto (mesmas regras de `isAvailable`/`hasScreen`/`isConditional` acima). Salto sem
+transição segura, ou status atual **fora do trilho** → **parar onde está**, comentar e reportar
+a posição alcançada — nunca forçar. Sem seção de trilho no mapa → só o salto direto (sem
+caminho → comenta, como hoje).
+
 O marco de closure atua na **sub-task**; o marco de funcionalidade pronta na Story —
 `jira-sync-feat.md`, quando ativo. **Story implícita** (degrau (0) do §7.0): mesma semântica,
 com a SPEC no lugar da FEAT — marco "pronta p/ QA" nela quando **todas** as TASKs da SPEC
@@ -316,7 +337,8 @@ ganchos anteriores tiverem rodado. Ao fim do ciclo, o estado-alvo do tracker é:
 no marco de closure (`Done`) · a **unidade de QA** (Story da FEAT, Story implícita ou tarefa
 isolada) no status-alvo de "pronta p/ QA" do mapa — o estado de espera-do-humano, coerente com
 o contrato Diretor–PO (o ciclo termina no push; revisão e merge são do Diretor) · **Epic
-intocado** (roadmap é do humano). A política `transition` continua valendo como em qualquer
+intocado** (roadmap é do humano — a única via de movê-lo é o verbo de fase do §13, que *é* o
+ato do humano, e ainda assim só com linha `epic` declarada no mapa). A política `transition` continua valendo como em qualquer
 marco (`comment` → o estado-alvo vira comentário; `off` → nada); a reconciliação do fecho
 (§12) é quem garante esse estado quando algum gancho não rodou.
 
@@ -382,3 +404,38 @@ criar** (no `--dry-run`, na seção de avisos; sem a flag, como primeira linha d
 real; (b) em `comment`, o marco de cada closure vira comentário e o alinhamento do quadro fica
 manual. **Não** mudar a ficha nem forçar transição por conta própria — a política de transição
 é decisão do projeto (§0, §9).
+
+## §13. Verbos de fase (`/keelson:jira-sync --phase start-dev|finish-dev`)
+
+Atos **imperativos** do humano sobre o quadro, fora dos marcos automáticos do ciclo: mover a
+árvore do alvo (slug inteiro ou a árvore de uma SPEC — mesmo recorte do §12) para o estado de
+uma fase do fluxo do time. O verbo **roda a reconciliação do §12 antes** (idempotente — no-op
+barato quando a árvore já existe; cria o que faltar quando não) e então aplica a fase.
+
+- **Alvos por nível**: as linhas da tabela Etapas/Colunas (§3) cujo `Gatilho` é
+  `--phase <verbo>`, uma por `Nível`. Linha ausente para um nível → aquele nível **não se
+  move** — opt-out declarado, não erro. A semântica das fases é do **mapa**, não hardcoded;
+  os verbos são a convenção: `start-dev` — a árvore entra em desenvolvimento (tipicamente
+  Epic "em progresso", Story e sub-tasks "em desenvolvimento"); `finish-dev` — o
+  desenvolvimento terminou (tipicamente sub-tasks "concluído", Story na coluna de revisão —
+  o passo seguinte do fluxo do quadro).
+- **Ordem coerente da árvore**: `start-dev` move **de cima para baixo** (epic → story →
+  sub-tasks); `finish-dev`, **de baixo para cima** (sub-tasks → story → epic, se declarado) —
+  o quadro nunca mostra filho concluído sob pai não-iniciado nem o inverso.
+- **Política `transition`**: o verbo é **ordem explícita do humano** — move o card com
+  `comment` e `auto` (a política governa os ganchos **automáticos** do ciclo, que seguem o §9
+  como sempre). `off` é política dura do projeto → o verbo **avisa e não move** — e não
+  comenta: em `off` nada toca a issue; o aviso fica no output do comando.
+- **Epic — duplo opt-in**: a doutrina "Epic intocado" (§9) vale para todo gancho automático,
+  inclusive a reconciliação; o Epic só se move **por verbo de fase** e **com linha `epic`**
+  declarada para o verbo no mapa.
+- **Mecânica de cada movimento**: a do §9 — transição direta quando existe; senão o **walker
+  multi-hop** pelo Trilho do board (§3), nunca regredindo, parando-e-comentando em salto
+  bloqueado. **Idempotente**: card já no alvo ou além dele no trilho → no-op; rodar o mesmo
+  verbo duas vezes é seguro.
+- **`--dry-run`**: imprime o plano de movimentação por card
+  (`KEY: <status atual> → <intermediários> → <alvo>` · `no-op (já no alvo/além)` ·
+  `bloqueado em <status>`) sem tocar no Jira.
+- **Registro** (§10): 1 linha no "Histórico recente" do INDEX — verbo, alvo, K cards movidos,
+  bloqueios. Best-effort (§0) como todo o resto: conector fora ou chamada falha → avisa,
+  registra o rastro e nunca trava.

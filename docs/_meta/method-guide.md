@@ -240,13 +240,24 @@ Roda a auditoria de vulnerabilidade conhecida sobre as dependências, **em momen
 Rede de segurança da integração opcional com Jira (via **conector MCP Atlassian**, ligada em `jira.enabled` na ficha). Os comandos do ciclo já sincronizam **best-effort**, e o fecho do `/keelson:auto` roda a mesma reconciliação automaticamente (decisão 4.53); este comando avulso cobre o resto — backfill de slug antigo, ciclo interrompido antes da entrega, conector que só ficou disponível depois — reprocessando o slug e criando/vinculando/comentando/transicionando o que ficou para trás, de forma **idempotente**.
 
 ```
-/keelson:jira-sync <slug | PLAN-MMM | SPEC-NNN ou caminho da SPEC> [--dry-run]
+/keelson:jira-sync <slug | PLAN-MMM | SPEC-NNN ou caminho da SPEC> [--dry-run] [--phase start-dev|finish-dev]
 ```
 
 Com slug ou `PLAN-MMM` reconcilia o slug inteiro; apontando uma **SPEC** (`SPEC-NNN` ou o
 caminho do arquivo), a reconciliação fica **escopada à árvore dela** — Epic, Stories e
 sub-tasks das TASKs dos PLANs que a cobrem (coluna "Cobre" do INDEX) — o fallback manual
 para o ciclo que terminou com o tracker vazio (decisão 4.55).
+
+Com `--phase` (decisão 4.60), depois de reconciliar o comando **move a árvore no quadro** —
+o ato imperativo seu, fora dos marcos automáticos: `start-dev` leva Epic/Story/sub-tasks às
+colunas de desenvolvimento; `finish-dev` conclui as sub-tasks e leva a Story à coluna de
+revisão (o passo seguinte do fluxo). Os alvos vêm das linhas `--phase` da tabela
+Etapas/Colunas do mapa, **por nível** (`epic`/`story`/`subtask` — workflows diferem por
+tipo; nível sem linha não se move, e o Epic só se move com a linha `epic` declarada). Sem
+transição direta, o walker percorre o **Trilho do board** do mapa status a status, validando
+cada salto em runtime — nunca regride, e salto bloqueado para-e-comenta. Por ser ordem
+explícita sua, o verbo move mesmo com `transition: comment` (só `off` bloqueia); os ganchos
+automáticos continuam regidos pela política da ficha.
 
 | Aspecto | Detalhe |
 |---|---|
@@ -266,7 +277,7 @@ descrição vazia ou com marcador; descrição editada por humano nunca é sobre
 `--refresh-descriptions` força o re-render sem marcador (backfill de cards da receita
 antiga, decisão explícita sua).
 
-Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53, 4.55 e 4.59 de `decisions.md`.
+Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53, 4.55, 4.59 e 4.60 de `decisions.md`.
 
 ### 3.14 `/keelson:review` — code review de um diff avulso (sem artefato SDD)
 

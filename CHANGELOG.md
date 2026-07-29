@@ -17,6 +17,43 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.39.0] — 2026-07-29
+
+Decision 4.60
+
+### Added
+- **Phase verbs on `/keelson:jira-sync` — the human's imperative act on the board.**
+  Creating issues was covered; moving them through the board was not — the sync only
+  aligned Jira to the *artifact* state at automatic cycle milestones. Now
+  `/keelson:jira-sync <target> --phase start-dev|finish-dev` first runs the normal
+  idempotent reconciliation (the tree is guaranteed to exist), then walks the tree:
+  `start-dev` moves Epic → Story → sub-tasks into the development columns (top-down),
+  `finish-dev` completes the sub-tasks and moves the Story to the review column
+  (bottom-up) — the board never shows a completed child under an unstarted parent.
+- **Per-level targets in the project map.** The Etapas/Colunas table gains a `Nível`
+  column (`epic` | `story` | `subtask`): a real board runs a different workflow per
+  issue type (measured in the field: a 17-status Story rail over a 3-status sub-task
+  rail), so one target per stage cannot project. A level with no row simply doesn't
+  move — declared opt-out, not an error. Legacy maps keep working.
+- **Board rail + multi-hop walker.** A new "Trilho do board" map section declares the
+  ordered status rail per level. When no direct transition to the target exists, the
+  sync walks the rail one status at a time, re-validating available transitions at
+  every hop (`isAvailable`/`hasScreen`/`isConditional`), never regressing; a blocked
+  hop stops where it is, comments, and reports the position reached. No rail section →
+  direct-hop only, as before. `/keelson:init` measures and seeds the rails per level.
+
+### Changed
+- **Explicit verb beats `comment`.** The `transition` policy keeps governing the
+  cycle's *automatic* hooks; a phase verb is the human's explicit order and moves cards
+  under `comment` or `auto`. `off` stays a hard project policy: the verb warns and does
+  nothing.
+- **The Epic can now move — under double opt-in.** "Epic untouched — the roadmap
+  belongs to the human" still binds every automatic hook, including reconciliation;
+  the only path that moves an Epic is a phase verb (which *is* the human's act) plus a
+  declared `epic` row in the map. `init` seeds that row commented out.
+
+---
+
 ## [0.38.0] — 2026-07-29
 
 Decision 4.59

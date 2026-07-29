@@ -100,7 +100,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 |---------|--------------|
 | `/keelson:init` | Interactive setup — detects the stack, writes the ficha and the `CLAUDE.md` block |
 | `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
-| `/keelson:jira-sync` | Reconcile a slug — or a single SPEC subtree — with Jira via the Atlassian MCP connector — idempotent, best-effort (optional) |
+| `/keelson:jira-sync` | Reconcile a slug — or a single SPEC subtree — with Jira via the Atlassian MCP connector; `--phase start-dev\|finish-dev` walks the tree across the board — idempotent, best-effort (optional) |
 | `/keelson:review` † | Review an arbitrary diff (working tree, last commit, N commits, range, branch) against the keelson doctrine via independent reviewers; on your OK, dispatches the fix to the developer agent and re-reviews — for code that arrived without an SDD artifact |
 | `/keelson:audit` † | On-demand dependency audit against known vulnerabilities (CVE/NVD); `full` adds hygiene (outdated, abandoned, licenses) |
 | `/keelson:status` | Executive summary of a slug's current state — what's done, in flight, planned |
@@ -285,6 +285,15 @@ transitions). It's **off by default** and **best-effort**: it never blocks the c
   `link` mode, read-seeding of the SPEC.
 - **Status policy.** Default `comment` posts progress without moving the card; moving cards is
   opt-in per project (`transition: auto`), always validated against the live workflow.
+- **Phase verbs.** `/keelson:jira-sync <target> --phase start-dev|finish-dev` is your
+  imperative act on the board, outside the cycle's automatic milestones: `start-dev` walks
+  Epic/Story/sub-tasks into the development columns, `finish-dev` completes the sub-tasks and
+  moves the Story to the review column. Targets are declared **per hierarchy level** in the map
+  (real boards run different workflows per issue type), and when no direct transition exists
+  the sync walks the map's ordered **board rail** status by status — validating every hop live,
+  never regressing, stopping-and-commenting on a blocked hop. Because the verb is your explicit
+  order, it moves cards even under `transition: comment` (only `off` blocks); the Epic moves
+  only via a phase verb *and* a declared `epic` row — automatic hooks still never touch it.
 - **The cycle ends reconciled — and the report says so.** `/keelson:auto`'s delivery step runs
   the same idempotent reconciliation as `/keelson:jira-sync` (a cheap no-op when the per-command
   hooks all fired, a repair pass when one didn't), and the delivery report carries a mandatory
@@ -309,7 +318,7 @@ The ficha's `jira` block (all IDs, zero secrets):
 Re-run `/keelson:jira-sync <slug>` any time to reconcile what a best-effort run skipped —
 or point it at a single SPEC (`SPEC-NNN` or its file path) to create/repair just that
 subtree (Epic, Stories, sub-tasks).
-Governance: decisions 4.22, 4.27, 4.28, 4.53 and 4.55 in `docs/_meta/decisions.md`.
+Governance: decisions 4.22, 4.27, 4.28, 4.53, 4.55, 4.59 and 4.60 in `docs/_meta/decisions.md`.
 
 ## Repository layout
 
@@ -330,11 +339,20 @@ keelson/
 
 ## Status
 
-`0.38.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.39.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **Jira cards are now written for humans** (decision 4.59) — a
+New in this release: **phase verbs move the board** (decision 4.60) —
+`/keelson:jira-sync <target> --phase start-dev|finish-dev` is the human's imperative act on
+the Jira board: `start-dev` walks Epic/Story/sub-tasks into the development columns,
+`finish-dev` completes the sub-tasks and moves the Story to the review column. Targets are
+declared per hierarchy level in the project map (real boards run different workflows per
+issue type), a new ordered "board rail" section lets the sync walk multi-hop transitions —
+validated live at every hop, never regressing, stopping-and-commenting when blocked — and
+the Epic moves only via a phase verb plus a declared `epic` row (automatic hooks still never
+touch it). See the full history in [CHANGELOG.md](CHANGELOG.md).
+Previously: **Jira cards are now written for humans** (decision 4.59) — a
 single description recipe in the sync protocol, leveled across every issue type: the
 Epic carries context, outcome and scope; the QA unit (feature Story, implicit Story or
 standalone task) gets the richest card — a business narrative, a "how to test" script
@@ -347,34 +365,11 @@ while never touching one a human edited. Every card opens with a do-not-edit not
 pointing humans to comments (which sync never touches), test scripts fold in the
 feature's NFR criteria and label purely-automated checks honestly, and
 `--refresh-descriptions` backfills pre-marker cards on explicit request.
-Previously: **task generation writes only what it verified** (decision 4.58) —
-the first automated maintainer message (4.54 mechanism) reported a four-finding cluster
-in `/keelson:tasks`' scope/criteria generation, consolidated here as one named principle,
-"verified, not deduced": paths cited in a TASK's scope are confirmed through the data
-chain (never deduced from a similar-looking name), every scope item carries its own
-executable done-criterion even without an AC (the oracle is the item's own contract),
-and the `task-validator` now fails a TASK whose scope has unreferenced items — the
-"recurrence becomes a mechanical check" ladder from 4.52, honored.
-Previously: **`/keelson:update` updates the installed plugin in one step**
-(decision 4.57) — a human-only command backed by a bundled script that drives the
-Claude Code CLI in the order that matters (marketplace refresh *then* plugin update),
-reports the before/after version best-effort, and always ends with the reminder that
-the running session keeps the old version until restarted.
-Previously: **the delivery report tells you how long the session took**
-(decision 4.56) — a measured cycle clock (`TZ=America/Sao_Paulo date`, never an
-estimate): kickoff timestamp in the BRIEF front-matter, one mark per completed stage
-in its `Cronologia`, and a mandatory report line with the total plus the per-stage
-breakdown (specify · plan · tasks · implement) in Brasília time. Wall-clock by
-design, and never a stop trigger.
-Previously: **plugin proposals learn to speak to the maintainer**
-(decision 4.54) — when a cycle in a consumer project produces a `PROPOSTA_PLUGIN`, the
-`agile-coach` now also writes the message for whoever maintains the plugin and wasn't
-there: the concrete scene (reconstructible without repo access), the real cost of the
-failure, the diagnosis and the minimal diff — never the generalized rule, which stays
-the maintainer's job. Each finding is addressed local × process × "a question `init`
-never asked", and `/keelson:auto`'s delivery report surfaces the message as a
-copy-paste block, ready to forward. No proposal → no section.
-Recent releases, in short: **screen verification on Playwright MCP** (decisions 4.49/4.51)
+Recent releases, in short: **"verified, not deduced" task generation** plus a
+task-validator check for orphan scope items (decision 4.58), **`/keelson:update`** for
+one-step plugin updates (4.57), a **measured session clock** in the delivery report
+(4.56), the **per-SPEC sync scope** (4.55), **maintainer-facing plugin proposals**
+(4.54) — **screen verification on Playwright MCP** (decisions 4.49/4.51)
 — one engine, headless by default, artifacts under `thoughts/screen-verify/<slug>/`, and a
 server that *answers* is no longer taken for one that is *configured* —
 the **PHP docblock rule** (decision 4.50, see
