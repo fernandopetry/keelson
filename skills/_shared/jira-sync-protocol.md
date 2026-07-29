@@ -129,7 +129,7 @@ se as TASKs deste slug terão onde aninhar. Inviável → criar a issue da SPEC 
 só quando a projeção degradada do §7 for possível; senão avisar e **não criar** (issue-mãe
 órfã sem filhos possíveis é meio-estado ruim, não progresso).
 1. Idempotência (§4). 2. `create` + sem key → `createJiraIssue` (projectKey, `issueType.spec`,
-`summary` = título da SPEC, `description` = resumo/outcome), aplicar campos `write` (§8),
+`summary` = título da SPEC, `description` = template **Epic** da receita §6.2), aplicar campos `write` (§8),
 gravar a key na linha `**Jira**:` do cabeçalho (§10). 3. `link` → validar a key existente e
 aplicar campos `write`/`read` conforme o mapa. PLAN **não** vira issue (fica implícito na
 descrição).
@@ -141,6 +141,70 @@ preenchido → leia `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md`; qu
 ausente → no-op (projeção em 2 níveis). **SPEC sem FEAT mas com `issueType.feature`
 preenchido**: não é no-op puro — vale o degrau (0) do §7.0 (Story implícita espelhando a
 SPEC), que preserva a Story como unidade de QA sem ativar este arquivo.
+
+## §6.2. Descrição para humanos (receita única de renderização)
+
+Toda issue criada pelo protocolo carrega uma `description` escrita **para o humano que vai
+lê-la no Jira** — em especial o analista de QA que testa a funcionalidade a partir do card
+(§9: Story/isolada é a unidade de QA). **Português**, markdown simples (headings/listas —
+o conector converte). Teste falsificável da receita: *um humano que só lê o card entende o
+que foi feito e consegue testá-lo sem abrir nenhum arquivo do repo*. Âncora de contenção: a
+descrição **projeta** o artefato SDD — muda a forma (jargão EARS/Given-When-Then vira
+linguagem de usuário), **nunca acrescenta afirmação que o artefato não sustenta** (mesma
+régua da 4.58: verificado, não deduzido).
+
+**Cabeçalho-aviso** (obrigatório, primeira linha de toda descrição gerada):
+`⚙️ *Texto gerado automaticamente pelo keelson — não edite: será re-renderizado na próxima
+sincronização. Ajustes, dúvidas e resultados de teste: registre um comentário.*`
+Comentários são o canal do humano — o sync nunca os toca (só adiciona, §9/§11), então
+sobrevivem a qualquer re-render. O aviso protege o distraído; a válvula deliberada de quem
+**quer** ser dono do texto continua sendo apagar o rodapé-marcador (abaixo).
+
+Templates por papel da issue (todos os tipos nivelados — nenhuma issue nasce só com título):
+
+- **Epic (issue da SPEC)** — o card de roadmap:
+  - **Contexto e objetivo** — problema + outcome esperado, em prosa (§1 da SPEC);
+  - **Escopo** — in/out resumidos (§4 da SPEC);
+  - **Funcionalidades** — lista das FEATs (nome + 1 linha) ou a nota de fluxo único.
+- **Unidade de QA** (Story de FEAT · Story implícita · tarefa isolada) — o padrão mais
+  rico, porque é o card que o QA humano testa:
+  - **O que esta funcionalidade faz** — narrativa de negócio em 2–6 frases, nos termos do
+    glossário da SPEC (persona, ação, resultado — não arquitetura);
+  - **Como testar** — roteiro imperativo derivado dos ACs: cada AC vira um cenário com
+    passos numerados (preparação ← Given · ação ← When · resultado esperado ← Then), sem
+    citar o jargão. Duas regras de honestidade do roteiro: **(a)** AC sem caminho manual
+    razoável (atomicidade, requisição forjada, ownership, contrato de servidor) **não vira
+    passo de teatro** — agrupa-se numa linha final "Verificações cobertas por teste
+    automatizado (sem passo manual)" com os IDs e o que provam; **(b)** os ACs de **NFR**
+    cujos elementos pertencem à funcionalidade (tema claro/escuro, viewport, leitor de
+    tela, sessão simulada) **entram no roteiro da Story correspondente** — a fórmula
+    `ACs(FEAT)` cobre FRs, e os de NFR são somados pelo elemento que exercitam, senão
+    ficam órfãos de card;
+  - **Critérios de aceitação** — a lista formal (ID + texto), para rastreabilidade;
+  - **Fora do escopo** — os out-of-scope da SPEC que um QA poderia confundir com defeito.
+  - Tarefa isolada de origem avulsa (bugfix/chore sem SPEC): mesmas seções derivadas da
+    própria TASK — o que muda, como verificar (do critério de verificação dela) e o escopo.
+- **Sub-task (TASK)** — o card do dev: objetivo em 1–2 frases + os ACs que cobre (ID +
+  1 linha cada). Curto por design; a narrativa mora na unidade de QA acima.
+
+**Rodapé-marcador** (obrigatório, última linha de toda descrição gerada):
+`— gerado pelo keelson a partir de <caminho relativo do artefato>`. O caminho é relativo à
+**raiz do repo consumidor** (ex.: `docs/specs/portal-login/specs/SPEC-001.md`) — o número
+do artefato se repete entre slugs; só o caminho desambigua. FEAT → caminho da SPEC +
+`#FEAT-NNN-XXX`; sub-task/isolada → caminho do arquivo da TASK. É o marcador que habilita
+o re-render abaixo.
+
+**Política de re-render (idempotência de conteúdo)**: ao encontrar issue existente com key
+válida (§4) — tipicamente na reconciliação (§12) — re-renderizar a descrição pelo template
+atual **somente quando** ela está vazia **ou** termina com o rodapé-marcador
+(`editJiraIssue`, só o campo `description`). Descrição sem marcador = editada por humano →
+**nunca sobrescrever**; contar nos avisos do output. Best-effort como tudo (§0).
+
+**Backfill de cards da receita antiga**: descrição gerada antes de o marcador existir não o
+tem — a política acima a trataria como editada por humano e o card magro ficaria magro para
+sempre. A saída é a flag `--refresh-descriptions` do `/keelson:jira-sync`, que força o
+re-render **também** de descrição sem marcador — decisão explícita e pontual do humano, que
+sabe que aqueles cards são gerados. Os ganchos automáticos do ciclo **nunca** forçam.
 
 ## §7. Criar sub-tasks das TASKs
 
@@ -169,8 +233,8 @@ Subtarefa"), **nesta ordem**:
   SPEC que **não** declara FEATs é, por definição, uma funcionalidade única (a camada FEAT é
   colapsável: sem declaração, *a funcionalidade é a própria SPEC*). Então projete-a como tal:
   `createJiraIssue` com `issueType.feature`, `parent` = Epic da SPEC, `summary` = título da
-  SPEC, `description` = resumo/outcome + a nota de que esta Story representa a SPEC inteira
-  como funcionalidade única. As TASKs viram sub-tasks **sob ela** (§7.1), e ela é a unidade de
+  SPEC, `description` = template **unidade de QA** da receita §6.2 + a nota de que esta Story
+  representa a SPEC inteira como funcionalidade única. As TASKs viram sub-tasks **sob ela** (§7.1), e ela é a unidade de
   QA do slug (§9 — marco "pronta p/ QA" quando **todas** as TASKs da SPEC estão Done).
   Idempotência pela linha `**Jira Story**:` do cabeçalho (§10). Isto **não** ativa o
   `jira-sync-feat.md`: não há FEAT declarada, há uma Story só, espelhando a SPEC.
@@ -190,6 +254,7 @@ humano, não do sync).
 ### §7.1 Criação
 
 Para cada TASK sem key: `createJiraIssue` com `issueType.task`, `summary` = título da TASK,
+`description` = template **sub-task** da receita §6.2,
 campos `write` aplicados, e `parent` = **o pai resolvido no §7.0** — a Story da FEAT primária
 (3º nível ativo, `jira-sync-feat.md`) · a **Story implícita** da SPEC (degrau (0)) · a issue da
 SPEC quando ela é nível 0 (2 níveis válido). Gravar a key na closure (§10). **Robustez**: se
@@ -200,7 +265,8 @@ SPEC quando ela é nível 0 (2 níveis válido). Gravar a key na closure (§10).
 tasks isoladas não sincronizam (nem avisa). Origem avulsa (abaixo); origem transversal —
 ver `jira-sync-feat.md`.
 - **TASK avulsa** (roteada pelo `/keelson:triage` direto para TASK — bugfix/chore/ops, sem
-  SPEC/FEAT): issue de `issueType.standalone` com `parent` = issue-SPEC do slug **quando
+  SPEC/FEAT): issue de `issueType.standalone` com `description` = template **unidade de QA**
+  da receita §6.2 (origem avulsa) e `parent` = issue-SPEC do slug **quando
   adjacente** (Epic(1) ▸ nível 0 — mesma regra da degradação do §7.0); sem issue-SPEC ou sem
   adjacência → **sem `parent`** + `createIssueLink` "relates to" com ela, se existir. Criada
   pelo gancho do comando que gera/executa a TASK (closure do `/keelson:implement` quando não
@@ -278,8 +344,9 @@ Best-effort (§0).
 
 Reprocessa um slug de forma idempotente (§4), na ordem: issue da SPEC (§6) → Stories das
 FEATs (`jira-sync-feat.md`, quando ativo) **ou** Story implícita (degrau (0) do §7.0) →
-sub-tasks (§7) → status (§9, incluindo o gatilho "Funcionalidade pronta p/ QA" para FEATs já
-completas). Aplica campos e — se `transition:auto` — alinha o status ao estado real das TASKs
+sub-tasks (§7) → **descrições das issues existentes** (§6.2 — re-render conforme a política
+do marcador; descrição sem marcador é do humano e fica intocada) → status (§9, incluindo o
+gatilho "Funcionalidade pronta p/ QA" para FEATs já completas). Aplica campos e — se `transition:auto` — alinha o status ao estado real das TASKs
 (Done → status-alvo de "concluída"). Estado misto (sub-tasks legadas sob a issue da SPEC com o
 3º nível ativo) é **reportado no output**, nunca re-parentado (§4).
 

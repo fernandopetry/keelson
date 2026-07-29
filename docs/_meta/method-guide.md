@@ -256,7 +256,17 @@ para o ciclo que terminou com o tracker vazio (decisão 4.55).
 | Pré-condição | Rodar **de dentro do repo consumidor** (ficha no cwd). A Etapa 0 resolve a **viabilidade da projeção** antes de planejar — 3 níveis · 2 níveis · 2 níveis via Story implícita · 2 níveis via `standalone` · inviável (com a perna que não aninha) — e sinaliza **backfill** quando o slug já está concluído e `transition` não move card |
 | Lógica | Toda no `skills/_shared/jira-sync-protocol.md` (régua de hierarquia: §7.0; 3º nível: `jira-sync-feat.md`) — o comando só orquestra |
 
-Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53 e 4.55 de `decisions.md`.
+As descrições dos cards seguem a **receita para humanos** (protocolo §6.2, decisão 4.59):
+todo tipo de issue nasce com narrativa em português — a unidade de QA (Story ou tarefa
+isolada) traz "o que faz", roteiro "como testar" derivado dos ACs (incluindo os de NFR da
+funcionalidade; AC sem caminho manual vira a linha "verificações automatizadas") e a lista
+formal deles. Toda descrição abre com o aviso "não edite — registre um comentário" e fecha
+no rodapé-marcador com o caminho relativo do artefato-fonte. A reconciliação re-renderiza
+descrição vazia ou com marcador; descrição editada por humano nunca é sobrescrita —
+`--refresh-descriptions` força o re-render sem marcador (backfill de cards da receita
+antiga, decisão explícita sua).
+
+Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53, 4.55 e 4.59 de `decisions.md`.
 
 ### 3.14 `/keelson:review` — code review de um diff avulso (sem artefato SDD)
 

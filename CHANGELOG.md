@@ -17,6 +17,41 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.38.0] — 2026-07-29
+
+Decision 4.59
+
+### Added
+- **Human-readable Jira descriptions — a single rendering recipe (§6.2 of the sync
+  protocol).** Cards created by the Jira sync were arriving too thin for the humans who
+  work from them — the feature is tested by a human QA analyst from the card, and the
+  protocol only ever specified "summary/outcome" for the Epic, raw Given-When-Then ACs
+  for the Story, and title-only sub-tasks. Now every issue type gets a leveled template,
+  in Portuguese, plain markdown: the Epic carries context/objective, scope and the
+  feature list; the **QA unit** (feature Story, implicit Story, standalone task) gets
+  the richest card — business narrative in the SPEC's glossary terms, a "how to test"
+  script with each AC translated into imperative numbered steps, the formal AC list for
+  traceability, and out-of-scope notes; sub-tasks state their goal plus the ACs they
+  cover. The description *projects* the SDD artifact — it never adds a claim the
+  artifact doesn't support (the 4.58 rule). Honest-script rules, added after a field
+  exercise rendering a real consumer SPEC: ACs with no reasonable manual path
+  (atomicity, forged requests, ownership) are grouped under an "automated checks" line
+  instead of becoming theater steps, and the feature's NFR criteria (dark mode,
+  viewport, screen reader) join the story's test script rather than being orphaned.
+- **Do-not-edit notice, marker footer and re-render policy.** Every generated
+  description opens with a notice telling humans not to edit the text and to register a
+  comment instead (sync never touches comments), and ends with
+  `— gerado pelo keelson a partir de <repo-relative artifact path>` (spec numbers repeat
+  across slugs; only the path disambiguates — FEATs anchor `#FEAT-NNN-XXX`). During
+  reconciliation, a description that is empty or ends with the marker is re-rendered
+  with the current template; a description without the marker was edited by a human and
+  is never overwritten (preserved and counted in the warnings). `/keelson:jira-sync`
+  gains the corresponding reconciliation step, a "Descrições" line in its output, and a
+  `--refresh-descriptions` flag that force-re-renders pre-marker cards (the old thin
+  descriptions) on explicit human request — cycle hooks never force.
+
+---
+
 ## [0.37.0] — 2026-07-28
 
 Decision 4.58

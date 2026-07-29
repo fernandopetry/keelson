@@ -16,8 +16,10 @@
    com aviso.
 3. **Criação** (modo `create`, por FEAT sem key — idempotência §4): `createJiraIssue` com
    `projectKey`, `issueType.feature`, `parent` = key da issue da SPEC, `summary` = nome da
-   FEAT, `description` = descrição (`>`) + lista dos ACs derivados
-   (`ACs(FEAT) = ACs que cobrem FRs da FEAT`); aplicar campos `write` (§8); gravar a key na
+   FEAT, `description` = template **unidade de QA** da receita §6.2 — narrativa a partir da
+   descrição (`>`) da FEAT, roteiro e lista formal a partir dos ACs derivados
+   (`ACs(FEAT) = ACs que cobrem FRs da FEAT`), marcador com o caminho relativo da SPEC +
+   `#FEAT-NNN-XXX`; aplicar campos `write` (§8); gravar a key na
    linha `**Jira**:` sob o heading (§10).
 4. **Escada de degradação (best-effort §0)**:
    - (i) `issueType.spec` não é epic-level ou o Jira rejeita o `parent` → criar a Story
@@ -47,7 +49,8 @@ para a Story primária quando ela existe.
 ## TASK transversal sem primária honesta (origem transversal do §7)
 
 Campo `**Funcionalidade**: transversal (FEAT-A, FEAT-B)` — serve a todas/quase todas as
-FEATs: issue de `issueType.standalone` com `parent` = issue da SPEC quando adjacente
+FEATs: issue de `issueType.standalone` com `description` = template **unidade de QA** da
+receita §6.2 (derivada da TASK) e `parent` = issue da SPEC quando adjacente
 (Epic(1) ▸ nível 0); senão sem pai + link "relates to". Cada FEAT listada recebe link
 "relates to" com a Story dela. Nunca replicada: ou aninha na primária (default), ou é
 **uma** issue isolada. Key persistida na closure da TASK (§10), como qualquer sub-task.

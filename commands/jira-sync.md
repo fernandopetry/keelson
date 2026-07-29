@@ -1,6 +1,6 @@
 ---
 description: Reconcilia um slug — ou uma SPEC dele — com o Jira via conector MCP Atlassian: cria/vincula o que faltou (épico, stories, sub-tasks) e alinha o status, de forma idempotente (opcional, best-effort)
-argument-hint: <slug | PLAN-MMM | SPEC-NNN ou caminho da SPEC> [--dry-run]
+argument-hint: <slug | PLAN-MMM | SPEC-NNN ou caminho da SPEC> [--dry-run] [--refresh-descriptions]
 ---
 
 # /keelson:jira-sync
@@ -21,12 +21,13 @@ slug inteiro — a reconciliação usa quase todos os §§: leia o protocolo **i
 ## Input
 
 ```
-/keelson:jira-sync <slug | PLAN-MMM | SPEC-NNN | caminho da SPEC> [--dry-run]
+/keelson:jira-sync <slug | PLAN-MMM | SPEC-NNN | caminho da SPEC> [--dry-run] [--refresh-descriptions]
 ```
 
 | Flag | Uso |
 |---|---|
 | `--dry-run` | Lista o que criaria/vincularia/moveria, sem tocar no Jira |
+| `--refresh-descriptions` | Força o re-render de descrições **sem** marcador (backfill de cards da receita antiga — protocolo §6.2); sem a flag, descrição sem marcador é tratada como editada por humano e preservada |
 
 Slug ou `PLAN-MMM` → reconcilia o **slug inteiro**. `SPEC-NNN` (ou o caminho do arquivo da
 SPEC) → reconcilia **só a árvore daquela SPEC** — o fallback manual para quando o ciclo
@@ -89,11 +90,15 @@ Aplicar o protocolo de sync Jira sobre o alvo (slug inteiro ou a árvore da SPEC
    Estado misto (sub-tasks legadas sob a issue da SPEC) → reportar, nunca re-parentar (§4).
 3. **Sub-tasks das TASKs** (§7): criar as que faltam (idempotência por key na closure); aplicar
    campos do mapa (§8).
-4. **Status** (§9): só com `transition:comment`/`auto`. Em `auto`, alinhar cada sub-task ao
+4. **Descrições** (§6.2): toda criação usa os templates da receita; issue **existente** com
+   descrição vazia ou terminada no rodapé-marcador → re-renderizar pelo template atual;
+   sem marcador (editada por humano) → preservar e contar nos avisos — a menos que
+   `--refresh-descriptions` tenha sido passada (backfill consciente da receita antiga).
+5. **Status** (§9): só com `transition:comment`/`auto`. Em `auto`, alinhar cada sub-task ao
    status-alvo correspondente ao estado real da TASK (ex.: TASK Done → status-alvo de
    "concluída"), sempre validando a transição em runtime — e aplicar o gatilho
    "Funcionalidade pronta p/ QA" (`jira-sync-feat.md` §6.1 item 5) às FEATs já completas.
-5. **Persistência** (§10): keys gravadas; 1 linha no "Histórico recente" do INDEX.
+6. **Persistência** (§10): keys gravadas; 1 linha no "Histórico recente" do INDEX.
 
 `--dry-run` → apenas imprimir o plano de reconciliação (o que seria criado/vinculado/movido),
 sem chamar as ferramentas de escrita.
@@ -108,6 +113,7 @@ sem chamar as ferramentas de escrita.
 - Issue da SPEC: <KEY> (criada | vinculada | já existia)
 - Stories: <N criadas>, <M já existiam> (de FEAT | implícitas) | n/a
 - Sub-tasks: <N criadas>, <M já existiam>
+- Descrições: <N renderizadas/re-renderizadas>, <M preservadas (editadas por humano)> | n/a
 - Status alinhado: <K movidas | só comentado | n/a>
 - Pulado/avisos: <itens best-effort que falharam · obrigatórios não cobertos (§8) · divergência TASK-INDEX × arquivos (§4) · Story implícita grossa (§7.0)>
 ```
@@ -116,5 +122,5 @@ sem chamar as ferramentas de escrita.
 
 Não cria PR nem faz merge/deploy; não altera SPEC/PLAN/TASK além das linhas `**Jira**:`
 (cabeçalho da SPEC, sob o heading da FEAT, closure da TASK); nunca bloqueia
-(best-effort — protocolo §0). Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53 e 4.55 de
-`decisions.md`.
+(best-effort — protocolo §0). Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53, 4.55 e
+4.59 de `decisions.md`.

@@ -330,11 +330,24 @@ keelson/
 
 ## Status
 
-`0.37.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.38.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **task generation writes only what it verified** (decision 4.58) —
+New in this release: **Jira cards are now written for humans** (decision 4.59) — a
+single description recipe in the sync protocol, leveled across every issue type: the
+Epic carries context, outcome and scope; the QA unit (feature Story, implicit Story or
+standalone task) gets the richest card — a business narrative, a "how to test" script
+with the acceptance criteria translated from Given-When-Then into imperative steps, the
+formal AC list and the out-of-scope notes — and sub-tasks state their goal plus the ACs
+they cover. Every generated description ends with a marker footer naming the source
+artifact by its repo-relative path (spec numbers repeat across slugs; only the path
+disambiguates), and reconciliation re-renders empty or marker-bearing descriptions
+while never touching one a human edited. Every card opens with a do-not-edit notice
+pointing humans to comments (which sync never touches), test scripts fold in the
+feature's NFR criteria and label purely-automated checks honestly, and
+`--refresh-descriptions` backfills pre-marker cards on explicit request.
+Previously: **task generation writes only what it verified** (decision 4.58) —
 the first automated maintainer message (4.54 mechanism) reported a four-finding cluster
 in `/keelson:tasks`' scope/criteria generation, consolidated here as one named principle,
 "verified, not deduced": paths cited in a TASK's scope are confirmed through the data
