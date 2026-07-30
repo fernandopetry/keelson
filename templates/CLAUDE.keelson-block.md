@@ -48,7 +48,9 @@ Humanos-only (não aparecem na listagem): `/keelson:guided` (ciclo com checkpoin
 `/keelson:refine` (lapidar ideia) · `/keelson:audit` (auditoria de dependências) ·
 `/keelson:review` (code review de um diff avulso, sem artefato SDD) ·
 `/keelson:verify-handoff` (fechar gate de tela remoto) ·
-`/keelson:update` (atualizar o plugin instalado — vale após reiniciar a sessão).
+`/keelson:update` (atualizar o plugin instalado — vale após reiniciar a sessão) ·
+`/keelson:postmortem` (postmortem de fim de sessão — relê as interações e produz a
+mensagem ao mantenedor do plugin).
 
 <!-- ============================================================= -->
 <!-- fim do bloco keelson                                          -->

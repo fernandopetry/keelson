@@ -107,6 +107,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:migrate-legacy` | Migrate a legacy slug (docs without `INDEX.md`) to the SDD layout |
 | `/keelson:rebuild-index` | Rebuild a slug's `INDEX.md` from scratch out of its artifacts |
 | `/keelson:verify-handoff` † | Close a pending screen-verification `HANDOFF` — consolidates the branch, exercises each item in the real environment; no merge (points to `/keelson:integrate`) |
+| `/keelson:postmortem` † | End-of-session postmortem — re-reads the whole session's interactions (corrections, retries, failed gates), separates defects from new scope, traces each gap to the mechanism that let it through, and produces the copy-paste maintainer message (with literal diffs via the agile-coach) that evolves the plugin |
 | `/keelson:update` † | Update the installed plugin to the latest marketplace version via the Claude Code CLI (marketplace refresh + plugin update, in that order); the running session keeps the old version until restarted |
 
 † Human-only (`disable-model-invocation`): never triggered by the model — you invoke
@@ -350,25 +351,23 @@ keelson/
 
 ## Status
 
-`0.45.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.46.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **assertions that can actually fail** (decision 4.68). A consumer
-delivery shipped four defects visible in seconds in the rendered e-mail — with every
-gate green — because the tests were tautological (expected values computed by the code
-under test, "contains" proving uniqueness, always-filled fixtures, one locale for an
-"all locales" NFR). Gate 1 now applies four mechanical anti-tautology checks as
-blocking findings; creatable test data can no longer self-grant a pending handoff
-("not found" ≠ "not possible" — create or escalate, with the attempt recorded); QA
-saves and inspects the **rendered artifact** as evidence; and the runner's toolchain is
-recognized as a test double (a green suite doesn't prove the app boots). See the full
-history in [CHANGELOG.md](CHANGELOG.md).
-Previously: **UI actions must specify observable feedback at the SPEC level** (decision
-4.67 — an FR for a user-initiated UI action specifies the three observable states, each
-becoming a verifiable AC), and **a failing verification can no longer be silently
-bypassed** (decision 4.66 — test baseline before coding, literal verification command
-in the report, gate 2 measures regression, and a hook blocks `--no-verify`).
+New in this release: **`/keelson:postmortem` — the end-of-session postmortem as a
+command** (decision 4.69). The consumer postmortems that moved doctrine the most were
+written by hand, on request; now the Diretor runs one command at session end. It
+re-reads every interaction (corrections, retries, failed gates), builds an honest facts
+table (defect ≠ new scope), traces mechanisms by root cause with literal evidence,
+dispatches process findings to the agile-coach (literal diffs, ledger dedup) and closes
+with the copy-paste maintainer block that feeds plugin evolution. See the full history
+in [CHANGELOG.md](CHANGELOG.md).
+Previously: **assertions that can actually fail** (decision 4.68 — four mechanical
+anti-tautology checks as blocking gate-1 findings, creatable test data can't self-grant
+a handoff, QA saves and inspects the rendered artifact, and the runner's toolchain is a
+test double), and **UI actions must specify observable feedback at the SPEC level**
+(decision 4.67 — the three observable states, each becoming a verifiable AC).
 Recent releases, in short: **Epics only where they group something** —
 `jira.epicPolicy: "multi-feature"` projects a single-feature SPEC without an Epic, the
 Story as the root of the tree (decision 4.61) — **phase verbs move the board** —

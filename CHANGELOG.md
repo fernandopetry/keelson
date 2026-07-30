@@ -17,6 +17,35 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.46.0] — 2026-07-30
+
+Decision 4.69
+
+### Added
+- **`/keelson:postmortem` — the end-of-session postmortem as a command.** The two
+  consumer postmortems that moved doctrine the most (4.67, 4.68) were written by hand,
+  on request — the same gap 4.54 closed for single findings. The existing machinery
+  covers the *single* process finding at cycle close (`agile-coach` → `PROPOSTA_PLUGIN`
+  → maintainer message); nothing owned the *whole episode*. The new human-only command
+  is run by the Diretor at session end (default target: the current session — its
+  interactions are the input) or pointed at a past episode. It re-reads every
+  interaction (corrections asked, retries, failed gates, "forgot to mention" moments),
+  cross-checks git and cycle artifacts, and builds: a facts table with an honest count
+  (defect ≠ new scope — a requirement remembered later is not a defect), root-cause
+  mechanisms with literal evidence (which gate saw it and approved, didn't run, or
+  couldn't see — down to quoting the weak assertion), and the cheapest missed
+  intervention point for each, including the Diretor's own. Addressing has one owner
+  per finding: project lessons are applied on the spot; process findings are dispatched
+  to the `agile-coach` (one invocation per root cause), which keeps its monopoly on
+  proposal format (ledger dedup, literal diff, line budget — 4.54/4.64); reasoning
+  failures and one-off cases are *declared discarded* — rules only for verification
+  failures, never "a better model wouldn't". Outputs: a durable
+  `<docsRoot>/_meta/postmortems/PM-<date>-<target>.md` plus the copy-paste maintainer
+  block that feeds plugin evolution. The command analyzes, never fixes — open defects
+  route to `/keelson:triage`. No new agent.
+
+---
+
 ## [0.45.0] — 2026-07-30
 
 Decision 4.68

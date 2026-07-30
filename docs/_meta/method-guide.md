@@ -318,6 +318,16 @@ Atualiza o keelson para a última versão do marketplace, **quando você decidir
 
 **O update não vale para a sessão corrente** — a CLI exige restart para aplicar; o report sempre termina lembrando de reiniciar a sessão. Falha é erro nomeado (CLI ausente, plugin não instalado via marketplace no scope, instalação de desenvolvimento), nunca contornada em silêncio. Governança: decisão 4.57 de `decisions.md`.
 
+### 3.17 `/keelson:postmortem` — postmortem de fim de sessão
+
+Rodado pelo Diretor no **fim da sessão** (é humano-only), ou apontando um episódio passado. Relê as interações da sessão inteira — cada correção pedida, retry, gate reprovado, "esqueci de falar" — como fonte primária de evidência, cruza com git e artefatos do ciclo, e monta: a **tabela dos fatos** (com a distinção inegociável entre defeito e requisito novo), os **mecanismos por causa-raiz** (qual gate viu e aprovou, não rodou ou não tinha como ver — com evidência literal, ex.: a asserção tautológica citada) e o **ponto de intervenção mais barato** de cada um, inclusive quando era um ato do Diretor.
+
+```
+/keelson:postmortem [slug | branch | descrição — sem argumento: a sessão corrente]
+```
+
+O endereçamento tem um dono por achado: lição de **projeto** é aplicada na hora (`lessons.md`/perfil); achado de **processo** vai ao `agile-coach` (uma invocação por causa-raiz), que deduplica no ledger e devolve `PROPOSTA_PLUGIN` + `mensagem_mantenedor` com diff literal (4.54/4.64); falha de raciocínio ou caso pontual é **descartado declaradamente** — regra só para falha de verificação. Saídas: o doc durável `<docsRoot>/_meta/postmortems/PM-<data>-<alvo>.md` e o **bloco copy-paste ao mantenedor** que fecha o output — é ele que alimenta a evolução do plugin. Não corrige nada (defeito aberto → `/keelson:triage`). Governança: decisão 4.69 de `decisions.md`.
+
 ---
 
 ## 4. Skills
