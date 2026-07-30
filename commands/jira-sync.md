@@ -143,8 +143,9 @@ sem tocar no Jira.
 - Sub-tasks: <N criadas>, <M já existiam>
 - Descrições: <N renderizadas/re-renderizadas>, <M preservadas (editadas por humano)> | n/a
 - Status alinhado: <K movidas | só comentado | n/a>
+- Unidade de QA: <KEY> em <coluna atual> (teto: <coluna | sem linha → só comentário>)
 - Fase: <n/a | start-dev/finish-dev — K cards movidos, M no-op, B bloqueados em <status>>
-- Pulado/avisos: <itens best-effort que falharam · obrigatórios não cobertos (§8) · divergência TASK-INDEX × arquivos (§4) · Story implícita grossa (§7.0) · fase sem linha no mapa / `transition: off` (§13)>
+- Pulado/avisos: <itens best-effort que falharam · obrigatórios não cobertos (§8) · divergência TASK-INDEX × arquivos (§4) · Story implícita grossa (§7.0) · marcos não-canônicos no mapa (§3 — documentação, não executados) · fase sem linha no mapa / `transition: off` (§13)>
 ```
 
 ## Limites

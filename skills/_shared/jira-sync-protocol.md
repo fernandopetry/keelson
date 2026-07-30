@@ -28,6 +28,12 @@
   semanas depois, "por que o Jira não recebeu nada?".
 - **Zero segredo**: o conector é o único canal; **nunca** peça/leia token ou credencial, e
   nada de Jira vai para `keelson.local.json`.
+- **§9 é pré-requisito de qualquer movimento de card**: os comandos leem este protocolo por
+  §§ (leitura seletiva por offset), e é fácil executar um passo que move card sem ter lido a
+  seção que governa **até onde** ele pode ir — foi assim que uma Story foi parar em concluído
+  (4.65). Regra: **nenhuma transição sem o §9 lido nesta execução**; o § que você veio buscar
+  (§7, §12, §13, `jira-sync-feat.md`) não substitui o §9, ele o pressupõe. Só comentar
+  (`transition: comment`) dispensa.
 - **Público/agnóstico**: nenhum ID, nome, site ou componente real entra em artefato do
   plugin — tudo vem da ficha e do mapa do projeto (consumidor), resolvido em runtime.
 
@@ -91,6 +97,23 @@ editado pelo humano. Ausente → o protocolo usa só `summary`+`description` e n
     Done` (com o 3º nível ativo, §6.1; Story implícita/isolada: mesma semântica com a
     SPEC/TASK no lugar da FEAT) — marco informado **na Story**; por ficar tipicamente além
     do teto, na prática vira comentário (§9).
+
+  **O catálogo de gatilhos é fechado**: as únicas linhas que o sync **executa** são os quatro
+  marcos canônicos acima e as linhas de fase (§13). O mapa é editado por humano e acumula o
+  fluxo real do time em prosa — linha com outro nome ou outro gatilho (ex.:
+  `Concluída | História | Feito | … | QA valida a funcionalidade / PR aberto`) é
+  **documentação do fluxo humano, nunca gatilho de sync**: não dispara, não se "considera
+  satisfeita", não move card — e entra em 1 linha de aviso do output (`marcos não-canônicos
+  no mapa: N — documentação, não executados`). Teste falsificável: *linha cujo gatilho o
+  keelson não dispara por si — um ato de pessoa, um evento do quadro — não move card nenhum.*
+  Rótulo próprio é permitido, **equivalência não é inferida**: linha com nome local (`Pronto
+  p/ QA`) só conta como o marco canônico se o mapa **declarar** a equivalência em texto; sem
+  declaração, é documentação. Renomear não cria marco novo — o catálogo é o do protocolo.
+  **Nenhum gate, agente ou etapa do ciclo satisfaz gatilho que nomeia ato humano**: gate 9/QA,
+  aceitação do PO, code review, push e entrega são atos do time simulado, não do Diretor — quem
+  satisfaz "QA validou", "PR aberto", "aprovado" é ele, movendo o card ou ordenando `--phase`
+  (§13). Confundir o QA do keelson com o QA humano do quadro é o erro concreto que fechou uma
+  Story indevidamente (4.65).
 - **Seção "Trilho do board"** (opcional; exigida pelo walker multi-hop do §9) — por nível, a
   lista **ordenada** de status-IDs das colunas do quadro, do início ao fim do fluxo (ex.:
   `story: 1 → 11606 → 10599 → … → 10001`). Workflows diferem por tipo — um trilho por nível,
@@ -370,17 +393,29 @@ política de `transition`):
   **tarefa isolada**: na própria issue, na closure `Done`): marco na **unidade de QA** — que,
   pelo teto abaixo, tipicamente vira **comentário**, não transição.
 
-**Teto de transição automática da unidade de QA**: a Story (e a tarefa isolada, que é sua
-própria unidade de QA) é movida **automaticamente** no máximo até o status-alvo de
-`Trabalho iniciado (Story)` — a coluna de desenvolvimento. Marco cujo alvo fica **além** do
-teto na régua do nível → degrada para comentário na issue (a informação chega, o card não
-anda). Racional: terminada a entrega da IA, o Diretor ainda analisa e pede ajustes — a
-unidade de QA fica em desenvolvimento até **ele** movê-la; pós-desenvolvimento é ato humano,
-pela mesma régua que mantém o Epic intocado (4.62). Linha `Trabalho iniciado (Story)`
-ausente no mapa → a Story não tem transição automática nenhuma (só comentários). **O teto
-governa só os ganchos automáticos**: o verbo de fase (§13) é ordem explícita do humano e
-pode ultrapassá-lo — `--phase finish-dev` levando a Story à revisão é exatamente o ato
-humano que o teto espera.
+**Teto de transição automática da unidade de QA** — **resolva o teto como valor antes de
+mover, nunca como lembrete depois**. A Story (e a tarefa isolada, que é sua própria unidade
+de QA) é movida **automaticamente** no máximo até `teto = status-alvo da linha
+'Trabalho iniciado (Story)'` — a coluna de desenvolvimento. Linha ausente no mapa →
+**`teto` = o status atual da issue**: nenhuma transição automática, só comentário (sem coluna
+de desenvolvimento declarada, mover é chute). Marco cujo alvo fica **além** do teto na régua
+do nível → degrada para comentário na issue (a informação chega, o card não anda). Racional:
+terminada a entrega da IA, o Diretor ainda analisa e pede ajustes — a unidade de QA fica em
+desenvolvimento até **ele** movê-la; pós-desenvolvimento é ato humano, pela mesma régua que
+mantém o Epic intocado (4.62).
+
+- **Declare o teto no output**, sempre que tocar a unidade de QA:
+  `Story <KEY>: teto <coluna> · alvo <coluna> → movida | comentário (alvo além do teto)`.
+  Teto aplicado em silêncio é indistinguível de teto esquecido — e foi esquecido em campo
+  (4.65); a linha é o que torna o esquecimento visível no relatório.
+- **A régua da sub-task não se estende à Story por analogia.** "As 10 sub-tasks foram até
+  Feito, conduzo a Story pela mesma cadeia" é exatamente o raciocínio que o teto existe para
+  impedir: sub-task é card de dev (sem teto, vai até o fim); a unidade de QA é o card do
+  Diretor. Cadeia de transições de um nível nunca é evidência sobre outro nível.
+- **O teto governa só os ganchos automáticos**: o verbo de fase (§13) é ordem explícita do
+  humano e pode ultrapassá-lo — `--phase finish-dev` levando a Story à revisão é exatamente o
+  ato humano que o teto espera. Fora de `--phase`, **não existe caminho** que leve a unidade de
+  QA além do teto: nem ciclo completo, nem todos os gates verdes, nem aceitação do PO.
 
 **Não-regressão (pré-condição de toda transição automática — ganchos e reconciliação §12)**:
 antes de transicionar, `getJiraIssue` (campo `status`) e comparar o status atual com o alvo
@@ -443,7 +478,10 @@ gatilho "Funcionalidade pronta p/ QA" para FEATs já completas). Aplica campos e
 `transition:auto` — alinha o status ao **estado real** das TASKs, sempre sob o teto e a
 não-regressão do §9: sub-task de TASK `In Progress` → alvo de `TASK iniciada`; de TASK
 `Done` → alvo de `TASK concluída`; Story com **alguma** TASK iniciada → alvo de
-`Trabalho iniciado (Story)` (o teto — nunca além, mesmo com tudo `Done`). Estado misto
+`Trabalho iniciado (Story)` (o teto — nunca além, mesmo com tudo `Done`). A reconciliação
+**não tem** caminho que leve a unidade de QA além do teto: plano de status que contenha um
+veio de linha não-canônica do mapa (§3) e está errado — leia o §9 **antes** de transicionar
+(§0) e declare o teto no output. Estado misto
 (sub-tasks legadas sob a issue da SPEC com o 3º nível ativo) é **reportado no output**,
 nunca re-parentado (§4).
 

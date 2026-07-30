@@ -17,6 +17,37 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.42.0] — 2026-07-30
+
+Decision 4.65
+
+### Fixed
+- **The QA unit no longer ends the cycle in "done".** In the first real end-to-end run of
+  the real-time board (0.41.0), the closing reconciliation walked the Story all the way to
+  the last column — the exact move the 4.62 ceiling exists to prevent. Three fixes, one per
+  cause: the sync protocol's §9 is now a **read prerequisite for any card movement** (and
+  `/keelson:auto` lists it explicitly — it did not before); the **ceiling is resolved as a
+  value** before moving (`ceiling = target status of "Trabalho iniciado (Story)"`; row
+  missing → ceiling is the current status, comment only); and outside `--phase` there is
+  **no route** past it — no combination of green gates, PO acceptance or a finished cycle
+  moves the QA unit further.
+
+### Changed
+- **The board map is documentation, not a source of triggers.** Only the four canonical
+  milestones and the `--phase` rows are ever *executed*. Any other row — the free-prose
+  workflow notes that accumulate in a human-edited map, e.g. *"QA validates the feature /
+  PR opened"* — is now explicitly documentation: it never fires, and it is reported as a
+  one-line warning. Corollary spelled out: no keelson gate or agent (QA gate 9, code review,
+  PO acceptance, push) satisfies a trigger that names a human act.
+- **Reports state the ceiling.** `/keelson:jira-sync` gained a `Unidade de QA: <KEY> em
+  <column> (teto: <column>)` line, and the mandatory tracker line of `/keelson:auto` now
+  carries the Story's current column and its ceiling — a silently applied ceiling was
+  indistinguishable from a forgotten one.
+- `/keelson:init` now diagnoses **non-canonical milestone rows** in an existing map (lists
+  them and recommends renaming or commenting them out) and never edits the human's table.
+
+---
+
 ## [0.41.1] — 2026-07-30
 
 Decision 4.64

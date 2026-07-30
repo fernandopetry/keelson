@@ -137,6 +137,8 @@ Se o humano optar por ligar (requer o **conector Atlassian** autorizado — sem 
 
 Merge-preserving (Regra de merge): bloco `jira` já presente → preserva; ficha antiga sem o bloco → acrescenta com `enabled:false`; bloco presente sem `issueType.feature`/`issueType.standalone` → acrescenta a(s) chave(s) como `null` sem tocar no resto; bloco sem `epicPolicy` → acrescenta `"always"` (comportamento atual); map file antigo sem algum dos marcos canônicos ("TASK iniciada", "TASK concluída", "Trabalho iniciado (Story)", "Funcionalidade pronta p/ QA"), sem a coluna `Nível`, sem as linhas de fase ou sem a seção "Trilho do board" → estrutura adicionada como sugestão comentada, nunca sobrescrevendo a tabela do humano.
 
+**Diagnóstico de marcos não-canônicos** (mapa antigo ou editado à mão): linha de Etapas/Colunas cujo `Gatilho` não é um dos quatro marcos canônicos nem `--phase <verbo>` — tipicamente prosa do fluxo real do time (`QA valida a funcionalidade / PR aberto`, `Funcionalidade aprovada na SPEC`) — **listar no output** como *documentação, não gatilho* (§3: catálogo fechado), com a recomendação de comentá-la ou renomeá-la para o marco canônico correspondente. **Não** alterar a tabela do humano. Um mapa em que a única linha de `story` que aponta para a coluna de desenvolvimento está ausente merece destaque: sem `Trabalho iniciado (Story)`, o teto do §9 vira "nenhuma transição automática na Story" e o quadro não mostra o trabalho começando.
+
 ## Etapa 5 — Injetar o bloco no `CLAUDE.md`
 
 Insira o conteúdo de `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.keelson-block.md` no `CLAUDE.md` do projeto (crie o arquivo se não existir). Se um bloco keelson já existir (entre os marcadores `<!-- ... keelson ... -->`), **substitua-o** — não duplique.

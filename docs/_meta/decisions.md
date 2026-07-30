@@ -2,7 +2,7 @@
 
 > Memória institucional das decisões sobre como o keelson (spec-driven development) é praticado. Diferente da doutrina de código (QUALITY-CHARTER + perfil ativo, que regem o **código**), este arquivo rege o **processo de desenvolvimento**.
 
-**Última revisão**: 2026-07-29
+**Última revisão**: 2026-07-30
 **Status do documento**: vivo, atualizado conforme decisões evoluem
 
 > **Nota de rename (decisão 4.40, 2026-07-26)**: entradas anteriores à 0.21.0 citam agents pelos IDs antigos (`task-implementer`, `task-reviewer`, `task-verifier`, `security-reviewer`, `product-critic`, `process-tuner`, `profile-writer`). Histórico não se reescreve — o de-para completo está na decisão 4.40.
@@ -1015,6 +1015,27 @@ Indisponibilidade nunca bloqueia; só o **desalinhamento real** bloqueia — a m
 **Decisão**: dois patches mínimos, cada um no dono da regra. (a) `commands/tasks.md`, parágrafo de falsificabilidade da Etapa 3: todo **exemplo literal** que ilustra um critério é conferido contra qualquer regra formal (regex/formato) já mandatória em outra seção da mesma TASK — se o Escopo fixa um padrão, o dado do exemplo tem de casá-lo. (b) `agents/agile-coach.md`, passo 7: a cena abre com a **versão instalada do plugin**, e o anexo é o **diff literal** contra o texto da versão instalada — proposta em prosa obriga o mantenedor a redigir o patch às cegas. A reformulação mecânica sugerida pelo próprio remetente (extrair regex do Escopo e casar contra exemplos dos critérios, no `task-validator`) fica **reservada para reincidência**, pela mesma régua da 4.52 — regra semântica no validator é cara e o caso tem amostra de um.
 
 **Aplicação**: `commands/tasks.md` (Etapa 3, falsificabilidade), `agents/agile-coach.md` (passo 7). Bump patch (ajuste fino de doutrina existente).
+
+---
+
+### 4.65 — O teto da unidade de QA é resolvido, declarado e inescapável; o mapa não é fonte de gatilho
+
+**Problema**: primeira rodada real da 4.62 (`/keelson:auto` de ponta a ponta num consumidor, plugin 0.41.0). Tudo funcionou — Story criada, 10 sub-tasks, waves, gates, push — **menos** o fim: no fecho, a reconciliação levou a Story de "A fazer" a **"Feito"**, exatamente o que o teto da 4.62 existe para impedir. O card que devia esperar o Diretor em desenvolvimento apareceu concluído. Três furos compostos, nenhum deles "a regra não existia":
+
+1. **A regra não foi lida.** Os comandos leem o protocolo por §§ (leitura seletiva por offset); o item 4 do `/keelson:auto` mandava ler §0–§1 + §6.2 + §11 + §12 — **§9 não estava na lista**, e a sessão leu as linhas 1–336 do arquivo, parando **antes** do teto (linha ~373) e do próprio §12. Executou a reconciliação sem as duas seções que a governam.
+2. **O mapa virou fonte de autoridade paralela.** Sem §9/§12, a única régua disponível foi a tabela Etapas/Colunas do consumidor — que trazia, herdada de edição humana anterior, a linha `Concluída | História | Feito | 11991 | 41 | QA valida a funcionalidade / PR aberto`. Nada no §3 dizia que linha fora do catálogo canônico **não é gatilho executável**; a sessão a leu como convite.
+3. **Gate do keelson confundido com ato humano.** A justificativa textual foi literal: *"conduzo a Story pela mesma cadeia — já que o gate 9 foi verificado ponta-a-ponta nesta sessão, o gatilho 'QA valida a funcionalidade' já está satisfeito"*. Duas falácias numa frase: o QA do time simulado não é o QA humano do quadro, e a cadeia da sub-task (card de dev, **sem** teto) não é evidência sobre a Story.
+
+**Decisão**: quatro patches, cada um fechando um dos vetores.
+
+1. **§9 é pré-requisito de qualquer movimento de card** (§0): nenhuma transição sem o §9 lido **nesta execução** — o § que se veio buscar (§7, §12, §13, feat) não substitui o §9, o pressupõe. `/keelson:auto` item 4 passa a listar §9 explicitamente.
+2. **Catálogo fechado de gatilhos** (§3): só os quatro marcos canônicos e as linhas `--phase` são **executados**. Linha com outro nome/gatilho é **documentação do fluxo humano** — não dispara, não se "considera satisfeita", entra em 1 linha de aviso. Teste falsificável: *gatilho que o keelson não dispara por si não move card*. Corolário explícito: nenhum gate, agente ou etapa do ciclo (gate 9/QA, aceitação do PO, review, push) satisfaz gatilho que nomeia ato humano.
+3. **Teto resolvido como valor, não como lembrete** (§9): antes de mover a unidade de QA, `teto = status-alvo de 'Trabalho iniciado (Story)'`; **linha ausente → teto = status atual** (só comentário). Mais a anti-analogia ("a cadeia da sub-task não se estende à Story") e o fecho de rota: fora de `--phase`, **não existe caminho** que ultrapasse o teto.
+4. **Teto visível no relatório**: a unidade de QA passa a ser declarada com coluna atual **e** teto — no output do `/keelson:jira-sync` e na linha obrigatória do tracker do `/keelson:auto` (`Story: <KEY> em <coluna> (teto: <coluna>)`). Teto aplicado em silêncio é indistinguível de teto esquecido; a linha é o que torna a reincidência detectável sem abrir o Jira. O `/keelson:init` ganha o **diagnóstico de marcos não-canônicos** em mapa antigo (lista e recomenda, nunca altera a tabela do humano).
+
+**Lição de método além do Jira**: doutrina que só existe em prosa dentro de um § longo é doutrina que a leitura seletiva pode pular. Regra que governa ato irreversível-ish precisa de (a) leitura declarada como pré-requisito, (b) valor resolvido antes do ato e (c) rastro no output — as mesmas três pernas da 4.30 (gate 8 inescapável).
+
+**Aplicação**: `skills/_shared/jira-sync-protocol.md` (§0 pré-requisito de leitura; §3 catálogo fechado; §9 teto resolvido/declarado + anti-analogia; §12 sem rota acima do teto), `commands/auto.md` (item 4 lê §9; item 6.1 declara coluna e teto), `commands/jira-sync.md` (linha "Unidade de QA" no output + aviso de marco não-canônico), `commands/init.md` (diagnóstico de marcos não-canônicos). Doutrina nova + mudança no contrato de output → minor: plugin 0.41.1 → 0.42.0.
 
 ---
 

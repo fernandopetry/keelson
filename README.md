@@ -350,30 +350,25 @@ keelson/
 
 ## Status
 
-`0.41.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.42.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **literal examples must obey the TASK's own formal rules** (decision
-4.64) — validated in the field by the first real maintainer message (the 4.54 mechanism):
-a consumer reported a TASK whose scope mandated a key regex its own criterion's example
-could never match. `/keelson:tasks` now checks every literal example against any formal
-rule (regex, format) already mandatory elsewhere in the same TASK, and `agile-coach`
-maintainer messages must open with the installed plugin version and attach a literal
-diff — not a prose proposal. See the full history in [CHANGELOG.md](CHANGELOG.md).
-Previously: **the Jira board moves in real time, safely** (decision 4.62) —
-with `transition: auto`, dispatching a TASK to the developer now moves its sub-task to
-the in-development column (and the Story, on its first TASK), and closure still moves
-sub-tasks to the final done column. The QA unit (Story or standalone task) has an
-automatic-transition ceiling: it is auto-moved at most to the development column and
-stays there after the AI delivers — the "ready for QA" milestone becomes a comment —
-because the human still reviews and requests adjustments; advancing the card is their
-act, typically via `--phase finish-dev` (the 4.60 phase verbs cross the ceiling: they
-*are* the human's order). Every automatic transition is guarded by a no-regression
-check against the level's ruler (board rail, or the map's row order): a card the human
-already moved ahead is never pulled back, and a status outside the ruler is never
-transitioned. Reconciliation aligns the board to the real TASK state under the same
-rules.
+New in this release: **the QA unit stops where it should** (decision 4.65). The first real
+end-to-end run of the real-time board closed a Story as done instead of leaving it in
+development for the human. Three fixes: §9 of the sync protocol is a **read prerequisite
+for any card movement**, the ceiling is **resolved as a value** before moving (and reported
+next to the card's current column), and the board map is **documentation, not a source of
+triggers** — only the canonical milestones and `--phase` rows are ever executed, and no
+keelson gate satisfies a trigger that names a human act. See the full history in
+[CHANGELOG.md](CHANGELOG.md).
+Previously: **literal examples must obey the TASK's own formal rules** (decision 4.64),
+and **the Jira board moves in real time, safely** (decision 4.62) — with
+`transition: auto`, dispatching a TASK moves its sub-task (and the Story, on its first
+TASK) to the in-development column, closure moves sub-tasks to the final done column, the
+QA unit stops at the development ceiling until the human advances it (typically via
+`--phase finish-dev`), and every automatic transition is guarded by a no-regression check
+against the level's ruler — a card the human already moved ahead is never pulled back.
 Recent releases, in short: **Epics only where they group something** —
 `jira.epicPolicy: "multi-feature"` projects a single-feature SPEC without an Epic, the
 Story as the root of the tree (decision 4.61) — **phase verbs move the board** —
