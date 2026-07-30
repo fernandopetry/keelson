@@ -51,6 +51,30 @@ teste e o que é a verificação.
 
 ---
 
+## Asserções que provam (anti-tautologia)
+
+Uma asserção só prova algo quando o valor esperado tem **origem independente** do código
+sob teste — um teste tautológico ou de asserção fraca **existe, roda e passa**, mas é
+incapaz de falhar junto com o comportamento. Quatro regras mecânicas (todas achado
+bloqueante no gate 1 — `./CODE-REVIEW.md`):
+
+- **Esperado independente do gerador**: asserção cujo valor esperado é **calculado
+  chamando o código de produção** (a própria unidade sob teste ou o helper que ela usa
+  para produzir a saída) é tautologia — passa para qualquer comportamento, certo ou
+  errado. O esperado é um **literal** ou construído por caminho independente do gerador.
+- **Unicidade se prova contando**: requisito "aparece exatamente uma vez" não se prova
+  com asserção de "contém" (ela passa com 1 **ou N** ocorrências) — exige **contagem**
+  de ocorrências comparada ao esperado.
+- **Um caso por ramo de fallback**: cadeia de fallback (`A senão B senão C`) tem um
+  teste por ramo. Fixture com todos os campos sempre preenchidos exercita só o primeiro
+  ramo e deixa os demais **invisíveis por construção** — o fixture tem a forma **real**
+  do dado (campos ausentes/vazios existem em produção), não a forma que o código espera.
+- **Quantificador vira tabela**: requisito quantificado ("todos os locales", "cada
+  tipo", "os N países") exige um caso por elemento — ou por classe de equivalência
+  **demonstrada** — via tabela de casos. Só o caso default testado = AC não coberto.
+
+---
+
 ## Fixtures e dados compartilhados (Art. 3)
 
 Schema de teste e construtores de dados são **centralizados**, não declarados inline em
@@ -71,6 +95,12 @@ para velocidade, mas o substituto **não é** o ambiente de produção — diale
 construções divergem. Quando a mudança altera o I/O real (a consulta, o comando, o
 contrato externo), o teste no dublê **não dispensa** a verificação de comportamento
 contra o ambiente real (o gate de comportamento observável, quando aplicável).
+
+O **toolchain do runner também é dublê**: quando o runtime carrega o código por caminho
+diferente do runner (outro transpilador/parser, outra versão de interpretador, outro
+loader), a suíte verde **não prova que a aplicação sobe**. Mudança em código carregado
+pelo runtime real → prove a carga/boot nele (o comando concreto é do perfil de linguagem
+ou da ficha), não só no runner.
 
 ---
 

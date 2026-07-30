@@ -17,6 +17,52 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.45.0] — 2026-07-30
+
+Decision 4.68
+
+### Added
+- **Assertions that can actually fail — mechanical anti-tautology rules.** Real consumer
+  postmortem: an e-mail delivery shipped with four defects visible in seconds in the
+  rendered artifact (missing photo, duplicated headline, wrong currency in 5 countries,
+  `file://` link) — with every gate green. The tests existed and passed, but could not
+  fail with the behavior: expected values computed by calling the production code,
+  "contains" assertions proving uniqueness, always-filled fixtures hiding fallback
+  branches, one locale tested against an "all locales" NFR. `core/TESTING.md` gains an
+  "Assertions that prove" section with four mechanical rules (independent expected
+  value · uniqueness by counting · one case per fallback branch · quantified
+  requirements as case tables), and `core/CODE-REVIEW.md` gate 1 applies them as
+  blocking findings — a tautological test counts as *no test* for its AC. The
+  `developer` (step 5) gets the same ruler at write time.
+- **Creatable test data is not an environment gap.** The gate that would have caught
+  everything (behavior verification) self-granted a pending handoff because the needed
+  record "was not in the dataset" — while the database was up and the record creatable
+  in seconds. `handoff-protocol.md` §8.1 and the `qa` agent now rule: "not found" ≠
+  "not possible". With the environment up, missing data gets **created** (seed, factory,
+  API); creation needing out-of-session access or decisions gets **escalated** (proposal
+  + default) before any AC is declared unverifiable. A data-blocked item only exists
+  with the creation attempt or escalation recorded — otherwise it is a shortcut handoff,
+  same ruler as the unprobed-environment rule (4.26).
+- **Rendered artifacts are evidence.** For renderable output (HTML e-mail, template,
+  generated document) the `qa` exercise now renders with representative data, inspects
+  the artifact itself (AC elements, duplication, links, empty-field fallbacks), saves it
+  and cites the path in the evidence — so the human review sees at a glance what a
+  20-item gate checklist hides.
+
+### Changed
+- **The runner's toolchain is a test double too** (`core/TESTING.md`, "the double is not
+  production"): 6137 green tests, dead application — Jest transpiled with modern Babel
+  while the runtime loaded through an old parser. When the runtime loads code through a
+  different path than the runner, a green suite does not prove the app boots: changes to
+  runtime-loaded code require a load/boot proof in the real runtime.
+- **Gate 2 gains the sanctioned full-suite exception** (`core/CODE-REVIEW.md`): shared
+  wide-reach data (locale, global config, central fixture) whose consumers cannot be
+  confidently enumerated by grep/imports → the scoped run is insufficient, run the full
+  suite. Fixing the shared locale data had broken two specs of another feature that only
+  the full suite revealed.
+
+---
+
 ## [0.44.0] — 2026-07-30
 
 Decision 4.67

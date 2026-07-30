@@ -1074,6 +1074,30 @@ Check mecânico no `spec-validator` (detectar FR de ação de UI sem os três es
 
 ---
 
+### 4.68 — Asserções que provam: anti-tautologia mecânica, dado criável não vira handoff, artefato renderizado como evidência
+
+**Problema**: postmortem real de consumidor — entrega de e-mail multi-locale com **quatro defeitos visíveis em segundos no artefato renderizado** (foto ausente, frase de destaque duplicada, moeda errada em 5 de 7 países, link `file://`), mais uma **regressão que derrubou o boot da aplicação** introduzida durante a correção. Todos os gates verdes; o code review aprovou. Cinco mecanismos, cada um com um furo de doutrina próprio:
+
+1. **Os testes eram tautológicos ou fracos — e o gate 1 não tinha régua mecânica para vê-los.** O valor esperado do teste de link era calculado chamando o próprio código de produção (`new AdUrl(...).handle()`) — o teste passa para qualquer URL que o gerador devolva. A frase duplicada foi *renderizada pelo teste e aprovada*: asserção de "contém" passa com 1 ou N ocorrências. O fixture sempre-preenchido tornava o ramo de fallback da foto invisível por construção. E o NFR "todos os locales" foi coberto testando só o default. O Charter já dizia "gerador ≠ avaliador" e o gate 1 já exigia "teste falsificável" — como **filosofia**. Quem escreveu os testes foi quem escreveu o código, na mesma sessão, com a mesma premissa errada; a filosofia não sobrevive a isso, um check mecânico sobrevive (o mesmo padrão da 4.58: reincidência de princípio ignorado vira check).
+2. **O gate que pegaria tudo não rodou — e a pendência se auto-concedeu.** Os 4 defeitos eram óbvios no e-mail renderizado (gate 9); o QA declarou "não há anúncio 'Em Oferta' no dataset" e a verificação virou `pendente_handoff`. Mas **o dado era criável** — o banco estava de pé. O protocolo de handoff nomeia 3 causas de indisponibilidade (runtime, credencial, app fora do ar — 4.49) e nenhuma cobre dado ausente; "não encontrei" foi aceito como "não é possível" sem tentativa de criação nem escalação, e o handoff virou papelada em vez de bloqueio.
+3. **Ninguém olhou o artefato.** O relatório de gates tinha 20 itens; o HTML renderizado revelava os 4 defeitos numa olhada de 30 segundos. A evidência do QA era só asserção e checklist — o artefato renderizado não era exigido como evidência nem chegava à revisão humana.
+4. **Runner e runtime com toolchains distintos**: Jest transpilava com Babel moderno; o runtime carregava via `babel-register` com parser antigo que não entende `??`. 6137 testes verdes, aplicação morta no boot. "O dublê não é produção" já existia no TESTING.md — mas falava de banco/serviço, não do **toolchain do próprio runner** como dublê.
+5. **A correção do dado compartilhado (locale) só revelou 2 specs quebradas de outra feature na suíte completa** — o filtro escopado do gate 2, mesmo ampliado "para os consumidores", não alcança consumidor que não é enumerável por grep/imports.
+
+**Decisão**: cinco patches, cada um no dono da regra.
+
+1. **`guidelines/core/TESTING.md`** (seção nova "Asserções que provam (anti-tautologia)"): quatro regras mecânicas — esperado com **origem independente** do gerador (nunca calculado chamando produção) · unicidade se prova **contando**, não com "contém" · **um caso por ramo** de fallback, com fixture na forma real do dado · requisito quantificado ("todos os X") vira **tabela de casos**, um por elemento ou classe de equivalência demonstrada.
+2. **`guidelines/core/CODE-REVIEW.md`**: gate 1 ganha os quatro checks como **achado bloqueante** (teste tautológico = AC sem teste); gate 2 ganha a **exceção sancionada da suíte completa** — dado compartilhado de amplo alcance (locale, config global, fixture central) cujos consumidores não são enumeráveis com confiança → a rodada escopada é insuficiente. `agents/developer.md` (etapa 5) aponta a régua para quem escreve o teste antes do reviewer aplicá-la.
+3. **Dado criável não é indisponibilidade** (`docs/_meta/conventions/handoff-protocol.md` §8.1 + `agents/qa.md` etapa 2): "não encontrei" ≠ "não é possível". Com o ambiente de pé, o dado que o AC exige se **cria** (seed, factory, API, rotina do projeto); criação que exige decisão/acesso fora da sessão **escala** (proposta + default) antes de declarar pendência. Item pendente por falta de dado só existe com a tentativa de criação ou a escalação **registrada** — sem registro é handoff-atalho, a mesma régua da sondagem (4.26).
+4. **Artefato renderizado é evidência** (`agents/qa.md` etapa 3): saída renderizável (e-mail HTML, template, documento) → renderizar com dado representativo, **inspecionar o artefato** (elementos do AC, duplicação, links, fallbacks de campo vazio), **salvar** e citar o caminho na evidência, que segue no report da Entrega — a revisão humana vê numa olhada o que o checklist esconde.
+5. **O toolchain do runner também é dublê** (`guidelines/core/TESTING.md`, "O dublê não é produção"): runtime que carrega o código por caminho diferente do runner (transpilador, versão de interpretador, loader) → suíte verde não prova que a aplicação sobe; mudança em código carregado pelo runtime real exige prova de carga/boot nele (comando concreto no perfil/ficha).
+
+A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto dele** (é regra de stack, não de doutrina) — o core carrega só o princípio generalizável do item 5.
+
+**Aplicação**: `guidelines/core/TESTING.md` (seção nova + dublê), `guidelines/core/CODE-REVIEW.md` (gates 1 e 2), `agents/qa.md` (etapas 2 e 3), `agents/developer.md` (etapa 5), `docs/_meta/conventions/handoff-protocol.md` (§8.1). Doutrina nova → minor: plugin 0.44.0 → 0.45.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

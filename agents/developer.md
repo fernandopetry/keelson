@@ -94,7 +94,10 @@ Para cada AC vinculado:
 - Runner declarado no perfil / `quality.test` da ficha.
 - Estrutura de pasta do projeto.
 
-Teste deve ser **falsificável**.
+Teste deve ser **falsificável** — régua mecânica em `TESTING.md`, "Asserções que provam":
+esperado independente do código sob teste (nunca calculado chamando produção), contagem
+para requisito de unicidade, um caso por ramo de fallback, tabela para requisito
+quantificado ("todos os X"). Teste que não é capaz de falhar reprova no gate 1.
 
 ### 6. Rodar testes e lint localmente
 

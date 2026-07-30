@@ -22,7 +22,19 @@
 Cada AC dos critérios de pronto tem ≥ 1 teste que o verifica, e o teste é **falsificável**
 (quebra se a implementação quebrar). Âncora: Charter Art. 1 · `./TESTING.md`.
 
-**Falha**: AC sem teste correspondente. Falso positivo típico: teste que sempre passa.
+**Checks mecânicos de falsificabilidade** (régua: `./TESTING.md`, "Asserções que provam")
+— aplique a cada teste que cobre um AC, não como filosofia:
+
+- valor esperado **calculado chamando o código de produção** (tautologia);
+- requisito de unicidade provado com "contém" em vez de **contagem**;
+- cadeia de fallback sem **um caso por ramo** (fixture sempre-preenchido);
+- AC quantificado ("todos os X") coberto só pelo caso default.
+
+Cada um é **achado bloqueante**: o teste existe e passa, mas não é capaz de falhar junto
+com o comportamento — o AC conta como **sem teste**.
+
+**Falha**: AC sem teste correspondente; teste tautológico ou de asserção fraca (checks
+acima). Falso positivo típico: teste que sempre passa.
 
 ### Gate 2: testes passando
 
@@ -33,8 +45,11 @@ implementou (`verificacao.baseline`): o gate mede **regressão**, não o passado
 Execute localmente os testes **filtrados ao escopo** — não confie no report de quem
 implementou. **Não** rode a suíte completa aqui (verificação forte e única —
 `./TESTING.md`). Valor ou constante compartilhada alterada → amplie o filtro para os
-consumidores. Você é o dono da rodada escopada: **registre o comando/filtro executado**,
-porque o `qa` decide por ele se precisa re-rodar.
+consumidores. **Exceção sancionada**: quando o dado alterado é compartilhado de amplo
+alcance (locale, config global, fixture central) e os consumidores **não são enumeráveis
+com confiança** por grep/imports, o filtro ampliado é insuficiente — rode a **suíte
+completa**: é o único caso em que ela entra neste gate. Você é o dono da rodada escopada:
+**registre o comando/filtro executado**, porque o `qa` decide por ele se precisa re-rodar.
 
 Vermelho **pré-existente declarado no baseline** (e sancionado pelo Tech Lead) não
 reprova por si — reprova qualquer vermelho **novo** ou teste novo vermelho. Vermelho

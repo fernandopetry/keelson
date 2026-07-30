@@ -350,22 +350,25 @@ keelson/
 
 ## Status
 
-`0.44.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.45.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **UI actions must specify observable feedback — at the SPEC level**
-(decision 4.67). A button that sent its e-mail with no visual feedback shipped approved,
-because the SPEC only defined the invisible effect. Now an FR for a user-initiated UI
-action must specify the **three observable states** (in progress, success, failure) —
-each becomes a verifiable AC, so the existing gates inherit the enforcement — and the
-product-analyst critique asks the classic missing-scenario question explicitly. See the
-full history in [CHANGELOG.md](CHANGELOG.md).
-Previously: **a failing verification can no longer be silently bypassed** (decision 4.66
-— test baseline before coding, literal verification command in the report, gate 2
-measures regression, and a hook blocks `--no-verify`), **the QA unit stops where it
-should** (decision 4.65), and **literal examples must obey the TASK's own formal rules**
-(decision 4.64).
+New in this release: **assertions that can actually fail** (decision 4.68). A consumer
+delivery shipped four defects visible in seconds in the rendered e-mail — with every
+gate green — because the tests were tautological (expected values computed by the code
+under test, "contains" proving uniqueness, always-filled fixtures, one locale for an
+"all locales" NFR). Gate 1 now applies four mechanical anti-tautology checks as
+blocking findings; creatable test data can no longer self-grant a pending handoff
+("not found" ≠ "not possible" — create or escalate, with the attempt recorded); QA
+saves and inspects the **rendered artifact** as evidence; and the runner's toolchain is
+recognized as a test double (a green suite doesn't prove the app boots). See the full
+history in [CHANGELOG.md](CHANGELOG.md).
+Previously: **UI actions must specify observable feedback at the SPEC level** (decision
+4.67 — an FR for a user-initiated UI action specifies the three observable states, each
+becoming a verifiable AC), and **a failing verification can no longer be silently
+bypassed** (decision 4.66 — test baseline before coding, literal verification command
+in the report, gate 2 measures regression, and a hook blocks `--no-verify`).
 Recent releases, in short: **Epics only where they group something** —
 `jira.epicPolicy: "multi-feature"` projects a single-feature SPEC without an Epic, the
 Story as the root of the tree (decision 4.61) — **phase verbs move the board** —
