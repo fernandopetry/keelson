@@ -17,6 +17,30 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.41.1] — 2026-07-30
+
+Decision 4.64
+
+### Changed
+- **Literal examples in generated TASKs must satisfy the TASK's own formal rules.** The
+  first real maintainer message from a consumer (decision 4.54's mechanism, validated in
+  the field) reported a TASK whose scope mandated a key regex with a 2+ letter prefix
+  while its dedupe criterion was illustrated with `B-2, A-1` — keys that regex can never
+  match. The falsifiability paragraph of `/keelson:tasks` (step 3) now requires every
+  literal example illustrating a criterion to be checked against any formal rule (regex,
+  format) already mandatory elsewhere in the same TASK. The deviation mechanism had
+  caught it downstream (developer noticed, reviewer confirmed, closure fixed the text) —
+  this moves the catch to generation, saving that correction round. The mechanical
+  variant (a `task-validator` semantic check) is reserved for recurrence.
+- **Maintainer messages now open with the installed plugin version and attach a literal
+  diff.** Judged against its own step-7 ruler, the received message had two gaps: no
+  plugin version (the maintainer cannot tell whether current doctrine already covers the
+  case) and a patch proposed in prose. The `agile-coach` scene now leads with the
+  installed version, and the attachment must be the literal diff against the installed
+  version's text — prose proposals force the maintainer to write the patch blind.
+
+---
+
 ## [0.41.0] — 2026-07-30
 
 Decision 4.62

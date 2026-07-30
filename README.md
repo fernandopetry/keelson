@@ -350,11 +350,18 @@ keelson/
 
 ## Status
 
-`0.41.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.41.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the Jira board moves in real time, safely** (decision 4.62) —
+New in this release: **literal examples must obey the TASK's own formal rules** (decision
+4.64) — validated in the field by the first real maintainer message (the 4.54 mechanism):
+a consumer reported a TASK whose scope mandated a key regex its own criterion's example
+could never match. `/keelson:tasks` now checks every literal example against any formal
+rule (regex, format) already mandatory elsewhere in the same TASK, and `agile-coach`
+maintainer messages must open with the installed plugin version and attach a literal
+diff — not a prose proposal. See the full history in [CHANGELOG.md](CHANGELOG.md).
+Previously: **the Jira board moves in real time, safely** (decision 4.62) —
 with `transition: auto`, dispatching a TASK to the developer now moves its sub-task to
 the in-development column (and the Story, on its first TASK), and closure still moves
 sub-tasks to the final done column. The QA unit (Story or standalone task) has an
@@ -367,25 +374,12 @@ check against the level's ruler (board rail, or the map's row order): a card the
 already moved ahead is never pulled back, and a status outside the ruler is never
 transitioned. Reconciliation aligns the board to the real TASK state under the same
 rules.
-Previously: **Epics only where they group something** (decision 4.61) — with
-`jira.epicPolicy: "multi-feature"`, a SPEC declaring 0–1 features projects without an
-Epic: the single Story is the root of the tree, sub-tasks under it. The signal is the
-declared feature count in the SPEC — a product statement, mechanically countable, never
-the AI inferring "this looks small". Evaluated once at first creation, recorded by the
-persisted keys, never re-parented when the SPEC later grows (sibling Story + link, mixed
-state reported). Default `"always"` keeps one Epic per SPEC. See the full history in
-[CHANGELOG.md](CHANGELOG.md).
-Previously: **phase verbs move the board** (decision 4.60) —
-`/keelson:jira-sync <target> --phase start-dev|finish-dev` is the human's imperative act on
-the Jira board: `start-dev` walks Epic/Story/sub-tasks into the development columns,
-`finish-dev` completes the sub-tasks and moves the Story to the review column. Targets are
-declared per hierarchy level in the project map (real boards run different workflows per
-issue type), a new ordered "board rail" section lets the sync walk multi-hop transitions —
-validated live at every hop, never regressing, stopping-and-commenting when blocked — and
-the Epic moves only via a phase verb plus a declared `epic` row (automatic hooks still never
-touch it). The verb reconciles first, so on a virgin slug one call creates the tree and
-walks it into development.
-Recent releases, in short: **Jira cards written for humans** — one leveled description
+Recent releases, in short: **Epics only where they group something** —
+`jira.epicPolicy: "multi-feature"` projects a single-feature SPEC without an Epic, the
+Story as the root of the tree (decision 4.61) — **phase verbs move the board** —
+`/keelson:jira-sync <target> --phase start-dev|finish-dev` as the human's imperative act,
+with per-level targets and a multi-hop board rail (decision 4.60) —
+**Jira cards written for humans** — one leveled description
 recipe per issue role, marker-gated re-render, `--refresh-descriptions` backfill
 (decision 4.59) — **"verified, not deduced" task generation** plus a
 task-validator check for orphan scope items (decision 4.58), **`/keelson:update`** for

@@ -1008,6 +1008,16 @@ Indisponibilidade nunca bloqueia; só o **desalinhamento real** bloqueia — a m
 
 ---
 
+### 4.64 — Exemplo literal conferido contra a regra formal da própria TASK; mensagem ao mantenedor carrega versão e diff literal
+
+**Problema**: primeira `mensagem_mantenedor` real recebida de um consumidor (professional-portal, LRN-025 lá) — validação em campo da 4.54. O caso relatado: o `/keelson:tasks` escreveu, na mesma TASK, um regex mandatório no "Escopo > Inclui" (chave com prefixo de 2+ letras) e ilustrou o critério de dedupe com o exemplo literal `B-2, A-1, B-2 → [B-2, A-1]` — chaves que o próprio regex nunca casa. O `task-validator` não pegou (check sintático: existe comando+esperado?; não semântico: o exemplo satisfaz a regra formal fixada alhures no MESMO documento?). O mecanismo de desvio funcionou como projetado — developer notou e preservou a garantia com chaves válidas, code-reviewer confirmou (0 matches), Tech Lead corrigiu a TASK na closure — nenhum código errado existiu, mas o ciclo gastou uma rodada de correção que a geração evitaria. E a própria mensagem, avaliada contra a régua do passo 7 do `agile-coach`, revelou dois furos: **não dizia a versão do plugin instalada** (o mantenedor não sabe se a doutrina vigente já cobre o caso — só a âncora textual citada, que por sorte resolveu, confirmou o alvo) e trouxe o patch **em prosa**, não o diff literal com orçamento de linhas que o passo 7 já mandava anexar.
+
+**Decisão**: dois patches mínimos, cada um no dono da regra. (a) `commands/tasks.md`, parágrafo de falsificabilidade da Etapa 3: todo **exemplo literal** que ilustra um critério é conferido contra qualquer regra formal (regex/formato) já mandatória em outra seção da mesma TASK — se o Escopo fixa um padrão, o dado do exemplo tem de casá-lo. (b) `agents/agile-coach.md`, passo 7: a cena abre com a **versão instalada do plugin**, e o anexo é o **diff literal** contra o texto da versão instalada — proposta em prosa obriga o mantenedor a redigir o patch às cegas. A reformulação mecânica sugerida pelo próprio remetente (extrair regex do Escopo e casar contra exemplos dos critérios, no `task-validator`) fica **reservada para reincidência**, pela mesma régua da 4.52 — regra semântica no validator é cara e o caso tem amostra de um.
+
+**Aplicação**: `commands/tasks.md` (Etapa 3, falsificabilidade), `agents/agile-coach.md` (passo 7). Bump patch (ajuste fino de doutrina existente).
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
