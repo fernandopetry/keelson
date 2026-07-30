@@ -91,3 +91,33 @@ Escolha a verificação que **prova o comportamento** (teste de integração/E2E
 suíte relevante **uma vez** ao final. Não prove a mesma coisa em várias ferramentas (lint
 + script de fiação + E2E + suíte repetida) — escolha a mais forte e pare. Rigor
 **proporcional a complexidade × risco** (ver `./WORKFLOW.md`).
+
+---
+
+## Verificação que falha não se contorna
+
+Uma verificação que falha — ou que **não consegue rodar** — tem exatamente **duas
+saídas**: corrigir a causa (se está no escopo) ou **parar e reportar o bloqueio** a quem
+orquestra. Não existe terceira via. Em particular, **erro pré-existente** (teste vermelho,
+suíte que não sobe, ambiente quebrado antes de você tocar em qualquer coisa) não é
+licença para pular a verificação: "não fui eu que quebrei" explica a origem do vermelho,
+não autoriza entregar sem prova.
+
+**Baseline antes de mudar**: quem vai implementar roda a verificação escopada **uma vez
+antes de tocar no código** e registra o resultado. Baseline vermelho → parar e reportar
+ali, antes de investir em implementação — é nesse momento que reportar é barato. A
+comparação final é sempre **contra o baseline**: nenhum vermelho novo.
+
+**São contorno — a mesma violação de gate do furo silencioso** (decisão 4.38):
+
+- Pular hook de verificação no commit (`--no-verify` e equivalentes).
+- Estreitar o filtro do runner para **excluir** o teste que falha.
+- Flag de "passa sem testes" / suíte vazia contando como verde.
+- Desabilitar, deletar ou marcar como skip o teste vermelho.
+- Não rodar a verificação e **silenciar** — entregar como se tivesse rodado.
+
+**Silêncio sobre verificação lê-se como verificação aprovada — e essa é a falha que esta
+regra existe para impedir.** Todo report declara o **comando literal** executado e o
+resultado; "não rodei: <motivo>" é um estado válido desde que explícito — a omissão nunca
+é. Os nomes concretos das flags de cada runner ficam no perfil de linguagem; a proibição
+é desta doutrina e vale para todos.

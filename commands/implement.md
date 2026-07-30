@@ -190,6 +190,7 @@ Falha: reportar específico, 1 retry, escalar.
 - Ajuste **localizado** da TASK (contrato intacto) → re-emitir a task ajustada;
 - O furo muda o **PLAN** (componente, DEC, fluxo) → tratar como mudança de plano (ajustar o PLAN e as TASKs afetadas antes de re-emitir);
 - O furo é de **produto** (contradiz SPEC/brief) → `po` em modo resolução quando há BRIEF; sem brief, escalar ao humano (ou escada, no `/keelson:auto`).
+- O furo é **baseline vermelho** (erro pré-existente na base — etapa 2 do developer, decisão 4.66) → corrigir se trivial e ao alcance da wave, estacionar (registro + sugestão de `/keelson:triage`), ou **sancionar prosseguir**: re-emitir a task com o vermelho declarado como conhecido (ele entra no `verificacao.baseline` do report e o gate 2 passa a medir regressão contra o baseline). A sanção é decisão registrada — nunca contorno: filtro estreitado, skip ou `--no-verify` seguem proibidos (`core/TESTING.md`).
 
 **Registro obrigatório** do furo: linha no `## Histórico recente` do INDEX — `<data>: furo no plano em TASK-MMM-XXX — <resumo> — destino: <decisão>`.
 

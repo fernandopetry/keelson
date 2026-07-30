@@ -27,7 +27,8 @@ Cada AC dos critérios de pronto tem ≥ 1 teste que o verifica, e o teste é **
 ### Gate 2: testes passando
 
 100% dos testes novos passam, e os pré-existentes do domínio tocado seguem verdes (sem
-regressão local).
+regressão local). A régua compara contra o **baseline** declarado no report de quem
+implementou (`verificacao.baseline`): o gate mede **regressão**, não o passado.
 
 Execute localmente os testes **filtrados ao escopo** — não confie no report de quem
 implementou. **Não** rode a suíte completa aqui (verificação forte e única —
@@ -35,7 +36,16 @@ implementou. **Não** rode a suíte completa aqui (verificação forte e única 
 consumidores. Você é o dono da rodada escopada: **registre o comando/filtro executado**,
 porque o `qa` decide por ele se precisa re-rodar.
 
-**Falha**: qualquer teste vermelho.
+Vermelho **pré-existente declarado no baseline** (e sancionado pelo Tech Lead) não
+reprova por si — reprova qualquer vermelho **novo** ou teste novo vermelho. Vermelho
+pré-existente que você descobre **sem declaração no report** → **REPROVADO por omissão**:
+declarar passa, esconder reprova — o incentivo tem de apontar para a honestidade. E
+nenhuma rodada que **contornou** a falha vale como evidência (filtro estreitado para
+excluir o vermelho, flag de "passa sem testes", hook de commit pulado — `./TESTING.md`,
+"Verificação que falha não se contorna").
+
+**Falha**: teste novo vermelho; vermelho novo vs. baseline; vermelho pré-existente
+omitido do report; evidência produzida por contorno.
 
 ### Gate 3: lint limpo
 

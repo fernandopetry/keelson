@@ -350,25 +350,23 @@ keelson/
 
 ## Status
 
-`0.42.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.43.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the QA unit stops where it should** (decision 4.65). The first real
-end-to-end run of the real-time board closed a Story as done instead of leaving it in
-development for the human. Three fixes: §9 of the sync protocol is a **read prerequisite
-for any card movement**, the ceiling is **resolved as a value** before moving (and reported
-next to the card's current column), and the board map is **documentation, not a source of
-triggers** — only the canonical milestones and `--phase` rows are ever executed, and no
-keelson gate satisfies a trigger that names a human act. See the full history in
-[CHANGELOG.md](CHANGELOG.md).
-Previously: **literal examples must obey the TASK's own formal rules** (decision 4.64),
-and **the Jira board moves in real time, safely** (decision 4.62) — with
-`transition: auto`, dispatching a TASK moves its sub-task (and the Story, on its first
-TASK) to the in-development column, closure moves sub-tasks to the final done column, the
-QA unit stops at the development ceiling until the human advances it (typically via
-`--phase finish-dev`), and every automatic transition is guarded by a no-regression check
-against the level's ruler — a card the human already moved ahead is never pulled back.
+New in this release: **a failing verification can no longer be silently bypassed**
+(decision 4.66). A pre-existing red suite on main had led a session to commit with
+`--no-verify` and report nothing. Now `core/TESTING.md` owns the rule — a failing (or
+un-runnable) verification has exactly two exits, fix or report, never a workaround — the
+developer captures a **test baseline before touching code** (red baseline stops the task
+right there), the report declares the **literal verification command** executed, gate 2
+**measures regression against the baseline** (a declared pre-existing red doesn't fail
+the gate; a hidden one does), and a new hook blocks `git commit/push --no-verify`. See
+the full history in [CHANGELOG.md](CHANGELOG.md).
+Previously: **the QA unit stops where it should** (decision 4.65), **literal examples
+must obey the TASK's own formal rules** (decision 4.64), and **the Jira board moves in
+real time, safely** (decision 4.62) — with the QA unit held at the development ceiling
+and every automatic transition guarded by a no-regression check.
 Recent releases, in short: **Epics only where they group something** —
 `jira.epicPolicy: "multi-feature"` projects a single-feature SPEC without an Epic, the
 Story as the root of the tree (decision 4.61) — **phase verbs move the board** —

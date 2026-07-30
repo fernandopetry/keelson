@@ -17,6 +17,40 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.43.0] — 2026-07-30
+
+Decision 4.66
+
+### Added
+- **A failing verification can no longer be silently bypassed.** Real case from a consumer
+  session: a pre-existing red Jest suite on main led the session to commit with
+  `--no-verify`, run no tests at all — its own or anyone's — and report nothing. Four
+  patches, each in the rule's owner, plus a mechanical guard:
+  - `core/TESTING.md` gains the doctrine section **"Verificação que falha não se
+    contorna"**: a failing (or un-runnable) verification has exactly two exits — fix the
+    cause, or stop and report the blocker. A pre-existing error explains where the red
+    came from; it never licenses delivering without proof. The named bypasses
+    (`--no-verify`, narrowing the runner filter to exclude the red test, pass-with-no-tests
+    flags, skipping/deleting tests, silence) are all the same gate violation as the silent
+    workaround of decision 4.38.
+  - The `developer` agent gains a mandatory **baseline step**: run the scoped suite once
+    *before touching code*. Red baseline → stop and report `Blocked` right there, while
+    reporting is still cheap; the Tech Lead decides (fix, park, or sanction proceeding
+    with the red declared). The final run is compared against the baseline: no new red.
+  - The developer report gains a mandatory **`verificacao` field** carrying the literal
+    command executed and its result, for both baseline and final runs — "did not run:
+    reason" is a valid state; omission never is.
+  - **Gate 2 now measures regression, not the past**: a declared-and-sanctioned
+    pre-existing red does not fail the gate by itself; a new red, an *undeclared*
+    pre-existing red (rejected for omission), or evidence produced by a bypass does.
+    Declaring passes, hiding fails — the incentive now points at honesty.
+  - New `hooks/noverify-guard.sh` (PreToolUse on Bash) blocks `git commit/push
+    --no-verify`; the conscious, named escape is prefixing the command with
+    `KEELSON_ALLOW_NO_VERIFY=1` (same rule as 4.63). Doctrine covers the agent that reads
+    it; the guard covers the one that didn't.
+
+---
+
 ## [0.42.0] — 2026-07-30
 
 Decision 4.65

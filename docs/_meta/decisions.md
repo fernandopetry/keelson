@@ -1039,6 +1039,26 @@ Indisponibilidade nunca bloqueia; só o **desalinhamento real** bloqueia — a m
 
 ---
 
+### 4.66 — Verificação que falha não se contorna: baseline obrigatório, bypass proibido e gate 2 por regressão
+
+**Problema**: caso real em sessão de consumidor — a sessão encontrou **erro pré-existente** na main (suíte Jest vermelha antes de qualquer mudança), não conseguiu rodar os testes, e a saída escolhida foi o **silêncio**: commitou com `--no-verify`, não rodou nem os testes próprios nem os do domínio, e não reportou nada. A doutrina já previa o caso — "testes pré-existentes vermelhos antes de você começar" era item da lista de furo no plano do `developer` (4.38) — mas previa **no lugar errado e com incentivo invertido**, por três furos compostos:
+
+1. **Sem passo de baseline no fluxo.** O developer só rodava testes na etapa final, *depois* de implementar. Descobrir o vermelho pré-existente com código já investido convida a racionalização "não fui eu que quebrei" — e a regra existia como item de lista dentro de uma seção, não como passo do fluxo (a mesma lição da 4.65: doutrina que a leitura seletiva pode pular).
+2. **Nenhum dono proibia os mecanismos de contorno.** `--no-verify`, filtro do runner estreitado para excluir a suíte vermelha, flag de "passa sem testes", skip/deleção do teste, ou simplesmente não rodar — nada nomeava esses atos como violação, e o report (`testes: total/passando`) aceitava uma rodada estreitada sem que ninguém percebesse: não havia campo que forçasse declarar **qual comando de verificação rodou de fato**.
+3. **O gate 2 punia a honestidade.** "Pré-existentes do domínio tocado seguem verdes" significava que **declarar** o vermelho pré-existente garantia reprovação, enquanto o silêncio tinha chance de passar — o incentivo apontava para esconder.
+
+**Decisão**: quatro patches, cada um no dono da regra, mais um cinto de segurança mecânico.
+
+1. **Doutrina agnóstica** (`core/TESTING.md`, seção nova "Verificação que falha não se contorna"): verificação que falha ou não roda tem **duas saídas** — corrigir (se no escopo) ou parar e reportar; erro pré-existente explica a origem do vermelho, **não autoriza entregar sem prova**. Baseline antes de mudar; lista nomeada dos contornos (todos = a violação de gate da 4.38); e a régua de silêncio: *"silêncio sobre verificação lê-se como verificação aprovada — e essa é a falha que esta regra existe para impedir"*. "Não rodei: motivo" é estado válido; omissão nunca é.
+2. **Baseline como etapa do fluxo** (`agents/developer.md`, etapa 2 nova): rodar a verificação escopada **uma vez antes de tocar no código** e registrar comando + resultado. Vermelho → parar ali (`Blocked`/`furo_no_plano`), quando reportar ainda é barato; o Tech Lead pode corrigir, estacionar ou **sancionar prosseguir** com o vermelho declarado. A rodada final compara contra o baseline: nenhum vermelho novo.
+3. **Verificação declarada no report** (`agents/developer.md`): campo obrigatório `verificacao:` com `baseline` e `final` — o comando **literal** executado e o resultado, espelhando para a verificação o princípio que o CODE-REVIEW já tinha para gates.
+4. **Gate 2 mede regressão, não o passado** (`core/CODE-REVIEW.md`): vermelho pré-existente **declarado e sancionado** não reprova por si — reprova vermelho **novo** vs. baseline, vermelho pré-existente **omitido** (REPROVADO por omissão) e evidência produzida por contorno. Declarar passa, esconder reprova — o incentivo passa a apontar para a honestidade.
+5. **Guard mecânico** (`hooks/noverify-guard.sh`, PreToolUse em Bash): bloqueia `git commit/push --no-verify` no mesmo comando simples (sem atravessar `| ; &&` — zero falso positivo de pipeline). Escape consciente e nomeado, mesma régua da 4.63: `KEELSON_ALLOW_NO_VERIFY=1` prefixado no comando — o pulo vira ato declarado com rastro no transcript. A doutrina cobre o agente que a lê; o guard cobre o que não leu. Validado com `bash -n` + 8 cenários sintéticos no scratchpad (commit/push bloqueiam · escape passa · commit normal passa · `--no-verify` noutro comando do pipeline passa · grep passa · input vazio/quebrado passa).
+
+**Aplicação**: `guidelines/core/TESTING.md` (seção nova), `agents/developer.md` (etapa 2 de baseline, renumeração 2→3…7→8, campo `verificacao`, caso de furo atualizado), `guidelines/core/CODE-REVIEW.md` (gate 2), `commands/implement.md` (destino "baseline vermelho" no sinal de furo da 3.5), `hooks/noverify-guard.sh` (novo) + registro em `hooks/hooks.json`. Doutrina nova + hook novo → minor: plugin 0.42.0 → 0.43.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
