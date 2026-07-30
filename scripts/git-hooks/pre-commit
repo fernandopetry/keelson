@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# pre-commit — guarda do topo da main (decisão 4.63)
+#
+# Sessões paralelas neste repo colidem em numeração de decisão (§4.x do decisions.md)
+# e na versão do plugin (bump nos 3 lugares): cada uma numera/bumpa a partir do que vê
+# localmente. Este hook confere o topo da main ANTES do commit: se origin/main tem
+# commits que este HEAD não tem, o commit é bloqueado com a instrução de integrar.
+#
+# Doutrina dos hooks do repo: bash 3.2-compatível, fallback gracioso — indisponibilidade
+# (sem remoto, sem rede) avisa e segue; só o desalinhamento REAL bloqueia.
+# Escape consciente: KEELSON_SKIP_MAIN_CHECK=1 git commit ...
+# Ativação (uma vez por clone): git config core.hooksPath scripts/git-hooks
+
+set -u
+
+[ "${KEELSON_SKIP_MAIN_CHECK:-0}" = "1" ] && exit 0
+
+# Detached HEAD (rebase/cherry-pick em andamento) → não interferir
+branch=$(git symbolic-ref --short HEAD 2>/dev/null) || exit 0
+[ "$branch" = "main" ] || exit 0
+
+# Sem remoto → nada a conferir
+git remote get-url origin >/dev/null 2>&1 || exit 0
+
+# Fetch barato; sem rede → best-effort (confere contra o último fetch conhecido)
+if ! git fetch origin main --quiet 2>/dev/null; then
+  echo "[keelson pre-commit] aviso: fetch de origin/main falhou (sem rede?) — conferindo contra o último fetch local." >&2
+fi
+
+git rev-parse --verify --quiet origin/main >/dev/null 2>&1 || exit 0
+
+behind=$(git rev-list --count HEAD..origin/main 2>/dev/null || echo 0)
+behind=${behind:-0}
+
+if [ "$behind" -gt 0 ] 2>/dev/null; then
+  echo "" >&2
+  echo "[keelson pre-commit] BLOQUEADO: origin/main tem $behind commit(s) que este HEAD não tem:" >&2
+  git log --oneline HEAD..origin/main 2>/dev/null | sed 's/^/    /' >&2
+  echo "" >&2
+  echo "  Sessão paralela já publicou — numerar decisão/bumpar versão agora colide (caso real: duas '4.60')." >&2
+  echo "  Integre antes de commitar:" >&2
+  echo "    git pull --rebase origin main" >&2
+  echo "  e confira o topo de docs/_meta/decisions.md (próximo §4.x livre) e a versão em .claude-plugin/plugin.json." >&2
+  echo "  Escape consciente: KEELSON_SKIP_MAIN_CHECK=1 git commit ..." >&2
+  exit 1
+fi
+
+exit 0

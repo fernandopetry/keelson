@@ -989,6 +989,23 @@ A reconciliação (§12) aplica as mesmas três: alinha sub-task ao estado real 
 
 **Aplicação**: `skills/_shared/jira-sync-protocol.md` (§3 marcos canônicos; §9 marco de início, teto e não-regressão; §12 alinhamento pelo estado real), `skills/_shared/jira-sync-feat.md` (item 5 respeita o teto), `commands/implement.md` (gancho de início na Etapa 3.2), `commands/init.md` (semeia os marcos novos no esqueleto do mapa; regra de merge acrescenta linhas faltantes comentadas), `commands/jira-sync.md` (Etapa 1 item 5 cita teto/não-regressão). Capacidade nova → minor: plugin 0.40.0 → 0.41.0.
 
+### 4.63 — Guarda do topo da main: hook git de pre-commit contra colisão de sessões paralelas
+
+**Problema**: caso real na leva 4.60–4.62 — duas sessões do Diretor, em máquinas diferentes, trabalharam o mesmo tema **no mesmo dia**: cada uma numerou a próxima decisão a partir do que via localmente e nasceram **duas "4.60"** com conteúdos distintos, mais bump de versão colidindo (ambas 0.39.0). O conflito só apareceu no `git push` — depois de decisão escrita, CHANGELOG composto e versão gravada nos 3 lugares — e custou um rebase de 7 arquivos com renumeração (4.60 → 4.62). A causa é estrutural: **numeração de decisão e bump derivam do estado local da main**, e nada conferia esse estado contra o remoto antes do commit.
+
+**Decisão**: nasce o hook git de **pre-commit** `scripts/git-hooks/pre-commit`, **versionado** no repo (vale para todas as máquinas) e ativado por clone com `git config core.hooksPath scripts/git-hooks` (ato explícito, uma vez — hook de `.git/hooks/` não viaja com o clone). Semântica, na doutrina dos hooks do repo (bash 3.2, fallback gracioso):
+
+- Age **só na `main`** (branch de feature, detached HEAD de rebase/cherry-pick → passa sem tocar);
+- `git fetch origin main` **best-effort** (sem rede → avisa e confere contra o último fetch conhecido; sem remoto → passa);
+- `origin/main` com commit que o HEAD local não tem → **bloqueia** o commit, lista os commits que chegaram e instrui: `git pull --rebase origin main` + conferir o próximo §4.x livre no `decisions.md` e a versão em `plugin.json`;
+- Escape consciente e nomeado: `KEELSON_SKIP_MAIN_CHECK=1 git commit ...` (para quem sabe que quer commitar atrás — ex.: preparando um rebase manual).
+
+Indisponibilidade nunca bloqueia; só o **desalinhamento real** bloqueia — a mesma régua best-effort do resto dos hooks. Validado com `bash -n` + repo sintético no scratchpad (5 cenários: atrás bloqueia · escape passa · em dia passa · feature atrás passa · sem remoto passa).
+
+**Custo assumido**: ~1s de `fetch` por commit na main (é o preço de conferir o topo de verdade) e a ativação manual por clone — mitigada pela nota no `CLAUDE.md` (as sessões leem) e por este registro. O hook embarca no pacote do plugin (`scripts/` é distribuído) mas é **inerte** em consumidores: só age quando ativado via `core.hooksPath` no repo de desenvolvimento.
+
+**Aplicação**: `scripts/git-hooks/pre-commit` (novo), nota de ativação no `CLAUDE.md` (§ Versionamento). Ferramenta do repo de desenvolvimento, fora da superfície de runtime do plugin → **sem bump de versão** (a régua de versionamento cobre capacidade do plugin; commit sem bump, como os `docs:` da leva 4.60).
+
 ---
 
 ## 5. Quality gates inegociáveis

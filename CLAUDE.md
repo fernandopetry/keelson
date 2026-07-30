@@ -20,6 +20,10 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   aponta para o CHANGELOG; não volta a acumular prosa histórica.
 - **Charter é versionado à parte** (`guidelines/_meta/QUALITY-CHARTER.md`): só muda quando
   os artigos mudam; cada perfil referencia a versão no frontmatter `charter:`.
+- **Sessões paralelas colidem em §4.x e versão** (caso real: duas "4.60" no mesmo dia —
+  decisão 4.63): antes de numerar decisão ou bumpar, `git fetch` e confira o topo da main.
+  O hook `scripts/git-hooks/pre-commit` bloqueia commit na `main` atrás do `origin/main` —
+  ative uma vez por clone: `git config core.hooksPath scripts/git-hooks`.
 
 ## Ao mudar comando ou doutrina
 
