@@ -17,6 +17,30 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.44.0] — 2026-07-30
+
+Decision 4.67
+
+### Added
+- **UI actions must specify observable feedback — at the SPEC level.** Real consumer
+  case: a button that sends an e-mail on click shipped with no visual feedback at all,
+  and the whole cycle approved it — the team delivered exactly what the SPEC asked for.
+  The rule lands where it generates enforcement for free instead of as implementation
+  prose someone must remember:
+  - `/keelson:specify` gains mandatory principle 9, the **three states of a UI action**:
+    an FR for a user-initiated interface action MUST specify the observable behavior of
+    *in progress*, *success*, and *failure*. An invisible effect (e-mail sent, record
+    saved, job dispatched) is not feedback — feedback is what the screen shows. Each
+    state becomes a verifiable AC, so gate 1 (test per AC) and gate 9 (QA proves
+    behavior) inherit the enforcement with no new machinery.
+  - The `product-analyst` critique axis for scenario coverage now asks the classic
+    missing-scenario question explicitly: does the user *perceive* the success, *see*
+    the failure, *know* it is in progress?
+  - A mechanical `spec-validator` check is deliberately **not** added — semantic rule,
+    sample of one; reserved for recurrence (same ruler as 4.52/4.64).
+
+---
+
 ## [0.43.0] — 2026-07-30
 
 Decision 4.66

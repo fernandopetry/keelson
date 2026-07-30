@@ -1059,6 +1059,21 @@ Indisponibilidade nunca bloqueia; só o **desalinhamento real** bloqueia — a m
 
 ---
 
+### 4.67 — Três estados da ação de UI: a FR especifica o comportamento observável; efeito invisível não é feedback
+
+**Problema**: caso real em consumidor — a demanda pedia um botão que envia e-mail ao clicar; o e-mail saiu, **nenhum feedback visual apareceu**, e o ciclo inteiro aprovou: o time entregou *exatamente* o que a SPEC pedia. O furo não foi do developer nem dos gates — foi da **SPEC**, que definiu o efeito (e-mail enviado) e calou sobre o comportamento observável (o que a tela mostra). A pergunta de projeto: onde colocar a regra genérica "ação em tela precisa de feedback"? Diretriz de implementação ("todo botão dá feedback") seria prosa dependente de alguém lembrar na hora de codar — o padrão de falha que a 4.65 nomeou (doutrina que a leitura seletiva pula) — e não teria dono claro: não existe perfil frontend além do `none.md`, e o core não tem doutrina de UX.
+
+**Decisão**: a regra sobe de altitude — vira regra de **escrita de FR**, onde ela gera ACs e os gates existentes a aplicam sem máquina nova. Dois patches, cada um no dono:
+
+1. **`commands/specify.md`** (Etapa 2, princípio 9 novo — o dono da regra): FR de ação iniciada pelo usuário na interface DEVE especificar o comportamento **observável** dos três estados — *em andamento*, *sucesso* e *falha*. **Efeito invisível (e-mail enviado, registro gravado, job disparado) não é feedback** — feedback é o que a tela mostra. FR de ação sem os três estados está incompleta; cada estado vira AC verificável, e daí o enforcement é herdado: gate 1 exige teste por AC, gate 9 (QA) prova o comportamento na tela. A regra fica falsificável em vez de aspiracional.
+2. **`agents/product-analyst.md`** (eixo 3, cobertura de cenários — o cinto): feedback/erro/loading esquecidos são *o* cenário faltante clássico; a crítica de mérito pergunta explicitamente se o usuário **percebe** o sucesso, **vê** a falha e **sabe** que está em andamento.
+
+Check mecânico no `spec-validator` (detectar FR de ação de UI sem os três estados) **não entra**: é regra semântica, cara, com amostra de um — **reservada para reincidência**, pela mesma régua das 4.52/4.64.
+
+**Aplicação**: `commands/specify.md` (Etapa 2, princípio 9), `agents/product-analyst.md` (eixo 3). Doutrina nova → minor: plugin 0.43.0 → 0.44.0.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

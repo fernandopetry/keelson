@@ -78,6 +78,13 @@ interromper em último caso).
 6. **Funcionalidades (FEAT)** — só quando há 2+ fluxos entregáveis: regra completa no comentário do template da §5 (Etapa 3).
 7. **Suposições explícitas**: `[confirmar]` ou `[assumido]`.
 8. **Escopo e não-escopo simétricos**.
+9. **Três estados da ação de UI** (decisão 4.67): FR de ação iniciada pelo usuário na
+   interface DEVE especificar o comportamento **observável** dos três estados — *em
+   andamento* (ação disparada, resultado pendente: botão desabilita? indicador aparece?),
+   *sucesso* e *falha*. Efeito invisível (e-mail enviado, registro gravado, job
+   disparado) **não é feedback** — feedback é o que a tela mostra ao usuário. FR de ação
+   sem os três estados está incompleta; cada estado vira AC verificável (e os gates 1 e 9
+   herdam a prova de graça).
 
 ## Etapa 3: estrutura obrigatória do arquivo SPEC
 
