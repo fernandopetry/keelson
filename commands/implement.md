@@ -96,6 +96,8 @@ Se esses subagents não existirem, usar subagents genéricos com instruções in
 
 Passe no prompt de cada agente os **inputs**: caminhos de TASK, PLAN, SPEC, ficha (`keelson.config.json`), INDEX.md e (se existir) do memo de exploração `thoughts/local/exploration-<slug>.md`. O fluxo de trabalho (status, implementação, testes, lint, commit) é o system prompt do `developer` — não o repita. **Espere de volta** o report próprio do agent (formato definido no `developer` — **não** o 3.4.1, que é consolidado depois pela main session).
 
+**Marco de início no Jira (opcional)**: só quando `jira.enabled`. No **despacho** de cada TASK, aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §9): marco `TASK iniciada` na sub-task do campo `Jira:` da closure — e, se esta é a **primeira** TASK da Story (de FEAT ou implícita) a ser despachada, marco `Trabalho iniciado (Story)` na Story (key sob o heading da FEAT ou na linha `**Jira Story**:` da SPEC). Ambos sob a política de `transition`, o teto e a **não-regressão** do §9 (a não-regressão também dispensa rastrear "primeira": Story já na coluna ou além → no-op). TASK **sem key** → pular em silêncio (criar é papel do gancho do `/keelson:tasks`, da closure e da reconciliação — nunca do despacho). Leitura: §0–§1 + §9. Best-effort (§0): falha → aviso, **não** atrasa o despacho.
+
 ### 3.3 Quality gates (revisão independente)
 
 Revisão por agentes independentes (o developer **nunca** revisa o próprio trabalho), com os guidelines ativos em contexto.

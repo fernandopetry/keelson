@@ -350,11 +350,24 @@ keelson/
 
 ## Status
 
-`0.40.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.41.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **Epics only where they group something** (decision 4.61) — with
+New in this release: **the Jira board moves in real time, safely** (decision 4.62) —
+with `transition: auto`, dispatching a TASK to the developer now moves its sub-task to
+the in-development column (and the Story, on its first TASK), and closure still moves
+sub-tasks to the final done column. The QA unit (Story or standalone task) has an
+automatic-transition ceiling: it is auto-moved at most to the development column and
+stays there after the AI delivers — the "ready for QA" milestone becomes a comment —
+because the human still reviews and requests adjustments; advancing the card is their
+act, typically via `--phase finish-dev` (the 4.60 phase verbs cross the ceiling: they
+*are* the human's order). Every automatic transition is guarded by a no-regression
+check against the level's ruler (board rail, or the map's row order): a card the human
+already moved ahead is never pulled back, and a status outside the ruler is never
+transitioned. Reconciliation aligns the board to the real TASK state under the same
+rules.
+Previously: **Epics only where they group something** (decision 4.61) — with
 `jira.epicPolicy: "multi-feature"`, a SPEC declaring 0–1 features projects without an
 Epic: the single Story is the root of the tree, sub-tasks under it. The signal is the
 declared feature count in the SPEC — a product statement, mechanically countable, never

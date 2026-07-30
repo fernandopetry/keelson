@@ -17,6 +17,48 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.41.0] — 2026-07-30
+
+Decision 4.62
+
+### Added
+- **The Jira board now moves in real time.** With `transition: auto`, the board only
+  moved at task closure — mid-wave, cards sat in "to do" while the work was already
+  running. The Etapas/Colunas map gains canonical cycle-milestone rows: `TASK iniciada`
+  moves the sub-task to the in-development column the moment the Tech Lead dispatches
+  the TASK to the developer (new hook in `/keelson:implement` step 3.2),
+  `Trabalho iniciado (Story)` moves the Story when its **first** TASK is dispatched,
+  and `TASK concluída` names the closure milestone that keeps moving sub-tasks to the
+  final done column. A missing row degrades that milestone to a comment, as before.
+- **No-regression guard on every automatic transition.** Before transitioning, the sync
+  reads the issue's current status and compares it against the level's ruler — the
+  board rail when declared (0.39.0), else the Etapas/Colunas row order: a card already
+  at or beyond the target is a silent no-op — a card the human moved ahead is never
+  pulled back — and a status outside the ruler is never transitioned (the milestone is
+  commented instead). The multi-hop walker already embedded this on the long path; it
+  now guards the direct hop too. This is what makes real-time board movement safe
+  against racing a human on the board.
+
+### Changed
+- **The QA unit now has an automatic-transition ceiling: the development column.** The
+  Story (or standalone task) is auto-moved at most to the `Trabalho iniciado (Story)`
+  target and **stays there after the cycle delivers** — the "ready for QA" milestone
+  becomes a comment on the Story instead of a transition, because the human still
+  reviews the delivery and requests adjustments; advancing the card is their act, by
+  the same rule that keeps the Epic untouched. The ceiling binds only automatic hooks:
+  a phase verb (0.39.0) is the human's explicit order and crosses it —
+  `--phase finish-dev` is exactly the act the ceiling waits for. Projects that relied
+  on the Story transitioning on "ready for QA" now get a comment; mapping that trigger
+  to the ceiling column itself restores a moving card. Reconciliation aligns sub-tasks
+  to the real TASK state (In Progress → started, Done → done) and the Story up to the
+  ceiling, under the same guard.
+- `/keelson:init` seeds the four canonical milestone rows in the map skeleton (Story
+  rows commented out when `issueType.feature` is null) and reminds that the row order
+  is the fallback progression ruler when a level has no board rail; the merge rule adds
+  any missing milestone row as a commented suggestion.
+
+---
+
 ## [0.40.0] — 2026-07-29
 
 Decision 4.61

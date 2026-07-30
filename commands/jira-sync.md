@@ -99,9 +99,13 @@ Aplicar o protocolo de sync Jira sobre o alvo (slug inteiro ou a árvore da SPEC
    sem marcador (editada por humano) → preservar e contar nos avisos — a menos que
    `--refresh-descriptions` tenha sido passada (backfill consciente da receita antiga).
 5. **Status** (§9): só com `transition:comment`/`auto`. Em `auto`, alinhar cada sub-task ao
-   status-alvo correspondente ao estado real da TASK (ex.: TASK Done → status-alvo de
-   "concluída"), sempre validando a transição em runtime — e aplicar o gatilho
-   "Funcionalidade pronta p/ QA" (`jira-sync-feat.md` §6.1 item 5) às FEATs já completas.
+   status-alvo correspondente ao estado real da TASK (In Progress → alvo de "TASK iniciada";
+   Done → alvo de "TASK concluída") e a Story ao teto (`Trabalho iniciado (Story)`) quando
+   alguma TASK dela já começou — sempre validando a transição em runtime e sob o **teto e a
+   não-regressão** do §9 (nunca puxar de volta card movido pelo humano; unidade de QA nunca
+   passa da coluna de desenvolvimento) — e aplicar o gatilho "Funcionalidade pronta p/ QA"
+   (`jira-sync-feat.md` §6.1 item 5) às FEATs já completas (pelo teto, tipicamente
+   comentário).
 6. **Persistência** (§10): keys gravadas; 1 linha no "Histórico recente" do INDEX.
 
 `--dry-run` → apenas imprimir o plano de reconciliação (o que seria criado/vinculado/movido),
@@ -148,4 +152,4 @@ sem tocar no Jira.
 Não cria PR nem faz merge/deploy; não altera SPEC/PLAN/TASK além das linhas `**Jira**:`
 (cabeçalho da SPEC, sob o heading da FEAT, closure da TASK); nunca bloqueia
 (best-effort — protocolo §0). Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53, 4.55,
-4.59, 4.60 e 4.61 de `decisions.md`.
+4.59, 4.60, 4.61 e 4.62 de `decisions.md`.

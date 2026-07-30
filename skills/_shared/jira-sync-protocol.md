@@ -76,10 +76,21 @@ editado pelo humano. Ausente → o protocolo usa só `summary`+`description` e n
   e tarefa isolada) e diz **em qual issue da árvore** o alvo atua; nas linhas de **fase**
   (`Gatilho` = `--phase <verbo>`, §13) a coluna é obrigatória — linha ausente para um nível =
   aquele nível não se move (opt-out declarado). Mapa legado sem a coluna → os marcos do ciclo
-  seguem valendo (o nível deles já era implícito no gatilho). Com o 3º nível ativo (§6.1), a
-  tabela pode declarar a linha
-  `Funcionalidade pronta p/ QA | story | <coluna> | <status-id> | todas as TASKs da FEAT Done` —
-  status-alvo aplicado **na Story** da FEAT; ausente → o marco vira comentário.
+  seguem valendo (o nível deles já era implícito no gatilho). A **ordem das linhas** (de cima
+  para baixo) espelha a progressão do quadro — é a régua que a não-regressão do §9 usa quando
+  o nível não tem Trilho declarado (com Trilho, vale ele). Marcos canônicos do ciclo (linha
+  ausente → aquele marco degrada para comentário, sem erro):
+  - `TASK iniciada | subtask | <coluna> | <status-id> | despacho da TASK ao developer` —
+    alvo aplicado à **sub-task/isolada** (§9);
+  - `TASK concluída | subtask | <coluna> | <status-id> | closure da TASK (Done)` — alvo
+    aplicado à **sub-task/isolada**;
+  - `Trabalho iniciado (Story) | story | <coluna> | <status-id> | primeira TASK da Story
+    despachada` — alvo aplicado à **Story** (de FEAT ou implícita); é também o **teto de
+    transição automática da unidade de QA** (§9);
+  - `Funcionalidade pronta p/ QA | story | <coluna> | <status-id> | todas as TASKs da FEAT
+    Done` (com o 3º nível ativo, §6.1; Story implícita/isolada: mesma semântica com a
+    SPEC/TASK no lugar da FEAT) — marco informado **na Story**; por ficar tipicamente além
+    do teto, na prática vira comentário (§9).
 - **Seção "Trilho do board"** (opcional; exigida pelo walker multi-hop do §9) — por nível, a
   lista **ordenada** de status-IDs das colunas do quadro, do início ao fim do fluxo (ex.:
   `story: 1 → 11606 → 10599 → … → 10001`). Workflows diferem por tipo — um trilho por nível,
@@ -320,13 +331,14 @@ Key persistida na closure da TASK (§10), como qualquer sub-task.
   injetar o conteúdo como **semente/sugestão** no ponto do SDD (ex.: campo de critérios de
   aceite → rascunho de ACs). **Nunca** sobrescreve o artefato — semeia para curadoria humana.
 
-## §9. Progresso na closure (comentar × transicionar)
+## §9. Progresso em tempo real (comentar × transicionar)
 
 Conforme `jira.transition`:
 - **`off`** → nada.
 - **`comment`** (default) → `addCommentToJiraIssue` na sub-task/issue com o marco (etapa +
   rótulo de coluna do mapa, se houver). **Não move o card.**
-- **`auto`** → resolver o status-alvo da etapa na seção Etapas/Colunas (§3); chamar
+- **`auto`** → resolver o status-alvo da etapa na seção Etapas/Colunas (§3); aplicar o
+  **teto** e a **não-regressão** (abaixo); chamar
   `getTransitionsForJiraIssue` e escolher a transição disponível cujo destino é o alvo,
   respeitando `isAvailable` e evitando `hasScreen`/`isConditional` quando não há como
   satisfazê-las; aplicar via `transitionJiraIssue`. **Sem caminho seguro → cai para comentar**
@@ -342,22 +354,54 @@ transição segura, ou status atual **fora do trilho** → **parar onde está**,
 a posição alcançada — nunca forçar. Sem seção de trilho no mapa → só o salto direto (sem
 caminho → comenta, como hoje).
 
-O marco de closure atua na **sub-task**; o marco de funcionalidade pronta na Story —
-`jira-sync-feat.md`, quando ativo. **Story implícita** (degrau (0) do §7.0): mesma semântica,
-com a SPEC no lugar da FEAT — marco "pronta p/ QA" nela quando **todas** as TASKs da SPEC
-estão `Done`. **Tarefa isolada** (§7) é a própria unidade de QA: na closure
-`Done`, além do marco normal, aplicar o marco "pronta p/ QA" (gatilho do mapa / política de
-`transition`) **na própria issue** — equivalente ao que a Story recebe quando a FEAT completa.
+**Marcos automáticos do ciclo e onde atuam** (gatilhos canônicos do §3; cada um segue a
+política de `transition`):
+
+- **`TASK iniciada`** — no **despacho** da TASK ao developer (gancho da Etapa 3.2 do
+  `/keelson:implement`): marco na **sub-task/isolada** do campo `Jira:` da closure. O quadro
+  mostra que o trabalho começou **enquanto** ele acontece, não só depois.
+- **`Trabalho iniciado (Story)`** — quando a **primeira** TASK da Story (de FEAT ou
+  implícita) é despachada: marco na **Story**. TASKs seguintes da mesma Story → no-op
+  (a não-regressão já resolve sem estado extra).
+- **`TASK concluída`** — na closure (`Done`): marco na **sub-task/isolada**. Sub-task é card
+  de dev, **sem teto**: vai até a última etapa do quadro.
+- **`Funcionalidade pronta p/ QA`** — todas as TASKs da FEAT `Done` (`jira-sync-feat.md`,
+  item 5, quando ativo; **Story implícita**: mesma semântica com a SPEC no lugar da FEAT;
+  **tarefa isolada**: na própria issue, na closure `Done`): marco na **unidade de QA** — que,
+  pelo teto abaixo, tipicamente vira **comentário**, não transição.
+
+**Teto de transição automática da unidade de QA**: a Story (e a tarefa isolada, que é sua
+própria unidade de QA) é movida **automaticamente** no máximo até o status-alvo de
+`Trabalho iniciado (Story)` — a coluna de desenvolvimento. Marco cujo alvo fica **além** do
+teto na régua do nível → degrada para comentário na issue (a informação chega, o card não
+anda). Racional: terminada a entrega da IA, o Diretor ainda analisa e pede ajustes — a
+unidade de QA fica em desenvolvimento até **ele** movê-la; pós-desenvolvimento é ato humano,
+pela mesma régua que mantém o Epic intocado (4.62). Linha `Trabalho iniciado (Story)`
+ausente no mapa → a Story não tem transição automática nenhuma (só comentários). **O teto
+governa só os ganchos automáticos**: o verbo de fase (§13) é ordem explícita do humano e
+pode ultrapassá-lo — `--phase finish-dev` levando a Story à revisão é exatamente o ato
+humano que o teto espera.
+
+**Não-regressão (pré-condição de toda transição automática — ganchos e reconciliação §12)**:
+antes de transicionar, `getJiraIssue` (campo `status`) e comparar o status atual com o alvo
+pela **régua do nível** — o Trilho do board (§3), quando declarado; sem trilho, a ordem das
+linhas da tabela Etapas/Colunas: atual **no alvo ou além** → no-op silencioso (nunca puxar
+de volta um card que o humano moveu — é a proteção contra a corrida com o quadro); atual
+**fora da régua** → não transicionar (sem ordem conhecida, mover é chute) — registrar o
+marco como comentário. O walker multi-hop acima já embute esta regra; ela vale **também**
+no salto direto. O custo é 1 `getJiraIssue` por transição; best-effort como tudo (§0).
 
 **Estado final do ciclo automático** (fecho do `/keelson:auto`): o fecho é, por definição do
 método, um **gatilho do marco "pronta p/ QA"** — não um efeito que só emerge se todos os
 ganchos anteriores tiverem rodado. Ao fim do ciclo, o estado-alvo do tracker é: **sub-tasks**
-no marco de closure (`Done`) · a **unidade de QA** (Story da FEAT, Story implícita ou tarefa
-isolada) no status-alvo de "pronta p/ QA" do mapa — o estado de espera-do-humano, coerente com
-o contrato Diretor–PO (o ciclo termina no push; revisão e merge são do Diretor) · **Epic
-intocado** (roadmap é do humano — a única via de movê-lo é o verbo de fase do §13, que *é* o
-ato do humano, e ainda assim só com linha `epic` declarada no mapa). A política `transition` continua valendo como em qualquer
-marco (`comment` → o estado-alvo vira comentário; `off` → nada); a reconciliação do fecho
+no marco de closure (`TASK concluída`) · a **unidade de QA** (Story da FEAT, Story implícita
+ou tarefa isolada) **na coluna-teto de desenvolvimento, com o marco "pronta p/ QA"
+comentado** — o estado de espera-do-humano, coerente com o contrato Diretor–PO (o ciclo
+termina no push; revisão, merge e o avanço do card são do Diretor — tipicamente via
+`--phase finish-dev`, §13) · **Epic intocado** (roadmap é do humano — a única via de movê-lo
+é o verbo de fase do §13, que *é* o ato do humano, e ainda assim só com linha `epic`
+declarada no mapa). A política `transition` continua valendo como em qualquer marco
+(`comment` → todo estado-alvo vira comentário; `off` → nada); a reconciliação do fecho
 (§12) é quem garante esse estado quando algum gancho não rodou.
 
 ## §10. Persistência das keys
@@ -395,9 +439,13 @@ projeção compacta do §7.0, cuja raiz é a Story única) → Stories das
 FEATs (`jira-sync-feat.md`, quando ativo) **ou** Story implícita (degrau (0) do §7.0) →
 sub-tasks (§7) → **descrições das issues existentes** (§6.2 — re-render conforme a política
 do marcador; descrição sem marcador é do humano e fica intocada) → status (§9, incluindo o
-gatilho "Funcionalidade pronta p/ QA" para FEATs já completas). Aplica campos e — se `transition:auto` — alinha o status ao estado real das TASKs
-(Done → status-alvo de "concluída"). Estado misto (sub-tasks legadas sob a issue da SPEC com o
-3º nível ativo) é **reportado no output**, nunca re-parentado (§4).
+gatilho "Funcionalidade pronta p/ QA" para FEATs já completas). Aplica campos e — se
+`transition:auto` — alinha o status ao **estado real** das TASKs, sempre sob o teto e a
+não-regressão do §9: sub-task de TASK `In Progress` → alvo de `TASK iniciada`; de TASK
+`Done` → alvo de `TASK concluída`; Story com **alguma** TASK iniciada → alvo de
+`Trabalho iniciado (Story)` (o teto — nunca além, mesmo com tudo `Done`). Estado misto
+(sub-tasks legadas sob a issue da SPEC com o 3º nível ativo) é **reportado no output**,
+nunca re-parentado (§4).
 
 **Escopo por SPEC** (decisão 4.55): quando o invocador aponta uma SPEC específica
 (`SPEC-NNN` ou caminho do arquivo) em vez do slug, a mesma reconciliação roda sobre a

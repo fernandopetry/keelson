@@ -37,8 +37,12 @@
    pronta — **todas** as TASKs que a listam em `Funcionalidade` (primária **ou** secundária,
    em qualquer PLAN do slug) estão `Done`, com os ACs verificados pelos gates — aplicar a
    política de `transition` **na Story**: `comment` → comenta "funcionalidade pronta para
-   QA"; `auto` → transiciona para o status-alvo do gatilho "Funcionalidade pronta p/ QA" do
-   mapa (validação em runtime, §9); sem linha no mapa → cai para comentário.
+   QA"; `auto` → o marco é regido pelo **teto e pela não-regressão do §9** — alvo além da
+   coluna-teto de desenvolvimento (o caso típico) → **comentário** na Story, não transição;
+   sem linha no mapa → cai para comentário. A Story chega à coluna de desenvolvimento pelo
+   marco `Trabalho iniciado (Story)` (§9, no despacho da primeira TASK) e **fica ali** até o
+   humano movê-la — tipicamente via `--phase finish-dev` (§13), que como ato do humano
+   ultrapassa o teto (4.62).
 
 ## Parenting das sub-tasks (complemento do §7)
 
