@@ -81,6 +81,8 @@ Se `--dry-run`, parar.
 
 **Antes da primeira wave**, grave o estado do run em `thoughts/local/run-state-<slug>.md` no formato canônico de sdd-conventions.md (`status: em_andamento`, `waves_concluidas: 0`) — sentinela do hook `wave-guard` (decisões 4.23/4.24).
 
+**Ledger de sessão (decisão 4.76 — mecanismo em sdd-conventions.md)**: a partir daqui, cada evento do catálogo fechado é escrito em `thoughts/local/session-ledger/` **quando acontece**, não no fim — um arquivo por evento, 2–3 linhas. Nesta orquestração, os eventos são: **`gate`** (cada veredito de `code-reviewer`/`security-engineer`/`qa`, com `implementado_por` e `revisado_por` — é a matéria da tabela do output final e a única prova de que gerador ≠ avaliador sobreviveu à compressão do contexto), **`fora_de_escopo`** e **`pendencia`** (achados estacionados dos sinais laterais 3.5), **`tracker`** (degradação de sync — item 4 da closure) e **`marco`** (fim de cada wave). Quem escreve é a **main session**: os avaliadores são read-only por desenho e reportam a você. O que já tem dono durável (closure, furo no plano, risco ativo) continua indo para o INDEX — o ledger não o substitui. Falha ao escrever não bloqueia nada.
+
 ### 3.1 Setup da wave
 
 **SUBAGENTS paralela**: branch única para wave, subagents na main session.
@@ -166,7 +168,7 @@ Report incompleto ou inválido: rejeitar, refazer.
      - Mover capacidade de "Em desenvolvimento" para "Implementadas".
      - Texto: `<capacidade> (SPEC-NNN, PLAN-MMM, ✅ <data>)`.
    - **Não** marcar Status do PLAN como Done automaticamente.
-4. **Sincronizar progresso com Jira (opcional)**: só quando `jira.enabled`. Aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`): closure → §9 na sub-task do campo `Jira:` (§10); TASK **sem key** com `issueType.standalone` preenchido → criar a issue isolada agora (§7) e gravar a key; closure completou uma FEAT (check do item 3) com o 3º nível ativo → aplicar também o item 5 de `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` na Story da FEAT. Leitura: §0–§1 + §6.2 (receita de descrição para humanos) + §7 + §9 + §10 (+ `jira-sync-feat.md` quando o 3º nível está ativo). Não leia o protocolo inteiro: localize os §§ com `grep -nE "^#+ §"` e leia §0 + §1 + os §§ citados aqui + os que eles referenciarem. Best-effort (§0): conector ausente/falha → aviso, **não** bloqueia a closure.
+4. **Sincronizar progresso com Jira (opcional)**: só quando `jira.enabled`. Aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`): closure → §9 na sub-task do campo `Jira:` (§10); TASK **sem key** com `issueType.standalone` preenchido → criar a issue isolada agora (§7) e gravar a key; closure completou uma FEAT (check do item 3) com o 3º nível ativo → aplicar também o item 5 de `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` na Story da FEAT. Leitura: §0–§1 + §6.2 (receita de descrição para humanos) + §7 + §9 + §10 (+ `jira-sync-feat.md` quando o 3º nível está ativo). Não leia o protocolo inteiro: localize os §§ com `grep -nE "^#+ §"` e leia §0 + §1 + os §§ citados aqui + os que eles referenciarem. Best-effort (§0): conector ausente/falha → aviso, **não** bloqueia a closure — **e evento `tracker` no ledger** (gancho + devolutiva literal). Conector que **cai no meio do run** é estado da execução (§0, 4.76): as closures seguintes não repetem a prova nem reprovam uma a uma; acumulam o que ficou para trás, e o output final (Etapa 5) fecha com a seção de reconexão da **§14**.
 5. **Registrar lição durável (memória da equipe)**: se algum report (`code-reviewer`, `security-engineer` ou `qa`) trouxe `licao_candidata` não-nula (defeito com causa-raiz generalizável, ou a task exigiu retry por motivo que pode se repetir), rotear pelo campo `alvo`:
    - **`alvo: projeto`** → persistir em `guidelines/project/lessons.md` no formato canônico (`## [Área] título` + **Erro/Causa/Solução** — dono: `guidelines/core/WORKFLOW.md`), abaixo do marcador `<!-- Adicionar lições abaixo desta linha -->`. **Deduplicar**: lição equivalente existente é atualizada, não duplicada. Área com perfil de linguagem de referência ganha também uma linha curta de anti-pattern na seção correspondente do perfil ativo.
    - **`alvo: processo`** (um artefato do keelson induziu/não preveniu o erro — inclui `evento_aprendizado` de validator e retry por instrução ambígua) → invocar o **`agile-coach`** com o evento (mecânica — ledger, dedup, modo dev × consumidor — é doutrina dele). `PROPOSTA_PLUGIN`/`proposta_doutrina` do report vão ao humano na entrega, nunca auto-aplicadas.
@@ -194,7 +196,7 @@ Falha: reportar específico, 1 retry, escalar.
 
 **Registro obrigatório** do furo: linha no `## Histórico recente` do INDEX — `<data>: furo no plano em TASK-MMM-XXX — <resumo> — destino: <decisão>`.
 
-**Fora de escopo (sinal Reviewer/QA → Tech Lead)**: achado real, porém fora da task (campo `fora_de_escopo[]` dos reports), **não** infla a task atual: a main session registra 1 linha no Histórico do INDEX e estaciona — desagua nas perguntas/report da Entrega ou vira sugestão de `/keelson:triage`.
+**Fora de escopo (sinal Reviewer/QA → Tech Lead)**: achado real, porém fora da task (campo `fora_de_escopo[]` dos reports), **não** infla a task atual: a main session registra 1 linha no Histórico do INDEX e estaciona — desagua nas perguntas/report da Entrega ou vira sugestão de `/keelson:triage`. **Também vira evento `fora_de_escopo` no ledger** (4.76): o INDEX guarda o fato para o futuro, o ledger garante que ele chegue ao report **desta** entrega.
 
 ### 3.6 Final da wave
 
@@ -245,7 +247,7 @@ E sugira `/keelson:integrate PLAN-MMM` para preparar a entrega (não execute; me
 
 ## Etapa 5: output final ao usuário
 
-**Run-state antes do output**: executado **dentro do `/keelson:auto`**, mantenha `status: em_andamento` — a Entrega do auto encerra/remove o arquivo após o push. Executado **avulso**, atualize para `status: encerrado — implement concluído (integração é humana)`; sem isso o `wave-guard` bloqueia o encerramento do turno.
+**Run-state antes do output**: executado **dentro do `/keelson:auto`**, mantenha `status: em_andamento` — a Entrega do auto encerra/remove o arquivo após o push. Executado **avulso**, atualize para `status: encerrado — implement concluído (integração é humana)`; sem isso o `wave-guard` bloqueia o encerramento do turno. **Ledger**: executado avulso, emitido o output abaixo, arquive os eventos consumidos em `thoughts/local/session-ledger/reported-<yyyymmdd-hhmmss>/`; **dentro do `/keelson:auto`, não arquive** — a Entrega dele ainda vai lê-los.
 
 ```markdown
 # Implementação concluída: PLAN-MMM
@@ -298,7 +300,14 @@ E sugira `/keelson:integrate PLAN-MMM` para preparar a entrega (não execute; me
 - Doc: {docsRoot}/<slug>/handoffs/HANDOFF-PLAN-MMM.md (N itens pendentes)
 - Motivo: <ambiente sem acesso a testes de tela>
 - Prompt para o agente com tela: <bloco do prompt canônico (handoff-protocol.md, §8.3), preenchido>
+
+## Tracker fora de sincronia — reconexão    # OMITIR se jira.enabled é false ou nada degradou
+<bloco no formato da §14 do protocolo de sync, montado pelos eventos `tracker` do ledger:
+ onde o conector caiu + devolutiva literal, o que ficou para trás, e o comando de
+ reconciliação em copy-paste>
 ```
+
+**Cobertura do ledger** (uma linha antes do bloco, quando houver lacuna): evento que deveria existir e não foi escrito → nomeie a lacuna ("gates da wave 2 sem registro — reportados de memória"). Ledger nunca bloqueia; ledger silenciosamente incompleto, sim, engana.
 
 ## Comportamento em caso de falha
 

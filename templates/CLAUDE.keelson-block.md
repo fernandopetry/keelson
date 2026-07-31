@@ -43,6 +43,15 @@
   sua tarefa e para; a orquestração é sempre do Tech Lead, e commit só a pedido do
   Diretor. Só o trivial não-comportamental (typo de comentário/doc) pode ser inline,
   declarado.
+- **Toda mudança fecha com relatório** (decisão 4.76): terminado o ajuste — sob demanda ou
+  ciclo — o Tech Lead **exibe o fecho sem que você peça**, em 6–10 linhas: o que mudou
+  (produção · teste · doc · migration/config) · gates rodados e **por quem**
+  (`revisado_por ≠ implementado_por`) · decisões tomadas em seu nome · o que ficou fora de
+  escopo ou pendente · estado do tracker (com `jira.enabled`) · e o que depende de você
+  (o commit é seu). O relatório é montado a partir do **ledger de sessão**
+  (`thoughts/local/session-ledger/`), onde cada evento é escrito **quando acontece** — não
+  se relê a sessão para produzi-lo, e o que o contexto comprimiu não se perde. Relatório
+  perdido ou sessão retomada → `/keelson:report` reconstrói.
 - **Varredura ampla → `code-scout`**: pergunta que exige varrer a codebase (entender
   um fluxo, mapear consumidores, "de onde vem este dado?") é delegada ao `code-scout`,
   que devolve conclusão ancorada em `arquivo:linha` — os arquivos lidos não entram no
@@ -62,6 +71,7 @@ Humanos-only (não aparecem na listagem): `/keelson:guided` (ciclo com checkpoin
 `/keelson:review` (code review de um diff avulso, sem artefato SDD) ·
 `/keelson:verify-handoff` (fechar gate de tela remoto) ·
 `/keelson:update` (atualizar o plugin instalado — vale após reiniciar a sessão) ·
+`/keelson:report` (refazer o relatório de fecho — sessão retomada ou report perdido) ·
 `/keelson:postmortem` (postmortem de fim de sessão — relê as interações e produz a
 mensagem ao mantenedor do plugin).
 

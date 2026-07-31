@@ -17,6 +17,44 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.51.0] — 2026-07-31
+
+Decision 4.76
+
+### Added
+- **Session ledger — the closing report is written as it happens, not remembered.** Every
+  event from a closed catalogue (`gate` with who implemented and who reviewed · decisions
+  taken on the Director's behalf · out-of-scope findings · parked work · tracker
+  degradation · timing marks) is written to `thoughts/local/session-ledger/` the moment it
+  occurs, one file per event. The final report is assembled by reading that folder instead
+  of re-reading a session whose context was compressed — so a detail that no longer fits in
+  the window still reaches you. Parallel waves in worktrees are safe by construction (no
+  shared append). The ledger is never a gate: missing or partial, the report ships with the
+  gap named.
+- **Every change now closes with a report — automatically.** On-demand mode (0.50.0) used
+  to deliver a change with no closure at all; it now ends with the same shape as the cycle's
+  delivery: diff composition, gates and who ran them, decisions made for you, what's out of
+  scope or pending, tracker state, and what's waiting on you.
+- **`/keelson:report`** — human-only safety net that rebuilds the closing report from the
+  ledger, the branch diff and the INDEX, for a resumed session or a report lost in the
+  scroll. It does not re-read the session (that's `/keelson:postmortem`, a different
+  question), does not commit, and never turns an unrecorded gate into an approved one.
+- **Reconnection section for a degraded tracker.** Any command whose Jira sync degraded now
+  emits a copy-paste block naming where the connector dropped, what it returned literally,
+  what was left behind, and the exact `/keelson:jira-sync` command to run once the MCP is
+  back — `--dry-run` first, `--phase` only when a board move was actually pending and never
+  under `transition: off`.
+
+### Changed
+- **Connector availability is execution state in both directions.** A proof that the
+  Atlassian connector is up already held for the whole run; a **drop mid-run** now does too.
+  Previously, a connector that was proven healthy at kickoff and died halfway made every
+  later hook fail on its own, each failure swallowed as best-effort and none of them
+  reaching the report. Per-operation failures with a responding connector remain warnings,
+  not a drop. Best-effort still never blocks — it just no longer stays quiet.
+
+---
+
 ## [0.50.0] — 2026-07-31
 
 Decision 4.75

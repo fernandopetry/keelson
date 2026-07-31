@@ -109,6 +109,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:verify-handoff` † | Close a pending screen-verification `HANDOFF` — consolidates the branch, exercises each item in the real environment; no merge (points to `/keelson:integrate`) |
 | `/keelson:postmortem` † | End-of-session postmortem — re-reads the whole session's interactions (corrections, retries, failed gates), separates defects from new scope, traces each gap to the mechanism that let it through, and produces the copy-paste maintainer message (with literal diffs via the agile-coach) that evolves the plugin |
 | `/keelson:update` † | Update the installed plugin to the latest marketplace version via the Claude Code CLI (marketplace refresh + plugin update, in that order); the running session keeps the old version until restarted |
+| `/keelson:report` † | Rebuild the closing report from the session ledger — safety net for a resumed session or a report lost in the scroll; every change already closes with one automatically |
 
 † Human-only (`disable-model-invocation`): never triggered by the model — you invoke
 it by typing the slash command.
@@ -351,21 +352,27 @@ keelson/
 
 ## Status
 
-`0.50.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.51.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **on-demand mode — the team serves free-form sessions without
-the full cycle** (decision 4.75). A point code change in a free session (no keelson
-command invoked) no longer runs unprotected: the main session delegates to the
-`developer`, the diff goes through the `code-reviewer` (standalone ruler), and
-`security-engineer`/`qa` fire on the usual triggers — without SPEC/PLAN/TASK and with
-no auto-commit. Invoking one agent never pulls the whole cycle. Broad codebase sweeps
-route to `code-scout` from the consumer's CLAUDE block and the exploratory commands
-(closing 4.73's observation: description-only adoption did not happen). Re-run
-`/keelson:init` on consumers to get the new block. See the full history in
+New in this release: **every change closes with a report, and a broken tracker says so**
+(decision 4.76). Events are written to a **session ledger**
+(`thoughts/local/session-ledger/`) the moment they happen — gates with who reviewed what,
+decisions taken on your behalf, out-of-scope findings, tracker degradation — so the closing
+report is assembled by reading a folder, not by re-reading a compressed session. On-demand
+mode now closes with that report automatically, and `/keelson:report` rebuilds it for a
+resumed session. On the Jira side, a connector that was **proven up at kickoff and drops
+mid-run** is now execution state instead of a string of individually swallowed failures: the
+delivery report carries a **reconnection section** with the literal `/keelson:jira-sync`
+command to run once the MCP is back — best-effort still never blocks, but it no longer stays
+quiet. Re-run `/keelson:init` on consumers to get the new block. See the full history in
 [CHANGELOG.md](CHANGELOG.md).
-Previously: **merge dry-run before integrating wave worktrees** (decision 4.74, teams
+Previously: **on-demand mode — the team serves free-form sessions without
+the full cycle** (decision 4.75 — the main session delegates to the `developer`, the diff
+goes through the `code-reviewer`, and `security-engineer`/`qa` fire on the usual triggers,
+with no SPEC/PLAN/TASK and no auto-commit; broad sweeps route to `code-scout`),
+**merge dry-run before integrating wave worktrees** (decision 4.74, teams
 mode — one conflicted dry-run means nothing gets integrated), **`code-scout` —
 anchored-conclusion codebase reconnaissance** (decision 4.73 — the Tech Lead delegates
 broad sweeps and gets back `file:line`-anchored conclusions, never file dumps), and

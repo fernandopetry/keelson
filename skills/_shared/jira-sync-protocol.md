@@ -19,6 +19,17 @@
   prova (`atlassianUserInfo`, ou `getAccessibleAtlassianResources`). Só o retorno dessa
   tentativa autoriza a conclusão; o resultado vale para a execução inteira (não repita a
   prova a cada gancho).
+- **A prova vale para a execução — a queda também** (decisão 4.76). O resultado da prova acima
+  não se repete a cada gancho, e é justamente aí que mora o silêncio: conector **provado
+  disponível na largada** que cai no meio faz cada gancho seguinte falhar sozinho, e cada falha
+  isolada é engolida como "best-effort". Trate a disponibilidade como **estado da execução**,
+  simétrico nos dois sentidos: qualquer chamada MCP que falhe por indisponibilidade do conector
+  (conexão fechada, não autorizado, servidor ausente) **marca o conector como caído** para o
+  resto da execução — os ganchos seguintes não reprovam um a um, apenas acumulam o que ficou
+  para trás. O estado é evento `tracker` no ledger de sessão (`sdd-conventions.md`), com o
+  gancho onde caiu e **a devolutiva literal da chamada**, e desagua na §14. Falha de **uma
+  operação** (campo obrigatório, transição inexistente, permissão da issue) com o conector
+  respondendo **não** é queda: é item de aviso, o resto do sync segue.
 - **Rastro durável do pulo**: sync pulado ou falho **não** pode viver só no output da sessão —
   num ciclo longo isso é indistinguível de nunca ter acontecido, e some quando a sessão fecha.
   Registre **1 linha no "Histórico recente" do `INDEX.md` do slug** (§10): data, o que seria
@@ -548,3 +559,44 @@ barato quando a árvore já existe; cria o que faltar quando não) e então apli
 - **Registro** (§10): 1 linha no "Histórico recente" do INDEX — verbo, alvo, K cards movidos,
   bloqueios. Best-effort (§0) como todo o resto: conector fora ou chamada falha → avisa,
   registra o rastro e nunca trava.
+
+## §14. Saída degradada — como o sync avisa e ensina a recuperação (decisão 4.76)
+
+Dono único do que o keelson **mostra ao Diretor** quando o sync não aconteceu por inteiro.
+"Avisa e segue" (§0) diz que não bloqueia; esta seção diz **em que formato**. Regra: sync
+degradado nunca termina só num aviso solto no meio do output — ele produz uma **seção de
+report acionável**, com o comando literal de recuperação. O Diretor não deve descobrir que o
+quadro não andou quando abrir o Jira dias depois.
+
+**Gatilho**: a execução teve conector caído (§0), sync pulado, ou qualquer operação de escrita
+que falhou — em **qualquer** comando com gancho de sync (`specify`, `tasks`, `implement`,
+`integrate`, `auto`, modo sob demanda). Nada degradado → a seção **não existe** (não gere
+seção vazia).
+
+**Formato** (copy-paste, mesmo padrão do prompt de handoff e da mensagem ao mantenedor):
+
+```markdown
+## Tracker fora de sincronia — reconexão
+
+- Conector: <caiu em <gancho> | indisponível desde a largada> — `<ferramenta>`: <devolutiva literal>
+- Ficou para trás: <N sub-tasks sem key · Story não movida · marco X só comentado>
+- Rastro durável: {docsRoot}/<slug>/INDEX.md (Histórico recente)
+
+Reconecte o conector Atlassian (MCP) e rode:
+
+    /keelson:jira-sync <slug> --dry-run          # confere o plano, não toca no Jira
+    /keelson:jira-sync <slug>[ --phase finish-dev]
+```
+
+- A **flag `--phase`** entra **só** quando a execução teria movido card e não moveu (a fase é
+  a do momento do ciclo: `start-dev` no despacho, `finish-dev` no fecho). Sem movimento
+  pendente, sugerir `--phase` é ensinar o Diretor a mexer no quadro sem necessidade.
+- `transition: off` → a linha do comando **não** carrega `--phase` (a política do projeto é
+  não mover; nomeie isso em meia linha em vez de sugerir o contrário).
+- O `--dry-run` vem **primeiro** de propósito: reconciliação é idempotente (§4), mas o Diretor
+  merece ver o plano antes da escrita.
+- **Slug não resolvido** (sync fora de ciclo, domínio sem artefato SDD): a seção sai mesmo
+  assim, com o alvo descrito em texto e o comando apontando o slug a preencher — a ausência de
+  slug tira o rastro do INDEX (§0), nunca a seção do report.
+- **Best-effort continua inviolável**: esta seção é saída, não gate. Ela não bloqueia commit,
+  push nem entrega — e nunca vira pergunta ao Diretor no meio do fluxo.

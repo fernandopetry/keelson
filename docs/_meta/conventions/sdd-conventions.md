@@ -20,6 +20,24 @@
   ```
 
   O `/keelson:implement` cria antes da primeira wave e atualiza `waves_concluidas` a cada final de wave; a Entrega (Etapa 5 do `/keelson:auto`, ou o output final do implement avulso) encerra/remove. O hook `wave-guard` (Stop) lê este arquivo **fora do contexto do modelo** — imune à sumarização — e bloqueia encerramento de turno enquanto `status: em_andamento` (decisões 4.23/4.24). Parada legítima (Entrega feita, degrau 3 com pergunta já disparada, pedido explícito do humano) muda `status:` para `encerrado — <motivo>` antes de encerrar.
+- **Ledger de sessão (matéria-prima do report — decisão 4.76).** O relatório final não se reconstrói de memória: cada evento que ele vai narrar é **escrito no instante em que acontece**, num arquivo próprio sob `thoughts/local/session-ledger/`. Motivo: num ciclo longo o contexto é comprimido e o detalhe (quem revisou, por que decidiu assim, o que o conector devolveu) some — é a mesma régua do rastro durável do sync (§0 do protocolo Jira). O relatório final **lê a pasta**, não relê a sessão.
+
+  - **Um arquivo por evento** — nunca append num arquivo compartilhado: waves rodam em paralelo (worktrees no modo teams) e o `thoughts/local/` de um worktree **não é** o do working tree principal. Nome ordenável, corpo curto:
+
+    ```md
+    thoughts/local/session-ledger/<yyyymmdd-hhmmss>-<tipo>-<origem>.md
+
+    ts: 2026-07-31T14:23:10-03:00 · tipo: gate · origem: code-reviewer · slug: <slug>
+    TASK-003 aprovada no retry (gate 4: duplicação em <arquivo>) · revisado_por ≠ implementado_por
+    ref: {docsRoot}/<slug>/tasks/TASK-003-*.md
+    ```
+
+    O caminho resolve **sempre na raiz do repo principal** (`git rev-parse --show-toplevel` do working tree principal), nunca dentro do worktree do agent. Timestamp medido (`TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z`), jamais estimado.
+  - **Quem escreve é o Tech Lead** (main session). Os avaliadores (`code-reviewer`, `qa`, `security-engineer`) são read-only por desenho e **não ganham `Write` para isso**: quem recebe o report do agent anota o evento em 2–3 linhas. No modo teams, o Tech Lead anota ao consolidar a wave.
+  - **Catálogo fechado** — só estes tipos entram; o que não está aqui não vira evento (senão o ledger vira log de tudo e custa mais do que economiza): `gate` (resultado + `implementado_por`/`revisado_por`) · `decisao` (decisão em nome do Diretor) · `fora_de_escopo` · `pendencia` (estacionada, handoff, achado não corrigido) · `tracker` (sync degradado, com a evidência literal do que a chamada devolveu) · `marco` (largada/etapa/entrega, para a linha de duração).
+  - **Não duplica dono.** Fato que **sobrevive à sessão** continua indo para onde já ia — `INDEX.md` (furo no plano, sync pulado, riscos ativos, closure), `Cronologia` do BRIEF (tempo, na rota formal), `learning-log.md` (lição de processo, do `agile-coach`). O ledger guarda o que hoje **só existe no contexto** e morre com ele. Régua: *sobrevive à sessão → INDEX; serve ao report desta sessão → ledger*.
+  - **Nunca é gate.** Ledger ausente, vazio ou incompleto não bloqueia nada e não consome retry: o report sai com a **lacuna nomeada** em meia linha (mesma degradação da linha de duração). Ele é insumo de transparência, não permissão.
+  - **Ciclo de vida.** Consumido pelo report → mover os arquivos para `thoughts/local/session-ledger/reported-<yyyymmdd-hhmmss>/` (mesmo precedente do memo de exploração removido na closure e do run-state removido após o push). Sem esse corte, o próximo relatório repete evento velho. Nada disso é versionado (`thoughts/` está no `.gitignore` pelo `/keelson:init`).
 - **Resolução de slug.** Dona é a Etapa 0.2 do `/keelson:specify`: reusar slug de domínio existente (inclusive legado — que primeiro migra) antes de criar novo; na dúvida, perguntar ao humano.
 - **Merge, PR e deploy são humanos.** Nenhum comando faz merge, abre PR nem deploya — a autonomia termina no push da branch de trabalho (4.37/4.41). Promoção de Status (`Draft → Approved → Done`): nunca é de validator; no ciclo com BRIEF (modo autônomo), a main session promove pelo veredito `APROVAR` do `po` (4.38); sem brief ou no `/keelson:guided`, é humana.
 - **Falha de gate**: 1 retry; persistiu → escalar ao humano com o diagnóstico.

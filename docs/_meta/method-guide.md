@@ -328,6 +328,16 @@ Rodado pelo Diretor no **fim da sessão** (é humano-only), ou apontando um epis
 
 O endereçamento tem um dono por achado: lição de **projeto** é aplicada na hora (`lessons.md`/perfil); achado de **processo** vai ao `agile-coach` (uma invocação por causa-raiz), que deduplica no ledger e devolve `PROPOSTA_PLUGIN` + `mensagem_mantenedor` com diff literal (4.54/4.64); falha de raciocínio ou caso pontual é **descartado declaradamente** — regra só para falha de verificação. Saídas: o doc durável `<docsRoot>/_meta/postmortems/PM-<data>-<alvo>.md` e o **bloco copy-paste ao mantenedor** que fecha o output — é ele que alimenta a evolução do plugin. Não corrige nada (defeito aberto → `/keelson:triage`). Governança: decisão 4.69 de `decisions.md`.
 
+### 3.18 `/keelson:report` — refazer o relatório de fecho
+
+Rede de segurança, não caminho normal (é humano-only): **toda mudança já fecha com relatório automático** — a Entrega do `/keelson:auto`, o output do `/keelson:implement` e o fecho do modo sob demanda (4.75/4.76). Este comando existe para quando o fecho **não existe ou não serve mais**: sessão retomada no dia seguinte, contexto comprimido, report perdido no scroll, sessão livre que acumulou várias mudanças sem consolidação.
+
+```
+/keelson:report [slug]
+```
+
+A matéria-prima é o **ledger de sessão** (`thoughts/local/session-ledger/` — §3.0/`sdd-conventions.md`), onde cada evento foi escrito **quando aconteceu**, somado ao diff da branch e ao INDEX; a sessão **não** é relida (esse é o trabalho — e o custo — do `/keelson:postmortem`, que investiga *por que* o processo deixou passar, não *o que* aconteceu). Gate sem evento registrado nunca vira "aprovado": vira lacuna nomeada, e o gate que o diff exigir é declarado como pendente de rodar. Não commita, não corrige, não move card. Governança: decisão 4.76 de `decisions.md`.
+
 ---
 
 ## 4. Skills
