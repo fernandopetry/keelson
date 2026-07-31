@@ -351,24 +351,23 @@ keelson/
 
 ## Status
 
-`0.49.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.49.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **`code-scout` — anchored-conclusion codebase reconnaissance**
-(decision 4.73). A tool outside the team cast, like the validators: the Tech Lead
-delegates broad codebase sweeps during exploratory phases and gets back a short
-conclusion where every structural claim cites its `file:line` anchor — never file
-dumps, so the exploration stops polluting the main session's context. Claims without
-anchors don't become facts; gaps are reported as *not found*, never filled with
-plausible guesses. Runs on `sonnet` — reconnaissance is pre-generation, not judgment,
-so the 4.70 axis stays intact. See the full history in [CHANGELOG.md](CHANGELOG.md).
-Previously: **the waiver's grantor no longer gets to evaluate it** (decision 4.71 —
-closed gate-9 cause enum, structured falsifiability sub-field, `quality.boot`, pendency
-is not `Done`, proven `sensitiveGlobs`), **per-role model assignment — cheap
-generation, expensive judgment** (decision 4.70 — high-volume execution on `sonnet`,
-judgment stays on `opus`), and **`/keelson:postmortem` — the end-of-session postmortem
-as a command** (decision 4.69).
+New in this release: **merge dry-run before integrating wave worktrees** (decision
+4.74, teams mode). At the end of a parallel wave, each task worktree's branch is
+dry-run-merged (`git merge-tree --write-tree`) before any real merge starts: one
+conflicted dry-run means nothing gets integrated, and the conflict is reported with
+the wave branch still clean — instead of surfacing mid-integration with the branch in
+an intermediate state. See the full history in [CHANGELOG.md](CHANGELOG.md).
+Previously: **`code-scout` — anchored-conclusion codebase reconnaissance** (decision
+4.73 — the Tech Lead delegates broad sweeps and gets back `file:line`-anchored
+conclusions, never file dumps), **the waiver's grantor no longer gets to evaluate it**
+(decision 4.71 — closed gate-9 cause enum, structured falsifiability sub-field,
+`quality.boot`, pendency is not `Done`, proven `sensitiveGlobs`), and **per-role model
+assignment — cheap generation, expensive judgment** (decision 4.70 — high-volume
+execution on `sonnet`, judgment stays on `opus`).
 Recent releases, in short: **Epics only where they group something** —
 `jira.epicPolicy: "multi-feature"` projects a single-feature SPEC without an Epic, the
 Story as the root of the tree (decision 4.61) — **phase verbs move the board** —

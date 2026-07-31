@@ -17,6 +17,23 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.49.1] — 2026-07-31
+
+Decision 4.74
+
+### Changed
+- **Merge dry-run before integrating wave worktrees (teams mode).** At the end of a
+  parallel wave, each task worktree's branch is now dry-run-merged into the wave branch
+  (`git merge-tree --write-tree`, git ≥ 2.38; fallback `git merge --no-commit
+  --no-ff` followed by `git merge --abort`) before any real merge starts. No real merge begins while a
+  conflicted dry-run sits in the queue: a conflict anywhere means nothing gets
+  integrated, and the report to the Director lists the conflicting worktrees and paths
+  with the wave branch still clean — previously the conflict only surfaced during the
+  real merge, mid-integration. The post-conflict rule is unchanged (pause, report,
+  manual resolution); no SEQUENTIAL_FORCED criterion is relaxed.
+
+---
+
 ## [0.49.0] — 2026-07-31
 
 Decision 4.73

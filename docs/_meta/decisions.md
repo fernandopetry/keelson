@@ -1138,6 +1138,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `agents/code-scout.md` novo (sonnet, tools read-only); sincronizações de agent novo — tabela §5 do `method-guide.md`, comentário de `agents/` no `README.md`, elenco do §3 deste arquivo. Capacidade nova → minor: plugin 0.48.1 → 0.49.0. Observar na 1ª rodada real se o Tech Lead o adota organicamente nas fases exploratórias ou se os commands precisarão de gatilho explícito (decisão futura, se necessário).
 
+### 4.74 — dry-run de merge antes de integrar worktrees no final da wave (modo teams)
+
+**Problema**: no modo AGENT_TEAMS, o final da wave (Etapa 3.6) faz merge das worktrees na branch principal da wave, e a regra para conflito era "pausar, reportar, resolução manual" — mas o conflito só aparecia **durante** o merge real. Numa wave com N worktrees, o conflito na worktree K deixa a branch da wave suja no meio da integração (merges 1..K-1 aplicados, K parado em estado conflitado), e o reporte ao Diretor sai com o repositório em estado intermediário — pior ponto de partida para a resolução manual. Insumo externo (relato de campo sobre orquestração multi-agente) apontou o padrão: merge de trabalho paralelo só roda depois de um dry-run limpo.
+
+**Decisão**: o merge de cada worktree na branch da wave é precedido de um **dry-run que não toca a branch**: `git merge-tree --write-tree <branch-da-wave> <branch-da-task>` (git ≥ 2.38; exit ≠ 0 sinaliza conflito sem alterar índice ou working tree). Fallback para git antigo: `git merge --no-commit --no-ff` seguido de `git merge --abort`. Teste falsificável: **nenhum merge real inicia com dry-run conflitado na fila** — detectado conflito em qualquer worktree, nada é integrado; reporta-se ao Diretor com a branch da wave **limpa**, listando quais worktrees conflitam e em quais paths. Dry-runs limpos em todas → merges reais em sequência. A regra pós-conflito não muda (pausar, reportar, resolução manual — o dry-run antecipa a detecção, não a decisão); nenhum critério SEQUENTIAL_FORCED da Etapa 1 relaxa por causa disso.
+
+**Aplicação**: bullet "Final da wave" do `docs/_meta/conventions/agent-teams.md` (dono único das especificidades do modo teams — `implement.md` segue intacto). Ajuste fino → patch: plugin 0.49.0 → 0.49.1. Sem rodada real em modo teams até aqui; observar na primeira.
+
 ---
 
 ## 5. Quality gates inegociáveis
