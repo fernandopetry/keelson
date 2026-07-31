@@ -219,34 +219,97 @@ Comentários são o canal do humano — o sync nunca os toca (só adiciona, §9/
 sobrevivem a qualquer re-render. O aviso protege o distraído; a válvula deliberada de quem
 **quer** ser dono do texto continua sendo apagar o rodapé-marcador (abaixo).
 
-Templates por papel da issue (todos os tipos nivelados — nenhuma issue nasce só com título):
+**Esqueletos literais** (decisão 4.77). Os headings abaixo são **a forma da descrição**, não
+uma sugestão de assunto: mesma ordem, mesmo texto de heading, nenhum a mais. Descrever a
+receita em prosa se mostrou parafraseável — cards reais saíram com seções inventadas
+("Pontos centrais") e sem a única que o QA precisa. Copie o esqueleto do papel da issue e
+preencha; nenhuma issue nasce só com título.
 
-- **Epic (issue da SPEC)** — o card de roadmap:
-  - **Contexto e objetivo** — problema + outcome esperado, em prosa (§1 da SPEC);
-  - **Escopo** — in/out resumidos (§4 da SPEC);
-  - **Funcionalidades** — lista das FEATs (nome + 1 linha) ou a nota de fluxo único.
-- **Unidade de QA** (Story de FEAT · Story implícita · tarefa isolada) — o padrão mais
-  rico, porque é o card que o QA humano testa:
-  - **O que esta funcionalidade faz** — narrativa de negócio em 2–6 frases, nos termos do
-    glossário da SPEC (persona, ação, resultado — não arquitetura);
-  - **Como testar** — roteiro imperativo derivado dos ACs — e dos **NFRs verificáveis sem
-    AC próprio** (idempotência, reversibilidade, refresh: cenários que o QA testa e que a
-    fórmula por ACs deixaria fora): cada um vira um cenário com
-    passos numerados (preparação ← Given · ação ← When · resultado esperado ← Then), sem
-    citar o jargão. Duas regras de honestidade do roteiro: **(a)** AC sem caminho manual
-    razoável (atomicidade, requisição forjada, ownership, contrato de servidor) **não vira
-    passo de teatro** — agrupa-se numa linha final "Verificações cobertas por teste
-    automatizado (sem passo manual)" com os IDs e o que provam; **(b)** os ACs de **NFR**
-    cujos elementos pertencem à funcionalidade (tema claro/escuro, viewport, leitor de
-    tela, sessão simulada) **entram no roteiro da Story correspondente** — a fórmula
-    `ACs(FEAT)` cobre FRs, e os de NFR são somados pelo elemento que exercitam, senão
-    ficam órfãos de card;
-  - **Critérios de aceitação** — a lista formal (ID + texto), para rastreabilidade;
-  - **Fora do escopo** — os out-of-scope da SPEC que um QA poderia confundir com defeito.
-  - Tarefa isolada de origem avulsa (bugfix/chore sem SPEC): mesmas seções derivadas da
-    própria TASK — o que muda, como verificar (do critério de verificação dela) e o escopo.
-- **Sub-task (TASK)** — o card do dev: objetivo em 1–2 frases + os ACs que cobre (ID +
-  1 linha cada). Curto por design; a narrativa mora na unidade de QA acima.
+**Epic (issue da SPEC)** — o card de roadmap:
+
+```markdown
+### Contexto e objetivo
+<problema + outcome esperado, em prosa — §1 da SPEC>
+
+### Escopo
+**Inclui**: <in-scope resumido — §4.1>
+**Não inclui**: <out-of-scope resumido — §4.2>
+
+### Funcionalidades
+- **<Nome da FEAT>** — <1 linha>
+<ou, em fluxo único: "Esta demanda tem um único fluxo entregável — ver a Story vinculada.">
+```
+
+**Unidade de QA** (Story de FEAT · Story implícita · tarefa isolada) — o card que o QA
+humano testa, o mais rico dos três:
+
+```markdown
+### O que esta funcionalidade faz
+<2–6 frases de negócio, nos termos do glossário da SPEC: persona, ação, resultado.
+Não arquitetura, não jargão de artefato.>
+
+### Como testar
+**1. <Nome do cenário>**
+   1. <preparação — o estado inicial, ← Given>
+   2. <ação — o que o testador faz, ← When>
+   3. <resultado esperado — o que a tela mostra, ← Then>
+**2. <Nome do cenário>**
+   ...
+
+Verificações cobertas por teste automatizado (sem passo manual): <IDs + o que provam>
+
+### Critérios de aceitação
+- **AC-NNN-XXX** — <texto integral do AC, copiado da SPEC>
+
+### Fora do escopo
+- <out-of-scope que um QA poderia confundir com defeito>
+```
+
+**Sub-task (TASK)** — o card do dev, curto por design (a narrativa mora na unidade de QA):
+
+```markdown
+### Objetivo
+<1–2 frases>
+
+### Critérios de aceitação cobertos
+- **AC-NNN-XXX** — <1 linha>
+```
+
+**Regras de preenchimento da unidade de QA:**
+
+- **Referência a artefato não substitui conteúdo.** `FR-NNN-008 a FR-NNN-012 (SPEC-NNN §5)`,
+  `AC-NNN-005, AC-NNN-006` soltos, `premissa A-NNN-003 preservada` — tudo isso manda o leitor
+  ao repo e reprova o teste falsificável acima. ID **sempre** acompanhado do texto; conteúdo
+  de FR/premissa que importa ao teste vira frase da narrativa ou passo do roteiro.
+- **Roteiro derivado dos ACs e dos NFRs verificáveis sem AC próprio** (idempotência,
+  reversibilidade, refresh: cenários que o QA testa e que a fórmula por ACs deixaria fora).
+  Duas regras de honestidade: **(a)** AC sem caminho manual razoável (atomicidade, requisição
+  forjada, ownership, contrato de servidor) **não vira passo de teatro** — vai para a linha
+  "Verificações cobertas por teste automatizado"; **(b)** os ACs de **NFR** cujos elementos
+  pertencem à funcionalidade (tema claro/escuro, viewport, leitor de tela, sessão simulada)
+  **entram no roteiro da Story correspondente** — a fórmula `ACs(FEAT)` cobre FRs, e os de NFR
+  são somados pelo elemento que exercitam, senão ficam órfãos de card.
+- **Cenário-limite conhecido é passo, não observação.** Regra de borda que a SPEC nomeia
+  (denominador zero, lista vazia, primeiro acesso, data de virada) entra em **Como testar**
+  como cenário próprio, com o valor concreto na preparação — não como frase explicativa na
+  narrativa. O que não vira passo, o QA não testa.
+- Tarefa isolada de origem avulsa (bugfix/chore sem SPEC): mesmo esqueleto, derivado da
+  própria TASK — o que muda, como verificar (do critério de verificação dela) e o escopo.
+
+**Check de forma antes de enviar** (decisão 4.77 — auto-corretivo, nunca bloqueia). Com a
+descrição renderizada e **antes** do `createJiraIssue`/`editJiraIssue`, confira contra o
+esqueleto do papel:
+
+1. Os headings do esqueleto estão **todos** presentes, na ordem, sem nenhum extra?
+2. Unidade de QA: **Como testar** tem ao menos um cenário com passos numerados?
+3. Unidade de QA: cada AC listado traz o **texto**, não só o ID?
+4. Alguma linha manda o leitor a um artefato do repo (`SPEC-`, `§5`, `FR-`/`A-` sem texto)?
+
+Falhou qualquer um → **re-renderize uma vez** pelo esqueleto. Falhou de novo → **crie a issue
+assim mesmo** e nomeie a lacuna no aviso do output (`descrição de <KEY> sem "Como testar"`).
+Card magro é ruim; card ausente é pior — quebra a hierarquia das sub-tasks e a idempotência
+do §4, e o §0 é inviolável. O check é gate de **forma**, não de mérito: ele não julga se o
+roteiro testa bem, só se o card é autossuficiente.
 
 **Rodapé-marcador** (obrigatório, última linha de toda descrição gerada):
 `— gerado pelo keelson a partir de <caminho relativo do artefato>`. O caminho é relativo à

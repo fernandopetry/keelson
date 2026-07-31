@@ -352,23 +352,24 @@ keelson/
 
 ## Status
 
-`0.51.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.52.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **every change closes with a report, and a broken tracker says so**
-(decision 4.76). Events are written to a **session ledger**
-(`thoughts/local/session-ledger/`) the moment they happen — gates with who reviewed what,
-decisions taken on your behalf, out-of-scope findings, tracker degradation — so the closing
-report is assembled by reading a folder, not by re-reading a compressed session. On-demand
-mode now closes with that report automatically, and `/keelson:report` rebuilds it for a
-resumed session. On the Jira side, a connector that was **proven up at kickoff and drops
-mid-run** is now execution state instead of a string of individually swallowed failures: the
-delivery report carries a **reconnection section** with the literal `/keelson:jira-sync`
-command to run once the MCP is back — best-effort still never blocks, but it no longer stays
-quiet. Re-run `/keelson:init` on consumers to get the new block. See the full history in
+New in this release: **the QA card is now a skeleton to fill, not a recipe to paraphrase**
+(decision 4.77). Jira descriptions are generated from **literal markdown skeletons** — exact
+headings, exact order — instead of prose describing what the sections should contain, and a
+**form check runs before the issue is sent**: all headings present, *How to test* carrying at
+least one numbered scenario, every acceptance criterion shown with its text and not just its
+ID, and no line sending the reader back to a repo artefact. It re-renders once, then ships the
+card anyway with the gap named — a thin card is bad, a missing card is worse. Real cards had
+been coming out with invented sections and no test script at all, which is exactly what the
+tester opening the board cannot recover from. See the full history in
 [CHANGELOG.md](CHANGELOG.md).
-Previously: **on-demand mode — the team serves free-form sessions without
+Previously: **every change closes with a report, and a broken tracker says so**
+(decision 4.76 — a session ledger written as events happen, `/keelson:report` to rebuild it,
+and a reconnection section when the Jira connector drops mid-run),
+**on-demand mode — the team serves free-form sessions without
 the full cycle** (decision 4.75 — the main session delegates to the `developer`, the diff
 goes through the `code-reviewer`, and `security-engineer`/`qa` fire on the usual triggers,
 with no SPEC/PLAN/TASK and no auto-commit; broad sweeps route to `code-scout`),

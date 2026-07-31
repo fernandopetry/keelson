@@ -17,6 +17,36 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.52.0] — 2026-07-31
+
+Decision 4.77
+
+### Added
+- **Literal skeletons for generated Jira descriptions.** The three issue roles (Epic ·
+  QA unit · sub-task) now ship as copyable markdown blocks with exact headings in exact
+  order, replacing prose that described what each section should contain. Prose about form
+  turned out to be paraphrasable: real cards came out with invented sections and without
+  **How to test** — the one section that justifies the card existing — while the acceptance
+  criteria were reduced to bare IDs pointing back at the spec.
+- **Form check before the issue is sent.** Every rendered description is verified against
+  its skeleton: all headings present and in order with none added, *How to test* carrying at
+  least one scenario with numbered steps, each acceptance criterion shown with its text and
+  not only its ID, and no line referring the reader to a repo artefact. It re-renders once on
+  failure, then creates the issue anyway with the gap named in the warning — a thin card is
+  bad, a missing card is worse (it breaks sub-task parenting and idempotency), and
+  best-effort stays inviolable. It checks form, not merit: whether the card stands on its
+  own, not whether the script tests well.
+
+### Changed
+- **Two writing rules now name the failures observed in the field.** A reference to an
+  artefact never substitutes for content — an ID always carries its text, and the part of a
+  requirement or assumption that matters to the test becomes a sentence in the narrative or a
+  step in the script. And a known edge case is a step, not a remark: a boundary rule the spec
+  names goes into *How to test* as its own scenario with the concrete value in the setup.
+  What does not become a step does not get tested.
+
+---
+
 ## [0.51.0] — 2026-07-31
 
 Decision 4.76
