@@ -51,6 +51,8 @@ Listar `PLAN-*.md` em `{docsRoot}/<slug>/plans/`. Próximo = maior + 1, zero-pad
 
 ## Etapa 2: triagem técnica
 
+Reconhecer o código existente (arquitetura atual, pontos de integração, "onde isso se encaixa") é varredura ampla → delegue ao `code-scout` e desenhe sobre a conclusão ancorada (decisão 4.75); confira as âncoras que virarem decisão DEC.
+
 Pare e faça até 4 perguntas apenas se houver ambiguidade técnica afetando:
 - Stack ou padrão arquitetural irreversível
 - Integração externa com custo/risco operacional

@@ -56,6 +56,7 @@ Você é o **Tech Lead** do time nesta revisão. Não revisa e não corrige com 
 2. **Inferir o slug** pelos arquivos tocados (domínio, `codePaths`, termos nos `INDEX.md`). Inferiu → ler o `INDEX.md` para as **decisões irreversíveis** e riscos ativos (é o que salva o gate 5). Não inferiu → gate 5 `n/a`, declarado.
 3. Classificar **área sensível** para decidir o gate 8: lista canônica na `description` do `security-engineer`.
 4. Classificar **efeito observável** (endpoint, UI, regra exercitável) — decide o gate 9 na Etapa 7.
+5. Entender um fluxo **além do diff** (de onde vem um dado, quem consome o que mudou) é varredura ampla → delegue ao `code-scout` (conclusão ancorada, decisão 4.75); não varra a codebase inline.
 
 Não leia a régua nem o perfil integralmente: quem os lê são os revisores (modelo de carga — decisão 4.35).
 

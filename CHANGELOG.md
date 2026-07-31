@@ -17,6 +17,38 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.50.0] — 2026-07-31
+
+Decision 4.75
+
+### Added
+- **On-demand mode: the team serves free-form sessions without the full cycle.** First
+  real round after 4.73 showed the gap: in a session with no keelson command invoked,
+  a point code change ran with none of the plugin's protections — the main session
+  swept the codebase inline and implemented the change itself. Free-form doctrine now
+  has a third state between "full cycle" and "inline": a localized code change with no
+  product decision is delegated to the `developer` (short distilled brief: what,
+  where, acceptance criterion), the diff goes through the `code-reviewer` with the
+  standalone ruler (4.36), and `security-engineer`/`qa` fire on the same triggers as
+  the cycle (sensitive change · observable behavior). No auto-commit — committing is
+  the Director's ask. Invoking one agent never pulls the whole cycle: each agent
+  returns its task and stops; orchestration always stays with the main session. Only
+  trivial non-behavioral fixes (comment/doc typo) may be done inline, declared.
+
+### Changed
+- **`code-scout` adoption stops relying on its description alone** (closes 4.73's
+  observation — organic adoption did not happen in the first real round). The trigger
+  now lives in the consumer's CLAUDE block — the only keelson surface always present
+  in a free-form session — and as a cue in the exploratory commands (`triage`,
+  `specify`, `plan`, `review`): broad sweeps are delegated, point lookups stay inline.
+- **Executor descriptions declare the new invoker**: `developer`, `code-reviewer`,
+  `qa`, `security-engineer` and `code-scout` now list the on-demand mode / free-form
+  session among their invokers.
+
+Re-run `/keelson:init` on consumer projects to receive the updated CLAUDE block.
+
+---
+
 ## [0.49.1] — 2026-07-31
 
 Decision 4.74

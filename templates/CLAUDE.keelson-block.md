@@ -34,6 +34,19 @@
   com o **relatório de aceitação do PO**. Você é o **Diretor**: veto, PR, merge e
   deploy são seus — a autonomia termina no push da branch. Aprovação etapa a etapa é
   opt-in (`/keelson:guided`). Rigor **proporcional a complexidade × risco** (ver Charter).
+- **Mudança pontual = modo sob demanda** (decisão 4.75): ajuste localizado de código,
+  sem decisão de produto, não precisa do ciclo — mas **a main session (Tech Lead) não
+  escreve o código**: destila um briefing curto (o quê, onde, critério de aceite),
+  delega ao `developer` e passa o diff pelo `code-reviewer` (régua avulsa);
+  `security-engineer` em mudança sensível e `qa` quando há comportamento observável —
+  mesmos gatilhos do ciclo. Invocar um agent **não puxa o ciclo**: cada um devolve a
+  sua tarefa e para; a orquestração é sempre do Tech Lead, e commit só a pedido do
+  Diretor. Só o trivial não-comportamental (typo de comentário/doc) pode ser inline,
+  declarado.
+- **Varredura ampla → `code-scout`**: pergunta que exige varrer a codebase (entender
+  um fluxo, mapear consumidores, "de onde vem este dado?") é delegada ao `code-scout`,
+  que devolve conclusão ancorada em `arquivo:linha` — os arquivos lidos não entram no
+  contexto da sessão. Lookup pontual (um grep) segue inline.
 - **Definição de pronto (gates):** ACs cobertos por prova · testes passando · lint
   limpo · escopo respeitado · decisões respeitadas · aderência ao Charter + perfil ·
   code review · **segurança** e **comportamento verificado** (condicionais aos gates

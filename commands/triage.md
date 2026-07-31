@@ -33,7 +33,9 @@ A resolução de slug segue a regra canônica (Etapa 0.2 do `/keelson:specify`):
 
 2. Ler a ficha (`keelson.config.json`) e os guidelines ativos (Charter em `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/` + perfil de linguagem resolvido por `profile.<role>.file` da ficha).
 
-3. Se o INDEX não existe ou está vazio, parar e reportar:
+3. Classificar exigiu entender o código além do INDEX (um fluxo, os consumidores de algo)? Delegue a varredura ao `code-scout` e trabalhe sobre a conclusão ancorada (decisão 4.75) — não varra a codebase inline; lookup pontual pode ser inline.
+
+4. Se o INDEX não existe ou está vazio, parar e reportar:
    ```
    Slug `<slug>` não tem INDEX.md (não é SDD nativo).
    Antes de classificar a mudança, este slug precisa estar no padrão SDD.

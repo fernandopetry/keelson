@@ -374,9 +374,11 @@ Os agents formam o **time** do keelson (modelo de time e contrato Diretor–PO �
 | `product-analyst` | **Product Analyst** — crítica de mérito da SPEC (o PO a resolve) | `/keelson:specify` |
 | `agile-coach` | **Agile Coach** — auto-aprendizado do processo | closure do `/keelson:implement`, `/keelson:auto`, `/keelson:review`, sob demanda |
 | `staff-engineer` | **Staff Engineer** — gera perfis de linguagem | `/keelson:init`, sob demanda |
-| `code-scout` | *(ferramenta, fora do elenco)* — reconhecimento de codebase, devolve conclusão ancorada em `arquivo:linha` | Tech Lead (main session), nas fases exploratórias |
+| `code-scout` | *(ferramenta, fora do elenco)* — reconhecimento de codebase, devolve conclusão ancorada em `arquivo:linha` | Tech Lead (main session), fases exploratórias e sessão livre |
 
 Os validators (`spec-validator`, `plan-validator`, `task-validator`) e o `code-scout` ficam **fora do elenco de propósito**: são ferramentas do time, não papéis (decisões 4.37/4.73).
+
+**Modo sob demanda** (decisão 4.75): em sessão livre, mudança pontual de código não entra no ciclo — mas tampouco é feita pela main session. O Tech Lead destila um briefing curto, delega ao `developer`, revisa com `code-reviewer` (régua avulsa da 4.36) e aciona `security-engineer`/`qa` pelos gatilhos usuais (mudança sensível · comportamento observável). Invocar um agent **não puxa o ciclo** — cada um devolve sua tarefa e para; commit é a pedido do Diretor. Só o trivial não-comportamental (typo de comentário/doc) pode ser inline, declarado.
 
 ---
 

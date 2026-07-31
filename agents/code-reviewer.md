@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Revisa o trabalho de um developer contra os quality gates 1–7 do keelson (os gates 8/segurança e 9/comportamento têm revisores dedicados). Não implementa código. Invocado pelo /keelson:implement após o developer terminar, e pelo /keelson:review em modo avulso (diff sem artefato SDD).
+description: Revisa o trabalho de um developer contra os quality gates 1–7 do keelson (gates 8/segurança e 9/comportamento têm revisores dedicados). Não implementa código. Invocado pelo /keelson:implement após o developer, pelo /keelson:review em modo avulso (diff sem artefato SDD) e pelo Tech Lead no modo sob demanda (4.75).
 tools: Read, Bash, Glob, Grep
 model: opus
 ---
