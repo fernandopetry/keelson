@@ -77,7 +77,7 @@ keelson/
 **Aplicação** *(elenco de agents atualizado pela 4.40 — IDs = nomes dos papéis)*:
 - Commands: `/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `/keelson:implement`, `/keelson:triage`, `/keelson:rebuild-index`, `/keelson:migrate-legacy`, `/keelson:auto`, `/keelson:guided`, `/keelson:refine`, `/keelson:integrate`, `/keelson:jira-sync`, `/keelson:verify-handoff`, `/keelson:audit`, `/keelson:review`, `/keelson:specify-epic`
 - Skills: `spec-validator`, `plan-validator`, `task-validator`, `status`, `screen-verify`
-- Agents: `po`, `pm`, `developer`, `code-reviewer`, `qa`, `security-engineer`, `product-analyst`, `agile-coach`, `staff-engineer`
+- Agents: `po`, `pm`, `developer`, `code-reviewer`, `qa`, `security-engineer`, `product-analyst`, `agile-coach`, `staff-engineer` — e `code-scout` (ferramenta fora do elenco, como os validators; decisão 4.73)
 
 **Docs de governança**: `decisions.md`, `method-guide.md` e `learning-log.md` moram em `<docsRoot>/_meta/` (fora do plugin) e não são invocáveis.
 
@@ -1129,6 +1129,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 **Decisão**: abstração como etapa obrigatória da absorção. Identificadores de consumidor (nome do projeto, slug de demanda/episódio, paths, globs, URLs, nomes de chave) **não entram** em doutrina, `decisions.md` nem `CHANGELOG.md` — registra-se o **padrão** que o caso ensina, formulado de modo que sirva a qualquer projeto; o literal fica no consumidor. Teste de aceitação: se a frase só faz sentido conhecendo aquele consumidor, ainda está específica demais. O dono da regra é o `CLAUDE.md` deste repo (é disciplina do mantenedor ao absorver, não do comando que gera o postmortem — o doc do consumidor **deve** citar seus próprios literais).
 
 **Aplicação**: bullet em "Registro e governança" do `CLAUDE.md`; retroativa na leva 4.71 (CHANGELOG `0.48.0`, `commands/init.md`, §4.71). Correção → patch: plugin 0.48.0 → 0.48.1.
+
+### 4.73 — code-scout: reconhecimento delegado devolve conclusão ancorada, não arquivos
+
+**Problema**: as fases exploratórias do ciclo rodam no contexto da main session — triage, specify, plan, status e review avulso abrem com varredura de codebase, e cada `grep`/`Read` exploratório fica residente no transcript do Tech Lead até o fim da sessão, pago de novo em cada turno seguinte, no modelo mais caro da casa. A 4.70 barateou o custo por token dos papéis de execução e a 4.35 atacou o volume via briefing destilado — mas a exploração do próprio Tech Lead seguia sem alavanca: ele lê dezenas de arquivos para responder uma pergunta e carrega todos dali em diante, sendo que só a resposta importava.
+
+**Decisão**: agent `code-scout` — ferramenta de reconhecimento **fora do elenco do time** (como os validators, 4.37): o Tech Lead delega a varredura ampla e recebe **conclusão ancorada** — síntese curta em que toda afirmação estrutural cita `arquivo:linha`, no eixo do "verificado, não deduzido" (4.58). Afirmação sem âncora não vira fato; lacuna vira `nao_encontrado`, nunca suposição plausível. Roda em `sonnet`: reconhecimento é pré-geração, não avaliação — o eixo da 4.70 (julgamento caro) fica intacto e nenhum avaliador foi rebaixado. Dois limites deliberados: (a) **gatilho com guardrail** — delega-se varredura ampla, onde a viagem de ida e volta compensa; lookup pontual o Tech Lead faz inline; (b) **exaustividade não é prometida** — censo completo (todos os usos de X antes de rename/migração) exige conferência do invocador, e o campo `confianca` do report declara a cobertura. O alcance é deliberadamente o Tech Lead: subagent não invoca subagent, então developer/reviewer não têm acesso — e pelo desenho SDD nem deveriam precisar (a TASK já chega com os arquivos apontados; developer varrendo codebase é sintoma de PLAN/TASK magro, não de falta de pesquisador).
+
+**Aplicação**: `agents/code-scout.md` novo (sonnet, tools read-only); sincronizações de agent novo — tabela §5 do `method-guide.md`, comentário de `agents/` no `README.md`, elenco do §3 deste arquivo. Capacidade nova → minor: plugin 0.48.1 → 0.49.0. Observar na 1ª rodada real se o Tech Lead o adota organicamente nas fases exploratórias ou se os commands precisarão de gatilho explícito (decisão futura, se necessário).
 
 ---
 

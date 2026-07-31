@@ -17,6 +17,26 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.49.0] — 2026-07-31
+
+Decision 4.73
+
+### Added
+- **`code-scout` agent — anchored-conclusion codebase reconnaissance.** A tool outside
+  the team cast (like the validators, not a role): the Tech Lead (main session)
+  delegates broad codebase sweeps during exploratory phases (triage, specify, plan,
+  status, standalone review) and gets back a short conclusion where every structural
+  claim cites its `file:line` anchor — never file dumps, so the exploration stops
+  polluting the main session's context. Claims without anchors don't become facts;
+  gaps are reported as *not found*, never filled with plausible guesses. Runs on
+  `sonnet` (read-only tools) — reconnaissance is pre-generation, not judgment, so the
+  4.70 axis ("cheap generation, expensive judgment") stays intact. Deliberate limits:
+  point lookups stay inline (the round trip only pays for broad sweeps), and
+  exhaustive censuses ("every usage of X" before a rename) still require the caller's
+  verification, with a declared confidence level in the report.
+
+---
+
 ## [0.48.1] — 2026-07-31
 
 Decision 4.72

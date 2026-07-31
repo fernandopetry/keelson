@@ -337,7 +337,7 @@ Governance: decisions 4.22, 4.27, 4.28, 4.53, 4.55, 4.59, 4.60 and 4.61 in `docs
 ```
 keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
-├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer…
+├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer… + code-scout (tool, not a role)
 ├── skills/            # spec / plan / task validators + status + screen-verify
 ├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard, jira-guard
 ├── guidelines/
@@ -351,25 +351,24 @@ keelson/
 
 ## Status
 
-`0.48.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.49.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the waiver's grantor no longer gets to evaluate it** (decision
-4.71, closing the evaluator side of the first `/keelson:postmortem`'s findings). Gate 9
-acceptance now requires the unavailability cause to come from the closed §8.1 enum; the
-code-reviewer's report declares the four gate-1 falsifiability checks as a structured
-sub-field; the new `quality.boot` config field makes "app down" provable (QA must
-attempt the boot before claiming it); a well-documented pendency no longer licenses
-`Done`; and init's self-check proves `sensitiveGlobs` actually match the secret files
-that exist on disk. See the full history in [CHANGELOG.md](CHANGELOG.md).
-Previously: **per-role model assignment — cheap generation, expensive judgment**
-(decision 4.70 — high-volume execution on `sonnet`, judgment stays on `opus`),
-**`/keelson:postmortem` — the end-of-session postmortem as a command** (decision 4.69),
-and **assertions that can actually fail** (decision 4.68 — four mechanical
-anti-tautology checks as blocking gate-1 findings, creatable test data can't self-grant
-a handoff, QA saves and inspects the rendered artifact, and the runner's toolchain is a
-test double).
+New in this release: **`code-scout` — anchored-conclusion codebase reconnaissance**
+(decision 4.73). A tool outside the team cast, like the validators: the Tech Lead
+delegates broad codebase sweeps during exploratory phases and gets back a short
+conclusion where every structural claim cites its `file:line` anchor — never file
+dumps, so the exploration stops polluting the main session's context. Claims without
+anchors don't become facts; gaps are reported as *not found*, never filled with
+plausible guesses. Runs on `sonnet` — reconnaissance is pre-generation, not judgment,
+so the 4.70 axis stays intact. See the full history in [CHANGELOG.md](CHANGELOG.md).
+Previously: **the waiver's grantor no longer gets to evaluate it** (decision 4.71 —
+closed gate-9 cause enum, structured falsifiability sub-field, `quality.boot`, pendency
+is not `Done`, proven `sensitiveGlobs`), **per-role model assignment — cheap
+generation, expensive judgment** (decision 4.70 — high-volume execution on `sonnet`,
+judgment stays on `opus`), and **`/keelson:postmortem` — the end-of-session postmortem
+as a command** (decision 4.69).
 Recent releases, in short: **Epics only where they group something** —
 `jira.epicPolicy: "multi-feature"` projects a single-feature SPEC without an Epic, the
 Story as the root of the tree (decision 4.61) — **phase verbs move the board** —
