@@ -17,6 +17,23 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.54.1] — 2026-07-31
+
+Decision 4.79 (revised)
+
+### Changed
+- **The tracker keys moved behind the commit type**, from
+  `PROJ-12 PROJ-34 PROJ-56 feat(scope): …` (as shipped in 0.54.0) to
+  `feat(scope): PROJ-12 PROJ-34 PROJ-56 …`. Jira matches an issue key **anywhere** in the
+  message, so opening the title with it gained nothing on the tracker side — while the first
+  position of a commit convention anchors real tooling: release and changelog generators that
+  derive the version from the type, message linters, and log filters anchored at the start.
+  Keelson ships to many projects, and breaking that anchor would fail **silently** in any
+  consumer relying on release automation. The cost is losing the keys' alignment in column one
+  of `git log --oneline`.
+
+---
+
 ## [0.54.0] — 2026-07-31
 
 Decision 4.79

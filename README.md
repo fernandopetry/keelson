@@ -352,16 +352,17 @@ keelson/
 
 ## Status
 
-`0.54.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.54.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **commit titles open with the tracker keys** (decision 4.79). With
-`jira.enabled`, every commit the cycle produces is prefixed broadest to narrowest —
-`PROJ-12 PROJ-34 PROJ-56 feat(<slug>): …` — before the project's own convention, which is
-prefixed rather than replaced, so `git log` finally says which demand each commit belongs to.
-Keys are read from where the cycle already stores them; a missing one is dropped and the
-commit proceeds, and with no Jira nothing changes at all.
+New in this release: **commit titles carry the tracker keys** (decision 4.79). With
+`jira.enabled`, every commit the cycle produces opens its description with the keys involved,
+broadest to narrowest — `feat(<slug>): PROJ-12 PROJ-34 PROJ-56 …` — right after the project's
+own `type(scope):`, which keeps the first position so release tooling anchored on it still
+works. `git log` finally says which demand each commit belongs to. Keys are read from where
+the cycle already stores them; a missing one is dropped and the commit proceeds, and with no
+Jira nothing changes at all.
 See the full history in [CHANGELOG.md](CHANGELOG.md).
 Previously: **the QA card speaks BDD, and tells the tester how to get there**
 (decisions 4.77 and 4.78 — literal skeletons, the criterion's verbatim Given-When-Then paired

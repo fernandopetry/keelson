@@ -687,18 +687,27 @@ Reconecte o conector Atlassian (MCP) e rode:
 - **Best-effort continua inviolável**: esta seção é saída, não gate. Ela não bloqueia commit,
   push nem entrega — e nunca vira pergunta ao Diretor no meio do fluxo.
 
-## §15. Prefixo de keys no título do commit (decisão 4.79)
+## §15. Keys do tracker no título do commit (decisão 4.79)
 
 **Gatilho**: `jira.enabled` (§0). Sem Jira, ou ficha ausente → **nada muda**; o padrão de commit
 do projeto segue intacto.
 
-**Forma**: as keys abrem o título, **do mais amplo ao mais específico**, separadas por espaço,
-**antes** do padrão de commit do projeto (que não é alterado — o keelson não substitui a
-convenção do consumidor, só a prefixa):
+**Forma**: as keys abrem a **descrição**, **do mais amplo ao mais específico**, separadas por
+espaço — **depois** do prefixo do padrão de commit do projeto, que permanece na primeira
+posição:
 
 ```
-PROJ-12 PROJ-34 PROJ-56 feat(<slug>): <descrição curta>
+feat(<slug>): PROJ-12 PROJ-34 PROJ-56 <descrição curta>
 ```
+
+**Por que não antes do `feat(...)`** (revisão da 4.79 na mesma leva): o tracker casa a key em
+**qualquer posição** da mensagem — Smart Commits e o painel de desenvolvimento varrem o texto
+inteiro —, então abrir o título com ela não ganha nada do lado do Jira. Já a primeira posição
+do padrão de commit é âncora de tooling real no consumidor: geradores de release e changelog
+que derivam a versão do tipo (`feat` → minor, `fix` → patch), linters de mensagem e filtros de
+log ancorados no início. O keelson é distribuído — quebrar essa âncora falharia **silenciosamente**
+num consumidor que a use. O que se perde é o alinhamento visual das keys na coluna 1 do
+`git log --oneline`; troca aceita.
 
 **Quais keys** — todas as que o escopo do commit envolve, **sem repetir**, lidas dos artefatos
 que o autor do commit já tem em mãos (fontes canônicas no §10):
@@ -715,9 +724,10 @@ título. Commit que fecha wave ou entrega leva Epic + as Stories tocadas; acima 
 só o Epic.
 
 **Commit que não é de demanda não leva key**: patch de doutrina/tooling (`chore(keelson): …`)
-e afins nascem sem prefixo — a key ali seria ruído, não rastro.
+e afins nascem limpos — a key ali seria ruído, não rastro.
 
 **Ausência nunca bloqueia** (§0). Key não persistida — sync degradado, sub-task criada só na
 closure, artefato ainda sem a linha — → **omita aquela e commite com as que existirem**; nenhuma
-key resolvida → commit **sem prefixo**, sem aviso e sem pergunta ao Diretor. **Nunca inventar
-key**: só entram as lidas literalmente dos artefatos. Um commit não espera o Jira.
+key resolvida → commit **sem key alguma**, idêntico ao de um projeto sem Jira, sem aviso e sem
+pergunta ao Diretor. **Nunca inventar key**: só entram as lidas literalmente dos artefatos. Um
+commit não espera o Jira.

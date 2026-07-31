@@ -118,17 +118,17 @@ feat(<slug>): <descrição curta>
 Implementa TASK-MMM-XXX, cobre FR-NNN-XXX, AC-NNN-XXX.
 ```
 
-**Com `jira.enabled` na ficha**, o título é **prefixado pelas keys** do mais amplo ao mais
-específico — Epic, Story, sub-task —, antes do padrão acima (decisão 4.79):
+**Com `jira.enabled` na ficha**, a descrição abre com as **keys** do mais amplo ao mais
+específico — Epic, Story, sub-task —, **depois** do `tipo(escopo):` (decisão 4.79):
 
 ```
-PROJ-12 PROJ-34 PROJ-56 feat(<slug>): <descrição curta>
+feat(<slug>): PROJ-12 PROJ-34 PROJ-56 <descrição curta>
 ```
 
 As três já estão nos artefatos que você recebeu: `**Jira**:` no cabeçalho da SPEC (Epic) ·
 `**Jira**:` sob o heading da FEAT da sua TASK, ou `**Jira Story**:` no cabeçalho (Story) ·
 campo `Jira:` da closure da sua TASK (sub-task). **Key ausente → omita aquela e commite**;
-nenhuma resolvida → commit sem prefixo. Nunca invente key, nunca espere o Jira para commitar.
+nenhuma resolvida → commit sem key. Nunca invente key, nunca espere o Jira para commitar.
 Régua completa (teto de Stories, projeção compacta): §15 do
 `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`.
 
