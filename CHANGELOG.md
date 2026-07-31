@@ -17,6 +17,30 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.54.0] — 2026-07-31
+
+Decision 4.79
+
+### Added
+- **Commit titles now open with the tracker keys.** With `jira.enabled`, every commit the
+  cycle produces is prefixed with the keys involved, broadest to narrowest —
+  `PROJ-12 PROJ-34 PROJ-56 feat(<slug>): …` — before the project's own commit convention, which
+  is prefixed rather than replaced. The repository history finally says which demand each
+  commit belongs to, and Jira links the work to the issue without waiting for a pull request.
+  Keys come from where the cycle already stores them: the epic on the spec header, the story
+  under its feature heading, the sub-task in the task's closure.
+  - Bounded on purpose: a cross-cutting task lists only its primary feature (secondary ones
+    are already linked in Jira), and a wave or delivery commit touching more than three
+    stories carries just the epic.
+  - Commits that are not demand work — doctrine and tooling patches — stay unprefixed.
+  - A missing key is dropped from the prefix and the commit proceeds; with no key resolved at
+    all the commit looks exactly as it does today. Keys are never invented, and a commit never
+    waits on Jira.
+  - Projects using a strict Conventional Commits parser (commitlint, semantic-release) need to
+    configure it for the prefix; without `jira.enabled` nothing changes at all.
+
+---
+
 ## [0.53.0] — 2026-07-31
 
 Decision 4.78

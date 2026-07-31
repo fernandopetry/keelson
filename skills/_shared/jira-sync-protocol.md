@@ -686,3 +686,38 @@ Reconecte o conector Atlassian (MCP) e rode:
   slug tira o rastro do INDEX (§0), nunca a seção do report.
 - **Best-effort continua inviolável**: esta seção é saída, não gate. Ela não bloqueia commit,
   push nem entrega — e nunca vira pergunta ao Diretor no meio do fluxo.
+
+## §15. Prefixo de keys no título do commit (decisão 4.79)
+
+**Gatilho**: `jira.enabled` (§0). Sem Jira, ou ficha ausente → **nada muda**; o padrão de commit
+do projeto segue intacto.
+
+**Forma**: as keys abrem o título, **do mais amplo ao mais específico**, separadas por espaço,
+**antes** do padrão de commit do projeto (que não é alterado — o keelson não substitui a
+convenção do consumidor, só a prefixa):
+
+```
+PROJ-12 PROJ-34 PROJ-56 feat(<slug>): <descrição curta>
+```
+
+**Quais keys** — todas as que o escopo do commit envolve, **sem repetir**, lidas dos artefatos
+que o autor do commit já tem em mãos (fontes canônicas no §10):
+
+| Nível | Fonte | Ausente quando |
+|---|---|---|
+| Epic | `**Jira**:` do cabeçalho da SPEC | projeção compacta do §7.0 (a Story é a raiz) → 2 keys |
+| Story | `**Jira**:` sob o heading da FEAT **primária** da TASK, ou `**Jira Story**:` do cabeçalho | SPEC sem FEAT e sem `issueType.feature` |
+| Sub-task | campo `Jira:` da closure da TASK | TASK cuja issue só nasce na closure (§7) |
+
+**Teto**: FEAT **secundária** de TASK transversal **não** entra — o vínculo dela é o
+`createIssueLink` "relates to" no Jira (`jira-sync-feat.md`), e enfileirar todas estouraria o
+título. Commit que fecha wave ou entrega leva Epic + as Stories tocadas; acima de **3** Stories,
+só o Epic.
+
+**Commit que não é de demanda não leva key**: patch de doutrina/tooling (`chore(keelson): …`)
+e afins nascem sem prefixo — a key ali seria ruído, não rastro.
+
+**Ausência nunca bloqueia** (§0). Key não persistida — sync degradado, sub-task criada só na
+closure, artefato ainda sem a linha — → **omita aquela e commite com as que existirem**; nenhuma
+key resolvida → commit **sem prefixo**, sem aviso e sem pergunta ao Diretor. **Nunca inventar
+key**: só entram as lidas literalmente dos artefatos. Um commit não espera o Jira.

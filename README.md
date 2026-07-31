@@ -352,22 +352,21 @@ keelson/
 
 ## Status
 
-`0.53.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.54.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the QA card speaks BDD, and tells the tester how to get there**
-(decisions 4.77 and 4.78). Jira descriptions are generated from **literal markdown
-skeletons** instead of prose describing what the sections should contain, and each scenario
-now pairs the acceptance criterion's **verbatim Given-When-Then** — the form a BDD-fluent
-tester already reads — with a **`How to reproduce`** line carrying concrete values: the date
-to set, the record to create, the profile to log in as. A criterion says what to prove and
-never how to reach that state, and that gap is exactly where testers stop and ask. The
-separate criteria list is gone (it lives inside the scenario now), so the card got *shorter*,
-and one scenario per criterion makes missing coverage visible. A **form check before the
-issue is sent** re-renders once and then ships the card anyway with the gap named. See the
-full history in [CHANGELOG.md](CHANGELOG.md).
-Previously: **every change closes with a report, and a broken tracker says so**
+New in this release: **commit titles open with the tracker keys** (decision 4.79). With
+`jira.enabled`, every commit the cycle produces is prefixed broadest to narrowest —
+`PROJ-12 PROJ-34 PROJ-56 feat(<slug>): …` — before the project's own convention, which is
+prefixed rather than replaced, so `git log` finally says which demand each commit belongs to.
+Keys are read from where the cycle already stores them; a missing one is dropped and the
+commit proceeds, and with no Jira nothing changes at all.
+See the full history in [CHANGELOG.md](CHANGELOG.md).
+Previously: **the QA card speaks BDD, and tells the tester how to get there**
+(decisions 4.77 and 4.78 — literal skeletons, the criterion's verbatim Given-When-Then paired
+with a `How to reproduce` line of concrete values, and a form check before the issue is sent),
+**every change closes with a report, and a broken tracker says so**
 (decision 4.76 — a session ledger written as events happen, `/keelson:report` to rebuild it,
 and a reconnection section when the Jira connector drops mid-run),
 **on-demand mode — the team serves free-form sessions without
