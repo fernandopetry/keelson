@@ -351,23 +351,25 @@ keelson/
 
 ## Status
 
-`0.46.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.47.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **`/keelson:postmortem` — the end-of-session postmortem as a
-command** (decision 4.69). The consumer postmortems that moved doctrine the most were
-written by hand, on request; now the Diretor runs one command at session end. It
-re-reads every interaction (corrections, retries, failed gates), builds an honest facts
-table (defect ≠ new scope), traces mechanisms by root cause with literal evidence,
-dispatches process findings to the agile-coach (literal diffs, ledger dedup) and closes
-with the copy-paste maintainer block that feeds plugin evolution. See the full history
-in [CHANGELOG.md](CHANGELOG.md).
-Previously: **assertions that can actually fail** (decision 4.68 — four mechanical
-anti-tautology checks as blocking gate-1 findings, creatable test data can't self-grant
-a handoff, QA saves and inspects the rendered artifact, and the runner's toolchain is a
-test double), and **UI actions must specify observable feedback at the SPEC level**
-(decision 4.67 — the three observable states, each becoming a verifiable AC).
+New in this release: **per-role model assignment — cheap generation, expensive
+judgment** (decision 4.70). Every agent now declares an explicit `model:`: high-volume
+execution (`developer`, `qa`, `agile-coach`) runs on `sonnet`, while judgment
+(`code-reviewer`, `security-engineer`, `po`, `pm`, `product-analyst`,
+`staff-engineer`) stays on `opus` — cheapening the generator is safe because the
+evaluators stay strong. See the full history in [CHANGELOG.md](CHANGELOG.md).
+Previously: **`/keelson:postmortem` — the end-of-session postmortem as a
+command** (decision 4.69 — the Diretor runs one command at session end; it re-reads
+every interaction, builds an honest facts table, traces mechanisms by root cause and
+dispatches process findings to the agile-coach), **assertions that can actually fail**
+(decision 4.68 — four mechanical anti-tautology checks as blocking gate-1 findings,
+creatable test data can't self-grant a handoff, QA saves and inspects the rendered
+artifact, and the runner's toolchain is a test double), and **UI actions must specify
+observable feedback at the SPEC level** (decision 4.67 — the three observable states,
+each becoming a verifiable AC).
 Recent releases, in short: **Epics only where they group something** —
 `jira.epicPolicy: "multi-feature"` projects a single-feature SPEC without an Epic, the
 Story as the root of the tree (decision 4.61) — **phase verbs move the board** —

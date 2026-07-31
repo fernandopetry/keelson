@@ -1106,6 +1106,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `commands/postmortem.md` (novo), tabela *Commands* do `README.md`, §3.17 do `docs/_meta/method-guide.md`, nota humano-only do `templates/CLAUDE.keelson-block.md`. Comando novo → minor: plugin 0.45.0 → 0.46.0.
 
+### 4.70 — Modelo por papel: geração barata, julgamento caro
+
+**Problema**: nenhum agent declarava `model:` no frontmatter — todos herdavam o modelo da sessão. Rodando o ciclo com um modelo de topo, cada token do ciclo custa o preço máximo, e o maior volume de tokens está justamente no papel que menos depende dele: o `developer` (lê codebase, escreve código, roda testes — transcripts longos), que no desenho SDD recebe uma TASK atômica cujo pensamento já aconteceu a montante (SPEC → PLAN → TASK). Relato de campo: consumo alto de cota nas rodadas reais do fluxo.
+
+**Decisão**: cada agent declara `model:` explícito no frontmatter, seguindo o princípio **geração barata, julgamento caro** — o mesmo eixo do "gerador ≠ avaliador" do Charter. Execução de alto volume roda em `sonnet`: `developer`, `qa` (executa e compara com ACs literais), `agile-coach` (patches pequenos de processo). Julgamento e decisão rodam em `opus`: `code-reviewer` (a rede que segura a qualidade quando a geração barateia), `security-engineer` (falso-negativo caro, volume baixo), `po`/`pm`/`product-analyst` (decidem em nome do Diretor / crítica de mérito), `staff-engineer` (gera doutrina, roda raro). A assimetria é deliberada: baratear o gerador é seguro **porque** os avaliadores continuam fortes — rebaixar um avaliador exige nova decisão, não ajuste fino. Validators (skills) ficam fora: rodam no contexto do invocador e seguem o modelo da sessão. Trocar modelo reduz o custo por token, não o volume — a dieta de contexto (briefing destilado, 4.35) segue sendo a alavanca do volume e deve ser observada nas rodadas reais.
+
+**Aplicação**: frontmatter `model:` nos 9 `agents/*.md`. Muda o comportamento nos consumidores → minor: plugin 0.46.0 → 0.47.0.
+
 ---
 
 ## 5. Quality gates inegociáveis

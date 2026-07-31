@@ -17,6 +17,26 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.47.0] — 2026-07-30
+
+Decision 4.70
+
+### Changed
+- **Per-role model assignment: cheap generation, expensive judgment.** Every agent now
+  declares an explicit `model:` in its frontmatter instead of inheriting the session
+  model. High-volume execution runs on `sonnet` — `developer` (the cycle's biggest
+  token consumer, implementing an atomic TASK whose thinking already happened upstream
+  in SPEC → PLAN → TASK), `qa` (runs and compares against literal ACs) and
+  `agile-coach` (small process patches). Judgment and decision-making run on `opus` —
+  `code-reviewer` (the net that holds quality when generation gets cheaper),
+  `security-engineer`, `po`, `pm`, `product-analyst` and `staff-engineer`. The
+  asymmetry is deliberate: cheapening the generator is safe *because* the evaluators
+  stay strong. Validators (skills) are unaffected — they run in the invoker's context
+  on the session model. This lowers cost per token, not context volume; the distilled
+  briefing discipline (4.35) remains the volume lever.
+
+---
+
 ## [0.46.0] — 2026-07-30
 
 Decision 4.69

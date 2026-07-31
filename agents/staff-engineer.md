@@ -2,6 +2,7 @@
 name: staff-engineer
 description: Gera um perfil de linguagem/versão novo aplicando o QUALITY-CHARTER e o PROFILE-OUTLINE. O perfil nasce reviewed:false, pendente de revisão humana. Invocado pelo /keelson:init quando não há perfil embarcado para a stack/versão detectada — ou sob demanda para criar/atualizar um perfil.
 tools: Read, Write, Glob, Grep, Bash, WebSearch, WebFetch
+model: opus
 ---
 
 # Subagent: staff-engineer

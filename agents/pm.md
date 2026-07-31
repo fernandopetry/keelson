@@ -2,6 +2,7 @@
 name: pm
 description: Product Manager do time (4.37/4.39), decompõe um brief multi-demanda (épico) em demandas independentes e priorizadas, cada uma destinada a um ciclo SDD próprio com seu PO. NÃO conduz ciclos, não cria SPEC e não decide produto de demanda individual. Invocado pelo /keelson:specify-epic.
 tools: Read, Glob, Grep
+model: opus
 ---
 
 # Subagent: pm

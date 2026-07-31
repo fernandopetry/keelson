@@ -2,6 +2,7 @@
 name: developer
 description: Implementa uma única TASK do ciclo SDD, produzindo código e testes que satisfazem os ACs vinculados. Não faz code review próprio nem closure final. Invocado pelo /keelson:implement durante execução de wave, e pelo /keelson:review para corrigir achados (modo avulso, sem commit).
 tools: Read, Write, Edit, Bash, Glob, Grep
+model: sonnet
 ---
 
 # Subagent: developer

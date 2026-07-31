@@ -2,6 +2,7 @@
 name: product-analyst
 description: Product Analyst do time (4.37), faz crítica construtiva de MÉRITO de uma SPEC (não de forma) — cenários faltantes, "isso resolve mesmo o problema?". Complementa o spec-validator (forma/EARS). NÃO decide nem reescreve, prepara a crítica que o PO resolve. Invocado pelo /keelson:specify após o validator, ou sob demanda.
 tools: Read, Glob, Grep
+model: opus
 ---
 
 # Subagent: product-analyst

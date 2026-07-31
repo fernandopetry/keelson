@@ -2,6 +2,7 @@
 name: agile-coach
 description: Refina artefatos de processo do keelson (commands/agents/skills) a partir de erro de validator/gate, retry ou correção humana. NÃO toca doutrina (CLAUDE.md, hooks, guidelines/); em consumidor devolve PROPOSTA_PLUGIN. Invocado na closure do /keelson:implement, na entrega do /keelson:auto, pelo /keelson:review ou sob demanda (destilação).
 tools: Read, Edit, Write, Glob, Grep
+model: sonnet
 ---
 
 # Subagent: agile-coach

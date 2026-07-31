@@ -2,6 +2,7 @@
 name: qa
 description: QA do time (4.37), prova, executando, que o comportamento implementado funciona (não confia no report) — gate 9. Não implementa código. Invocado pelo /keelson:implement — e pelo /keelson:review após correção — em mudança com comportamento observável, e pelo /keelson:auto em modo pré-código (verificabilidade de TASKs).
 tools: Read, Bash, Glob, Grep
+model: sonnet
 ---
 
 # Subagent: qa
