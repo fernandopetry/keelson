@@ -17,6 +17,37 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.53.0] — 2026-07-31
+
+Decision 4.78
+
+### Changed
+- **Generated QA cards keep the acceptance criterion's Given-When-Then instead of
+  paraphrasing it.** Teams used to BDD read `Given/When/Then` as native vocabulary, and the
+  previous recipe threw that away by rewriting every criterion as imperative prose — then
+  repeated the same content in a separate formal list. The criterion is now **copied
+  verbatim** into the scenario (rewriting it would let claims drift from what the artefact
+  supports); what still gets translated into business language is the requirement itself,
+  never the criterion.
+- **Each scenario now carries a `How to reproduce` line with concrete values.** An
+  acceptance criterion is declarative by design — *"Given a competence whose first day falls
+  on a Wednesday"* says what to prove and not how to get there, and that gap is precisely
+  where a tester stops and asks. The card now names the literal date to set, the record to
+  create, the profile to log in as. Restating the abstract condition as if it were a step is
+  called out as the failure, not accepted as a variation.
+- **The separate "Acceptance criteria" section is gone** — the criterion lives inside its
+  scenario. The card gets **shorter** than before: two sections merged into one, not a third
+  one added.
+- **One scenario per criterion makes coverage visible.** A criterion with no scenario and no
+  place on the automated-checks line now stands out, where a bare list of IDs hid it — a real
+  card had been silently missing two. The form check gained the matching item, plus one that
+  catches a reproduction line with no concrete value.
+- **An accepted risk that shows up on screen now belongs in "Out of scope".** It is exactly
+  what a good-faith tester files as a bug, so the spec's risk section became a legitimate
+  source for the card alongside the scope section.
+
+---
+
 ## [0.52.0] — 2026-07-31
 
 Decision 4.77

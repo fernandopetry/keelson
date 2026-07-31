@@ -208,9 +208,16 @@ lê-la no Jira** — em especial o analista de QA que testa a funcionalidade a p
 (§9: Story/isolada é a unidade de QA). **Português**, markdown simples (headings/listas —
 o conector converte). Teste falsificável da receita: *um humano que só lê o card entende o
 que foi feito e consegue testá-lo sem abrir nenhum arquivo do repo*. Âncora de contenção: a
-descrição **projeta** o artefato SDD — muda a forma (jargão EARS/Given-When-Then vira
-linguagem de usuário), **nunca acrescenta afirmação que o artefato não sustenta** (mesma
-régua da 4.58: verificado, não deduzido).
+descrição **projeta** o artefato SDD — **nunca acrescenta afirmação que o artefato não
+sustenta** (mesma régua da 4.58: verificado, não deduzido).
+
+**O Given-When-Then do AC é preservado, não traduzido** (decisão 4.78). Ele é a forma que o
+analista de QA já lê — descartá-lo em favor de prosa imperativa jogava fora vocabulário
+compartilhado e ainda duplicava o conteúdo (roteiro + lista formal de ACs). O que a descrição
+traduz é o **EARS dos FRs**, que vira narrativa de negócio. O AC declara *o que provar* e é
+declarativo por desenho ("Dado uma competência cujo primeiro dia cai numa quarta-feira") —
+sozinho ele trava o testador, que não sabe **como chegar** àquele estado. Por isso cada cenário
+é **AC literal + reprodução concreta**: o Gherkin dá o contrato, os passos dão o caminho.
 
 **Cabeçalho-aviso** (obrigatório, primeira linha de toda descrição gerada):
 `⚙️ *Texto gerado automaticamente pelo keelson — não edite: será re-renderizado na próxima
@@ -249,17 +256,16 @@ humano testa, o mais rico dos três:
 Não arquitetura, não jargão de artefato.>
 
 ### Como testar
-**1. <Nome do cenário>**
-   1. <preparação — o estado inicial, ← Given>
-   2. <ação — o que o testador faz, ← When>
-   3. <resultado esperado — o que a tela mostra, ← Then>
-**2. <Nome do cenário>**
-   ...
+**Cenário 1 — <o que este cenário prova, em linguagem de usuário>** · AC-NNN-XXX
+**Dado** <copiado literalmente do AC>,
+**Quando** <copiado literalmente do AC>,
+**Então** <copiado literalmente do AC>.
+*Como reproduzir:* <passo com valor concreto> · <passo> · <passo>.
+
+**Cenário 2 — <...>** · AC-NNN-YYY
+...
 
 Verificações cobertas por teste automatizado (sem passo manual): <IDs + o que provam>
-
-### Critérios de aceitação
-- **AC-NNN-XXX** — <texto integral do AC, copiado da SPEC>
 
 ### Fora do escopo
 - <out-of-scope que um QA poderia confundir com defeito>
@@ -281,18 +287,32 @@ Verificações cobertas por teste automatizado (sem passo manual): <IDs + o que 
   `AC-NNN-005, AC-NNN-006` soltos, `premissa A-NNN-003 preservada` — tudo isso manda o leitor
   ao repo e reprova o teste falsificável acima. ID **sempre** acompanhado do texto; conteúdo
   de FR/premissa que importa ao teste vira frase da narrativa ou passo do roteiro.
-- **Roteiro derivado dos ACs e dos NFRs verificáveis sem AC próprio** (idempotência,
-  reversibilidade, refresh: cenários que o QA testa e que a fórmula por ACs deixaria fora).
-  Duas regras de honestidade: **(a)** AC sem caminho manual razoável (atomicidade, requisição
-  forjada, ownership, contrato de servidor) **não vira passo de teatro** — vai para a linha
-  "Verificações cobertas por teste automatizado"; **(b)** os ACs de **NFR** cujos elementos
-  pertencem à funcionalidade (tema claro/escuro, viewport, leitor de tela, sessão simulada)
-  **entram no roteiro da Story correspondente** — a fórmula `ACs(FEAT)` cobre FRs, e os de NFR
-  são somados pelo elemento que exercitam, senão ficam órfãos de card.
-- **Cenário-limite conhecido é passo, não observação.** Regra de borda que a SPEC nomeia
-  (denominador zero, lista vazia, primeiro acesso, data de virada) entra em **Como testar**
-  como cenário próprio, com o valor concreto na preparação — não como frase explicativa na
-  narrativa. O que não vira passo, o QA não testa.
+- **Um cenário por AC da funcionalidade** — a cobertura fica visível em vez de declarada: um
+  AC que não virou cenário nem entrou na linha dos automatizados **salta aos olhos**, ao
+  contrário da lista de IDs, que esconde a omissão. Duas regras de honestidade: **(a)** AC sem
+  caminho manual razoável (atomicidade, requisição forjada, ownership, contrato de servidor)
+  **não vira cenário de teatro** — vai para a linha "Verificações cobertas por teste
+  automatizado", com o que prova; **(b)** os ACs de **NFR** cujos elementos pertencem à
+  funcionalidade (tema claro/escuro, viewport, leitor de tela, sessão simulada) **entram na
+  Story correspondente** — a fórmula `ACs(FEAT)` cobre FRs, e os de NFR são somados pelo
+  elemento que exercitam, senão ficam órfãos de card.
+- **O Gherkin é copiado, a reprodução é escrita.** As três linhas `Dado/Quando/Então` saem
+  **literais** da SPEC — reescrevê-las abre espaço para afirmação que o artefato não sustenta
+  (âncora de contenção acima). O que se escreve é o `Como reproduzir`.
+- **Reprodução tem valor concreto, não a condição abstrata.** O AC declara o estado
+  ("numa competência cujo primeiro dia cai numa quarta-feira"); a reprodução diz **como chegar
+  lá** com o valor que o testador digita — a data literal a posicionar, o registro a criar, o
+  perfil com que entrar. Repetir a condição abstrata como se fosse passo é o furo que faz o QA
+  perguntar ao Diretor; é para isso que esta linha existe. Passo que exige dado inexistente
+  no ambiente inclui **como criá-lo**.
+- **Cenário-limite conhecido é cenário, não observação.** Regra de borda que a SPEC nomeia
+  (denominador zero, lista vazia, primeiro acesso, mês que abre em fim de semana) entra em
+  **Como testar** com nome próprio e o valor concreto na reprodução — nunca como frase
+  explicativa na narrativa. O que não vira cenário, o QA não testa.
+- **Risco aceito que se manifesta na tela vira linha do fora do escopo.** Comportamento que a
+  SPEC registrou como risco assumido (não como defeito) é exatamente o que um QA de boa-fé
+  abre como bug. Nomeie-o com o efeito visível e a palavra "conhecido e aceito" — os riscos da
+  §9 da SPEC são fonte tão legítima quanto o out-of-scope da §4.
 - Tarefa isolada de origem avulsa (bugfix/chore sem SPEC): mesmo esqueleto, derivado da
   própria TASK — o que muda, como verificar (do critério de verificação dela) e o escopo.
 
@@ -301,15 +321,18 @@ descrição renderizada e **antes** do `createJiraIssue`/`editJiraIssue`, confir
 esqueleto do papel:
 
 1. Os headings do esqueleto estão **todos** presentes, na ordem, sem nenhum extra?
-2. Unidade de QA: **Como testar** tem ao menos um cenário com passos numerados?
-3. Unidade de QA: cada AC listado traz o **texto**, não só o ID?
+2. Unidade de QA: **Como testar** tem ao menos um cenário com `Dado`/`Quando`/`Então` e a
+   linha `Como reproduzir`?
+3. Unidade de QA: **todo** AC da funcionalidade (fórmula `ACs(FEAT)` + os de NFR pela regra
+   (b)) aparece como cenário **ou** na linha dos automatizados? Nenhum sobra sem destino.
 4. Alguma linha manda o leitor a um artefato do repo (`SPEC-`, `§5`, `FR-`/`A-` sem texto)?
+5. Alguma linha `Como reproduzir` só repete a condição abstrata do `Dado`, sem valor concreto?
 
 Falhou qualquer um → **re-renderize uma vez** pelo esqueleto. Falhou de novo → **crie a issue
 assim mesmo** e nomeie a lacuna no aviso do output (`descrição de <KEY> sem "Como testar"`).
 Card magro é ruim; card ausente é pior — quebra a hierarquia das sub-tasks e a idempotência
 do §4, e o §0 é inviolável. O check é gate de **forma**, não de mérito: ele não julga se o
-roteiro testa bem, só se o card é autossuficiente.
+cenário testa bem, só se o card é autossuficiente.
 
 **Rodapé-marcador** (obrigatório, última linha de toda descrição gerada):
 `— gerado pelo keelson a partir de <caminho relativo do artefato>`. O caminho é relativo à

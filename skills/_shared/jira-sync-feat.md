@@ -19,7 +19,7 @@
    projeção compacta do §7.0 (`epicPolicy: multi-feature` ∧ FEAT única): a Story da FEAT é
    a **raiz** da árvore e nasce **sem `parent`** —, `summary` = nome da
    FEAT, `description` = template **unidade de QA** da receita §6.2 — narrativa a partir da
-   descrição (`>`) da FEAT, roteiro e lista formal a partir dos ACs derivados
+   descrição (`>`) da FEAT, um cenário por AC derivado
    (`ACs(FEAT) = ACs que cobrem FRs da FEAT`), marcador com o caminho relativo da SPEC +
    `#FEAT-NNN-XXX`; aplicar campos `write` (§8); gravar a key na
    linha `**Jira**:` sob o heading (§10).
