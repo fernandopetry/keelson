@@ -17,6 +17,21 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.48.1] — 2026-07-31
+
+Decision 4.72
+
+### Fixed
+- **Real-consumer input is abstracted before it becomes a record.** The 4.71 batch let
+  a consumer project's literal config glob and episode slug travel into the CHANGELOG,
+  the init doctrine and the decisions log. New standing rule (owner: this repo's
+  `CLAUDE.md`): consumer identifiers — project names, demand slugs, paths, globs, URLs,
+  key names — never enter doctrine, decisions or the CHANGELOG; what gets recorded is
+  the generic pattern the case teaches, phrased so it works for any project. Applied
+  retroactively to the 4.71 texts.
+
+---
+
 ## [0.48.0] — 2026-07-31
 
 Decision 4.71
@@ -51,8 +66,9 @@ Decision 4.71
 - **Init's self-check proves `sensitiveGlobs` coverage by real matching.** Secret-shaped
   files that exist in the project (`.env*` at any level — root included —, `*.pem`,
   `*.key`, project credential files) must each match some glob, proven mechanically
-  (same ruler as 4.51); measured failure: a config covering `b2b-adm-*/.env*` while the
-  root `.env` leaked. Uncovered candidate → add the exact-path glob.
+  (same ruler as 4.51); measured failure: a config whose globs covered subdirectory
+  `.env*` files while the root `.env` went uncovered — and leaked. Uncovered
+  candidate → add the exact-path glob.
 
 The sixth postmortem residue — a hook governing *how* secret files are read (a `grep`
 that echoes values where `cut -d= -f1` suffices) — is deferred to its own decision: it

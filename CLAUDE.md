@@ -77,6 +77,14 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 - Decisão de processo/governança → entrada numerada em `docs/_meta/decisions.md` (§4.x,
   formato Problema/Decisão/Aplicação). Lição de processo → `learning-log.md` via
   `agile-coach`.
+- **Insumo de consumidor real se abstrai antes de virar registro** (decisão 4.72):
+  postmortems, propostas e relatos de campo chegam com identificadores do projeto —
+  nome, slug de demanda, paths, globs, URLs, nomes de chave. Nada disso entra em
+  doutrina, `decisions.md` ou `CHANGELOG.md`: extraia o **padrão genérico** que ensina
+  (ex.: "globs cobriam os `.env*` de subdiretórios, não o `.env` da raiz") e deixe o
+  literal no consumidor (ficha/docs dele). Teste antes de registrar: a frase funciona
+  para qualquer projeto? Se só faz sentido conhecendo aquele consumidor, ainda é
+  específica demais.
 - Hooks são bash 3.2-compatível com **fallback gracioso** (sem `jq`/ficha → `exit 0`,
   nunca travar o fluxo) e anti-renudge por fingerprint. Validar com `bash -n` + teste
   sintético (repo temporário no scratchpad).
