@@ -1,0 +1,44 @@
+name: Publish wiki
+
+# A wiki é artefato gerado a partir deste repositório (decisão 4.81): docs/wiki/ mais os
+# espelhos dos donos únicos (method-guide, Charter, convenções). Publicar no push da main
+# é o que impede a wiki de envelhecer em silêncio — o conteúdo passa por PR como qualquer
+# arquivo, e a publicação em si é mecânica.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/wiki/**'
+      - 'docs/_meta/method-guide.md'
+      - 'docs/_meta/conventions/**'
+      - 'guidelines/_meta/QUALITY-CHARTER.md'
+      - 'scripts/publish-wiki.sh'
+      - '.github/workflows/publish-wiki.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-wiki
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publicar no wiki
+        env:
+          # GITHUB_TOKEN cobre o wiki com contents:write. Se a organização restringir a
+          # escrita no wiki para o token da Action, crie um PAT com escopo de repo e
+          # guarde como secret WIKI_TOKEN — o fallback abaixo o usa sem outra mudança.
+          WIKI_TOKEN: ${{ secrets.WIKI_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          scripts/publish-wiki.sh \
+            --remote "https://x-access-token:${WIKI_TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git" \
+            --message "docs: publish wiki from ${GITHUB_SHA:0:7}"

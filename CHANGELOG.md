@@ -17,6 +17,33 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.56.0] — 2026-07-31
+
+Decision 4.81
+
+### Added
+- **A user wiki, with its source in this repository.** The
+  [wiki](https://github.com/fernandopetry/keelson/wiki) answers the question neither the
+  README (the package's English shop window) nor the method guide (reference for people
+  already inside the repo) was written for: *I installed it, now what?* It ships pages for
+  install and update, first steps, concepts, the ficha field by field, troubleshooting and an
+  FAQ — in Portuguese, the language of the doctrine.
+- **The wiki is a generated artifact, never a source.** Pages live in `docs/wiki/`; files that
+  already own their text (method guide, Quality Charter, INDEX contract, commit convention,
+  handoff protocol) are **mirrored, not rewritten**, so no rule gains a second owner. Content
+  goes through a Pull Request like any other file — a wiki nobody can review is the failure
+  mode this plugin exists to fix.
+- **`scripts/publish-wiki.sh`** — copies the pages, rewrites links (published target → wiki
+  page, everything else → GitHub blob), removes only pages it generated itself (a
+  hand-written page on the wiki survives) and pushes. `--dry-run` to preview, `--check` to
+  fail when the published wiki is stale. A wiki that was never initialized is reported with
+  the fix, never worked around: the `.wiki.git` repository only exists after the first page is
+  created through the web UI.
+- **`.github/workflows/publish-wiki.yml`** — republishes on every push to `main` that touches
+  the sources. Publishing is mechanical; forgetting it is what makes documentation rot.
+
+---
+
 ## [0.55.0] — 2026-07-31
 
 Decision 4.80

@@ -9,3 +9,6 @@
 # Logs e temporários
 *.log
 .tmp/
+
+# Clone de trabalho do GitHub Wiki (destino de scripts/publish-wiki.sh)
+.wiki/

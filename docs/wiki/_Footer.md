@@ -1,0 +1,1 @@
+Wiki gerada a partir de [`docs/wiki/`](https://github.com/fernandopetry/keelson/tree/main/docs/wiki) no repositório do keelson — edições feitas aqui são sobrescritas na próxima publicação. · [MIT](https://github.com/fernandopetry/keelson/blob/main/LICENSE)

@@ -391,16 +391,30 @@ keelson/
 │   ├── backend/       # php.md (8.5 exemplar) · php-{5.6,7.0,7.4,8.0}.md (legacy ladder) · none.md · _review/ (human-review backlogs)
 │   └── frontend/      # none.md (others generated on install)
 ├── templates/         # keelson.config.example.json · keelson.local.example.json · CLAUDE block
-└── docs/_meta/        # method guide · conventions/ (runtime contracts: SDD, INDEX, handoff, teams, commits) · decisions · learning log
+├── docs/_meta/        # method guide · conventions/ (runtime contracts: SDD, INDEX, handoff, teams, commits) · decisions · learning log
+└── docs/wiki/         # source of the user wiki (generated output: scripts/publish-wiki.sh)
 ```
+
+The **[wiki](https://github.com/fernandopetry/keelson/wiki)** is user-facing documentation
+in Portuguese — install, first steps, concepts, the ficha, troubleshooting, FAQ. It is a
+**generated artifact**: its source lives in `docs/wiki/` plus mirrors of the files that
+already own their text (method guide, Charter, conventions), and a push to `main`
+republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.55.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.56.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **commits that feed release automation** (decisions 4.79 and 4.80). The
+New in this release: **a user wiki whose source is this repository** (decision 4.81). The
+[wiki](https://github.com/fernandopetry/keelson/wiki) answers what the README and the method
+guide never did — *I installed it, now what?* — with install, first steps, concepts, the ficha,
+troubleshooting and an FAQ, in Portuguese. It is a **generated artifact**: pages live in
+`docs/wiki/`, the files that already own their text are mirrored rather than rewritten, and a
+push to `main` republishes. A wiki nobody can review is the failure mode this plugin exists to
+fix, so its content goes through a Pull Request like any other file.
+Previously: **commits that feed release automation** (decisions 4.79 and 4.80). The
 commit message finally has an owner: a closed list of eleven types, the test for picking one,
 and **breaking changes declared rather than inferred** — because with a tool deriving versions
 from history, `feat` means minor, `fix` means patch, and an invented type makes the change
@@ -411,7 +425,7 @@ And with `jira.enabled`, every commit carries its tracker keys right after `type
 `git log` says which demand each commit belongs to. **Re-run `/keelson:init`** on consumers for
 the new ficha block.
 See the full history in [CHANGELOG.md](CHANGELOG.md).
-Previously: **the QA card speaks BDD, and tells the tester how to get there**
+Before that: **the QA card speaks BDD, and tells the tester how to get there**
 (decisions 4.77 and 4.78 — literal skeletons, the criterion's verbatim Given-When-Then paired
 with a `How to reproduce` line of concrete values, and a form check before the issue is sent),
 **every change closes with a report, and a broken tracker says so**

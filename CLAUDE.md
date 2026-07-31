@@ -74,6 +74,21 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   aceitação (PO → Diretor). Boletim entre waves narrado em linguagem de time, fechando
   com o estado de pendência do Diretor.
 
+## Wiki (documentação de usuário — decisão 4.81)
+
+- A **wiki do GitHub é artefato gerado, nunca fonte**. Fonte = `docs/wiki/` (páginas
+  próprias de onboarding) + os **espelhos** listados no manifesto `MIRRORS` de
+  `scripts/publish-wiki.sh` (method-guide, Charter, convenções). Regra de corte:
+  **texto que já tem dono é espelhado, nunca reescrito** — página própria só para o que
+  não existe em lugar nenhum. A wiki **não** é um 4º lugar a sincronizar: comando novo
+  continua em `commands/*.md` + `README.md` + `method-guide.md`, e a página é derivada.
+- Publicação: `scripts/publish-wiki.sh` (bash 3.2; `--dry-run`, `--check`) e a Action
+  `.github/workflows/publish-wiki.yml` no push da `main`. Página nova → só criar o `.md`
+  em `docs/wiki/` e linkar no `_Sidebar.md`; espelho novo → uma linha em `MIRRORS`.
+- Wiki em **português** (é o idioma da doutrina); o `README.md` segue a face em inglês.
+  Edição pela UI do GitHub é sobrescrita — o script só remove páginas que ele gerou
+  (`.keelson-wiki-pages`), então página feita à mão sobrevive.
+
 ## Registro e governança
 
 - Decisão de processo/governança → entrada numerada em `docs/_meta/decisions.md` (§4.x,
