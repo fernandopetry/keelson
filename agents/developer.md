@@ -110,13 +110,21 @@ quantificado ("todos os X"). Teste que não é capaz de falhar reprova no gate 1
 
 ### 7. Commit
 
-Padrão de commit do projeto (ver `CLAUDE.md`/ficha). Default: Conventional Commits. **Estagie por caminho explícito** (`git add <arquivos da task>`; nunca `git add -A`/`git add .`/`git add <diretório inteiro>`): o working tree é compartilhado com outras waves/tasks e arquivos untracked de outro escopo não podem entrar no seu commit nem poluir o snapshot do reviewer.
+Padrão de commit do projeto (ver `CLAUDE.md`/ficha); na ausência de um declarado, a régua é
+`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/commit-convention.md` — **dono único** do tipo
+(lista fechada), do escopo e da marca de quebra. **Estagie por caminho explícito** (`git add <arquivos da task>`; nunca `git add -A`/`git add .`/`git add <diretório inteiro>`): o working tree é compartilhado com outras waves/tasks e arquivos untracked de outro escopo não podem entrar no seu commit nem poluir o snapshot do reviewer.
 
 ```
 feat(<slug>): <descrição curta>
 
 Implementa TASK-MMM-XXX, cobre FR-NNN-XXX, AC-NNN-XXX.
 ```
+
+**Tipo fora da lista fechada é defeito** — some do changelog de quem gera release pelos commits.
+Com `commit.releaseAutomation` preenchido na ficha, o tipo tem **efeito de publicação** (`feat` →
+minor, `fix` → patch) e **quebra de compatibilidade se declara** (`tipo(escopo)!:` ou rodapé
+`BREAKING CHANGE:`) — omiti-la faz a automação publicar minor onde era major. Na dúvida entre
+`feat` e `fix`, é o sinal **furo no plano**: reporte ao Tech Lead em vez de escolher no escuro.
 
 **Com `jira.enabled` na ficha**, a descrição abre com as **keys** do mais amplo ao mais
 específico — Epic, Story, sub-task —, **depois** do `tipo(escopo):` (decisão 4.79):

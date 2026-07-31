@@ -22,6 +22,10 @@
     "screenVerify": { "enabled": false, "method": null, "artifactsDir": "thoughts/screen-verify" }
   },
   "docsRoot": "docs",
+  "commit": {
+    "convention": "conventional",
+    "releaseAutomation": null
+  },
   "jira": {
     "enabled": false,
     "site": null,

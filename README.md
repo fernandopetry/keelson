@@ -333,6 +333,50 @@ or point it at a single SPEC (`SPEC-NNN` or its file path) to create/repair just
 subtree (Epic, Stories, sub-tasks).
 Governance: decisions 4.22, 4.27, 4.28, 4.53, 4.55, 4.59, 4.60 and 4.61 in `docs/_meta/decisions.md`.
 
+## Commits and release automation
+
+Keelson writes commits in your repository, so it follows **Conventional Commits** unless your
+project declares another convention — in which case it follows yours. The type is drawn from a
+**closed list** (`feat` `fix` `perf` `refactor` `docs` `test` `build` `ci` `style` `chore`
+`revert`), because an invented type is dropped by changelog generators and rejected by message
+linters: the commit disappears from the release notes exactly when it matters.
+
+```
+feat(portal): PROJ-12 PROJ-34 replace the seven-day window
+│    │        └─ tracker keys, when Jira is enabled
+│    └─ scope: the area touched
+└─ type: drives the version a release tool derives
+```
+
+Two rules carry real weight once a project derives releases from its history: `feat` means minor
+and `fix` means patch, and a **breaking change is declared, never inferred** — `type(scope)!:` or
+a `BREAKING CHANGE:` footer. Omitting the mark publishes a minor where a major was due, and the
+damage lands on your consumers.
+
+`/keelson:init` **detects** what your project already uses — `semantic-release`,
+`release-please`, `standard-version`, `commitlint`, `git-cliff`, `python-semantic-release` — and
+records it in the ficha:
+
+```jsonc
+"commit": {
+  "convention": "conventional",        // or your project's own, respected as found
+  "releaseAutomation": "semantic-release"   // null when none is detected
+}
+```
+
+It also reports any non-canonical types it finds in your history, mapped to the canonical
+equivalent — as information, never as a rewrite.
+
+**Keelson feeds release automation; it does not operate it.** Publishing a release is your act,
+in the same class as opening a PR, merging and deploying: it involves credentials, branch
+protection and tags that live outside the repository. Setting the tool up is an engineering
+decision for your project — the usual routes are `semantic-release` or `release-please` for
+Node, `release-please` or `python-semantic-release` for Python, and `release-please` or
+`git-cliff` for stacks without a native option (both read the git history rather than a package
+manifest). Whichever you pick, the history keelson produces is already consumable by it.
+
+Owner of the rule: `docs/_meta/conventions/commit-convention.md`. Governance: decision 4.80.
+
 ## Repository layout
 
 ```
@@ -347,22 +391,25 @@ keelson/
 │   ├── backend/       # php.md (8.5 exemplar) · php-{5.6,7.0,7.4,8.0}.md (legacy ladder) · none.md · _review/ (human-review backlogs)
 │   └── frontend/      # none.md (others generated on install)
 ├── templates/         # keelson.config.example.json · keelson.local.example.json · CLAUDE block
-└── docs/_meta/        # method guide · conventions/ (runtime contracts: SDD, INDEX, handoff, teams) · decisions · learning log
+└── docs/_meta/        # method guide · conventions/ (runtime contracts: SDD, INDEX, handoff, teams, commits) · decisions · learning log
 ```
 
 ## Status
 
-`0.54.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.55.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **commit titles carry the tracker keys** (decision 4.79). With
-`jira.enabled`, every commit the cycle produces opens its description with the keys involved,
-broadest to narrowest — `feat(<slug>): PROJ-12 PROJ-34 PROJ-56 …` — right after the project's
-own `type(scope):`, which keeps the first position so release tooling anchored on it still
-works. `git log` finally says which demand each commit belongs to. Keys are read from where
-the cycle already stores them; a missing one is dropped and the commit proceeds, and with no
-Jira nothing changes at all.
+New in this release: **commits that feed release automation** (decisions 4.79 and 4.80). The
+commit message finally has an owner: a closed list of eleven types, the test for picking one,
+and **breaking changes declared rather than inferred** — because with a tool deriving versions
+from history, `feat` means minor, `fix` means patch, and an invented type makes the change
+vanish from the release notes. `/keelson:init` detects the automation your project already uses
+and records it, respecting a house convention where it finds one. Keelson **feeds** that
+automation and does not operate it: publishing a release is your act, like a PR or a deploy.
+And with `jira.enabled`, every commit carries its tracker keys right after `type(scope):`, so
+`git log` says which demand each commit belongs to. **Re-run `/keelson:init`** on consumers for
+the new ficha block.
 See the full history in [CHANGELOG.md](CHANGELOG.md).
 Previously: **the QA card speaks BDD, and tells the tester how to get there**
 (decisions 4.77 and 4.78 — literal skeletons, the criterion's verbatim Given-When-Then paired

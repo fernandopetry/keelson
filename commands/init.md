@@ -140,6 +140,36 @@ Merge-preserving (Regra de merge): bloco `jira` já presente → preserva; ficha
 
 **Diagnóstico de marcos não-canônicos** (mapa antigo ou editado à mão): linha de Etapas/Colunas cujo `Gatilho` não é um dos quatro marcos canônicos nem `--phase <verbo>` — tipicamente prosa do fluxo real do time (`QA valida a funcionalidade / PR aberto`, `Funcionalidade aprovada na SPEC`) — **listar no output** como *documentação, não gatilho* (§3: catálogo fechado), com a recomendação de comentá-la ou renomeá-la para o marco canônico correspondente. **Não** alterar a tabela do humano. Um mapa em que a única linha de `story` que aponta para a coluna de desenvolvimento está ausente merece destaque: sem `Trabalho iniciado (Story)`, o teto do §9 vira "nenhuma transição automática na Story" e o quadro não mostra o trabalho começando.
 
+## Etapa 4.7 — Convenção de commit e release automation (detecção, decisão 4.80)
+
+O keelson escreve commits no repo do consumidor, e num projeto que **deriva versão e changelog
+dos commits** a escolha do tipo deixa de ser organização e passa a ter efeito de publicação. Aqui
+você **descobre e grava**; a régua da mensagem tem dono único em
+`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/commit-convention.md`.
+
+1. **Detectar a automação** (sem perguntar o que dá para ver): `package.json` (`semantic-release`,
+   `standard-version`, `@commitlint/*`), `.releaserc*` / `release.config.*`,
+   `release-please-config.json`, `cliff.toml`, `.commitlintrc*`, `.github/workflows/*` com passo de
+   release, `pyproject.toml` (`python-semantic-release`). Achou → `commit.releaseAutomation` recebe
+   o nome da ferramenta.
+2. **Detectar a convenção em uso** quando não há ferramenta declarada: amostre os tipos do
+   histórico — `git log --pretty=%s -200 | grep -oE '^[a-z]+' | sort | uniq -c | sort -rn`. Maioria
+   dentro da lista fechada → `convention: "conventional"`. Padrão próprio dominante → grave-o como
+   string livre e **respeite-o** (o keelson segue a casa, não a converte). Histórico sem padrão →
+   `"conventional"`, que é o default do plugin.
+3. **Tipos fora da lista fechada no histórico** (ex.: um `harden:` ou `security:` esparso) →
+   **listar no relatório** como observação, com o tipo canônico correspondente. Não reescreva
+   histórico, não proponha rebase: é informação para o Diretor decidir, e vira defeito de verdade
+   só quando houver automação lendo aqueles commits.
+4. **Sem automação detectada** → `releaseAutomation: null` e **uma linha** no relatório dizendo que
+   o histórico já sai consumível caso o projeto adote uma depois. **Não ofereça configurar**:
+   publicar release é ato do Diretor, da mesma classe de PR, merge e deploy (decisão 4.41) —
+   envolve credencial, proteção de branch e tag, tudo fora do repositório. O README documenta o
+   caminho por stack para quem quiser adotar.
+
+Merge-preserving (Regra de merge): bloco `commit` já presente → preserva (só acrescenta chave
+faltante); ficha antiga sem o bloco → acrescenta com o detectado.
+
 ## Etapa 5 — Injetar o bloco no `CLAUDE.md`
 
 Insira o conteúdo de `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.keelson-block.md` no `CLAUDE.md` do projeto (crie o arquivo se não existir). Se um bloco keelson já existir (entre os marcadores `<!-- ... keelson ... -->`), **substitua-o** — não duplique.

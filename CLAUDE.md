@@ -36,8 +36,10 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 - **Um dono por regra**: o core (`guidelines/core/`) diz *o quê* (agnóstico); o perfil diz
   *como* na linguagem. Não duplicar regra entre eles. Blocos compartilhados dos comandos
   têm dono único em `docs/_meta/conventions/` — `sdd-conventions.md` (convenções comuns,
-  ex-§3.0), `index-contract.md` (artefatos/IDs + contrato/template/receita do INDEX, ex-§6)
-  e `handoff-protocol.md` (handoff de verificação de tela, ex-§8); o `method-guide.md`
+  ex-§3.0), `index-contract.md` (artefatos/IDs + contrato/template/receita do INDEX, ex-§6),
+  `handoff-protocol.md` (handoff de verificação de tela, ex-§8) e `commit-convention.md`
+  (tipo/escopo/quebra da mensagem de commit no consumidor — o bloco de keys do tracker
+  continua no §15 do protocolo Jira); o `method-guide.md`
   segue guia humano, com os headings §3.0/§6/§8 preservados como ponteiros. A moldura dos
   validators vive em `skills/_shared/validator-protocol.md`; a **régua dos gates 1–7**
   (o que cada gate exige, degradação sem artefato SDD, calibração de severidade) tem dono

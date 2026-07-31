@@ -17,6 +17,40 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.55.0] — 2026-07-31
+
+Decision 4.80
+
+### Added
+- **Commit messages have an owner, and the type is a closed list.** The rule used to be a
+  sentence — "the project's convention; defaults to Conventional Commits" — with no list of
+  types, no handling of breaking changes and nowhere to look it up. It now lives in
+  `docs/_meta/conventions/commit-convention.md`: eleven canonical types, the test for picking
+  one (*does whoever uses the system notice a difference?*), the `fix` vs `refactor` line, and
+  **breaking changes declared rather than inferred** (`type(scope)!:` or a `BREAKING CHANGE:`
+  footer). An invented type is a defect, not creativity — changelog generators drop it and
+  message linters reject it, so the commit vanishes from the release notes precisely when it
+  matters.
+- **`/keelson:init` detects your release automation** — `semantic-release`, `release-please`,
+  `standard-version`, `commitlint`, `git-cliff`, `python-semantic-release` — and records it in
+  the new `commit` block of the ficha, alongside the convention your history actually uses. A
+  project with its own convention keeps it: keelson follows the house rather than converting
+  it. Non-canonical types found in the history are reported with their canonical equivalent,
+  as information — never as a rewrite.
+- **Where the type starts to carry weight**: with automation declared, `feat` means minor and
+  `fix` means patch, and an unmarked breaking change publishes a minor where a major was due.
+  The developer agent now escalates a genuine `feat`-or-`fix` doubt instead of guessing.
+
+### Changed
+- **Keelson feeds release automation; it does not operate it.** Publishing a release is the
+  Director's act, in the same class as opening a PR, merging and deploying — it involves
+  credentials, branch protection and tags that live outside the repository, and the right tool
+  varies by stack. So no agent was added for this, and nothing is installed in your repository:
+  the plugin guarantees the one thing only it can, which is that the commits it writes are
+  consumable by whichever tool you choose. The README documents the usual routes per stack.
+
+---
+
 ## [0.54.1] — 2026-07-31
 
 Decision 4.79 (revised)
