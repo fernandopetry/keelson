@@ -18,6 +18,9 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   pacote, como o `README.md`). Escreva pelo efeito no consumidor — o *porquê* fica na
   decisão, a uma referência de distância. O `Status` do README traz só a manchete atual e
   aponta para o CHANGELOG; não volta a acumular prosa histórica.
+- **A leva de release passa pela wiki** (4.81): junto com a entrada do `CHANGELOG.md`,
+  aplique o gatilho de página própria da seção *Wiki*. Publicar é automático — o que a
+  leva revisa é o **conteúdo**, não o ato de subir.
 - **Charter é versionado à parte** (`guidelines/_meta/QUALITY-CHARTER.md`): só muda quando
   os artigos mudam; cada perfil referencia a versão no frontmatter `charter:`.
 - **Sessões paralelas colidem em §4.x e versão** (caso real: duas "4.60" no mesmo dia —
@@ -30,6 +33,8 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 - Comando novo/renomeado → sincronizar **3 lugares**: `commands/*.md` · tabela *Commands*
   do `README.md` · §3.x do `docs/_meta/method-guide.md`. Comando humano-only
   (`disable-model-invocation`) → também a nota do `templates/CLAUDE.keelson-block.md`.
+  Continuam **3** — a página da wiki é derivada do method-guide (4.81); não escreva a
+  quarta cópia.
 - Agent novo/renomeado → sincronizar: `agents/*.md` (arquivo + `name:` + `# Subagent:`) ·
   tabela §5 do `method-guide.md` · comentário de `agents/` no `README.md` · §2/§3 do
   `decisions.md` (convenção de nomes) — e a description declara **todos** os invocadores.
@@ -82,8 +87,18 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   **texto que já tem dono é espelhado, nunca reescrito** — página própria só para o que
   não existe em lugar nenhum. A wiki **não** é um 4º lugar a sincronizar: comando novo
   continua em `commands/*.md` + `README.md` + `method-guide.md`, e a página é derivada.
-- Publicação: `scripts/publish-wiki.sh` (bash 3.2; `--dry-run`, `--check`) e a Action
-  `.github/workflows/publish-wiki.yml` no push da `main`. Página nova → só criar o `.md`
+- **Espelho anda sozinho; página própria tem gatilho.** Mexeu em `method-guide`, Charter
+  ou convenção → a wiki acompanha no push, sem ação nenhuma. O que exige olhar é a página
+  própria, e o teste é um só: **o que o consumidor faz mudou?** — campo novo na ficha →
+  `Ficha-do-projeto.md` · comando ou gate com efeito no uso → `Primeiros-passos.md`,
+  `Conceitos.md`, `Perguntas-frequentes.md` · falha nova que dá para reconhecer →
+  `Solucao-de-problemas.md`. *Nada a mudar* é resposta válida; não olhar, não.
+- **Publicar não é passo de release.** A Action republica sozinha no push da `main` que
+  toca as fontes — não existe "subir a wiki" na leva. Action vermelha (ou pressa) →
+  `scripts/publish-wiki.sh` à mão; `--dry-run` mostra antes, `--check` sai 1 se a wiki
+  publicada está atrasada.
+- Publicação: `scripts/publish-wiki.sh` (bash 3.2) e a Action
+  `.github/workflows/publish-wiki.yml`. Página nova → só criar o `.md`
   em `docs/wiki/` e linkar no `_Sidebar.md`; espelho novo → uma linha em `MIRRORS`.
 - Wiki em **português** (é o idioma da doutrina); o `README.md` segue a face em inglês.
   Edição pela UI do GitHub é sobrescrita — o script só remove páginas que ele gerou
