@@ -169,6 +169,13 @@ A TASK revelou premissa errada do PLAN/SPEC, ou pede algo que o escopo não sust
   roda, antes de você começar — reportar, nunca contornar (`--no-verify`, filtro
   estreitado, skip — TESTING.md, "Verificação que falha não se contorna").
 
+**Pendência documentada não é licença para Done** (decisão 4.71): registrar um bloqueio
+em `notas` — com evidência caprichada, curl, print, tudo — não muda o status que ele
+impõe. AC não realizado, verificação que não rodou ou dependência que não respondeu →
+`status_proposto: Blocked` (ou `Failed`) com a pendência em `falhas`, **nunca** `Done`
+com a pendência narrada. `Done` afirma que tudo que a TASK exige foi feito e verificado;
+documentar bem um furo é obrigação, não substituto.
+
 ## Limites
 
 Além do que a abertura já veda (review próprio, closure): não atualiza INDEX.md nem TASK-MMM-INDEX.md, não modifica SPEC/PLAN/ficha/guidelines, não cria PR nem faz merge/deploy, e não decide entre alternativas técnicas não cobertas pelo PLAN.

@@ -17,6 +17,49 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.48.0] — 2026-07-31
+
+Decision 4.71
+
+### Added
+- **`quality.boot` config field** — how this project's app is brought up for local
+  exercise (`docker compose up -d`, a dev-server script…). `/keelson:init` detects it,
+  asks when unsure (`null` is a valid answer — a permanent environment — but a chosen
+  one, never a silent default) and self-checks that the declared command exists on
+  disk. With `boot` declared, QA may only report `app_fora_do_ar` after actually
+  attempting the boot and re-probing, with the attempt recorded as evidence; an absent
+  field on an older config is a config gap to fill, not a presumption.
+- **"Lessons registered" section in the delivery report** — a lesson persisted on a
+  wave branch is declared **pending merge** until it lands on main; reporting it as
+  "registered" without that state is the same false green the gates exist to prevent.
+
+### Changed
+- **Gate 9 waiver causes are a closed enum at acceptance time.** The main session now
+  rejects a QA `PARCIAL` report whose `causa_indisponibilidade` is not one of
+  `runtime_browser | credencial | app_fora_do_ar` (§8.1) — the waiver's grantor doesn't
+  get to grow the catalog. A novel value signals the real blocker has another route
+  (missing test data is created or escalated, never waived).
+- **The code-reviewer's report declares gate-1 falsifiability.** The four mechanical
+  anti-tautology checks from 4.68 are now a structured sub-field
+  (`falsificabilidade:`) of the AC-coverage gate, mirroring the gate-6 sub-item
+  pattern — applied and declared, not presumed.
+- **A documented pendency is no longer a license for `Done`.** The developer contract
+  states it explicitly: an unrealized AC, a verification that didn't run or a
+  dependency that didn't answer imposes `Blocked`/`Failed` with the pendency under
+  `falhas` — however well-narrated the blocker is, `Done` asserts everything the TASK
+  requires was done and verified.
+- **Init's self-check proves `sensitiveGlobs` coverage by real matching.** Secret-shaped
+  files that exist in the project (`.env*` at any level — root included —, `*.pem`,
+  `*.key`, project credential files) must each match some glob, proven mechanically
+  (same ruler as 4.51); measured failure: a config covering `b2b-adm-*/.env*` while the
+  root `.env` leaked. Uncovered candidate → add the exact-path glob.
+
+The sixth postmortem residue — a hook governing *how* secret files are read (a `grep`
+that echoes values where `cut -d= -f1` suffices) — is deferred to its own decision: it
+needs false-positive design that doesn't fit this batch.
+
+---
+
 ## [0.47.0] — 2026-07-30
 
 Decision 4.70

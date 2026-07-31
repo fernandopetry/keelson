@@ -69,7 +69,9 @@ data_revisao: <ISO 8601>
 gates:
   cobertura_acs:
     status: OK | FAIL
-    detalhe: <descrição>
+    detalhe:
+      acs: <AC → teste que o cobre; ausente = FAIL com motivo>
+      falsificabilidade: OK | FAIL: <check violado + arquivo:linha>   # os 4 checks mecânicos de "Asserções que provam" (régua do gate 1) — declarados aqui, aplicados, não presumidos
   testes_passando:
     status: OK | FAIL
     detalhe: "N/M tests passing"

@@ -35,7 +35,7 @@ Inspecione a raiz do projeto:
 
 1. **Backend — linguagem e versão.** Procure o manifesto: `composer.json` (`require.php` → PHP + versão), `package.json` (Node — `engines.node`), `go.mod`, `pyproject.toml`/`requirements.txt`, `Gemfile`, `*.csproj`, `Cargo.toml`… Extraia `lang` e a **versão exata** (versão é primeira classe: PHP 5.6 ≠ 8.5).
 2. **Frontend.** Há `package.json` com `vue`/`react`/`@angular/core`/`svelte`? Ou nenhum framework (front sem framework)? Ou não há frontend (API pura)?
-3. **Comandos de qualidade.** Leia os `scripts` de `package.json` e/ou `composer.json` e infira `test`, `lint`, `typecheck`, `build`. Confirme a existência dos binários quando possível.
+3. **Comandos de qualidade.** Leia os `scripts` de `package.json` e/ou `composer.json` e infira `test`, `lint`, `typecheck`, `build`. Infira também `boot` — o comando que **sobe a app** para exercício local (`docker-compose.yml`/`compose.yaml` → `docker compose up -d`; scripts `dev`/`serve`/`start`; `php -S`…); ambiente permanente (app já de pé fora do repo) ou nada a subir → `null`, dito por extenso no relatório. Confirme a existência dos binários quando possível.
 4. **Paths de código.** Heurística pelo layout (`src/`, `app/`, `lib/`, `apps/*`). Não invente — proponha o que existe.
 
 ## Etapa 2 — Perguntar só as lacunas
@@ -46,6 +46,7 @@ Para cada valor que **não** inferiu com confiança, pergunte com opções fecha
 - **Se o método é a skill embarcada** — *"Rodar o browser em headless (padrão, sem janela) ou com janela visível?"* → vira a flag `--headless` da Etapa 4.4. Headless é o default; janela visível só quando o humano quer acompanhar a verificação com os próprios olhos.
 - **Se há frontend** — *"Quantas áreas logadas (realms) a aplicação tem?"* — ex.: só a admin; ou admin **+** portal de usuários finais, com URL e usuário distintos. Cada realm vira uma entrada em `screenVerify.realms` do `keelson.local.json` (Etapa 4.5), com `description` dizendo do que se trata o acesso, `baseUrl`, rota de login e usuário de dev próprios.
 - *"Detectei o script `test` — usar `<comando>` como `quality.test`?"*
+- *"Como se sobe a app deste projeto para exercício local?"* → `quality.boot` (decisão 4.71). É o comando que o `qa` roda antes de declarar `app_fora_do_ar` — sem ele, "app fora do ar" vira waiver barato. `null` é resposta válida (ambiente permanente), mas **escolhida**, nunca default silencioso.
 - *"O código de backend fica em `<path>`?"*
 
 Não pergunte o que já sabe. Não faça perguntas de implementação que você mesmo pode resolver.
@@ -155,7 +156,9 @@ Com `method: skill:screen-verify`, garanta **também** a linha `.playwright-mcp/
 
 Prove que a ficha funciona:
 - `quality.test`/`quality.lint` declarados **existem/rodam** (execução rápida ou `--help`/dry-run);
+- `quality.boot` declarado → o que ele invoca **existe no disco** (binário no PATH, compose file, script) — não suba a app aqui, prove só que o comando não é fantasia; campo ausente numa ficha antiga → complete com a pergunta da Etapa 2 (Regra de merge);
 - os `codePaths` existem no disco;
+- `sensitiveGlobs` **cobre os arquivos de segredo que existem no projeto** (decisão 4.71): enumere os candidatos em disco (`.env*` em **qualquer** nível — raiz inclusive —, `*.pem`/`*.key`, arquivos de credencial do projeto) e prove **por matching real** que cada um casa com algum glob — mesma régua da 4.51: inferir da leitura dos globs não vale (caso medido: `b2b-adm-*/.env*` presente na ficha, `.env` da raiz descoberto). Candidato sem cobertura → acrescente o glob do caminho exato;
 - os guidelines do perfil ativo resolvem: cada `profile.<role>.file` da ficha aponta para um arquivo existente (regra de resolução da Etapa 3); perfil com `reviewed: false` no front-matter vira instrução de revisão no relatório; perfil cujo `charter:` no front-matter é **menor** que a versão atual do `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md` vira aviso de re-derivação/revisão no relatório;
 - se `screenVerify.enabled`: `keelson.local.example.json` existe e está **versionado** (sem senha real); `keelson.local.json` existe **e** está no `.gitignore` (confirme que **não** aparece em `git status`/`git ls-files`); campos ainda em placeholder (`<...>`) viram instrução de preenchimento no relatório (com o aviso dev-only); `artifactsDir` e `.playwright-mcp/` **provados** cobertos por `git check-ignore` (Etapa 5.5) — inferir da linha `thoughts/` não vale.
 - se `method: skill:screen-verify`: o **runtime de browser responde** — ferramentas `mcp__playwright__*` carregadas (deferred não aparecem até serem buscadas) e uma navegação de prova barata (`browser_navigate` para `about:blank`, ou a `baseUrl` do realm default quando a app está de pé). Falhou → **não** é `✓` silencioso nem `✗` genérico: o relatório nomeia a causa (servidor não configurado · pacote não baixado · binário do navegador ausente · Node < 18) **e o comando exato** que resolve.

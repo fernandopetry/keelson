@@ -122,7 +122,7 @@ You never edit the engine. You edit the **ficha**:
   "profile": { "backend": { "lang": "php", "version": "8.5" },
                "frontend": { "lang": "none", "version": null } },
   "codePaths": { "backend": ["src"], "frontend": [] },
-  "quality":   { "test": "composer test", "lint": "..." },
+  "quality":   { "test": "composer test", "lint": "...", "boot": "docker compose up -d" },
   "gates":     { "security": true, "screenVerify": false }
 }
 ```
@@ -351,25 +351,25 @@ keelson/
 
 ## Status
 
-`0.47.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.48.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **per-role model assignment — cheap generation, expensive
-judgment** (decision 4.70). Every agent now declares an explicit `model:`: high-volume
-execution (`developer`, `qa`, `agile-coach`) runs on `sonnet`, while judgment
-(`code-reviewer`, `security-engineer`, `po`, `pm`, `product-analyst`,
-`staff-engineer`) stays on `opus` — cheapening the generator is safe because the
-evaluators stay strong. See the full history in [CHANGELOG.md](CHANGELOG.md).
-Previously: **`/keelson:postmortem` — the end-of-session postmortem as a
-command** (decision 4.69 — the Diretor runs one command at session end; it re-reads
-every interaction, builds an honest facts table, traces mechanisms by root cause and
-dispatches process findings to the agile-coach), **assertions that can actually fail**
-(decision 4.68 — four mechanical anti-tautology checks as blocking gate-1 findings,
-creatable test data can't self-grant a handoff, QA saves and inspects the rendered
-artifact, and the runner's toolchain is a test double), and **UI actions must specify
-observable feedback at the SPEC level** (decision 4.67 — the three observable states,
-each becoming a verifiable AC).
+New in this release: **the waiver's grantor no longer gets to evaluate it** (decision
+4.71, closing the evaluator side of the first `/keelson:postmortem`'s findings). Gate 9
+acceptance now requires the unavailability cause to come from the closed §8.1 enum; the
+code-reviewer's report declares the four gate-1 falsifiability checks as a structured
+sub-field; the new `quality.boot` config field makes "app down" provable (QA must
+attempt the boot before claiming it); a well-documented pendency no longer licenses
+`Done`; and init's self-check proves `sensitiveGlobs` actually match the secret files
+that exist on disk. See the full history in [CHANGELOG.md](CHANGELOG.md).
+Previously: **per-role model assignment — cheap generation, expensive judgment**
+(decision 4.70 — high-volume execution on `sonnet`, judgment stays on `opus`),
+**`/keelson:postmortem` — the end-of-session postmortem as a command** (decision 4.69),
+and **assertions that can actually fail** (decision 4.68 — four mechanical
+anti-tautology checks as blocking gate-1 findings, creatable test data can't self-grant
+a handoff, QA saves and inspects the rendered artifact, and the runner's toolchain is a
+test double).
 Recent releases, in short: **Epics only where they group something** —
 `jira.epicPolicy: "multi-feature"` projects a single-feature SPEC without an Epic, the
 Story as the root of the tree (decision 4.61) — **phase verbs move the board** —

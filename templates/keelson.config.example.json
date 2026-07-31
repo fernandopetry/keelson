@@ -12,7 +12,8 @@
     "test": "composer test",
     "lint": "vendor/bin/php-cs-fixer fix --dry-run --diff",
     "typecheck": null,
-    "build": null
+    "build": null,
+    "boot": null
   },
   "gates": {
     "security": true,

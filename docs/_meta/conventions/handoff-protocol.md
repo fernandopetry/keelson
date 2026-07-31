@@ -17,7 +17,7 @@ Quando o ciclo roda num ambiente **sem acesso a testes de tela** — worktree se
 |---|---|---|
 | Ferramentas `mcp__playwright__*` carregadas e respondendo (deferred: carregue antes de concluir) | **runtime de browser ausente** | o comando que resolve — `claude mcp add playwright -s user npx -- @playwright/mcp@latest --headless --isolated` e/ou `npx playwright install chromium` (Linux: `--with-deps`); Node < 18 é sub-causa e se diz por extenso |
 | `keelson.local.json` existe e tem o realm alvo preenchido (sem placeholder) | **credencial ausente** | qual realm, qual campo — e que o caminho é `/keelson:init` ou preencher o arquivo; **nunca** chutar credencial |
-| `baseUrl` do realm responde (ex.: `curl -sI`), ou a app sobe pelo método do projeto | **app fora do ar** | o que foi tentado e o retorno (código HTTP, erro de conexão) |
+| `baseUrl` do realm responde (ex.: `curl -sI`), ou a app sobe pelo método do projeto | **app fora do ar** | o que foi tentado e o retorno (código HTTP, erro de conexão) — com `quality.boot` declarado na ficha, a tentativa de boot (comando, saída, re-sondagem) é parte obrigatória do registro (decisão 4.71) |
 
 Uma causa não encobre a outra: app no ar com runtime ausente é `runtime de browser ausente`, não "ambiente sem tela". E **runtime ausente não vira fallback silencioso** para outro browser — o método é único por decisão de projeto (4.49); trocar de motor por conta própria produz evidência que ninguém consegue reproduzir.
 
@@ -54,7 +54,7 @@ sonda: <evidência da sondagem que falhou, por realm — o que foi tentado, o qu
 - API exercitada sem tela: <chamadas feitas e resultados, ou "nenhuma">
 
 ## 3. Pré-requisitos de ambiente
-- Subir app + login: <como subir a app deste projeto e autenticar; pegadinhas de permissão>
+- Subir app + login: <como subir a app deste projeto (`quality.boot` da ficha, quando declarado) e autenticar; pegadinhas de permissão>
 - Migrações/seeds pendentes DESTA branch: <lista com comandos, ou "nenhuma">
 - Feature flags / permissões necessárias: <lista, ou "nenhuma">
 - Dados de teste: <como obter/criar o estado necessário>
