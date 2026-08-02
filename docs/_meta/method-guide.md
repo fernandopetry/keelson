@@ -395,7 +395,7 @@ Os agents formam o **time** do keelson (modelo de time e contrato Diretor–PO �
 
 Os validators (`spec-validator`, `plan-validator`, `task-validator`) e o `code-scout` ficam **fora do elenco de propósito**: são ferramentas do time, não papéis (decisões 4.37/4.73).
 
-**Modo sob demanda** (decisão 4.75): em sessão livre, mudança pontual de código não entra no ciclo — mas tampouco é feita pela main session. O Tech Lead destila um briefing curto, delega ao `developer`, revisa com `code-reviewer` (régua avulsa da 4.36) e aciona `security-engineer`/`qa` pelos gatilhos usuais (mudança sensível · comportamento observável). Invocar um agent **não puxa o ciclo** — cada um devolve sua tarefa e para; commit é a pedido do Diretor. Só o trivial não-comportamental (typo de comentário/doc) pode ser inline, declarado.
+**Modo sob demanda** (decisão 4.75): em sessão livre, mudança pontual de código não entra no ciclo — mas tampouco é feita pela main session. O Tech Lead destila um briefing curto, delega ao `developer`, revisa com `code-reviewer` (régua avulsa da 4.36) e aciona `security-engineer`/`qa` pelos gatilhos usuais (mudança sensível · comportamento observável). Invocar um agent **não puxa o ciclo** — cada um devolve sua tarefa e para; commit é a pedido do Diretor. Só o trivial não-comportamental (typo de comentário/doc) pode ser inline, declarado. Conflito entre este contrato e a política da sessão/harness (restrição de subagents, permissões, modo) **escala ao Diretor com proposta + default** — nunca se resolve em silêncio (4.85).
 
 ---
 

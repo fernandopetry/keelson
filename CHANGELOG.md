@@ -17,6 +17,30 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.60.0] — 2026-08-02
+
+Decision 4.85
+
+### Changed
+- **Contract conflicts now escalate instead of being silently arbitrated.** Field
+  postmortem from the first real free-form session on a consumer: a harness directive
+  restricting subagents clashed with the on-demand delegation contract (4.75) and the
+  session resolved it silently in the harness's favor — the human who configures both
+  sides never learned there was a conflict. The consumer block now requires declaring
+  **who writes the code** in the first turn, and any session/harness policy conflicting
+  with the contract escalates to the human with a proposal and a default — the PO's
+  escalation-by-exception rule (4.37), now applied to the Tech Lead itself.
+- **The closing report declares the gate that did NOT run.** The block's closing rule
+  was one-way ("gates run, and by whom"), so a report could read "Gates ✅ · the commit
+  is yours" while review and security had not run yet — emitted before Stop hooks could
+  block the turn. The closing rule is now symmetric and aligned with `/keelson:report`:
+  every applicable gate carries a declared state — run (and by whom) · n/a (reason) ·
+  **"not run — reason", never omitted** — and a close with a pending gate declares
+  itself partial and does not invite a commit.
+- Re-run `/keelson:init` on consumers (the managed block changed; merge-preserving).
+
+---
+
 ## [0.59.0] — 2026-08-02
 
 Decision 4.84

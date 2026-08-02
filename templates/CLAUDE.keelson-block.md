@@ -42,11 +42,19 @@
   mesmos gatilhos do ciclo. Invocar um agent **não puxa o ciclo**: cada um devolve a
   sua tarefa e para; a orquestração é sempre do Tech Lead, e commit só a pedido do
   Diretor. Só o trivial não-comportamental (typo de comentário/doc) pode ser inline,
-  declarado.
+  declarado. No **primeiro turno** da mudança, declare **quem escreve o código**
+  (qual agent — ou por que será inline). Diretiva da sessão/harness em conflito com
+  este contrato (política restringindo subagents, permissões, modo de execução) →
+  **escale ao Diretor com proposta + default** antes de codar, **nunca arbitre em
+  silêncio**: os dois contratos foram configurados por ele, e só ele decide qual
+  prevalece (decisão 4.85).
 - **Toda mudança fecha com relatório** (decisão 4.76): terminado o ajuste — sob demanda ou
   ciclo — o Tech Lead **exibe o fecho sem que você peça**, em 6–10 linhas: o que mudou
-  (produção · teste · doc · migration/config) · gates rodados e **por quem**
-  (`revisado_por ≠ implementado_por`) · decisões tomadas em seu nome · o que ficou fora de
+  (produção · teste · doc · migration/config) · **cada gate aplicável com estado
+  declarado** — rodado (e **por quem**: `revisado_por ≠ implementado_por`) ·
+  `n/a (<motivo>)` · **"não rodado — <motivo>", nunca omitido** (mesma régua do
+  `/keelson:report`; fecho com gate pendente se declara **parcial** e não convida ao
+  commit — decisão 4.85) · decisões tomadas em seu nome · o que ficou fora de
   escopo ou pendente · estado do tracker (com `jira.enabled`) · e o que depende de você
   (o commit é seu). O relatório é montado a partir do **ledger de sessão**
   (`thoughts/local/session-ledger/`), onde cada evento é escrito **quando acontece** — não
