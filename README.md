@@ -405,74 +405,20 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.58.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.59.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **a user wiki whose source is this repository** (decision 4.81). The
-[wiki](https://github.com/fernandopetry/keelson/wiki) answers what the README and the method
-guide never did — *I installed it, now what?* — with install, first steps, concepts, the ficha,
-troubleshooting and an FAQ, in Portuguese. It is a **generated artifact**: pages live in
-`docs/wiki/`, the files that already own their text are mirrored rather than rewritten, and a
-push to `main` republishes. A wiki nobody can review is the failure mode this plugin exists to
-fix, so its content goes through a Pull Request like any other file.
-Previously: **commits that feed release automation** (decisions 4.79 and 4.80). The
-commit message finally has an owner: a closed list of eleven types, the test for picking one,
-and **breaking changes declared rather than inferred** — because with a tool deriving versions
-from history, `feat` means minor, `fix` means patch, and an invented type makes the change
-vanish from the release notes. `/keelson:init` detects the automation your project already uses
-and records it, respecting a house convention where it finds one. Keelson **feeds** that
-automation and does not operate it: publishing a release is your act, like a PR or a deploy.
-And with `jira.enabled`, every commit carries its tracker keys right after `type(scope):`, so
-`git log` says which demand each commit belongs to. **Re-run `/keelson:init`** on consumers for
-the new ficha block.
-See the full history in [CHANGELOG.md](CHANGELOG.md).
-Before that: **the QA card speaks BDD, and tells the tester how to get there**
-(decisions 4.77 and 4.78 — literal skeletons, the criterion's verbatim Given-When-Then paired
-with a `How to reproduce` line of concrete values, and a form check before the issue is sent),
-**every change closes with a report, and a broken tracker says so**
-(decision 4.76 — a session ledger written as events happen, `/keelson:report` to rebuild it,
-and a reconnection section when the Jira connector drops mid-run),
-**on-demand mode — the team serves free-form sessions without
-the full cycle** (decision 4.75 — the main session delegates to the `developer`, the diff
-goes through the `code-reviewer`, and `security-engineer`/`qa` fire on the usual triggers,
-with no SPEC/PLAN/TASK and no auto-commit; broad sweeps route to `code-scout`),
-**merge dry-run before integrating wave worktrees** (decision 4.74, teams
-mode — one conflicted dry-run means nothing gets integrated), **`code-scout` —
-anchored-conclusion codebase reconnaissance** (decision 4.73 — the Tech Lead delegates
-broad sweeps and gets back `file:line`-anchored conclusions, never file dumps), and
-**the waiver's grantor no longer gets to evaluate it** (decision 4.71 — closed gate-9
-cause enum, structured falsifiability sub-field, `quality.boot`, pendency is not
-`Done`, proven `sensitiveGlobs`).
-Recent releases, in short: **Epics only where they group something** —
-`jira.epicPolicy: "multi-feature"` projects a single-feature SPEC without an Epic, the
-Story as the root of the tree (decision 4.61) — **phase verbs move the board** —
-`/keelson:jira-sync <target> --phase start-dev|finish-dev` as the human's imperative act,
-with per-level targets and a multi-hop board rail (decision 4.60) —
-**Jira cards written for humans** — one leveled description
-recipe per issue role, marker-gated re-render, `--refresh-descriptions` backfill
-(decision 4.59) — **"verified, not deduced" task generation** plus a
-task-validator check for orphan scope items (decision 4.58), **`/keelson:update`** for
-one-step plugin updates (4.57), a **measured session clock** in the delivery report
-(4.56), the **per-SPEC sync scope** (4.55), **maintainer-facing plugin proposals**
-(4.54) — **screen verification on Playwright MCP** (decisions 4.49/4.51)
-— one engine, headless by default, artifacts under `thoughts/screen-verify/<slug>/`, and a
-server that *answers* is no longer taken for one that is *configured* —
-the **PHP docblock rule** (decision 4.50, see
-[Comments in generated code](#comments-in-generated-code)), and a
-**[CHANGELOG](CHANGELOG.md)** (decision 4.48), backfilled to `0.1.0`, so a version
-bump is incomplete without its entry and this section keeps only the headline. Before
-that, **`jira-guard`** and the Jira reliability batch (decisions
-4.43–4.47) — feasibility resolved before anything is created, a Story mirroring a
-FEAT-less SPEC so QA keeps a flow-level card, required-field and duplicate pre-checks, a
-backfill warning, proven connector unavailability with a durable trace in the slug INDEX,
-and a Stop hook that blocks the turn when a branch carries SDD artifacts without a Jira
-key. Earlier, the **team model** (decisions 4.37–4.42): the human becomes the Director
-issuing a durable BRIEF, a `po` agent owns each demand, a `pm` agent decomposes epics via
-`/keelson:specify-epic`, lateral signals get named routes, and the agents carry real-life
-role ids (`developer`, `code-reviewer`, `qa`, `security-engineer`, `product-analyst`,
-`agile-coach`, `staff-engineer`) — **re-run `/keelson:init`** to refresh the consumer
-block. Full history in the [changelog](CHANGELOG.md); the reasoning behind each change in
+New in this release: **an inert diff waives the test suite** (decision 4.84). The suite
+exists to prove code: when no file in the diff can change the behavior it proves —
+docs-only, SDD artifacts, static assets — every execution point (developer baseline and
+final run, review gate 2, end of wave, DoD check, `/keelson:integrate`) waives the run.
+The check is mechanically anchored (`git diff --name-only` against the ficha's
+`codePaths` and the test trees), anything the runtime or runner loads still counts as
+code, and the waiver is always a declared state, never silence. When in doubt, the
+suite runs.
+
+Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
 
 ## Author & license

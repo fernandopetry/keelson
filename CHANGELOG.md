@@ -17,6 +17,24 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.59.0] — 2026-08-02
+
+Decision 4.84
+
+### Added
+- **Inert diff waives the test suite.** The suite exists to prove code: when no file in
+  the diff can change the behavior it proves — docs-only, SDD artifacts, static assets —
+  the run is waived at every execution point (developer baseline and final run, gate 2,
+  end of wave, DoD check, `/keelson:integrate`). The rule has a single owner
+  (`guidelines/core/TESTING.md`, "Diff inerte") and three guard-rails: the check is
+  mechanical and anchored (`git diff --name-only <base>...HEAD` against the project's
+  `codePaths` and test trees, never an impression); anything the runtime or runner loads
+  (source, tests, fixtures, dependency manifests, runtime config, build scripts) still
+  counts as code — when in doubt, run; and the waiver is always a declared state in the
+  report, never silence.
+
+---
+
 ## [0.58.0] — 2026-08-02
 
 Decision 4.83

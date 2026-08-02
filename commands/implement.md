@@ -201,7 +201,7 @@ Falha: reportar específico, 1 retry, escalar.
 ### 3.6 Final da wave
 
 1. Todas as tasks Done com closure.
-2. Rodar a suíte **relevante ao escopo da wave** no working tree principal — ampla o bastante para pegar regressão cross-task (não só os `--filter` de cada task), mas **não** a suíte completa a cada wave. A completa roda 1× na Etapa 4 (verificação forte e única).
+2. Rodar a suíte **relevante ao escopo da wave** no working tree principal — ampla o bastante para pegar regressão cross-task (não só os `--filter` de cada task), mas **não** a suíte completa a cada wave. A completa roda 1× na Etapa 4 (verificação forte e única). **Dispensa por diff inerte**: se o diff da wave não toca código que a suíte exercita (só docs/artefatos SDD — régua e âncora mecânica em `core/TESTING.md`, "Diff inerte"), a rodada é dispensada e **declarada no boletim**, nunca omitida.
 3. Regressão: parar e reportar.
 4. Atualizar `waves_concluidas` no `thoughts/local/run-state-<slug>.md` (o `status` continua `em_andamento` até a Entrega).
 5. **Boletim de wave (ao Diretor)**: 3–6 linhas em linguagem de time (Developer, Code Reviewer, QA, Security, PO), cobrindo o que fechou, sinais laterais tratados e decisões tomadas, fechando com o estado de pendência do Diretor (ex.: *"nada pendente de você"*). O boletim é **narração na mesma mensagem em que a próxima wave inicia** — nunca uma parada nem fim de turno (4.23/4.24; o `wave-guard` reforça).
@@ -210,7 +210,7 @@ Falha: reportar específico, 1 retry, escalar.
 ## Etapa 4: validação final contra DoD do PLAN
 
 1. Ler checklist "Definition of Done" do PLAN.
-2. **Rodar a suíte completa 1×** (o comando `quality.test` da ficha; quando houver frontend, também `quality.lint` + `quality.typecheck`). Regressão → parar e reportar.
+2. **Rodar a suíte completa 1×** (o comando `quality.test` da ficha; quando houver frontend, também `quality.lint` + `quality.typecheck`). Regressão → parar e reportar. **Dispensa por diff inerte**: branch inteira sem código que a suíte exercita (`git diff --name-only <base>...HEAD` confrontado com os `codePaths` — régua em `core/TESTING.md`, "Diff inerte") → dispensar e declarar no report da Entrega.
 3. Validar cada item da DoD.
 4. Validar aderência global à ficha e ao perfil de linguagem ativo.
 5. **Remover o memo de exploração** (`thoughts/local/exploration-<slug>.md`), se existir — a closure do PLAN encerra o ciclo de exploração.

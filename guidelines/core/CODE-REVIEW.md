@@ -51,6 +51,11 @@ com confiança** por grep/imports, o filtro ampliado é insuficiente — rode a 
 completa**: é o único caso em que ela entra neste gate. Você é o dono da rodada escopada:
 **registre o comando/filtro executado**, porque o `qa` decide por ele se precisa re-rodar.
 
+**Dispensa por diff inerte**: quando nenhum arquivo do diff é código que a suíte exercita
+(régua e âncora mecânica em `./TESTING.md`, "Diff inerte"), o gate não roda testes —
+aprova **declarando** `gate 2: dispensado — diff inerte`, nunca em silêncio. Na dúvida
+(manifesto, config de runtime, fixture), o diff não é inerte: rode.
+
 Vermelho **pré-existente declarado no baseline** (e sancionado pelo Tech Lead) não
 reprova por si — reprova qualquer vermelho **novo** ou teste novo vermelho. Vermelho
 pré-existente que você descobre **sem declaração no report** → **REPROVADO por omissão**:

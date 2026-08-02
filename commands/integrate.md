@@ -37,7 +37,7 @@ Você é um Release Engineer especialista em integração assistida por IA. Sua 
 
 ## Etapa 2: suíte completa
 
-1. Rodar a suíte completa pelos comandos de qualidade da ficha: `quality.test`; quando houver frontend, também `quality.lint` + `quality.typecheck` — se o comportamento de UI só se prova em tela e `gates.screenVerify` está ativo, ele é coberto pela verificação de tela (handoff), não por suíte automatizada.
+1. Rodar a suíte completa pelos comandos de qualidade da ficha: `quality.test`; quando houver frontend, também `quality.lint` + `quality.typecheck` — se o comportamento de UI só se prova em tela e `gates.screenVerify` está ativo, ele é coberto pela verificação de tela (handoff), não por suíte automatizada. **Dispensa por diff inerte**: branch cujo diff contra a base não toca código que a suíte exercita (régua e âncora mecânica em `guidelines/core/TESTING.md`, "Diff inerte") dispensa a suíte — a seção Testes do output declara `dispensada: diff sem código` em vez de N/N.
 2. Regressão ou teste vermelho → **parar**, reportar a task/área provável, não abrir PR.
 3. Rodar lint/auditoria de dependências disponível (conforme o perfil de linguagem ativo) e reportar.
 

@@ -124,6 +124,27 @@ suíte relevante **uma vez** ao final. Não prove a mesma coisa em várias ferra
 
 ---
 
+## Diff inerte: a suíte prova código
+
+A suíte existe para provar **código em execução**. Quando **nenhum** arquivo do diff pode
+alterar o comportamento que ela prova — só documentação, artefatos SDD (`{docsRoot}`),
+asset estático sem passo de build — rodá-la não prova nada de novo: a rodada é
+**dispensada** (rigor proporcional — `./WORKFLOW.md`).
+
+O teste é mecânico e **ancorado**, nunca impressão: `git diff --name-only <base>...HEAD`
+confrontado com os `codePaths` da ficha e as árvores de teste do projeto. Conta como
+código — e obriga a rodada — todo arquivo que o runtime ou o runner carregam: fonte,
+teste, fixture, manifesto/lockfile de dependência, configuração de runtime, script de
+build, template executável. **Na dúvida, rode** — a dispensa é exceção que se prova, não
+default.
+
+A dispensa obedece à régua de declaração desta doutrina (abaixo): o report registra
+`não rodei: diff sem código que a suíte exercita` e a lista dos arquivos do diff. Vale
+igualmente para o **baseline**: task cujo escopo só toca arquivos inertes dispensa
+baseline e rodada final com a mesma declaração — a omissão continua proibida.
+
+---
+
 ## Verificação que falha não se contorna
 
 Uma verificação que falha — ou que **não consegue rodar** — tem exatamente **duas

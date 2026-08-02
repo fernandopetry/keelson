@@ -51,6 +51,12 @@ corrigidos. Todo o resto do fluxo (perfil, testes, lint, report) vale igual.
 resultado — esse é o seu **baseline** (`${CLAUDE_PLUGIN_ROOT}/guidelines/core/TESTING.md`,
 "Verificação que falha não se contorna").
 
+**Escopo inerte**: quando nenhum arquivo do "Escopo > Inclui" é código que a suíte
+exercita — só docs, artefatos SDD, asset estático (régua e âncora mecânica em
+`TESTING.md`, "Diff inerte") — baseline e rodada da etapa 6 são dispensados, com a
+declaração no report (`verificacao.baseline: "não rodei: escopo sem código que a suíte
+exercita"`). Manifesto, fixture ou config de runtime **não** são inertes; na dúvida, rode.
+
 - **Baseline verde** → siga; a rodada final da etapa 6 compara contra ele.
 - **Baseline vermelho ou verificação que não roda** (erro pré-existente, ambiente
   quebrado) → **pare aqui**, sem implementar: `status_proposto: Blocked`,
@@ -105,6 +111,8 @@ quantificado ("todos os X"). Teste que não é capaz de falhar reprova no gate 1
 1. Executar a suíte via `quality.test` da ficha (mínimo: testes novos verdes) e comparar
    **contra o baseline da etapa 2**: nenhum vermelho novo. Vermelho que não estava no
    baseline é seu — corrija ou reporte; nunca estreite o filtro para escondê-lo.
+   (Dispensa por escopo inerte declarada na etapa 2 vale aqui também — confira que o
+   diff **real** continuou inerte antes de mantê-la.)
 2. Executar lint/formatter via `quality.lint` da ficha.
 3. Capturar: comando literal, passa/total, cobertura, warnings.
 
