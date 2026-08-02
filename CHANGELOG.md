@@ -17,6 +17,31 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.58.0] — 2026-08-02
+
+Decision 4.83
+
+### Added
+- **The mechanical part of the plugin now proves itself.** The repo's `pre-commit` hook
+  gains a quality guard: `bash -n` on every staged script, the graph regression suite
+  when `scripts/graph.sh` or its fixtures change, and release checks when
+  `.claude-plugin/`, `CHANGELOG.md`, `README.md` or `publish-wiki.sh` change — commits
+  that touch none of it pay nothing (`KEELSON_SKIP_TESTS=1` is the conscious escape).
+- **`scripts/check-release.sh`**: the release rules that were doctrine-only become a
+  machine — version synchronized across the three places, current version present in
+  the CHANGELOG (rule 4.48), no phantom wiki mirrors, `bash -n` across all scripts.
+  All violations listed at once; `--root` makes it testable against synthetic trees.
+- **CI (`.github/workflows/test.yml`)**: every push/PR runs the graph suite and the
+  release checks on `ubuntu-latest` — the safety net for whatever slips past the local
+  hook, and the Linux portability proof a macOS workstation cannot give.
+
+### Fixed
+- The `pre-commit` main-top guard (4.63) was restructured as a function: its
+  "not applicable" early exits (detached HEAD, non-main branch, no remote) no longer
+  skip the quality guard that now follows it.
+
+---
+
 ## [0.57.0] — 2026-08-02
 
 Decision 4.82

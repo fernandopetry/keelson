@@ -1,0 +1,28 @@
+name: Test
+
+# Guarda mecânica do repositório (decisão 4.83): a suíte de regressão do grafo e os
+# checks de release rodam em todo push/PR — em Linux, o que também prova a
+# portabilidade (bash 3.2 + awk POSIX) que a máquina local macOS não prova.
+# O pre-commit local (scripts/git-hooks/pre-commit) roda o mesmo conjunto antes do
+# commit; este workflow é a rede de segurança para o que escapar dele.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Suíte do grafo (scripts/tests/graph/run.sh)
+        run: bash scripts/tests/graph/run.sh
+
+      - name: Checks de release (versões · CHANGELOG · MIRRORS · bash -n)
+        run: bash scripts/check-release.sh

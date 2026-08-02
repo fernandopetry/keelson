@@ -392,7 +392,7 @@ keelson/
 │   ├── backend/       # php.md (8.5 exemplar) · php-{5.6,7.0,7.4,8.0}.md (legacy ladder) · none.md · _review/ (human-review backlogs)
 │   └── frontend/      # none.md (others generated on install)
 ├── templates/         # keelson.config.example.json · keelson.local.example.json · CLAUDE block
-├── scripts/           # update.sh · publish-wiki.sh · graph.sh (SDD graph facts, decision 4.82) · tests/graph/ (its regression suite) · git-hooks/
+├── scripts/           # update.sh · publish-wiki.sh · graph.sh (SDD graph facts, 4.82) · check-release.sh · tests/graph/ (regression suite) · git-hooks/ (main guard + quality guard, 4.83)
 ├── docs/_meta/        # method guide · conventions/ (runtime contracts: SDD, INDEX, handoff, teams, commits, graph) · decisions · learning log
 └── docs/wiki/         # source of the user wiki (generated output: scripts/publish-wiki.sh)
 ```
@@ -405,7 +405,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.57.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.58.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 

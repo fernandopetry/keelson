@@ -11,7 +11,8 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   seção *Status* do `README.md`.
 - Regra (0.x): capacidade nova ou quebra (comando novo, rename, doutrina nova) → **minor**;
   correção/ajuste fino → **patch**. Bump uma vez por leva de release, não por commit.
-- **Bump sem entrada no `CHANGELOG.md` é release incompleto** (decisão 4.48): a mesma leva
+- **Bump sem entrada no `CHANGELOG.md` é release incompleto** (decisão 4.48 — provado
+  mecanicamente por `scripts/check-release.sh` no pre-commit e no CI, 4.83): a mesma leva
   que mexe nos 3 lugares escreve a entrada. Formato: `## [X.Y.Z] — AAAA-MM-DD`, linha de
   âncora (`Decisão 4.x · <hash do commit de bump>`; `Charter A.B.C` quando ele mudou) e
   bullets sob `Added` / `Changed` / `Fixed` / `Removed`, em **inglês** (é a face pública do
@@ -25,8 +26,11 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   os artigos mudam; cada perfil referencia a versão no frontmatter `charter:`.
 - **Sessões paralelas colidem em §4.x e versão** (caso real: duas "4.60" no mesmo dia —
   decisão 4.63): antes de numerar decisão ou bumpar, `git fetch` e confira o topo da main.
-  O hook `scripts/git-hooks/pre-commit` bloqueia commit na `main` atrás do `origin/main` —
-  ative uma vez por clone: `git config core.hooksPath scripts/git-hooks`.
+  O hook `scripts/git-hooks/pre-commit` bloqueia commit na `main` atrás do `origin/main`
+  **e roda a guarda de qualidade** (4.83: `bash -n` nos scripts staged; suíte do grafo
+  quando o motor muda; `check-release.sh` quando versão/CHANGELOG/wiki mudam) — ative
+  uma vez por clone: `git config core.hooksPath scripts/git-hooks`. O CI (`test.yml`)
+  repete o conjunto em Linux a cada push/PR.
 
 ## Ao mudar comando ou doutrina
 
@@ -115,10 +119,11 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   `[legacy]`/`[parse]`, contrato de invocação/saída — tem dono único em
   `docs/_meta/conventions/graph-contract.md`. Validators **citam a saída como fato**
   e não re-derivam estrutura; a calibração continua deles.
-- **Mexeu no parser ou no catálogo → rode `scripts/tests/graph/run.sh`** (21 casos;
-  fixtures sintéticas com defeitos plantados + saídas esperadas congeladas). Check
-  novo não entra no catálogo sem fixture; mudança de severidade é decisão explícita
-  (§4.x), nunca efeito colateral do script.
+- **Mexeu no parser ou no catálogo → a suíte roda sozinha** no pre-commit e no CI
+  (4.83); durante o desenvolvimento, itere com `scripts/tests/graph/run.sh` (fixtures
+  sintéticas com defeitos plantados + saídas esperadas congeladas). Check novo não
+  entra no catálogo sem fixture; mudança de severidade é decisão explícita (§4.x),
+  nunca efeito colateral do script.
 - Falso-positivo num artefato legítimo é o pior defeito desta camada: na dúvida, o
   extrator degrada com `WARNING nao-parseavel` (e os checks de ausência degradam
   junto) — nunca inventa ERROR.
