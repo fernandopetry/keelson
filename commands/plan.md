@@ -128,7 +128,11 @@ Antes de gerar o PLAN: **stack proposto autorizado** pela ficha e pelo perfil de
 **Responsabilidade**: ...
 **Realiza**: FR-NNN-XXX
 **Interface pública**: ...
-**Dependências**: ...
+**Dependências**: COMP-MMM-YYY, COMP-MMM-ZZZ <!-- lista de IDs ou `nenhuma` -->
+<!-- Campo de aresta do grafo (graph-contract.md §1): só IDs de COMP do slug (PLAN
+anterior vale); dependência externa (lib, serviço) vai para a §2 ou para a prosa do
+componente, nunca para este campo. -->
+
 
 ## 4. Fluxos principais
 

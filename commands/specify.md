@@ -133,7 +133,10 @@ derivam da FEAT do FR que cobrem. Forma:
 - **NFR-NNN-001** [MUST] ...
 
 ## 7. Critérios de aceitação (Given-When-Then)
-- **AC-NNN-001** (cobre FR-NNN-001)
+- **AC-NNN-001** (cobre FR-NNN-001, FR-NNN-002)
+<!-- O "(cobre …)" é campo de aresta do grafo: IDs completos de FR/NFR separados por
+vírgula — sem barra-abreviação (FR-x/y) nem sub-item (FR-x-001a). Régua:
+${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md §1. -->
 
 ## 8. Premissas e decisões prévias
 - **A-NNN-001** [assumido] ...

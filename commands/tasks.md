@@ -86,7 +86,8 @@ Um arquivo por task: `{docsRoot}/<slug>/tasks/TASK-MMM-XXX-<titulo-kebab>.md`.
 
 **Slug**: <slug>
 **Pertence a**: PLAN-MMM
-**Realiza (FRs)**: FR-NNN-XXX, FR-NNN-YYY <!-- Tipo=bugfix → inclua também o AC violado (FR-NNN-XXX / AC-n) -->
+**Realiza (FRs)**: FR-NNN-XXX, FR-NNN-YYY <!-- lista de IDs ou `nenhuma` (chore sem FR) -->
+**AC violado**: AC-NNN-XXX <!-- só Tipo=bugfix: o AC que o bug viola; omitir a linha nos demais tipos -->
 **Funcionalidade**: FEAT-NNN-XXX (primária)[, FEAT-NNN-YYY]
 **Componente**: COMP-MMM-XXX
 **Wave**: <número>
@@ -102,8 +103,8 @@ Um arquivo por task: `{docsRoot}/<slug>/tasks/TASK-MMM-XXX-<titulo-kebab>.md`.
 
 ## Dependências
 
-- **Depende de**: TASK-MMM-AAA (vazio se nenhuma)
-- **Bloqueia**: TASK-MMM-CCC (preencher após gerar todas)
+- **Depende de**: TASK-MMM-AAA, TASK-MMM-BBB <!-- lista de IDs ou `nenhuma` -->
+- **Bloqueia**: TASK-MMM-CCC <!-- lista de IDs ou `nenhuma`; preencher após gerar todas -->
 
 ## Contexto
 
@@ -171,6 +172,15 @@ mais fraca).>
 
 **Notas**: 
 ```
+
+### Campos de aresta — sintaxe canônica do grafo
+
+`Realiza (FRs)`, `AC violado`, `Depende de` e `Bloqueia` são **campos de aresta**:
+lista de IDs separados por vírgula, ou `nenhuma` — prosa vai para Contexto/Escopo. Os
+ACs citados em item `- [ ]` dos "Critérios de pronto" e no "Roteiro do gate 9" também
+viram aresta (cobertura); menção a AC em prosa corrida não conta como cobertura. A
+régua completa (sintaxe, catálogo, extrator) tem dono único:
+`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md`.
 
 ### Campo `Funcionalidade` — derivado dos FRs, nunca inventado
 
@@ -253,7 +263,13 @@ Criar/atualizar `{docsRoot}/<slug>/tasks/TASK-MMM-INDEX.md`:
 
 ## Etapa 5: gate de validação
 
-Após gerar todas as TASKs e o TASK-MMM-INDEX, invocar a skill `task-validator` em modo batch (apontando para o TASK-MMM-INDEX).
+Após gerar todas as TASKs e o TASK-MMM-INDEX, **conferir o grafo mecanicamente**:
+`${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh {docsRoot}/<slug> --check --stage=tasks --plan MMM`
+(contrato: `graph-contract.md`). Ciclo, wave incoerente ou referência quebrada aqui é
+defeito de geração — corrija as TASKs antes do gate, não deixe para o validator.
+Script indisponível/falhou → siga ao gate declarando a degradação.
+
+Em seguida, invocar a skill `task-validator` em modo batch (apontando para o TASK-MMM-INDEX).
 
 **Se errors == 0**: prosseguir.
 **Se errors > 0**: reportar errors específicos por TASK. INDEX do slug ainda é atualizado, mas Status das tasks com error fica `Blocked`.
