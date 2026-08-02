@@ -1,0 +1,2 @@
+ERROR	ciclo-comp	COMP-001-001 -> COMP-001-002 -> COMP-001-001
+WARNING	comp-sem-fr	COMP-001-002 sem linha no Mapeamento FR -> componente (§7)

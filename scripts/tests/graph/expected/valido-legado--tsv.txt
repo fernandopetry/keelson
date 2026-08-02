@@ -1,0 +1,22 @@
+edge	ac-covers	AC-001-001	FR-001-001	specs/SPEC-001-legado.md:13
+edge	belongs-to	TASK-001-001	PLAN-001	tasks/TASK-001-001-logger.md:4
+edge	belongs-to	TASK-001-002	PLAN-001	tasks/TASK-001-002-crlf.md:4
+edge	comp-realiza	COMP-001-001	FR-001-001	plans/PLAN-001-legado.md:20
+edge	covers-ac	TASK-001-001	AC-001-001	tasks/TASK-001-001-logger.md:22
+edge	covers-ac	TASK-001-002	AC-001-001	tasks/TASK-001-002-crlf.md:19
+edge	implements	TASK-001-001	COMP-001-001	tasks/TASK-001-001-logger.md:6
+edge	implements	TASK-001-002	COMP-001-001	tasks/TASK-001-002-crlf.md:6
+edge	maps	FR-001-001	COMP-001-001	plans/PLAN-001-legado.md:28
+edge	maps-ac	FR-001-001	AC-001-001	plans/PLAN-001-legado.md:28
+edge	plan-covers	PLAN-001	FR-001-001	plans/PLAN-001-legado.md:14
+edge	realiza	TASK-001-001	FR-001-001	tasks/TASK-001-001-logger.md:5
+edge	realiza	TASK-001-002	FR-001-001	tasks/TASK-001-002-crlf.md:5
+edge	spec-ref	PLAN-001	SPEC-001	plans/PLAN-001-legado.md:11
+node	AC	AC-001-001	specs/SPEC-001-legado.md	
+node	COMP	COMP-001-001	plans/PLAN-001-legado.md	
+node	FR	FR-001-001	specs/SPEC-001-legado.md	
+node	PLAN	PLAN-001	plans/PLAN-001-legado.md	status=Done
+node	SPEC	SPEC-001	specs/SPEC-001-legado.md	
+node	TASK	TASK-001-001	tasks/TASK-001-001-logger.md	wave=1 status=Done tipo=feature
+node	TASK	TASK-001-002	tasks/TASK-001-002-crlf.md	wave=1 status=Done tipo=chore
+warn	nao-parseavel	plans/PLAN-001-legado.md	Dependências	usa o repositório compartilhado da wave anterior

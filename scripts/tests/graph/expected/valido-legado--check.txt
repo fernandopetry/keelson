@@ -1,0 +1,1 @@
+WARNING	nao-parseavel	plans/PLAN-001-legado.md campo "Dependências": usa o repositório compartilhado da wave anterior

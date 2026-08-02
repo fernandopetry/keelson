@@ -1,0 +1,3 @@
+WARNING	ac-sem-task	AC-001-002 (cobre FR-001-002, PLAN-001) sem TASK que o cubra em criterio ou roteiro [legacy]
+WARNING	fr-sem-task	FR-001-002 coberto por PLAN-001 sem TASK que o realize [legacy]
+WARNING	wave-incoerente	TASK-001-001 (wave 1) depende de TASK-001-002 (wave 2) [legacy]
