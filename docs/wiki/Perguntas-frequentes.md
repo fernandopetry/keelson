@@ -121,6 +121,15 @@ Comentário que parafraseia o código é ruído que envelhece mal. O que fica s�
 uma linha ligando o código à decisão que o moldou (`// DEC-03: …`) — o grafo de navegação
 que um agente (ou você, em seis meses) segue.
 
+### O relatório do validator cita `[graph.sh]` — o que é isso?
+
+É um **fato computado, não opinião do agente**: um script determinístico extrai o grafo
+dos seus artefatos (dependências, cobertura, waves) e acusa defeitos estruturais —
+ciclo, referência quebrada, FR sem task. O validator cita a linha e calibra a
+severidade. Artefato antigo não reprova por forma: prosa vira aviso, campo vazio vale
+`nenhuma`, e achado sobre coisa já entregue sai rebaixado como `[legacy]`. A régua
+completa está no [Contrato do grafo](Contrato-do-grafo).
+
 ### Como sei que um gate realmente rodou?
 
 Pelo relatório de fecho, que é montado a partir de um **ledger** escrito enquanto os

@@ -129,6 +129,24 @@ Skills que não geram artefato — validam forma:
 `ERROR` bloqueia a promoção de status; `WARNING` não bloqueia. E **promover status nunca é
 do validator**: quem leva `Draft → Approved → Done` é o PO (no ciclo com brief) ou você.
 
+### O grafo dos artefatos
+
+Os artefatos de um slug formam um grafo: TASK depende de TASK, PLAN cobre FR, critério
+cobre AC. Desde a versão 0.57.0 esse grafo é **verificado mecanicamente**: um script
+determinístico (`graph.sh`) extrai as relações e computa ciclos, referências quebradas,
+cobertura e waves — e os validators **citam o resultado como fato** (você verá linhas
+`**[graph.sh]** ERROR ciclo-task — …` nos relatórios) em vez de re-deduzir a estrutura
+a cada rodada. Três coisas úteis de saber:
+
+- **Seus artefatos antigos não reprovam por forma.** Campo de dependência vazio vale
+  como `nenhuma`; prosa antiga vira aviso (`nao-parseavel`), nunca erro; e achado de
+  wave/cobertura sobre artefato já `Done` é rebaixado a aviso `[legacy]`.
+- **Dá para ver o desenho.** Pergunte ao `/keelson:status` sobre dependências ou ordem
+  das tasks e ele devolve o diagrama (Mermaid) — tasks por wave, com status, ou o mapa
+  FR→componente.
+- A régua completa (sintaxe dos campos, catálogo de checks) está no
+  [Contrato do grafo](Contrato-do-grafo).
+
 ## Comentários no código gerado
 
 O default é **nenhum comentário**. Todo comentário que os agents escrevem passa por um

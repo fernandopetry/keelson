@@ -18,5 +18,6 @@
 
 - [Quality Charter](Quality-Charter)
 - [Contrato do INDEX](Contrato-do-INDEX)
+- [Contrato do grafo](Contrato-do-grafo)
 - [Convenção de commits](Convencao-de-commits)
 - [Handoff de verificação](Handoff-de-verificacao)

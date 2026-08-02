@@ -24,7 +24,8 @@ MIRRORS='docs/_meta/method-guide.md|Guia-do-metodo
 guidelines/_meta/QUALITY-CHARTER.md|Quality-Charter
 docs/_meta/conventions/index-contract.md|Contrato-do-INDEX
 docs/_meta/conventions/commit-convention.md|Convencao-de-commits
-docs/_meta/conventions/handoff-protocol.md|Handoff-de-verificacao'
+docs/_meta/conventions/handoff-protocol.md|Handoff-de-verificacao
+docs/_meta/conventions/graph-contract.md|Contrato-do-grafo'
 
 DRY_RUN=0
 CHECK=0

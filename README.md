@@ -32,6 +32,7 @@ Same engine everywhere; only the ~15-line adapter changes.
 | **Language profiles** | The Charter *instantiated* for a language/version (`backend/php.md`, `frontend/*`). Ships with PHP — the 8.5 exemplar plus a curated legacy ladder (5.6 · 7.0 · 7.4 · 8.0); other stacks are **generated on install** from your standard, then reviewed by you. |
 | **The ficha** (`keelson.config.json`) | The per-project adapter: paths, quality commands, active profile, gates. |
 | **Gates** | The definition of done: tests, lint, scope, security, verified behavior — calibrated to *complexity × risk*, not fixed. |
+| **The artifact graph** | Every relation the SDD artifacts declare — dependencies, coverage, waves — is extracted and checked *mechanically* (`scripts/graph.sh`): validators cite computed facts instead of re-deriving structure, and the state of a slug renders as a Mermaid diagram on demand. |
 
 ## Install
 
@@ -391,7 +392,8 @@ keelson/
 │   ├── backend/       # php.md (8.5 exemplar) · php-{5.6,7.0,7.4,8.0}.md (legacy ladder) · none.md · _review/ (human-review backlogs)
 │   └── frontend/      # none.md (others generated on install)
 ├── templates/         # keelson.config.example.json · keelson.local.example.json · CLAUDE block
-├── docs/_meta/        # method guide · conventions/ (runtime contracts: SDD, INDEX, handoff, teams, commits) · decisions · learning log
+├── scripts/           # update.sh · publish-wiki.sh · graph.sh (SDD graph facts, decision 4.82) · tests/graph/ (its regression suite) · git-hooks/
+├── docs/_meta/        # method guide · conventions/ (runtime contracts: SDD, INDEX, handoff, teams, commits, graph) · decisions · learning log
 └── docs/wiki/         # source of the user wiki (generated output: scripts/publish-wiki.sh)
 ```
 
@@ -403,7 +405,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.56.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.57.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 

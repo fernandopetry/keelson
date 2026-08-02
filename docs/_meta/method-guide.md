@@ -347,9 +347,16 @@ Skills não geram artefatos novos — validam ou consultam. As três validators 
 | Skill | Valida/Faz | Disparo automático |
 |---|---|---|
 | `spec-validator` | EARS, RFC 2119, IDs, verificabilidade FR↔AC, domínio vs tecnologia, glossário, escopo simétrico | Final do `/keelson:specify` |
-| `plan-validator` | Estrutura, cobertura declarada, DECs com alternativas, mapeamento FR→COMP, aderência ao Charter + perfil, DoD | Final do `/keelson:plan` |
-| `task-validator` | Vinculação ao PLAN, FRs/ACs existentes, dependências sem ciclo, convenções, campos de closure preparados | Final do `/keelson:tasks` |
+| `plan-validator` | Estrutura, cobertura declarada, DECs com alternativas, grafo de componentes (fato mecânico via `graph.sh`), aderência ao Charter + perfil, DoD | Final do `/keelson:plan` |
+| `task-validator` | Vinculação, dependências, ciclos, waves e cobertura FR/AC (fato mecânico via `graph.sh`), convenções, campos de closure preparados | Final do `/keelson:tasks` |
 | `status` | **Consulta** (read-only): resumo executivo do estado de um slug | Perguntas sobre estado/progresso |
+
+Os checks **estruturais** do plan/task-validator chegam como **fato mecânico**:
+`scripts/graph.sh` extrai o grafo dos artefatos (nós e arestas tipadas) e computa
+ciclos, referências quebradas, cobertura e waves — o validator cita e calibra, nunca
+re-deriva. Régua e contrato: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md`
+(decisão 4.82). O `/keelson:status` desenha o grafo em Mermaid quando a pergunta é
+sobre dependências ou ordem.
 
 ### Severidades e gate de status
 

@@ -17,6 +17,45 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.57.0] — 2026-08-02
+
+Decision 4.82
+
+### Added
+- **The SDD artifact graph becomes a mechanical fact.** `scripts/graph.sh` (bash 3.2 +
+  POSIX awk, zero new dependencies, read-only) extracts every typed relation between
+  SPECs, PLANs and TASKs into a deterministic TSV, computes the structural check
+  catalog — dependency cycles, broken references, duplicate IDs (the parallel-session
+  hazard of decision 4.63), incoherent waves, FR/AC coverage, FRs missing from the §7
+  mapping, derived FEAT sets, Depende/Bloqueia symmetry, stale TASK-INDEX — and renders
+  Mermaid diagrams (tasks by wave; FR→COMP). The rulebook has a single owner,
+  `docs/_meta/conventions/graph-contract.md`, mirrored to the wiki.
+- **A durable regression suite** (`scripts/tests/graph/`): synthetic slugs with planted
+  defects, frozen expected outputs and a 21-case runner proving zero false positives on
+  valid fixtures, byte-for-byte determinism and read-only behavior. A check does not
+  enter the catalog without a fixture.
+
+### Changed
+- **Validators now cite computed facts instead of re-deriving structure.** The
+  task-validator's linkage/dependency/coverage steps and the plan-validator's
+  component-graph step run graph.sh and quote its findings; only semantic checks remain
+  theirs. Calibration stays with the validator (protocol §1/§3). Degradation is by
+  result — any run without contract-valid output falls back to reading, declared with
+  the named cause — and unparseable edges block asserting absence-of-defect for that
+  artifact (mixed coverage).
+- **Edge fields gain canonical syntax** in the generator templates (ID lists or
+  `nenhuma`); bugfix TASKs declare the violated AC in a dedicated `AC violado` field;
+  the AC `(cobre …)` annotation is a full-ID list scoped to a single FEAT. Legacy
+  artifacts never fail on form: empty fields read as `nenhuma`, prose degrades to a
+  `nao-parseavel` warning — and any absence check fed by an unparseable field degrades
+  with it (`[parse]`) — while wave/coverage findings on `Done` artifacts downgrade to
+  `[legacy]` warnings.
+- `/keelson:tasks` verifies cycles and waves mechanically before its validation gate;
+  `/keelson:status` renders the dependency or FR→COMP Mermaid when asked about
+  ordering.
+
+---
+
 ## [0.56.0] — 2026-07-31
 
 Decision 4.81

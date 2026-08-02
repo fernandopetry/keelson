@@ -42,9 +42,11 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   *como* na linguagem. Não duplicar regra entre eles. Blocos compartilhados dos comandos
   têm dono único em `docs/_meta/conventions/` — `sdd-conventions.md` (convenções comuns,
   ex-§3.0), `index-contract.md` (artefatos/IDs + contrato/template/receita do INDEX, ex-§6),
-  `handoff-protocol.md` (handoff de verificação de tela, ex-§8) e `commit-convention.md`
+  `handoff-protocol.md` (handoff de verificação de tela, ex-§8), `commit-convention.md`
   (tipo/escopo/quebra da mensagem de commit no consumidor — o bloco de keys do tracker
-  continua no §15 do protocolo Jira); o `method-guide.md`
+  continua no §15 do protocolo Jira) e `graph-contract.md` (sintaxe canônica de aresta,
+  catálogo de arestas/checks do grafo e contrato do `scripts/graph.sh` — decisão 4.82);
+  o `method-guide.md`
   segue guia humano, com os headings §3.0/§6/§8 preservados como ponteiros. A moldura dos
   validators vive em `skills/_shared/validator-protocol.md`; a **régua dos gates 1–7**
   (o que cada gate exige, degradação sem artefato SDD, calibração de severidade) tem dono
@@ -103,6 +105,23 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 - Wiki em **português** (é o idioma da doutrina); o `README.md` segue a face em inglês.
   Edição pela UI do GitHub é sobrescrita — o script só remove páginas que ele gerou
   (`.keelson-wiki-pages`), então página feita à mão sobrevive.
+
+## Grafo dos artefatos (fato mecânico — decisão 4.82)
+
+- **O markdown é a fonte; o grafo é derivado** (mesmo princípio da wiki). As relações
+  entre artefatos SDD (dependências, cobertura, waves, FEATs) são extraídas e
+  verificadas por `scripts/graph.sh` (bash 3.2 + awk POSIX, read-only); a régua —
+  sintaxe canônica de aresta, catálogo de checks com severidades e carências
+  `[legacy]`/`[parse]`, contrato de invocação/saída — tem dono único em
+  `docs/_meta/conventions/graph-contract.md`. Validators **citam a saída como fato**
+  e não re-derivam estrutura; a calibração continua deles.
+- **Mexeu no parser ou no catálogo → rode `scripts/tests/graph/run.sh`** (21 casos;
+  fixtures sintéticas com defeitos plantados + saídas esperadas congeladas). Check
+  novo não entra no catálogo sem fixture; mudança de severidade é decisão explícita
+  (§4.x), nunca efeito colateral do script.
+- Falso-positivo num artefato legítimo é o pior defeito desta camada: na dúvida, o
+  extrator degrada com `WARNING nao-parseavel` (e os checks de ausência degradam
+  junto) — nunca inventa ERROR.
 
 ## Registro e governança
 
