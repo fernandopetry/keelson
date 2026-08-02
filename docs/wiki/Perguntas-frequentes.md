@@ -9,7 +9,7 @@ Não. O rigor é **proporcional**:
 | Mudança | Caminho |
 |---|---|
 | Typo, texto, cor | Direto, sem SPEC |
-| Bug, refactor pontual | TASK, ou o modo sob demanda em sessão livre |
+| Bug, refactor pontual | TASK sob o PLAN original — ou, sem PLAN aplicável, **brief avulso** (a tarefa escrita do dia a dia, antes do código) |
 | Contrato igual, estratégia nova | PLAN com recorte (`--slice`) |
 | Contrato novo, capacidade nova | Ciclo completo |
 
@@ -93,6 +93,15 @@ não tudo de uma vez.
 
 Não. A integração vem **desligada** e é *best-effort* — nunca bloqueia o ciclo. Sem Jira,
 nada muda no funcionamento.
+
+### Trabalho fora do ciclo aparece no Jira?
+
+Sim, desde a decisão 4.86: a mudança avulsa nasce como **brief avulso** e, com
+`jira.enabled` e `issueType.standalone` configurados, vira uma Story no quadro **antes
+do código** — quem olha o board vê o que está em andamento, mesmo fora do ciclo. Se a
+tarefa já existe como card (escrita por alguém do time), cite a key: o keelson **usa** o
+card existente em vez de criar outro (`/keelson:triage --from=<KEY>` ou a key direto no
+pedido). Um Epic agrupador opcional (`jira.standaloneParent`) organiza essas Stories.
 
 ### Preciso de token de API do Jira?
 

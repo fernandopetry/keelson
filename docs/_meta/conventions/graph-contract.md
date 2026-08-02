@@ -48,12 +48,16 @@ separados por vírgula** ou a palavra **`nenhuma`**:
 | `covers-ac` | TASK → AC | itens `- [ ]` de "Critérios de pronto" ∪ linhas do "Roteiro do gate 9" |
 | `ac-covers` | AC → FR\|NFR | `(cobre …)` do AC |
 | `feat-of` | FR → FEAT | posicional: FR sob heading `### FEAT-` na §5 da SPEC |
+| `task-brief` | TASK → BRIEF | `**Brief**:` — âncora da TASK avulsa (decisão 4.86); exclusiva com `belongs-to` |
 
-Nós: `SPEC · FR · NFR · AC · FEAT · PLAN · COMP · DEC · TASK` (TASK carrega atributos
-`wave`, `status`, `tipo`). Fontes: somente `specs/SPEC-*.md`, `plans/PLAN-*.md` e
-`tasks/TASK-*.md` — `TASK-*-INDEX.md`, `INDEX.md`, `briefs/`, `handoffs/` e `legacy/`
-são derivados ou prosa livre, **nunca fonte de nó/aresta**. `covers-ac` ignora menção
-a AC em prosa fora de item `- [ ]` (menção de realocação não é cobertura).
+Nós: `SPEC · FR · NFR · AC · FEAT · PLAN · COMP · DEC · TASK · BRIEF` (TASK carrega
+atributos `wave`, `status`, `tipo`; BRIEF carrega `status` e `crit` — 1 quando o heading
+`## Critério de aceite` existe). Fontes: `specs/SPEC-*.md`, `plans/PLAN-*.md`,
+`tasks/TASK-*.md` **e `briefs/BRIEF-*-avulso.md`** (só o sabor avulso — decisão 4.86) —
+`TASK-*-INDEX.md`, `INDEX.md`, os demais sabores de `briefs/` (pareado, épico),
+`handoffs/` e `legacy/` são derivados ou prosa livre, **nunca fonte de nó/aresta**.
+`covers-ac` ignora menção a AC em prosa fora de item `- [ ]` (menção de realocação não
+é cobertura).
 Cross-PLAN: aresta para nó de outro PLAN/SPEC do **mesmo slug** é válida — a
 existência resolve no slug inteiro.
 
@@ -77,7 +81,7 @@ ponta a ponta, e o validator decide com os próprios olhos (cobertura mista, §5
 | `ciclo-comp` | ciclo em `comp-dep` | ERROR (sempre) |
 | `ref-quebrada` | aresta apontando para nó inexistente no slug | ERROR (sempre) |
 | `id-duplicado` | mesmo ID de nó declarado 2+ vezes (precedente §4.63) | ERROR (sempre) |
-| `pertence-vs-arquivo` | MMM de `Pertence a` ≠ MMM do nome do arquivo | ERROR |
+| `pertence-vs-arquivo` | MMM da âncora (`Pertence a` ou `Brief`) ≠ MMM do nome do arquivo/ID | ERROR |
 | `wave-incoerente` | `wave(T) ≤ wave(dep)` no **mesmo** PLAN (cross-PLAN não se aplica) | ERROR · carência |
 | `fr-sem-task` | FR coberto pelo PLAN sem `realiza` de TASK dele (NFR não entra: NFR não é realizado por TASK — verifica-se na DoD do PLAN) | ERROR · carência |
 | `ac-sem-task` | AC de FR coberto sem `covers-ac` de TASK do PLAN | ERROR · carência |
@@ -89,6 +93,12 @@ ponta a ponta, e o validator decide com os próprios olhos (cobertura mista, §5
 | `realiza-vs-mapeamento` | `comp-realiza` divergente da §7 (a §7 é a fonte de cobertura) | WARNING |
 | `dep-bloqueia-assimetrica` | A depende de B sem B bloquear A (ou vice-versa) — suprimido quando quem deveria declarar é TASK `Done` de outro PLAN (reeditar artefato entregue seria pior que a assimetria) | WARNING |
 | `index-desatualizado` | `TASK-MMM-INDEX.md` diverge do computado (waves, tabelas FR/AC) — best-effort | WARNING |
+| `brief-sem-criterio` | brief avulso sem heading `## Critério de aceite` (forma do esqueleto — decisão 4.86) | WARNING |
+| `task-ancora-dupla` | TASK com `Pertence a` **e** `Brief` preenchidos (âncora é exclusiva) | ERROR |
+
+`ref-quebrada` cobre também a âncora avulsa (TASK com `**Brief**:` apontando BRIEF
+inexistente no slug) — não é check novo, é o genérico sobre `task-brief`. TASK sem
+nenhuma âncora continua matéria do `task-validator` (tolerância ao acervo legado, §1).
 
 ## §4. Invocação e saída
 

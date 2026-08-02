@@ -1,0 +1,4 @@
+ERROR	pertence-vs-arquivo	TASK-005-001: Brief BRIEF-003 difere do MMM do ID
+ERROR	ref-quebrada	TASK-004-001 -> BRIEF-004 nao existe no slug (task-brief, tasks/TASK-004-001-brief-orfao.md:4)
+ERROR	task-ancora-dupla	TASK-003-001: Pertence a PLAN-003 e Brief BRIEF-003 simultaneos (ancora exclusiva)
+WARNING	brief-sem-criterio	BRIEF-003 sem heading "## Criterio de aceite" (briefs/BRIEF-003-sem-criterio-avulso.md)

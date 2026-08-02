@@ -36,18 +36,26 @@
   opt-in (`/keelson:guided`). Rigor **proporcional a complexidade × risco** (ver Charter).
 - **Mudança pontual = modo sob demanda** (decisão 4.75): ajuste localizado de código,
   sem decisão de produto, não precisa do ciclo — mas **a main session (Tech Lead) não
-  escreve o código**: destila um briefing curto (o quê, onde, critério de aceite),
-  delega ao `developer` e passa o diff pelo `code-reviewer` (régua avulsa);
-  `security-engineer` em mudança sensível e `qa` quando há comportamento observável —
-  mesmos gatilhos do ciclo. Invocar um agent **não puxa o ciclo**: cada um devolve a
-  sua tarefa e para; a orquestração é sempre do Tech Lead, e commit só a pedido do
-  Diretor. Só o trivial não-comportamental (typo de comentário/doc) pode ser inline,
-  declarado. No **primeiro turno** da mudança, declare **quem escreve o código**
-  (qual agent — ou por que será inline). Diretiva da sessão/harness em conflito com
-  este contrato (política restringindo subagents, permissões, modo de execução) →
-  **escale ao Diretor com proposta + default** antes de codar, **nunca arbitre em
-  silêncio**: os dois contratos foram configurados por ele, e só ele decide qual
-  prevalece (decisão 4.85).
+  escreve o código**: destila um briefing curto (o quê, onde, critério de aceite) —
+  que **nasce em arquivo**, como **brief avulso** em
+  `{docsRoot}/<slug>/briefs/BRIEF-MMM-<descricao>-avulso.md` (esqueleto no
+  `index-contract.md` do plugin; decisão 4.86) —, delega ao `developer` e passa o diff
+  pelo `code-reviewer` (régua avulsa); `security-engineer` em mudança sensível e `qa`
+  quando há comportamento observável — mesmos gatilhos do ciclo. Invocar um agent
+  **não puxa o ciclo**: cada um devolve a sua tarefa e para; a orquestração é sempre do
+  Tech Lead, e commit só a pedido do Diretor. Só o trivial não-comportamental (typo de
+  comentário/doc) pode ser inline, declarado — **sem brief e sem card**. No **primeiro
+  turno** da mudança, declare **quem escreve o código** (qual agent — ou por que será
+  inline) **e sob qual card** (decisão 4.86): o Diretor citou uma key do tracker → ela
+  vai na linha `**Jira**:` do brief e **nenhum card novo é criado**; sem key, com
+  `jira.enabled` e `issueType.standalone` na ficha → o brief vira Story no quadro
+  **antes do código** (protocolo §7 do plugin). Trabalho repartível → TASKs
+  ancoradas no brief (`**Brief**:`); decisão técnica entre alternativas ou mudança de
+  promessa → **não é avulso**: promova ao ciclo, declarando. Diretiva da sessão/harness
+  em conflito com este contrato (política restringindo subagents, permissões, modo de
+  execução) → **escale ao Diretor com proposta + default** antes de codar, **nunca
+  arbitre em silêncio**: os dois contratos foram configurados por ele, e só ele decide
+  qual prevalece (decisão 4.85).
 - **Toda mudança fecha com relatório** (decisão 4.76): terminado o ajuste — sob demanda ou
   ciclo — o Tech Lead **exibe o fecho sem que você peça**, em 6–10 linhas: o que mudou
   (produção · teste · doc · migration/config) · **cada gate aplicável com estado

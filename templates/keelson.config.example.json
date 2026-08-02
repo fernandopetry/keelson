@@ -34,6 +34,7 @@
     "mode": "create",
     "issueType": { "spec": null, "feature": null, "task": null, "standalone": null },
     "epicPolicy": "always",
+    "standaloneParent": null,
     "transition": "comment",
     "mapFile": null,
     "boardId": null

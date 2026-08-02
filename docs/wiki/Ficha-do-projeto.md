@@ -120,6 +120,7 @@ grava **IDs**.
   "mode": "create",                       // "create" | "link"
   "issueType": { "spec": null, "feature": null, "task": null, "standalone": null },
   "epicPolicy": "always",                 // "always" | "multi-feature" (0–1 FEAT → sem Epic)
+  "standaloneParent": null,               // key de um Epic agrupador p/ as Stories avulsas
   "transition": "comment",                // "off" | "comment" | "auto"
   "mapFile": null, "boardId": null
 }
@@ -129,6 +130,7 @@ grava **IDs**.
 |---|---|
 | `mode` | `create` — o keelson cria a issue da SPEC e as sub-tasks; `link` — pendura o trabalho numa issue que você já abriu |
 | `epicPolicy` | `multi-feature` não cria Epic para SPEC com 0–1 funcionalidade (a Story vira a raiz) |
+| `standaloneParent` | key de um Epic que **você** cria uma vez (ex.: "Manutenção") para as Stories de tarefa avulsa aninharem; `null` → a Story avulsa nasce sem pai — os dois são válidos |
 | `transition` | `comment` (default) só comenta; `auto` move cards; `off` não toca no quadro |
 | `mapFile` | Tabela Markdown com campos customizados e colunas do board, criada pelo `init` e preenchida por você |
 

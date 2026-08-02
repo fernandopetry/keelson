@@ -12,6 +12,7 @@
 └── <slug>/
     ├── INDEX.md               # estado atual (GERADO — não editar)
     ├── briefs/BRIEF-NNN.md    # intenção do Diretor + interpretação do PO (contrato abaixo; vazio na maioria dos slugs)
+    │       └── BRIEF-MMM-*-avulso.md  # 3º sabor: mudança avulsa, sem SPEC/PLAN (decisão 4.86)
     ├── specs/SPEC-NNN-*.md
     ├── plans/PLAN-MMM-*.md
     ├── tasks/
@@ -23,7 +24,7 @@
 
 | ID | Significado | Escopo da numeração |
 |---|---|---|
-| `BRIEF-NNN` | Brief da demanda — pedido do Diretor + interpretação do PO (contrato Diretor–PO, decisões 4.37/4.38) | NNN = nº da SPEC pareada (1:1) |
+| `BRIEF-NNN` | Brief da demanda — pedido do Diretor + interpretação do PO (contrato Diretor–PO, decisões 4.37/4.38) | NNN = nº da SPEC pareada (1:1); sabor **avulso** usa MMM próprio do alocador único (4.86) |
 | `FR-NNN-XXX` / `NFR-NNN-XXX` | Requisito funcional / não-funcional | NNN = nº da SPEC |
 | `AC-NNN-XXX` | Critério de aceitação (Given-When-Then) | NNN = nº da SPEC |
 | `RISK-NNN-XXX` / `A-NNN-XXX` / `Q-NNN-XXX` | Risco / premissa / questão aberta | NNN = nº da SPEC |
@@ -31,18 +32,27 @@
 | `COMP-MMM-XXX` | Componente | MMM = nº do PLAN |
 | `DEC-MMM-XXX` | Decisão arquitetural (com alternativas e flag `Irreversível`) | MMM = nº do PLAN |
 | `TRISK-MMM-XXX` | Risco técnico | MMM = nº do PLAN |
-| `TASK-MMM-XXX` | Tarefa | MMM = PLAN ao qual pertence |
+| `TASK-MMM-XXX` | Tarefa | MMM = âncora à qual pertence: PLAN (campo `**Pertence a**:`) **ou** brief avulso (campo `**Brief**:` — decisão 4.86); nunca os dois |
 
 Nomes de arquivo de TASK por tipo: `-fix-` (bugfix), `-refactor-` (refactor), `-chore-` (chore); sem sufixo = feature.
+
+**Alocação de número (decisão 4.86)**: número novo de artefato numerado do slug — SPEC
+(com seu BRIEF pareado), PLAN ou brief avulso — sai de um **alocador único**:
+`max(todos os NNN e MMM já usados no slug) + 1`. Consequências: nunca nascem dois
+artefatos novos com o mesmo número (a colisão de nome BRIEF-pareado × BRIEF-avulso é
+impossível por construção); pares NNN/MMM iguais pré-4.86 (ex.: SPEC-001 + PLAN-001)
+permanecem válidos; **densidade por tipo não é contrato** — PLAN-002 seguido de PLAN-004
+é normal quando o 003 foi um avulso ou uma SPEC.
 
 ### Contrato do BRIEF (fonte única — decisão 4.38)
 
 O BRIEF é o artefato-âncora do contrato Diretor–PO (4.37): o pedido do Diretor capturado
 **como dito** + a interpretação do PO. O PO valida SPEC e entrega **contra ele** — nunca
-contra a própria opinião. Só existe no **ciclo formal** (rota feature/risco do
-`/keelson:auto` e do `/keelson:guided`, pareado 1:1 com a SPEC que nasce dele — o NNN é
-alocado pela mesma varredura que numera a SPEC); bug/refactor usam espelho inline sem
-arquivo, e trivial não tem brief.
+contra a própria opinião. No **ciclo formal** (rota feature/risco do
+`/keelson:auto` e do `/keelson:guided`) é pareado 1:1 com a SPEC que nasce dele — o NNN é
+alocado pela mesma varredura que numera a SPEC; bug/refactor **no ciclo** usam espelho
+inline sem arquivo, e trivial não tem brief. Fora do ciclo, a mudança avulsa usa o
+**3º sabor** (variação avulsa, decisão 4.86 — abaixo).
 
 ```markdown
 # BRIEF-NNN: <título curto da demanda>
@@ -83,6 +93,52 @@ numeração NNN nem a linha `**SPEC**:`). Conteúdo: pedido épico verbatim + de
 confirmada do PM (demandas-filhas: prioridade, título, resumo, slug de destino,
 dependências, riscos). Cada filha ganha seu `BRIEF-NNN` normal **no slug de destino**
 quando o ciclo dela começa, com a linha `**Epico**:` apontando ao pai.
+
+**Variação avulsa (decisão 4.86)**: a tarefa do dia a dia — bugfix, melhoria pequena,
+chore **sem SPEC/PLAN aplicável** — nasce como brief avulso em
+`briefs/BRIEF-MMM-<descricao>-avulso.md` (MMM do alocador único), **antes do código**:
+é o briefing destilado do modo sob demanda (4.75) materializado em arquivo, e a origem
+da Story `standalone` no tracker (protocolo Jira §7). Esqueleto literal:
+
+```markdown
+# BRIEF-MMM: <título curto da mudança>
+
+**Slug**: <slug>
+**Tipo**: avulso
+**Status**: Aberto | Concluído
+**Data**: <YYYY-MM-DD>
+**Origem**: <Diretor (pedido em sessão) | key do tracker (rota pull, ex.: PROJ-123)>
+**Jira**: <KEY — gravada pelo sync (§10 do protocolo); linha ausente = não sincronizado>
+
+## Pedido como dito
+<verbatim — do Diretor, ou a descrição do card do tracker (rota pull)>
+
+## Interpretação
+<~3 linhas do Tech Lead: o quê, onde, por que agora>
+
+## Critério de aceite
+- <observável e verificável — é contra isto que code-reviewer e qa avaliam>
+
+## TASKs
+<nenhuma — o brief é a unidade de execução | TASK-MMM-001..N quando o trabalho reparte>
+
+## Execução
+<closure quando não há TASKs (com TASKs, a closure vive nelas):>
+- **Implementado por**: <developer | inline — <motivo> (4.75)>
+- **Revisado por**: <cada gate aplicável com estado declarado — régua simétrica (4.85)>
+- **Commit**: <SHA | pendente — commit é ato do Diretor>
+```
+
+Réguas (falsificáveis — na dúvida, promova): **avulso ou ciclo?** — muda o que o sistema
+promete, ou a decomposição exigiria escolher entre alternativas técnicas (haveria uma
+DEC) → ciclo; só reparte trabalho mecânico → avulso. **Com ou sem TASK?** — um executor,
+um diff → sem TASK; repartível em pedaços independentes → TASKs, cada uma com
+`**Brief**: BRIEF-MMM` no lugar de `**Pertence a**:` (âncora polimórfica — o grafo
+verifica a referência e a forma: `task-brief` e `brief-sem-criterio` no
+`graph-contract.md`). Avulso que acumular decisão técnica ou tocar contrato no meio do
+caminho **para e promove** (vira SPEC/ciclo), declarando. O trivial inline (4.75)
+continua sem brief. Slug com avulsos ganha no INDEX a seção `## Avulsas`
+(tabela `| ID | Título | Status | Jira | Data |`), mantida por quem fecha o avulso.
 
 ### Contrato da tabela "PLANs" do INDEX (fonte única)
 
@@ -159,6 +215,7 @@ Seção ainda sem conteúdo leva nota curta do que a preenche (ex.: "(vazio até
 - **`/keelson:rebuild-index`**: acrescenta ao aviso a linha `> Última reconstrução completa via /keelson:rebuild-index: <ISO 8601>` e, se houver, a seção final `## Inconsistências conhecidas` (descrição + ação sugerida).
 - **`/keelson:migrate-legacy`**: acrescenta `**Origem**: migrado de legado em <YYYY-MM-DD> via /keelson:migrate-legacy`; capacidades legadas entram em `### Implementadas (legado, sem rastreabilidade SDD)` com marcador 📜 e origem (`legacy/<arquivo>`); decisões extraídas viram `LEGACY-DEC-*`; "SPECs"/"PLANs" ficam vazios com nota de que não há artefatos retroativos; seção extra `## Documentação legada` lista os arquivos preservados.
 - **Slug migrado** (em qualquer rebuild): as seções espelhadas do legado abrem com `> Fonte durável: legacy/TRIAGE-<data>.md` — é do TRIAGE que o rebuild as reespelha.
+- **Slug com briefs avulsos (decisão 4.86)**: seção adicional `## Avulsas` — tabela `| ID | Título | Status | Jira | Data |`, uma linha por `briefs/BRIEF-*-avulso.md`, derivável dos próprios arquivos (o rebuild a reconstrói de lá).
 - **Granularidade das Capacidades**: SPEC que declara FEATs → **uma entrada de capacidade por FEAT**, no formato `<nome da FEAT> (SPEC-NNN/FEAT-NNN-XXX, PLAN-MMM, <marcador>)`, movida entre subseções quando a FEAT fica pronta (todos os FRs dela cobertos por PLANs **e** todas as TASKs que a listam em `Funcionalidade` — primária ou secundária, em qualquer PLAN do slug — Done); SPEC sem FEATs → uma entrada por SPEC, como sempre.
 
 ### Receita de atualização do INDEX (fonte única)

@@ -150,10 +150,10 @@ Orquestra a implementação wave por wave, usando subagents (`developer` + `code
 Quando você não sabe se uma demanda vira SPEC, PLAN ou TASK, este comando classifica e roteia. **Não executa nada sem confirmação.**
 
 ```
-/keelson:triage <descrição em linguagem natural> [--slug=<nome>]
+/keelson:triage <descrição em linguagem natural> [--slug=<nome>] [--from=<KEY>]
 ```
 
-Roteamento em resumo: contrato novo → SPEC; contrato igual com estratégia nova → PLAN `--slice`; bug/refactor → TASK pré-preenchida; trivial → direto no código; slug legado sem INDEX → `/keelson:migrate-legacy` antes. A tabela e os critérios canônicos são do próprio comando: `${CLAUDE_PLUGIN_ROOT}/commands/triage.md`.
+Roteamento em resumo: contrato novo → SPEC; contrato igual com estratégia nova → PLAN `--slice`; bug/refactor → TASK pré-preenchida — **sem PLAN aplicável, brief avulso** (`briefs/BRIEF-MMM-*-avulso.md`, contrato no `index-contract.md`; decisão 4.86); trivial → direto no código; slug legado sem INDEX → `/keelson:migrate-legacy` antes. `--from=<KEY>` (rota pull, 4.86): a demanda já é um card do tracker — a descrição do card vira o insumo, e a key acompanha o destino (nunca cria card duplicado). A tabela e os critérios canônicos são do próprio comando: `${CLAUDE_PLUGIN_ROOT}/commands/triage.md`.
 
 **Quando NÃO usar**: se você já sabe o que fazer (vá direto ao comando), para triviais óbvios, ou em emergências.
 
@@ -270,7 +270,7 @@ Jira). Default `"always"` mantém o comportamento clássico: toda SPEC vira Epic
 
 | Aspecto | Detalhe |
 |---|---|
-| Gera | Issues, Stories de FEAT (quando a SPEC declara FEATs e `issueType.feature` está preenchido), sub-tasks e tarefas isoladas (`issueType.standalone` — TASK avulsa ou transversal sem primária) no Jira (via conector); grava a linha `**Jira**:` no cabeçalho da SPEC, sob os headings FEAT e na closure das TASKs |
+| Gera | Issues, Stories de FEAT (quando a SPEC declara FEATs e `issueType.feature` está preenchido), sub-tasks e tarefas isoladas (`issueType.standalone` — brief avulso, decisão 4.86, ou transversal sem primária) no Jira (via conector); grava a linha `**Jira**:` no cabeçalho da SPEC, sob os headings FEAT, no cabeçalho do brief avulso e na closure das TASKs |
 | Atualiza | 1 linha no "Histórico recente" do `INDEX.md` (contrato da tabela "PLANs" intocado) |
 | Gate | — (best-effort; `jira.enabled:false` ou conector ausente → não faz nada) |
 | Pré-condição | Rodar **de dentro do repo consumidor** (ficha no cwd). A Etapa 0 resolve a **viabilidade da projeção** antes de planejar — 3 níveis · 2 níveis · 2 níveis via Story implícita · 2 níveis via `standalone` · inviável (com a perna que não aninha) — e sinaliza **backfill** quando o slug já está concluído e `transition` não move card |
@@ -395,7 +395,7 @@ Os agents formam o **time** do keelson (modelo de time e contrato Diretor–PO �
 
 Os validators (`spec-validator`, `plan-validator`, `task-validator`) e o `code-scout` ficam **fora do elenco de propósito**: são ferramentas do time, não papéis (decisões 4.37/4.73).
 
-**Modo sob demanda** (decisão 4.75): em sessão livre, mudança pontual de código não entra no ciclo — mas tampouco é feita pela main session. O Tech Lead destila um briefing curto, delega ao `developer`, revisa com `code-reviewer` (régua avulsa da 4.36) e aciona `security-engineer`/`qa` pelos gatilhos usuais (mudança sensível · comportamento observável). Invocar um agent **não puxa o ciclo** — cada um devolve sua tarefa e para; commit é a pedido do Diretor. Só o trivial não-comportamental (typo de comentário/doc) pode ser inline, declarado. Conflito entre este contrato e a política da sessão/harness (restrição de subagents, permissões, modo) **escala ao Diretor com proposta + default** — nunca se resolve em silêncio (4.85).
+**Modo sob demanda** (decisão 4.75): em sessão livre, mudança pontual de código não entra no ciclo — mas tampouco é feita pela main session. O Tech Lead destila um briefing curto — que desde a 4.86 **nasce em arquivo**, como brief avulso (`briefs/BRIEF-MMM-*-avulso.md`), e com `jira.enabled` + `issueType.standalone` vira Story no quadro **antes do código** (key existente citada pelo Diretor → nenhum card novo) —, delega ao `developer`, revisa com `code-reviewer` (régua avulsa da 4.36) e aciona `security-engineer`/`qa` pelos gatilhos usuais (mudança sensível · comportamento observável). Invocar um agent **não puxa o ciclo** — cada um devolve sua tarefa e para; commit é a pedido do Diretor. Só o trivial não-comportamental (typo de comentário/doc) pode ser inline, declarado — sem brief e sem card. Conflito entre este contrato e a política da sessão/harness (restrição de subagents, permissões, modo) **escala ao Diretor com proposta + default** — nunca se resolve em silêncio (4.85).
 
 ---
 

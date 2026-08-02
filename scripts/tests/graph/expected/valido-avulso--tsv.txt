@@ -1,0 +1,7 @@
+edge	blocks	TASK-002-001	TASK-002-002	tasks/TASK-002-001-atualizar-timeout.md:13
+edge	task-brief	TASK-002-001	BRIEF-002	tasks/TASK-002-001-atualizar-timeout.md:4
+edge	task-brief	TASK-002-002	BRIEF-002	tasks/TASK-002-002-documentar-limite.md:4
+edge	task-dep	TASK-002-002	TASK-002-001	tasks/TASK-002-002-documentar-limite.md:12
+node	BRIEF	BRIEF-002	briefs/BRIEF-002-corrigir-timeout-avulso.md	status=Aberto crit=1
+node	TASK	TASK-002-001	tasks/TASK-002-001-atualizar-timeout.md	wave=1 status=Todo tipo=chore
+node	TASK	TASK-002-002	tasks/TASK-002-002-documentar-limite.md	wave=2 status=Todo tipo=chore

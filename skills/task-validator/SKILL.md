@@ -1,6 +1,6 @@
 ---
 name: task-validator
-description: Valida TASKs SDD ({docsRoot}/*/tasks/TASK-*.md): vínculo ao PLAN, FRs realizados, ACs cobertos, dependências sem ciclos, campos de closure. Ativar após /keelson:tasks (gate de qualidade) ou sob demanda. Reporta por severidade.
+description: Valida TASKs SDD ({docsRoot}/*/tasks/TASK-*.md): vínculo ao PLAN (ou ao brief avulso — 4.86), FRs realizados, ACs cobertos, dependências sem ciclos, campos de closure. Ativar após /keelson:tasks (gate de qualidade) ou sob demanda. Reporta por severidade.
 ---
 
 # Skill: task-validator
@@ -13,14 +13,24 @@ Você é um Quality Engineer: valide a TASK contra os checks abaixo.
 
 Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara validação batch de todas as tasks daquele PLAN). Contexto a ler (protocolo §2): a TASK, o PLAN (`Pertence a`), a SPEC referenciada pelo PLAN (incluindo o mapa FR→FEAT quando a §5 declara FEATs) e as outras TASKs do mesmo PLAN.
 
+**Modo avulso (decisão 4.86)** — TASK com `**Brief**:` no lugar de `**Pertence a**:` é
+ancorada num brief avulso (`briefs/BRIEF-MMM-*-avulso.md`), fora do ciclo SPEC/PLAN.
+Substituições, válidas para todas as etapas abaixo: o **contexto** é o brief (não há
+PLAN/SPEC); não existem FR, AC, FEAT nem COMP — checks que os exigem são **n/a**
+(`Realiza (FRs)`, `Funcionalidade`, `Componente`, vínculo a AC); no lugar deles, os
+critérios de pronto devem ancorar no **critério de aceite do brief** — ERROR se nenhum
+critério o referencia. Âncora dupla, referência quebrada e MMM divergente chegam como
+fato (`task-ancora-dupla`, `ref-quebrada`, `pertence-vs-arquivo` — Etapa 2). O resto da
+régua (escopo, verificação executável, closure, convenções, tipo) vale **idêntico**.
+
 **Batch com FEATs**: validar também a seção "Cobertura por funcionalidade" do TASK-MMM-INDEX — ERROR se divergente dos campos `Funcionalidade` das TASKs; WARNING se alguma FEAT da SPEC com FR coberto pelo PLAN não tem nenhuma TASK que a liste. (As divergências de **waves** e das tabelas de **FR/AC** do TASK-MMM-INDEX já chegam como fato — check `index-desatualizado` da Etapa 2; a seção de funcionalidade permanece sua.)
 
 ## Etapa 1: checks estruturais
 
 ### Front-matter (ERROR se ausente)
 - `Slug`
-- `Pertence a` presente (a existência do PLAN apontado chega como fato — `ref-quebrada`, Etapa 2)
-- `Realiza (FRs)` listado
+- Âncora presente: `Pertence a` (ciclo) **ou** `Brief` (modo avulso) — exatamente um dos dois (existência e exclusividade chegam como fato — `ref-quebrada`/`task-ancora-dupla`, Etapa 2)
+- `Realiza (FRs)` listado (ciclo; n/a no modo avulso)
 - `Funcionalidade` — obrigatório **somente** quando a SPEC do PLAN declara FEATs (headings
   `### FEAT-` na §5) e a TASK realiza FRs (ERROR se ausente nesse caso). Presente com SPEC
   **sem** FEATs → WARNING + auto-fix de remoção da linha. `chore` sem FR → pode omitir.

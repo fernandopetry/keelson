@@ -64,6 +64,11 @@ runcase plan-sem-tasks-stage     plan-sem-tasks     0 plan-sem-tasks--check-stag
 runcase parse-degrade-check      defeito-parse-degrade 0 defeito-parse-degrade--check.txt --check
 # --plan aceita MMM sem zero-padding (mesmo resultado do padded)
 runcase cobertura-plan-1         defeito-cobertura  1 defeito-cobertura--check-plan.txt --check --plan 1
+# brief avulso (decisão 4.86): nó BRIEF + âncora task-brief; defeitos plantados
+# cobrem brief-sem-criterio, task-ancora-dupla, ref-quebrada e pertence-vs-arquivo
+runcase valido-avulso-check      valido-avulso      0 valido-avulso--check.txt        --check
+runcase valido-avulso-tsv        valido-avulso      0 valido-avulso--tsv.txt          --format=tsv
+runcase defeito-avulso-check     defeito-avulso     1 defeito-avulso--check.txt       --check
 
 # Determinismo: duas execuções idênticas byte a byte (AC-001-001)
 total=$((total + 1))

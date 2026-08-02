@@ -67,9 +67,9 @@ done
 
 cd "$SLUG_DIR" || die2 "não consegui entrar em $SLUG_DIR"
 
-SRC="$( { ls specs/SPEC-*.md plans/PLAN-*.md tasks/TASK-*.md 2>/dev/null || true; } | grep -v -- '-INDEX\.md$' || true)"
+SRC="$( { ls specs/SPEC-*.md plans/PLAN-*.md tasks/TASK-*.md briefs/BRIEF-*-avulso.md 2>/dev/null || true; } | grep -v -- '-INDEX\.md$' || true)"
 IDX="$(ls tasks/TASK-*-INDEX.md 2>/dev/null || true)"
-[ -n "$SRC" ] || die2 "nenhum artefato SDD (specs/SPEC-*.md, plans/PLAN-*.md, tasks/TASK-*.md) em: $SLUG_DIR"
+[ -n "$SRC" ] || die2 "nenhum artefato SDD (specs/SPEC-*.md, plans/PLAN-*.md, tasks/TASK-*.md, briefs/BRIEF-*-avulso.md) em: $SLUG_DIR"
 
 TMP="$(mktemp -d)" || die2 "não consegui criar diretório temporário."
 trap 'rm -rf "$TMP"' EXIT
@@ -159,6 +159,7 @@ FNR == 1 {
   else if (FILENAME ~ /(^|\/)specs\//)       ftype = "S"
   else if (FILENAME ~ /(^|\/)plans\//)       ftype = "P"
   else if (FILENAME ~ /(^|\/)tasks\//)       ftype = "T"
+  else if (FILENAME ~ /(^|\/)briefs\//)      ftype = "B"
   cur_feat = ""; cur_comp = ""; cur_nd = 0; sect = ""; covermode = ""; curwave = ""
   cur_task = ""; warned_headless = 0
   fmmm = ""
@@ -297,6 +298,24 @@ ftype == "P" && sect == "map7" && line ~ /^\|/ {
   next
 }
 
+# ---------- BRIEF avulso (só briefs/BRIEF-*-avulso.md entram no SRC — 4.86) ----------
+ftype == "B" && line ~ /^# BRIEF-[0-9]+/ {
+  id = grabid(line, "BRIEF-[0-9]+")
+  if (id != "") { cur_nd = node("BRIEF", id); NCRIT[cur_nd] = 0 }
+  next
+}
+ftype == "B" && cur_nd > 0 && line ~ /^\*\*Status\*\*[ \t]*:/ {
+  NSTAT[cur_nd] = trimtok(fieldrest(line)); next
+}
+ftype == "B" && cur_nd > 0 && line ~ /^## Crit/ {
+  NCRIT[cur_nd] = 1; next
+}
+ftype == "B" && cur_nd == 0 && line ~ /^(\*\*(Status|Tipo|Origem)\*\*[ \t]*:|## )/ {
+  # arquivo -avulso.md cujo H1 não foi reconhecido: degrada declaradamente (§1)
+  if (!warned_headless) { warnout("heading", "brief avulso sem heading '# BRIEF-MMM:' reconhecivel"); warned_headless = 1 }
+  next
+}
+
 # ---------- TASK ----------
 ftype == "T" && line ~ /^# TASK-[0-9]+-[0-9]+/ {
   id = grabid(line, "TASK-[0-9]+-[0-9]+")
@@ -309,7 +328,7 @@ ftype == "T" && line ~ /^## / {
   else sect = ""
   next
 }
-ftype == "T" && cur_task == "" && line ~ /^\*\*(Pertence a|Realiza \(FRs\)|Componente|Wave|Status|Tipo)\*\*[ \t]*:/ {
+ftype == "T" && cur_task == "" && line ~ /^\*\*(Pertence a|Brief|Realiza \(FRs\)|Componente|Wave|Status|Tipo)\*\*[ \t]*:/ {
   # campo de TASK num arquivo cujo H1 não foi reconhecido: degrada declaradamente,
   # nunca herda a task do arquivo anterior
   if (!warned_headless) { warnout("heading", "arquivo de TASK sem heading '# TASK-MMM-XXX:' reconhecivel"); warned_headless = 1 }
@@ -317,6 +336,10 @@ ftype == "T" && cur_task == "" && line ~ /^\*\*(Pertence a|Realiza \(FRs\)|Compo
 }
 ftype == "T" && cur_task != "" && line ~ /^\*\*Pertence a\*\*[ \t]*:/ {
   listedges("belongs-to", cur_task, fieldrest(line), "^PLAN-[0-9]+$", "Pertence a"); next
+}
+ftype == "T" && cur_task != "" && line ~ /^\*\*Brief\*\*[ \t]*:/ {
+  # âncora da TASK avulsa (4.86) — exclusiva com Pertence a (check task-ancora-dupla)
+  listedges("task-brief", cur_task, fieldrest(line), "^BRIEF-[0-9]+$", "Brief"); next
 }
 ftype == "T" && cur_task != "" && line ~ /^\*\*Realiza \(FRs\)\*\*[ \t]*:/ {
   listedges("realiza", cur_task, fieldrest(line), "^FR-[0-9]+-[0-9]+$", "Realiza (FRs)"); next
@@ -414,6 +437,7 @@ END {
     if (i in NWAVE) a = "wave=" NWAVE[i]
     if (i in NSTAT) a = a (a == "" ? "" : " ") "status=" NSTAT[i]
     if (i in NTIPO) a = a (a == "" ? "" : " ") "tipo=" NTIPO[i]
+    if (i in NCRIT) a = a (a == "" ? "" : " ") "crit=" NCRIT[i]
     print "node\t" NDT[i] "\t" NDI[i] "\t" NDF[i] "\t" a
   }
 }
@@ -542,13 +566,15 @@ $1 == "node" {
     if (match($5, /wave=[0-9]+/)) wave[id] = substr($5, RSTART + 5, RLENGTH - 5)
     if (index($5, "status=") > 0) {
       st = substr($5, index($5, "status=") + 7)
-      sub(/ tipo=.*$/, "", st)
+      sub(/ (tipo|crit)=.*$/, "", st)
       status[id] = st
     }
+    if (match($5, /crit=[0-9]+/)) bcrit[id] = substr($5, RSTART + 5, RLENGTH - 5)
   }
-  if (type == "TASK") { TKN++; TK[TKN] = id }
-  if (type == "COMP") { CPN++; CP[CPN] = id }
-  if (type == "PLAN") { planbymmm[mmm(id)] = id }
+  if (type == "TASK")  { TKN++; TK[TKN] = id }
+  if (type == "COMP")  { CPN++; CP[CPN] = id }
+  if (type == "PLAN")  { planbymmm[mmm(id)] = id }
+  if (type == "BRIEF") { BFN++; BF[BFN] = id }
   next
 }
 $1 == "edge" {
@@ -556,6 +582,7 @@ $1 == "edge" {
   if ($2 == "task-dep")      { td[$3 SUBSEP $4] = $5 }
   if ($2 == "blocks")        { bl[$3 SUBSEP $4] = $5 }
   if ($2 == "belongs-to")    { belongs[$3] = $4 }
+  if ($2 == "task-brief")    { tbrief[$3] = $4 }
   if ($2 == "plan-covers")   { pcov[$3 SUBSEP $4] = 1 }
   if ($2 == "realiza")       { RZN++; RZF[RZN] = $3; RZT[RZN] = $4 }
   if ($2 == "maps")          { mapped_to[$4] = 1; MPN++; MPF[MPN] = $3; MPT[MPN] = $4; MPL[MPN] = $5 }
@@ -588,6 +615,19 @@ END {
   for (i = 1; i <= NN; i++) {
     if (cnt[NTY[i], NID[i]] > 1)
       finding("ERROR", "id-duplicado", NID[i] " declarado " cnt[NTY[i], NID[i]] "x (" nfiles[NTY[i], NID[i]] ")")
+  }
+
+  # ---- brief-sem-criterio / task-ancora-dupla (todo stage — 4.86) ----
+  for (i = 1; i <= BFN; i++) {
+    if (!inplan(nodefile[BF[i]])) continue
+    if (bcrit[BF[i]] == "0")
+      finding("WARNING", "brief-sem-criterio", BF[i] " sem heading \"## Criterio de aceite\" (" nodefile[BF[i]] ")")
+  }
+  for (i = 1; i <= TKN; i++) {
+    t = TK[i]
+    if (!inplan(nodefile[t])) continue
+    if ((t in belongs) && (t in tbrief))
+      finding("ERROR", "task-ancora-dupla", t ": Pertence a " belongs[t] " e Brief " tbrief[t] " simultaneos (ancora exclusiva)")
   }
 
   # ---- ref-quebrada ----
@@ -717,6 +757,8 @@ END {
         finding("ERROR", "pertence-vs-arquivo", t ": MMM do arquivo (" fm ") difere do ID (" nodefile[t] ")")
       if ((t in belongs) && mmm(belongs[t]) != mmm(t))
         finding("ERROR", "pertence-vs-arquivo", t ": Pertence a " belongs[t] " difere do MMM do ID")
+      if ((t in tbrief) && mmm(tbrief[t]) != mmm(t))
+        finding("ERROR", "pertence-vs-arquivo", t ": Brief " tbrief[t] " difere do MMM do ID")
     }
 
     # ---- index-desatualizado ----

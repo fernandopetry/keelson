@@ -73,6 +73,7 @@ variam por projeto.
 | `mode` | `create` (cria hierarquia) \| `link` (pendura em issue existente) — §5 |
 | `issueType.spec` / `issueType.feature` / `issueType.task` / `issueType.standalone` | **IDs** do tipo da issue da SPEC, da Story de funcionalidade (opcional — `null` desliga o 3º nível, §6.1), da sub-task da TASK, e do tipo **nível 0** da tarefa isolada (opcional — `null` = tasks isoladas não sincronizam, §7) |
 | `epicPolicy` | `always` (default — SPEC → Epic sempre) \| `multi-feature` (0–1 FEAT → projeção **compacta**, sem Epic — §7.0) |
+| `standaloneParent` | key **literal** de um Epic agrupador (criado uma vez pelo humano, sem SPEC por trás) que vira `parent` da Story avulsa (§7.1 — decisão 4.86); `null` (default) → Story avulsa nasce sem pai |
 | `transition` | `off` \| `comment` (default) \| `auto` — §9 |
 | `mapFile` | caminho do mapa `.md` do projeto (§3); `null` → só `summary`+`description`, sem mover card |
 | `boardId` | opcional, só para compor link "ver no board" em comentário |
@@ -313,8 +314,10 @@ Verificações cobertas por teste automatizado (sem passo manual): <IDs + o que 
   SPEC registrou como risco assumido (não como defeito) é exatamente o que um QA de boa-fé
   abre como bug. Nomeie-o com o efeito visível e a palavra "conhecido e aceito" — os riscos da
   §9 da SPEC são fonte tão legítima quanto o out-of-scope da §4.
-- Tarefa isolada de origem avulsa (bugfix/chore sem SPEC): mesmo esqueleto, derivado da
-  própria TASK — o que muda, como verificar (do critério de verificação dela) e o escopo.
+- Tarefa isolada de origem avulsa (bugfix/chore sem SPEC — decisão 4.86): mesmo esqueleto,
+  derivado do **brief avulso** — pedido como dito, interpretação, critério de aceite (vira
+  o cenário de "Como testar") e o que ficou fora; TASKs filhas, quando existem, derivam
+  das próprias TASKs como qualquer sub-task.
 
 **Check de forma antes de enviar** (decisão 4.77 — auto-corretivo, nunca bloqueia). Com a
 descrição renderizada e **antes** do `createJiraIssue`/`editJiraIssue`, confira contra o
@@ -424,16 +427,25 @@ SPEC quando ela é nível 0 (2 níveis válido). Gravar a key na closure (§10).
 `createIssueLink` ("relates to") em vez de sub-task.
 
 **Tarefa isolada (`issueType.standalone`)** — o card de QA fora do aninhamento; `null` →
-tasks isoladas não sincronizam (nem avisa). Origem avulsa (abaixo); origem transversal —
+avulsos não sincronizam (nem avisa). Origem avulsa (abaixo); origem transversal —
 ver `jira-sync-feat.md`.
-- **TASK avulsa** (roteada pelo `/keelson:triage` direto para TASK — bugfix/chore/ops, sem
-  SPEC/FEAT): issue de `issueType.standalone` com `description` = template **unidade de QA**
-  da receita §6.2 (origem avulsa) e `parent` = issue-SPEC do slug **quando
-  adjacente** (Epic(1) ▸ nível 0 — mesma regra da degradação do §7.0); sem issue-SPEC ou sem
-  adjacência → **sem `parent`** + `createIssueLink` "relates to" com ela, se existir. Criada
-  pelo gancho do comando que gera/executa a TASK (closure do `/keelson:implement` quando não
-  há key) ou pela reconciliação (§12).
-Key persistida na closure da TASK (§10), como qualquer sub-task.
+
+- **Brief avulso** (decisão 4.86 — a origem avulsa: mudança do dia a dia sem SPEC/PLAN,
+  roteada pelo `/keelson:triage` ou nascida no modo sob demanda, 4.75): o **brief** projeta
+  como Story de `issueType.standalone` com `description` = template **unidade de QA** da
+  receita §6.2 (origem avulsa, derivada do próprio brief — pedido, interpretação, critério
+  de aceite) e `parent` = **`standaloneParent` da ficha** quando preenchido e adjacente
+  (Epic(1) ▸ nível 0); sem ele → **sem `parent`** + `createIssueLink` "relates to" com a
+  issue-SPEC do slug, se existir. **Momento da criação: antes do código** — na largada da
+  execução do brief, com o marco "TASK iniciada" (§9) movendo a Story; é a visibilidade
+  que motivou a 4.86 (o card existe enquanto o trabalho acontece, não depois). A closure e
+  a reconciliação (§12) continuam como rede de segurança idempotente para brief que ficou
+  sem key. Rota pull (`--from <KEY>`): o brief **nasce** da issue existente — semântica
+  `link` (§5): validar com `getJiraIssue`, **nunca criar duplicata**.
+- **TASKs do brief avulso** (quando o trabalho reparte): sub-tasks **da Story avulsa**
+  (`issueType.task`, 0 ▸ −1 — mesma régua de adjacência do §7.0), template sub-task da
+  §6.2, key na closure da TASK (§10). Sem TASKs → a Story é o card único. Para o §9, a
+  Story avulsa **é** a "isolada": unidade de QA, com os mesmos marcos e o mesmo teto.
 
 ## §8. Campos personalizados (§3, seção Campos)
 
@@ -551,6 +563,9 @@ declarada no mapa). A política `transition` continua valendo como em qualquer m
   a mesma key = persistência inconsistente** (a mesma issue não pode ser Epic e Story):
   tratar a Story como **ausente** — sondagem anti-duplicata (§4), criar/corrigir e avisar no
   output; nunca aceitar a key duplicada como estado válido.
+- **Brief avulso** (decisão 4.86) → linha `**Jira**: <KEY>` no cabeçalho do
+  `briefs/BRIEF-MMM-*-avulso.md` (ausente = ainda não sincronizado; na rota pull a linha
+  já nasce preenchida com a key do card de origem — é ela que impede a duplicata).
 - **TASK** → campo `Jira: <KEY>` no bloco "Histórico de execução" da closure, ao lado de
   `Commit SHA`.
 - **INDEX** → apenas 1 linha no "Histórico recente" — **do sucesso**

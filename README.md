@@ -92,7 +92,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:auto` | The default: full cycle end-to-end — critical questions once at kickoff, then no per-step approval |
 | `/keelson:guided` † | Opt-in paused cycle — checkpoints at SPEC and PLAN for your OK |
 | `/keelson:refine` † | Polish a raw idea into a refined prompt before it becomes a demand |
-| `/keelson:triage` | Triage a new demand — routes to SPEC, PLAN, TASK or direct action (classifies, doesn't execute) |
+| `/keelson:triage` | Triage a new demand — routes to SPEC, PLAN, TASK, standalone brief or direct action; `--from=<KEY>` pulls an existing tracker card as the input (classifies, doesn't execute) |
 | `/keelson:specify-epic` | Decompose an epic-sized request into prioritized independent demands via the PM agent — you confirm the split, each demand then runs its own cycle |
 
 **Support:**
@@ -405,18 +405,17 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.60.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.61.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **an inert diff waives the test suite** (decision 4.84). The suite
-exists to prove code: when no file in the diff can change the behavior it proves —
-docs-only, SDD artifacts, static assets — every execution point (developer baseline and
-final run, review gate 2, end of wave, DoD check, `/keelson:integrate`) waives the run.
-The check is mechanically anchored (`git diff --name-only` against the ficha's
-`codePaths` and the test trees), anything the runtime or runner loads still counts as
-code, and the waiver is always a declared state, never silence. When in doubt, the
-suite runs.
+New in this release: **day-to-day work gets a written task — and a board card — before
+the code** (decision 4.86). A bugfix or small improvement with no applicable SPEC/PLAN
+is born as a **standalone brief** (request as stated, interpretation, acceptance
+criterion); splittable work anchors TASKs on it, and with Jira enabled the brief
+becomes a Story on the board **before coding starts** — a card someone already wrote
+pulls in via `/keelson:triage --from=<KEY>` with no duplicates. Changing what the
+system promises, or needing a technical decision, still means the full cycle.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

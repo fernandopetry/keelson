@@ -17,6 +17,43 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.61.0] — 2026-08-02
+
+Decision 4.86
+
+### Added
+- **Standalone brief: day-to-day work gets a written task before the code.** A bugfix
+  or small improvement with no applicable SPEC/PLAN is born as a standalone brief
+  (`briefs/BRIEF-MMM-*-avulso.md`) — request as stated, interpretation, acceptance
+  criterion — written in the on-demand mode's first turn (4.75) or routed by
+  `/keelson:triage`. Splittable work anchors TASKs on the brief (`**Brief**:` instead
+  of `**Pertence a**:`); a single diff needs no TASK — the brief is the unit and
+  carries the closure fields. Falsifiable routing rule: changing what the system
+  promises, or a decomposition that would need a technical decision (a DEC), is a
+  cycle, never a standalone.
+- **The tracker card exists while the work happens, not after.** With `jira.enabled`
+  and `issueType.standalone` set (the leg shipped in 4.28 that never had a producer),
+  the brief becomes a Story on the board **before coding starts**, and its TASKs
+  become sub-tasks of that Story. New ficha field `jira.standaloneParent`: the key of
+  a grouping Epic (created once by the human) that parents those Stories; `null` →
+  parentless Story — both valid.
+- **Pull route.** `/keelson:triage --from=<KEY>` (or citing a key in the on-demand
+  mode) turns an existing human-written card into the brief: the card's description
+  is the classification input, the key lands on the brief's `**Jira**:` line (link
+  semantics), and no duplicate card is ever created.
+- **The graph learns the standalone anchor.** New node (standalone BRIEF), new edge
+  (`task-brief`), new checks (`brief-sem-criterio` WARNING, `task-ancora-dupla`
+  ERROR); `ref-quebrada` and `pertence-vs-arquivo` cover the new anchor. Two new
+  fixtures; suite grows to 24 cases, all green. Artifact numbering becomes a single
+  per-slug allocator (max of all numbered artifacts + 1), making BRIEF filename
+  collisions impossible by construction — per-type density was never a contract.
+
+### Changed
+- Re-run `/keelson:init` on consumers (the managed block and the ficha changed;
+  merge-preserving).
+
+---
+
 ## [0.60.0] — 2026-08-02
 
 Decision 4.85
