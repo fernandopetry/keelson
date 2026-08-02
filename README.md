@@ -405,17 +405,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.61.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.62.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **day-to-day work gets a written task — and a board card — before
-the code** (decision 4.86). A bugfix or small improvement with no applicable SPEC/PLAN
-is born as a **standalone brief** (request as stated, interpretation, acceptance
-criterion); splittable work anchors TASKs on it, and with Jira enabled the brief
-becomes a Story on the board **before coding starts** — a card someone already wrote
-pulls in via `/keelson:triage --from=<KEY>` with no duplicates. Changing what the
-system promises, or needing a technical decision, still means the full cycle.
+New in this release: **a standalone brief that spans several slugs now has a defined
+home** (decision 4.87). A cross-cutting change keeps **one** brief — it lives in the
+dominant slug (the one whose SPEC it would become if the work grew into a cycle), the
+other touched slugs get a one-line pointer in their INDEX, and the brief's TASKs stay
+in the brief's slug. One change, one brief, one card — never duplicates.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

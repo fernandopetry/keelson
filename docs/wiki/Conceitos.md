@@ -45,7 +45,10 @@ demanda — o agrupador de SPECs, PLANs e TASKs de um mesmo assunto.
 registro: nasce como **brief avulso** (`briefs/BRIEF-MMM-*-avulso.md`) — a tarefa
 escrita *antes* do código, com pedido, interpretação e critério de aceite. Se o
 trabalho reparte, TASKs ancoram nele; com Jira ligado, ele vira Story no quadro na
-largada (e um card que você já abriu entra como origem, sem duplicar). Regra de corte:
+largada (e um card que você já abriu entra como origem, sem duplicar). Mudança que
+cruza várias áreas continua com **um brief só**: ele mora no slug dominante — o de onde
+sairia a SPEC se o trabalho crescesse — e os demais ganham uma linha de referência no
+INDEX. Regra de corte:
 mudou o que o sistema **promete**, ou há decisão técnica entre alternativas → é ciclo,
 não avulso.
 

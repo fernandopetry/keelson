@@ -36,6 +36,8 @@ só com o que o humano colou.
 
 A resolução de slug segue a regra canônica (Etapa 0.2 do `/keelson:specify`): faceta de domínio que já tem pasta **pertence a esse slug**; legado primeiro migra (`/keelson:migrate-legacy`).
 
+Demanda que toca **vários slugs** com destino avulso: o brief é **um só**, na morada do slug dominante — teste: *se crescesse para um ciclo, onde viveria a SPEC?* (regra e rastro nos demais INDEXes: `index-contract.md`, decisão 4.87).
+
 ## Etapa 1: carregar contexto
 
 1. Ler `{docsRoot}/<slug>/INDEX.md` inteiro — capacidades (por estado), SPECs/PLANs, decisões irreversíveis e riscos ativos.

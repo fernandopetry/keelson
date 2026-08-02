@@ -17,6 +17,36 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.62.0] — 2026-08-02
+
+Decision 4.87
+
+### Added
+- **A standalone brief that spans several slugs now has a defined home.** The first
+  real-world standalone change crossed four slugs and, with no placement rule, no
+  brief was written at all — the board card only appeared after the code, pushed by
+  the jira-guard. The rule: a cross-cutting change keeps **one** brief (the unit is
+  the change, not the slug), living in the **dominant slug** — falsifiable test:
+  *if this grew into a cycle, which slug would own the SPEC?* In practice, the slug
+  that owns the code realizing the change (the shared component/mechanism), not the
+  screens receiving it; a genuine tie is broken by declaring the choice in the
+  brief's interpretation. Each other touched slug gets a one-line pointer in its
+  INDEX's recent-history section — a reference, never a copy. The brief's TASKs stay
+  in the brief's slug: the `**Brief**:` anchor never crosses slugs (the graph works
+  per slug directory, and a cross-slug anchor failing as `ref-quebrada` is now by
+  design). The skeleton's `**Slug**:` line gains a short opt-in form naming the
+  other touched slugs; the graph extractor does not read that line, so the engine
+  is untouched.
+
+### Changed
+- If the card-after-the-code pattern recurs on a multi-slug change now that the
+  placement rule exists, the planned response is a mechanical **brief-guard** (a
+  Stop hook in the jira-guard mold: non-trivial change with neither a brief nor an
+  SDD artifact → demand the file). Recorded in the decision as the escalation path,
+  not shipped in this release.
+
+---
+
 ## [0.61.0] — 2026-08-02
 
 Decision 4.86

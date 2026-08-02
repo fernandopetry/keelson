@@ -103,7 +103,7 @@ da Story `standalone` no tracker (protocolo Jira §7). Esqueleto literal:
 ```markdown
 # BRIEF-MMM: <título curto da mudança>
 
-**Slug**: <slug>
+**Slug**: <slug-morada> — toca também: <slug2>, <slug3> (forma curta só quando multi-slug)
 **Tipo**: avulso
 **Status**: Aberto | Concluído
 **Data**: <YYYY-MM-DD>
@@ -139,6 +139,19 @@ verifica a referência e a forma: `task-brief` e `brief-sem-criterio` no
 caminho **para e promove** (vira SPEC/ciclo), declarando. O trivial inline (4.75)
 continua sem brief. Slug com avulsos ganha no INDEX a seção `## Avulsas`
 (tabela `| ID | Título | Status | Jira | Data |`), mantida por quem fecha o avulso.
+
+**Morada multi-slug (decisão 4.87)**: mudança avulsa que toca vários slugs continua com
+**um brief só** — a unidade do brief é a mudança, não o slug; nunca duplique brief nem
+card. A morada é o **slug dominante** — teste falsificável: *se isto crescesse para um
+ciclo, em qual slug viveria a SPEC?* Na prática, o slug dono do código que **realiza** a
+mudança (o componente/mecanismo compartilhado), não os que apenas a recebem; sem
+mecanismo comum, o do efeito observável principal; empate genuíno → qualquer um,
+**declarado na interpretação**. Na entrega, cada slug adicional recebe **1 linha no
+`## Histórico recente` do INDEX** apontando a morada
+(`<data>: <descrição> — brief avulso em <slug>/briefs/BRIEF-MMM (<key>)`) — referência,
+nunca cópia; `## Avulsas` existe só no slug-morada. TASKs do brief vivem **no slug do
+brief**: a âncora `**Brief**:` não cruza slug — o grafo opera por diretório, e âncora
+cross-slug reprova como `ref-quebrada` por design.
 
 ### Contrato da tabela "PLANs" do INDEX (fonte única)
 

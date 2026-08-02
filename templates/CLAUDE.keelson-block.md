@@ -39,7 +39,9 @@
   escreve o código**: destila um briefing curto (o quê, onde, critério de aceite) —
   que **nasce em arquivo**, como **brief avulso** em
   `{docsRoot}/<slug>/briefs/BRIEF-MMM-<descricao>-avulso.md` (esqueleto no
-  `index-contract.md` do plugin; decisão 4.86) —, delega ao `developer` e passa o diff
+  `index-contract.md` do plugin; decisão 4.86; mudança que cruza slugs → **um brief só**,
+  no slug dominante — onde viveria a SPEC — com 1 linha de rastro no INDEX dos demais,
+  decisão 4.87) —, delega ao `developer` e passa o diff
   pelo `code-reviewer` (régua avulsa); `security-engineer` em mudança sensível e `qa`
   quando há comportamento observável — mesmos gatilhos do ciclo. Invocar um agent
   **não puxa o ciclo**: cada um devolve a sua tarefa e para; a orquestração é sempre do
