@@ -68,15 +68,32 @@ Caminho de um ou mais `PLAN-*.md`. Contexto a ler (protocolo §2): o PLAN, a SPE
 
 ## Etapa 4: checks do grafo de componentes (FR → COMP e COMP → COMP)
 
-### ERROR se:
-- Tabela "Mapeamento FR -> componente" ausente
-- FR coberto não mapeado para COMP
-- Mapping referencia COMP não definido na seção 3
-- ACs listados não existem na SPEC
+### Fato mecânico primeiro
 
-### WARNING se:
+A parte estrutural desta etapa tem **dono único e execução mecânica** — catálogo,
+severidades e carência de legado em
+`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md`. Execute (num subagent
+executor sem a env var, derive a raiz do plugin do caminho deste SKILL.md — o prefixo
+antes de `/skills/`):
+
+```
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh" {docsRoot}/<slug> --check --stage=plan --plan MMM
+```
+
+Chega como fato: FR coberto sem linha na §7 (`fr-sem-comp`), §7 referenciando COMP ou
+AC inexistente (`ref-quebrada`), FR mapeado fora da cobertura, COMP sem FR
+(`comp-sem-fr`), divergência entre o `Realiza` dos COMPs e a §7, ciclo COMP → COMP e
+ID duplicado. Cada achado entra no relatório como `**[graph.sh]** SEVERIDADE check —
+detalhe`; a calibração final é sua (protocolo §1/§3). **Degradação por resultado** e
+**cobertura mista**: réguas do §5 do graph-contract.md — sem saída válida, aplique os
+mesmos checks por leitura e declare a degradação; artefato com `nao-parseavel`, não
+ateste ausência de defeito para aquela aresta.
+
+### ERROR se (seus):
+- Tabela "Mapeamento FR -> componente" ausente
+
+### WARNING se (seus):
 - Muitos FRs no mesmo COMP (COMP doing too much)
-- COMP sem FR mapeado
 - **Aresta de interface aberta** — toda aresta declarada na §3 fecha nas **duas** pontas. Aberta em qualquer uma delas, o PLAN é internamente contraditório e a TASK que decompõe o COMP herda a decisão que o PLAN não tomou: quem implementa escolhe sozinho. Checar as duas direções:
   - **Saída sem consumidor** (código morto decidido no PLAN): elemento da `Interface pública` que nenhum consumidor declarado invoca (COMP dependente, fluxo da §4, rota). Contra-exemplo: uma operação `Toggle<X>` exposta na `Interface pública` de um COMP enquanto nenhum COMP dependente, fluxo da §4 ou rota declarada a invoca. Exceção: superfície sem consumidor interno por natureza (testes, rotas HTTP, CLI, migration).
   - **Entrada sem fornecedor** (inobtenível): valor que a `Interface pública` exige — argumento **ou** placeholder (`:foo`) do SQL escrito no PLAN — sem origem declarada no mesmo PLAN. Origens válidas: path param da tabela de rotas, corpo/DTO, sessão (identidade, permissão), retorno de outro COMP. Contra-exemplo: uma operação cuja `Interface pública` exige o identificador do agrupamento pai (`:parent_id`) sem origem declarada, enquanto a rota que a aciona traz apenas o id do próprio recurso no path (`DELETE /recurso/{id}`) — a única origem seria um `SELECT` antes da escrita, o check-then-act que uma DEC **citada pelo próprio PLAN** fecha. "Só dá para obter consultando o banco antes" é o sinal.

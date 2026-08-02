@@ -33,6 +33,13 @@ Produza um **resumo executivo** do estado de um slug, respondendo à pergunta es
    - Risks: INDEX seção "Riscos ativos" + SPECs ativas para Q-XXX e RISK-XXX.
    - Glossary: INDEX seção glossário.
    - Decisions: INDEX + PLANs Done para DECs irreversíveis.
+4. **Pergunta sobre dependências, ordem ou paralelismo** (waves, "o que bloqueia o
+   quê", arquitetura FR→COMP): gere o diagrama e inclua-o na resposta —
+   `bash "${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh" {docsRoot}/<slug> --format=mermaid`
+   (TASKs por wave, com status) ou `--format=mermaid-comp` (FR → COMP + dependências).
+   O script é read-only (compatível com o princípio inviolável); régua e contrato:
+   `docs/_meta/conventions/graph-contract.md`. Indisponível/falhou → siga pelo INDEX,
+   nomeando a causa.
 
 ## Etapa 2: síntese
 

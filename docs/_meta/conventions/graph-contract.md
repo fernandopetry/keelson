@@ -78,6 +78,7 @@ foram ERROR nos validators.
 | `realiza-fora-cobertura` | TASK realiza FR que o PLAN dela não cobre | ERROR |
 | `feat-divergente` | `declares-feat` ≠ conjunto derivado (`realiza` × `feat-of`), ou primária fora dele — só roda quando o conjunto derivado é não-vazio (campo presente com SPEC sem FEATs é matéria do validator, WARNING+auto-fix) | ERROR |
 | `fr-mapeado-fora-cobertura` | §7 mapeia FR fora de `plan-covers` | ERROR |
+| `fr-sem-comp` | FR coberto pelo PLAN sem linha na §7 dele | ERROR · carência |
 | `comp-sem-fr` | COMP sem linha na §7 | WARNING |
 | `realiza-vs-mapeamento` | `comp-realiza` divergente da §7 (a §7 é a fonte de cobertura) | WARNING |
 | `dep-bloqueia-assimetrica` | A depende de B sem B bloquear A (ou vice-versa) | WARNING |
@@ -95,7 +96,7 @@ scripts/graph.sh <dir-do-slug> [--check] [--stage=plan|tasks] [--format=tsv|merm
   executor (decisão 4.42), a raiz do plugin deriva do caminho do SKILL.md citado no
   briefing (prefixo antes de `/skills/`).
 - `--stage=plan` roda só o computável sem TASKs (`ciclo-comp`, `ref-quebrada` do lado
-  PLAN/SPEC, `id-duplicado`, `fr-mapeado-fora-cobertura`, `comp-sem-fr`,
+  PLAN/SPEC, `id-duplicado`, `fr-mapeado-fora-cobertura`, `fr-sem-comp`, `comp-sem-fr`,
   `realiza-vs-mapeamento`) — PLAN recém-criado sem `tasks/` sai 0. `--stage=tasks`
   (ou sem flag) roda tudo. `--plan MMM` restringe ao PLAN indicado.
 - `--format=tsv` emite o grafo: `node<TAB>TIPO<TAB>ID<TAB>arquivo<TAB>attrs` ·

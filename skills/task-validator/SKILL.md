@@ -13,7 +13,7 @@ Você é um Quality Engineer: valide a TASK contra os checks abaixo.
 
 Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara validação batch de todas as tasks daquele PLAN). Contexto a ler (protocolo §2): a TASK, o PLAN (`Pertence a`), a SPEC referenciada pelo PLAN (incluindo o mapa FR→FEAT quando a §5 declara FEATs) e as outras TASKs do mesmo PLAN.
 
-**Batch com FEATs**: validar também a seção "Cobertura por funcionalidade" do TASK-MMM-INDEX — ERROR se divergente dos campos `Funcionalidade` das TASKs; WARNING se alguma FEAT da SPEC com FR coberto pelo PLAN não tem nenhuma TASK que a liste.
+**Batch com FEATs**: validar também a seção "Cobertura por funcionalidade" do TASK-MMM-INDEX — ERROR se divergente dos campos `Funcionalidade` das TASKs; WARNING se alguma FEAT da SPEC com FR coberto pelo PLAN não tem nenhuma TASK que a liste. (As divergências de **waves** e das tabelas de **FR/AC** do TASK-MMM-INDEX já chegam como fato — check `index-desatualizado` da Etapa 2; a seção de funcionalidade permanece sua.)
 
 ## Etapa 1: checks estruturais
 
@@ -45,30 +45,42 @@ Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara valida
 - Bugfix: `-fix-` no nome se Tipo=bugfix
 - Refactor: `-refactor-` no nome se Tipo=refactor
 
-## Etapa 2: checks de vinculação
+## Etapa 2: fato mecânico do grafo (vinculação, dependências, cobertura)
+
+Os checks estruturais desta etapa têm **dono único e execução mecânica** — catálogo de
+checks, severidades e carência de legado em
+`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md`. Execute (diretório do
+slug já resolvido via `docsRoot`; num subagent executor sem a env var, derive a raiz do
+plugin do caminho deste SKILL.md — o prefixo antes de `/skills/`):
+
+```
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh" {docsRoot}/<slug> --check --stage=tasks --plan MMM
+```
+
+Chega como fato: referência quebrada (PLAN, FR, COMP, AC, FEAT ou TASK inexistente), FR
+de `Realiza` fora da cobertura do PLAN, conjunto/primária de `Funcionalidade` divergente
+do derivado, ciclo de dependência, wave incoerente, ID duplicado, `Pertence a` vs
+arquivo, FR/AC coberto sem TASK e assimetria Depende de/Bloqueia.
+
+- Cada achado entra no relatório como **fato** — `**[graph.sh]** SEVERIDADE check —
+  detalhe` — somado à lista da severidade correspondente. A calibração final é sua
+  (protocolo §1/§3): o fato substitui a derivação, nunca o julgamento.
+- **Degradação por resultado**: execução sem saída válida no contrato (script ausente,
+  exit 2, crash, saída malformada) → aplique os mesmos checks por leitura, seguindo o
+  catálogo do graph-contract.md, e **declare** a degradação com a causa nomeada.
+- **Cobertura mista**: artefato com achado `nao-parseavel` → não cite ausência de
+  defeito como fato para os checks que dependem daquela aresta — para esse artefato
+  valem seus próprios olhos, declarado no relatório.
+
+## Etapa 3: checks de vinculação que permanecem seus (o script não computa)
 
 ### ERROR se:
-- PLAN referenciado não existe
-- Algum FR em `Realiza` não existe na SPEC
-- Algum FR em `Realiza` não está coberto pelo PLAN
-- Componente referenciado não definido no PLAN
-- AC vinculado em "Critérios" não existe na SPEC
-- Com FEATs na SPEC: FEAT listada em `Funcionalidade` não existe na SPEC; conjunto listado
-  difere do conjunto derivado das FEATs dos FRs de `Realiza` (faltando ou sobrando); a
-  `(primária)` não pertence ao conjunto derivado; com 2+ FEATs listadas, nem uma marcada
-  `(primária)` nem a forma `transversal (FEAT-..., FEAT-...)` — uma das duas é obrigatória;
-  forma `transversal (...)` com apenas 1 FEAT (transversal exige 2+)
+- Com FEATs na SPEC: com 2+ FEATs listadas, nem uma marcada `(primária)` nem a forma
+  `transversal (FEAT-..., FEAT-...)` — uma das duas é obrigatória; forma
+  `transversal (...)` com apenas 1 FEAT (transversal exige 2+)
 
 ### WARNING se:
-- TASK realiza FR também coberto por outra TASK do mesmo PLAN
-
-## Etapa 3: checks de dependências
-
-### ERROR se:
-- `Depende de: TASK-X` mas TASK-X não existe
-- Ciclo de dependência
-
-### WARNING se:
+- TASK realiza FR também coberto por outra TASK do mesmo PLAN (overlap)
 - TASK em Wave 2+ sem declarar nenhuma dependência (suspeito — heurística, não bloqueia)
 
 ## Etapa 4: checks de critérios de pronto
@@ -122,7 +134,9 @@ A fonte primária de convenções é a **ficha/perfil** (o que o `/keelson:tasks
 ## Etapa 8: checks específicos por tipo
 
 ### Tipo = bugfix
-- ERROR se: `Realiza` não menciona o AC violado.
+- ERROR se: campo `**AC violado**:` ausente ou vazio (a existência do AC citado já
+  chega como fato — `ref-quebrada` da Etapa 2). Acervo legado que ainda traz o AC
+  dentro de `Realiza (FRs)` (forma antiga `FR-X / AC-n`) não reprova: registre INFO.
 - WARNING se: descrição não cita comportamento atual vs esperado.
 
 ### Tipo = refactor

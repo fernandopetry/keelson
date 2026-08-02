@@ -1,6 +1,7 @@
 ERROR	ac-sem-task	AC-001-002 (cobre FR-001-002, PLAN-001) sem TASK que o cubra em criterio ou roteiro
 ERROR	feat-divergente	TASK-001-001: Funcionalidade declarada diverge do derivado (sobrando: FEAT-001-002) (faltando: FEAT-001-001)
 ERROR	fr-mapeado-fora-cobertura	§7 mapeia FR-001-003 -> COMP-001-001 mas PLAN-001 nao o cobre
+ERROR	fr-sem-comp	FR-001-002 coberto por PLAN-001 sem linha no Mapeamento FR -> componente (§7)
 ERROR	fr-sem-task	FR-001-002 coberto por PLAN-001 sem TASK que o realize
 ERROR	realiza-fora-cobertura	TASK-001-002 realiza FR-001-003 que PLAN-001 nao cobre
 WARNING	comp-sem-fr	COMP-001-002 sem linha no Mapeamento FR -> componente (§7)

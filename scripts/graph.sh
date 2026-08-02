@@ -680,6 +680,21 @@ END {
     }
   }
 
+  # ---- fr-sem-comp (FR coberto sem linha na §7 do seu PLAN) ----
+  for (k in pcov) {
+    split(k, kk, SUBSEP); p = kk[1]; fr = kk[2]
+    if (fr !~ /^FR-/) continue
+    if (!(fr in exist)) continue
+    if (PLANF != "" && mmm(p) != PLANF) continue
+    hit = 0
+    for (i = 1; i <= MPN; i++) if (MPF[i] == fr && mmm(MPT[i]) == mmm(p)) { hit = 1; break }
+    if (!hit) {
+      det = fr " coberto por " p " sem linha no Mapeamento FR -> componente (§7)"
+      if (status[p] == "Done") finding("WARNING", "fr-sem-comp", det " [legacy]")
+      else finding("ERROR", "fr-sem-comp", det)
+    }
+  }
+
   # ---- fr-mapeado-fora-cobertura / comp-sem-fr / realiza-vs-mapeamento (todo stage) ----
   for (i = 1; i <= MPN; i++) {
     fr = MPF[i]; comp = MPT[i]
