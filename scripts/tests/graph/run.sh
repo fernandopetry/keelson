@@ -61,6 +61,9 @@ runcase cobertura-check          defeito-cobertura  1 defeito-cobertura--check.t
 runcase legado-done-check        defeito-legado-done 0 defeito-legado-done--check.txt --check
 runcase plan-sem-tasks-check     plan-sem-tasks     1 plan-sem-tasks--check.txt       --check
 runcase plan-sem-tasks-stage     plan-sem-tasks     0 plan-sem-tasks--check-stage-plan.txt --check --stage=plan
+runcase parse-degrade-check      defeito-parse-degrade 0 defeito-parse-degrade--check.txt --check
+# --plan aceita MMM sem zero-padding (mesmo resultado do padded)
+runcase cobertura-plan-1         defeito-cobertura  1 defeito-cobertura--check-plan.txt --check --plan 1
 
 # Determinismo: duas execuções idênticas byte a byte (AC-001-001)
 total=$((total + 1))
@@ -87,6 +90,10 @@ total=$((total + 1))
 bash "$GRAPH" /caminho/que/nao/existe --check > /dev/null 2>&1
 if [ $? -eq 2 ]; then echo "ok   dir-inexistente-exit-2"
 else echo "FAIL dir-inexistente-exit-2"; fail=$((fail + 1)); fi
+total=$((total + 1))
+bash "$GRAPH" "$FIX/valido" --check --plan 999 > /dev/null 2>&1
+if [ $? -eq 2 ]; then echo "ok   plan-inexistente-exit-2"
+else echo "FAIL plan-inexistente-exit-2 (filtro inválido não pode sair verde)"; fail=$((fail + 1)); fi
 
 echo ""
 if [ "$fail" -gt 0 ]; then

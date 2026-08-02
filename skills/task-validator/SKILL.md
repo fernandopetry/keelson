@@ -19,12 +19,12 @@ Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara valida
 
 ### Front-matter (ERROR se ausente)
 - `Slug`
-- `Pertence a` apontando para PLAN existente
+- `Pertence a` presente (a existência do PLAN apontado chega como fato — `ref-quebrada`, Etapa 2)
 - `Realiza (FRs)` listado
 - `Funcionalidade` — obrigatório **somente** quando a SPEC do PLAN declara FEATs (headings
   `### FEAT-` na §5) e a TASK realiza FRs (ERROR se ausente nesse caso). Presente com SPEC
   **sem** FEATs → WARNING + auto-fix de remoção da linha. `chore` sem FR → pode omitir.
-- `Componente` apontando para COMP existente no PLAN
+- `Componente` presente (a existência do COMP apontado chega como fato — `ref-quebrada`, Etapa 2)
 - `Wave` declarada
 - `Tamanho estimado` em `{small, medium}`
 - `Status` em `{Todo, In Progress, Done, Blocked}`

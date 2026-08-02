@@ -1,0 +1,3 @@
+WARNING	fr-sem-task	FR-001-001 coberto por PLAN-001 sem TASK que o realize [parse]
+WARNING	fr-sem-task	FR-001-002 coberto por PLAN-001 sem TASK que o realize [parse]
+WARNING	nao-parseavel	tasks/TASK-001-001-prosa.md campo "Realiza (FRs)": implementa o fluxo de login descrito acima

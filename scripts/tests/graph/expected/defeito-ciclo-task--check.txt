@@ -1,3 +1,4 @@
 ERROR	ciclo-task	TASK-001-001 -> TASK-001-002 -> TASK-001-001
 ERROR	wave-incoerente	TASK-001-001 (wave 1) depende de TASK-001-002 (wave 1)
 ERROR	wave-incoerente	TASK-001-002 (wave 1) depende de TASK-001-001 (wave 1)
+ERROR	wave-incoerente	TASK-001-002 (wave 1) depende de TASK-001-003 (wave 1)

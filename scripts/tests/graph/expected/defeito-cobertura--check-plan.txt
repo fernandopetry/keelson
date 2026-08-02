@@ -1,0 +1,11 @@
+ERROR	ac-sem-task	AC-001-002 (cobre FR-001-002, PLAN-001) sem TASK que o cubra em criterio ou roteiro
+ERROR	feat-divergente	TASK-001-001: Funcionalidade declarada diverge do derivado (sobrando: FEAT-001-002) (faltando: FEAT-001-001)
+ERROR	fr-mapeado-fora-cobertura	§7 mapeia FR-001-003 -> COMP-001-001 mas PLAN-001 nao o cobre
+ERROR	fr-sem-comp	FR-001-002 coberto por PLAN-001 sem linha no Mapeamento FR -> componente (§7)
+ERROR	fr-sem-task	FR-001-002 coberto por PLAN-001 sem TASK que o realize
+ERROR	realiza-fora-cobertura	TASK-001-002 realiza FR-001-003 que PLAN-001 nao cobre
+WARNING	comp-sem-fr	COMP-001-002 sem linha no Mapeamento FR -> componente (§7)
+WARNING	dep-bloqueia-assimetrica	TASK-001-001 bloqueia TASK-001-002 sem TASK-001-002 declarar Depende de TASK-001-001
+WARNING	index-desatualizado	Cobertura de FRs (FR-001-001): INDEX lista "TASK-001-009", computado "TASK-001-001"
+WARNING	index-desatualizado	tasks/TASK-001-INDEX.md: TASK-001-001 em Wave 2 mas o arquivo declara wave 1
+WARNING	realiza-vs-mapeamento	COMP-001-001: Realiza e §7 divergem — FR-001-002 (so no Realiza), FR-001-003 (so na §7)

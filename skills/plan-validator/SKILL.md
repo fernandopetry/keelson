@@ -42,10 +42,11 @@ Caminho de um ou mais `PLAN-*.md`. Contexto a ler (protocolo §2): o PLAN, a SPE
 
 ### ERROR se:
 - Seção "Cobertura" não declara `SPEC referenciada`
-- SPEC referenciada não existe
 - Lista `FRs cobertos` vazia
-- FR coberto não existe na SPEC referenciada
 - "Cobertura agregada do slug" ausente ou inconsistente
+
+(A **existência** da SPEC referenciada e dos FRs/NFRs cobertos chega como fato —
+`ref-quebrada` em `spec-ref`/`plan-covers`, Etapa 4 — não a re-derive aqui.)
 
 ### WARNING se:
 - Algum FR coberto também em PLAN anterior (overlap não justificado)
@@ -80,8 +81,9 @@ antes de `/skills/`):
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh" {docsRoot}/<slug> --check --stage=plan --plan MMM
 ```
 
-Chega como fato: FR coberto sem linha na §7 (`fr-sem-comp`), §7 referenciando COMP ou
-AC inexistente (`ref-quebrada`), FR mapeado fora da cobertura, COMP sem FR
+Chega como fato: SPEC referenciada ou FR/NFR coberto inexistente (`ref-quebrada` em
+`spec-ref`/`plan-covers`), FR coberto sem linha na §7 (`fr-sem-comp`), §7 referenciando
+COMP ou AC inexistente (`ref-quebrada`), FR mapeado fora da cobertura, COMP sem FR
 (`comp-sem-fr`), divergência entre o `Realiza` dos COMPs e a §7, ciclo COMP → COMP e
 ID duplicado. Cada achado entra no relatório como `**[graph.sh]** SEVERIDADE check —
 detalhe`; a calibração final é sua (protocolo §1/§3). **Degradação por resultado** e

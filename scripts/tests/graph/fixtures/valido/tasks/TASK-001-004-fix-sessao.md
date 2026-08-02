@@ -1,35 +1,25 @@
-# TASK-001-001: Preparar o esqueleto de autenticação
+# TASK-001-004: Corrigir expiração de sessão
 
 **Slug**: valido
 **Pertence a**: PLAN-001
 **Realiza (FRs)**: FR-001-001
+**AC violado**: AC-001-001
 **Funcionalidade**: FEAT-001-001 (primária)
 **Componente**: COMP-001-001
 **Wave**: 1
 **Tamanho estimado**: small
-**Tipo**: feature
+**Tipo**: bugfix
 **Status**: Todo
 
 ## Dependências
 
 - **Depende de**: nenhuma
-- **Bloqueia**: TASK-001-002, TASK-001-003, TASK-001-005
+- **Bloqueia**: nenhuma
 
 ## Contexto
 
-Fixture válida.
-
-## Escopo
-
-### Inclui
-- login()
-
-### Não inclui
-- relatório
+Fixture: exercita a aresta violates (campo AC violado do bugfix).
 
 ## Critérios de pronto
 
 - [ ] Testes cobrem AC-001-001 — verificação executável: `make test` → verde
-- [ ] Sem warnings novos
-
-## Histórico de execução (preenchido pelo /keelson:implement)

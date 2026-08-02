@@ -135,7 +135,9 @@ derivam da FEAT do FR que cobrem. Forma:
 ## 7. Critérios de aceitação (Given-When-Then)
 - **AC-NNN-001** (cobre FR-NNN-001, FR-NNN-002)
 <!-- O "(cobre …)" é campo de aresta do grafo: IDs completos de FR/NFR separados por
-vírgula — sem barra-abreviação (FR-x/y) nem sub-item (FR-x-001a). Régua:
+vírgula — sem barra-abreviação (FR-x/y) nem sub-item (FR-x-001a). Com FEATs declaradas
+na §5, os FRs de um mesmo "(cobre …)" pertencem à MESMA FEAT — a filiação do AC deriva
+dela; AC atravessando FEATs é cenário mal fatiado: divida o AC. Régua:
 ${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md §1. -->
 
 ## 8. Premissas e decisões prévias

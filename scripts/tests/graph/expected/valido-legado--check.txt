@@ -1,1 +1,2 @@
 WARNING	nao-parseavel	plans/PLAN-001-legado.md campo "Dependências": usa o repositório compartilhado da wave anterior
+WARNING	nao-parseavel	plans/PLAN-001-legado.md campo "Mapeamento §7": | FR-001-001, FR-001-001 | COMP-001-001 | |

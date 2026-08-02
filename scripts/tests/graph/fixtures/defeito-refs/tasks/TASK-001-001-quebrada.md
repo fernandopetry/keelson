@@ -3,6 +3,7 @@
 **Slug**: defeito-refs
 **Pertence a**: PLAN-002
 **Realiza (FRs)**: FR-001-097
+**AC violado**: AC-001-099
 **Componente**: COMP-001-099
 **Wave**: 1
 **Tipo**: feature

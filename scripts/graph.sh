@@ -50,7 +50,8 @@ while [ $# -gt 0 ]; do
     --stage=plan|--stage=tasks) STAGE="${1#--stage=}" ;;
     --plan)
       shift; [ $# -gt 0 ] || die2 "--plan exige o MMM (ex.: 001)."
-      PLANF="${1#PLAN-}" ;;
+      PLANF="${1#PLAN-}"
+      case "$PLANF" in ''|*[!0-9]*) die2 "--plan exige MMM numérico (ex.: 001)." ;; esac ;;
     -h|--help) usage; exit 0 ;;
     -*) die2 "opção desconhecida: $1 (use --help)" ;;
     *)
@@ -102,6 +103,10 @@ function parselist(val, typere,   n, i, t, arr, low) {
   n = split(val, arr, ",")
   for (i = 1; i <= n; i++) {
     t = trimtok(arr[i])
+    # anotação parentética legada apos o ID (ex.: "FR-001-002 (FR-001-001 / AC-2)"
+    # do bugfix antigo) é tolerada: o token é o ID antes do parêntese
+    sub(/[ \t]*\([^)]*\)$/, "", t)
+    t = trimtok(t)
     if (t == "") continue
     if (t !~ typere) { TN = 0; return 0 }
     TN++; TOK[TN] = t
@@ -155,6 +160,7 @@ FNR == 1 {
   else if (FILENAME ~ /(^|\/)plans\//)       ftype = "P"
   else if (FILENAME ~ /(^|\/)tasks\//)       ftype = "T"
   cur_feat = ""; cur_comp = ""; cur_nd = 0; sect = ""; covermode = ""; curwave = ""
+  cur_task = ""; warned_headless = 0
   fmmm = ""
   if (match(FILENAME, /TASK-[0-9]+/)) fmmm = substr(FILENAME, RSTART + 5, RLENGTH - 5)
 }
@@ -224,8 +230,19 @@ ftype == "P" && line ~ /^\*\*SPEC referenciada\*\*[ \t]*:/ {
   if (id != "") listedges("spec-ref", id, fieldrest(line), "^SPEC-[0-9]+$", "SPEC referenciada")
   next
 }
-ftype == "P" && sect == "cob" && line ~ /^\*\*FRs cobertos\*\*/  { covermode = "fr";  next }
-ftype == "P" && sect == "cob" && line ~ /^\*\*NFRs cobertos\*\*/ { covermode = "nfr"; next }
+ftype == "P" && sect == "cob" && line ~ /^\*\*FRs cobertos\*\*/  {
+  v = fieldrest(line); sub(/^[ \t]+/, "", v); sub(/[ \t]+$/, "", v)
+  # forma inline ("**FRs cobertos**: FR-001-001, FR-001-002") é sintaxe canônica §1
+  if (v != "") { listedges("plan-covers", NDI[cur_nd], v, "^FR-[0-9]+-[0-9]+$", "FRs cobertos"); covermode = "" }
+  else covermode = "fr"
+  next
+}
+ftype == "P" && sect == "cob" && line ~ /^\*\*NFRs cobertos\*\*/ {
+  v = fieldrest(line); sub(/^[ \t]+/, "", v); sub(/[ \t]+$/, "", v)
+  if (v != "") { listedges("plan-covers", NDI[cur_nd], v, "^NFR-[0-9]+-[0-9]+$", "NFRs cobertos"); covermode = "" }
+  else covermode = "nfr"
+  next
+}
 ftype == "P" && sect == "cob" && line ~ /^\*\*/                  { covermode = "";    next }
 ftype == "P" && sect == "cob" && covermode != "" && line ~ /^- / {
   v = trimtok(substr(line, 3))
@@ -257,10 +274,21 @@ ftype == "P" && cur_comp != "" && line ~ /^\*\*Depend/ && index(line, "ncias**")
 ftype == "P" && sect == "map7" && line ~ /^\|/ {
   n = split(line, c, "|")
   if (n < 4) next
-  fr = trimtok(c[2]); comp = trimtok(c[3])
-  if (fr !~ /^(FR|NFR)-[0-9]+-[0-9]+$/) next
-  if (comp ~ /^COMP-[0-9]+-[0-9]+$/) edge("maps", fr, comp)
-  else warnout("Mapeamento §7", line)
+  fr = trimtok(c[2])
+  if (fr !~ /^(FR|NFR)-[0-9]+-[0-9]+$/) {
+    # header ("FR") e separador ("---") caem em silêncio; conteúdo irreconhecível
+    # (célula com dígito ou prefixo de ID) degrada declaradamente (§1 do contrato)
+    if (fr ~ /[0-9]/ || fr ~ /(FR|NFR)-/) warnout("Mapeamento §7", line)
+    next
+  }
+  # a célula Componente aceita lista (um FR entregue por 2+ COMPs)
+  cn = split(c[3], cc, ",")
+  for (i = 1; i <= cn; i++) {
+    comp = trimtok(cc[i])
+    if (comp == "") continue
+    if (comp ~ /^COMP-[0-9]+-[0-9]+$/) edge("maps", fr, comp)
+    else warnout("Mapeamento §7", line)
+  }
   s = c[4]
   while (match(s, /AC-[0-9]+-[0-9]+/)) {
     edge("maps-ac", fr, substr(s, RSTART, RLENGTH))
@@ -279,6 +307,12 @@ ftype == "T" && line ~ /^## / {
   if (line ~ /^## Crit/) sect = "crit"
   else if (line ~ /^## Roteiro do gate 9/) sect = "gate9"
   else sect = ""
+  next
+}
+ftype == "T" && cur_task == "" && line ~ /^\*\*(Pertence a|Realiza \(FRs\)|Componente|Wave|Status|Tipo)\*\*[ \t]*:/ {
+  # campo de TASK num arquivo cujo H1 não foi reconhecido: degrada declaradamente,
+  # nunca herda a task do arquivo anterior
+  if (!warned_headless) { warnout("heading", "arquivo de TASK sem heading '# TASK-MMM-XXX:' reconhecivel"); warned_headless = 1 }
   next
 }
 ftype == "T" && cur_task != "" && line ~ /^\*\*Pertence a\*\*[ \t]*:/ {
@@ -309,6 +343,8 @@ ftype == "T" && cur_task != "" && line ~ /^\*\*Funcionalidade\*\*[ \t]*:/ {
   v = fieldrest(line)
   sub(/^[ \t]+/, "", v); sub(/[ \t]+$/, "", v)
   if (v == "") next
+  low = tolower(trimtok(v))
+  if (low == "nenhuma" || low == "nenhum" || low == "-" || low == "n/a") next
   if (tolower(v) ~ /^transversal/) {
     ci = index(v, "(")
     ce = 0; if (ci > 0) ce = index(substr(v, ci), ")")
@@ -387,6 +423,13 @@ AWK
 awk -f "$TMP/extract.awk" $SRC $IDX > "$TMP/raw.tsv" || die2 "extração falhou."
 sort "$TMP/raw.tsv" > "$TMP/graph.tsv"
 
+if [ -n "$PLANF" ]; then
+  awk -F'\t' -v P="$PLANF" '
+    $1 == "node" && $2 == "PLAN" { split($3, a, "-"); if (a[2] + 0 == P + 0) found = 1 }
+    END { exit found ? 0 : 1 }' "$TMP/graph.tsv" \
+    || die2 "PLAN-$PLANF não existe no slug (um filtro inválido sairia verde em silêncio)."
+fi
+
 if [ "$MODE" = "tsv" ]; then
   grep -v '^index-' "$TMP/graph.tsv" || true
   exit 0
@@ -462,14 +505,31 @@ function scope_of(f) {
 function inplan(f,   s) {
   if (PLANF == "") return 1
   s = scope_of(f)
-  return (s == "" || s == PLANF)
+  return (s == "" || s + 0 == PLANF + 0)
+}
+# degradação [parse]: campo não-parseável que alimenta um check de ausência rebaixa o
+# achado para WARNING — a promessa "irreconhecível nunca vira ERROR" vale ponta a ponta
+function sev_abs(base, p, kind,   m) {
+  m = mmm(p) + 0
+  if (kind == "cov"  && ((m in pdeg) || (m in rdeg))) return "parse"
+  if (kind == "map7" && ((m in pdeg) || (m in mdeg))) return "parse"
+  return base
 }
 function ssortidx(arr, n,   i, j, t) {
   for (i = 2; i <= n; i++)
     for (j = i; j > 1 && arr[j] < arr[j-1]; j--) { t = arr[j]; arr[j] = arr[j-1]; arr[j-1] = t }
 }
 
-$1 == "warn" { finding("WARNING", "nao-parseavel", $3 " campo \"" $4 "\": " $5); next }
+$1 == "warn" {
+  finding("WARNING", "nao-parseavel", $3 " campo \"" $4 "\": " $5)
+  m = scope_of($3)
+  if (m != "") {
+    if ($4 == "FRs cobertos" || $4 == "NFRs cobertos") pdeg[m + 0] = 1
+    if ($4 == "Realiza (FRs)")                         rdeg[m + 0] = 1
+    if ($4 == "Mapeamento §7")                         mdeg[m + 0] = 1
+  }
+  next
+}
 
 $1 == "node" {
   type = $2; id = $3; f = $4
@@ -564,26 +624,29 @@ END {
       split(k, kk, SUBSEP); p = kk[1]; fr = kk[2]
       if (fr !~ /^FR-/) continue
       if (!(fr in exist)) continue
-      if (PLANF != "" && mmm(p) != PLANF) continue
+      if (PLANF != "" && mmm(p) + 0 != PLANF + 0) continue
       hit = 0
       for (i = 1; i <= RZN; i++) if (RZT[i] == fr && planof[RZF[i]] == p) { hit = 1; break }
       if (!hit) {
         det = fr " coberto por " p " sem TASK que o realize"
         if (status[p] == "Done") finding("WARNING", "fr-sem-task", det " [legacy]")
+        else if (sev_abs("ERROR", p, "cov") == "parse") finding("WARNING", "fr-sem-task", det " [parse]")
         else finding("ERROR", "fr-sem-task", det)
       }
     }
     for (i = 1; i <= ACN; i++) {
       ac = ACF[i]; fr = ACT[i]
+      if (fr !~ /^FR-/) continue
       for (j = 1; j <= NN; j++) if (NTY[j] == "PLAN") {
         p = NID[j]
         if (!((p SUBSEP fr) in pcov)) continue
-        if (PLANF != "" && mmm(p) != PLANF) continue
+        if (PLANF != "" && mmm(p) + 0 != PLANF + 0) continue
         hit = 0
         for (x = 1; x <= TKN; x++) if (planof[TK[x]] == p && ((TK[x] SUBSEP ac) in covac)) { hit = 1; break }
         if (!hit) {
           det = ac " (cobre " fr ", " p ") sem TASK que o cubra em criterio ou roteiro"
           if (status[p] == "Done") finding("WARNING", "ac-sem-task", det " [legacy]")
+          else if (sev_abs("ERROR", p, "cov") == "parse") finding("WARNING", "ac-sem-task", det " [parse]")
           else finding("ERROR", "ac-sem-task", det)
         }
       }
@@ -596,8 +659,11 @@ END {
       if (!(fr in exist)) continue
       p = planof[t]
       if (p == "" || !(p in exist)) continue
-      if (!((p SUBSEP fr) in pcov))
-        finding("ERROR", "realiza-fora-cobertura", t " realiza " fr " que " p " nao cobre")
+      if (!((p SUBSEP fr) in pcov)) {
+        det = t " realiza " fr " que " p " nao cobre"
+        if (sev_abs("ERROR", p, "cov") == "parse") finding("WARNING", "realiza-fora-cobertura", det " [parse]")
+        else finding("ERROR", "realiza-fora-cobertura", det)
+      }
     }
 
     # ---- feat-divergente ----
@@ -627,12 +693,16 @@ END {
     for (k in td) {
       split(k, kk, SUBSEP); a = kk[1]; b = kk[2]
       if (!inplan(nodefile[a])) continue
+      # quem deveria declarar Bloqueia é TASK Done de outro PLAN → reeditar artefato
+      # entregue para calar o aviso seria pior que a assimetria: suprime
+      if (status[b] == "Done" && mmm(b) != mmm(a)) continue
       if (!((b SUBSEP a) in bl))
         finding("WARNING", "dep-bloqueia-assimetrica", a " depende de " b " sem " b " declarar Bloqueia " a)
     }
     for (k in bl) {
       split(k, kk, SUBSEP); b = kk[1]; a = kk[2]
       if (!inplan(nodefile[b])) continue
+      if (status[a] == "Done" && mmm(a) != mmm(b)) continue
       if (!((a SUBSEP b) in td))
         finding("WARNING", "dep-bloqueia-assimetrica", b " bloqueia " a " sem " a " declarar Depende de " b)
     }
@@ -651,7 +721,7 @@ END {
 
     # ---- index-desatualizado ----
     for (i = 1; i <= IWN; i++) {
-      if (PLANF != "" && IWM[i] != PLANF) continue
+      if (PLANF != "" && IWM[i] + 0 != PLANF + 0) continue
       t = IWT[i]
       if (!(t in exist))
         finding("WARNING", "index-desatualizado", IWF[i] ": lista " t " que nao existe")
@@ -659,7 +729,7 @@ END {
         finding("WARNING", "index-desatualizado", IWF[i] ": " t " em Wave " IWW[i] " mas o arquivo declara wave " wave[t])
     }
     for (i = 1; i <= IFN; i++) {
-      if (PLANF != "" && IFM[i] != PLANF) continue
+      if (PLANF != "" && IFM[i] + 0 != PLANF + 0) continue
       cn2 = 0; delete cl
       for (j = 1; j <= RZN; j++) if (RZT[j] == IFK[i] && mmm(RZF[j]) == IFM[i]) { cn2++; cl[cn2] = RZF[j] }
       ssortidx(cl, cn2)
@@ -669,7 +739,7 @@ END {
         finding("WARNING", "index-desatualizado", "Cobertura de FRs (" IFK[i] "): INDEX lista \"" IFL[i] "\", computado \"" comp2 "\"")
     }
     for (i = 1; i <= IAN; i++) {
-      if (PLANF != "" && IAM[i] != PLANF) continue
+      if (PLANF != "" && IAM[i] + 0 != PLANF + 0) continue
       cn2 = 0; delete cl
       for (t in planof) if (mmm(t) == IAM[i] && ((t SUBSEP IAK[i]) in covac)) { cn2++; cl[cn2] = t }
       ssortidx(cl, cn2)
@@ -685,12 +755,13 @@ END {
     split(k, kk, SUBSEP); p = kk[1]; fr = kk[2]
     if (fr !~ /^FR-/) continue
     if (!(fr in exist)) continue
-    if (PLANF != "" && mmm(p) != PLANF) continue
+    if (PLANF != "" && mmm(p) + 0 != PLANF + 0) continue
     hit = 0
     for (i = 1; i <= MPN; i++) if (MPF[i] == fr && mmm(MPT[i]) == mmm(p)) { hit = 1; break }
     if (!hit) {
       det = fr " coberto por " p " sem linha no Mapeamento FR -> componente (§7)"
       if (status[p] == "Done") finding("WARNING", "fr-sem-comp", det " [legacy]")
+      else if (sev_abs("ERROR", p, "map7") == "parse") finding("WARNING", "fr-sem-comp", det " [parse]")
       else finding("ERROR", "fr-sem-comp", det)
     }
   }
@@ -702,8 +773,11 @@ END {
     if (!(fr in exist)) continue
     p = (mmm(comp) in planbymmm) ? planbymmm[mmm(comp)] : ""
     if (p == "") continue
-    if (!((p SUBSEP fr) in pcov))
-      finding("ERROR", "fr-mapeado-fora-cobertura", "§7 mapeia " fr " -> " comp " mas " p " nao o cobre")
+    if (!((p SUBSEP fr) in pcov)) {
+      det = "§7 mapeia " fr " -> " comp " mas " p " nao o cobre"
+      if (sev_abs("ERROR", p, "cov") == "parse") finding("WARNING", "fr-mapeado-fora-cobertura", det " [parse]")
+      else finding("ERROR", "fr-mapeado-fora-cobertura", det)
+    }
   }
   for (i = 1; i <= CPN; i++) {
     if (!inplan(nodefile[CP[i]])) continue
@@ -730,7 +804,7 @@ END {
 }
 
 # Kahn: detecta ciclo no tipo de aresta et; reporta um ciclo concreto por componente
-function cyc(et, chk,   i, n, ids, indeg, succ, nsucc, changed, rem, remn, j, k, path, pn, cur, seenw, out, t) {
+function cyc(et, chk,   i, n, ids, indeg, succ, nsucc, changed, rem, remn, j, k, path, pn, cur, seenw, out, t, closed) {
   n = 0
   for (i = 1; i <= EN; i++) {
     if (ET[i] != et) continue
@@ -759,7 +833,10 @@ function cyc(et, chk,   i, n, ids, indeg, succ, nsucc, changed, rem, remn, j, k,
     cur = rem[i]
     if (cur in seenw) continue
     pn = 0; delete path
-    while (!(cur in path)) {
+    closed = 0
+    # a caminhada só reporta quando FECHA um ciclo — nó que sobrou no peeling por ser
+    # alcançado por um ciclo (sem participar dele) termina em dead-end e não é finding
+    while (1) {
       path[cur] = ++pn; seenw[cur] = 1
       t = ""
       for (j = 1; j <= nsucc[cur]; j++) {
@@ -767,9 +844,10 @@ function cyc(et, chk,   i, n, ids, indeg, succ, nsucc, changed, rem, remn, j, k,
         if (ids[k] == 1 && (t == "" || k < t)) t = k
       }
       if (t == "") break
+      if (t in path) { closed = 1; cur = t; break }
       cur = t
     }
-    if (cur in path) {
+    if (closed) {
       out = cur
       # reconstruir na ordem do caminho a partir do ponto onde o ciclo fecha
       for (j = path[cur] + 1; j <= pn; j++)

@@ -1,4 +1,4 @@
-# TASK-001-002: Segunda metade
+# TASK-001-003: Nó fora do ciclo, alcançado por ele
 
 **Slug**: defeito-ciclo-task
 **Pertence a**: PLAN-001
@@ -10,8 +10,8 @@
 
 ## Dependências
 
-- **Depende de**: TASK-001-001, TASK-001-003
-- **Bloqueia**: TASK-001-001
+- **Depende de**: nenhuma
+- **Bloqueia**: TASK-001-002
 
 ## Critérios de pronto
 

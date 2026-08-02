@@ -4,10 +4,11 @@ ERROR	ref-quebrada	AC-001-002 -> FR-001-099 nao existe no slug (ac-covers, specs
 ERROR	ref-quebrada	FR-001-001 -> COMP-001-009 nao existe no slug (maps, plans/PLAN-001-refs.md:25)
 ERROR	ref-quebrada	PLAN-001 -> FR-001-098 nao existe no slug (plan-covers, plans/PLAN-001-refs.md:12)
 ERROR	ref-quebrada	PLAN-001 -> SPEC-009 nao existe no slug (spec-ref, plans/PLAN-001-refs.md:8)
-ERROR	ref-quebrada	TASK-001-001 -> COMP-001-099 nao existe no slug (implements, tasks/TASK-001-001-quebrada.md:6)
+ERROR	ref-quebrada	TASK-001-001 -> AC-001-099 nao existe no slug (violates, tasks/TASK-001-001-quebrada.md:6)
+ERROR	ref-quebrada	TASK-001-001 -> COMP-001-099 nao existe no slug (implements, tasks/TASK-001-001-quebrada.md:7)
 ERROR	ref-quebrada	TASK-001-001 -> FR-001-097 nao existe no slug (realiza, tasks/TASK-001-001-quebrada.md:5)
 ERROR	ref-quebrada	TASK-001-001 -> PLAN-002 nao existe no slug (belongs-to, tasks/TASK-001-001-quebrada.md:4)
-ERROR	ref-quebrada	TASK-001-001 -> TASK-001-099 nao existe no slug (task-dep, tasks/TASK-001-001-quebrada.md:13)
+ERROR	ref-quebrada	TASK-001-001 -> TASK-001-099 nao existe no slug (task-dep, tasks/TASK-001-001-quebrada.md:14)
 WARNING	comp-sem-fr	COMP-001-001 sem linha no Mapeamento FR -> componente (§7)
 WARNING	dep-bloqueia-assimetrica	TASK-001-001 depende de TASK-001-099 sem TASK-001-099 declarar Bloqueia TASK-001-001
 WARNING	realiza-vs-mapeamento	COMP-001-001: Realiza e §7 divergem — FR-001-001 (so no Realiza)

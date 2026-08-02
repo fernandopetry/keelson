@@ -35,13 +35,13 @@ separados por vírgula** ou a palavra **`nenhuma`**:
 |---|---|---|
 | `spec-ref` | PLAN → SPEC | `**SPEC referenciada**:` |
 | `plan-covers` | PLAN → FR\|NFR | bullets de `FRs cobertos` / `NFRs cobertos` |
-| `maps` | FR → COMP | tabela §7 do PLAN (ACs da linha viram `maps-ac`) |
+| `maps` | FR → COMP | tabela §7 do PLAN (ACs da linha viram `maps-ac`; a célula Componente aceita lista — um FR entregue por 2+ COMPs) |
 | `comp-realiza` | COMP → FR | `**Realiza**:` do bloco COMP |
 | `comp-dep` | COMP → COMP | `**Dependências**:` do bloco COMP |
 | `belongs-to` | TASK → PLAN | `**Pertence a**:` |
 | `realiza` | TASK → FR | `**Realiza (FRs)**:` |
 | `implements` | TASK → COMP | `**Componente**:` |
-| `declares-feat` | TASK → FEAT | `**Funcionalidade**:` (formas `(primária)` / `transversal (…)`) |
+| `declares-feat` | TASK → FEAT | `**Funcionalidade**:` (formas `(primária)` / `transversal (…)`) — a marca `(primária)` emite também a aresta auxiliar `feat-primaria` (TASK → FEAT), consumida pelo check `feat-divergente` |
 | `violates` | TASK → AC | `**AC violado**:` (só bugfix) |
 | `task-dep` | TASK → TASK | `- **Depende de**:` |
 | `blocks` | TASK → TASK | `- **Bloqueia**:` |
@@ -65,6 +65,12 @@ existência resolve no slug inteiro.
 estruturais de integridade (ciclo, referência, duplicidade) valem sempre — sempre
 foram ERROR nos validators.
 
+**Degradação `[parse]`**: campo não-parseável (aviso `nao-parseavel`) que alimenta um
+check de **ausência** — `FRs/NFRs cobertos` → cobertura; `Realiza (FRs)` → cobertura;
+`Mapeamento §7` → mapeamento — rebaixa os achados de ausência daquele PLAN para
+`WARNING` com sufixo `[parse]`: a promessa "irreconhecível nunca vira ERROR" vale de
+ponta a ponta, e o validator decide com os próprios olhos (cobertura mista, §5).
+
 | Check | Achado | Severidade |
 |---|---|---|
 | `ciclo-task` | ciclo em `task-dep` | ERROR (sempre) |
@@ -81,7 +87,7 @@ foram ERROR nos validators.
 | `fr-sem-comp` | FR coberto pelo PLAN sem linha na §7 dele | ERROR · carência |
 | `comp-sem-fr` | COMP sem linha na §7 | WARNING |
 | `realiza-vs-mapeamento` | `comp-realiza` divergente da §7 (a §7 é a fonte de cobertura) | WARNING |
-| `dep-bloqueia-assimetrica` | A depende de B sem B bloquear A (ou vice-versa) | WARNING |
+| `dep-bloqueia-assimetrica` | A depende de B sem B bloquear A (ou vice-versa) — suprimido quando quem deveria declarar é TASK `Done` de outro PLAN (reeditar artefato entregue seria pior que a assimetria) | WARNING |
 | `index-desatualizado` | `TASK-MMM-INDEX.md` diverge do computado (waves, tabelas FR/AC) — best-effort | WARNING |
 
 ## §4. Invocação e saída
@@ -98,7 +104,9 @@ scripts/graph.sh <dir-do-slug> [--check] [--stage=plan|tasks] [--format=tsv|merm
 - `--stage=plan` roda só o computável sem TASKs (`ciclo-comp`, `ref-quebrada` do lado
   PLAN/SPEC, `id-duplicado`, `fr-mapeado-fora-cobertura`, `fr-sem-comp`, `comp-sem-fr`,
   `realiza-vs-mapeamento`) — PLAN recém-criado sem `tasks/` sai 0. `--stage=tasks`
-  (ou sem flag) roda tudo. `--plan MMM` restringe ao PLAN indicado.
+  (ou sem flag) roda tudo. `--plan MMM` restringe ao PLAN indicado — MMM numérico
+  (com ou sem zero-padding); PLAN inexistente no slug é uso incorreto (exit 2),
+  nunca "verde em silêncio".
 - `--format=tsv` emite o grafo: `node<TAB>TIPO<TAB>ID<TAB>arquivo<TAB>attrs` ·
   `edge<TAB>TIPO<TAB>DE<TAB>PARA<TAB>arquivo:linha` ·
   `warn<TAB>nao-parseavel<TAB>arquivo<TAB>campo<TAB>trecho` — ordenado com

@@ -10,8 +10,7 @@
 
 **SPEC referenciada**: SPEC-001
 
-**FRs cobertos**:
-- FR-001-001
+**FRs cobertos**: FR-001-001
 
 ## 3. Componentes
 
@@ -26,3 +25,4 @@
 | FR | Componente | AC cobertos |
 |----|------------|-------------|
 | FR-001-001 | COMP-001-001 | AC-001-001 |
+| FR-001-001, FR-001-001 | COMP-001-001 | |

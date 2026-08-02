@@ -1,10 +1,13 @@
 flowchart TD
   subgraph W1["Wave 1"]
     TASK_001_001["TASK-001-001 ⏸"]
+    TASK_001_004["TASK-001-004 ⏸"]
   end
   subgraph W2["Wave 2"]
     TASK_001_002["TASK-001-002 ⏸"]
     TASK_001_003["TASK-001-003 ⏸"]
+    TASK_001_005["TASK-001-005 ⏸"]
   end
   TASK_001_001 --> TASK_001_002
   TASK_001_001 --> TASK_001_003
+  TASK_001_001 --> TASK_001_005
