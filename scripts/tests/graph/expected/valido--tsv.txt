@@ -72,7 +72,7 @@ node	FR	FR-001-002	specs/SPEC-001-demo-auth.md
 node	FR	FR-001-003	specs/SPEC-001-demo-auth.md	
 node	NFR	NFR-001-001	specs/SPEC-001-demo-auth.md	
 node	PLAN	PLAN-001	plans/PLAN-001-demo-auth.md	status=Approved
-node	SPEC	SPEC-001	specs/SPEC-001-demo-auth.md	
+node	SPEC	SPEC-001	specs/SPEC-001-demo-auth.md	status=Approved
 node	TASK	TASK-001-001	tasks/TASK-001-001-setup-auth.md	wave=1 status=Todo tipo=feature
 node	TASK	TASK-001-002	tasks/TASK-001-002-login-invalido.md	wave=2 status=Todo tipo=feature
 node	TASK	TASK-001-003	tasks/TASK-001-003-relatorio.md	wave=2 status=Todo tipo=feature

@@ -100,11 +100,11 @@ Passe no prompt de cada agente os **inputs**: caminhos de TASK, PLAN, SPEC, fich
 
 **Marco de início no Jira (opcional)**: só quando `jira.enabled`. No **despacho** de cada TASK, aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §9): marco `TASK iniciada` na sub-task do campo `Jira:` da closure — e, se esta é a **primeira** TASK da Story (de FEAT ou implícita) a ser despachada, marco `Trabalho iniciado (Story)` na Story (key sob o heading da FEAT ou na linha `**Jira Story**:` da SPEC). Ambos sob a política de `transition`, o teto e a **não-regressão** do §9 (a não-regressão também dispensa rastrear "primeira": Story já na coluna ou além → no-op). TASK **sem key** → pular em silêncio (criar é papel do gancho do `/keelson:tasks`, da closure e da reconciliação — nunca do despacho). Leitura: §0–§1 + §9. Best-effort (§0): falha → aviso, **não** atrasa o despacho.
 
-### 3.3 Quality gates (revisão independente)
+### 3.3 Quality gates (revisão independente — 1× por wave, decisão 4.90)
 
-Revisão por agentes independentes (o developer **nunca** revisa o próprio trabalho), com os guidelines ativos em contexto.
+Revisão por agentes independentes (o developer **nunca** revisa o próprio trabalho), com os guidelines ativos em contexto. **Recorte** (dono: `core/CODE-REVIEW.md` §Orquestração): a rodada de revisão roda **uma vez por wave**, depois que todas as TASKs da wave retornam do developer — sobre o **diff acumulado da wave**, com o pacote de contexto (4.89) incluindo o **mapa TASK→arquivos** e os reports dos developers. Cada TASK continua provada individualmente pelos próprios testes (gate 2, no report do developer). Achado é **roteado à TASK de origem**: o retry vai ao developer daquela TASK e o re-review é sobre o delta (4.88).
 
-**Sempre — via `code-reviewer`:**
+**Sempre — via `code-reviewer` (1× por wave):**
 
 1. Cobertura de ACs
 2. Testes passando
@@ -114,10 +114,10 @@ Revisão por agentes independentes (o developer **nunca** revisa o próprio trab
 6. Aderência à ficha e ao perfil de linguagem ativo (stack, padrão, naming, teste, anti-padrões, decisões irreversíveis)
 7. Code review qualitativo
 
-**Proporcional ao risco — gates dedicados, em paralelo ao reviewer:**
+**Proporcional ao risco — gates dedicados:**
 
-8. **Segurança — via `security-engineer`** (REJEIÇÃO IMEDIATA): obrigatório quando a mudança é **sensível** (lista canônica: `description` do `security-engineer`) e o gate `gates.security` está ativo. Roda o checklist de `guidelines/core/SECURITY.md` (instancia o Art. 2 do Charter) mapeado na seção de segurança do perfil ativo. Fora desses casos, segurança é coberta pelo Gate 6.
-9. **Comportamento verificado — via `qa`**: obrigatório quando a mudança tem efeito observável (endpoint, UI, regra exercitável). Roda os testes e exercita a app quando o ambiente está disponível. Refactor sem efeito observável dispensa (Gates 1/2 bastam). **Quando `gates.screenVerify` está ativo e o efeito é de tela** e o ambiente desta sessão **não permite exercitá-la** (worktree/nuvem, sem browser), o `qa` reporta `PARCIAL` com `handoff_seed` — sondagem e mecânica são do `qa`; evidência obrigatória (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`, §8.1, decisão 4.26). Aceite do report: `PARCIAL` com seed **e** `evidencia_indisponibilidade` **e** `causa_indisponibilidade` **do enum fechado** do §8.1 (`runtime_browser | credencial | app_fora_do_ar`, decisões 4.49/4.71) → aceitar; seed **sem** evidência de sondagem, com causa genérica quando a sondagem sabia qual das três era, **ou com causa fora do enum** (quem concede o waiver não amplia o catálogo — valor novo é sinal de que o bloqueio real tem outra rota, ex.: dado de teste ausente se **cria** ou se escala, §8.1) → rejeitar e refazer; `pendente_handoff` **não é falha de gate** (não consome retry, não bloqueia closure) — as seeds são consolidadas num **handoff de verificação** na Etapa 4. O que o `qa` **conseguiu** exercitar (testes, chamadas de endpoint) continua bloqueante se divergir.
+8. **Segurança — via `security-engineer`** (REJEIÇÃO IMEDIATA): 1× por wave, **em paralelo ao reviewer**, obrigatório quando a wave contém mudança **sensível** (lista canônica: `description` do `security-engineer`) e o gate `gates.security` está ativo. Roda o checklist de `guidelines/core/SECURITY.md` (instancia o Art. 2 do Charter) mapeado na seção de segurança do perfil ativo — o diff acumulado da wave é vantagem aqui: a interação entre TASKs aparece. Vulnerabilidade nunca espera além da própria wave. Fora desses casos, segurança é coberta pelo Gate 6.
+9. **Comportamento verificado — via `qa`**: **por FEAT/história, não por TASK** — roda no fecho da wave em que a FEAT completa (§3.6, item 3), provando o comportamento de ponta a ponta quando ele passa a existir; SPEC **sem** FEATs → 1× na Etapa 4, contra o DoD do PLAN. Obrigatório quando há efeito observável (endpoint, UI, regra exercitável); refactor sem efeito observável dispensa (Gates 1/2 bastam). A verificação é **gravada na SPEC** (linha `**Verificação (gate 9)**:` sob o heading da FEAT — data e como, ou `n/a — motivo`); o grafo cobra a linha quando a FEAT completa (check `feat-sem-verificacao`). **Quando `gates.screenVerify` está ativo e o efeito é de tela** e o ambiente desta sessão **não permite exercitá-la** (worktree/nuvem, sem browser), o `qa` reporta `PARCIAL` com `handoff_seed` — sondagem e mecânica são do `qa`; evidência obrigatória (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`, §8.1, decisão 4.26). Aceite do report: `PARCIAL` com seed **e** `evidencia_indisponibilidade` **e** `causa_indisponibilidade` **do enum fechado** do §8.1 (`runtime_browser | credencial | app_fora_do_ar`, decisões 4.49/4.71) → aceitar; seed **sem** evidência de sondagem, com causa genérica quando a sondagem sabia qual das três era, **ou com causa fora do enum** (quem concede o waiver não amplia o catálogo — valor novo é sinal de que o bloqueio real tem outra rota, ex.: dado de teste ausente se **cria** ou se escala, §8.1) → rejeitar e refazer; `pendente_handoff` **não é falha de gate** (não consome retry, não bloqueia closure) — as seeds são consolidadas num **handoff de verificação** na Etapa 4. O que o `qa` **conseguiu** exercitar (testes, chamadas de endpoint) continua bloqueante se divergir.
 
 **Briefing destilado para os gates dedicados**: ao invocar `security-engineer`/`qa`, monte no prompt um briefing com o que eles de fato usam — ACs vinculados **copiados literalmente** da SPEC, DECs que tocam o escopo, arquivos da task (`git diff --name-only`), comandos `quality.*` da ficha — e aponte a **seção** do perfil a ler (segurança → seção de segurança; verificação → seção de testes). Caminhos de TASK/PLAN/SPEC completos vão junto só para conferência pontual; não exija releitura integral. Este briefing é a instância do **pacote de contexto de gate** (regra geral — montado uma vez, idêntico para os revisores da rodada, factual e nunca avaliativo: `core/CODE-REVIEW.md` §Orquestração, decisão 4.89).
 
@@ -147,10 +147,10 @@ quality_gates:
   testes_passando: <N/N>
   lint_limpo: true
   aderencia_ficha_perfil: true
-  code_review_aprovado: true
+  code_review_aprovado: true               # rodada da wave (4.90) — achados desta TASK resolvidos
   acs_verificados: [AC-NNN-XXX]
-  seguranca_gate8: aprovado | n/a          # via security-engineer, quando mudança sensível e gates.security ativo
-  comportamento_gate9: verificado | pendente_handoff | n/a   # via qa; pendente_handoff = ambiente sem tela (gates.screenVerify), seeds guardadas p/ Etapa 4
+  seguranca_gate8: aprovado (wave N) | n/a # via security-engineer, 1× por wave, quando a wave tem mudança sensível e gates.security ativo
+  comportamento_gate9: consolidado (FEAT-NNN-XXX) | consolidado (DoD, Etapa 4) | verificado | pendente_handoff | n/a   # via qa por FEAT (4.90); SPEC sem FEATs → Etapa 4; pendente_handoff = ambiente sem tela (gates.screenVerify), seeds p/ Etapa 4
 notas: <opcional>
 ```
 
@@ -201,21 +201,23 @@ Falha: reportar específico, 1 retry, escalar.
 ### 3.6 Final da wave
 
 1. Todas as tasks Done com closure.
-2. Rodar a suíte **relevante ao escopo da wave** no working tree principal — ampla o bastante para pegar regressão cross-task (não só os `--filter` de cada task), mas **não** a suíte completa a cada wave. A completa roda 1× na Etapa 4 (verificação forte e única). **Dispensa por diff inerte**: se o diff da wave não toca código que a suíte exercita (só docs/artefatos SDD — régua e âncora mecânica em `core/TESTING.md`, "Diff inerte"), a rodada é dispensada e **declarada no boletim**, nunca omitida.
-3. Regressão: parar e reportar.
-4. Atualizar `waves_concluidas` no `thoughts/local/run-state-<slug>.md` (o `status` continua `em_andamento` até a Entrega).
-5. **Boletim de wave (ao Diretor)**: 3–6 linhas em linguagem de time (Developer, Code Reviewer, QA, Security, PO), cobrindo o que fechou, sinais laterais tratados e decisões tomadas, fechando com o estado de pendência do Diretor (ex.: *"nada pendente de você"*). O boletim é **narração na mesma mensagem em que a próxima wave inicia** — nunca uma parada nem fim de turno (4.23/4.24; o `wave-guard` reforça).
-6. **Iniciar a próxima wave imediatamente** — o loop da Etapa 3 só termina com a última wave fechada (→ Etapa 4) ou falha listada em "Comportamento em caso de falha"; não termine o turno entre waves nem pergunte se deve continuar.
+2. **Gate 9 por FEAT (decisão 4.90)**: para cada FEAT que **completou nesta wave** (check do item 3 da closure — todas as TASKs que a listam Done), invocar o `qa` com o pacote da FEAT: nome e propósito, ACs literais dos FRs dela, telas/endpoints envolvidos, mapa TASK→arquivos. O `qa` prova o comportamento **de ponta a ponta** (fluxo, não diffs isolados; screen-verify quando `gates.screenVerify` e efeito de tela). Resultado → gravar na SPEC, sob o heading da FEAT, a linha `**Verificação (gate 9)**: <data> — <como/por quem>` (ou `n/a — <motivo>` quando não há efeito observável) — o grafo cobra essa linha (check `feat-sem-verificacao`); `pendente_handoff` → a seed vai para a Etapa 4 e a linha registra o estado. Falha do `qa` → tratar como falha de gate (retry roteado, convergência 4.88). Nenhuma FEAT completou → pular, sem menção.
+3. Rodar a suíte **relevante ao escopo da wave** no working tree principal — ampla o bastante para pegar regressão cross-task (não só os `--filter` de cada task), mas **não** a suíte completa a cada wave. A completa roda 1× na Etapa 4 (verificação forte e única). **Dispensa por diff inerte**: se o diff da wave não toca código que a suíte exercita (só docs/artefatos SDD — régua e âncora mecânica em `core/TESTING.md`, "Diff inerte"), a rodada é dispensada e **declarada no boletim**, nunca omitida.
+4. Regressão: parar e reportar.
+5. Atualizar `waves_concluidas` no `thoughts/local/run-state-<slug>.md` (o `status` continua `em_andamento` até a Entrega).
+6. **Boletim de wave (ao Diretor)**: 3–6 linhas em linguagem de time (Developer, Code Reviewer, QA, Security, PO), cobrindo o que fechou, sinais laterais tratados e decisões tomadas, fechando com o estado de pendência do Diretor (ex.: *"nada pendente de você"*). O boletim é **narração na mesma mensagem em que a próxima wave inicia** — nunca uma parada nem fim de turno (4.23/4.24; o `wave-guard` reforça).
+7. **Iniciar a próxima wave imediatamente** — o loop da Etapa 3 só termina com a última wave fechada (→ Etapa 4) ou falha listada em "Comportamento em caso de falha"; não termine o turno entre waves nem pergunte se deve continuar.
 
 ## Etapa 4: validação final contra DoD do PLAN
 
 1. Ler checklist "Definition of Done" do PLAN.
 2. **Rodar a suíte completa 1×** (o comando `quality.test` da ficha; quando houver frontend, também `quality.lint` + `quality.typecheck`). Regressão → parar e reportar. **Dispensa por diff inerte**: branch inteira sem código que a suíte exercita (`git diff --name-only <base>...HEAD` confrontado com os `codePaths` — régua em `core/TESTING.md`, "Diff inerte") → dispensar e declarar no report da Entrega.
-3. Validar cada item da DoD.
-4. Validar aderência global à ficha e ao perfil de linguagem ativo.
-5. **Remover o memo de exploração** (`thoughts/local/exploration-<slug>.md`), se existir — a closure do PLAN encerra o ciclo de exploração.
-6. **Handoff de verificação (gate 9 remoto)** — só quando `gates.screenVerify` está ativo: se alguma task fechou com `comportamento_gate9: pendente_handoff`, consolidar os `handoff_seed` de todas as tasks em **um** `{docsRoot}/<slug>/handoffs/HANDOFF-PLAN-MMM.md` no formato canônico do §8.2 (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`), preenchendo o `sonda:` do front-matter com as evidências de indisponibilidade e preservando o `realm` de cada item (projeto multi-realm). Deduplicar itens que exercitam o mesmo fluxo **no mesmo realm**. O doc entra no commit da entrega.
-7. **Pendência de deploy visível no INDEX (check determinístico — não é opinião)**: toda pendência de deploy que a branch introduz — migration, seed, mudança de schema, criação de índice, secret/variável de ambiente novos, qualquer passo manual que produção exija **além** de subir o código — **DEVE** estar declarada no `{docsRoot}/<slug>/INDEX.md`. Compare o que a branch **realmente acrescenta** com o que o INDEX **declara**:
+3. **Gate 9 consolidado do PLAN (decisão 4.90)** — SPEC **sem** FEATs, com efeito observável: invocar o `qa` 1× contra o DoD (fluxos de ponta a ponta, ACs literais no pacote). SPEC **com** FEATs: conferir que cada FEAT completada tem a linha `**Verificação (gate 9)**:` na SPEC (o §3.6 gravou; o grafo cobra — rode `graph.sh <slug> --check` e trate `feat-sem-verificacao`).
+4. Validar cada item da DoD.
+5. Validar aderência global à ficha e ao perfil de linguagem ativo.
+6. **Remover o memo de exploração** (`thoughts/local/exploration-<slug>.md`), se existir — a closure do PLAN encerra o ciclo de exploração.
+7. **Handoff de verificação (gate 9 remoto)** — só quando `gates.screenVerify` está ativo: se alguma task fechou com `comportamento_gate9: pendente_handoff`, consolidar os `handoff_seed` de todas as tasks em **um** `{docsRoot}/<slug>/handoffs/HANDOFF-PLAN-MMM.md` no formato canônico do §8.2 (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`), preenchendo o `sonda:` do front-matter com as evidências de indisponibilidade e preservando o `realm` de cada item (projeto multi-realm). Deduplicar itens que exercitam o mesmo fluxo **no mesmo realm**. O doc entra no commit da entrega.
+8. **Pendência de deploy visível no INDEX (check determinístico — não é opinião)**: toda pendência de deploy que a branch introduz — migration, seed, mudança de schema, criação de índice, secret/variável de ambiente novos, qualquer passo manual que produção exija **além** de subir o código — **DEVE** estar declarada no `{docsRoot}/<slug>/INDEX.md`. Compare o que a branch **realmente acrescenta** com o que o INDEX **declara**:
 
    ```bash
    # o que a branch REALMENTE acrescenta (ajuste os diretórios à estrutura da stack do projeto)
@@ -235,7 +237,7 @@ Se todas tasks Done e DoD satisfeita:
 1. **Atualizar coluna Status na tabela "PLANs" do INDEX**: de `Approved` para `Done (sugerido)`.
 2. **Adicionar entrada ao Histórico**: `<data>: PLAN-MMM implementado (N tasks), aguardando promoção manual de Status`.
 3. **Limpar Riscos ativos** mitigados por este PLAN.
-4. **Se gerou handoff (item 6 da Etapa 4)**: adicionar risco ativo `Verificação de tela pendente — HANDOFF-PLAN-MMM ({docsRoot}/<slug>/handoffs/)` — removido só na closure do handoff, pelo agente verificador.
+4. **Se gerou handoff (item 7 da Etapa 4)**: adicionar risco ativo `Verificação de tela pendente — HANDOFF-PLAN-MMM ({docsRoot}/<slug>/handoffs/)` — removido só na closure do handoff, pelo agente verificador.
 
 ### 4.2 Sugestão de promoção do PLAN
 

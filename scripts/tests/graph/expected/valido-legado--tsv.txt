@@ -20,7 +20,7 @@ node	AC	AC-001-001	specs/SPEC-001-legado.md
 node	COMP	COMP-001-001	plans/PLAN-001-legado.md	
 node	FR	FR-001-001	specs/SPEC-001-legado.md	
 node	PLAN	PLAN-001	plans/PLAN-001-legado.md	status=Done
-node	SPEC	SPEC-001	specs/SPEC-001-legado.md	
+node	SPEC	SPEC-001	specs/SPEC-001-legado.md	status=Approved
 node	TASK	TASK-001-001	tasks/TASK-001-001-logger.md	wave=1 status=Done tipo=feature
 node	TASK	TASK-001-002	tasks/TASK-001-002-crlf.md	wave=1 status=Done tipo=chore
 node	TASK	TASK-001-003	tasks/TASK-001-003-fix-antigo.md	wave=1 status=Done tipo=bugfix

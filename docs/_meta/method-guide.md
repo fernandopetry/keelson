@@ -141,7 +141,7 @@ Orquestra a implementação wave por wave, usando subagents (`developer` + `code
 | `--max-parallel=N` | Limita paralelismo |
 | `--force-mode=...` | Força `teams` ou `subagents` (default: `subagents`) |
 
-**Quality gates por task** (obrigatórios): implementação completa, testes cobrindo ACs passando, lint limpo, escopo respeitado, DECs respeitadas, aderência ao Charter + perfil ativo, code review pelo reviewer agent. Falha = 1 retry, depois escala para humano.
+**Quality gates** (obrigatórios): implementação completa, testes cobrindo ACs passando, lint limpo, escopo respeitado, DECs respeitadas, aderência ao Charter + perfil ativo, code review pelo reviewer agent. Recorte por natureza (decisão 4.90, dono: `core/CODE-REVIEW.md` §Orquestração): testes por task; revisão + segurança **1× por wave** sobre o diff acumulado, achado roteado à task de origem; comportamento (`qa`) **por FEAT/história** na wave em que ela completa (sem FEATs → contra o DoD, no fim), com a verificação gravada na SPEC e cobrada pelo grafo (`feat-sem-verificacao`). Falha = 1 retry, depois escala para humano.
 
 **O que ele NÃO faz**: promover Status do PLAN para Done (apenas sugere), deploy, criar PR, resolver conflito de merge, modificar SPEC/PLAN durante a implementação.
 

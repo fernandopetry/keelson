@@ -1,0 +1,2 @@
+ERROR	feat-sem-verificacao	FEAT-001-001: todas as 1 TASK(s) Done e sem linha de verificacao do gate 9 sob o heading (specs/SPEC-001-feats.md)
+WARNING	feat-sem-verificacao	FEAT-002-001: todas as 1 TASK(s) Done e sem linha de verificacao do gate 9 sob o heading (specs/SPEC-002-legada.md) [legacy]

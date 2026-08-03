@@ -217,6 +217,27 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   runtime (este arquivo, `SECURITY.md`, a seção do perfil) — o pacote poupa a
   redescoberta do contexto do trabalho, nunca resume doutrina de memória.
 
+**Recorte da rodada no ciclo (decisão 4.90)** — a unidade de execução de cada gate
+segue a natureza do que ele prova, não é uniforme por TASK:
+
+- **Testes por TASK** (gate 2, executados pelo developer) são a rede fina — intocados;
+  é o que permite à wave seguinte construir sobre base provada.
+- **Revisão independente (gates 1–7) e segurança (gate 8) rodam 1× por wave**, sobre o
+  diff acumulado da wave, com o mapa TASK→arquivos no pacote de contexto. A wave é a
+  unidade de integração do ciclo; revisar por TASK re-lê o mesmo entorno N vezes, e o
+  security **ganha** vendo a interação entre TASKs. Achado é roteado à TASK de origem;
+  o retry segue a convergência abaixo. Vulnerabilidade continua **rejeição imediata** —
+  o recorte por wave nunca a adia além da própria wave.
+- **Comportamento (gate 9) roda por FEAT/história**, na primeira wave em que a FEAT
+  completa — é quando o comportamento de ponta a ponta passa a existir; provar "metade
+  de uma feature" por TASK duplica o gate 2 ou prova parcial. SPEC sem FEATs → 1× na
+  validação final contra o DoD do PLAN. A verificação é **registrada na SPEC** (linha
+  `**Verificação (gate 9)**:` sob o heading da FEAT — data e como, ou `n/a — motivo`)
+  e cobrada mecanicamente pelo grafo (check `feat-sem-verificacao`, `graph-contract.md`).
+- **Adiamento é declarado, nunca silencioso** (régua da 4.85): a closure da TASK
+  registra onde cada gate consolidado rodou/rodará (`wave N` · `FEAT-X` · `DoD`).
+  No modo sob demanda nada muda: uma mudança = uma rodada.
+
 ---
 
 ## Convergência do re-gate (decisão 4.88)

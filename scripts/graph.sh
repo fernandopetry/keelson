@@ -180,13 +180,22 @@ FNR == 1 {
 
 # ---------- SPEC ----------
 ftype == "S" && line ~ /^# SPEC-[0-9]+/ {
-  id = grabid(line, "SPEC-[0-9]+"); if (id != "") node("SPEC", id); next
+  id = grabid(line, "SPEC-[0-9]+"); if (id != "") cur_spec_nd = node("SPEC", id); next
+}
+ftype == "S" && cur_spec_nd > 0 && line ~ /^\*\*Status\*\*[ \t]*:/ {
+  if (!(cur_spec_nd in NSTAT)) NSTAT[cur_spec_nd] = trimtok(fieldrest(line))
+  next
 }
 ftype == "S" && line ~ /^## / { cur_feat = ""; next }
 ftype == "S" && line ~ /^### FEAT-[0-9]+-[0-9]+/ {
   id = grabid(line, "FEAT-[0-9]+-[0-9]+")
-  if (id != "") { node("FEAT", id); cur_feat = id }
+  if (id != "") { cur_feat_nd = node("FEAT", id); cur_feat = id }
   next
+}
+# linha de verificacao do gate 9 sob o heading da FEAT (4.90); presenca basta,
+# conteudo livre (data ou "n/a — motivo") — declarado e legivel por humanos
+ftype == "S" && cur_feat != "" && line ~ /^\*\*Verifica[^*]*\*\*[ \t]*:/ {
+  NVERIF[cur_feat_nd] = 1; next
 }
 ftype == "S" && line ~ /^- \*\*FR-[0-9]+-[0-9]+\*\*/ {
   id = grabid(line, "FR-[0-9]+-[0-9]+")
@@ -438,6 +447,7 @@ END {
     if (i in NSTAT) a = a (a == "" ? "" : " ") "status=" NSTAT[i]
     if (i in NTIPO) a = a (a == "" ? "" : " ") "tipo=" NTIPO[i]
     if (i in NCRIT) a = a (a == "" ? "" : " ") "crit=" NCRIT[i]
+    if (i in NVERIF) a = a (a == "" ? "" : " ") "verif=" NVERIF[i]
     print "node\t" NDT[i] "\t" NDI[i] "\t" NDF[i] "\t" a
   }
 }
@@ -566,15 +576,17 @@ $1 == "node" {
     if (match($5, /wave=[0-9]+/)) wave[id] = substr($5, RSTART + 5, RLENGTH - 5)
     if (index($5, "status=") > 0) {
       st = substr($5, index($5, "status=") + 7)
-      sub(/ (tipo|crit)=.*$/, "", st)
+      sub(/ (tipo|crit|verif)=.*$/, "", st)
       status[id] = st
     }
     if (match($5, /crit=[0-9]+/)) bcrit[id] = substr($5, RSTART + 5, RLENGTH - 5)
+    if (match($5, /verif=1/)) fverif[id] = 1
   }
   if (type == "TASK")  { TKN++; TK[TKN] = id }
   if (type == "COMP")  { CPN++; CP[CPN] = id }
   if (type == "PLAN")  { planbymmm[mmm(id)] = id }
   if (type == "BRIEF") { BFN++; BF[BFN] = id }
+  if (type == "FEAT")  { FTN++; FT[FTN] = id }
   next
 }
 $1 == "edge" {
@@ -628,6 +640,25 @@ END {
     if (!inplan(nodefile[t])) continue
     if ((t in belongs) && (t in tbrief))
       finding("ERROR", "task-ancora-dupla", t ": Pertence a " belongs[t] " e Brief " tbrief[t] " simultaneos (ancora exclusiva)")
+  }
+
+  # ---- feat-sem-verificacao (todo stage — 4.90) ----
+  # FEAT com 1+ TASK declarante, todas Done, sem linha **Verificacao...**: sob o heading.
+  # TASK nao-parseavel sem status derruba o "todas Done" — o check degrada em silencio
+  # na direcao segura (nao inventa ERROR). SPEC Done = acervo legado -> WARNING [legacy].
+  for (i = 1; i <= FTN; i++) {
+    ft = FT[i]
+    fn = 0; alldone = 1
+    for (j = 1; j <= DFN; j++) {
+      if (DFT[j] == ft) { fn++; if (status[DFF[j]] != "Done") alldone = 0 }
+    }
+    if (fn == 0 || !alldone) continue
+    if (fverif[ft]) continue
+    det = ft ": todas as " fn " TASK(s) Done e sem linha de verificacao do gate 9 sob o heading (" nodefile[ft] ")"
+    if (status["SPEC-" mmm(ft)] == "Done")
+      finding("WARNING", "feat-sem-verificacao", det " [legacy]")
+    else
+      finding("ERROR", "feat-sem-verificacao", det)
   }
 
   # ---- ref-quebrada ----

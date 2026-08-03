@@ -62,6 +62,7 @@ runcase legado-done-check        defeito-legado-done 0 defeito-legado-done--chec
 runcase plan-sem-tasks-check     plan-sem-tasks     1 plan-sem-tasks--check.txt       --check
 runcase plan-sem-tasks-stage     plan-sem-tasks     0 plan-sem-tasks--check-stage-plan.txt --check --stage=plan
 runcase parse-degrade-check      defeito-parse-degrade 0 defeito-parse-degrade--check.txt --check
+runcase feat-verificacao-check   defeito-feat-verificacao 1 defeito-feat-verificacao--check.txt --check
 # --plan aceita MMM sem zero-padding (mesmo resultado do padded)
 runcase cobertura-plan-1         defeito-cobertura  1 defeito-cobertura--check-plan.txt --check --plan 1
 # brief avulso (decisão 4.86): nó BRIEF + âncora task-brief; defeitos plantados

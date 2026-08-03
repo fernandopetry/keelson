@@ -95,6 +95,7 @@ ponta a ponta, e o validator decide com os próprios olhos (cobertura mista, §5
 | `index-desatualizado` | `TASK-MMM-INDEX.md` diverge do computado (waves, tabelas FR/AC) — best-effort | WARNING |
 | `brief-sem-criterio` | brief avulso sem heading `## Critério de aceite` (forma do esqueleto — decisão 4.86) | WARNING |
 | `task-ancora-dupla` | TASK com `Pertence a` **e** `Brief` preenchidos (âncora é exclusiva) | ERROR |
+| `feat-sem-verificacao` | FEAT com 1+ TASK declarante, **todas Done**, sem linha `**Verificação (gate 9)**:` sob o heading na SPEC (recorte do gate 9 por FEAT — decisão 4.90). A linha é livre no conteúdo (data e como, ou `n/a — motivo`); a **presença** é o declarado. SPEC `Status: Done` (ciclo fechado antes da 4.90) → `WARNING [legacy]`. TASK não-parseável sem status derruba o "todas Done" e o check silencia — degrada na direção segura, nunca inventa ERROR | ERROR · carência |
 
 `ref-quebrada` cobre também a âncora avulsa (TASK com `**Brief**:` apontando BRIEF
 inexistente no slug) — não é check novo, é o genérico sobre `task-brief`. TASK sem

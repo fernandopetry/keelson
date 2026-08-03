@@ -405,17 +405,17 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.64.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.65.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **review rounds got faster without losing a single proof**
-(decision 4.89). Applicable gates (review · security · behaviour) now run **in
-parallel by default** in every mode, over a **single context package** the orchestrator
-builds once — diff + SHA, literal acceptance criteria, the ficha slices and profile
-section each reviewer actually uses. The package is factual, never evaluative:
-reviewer independence stays intact, and each reviewer still reads its own doctrine at
-runtime.
+New in this release: **each gate now runs at the granularity of what it proves**
+(decision 4.90). Tests stay per task (the fine-grained net); review and security run
+**once per wave** over the integrated diff, with findings routed back to the
+originating task; and behaviour (QA) is proven **per feature/story** — end to end,
+when the flow actually exists — recorded in the SPEC and mechanically enforced by the
+graph (new `feat-sem-verificacao` check, born with its fixture). Consolidation is
+always declared, never silent.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

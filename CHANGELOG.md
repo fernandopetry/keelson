@@ -17,6 +17,43 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.65.0] — 2026-08-03
+
+Decision 4.90
+
+### Added
+- **Gates now run at the granularity of what they prove — not uniformly per task.**
+  Tests stay per task: they are the fine-grained net that lets the next wave build on
+  proven ground. Independent review (gates 1–7) and security (gate 8) run **once per
+  wave**, over the wave's accumulated diff with a task→files map in the context
+  package — the wave was already the cycle's integration unit (merge dry-run, wave
+  suite), reviewing per task re-read the same surroundings N times, and security
+  actually *gains* from the integrated view (a new writer in one task plus a relaxed
+  guard in another is exactly what isolated reviews miss). Findings are routed to the
+  originating task; retries follow the 4.88 convergence rule; a vulnerability is
+  still an immediate rejection and never waits beyond its own wave.
+- **Behaviour (gate 9) is proven per feature/story, not per task** — in the first
+  wave where the FEAT completes, when the end-to-end flow actually exists; proving
+  "half a feature" per task duplicated gate 2 or proved nothing. A SPEC without
+  FEATs gets one QA round against the PLAN's DoD in the final validation. The
+  verification is recorded in the SPEC itself (a `**Verificação (gate 9)**:` line
+  under the FEAT heading — free-form content, presence is the contract).
+- **New graph check `feat-sem-verificacao`** (born with its fixture, suite 25/25):
+  a FEAT whose declaring tasks are all Done with no verification line is an ERROR;
+  a SPEC already `Done` (cycle closed before 4.90) degrades to `WARNING [legacy]`;
+  an unparseable task silences the check in the safe direction. The SPEC node now
+  carries `status=` and FEAT nodes carry `verif=` in the TSV (expected files
+  refrozen deliberately).
+
+### Changed
+- Task closure declares where each consolidated gate ran (`wave N` · `FEAT-X` ·
+  `DoD`) — consolidation is always declared, never silent (the 4.85 rule applied to
+  granularity); the task-validator accepts these states as valid, not as pending.
+  The on-demand mode is untouched: one change, one round. The consumer block does
+  not change — no re-init needed for this batch.
+
+---
+
 ## [0.64.0] — 2026-08-03
 
 Decision 4.89

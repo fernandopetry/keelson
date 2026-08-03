@@ -110,9 +110,11 @@ os ACs derivam a filiação do FR que cobrem — não há vínculo AC→FEAT lit
 - FEAT sem a linha de descrição `>` (o QA não sabe o que testar de ponta a ponta)
 - Nome de FEAT que não é um fluxo verificável (ex.: "melhorias gerais", "ajustes")
 
-As linhas `**Jira**:` (sob o heading da FEAT ou no cabeçalho da SPEC) e `**Jira Story**:` (no
-cabeçalho — Story implícita da SPEC sem FEAT) são **toleradas e ignoradas** pelos checks: são
-rastro do tracker, não conteúdo de especificação.
+As linhas `**Jira**:` (sob o heading da FEAT ou no cabeçalho da SPEC), `**Jira Story**:` (no
+cabeçalho — Story implícita da SPEC sem FEAT) e `**Verificação (gate 9)**:` (sob o heading da
+FEAT — registro da verificação de comportamento, gravado pelo `/keelson:implement`, decisão
+4.90) são **toleradas e ignoradas** pelos checks: são rastro de execução/tracker, não conteúdo
+de especificação.
 
 ## Etapa 5: checks de domínio vs tecnologia
 

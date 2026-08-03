@@ -103,6 +103,13 @@ aplicada com o mesmo peso a tudo.
 | **8** | `security-engineer` | Só em mudança sensível (auth, autorização, injeção, upload, dados pessoais, cripto, sessão, endpoints, redirect, exec, dependências) |
 | **9** | `qa` | Comportamento **provado executando**, não deduzido do relatório do developer |
 
+Cada gate roda no recorte do que ele prova: os testes acompanham **cada tarefa**; a
+revisão e a segurança rodam **uma vez por wave**, sobre o conjunto integrado (é onde a
+interação entre tarefas aparece); e o QA prova a **história completa** quando ela passa
+a existir de ponta a ponta — como um QA de time real, que testa a funcionalidade, não o
+commit. Nada disso é gate pulado: cada consolidação fica declarada na tarefa, e a
+verificação da funcionalidade fica registrada na própria SPEC, cobrada mecanicamente.
+
 Falhou? Um retry, depois escala para você. E a régua que atravessa tudo:
 
 > **Gerador ≠ avaliador.** A prova de que um artigo do Charter foi cumprido é externa e

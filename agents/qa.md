@@ -18,6 +18,7 @@ Invocado pelo `/keelson:auto` (Etapa 3.5) **antes** de existir código, sobre as
 ## Input esperado
 
 - **Briefing destilado da main session** (preferencial): ACs vinculados **literais** (copiados da SPEC), efeito observável esperado, arquivos da task, comandos `quality.*` da ficha
+- **Modo FEAT (ciclo — decisão 4.90)**: no ciclo, seu recorte é a **FEAT/história completa**, não a TASK — o briefing traz a FEAT (nome, propósito), os ACs literais de todos os FRs dela, telas/endpoints e o mapa TASK→arquivos. Prove o **fluxo de ponta a ponta** (a jornada que a FEAT promete), não diffs isolados; o resultado vira a linha `**Verificação (gate 9)**:` que a main session grava na SPEC. TASK avulsa/sob demanda continua no recorte da mudança.
 - Report do `developer`; `${CLAUDE_PLUGIN_ROOT}/guidelines/core/TESTING.md` e a **seção de testes** do perfil ativo (não o arquivo inteiro)
 - Caminhos de TASK/PLAN/SPEC só para conferência pontual — o briefing traz o que você usa
 

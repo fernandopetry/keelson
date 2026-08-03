@@ -102,7 +102,7 @@ Antes da Entrega: houve erro de **processo** no ciclo (validator reprovou artefa
 
 Uma entrega com gate 9 furado **nunca é silenciosa**. Antes da Entrega:
 
-1. **Garanta o handoff**: na rota **formal**, o `/keelson:implement` (Etapa 4, item 6) **já consolidou** o `HANDOFF-PLAN-MMM.md` — não gere outro; confira e siga ao item 2. Na rota **inline**, gere `{docsRoot}/<slug>/handoffs/HANDOFF-<id>.md` no formato e nas regras de roteiro canônicos do §8.2 (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`; `<id>` = `PLAN-MMM` na rota formal; `<yyyy-mm-dd>-<descrição-curta>` na inline), incluindo os pontos frágeis que você conhece (dark mode, estados vazios, autorização) mesmo sem AC formal.
+1. **Garanta o handoff**: na rota **formal**, o `/keelson:implement` (Etapa 4, item 7) **já consolidou** o `HANDOFF-PLAN-MMM.md` — não gere outro; confira e siga ao item 2. Na rota **inline**, gere `{docsRoot}/<slug>/handoffs/HANDOFF-<id>.md` no formato e nas regras de roteiro canônicos do §8.2 (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`; `<id>` = `PLAN-MMM` na rota formal; `<yyyy-mm-dd>-<descrição-curta>` na inline), incluindo os pontos frágeis que você conhece (dark mode, estados vazios, autorização) mesmo sem AC formal.
 2. **Registre o risco ativo no INDEX** do slug: `Verificação de tela pendente — HANDOFF-<id>` (na rota formal o `/keelson:implement` já fez).
 3. **Domínio sem slug SDD**: não crie arquivo — o roteiro completo vai inline no prompt do report da Entrega (e aplique a calibração de documentação autônoma dos guidelines para a falta de slug).
 4. **Ambiente com tela disponível** → esta etapa não existe: exercite de verdade (gate 9 normal). Handoff é **fallback, não atalho** (§8.1, decisão 4.26).

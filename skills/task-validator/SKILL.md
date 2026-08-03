@@ -139,7 +139,7 @@ A fonte primária de convenções é a **ficha/perfil** (o que o `/keelson:tasks
 - Status ≠ `Done` mas histórico preenchido (inconsistente)
 
 ### WARNING se:
-- Status = `Done` mas Quality gates do histórico têm item desmarcado
+- Status = `Done` mas Quality gates do histórico têm item desmarcado — **exceto** gate com consolidação declarada (decisão 4.90): `aprovado (wave N)`, `consolidado (FEAT-...)` ou `consolidado (DoD, Etapa 4)` são estados válidos, não pendência
 
 ## Etapa 8: checks específicos por tipo
 
