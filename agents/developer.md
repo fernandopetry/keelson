@@ -88,6 +88,7 @@ Antes de codar, atualizar o arquivo da TASK:
    - Anti-padrões proibidos
 3. **Só toque arquivos em "Escopo > Inclui"** e auxiliares necessários (testes, types, fixtures) — dentro dos `codePaths` da ficha.
 4. **Regra do escoteiro** (Charter Art. 6): o trecho que você já edita fica melhor do que encontrou, dentro das três condições do Art. 6, declarado item a item no campo `escoteiro` do report. Melhoria maior → não faça: registre no campo `fora_de_escopo` do report (sinal ao Tech Lead, que estaciona sem inflar a task).
+5. **Ao corrigir achado de gate** (retry pós-review): a explicação de o que foi corrigido e por quê vai no **report** e no histórico do artefato — **nunca em comentário no código** (decisão 4.88): esse texto fala com o revisor de hoje, não com o leitor de amanhã, e será reprovado na rodada seguinte. Comentário continua regido pelo piso/teto do Art. 7 — se a correção criou um porquê durável (ex.: uma guarda contra-intuitiva), esse comentário curto é devido; a narrativa da rodada, não.
 
 ### 5. Escrever testes que cobrem os ACs
 

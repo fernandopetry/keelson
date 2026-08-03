@@ -405,15 +405,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.62.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.63.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **a standalone brief that spans several slugs now has a defined
-home** (decision 4.87). A cross-cutting change keeps **one** brief — it lives in the
-dominant slug (the one whose SPEC it would become if the work grew into a cycle), the
-other touched slugs get a one-line pointer in their INDEX, and the brief's TASKs stay
-in the brief's slug. One change, one brief, one card — never duplicates.
+New in this release: **post-verdict fixes converge or escalate — they never restart
+the review** (decision 4.88). Re-review is scoped to the fix's delta, a gate that
+fails twice escalates to the human with a proposal instead of running a third round,
+text-only fixes don't reopen the behavioural gates, and the story of what a fix round
+changed lives in the report — never in code comments.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

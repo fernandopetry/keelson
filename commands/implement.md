@@ -121,7 +121,7 @@ Revisão por agentes independentes (o developer **nunca** revisa o próprio trab
 
 **Briefing destilado para os gates dedicados**: ao invocar `security-engineer`/`qa`, monte no prompt um briefing com o que eles de fato usam — ACs vinculados **copiados literalmente** da SPEC, DECs que tocam o escopo, arquivos da task (`git diff --name-only`), comandos `quality.*` da ficha — e aponte a **seção** do perfil a ler (segurança → seção de segurança; verificação → seção de testes). Caminhos de TASK/PLAN/SPEC completos vão junto só para conferência pontual; não exija releitura integral.
 
-Falha em qualquer gate: motivo específico, 1 retry, depois escala humano. Vulnerabilidade (Gate 8) é sempre bloqueante.
+Falha em qualquer gate: motivo específico, 1 retry, depois escala humano. Vulnerabilidade (Gate 8) é sempre bloqueante. O retry segue a régua de convergência do `core/CODE-REVIEW.md` (decisão 4.88): re-review **sobre o delta**, achado só-texto não reabre gates de comportamento, narrativa de correção fica no report — nunca em comentário.
 
 **Modo autônomo** (pós-largada do `/keelson:auto`): "escalar humano" = escada de reação do auto (estacionar → degrau 3), nunca pergunta pendurada no meio do run.
 

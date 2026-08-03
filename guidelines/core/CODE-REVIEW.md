@@ -194,6 +194,36 @@ revisão independente **é** a prova.
 
 ---
 
+## Convergência do re-gate (decisão 4.88)
+
+Vale para **todo invocador** da régua — ciclo (`/keelson:implement`), diff avulso
+(`/keelson:review`) e modo sob demanda. Correção pós-veredito não recomeça a revisão:
+ela converge ou escala.
+
+- **Re-review é sobre o delta.** O revisor da rodada N+1 recebe o veredito anterior e o
+  **delta da correção**; o que já foi aprovado permanece aprovado, salvo quando o delta
+  o toca. Reler o diff inteiro do zero a cada rodada é retrabalho que só produz achado
+  marginal novo — e é o motor do loop.
+- **Teto: 1 retry por gate, depois escala.** Achado → correção → re-review do delta. Se
+  o gate reprova de novo, a 3ª rodada **não roda por decisão própria**: escale ao
+  Diretor com o estado (o que passou · o que resta · proposta + default). É a mesma
+  régua que o `/keelson:implement` sempre teve ("1 retry, depois escala humano"),
+  valendo agora em qualquer invocação. Achado de **segurança** persistente escala como
+  **bloqueio** — o Diretor decide o rumo; nunca se contorna nem se commita por cima.
+- **Achado só-texto não reabre o ciclo.** Correção cujo delta é **inerte** (comentário,
+  docblock, doc — teste mecânico em `./TESTING.md`, "Diff inerte") re-verifica com o
+  **mesmo revisor**, sobre o delta, e nada mais: os gates de comportamento (1/2/9)
+  permanecem válidos porque nada do que eles provam mudou.
+- **Narrativa de correção não entra no código.** A explicação de "o que a rodada N
+  corrigiu e por quê" vive no report do gate e no histórico do artefato (TASK/brief) —
+  nunca em comentário: esse texto fala com o revisor de hoje, não com o leitor de
+  amanhã, e reprova no teste de apagar na rodada seguinte (o processo passa a produzir
+  o defeito que ele mesmo reprova). O **porquê durável** continua obrigatório no código
+  pelo piso do Art. 7 — o endereço muda para a prosa de processo, não a régua de
+  conteúdo.
+
+---
+
 ## Formato de saída
 
 **Aprovado:**

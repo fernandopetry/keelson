@@ -124,6 +124,17 @@ Dois ou mais recursos independentes, dois ou mais slugs prováveis, um roadmap n
 O PM decompõe em demandas priorizadas e **você confirma a decomposição** — depois cada
 demanda segue seu próprio ciclo.
 
+### Uma mudança pequena está levando horas em rodadas de review
+
+O sintoma: reviewer acha algo, developer corrige, a correção reabre os gates, e as
+últimas rodadas discutem só comentários — que o próprio processo gerou. Desde a decisão
+4.88 isso tem régua de **convergência**: re-review é sobre o **delta** da correção
+(nunca o diff inteiro de novo), um gate que reprova duas vezes **escala para você** com
+proposta em vez de rodar uma 3ª vez sozinho, e correção que só muda comentário/doc não
+reabre os gates de comportamento. Se uma sessão entrar nesse loop mesmo assim, mande
+parar e fechar declarando o estado dos gates — e rode `/keelson:postmortem`: a mensagem
+ao mantenedor é o caminho de correção do processo.
+
 ## Jira
 
 ### O ciclo terminou e o Jira não soube de nada

@@ -180,7 +180,7 @@ Antes de encerrar, aplique o gate de segurança:
 - Só quando a mudança está FORA dos gatilhos do gate 8 (este aviso é heurístico e pode ser falso-positivo) → basta o checklist de guidelines/core/SECURITY.md + a seção de segurança do perfil ativo.
 - Confirme: consultas parametrizadas; saída escapada no destino; autorização verificada (negar por padrão); guarda de step-up no ponto que ESCREVE o dado (todos os writers, não só o caminho da tela); sem segredo/PII em log; cookies httponly/secure/samesite; sem token em storage do cliente; sem renderização crua de dado de usuário.
 
-Se o security-engineer JÁ rodou sobre este diff (ou a mudança está comprovadamente fora dos gatilhos), pode encerrar — este aviso não se repetirá para esta mesma mudança.${dep_note}${base_note}
+Se o security-engineer JÁ rodou sobre este diff (ou a mudança está comprovadamente fora dos gatilhos), pode encerrar — este aviso não se repetirá para esta mesma mudança. Se o que mudou desde o veredito dele é só o delta de uma correção de achados, a re-verificação é sobre o delta (régua de convergência: guidelines/core/CODE-REVIEW.md, decisão 4.88); achado de segurança que persistir após 1 retry escala ao Diretor como bloqueio, nunca ganha 3ª rodada silenciosa.${dep_note}${base_note}
 EOF
 )"
   if [ -n "$marker" ] && [ -n "$fingerprint" ]; then

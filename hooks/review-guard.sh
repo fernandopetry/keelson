@@ -159,7 +159,7 @@ Antes de encerrar, aplique o code review:
 - Rode /keelson:review (revisores independentes sobre este diff) OU o code-reviewer sobre o diff OU aplique o checklist de guidelines/core/CODE-REVIEW.md (e o perfil de linguagem ativo).
 - Confirme: limites/responsabilidade única respeitados; sem reimplementação de utilitário existente (DRY); nomes pela intenção; sem abstração especulativa; condicionais e assinaturas saudáveis; tratamento de erro presente; sem código morto.
 
-Se esta mudança JÁ passou por code review (ex.: fluxo /keelson:implement com reviewer), pode encerrar — este aviso não se repetirá para esta mesma mudança.${base_note}
+Se esta mudança JÁ passou por code review (ex.: fluxo /keelson:implement com reviewer), pode encerrar — este aviso não se repetirá para esta mesma mudança. Se o que mudou desde o último veredito é só o delta de uma correção de achados, a re-verificação é sobre o delta — e delta só de comentário/doc re-checa com o próprio revisor, sem rodada nova completa (régua de convergência: guidelines/core/CODE-REVIEW.md, decisão 4.88).${base_note}
 EOF
 )"
 if [ -n "$marker" ] && [ -n "$fingerprint" ]; then

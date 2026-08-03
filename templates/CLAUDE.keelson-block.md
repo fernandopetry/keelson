@@ -43,7 +43,12 @@
   no slug dominante — onde viveria a SPEC — com 1 linha de rastro no INDEX dos demais,
   decisão 4.87) —, delega ao `developer` e passa o diff
   pelo `code-reviewer` (régua avulsa); `security-engineer` em mudança sensível e `qa`
-  quando há comportamento observável — mesmos gatilhos do ciclo. Invocar um agent
+  quando há comportamento observável — mesmos gatilhos do ciclo. Correção pós-gate
+  **converge, não recomeça** (decisão 4.88): re-review sobre o **delta**; gate que
+  reprova de novo após 1 retry → **escala ao Diretor** (estado + proposta + default),
+  nunca 3ª rodada por conta própria; delta só de comentário/doc re-checa com o próprio
+  revisor sem reabrir os gates de comportamento; e a explicação da correção vai no
+  report — **nunca em comentário no código**. Invocar um agent
   **não puxa o ciclo**: cada um devolve a sua tarefa e para; a orquestração é sempre do
   Tech Lead, e commit só a pedido do Diretor. Só o trivial não-comportamental (typo de
   comentário/doc) pode ser inline, declarado — **sem brief e sem card**. No **primeiro

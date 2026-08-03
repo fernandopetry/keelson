@@ -17,6 +17,40 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.63.0] — 2026-08-03
+
+Decision 4.88
+
+### Added
+- **Re-gate convergence rule: a post-verdict fix converges or escalates — it never
+  restarts the review.** Two consecutive real-world sessions spent ~1h45 each on
+  changes worth a few dozen lines, and the time went to a review loop: each fix
+  changed the diff, the Stop hooks correctly re-fired, the next round re-read the
+  whole diff and found something more marginal — until the final rounds were arguing
+  only about comments the process itself had produced. The rule, owned by
+  `guidelines/core/CODE-REVIEW.md` and binding for every invoker (cycle, standalone
+  review, on-demand mode): re-review is scoped to the **delta** of the fix (approved
+  code stays approved unless the delta touches it); **one retry per gate**, then the
+  second failure escalates to the human with state + proposal + default instead of a
+  silent third round (a persistent security finding escalates as a blocker — it is
+  never worked around); a fix whose delta is inert (comments/docs only, the 4.84
+  mechanical test) re-checks with the same reviewer and does not reopen the
+  behavioural gates; and the story of what a fix round changed lives in the gate
+  report and the artifact history — **never in code comments**, where it talks to
+  today's reviewer instead of tomorrow's reader and gets (rightly) rejected on the
+  next round.
+- New troubleshooting entry: "a small change is taking hours in review rounds" —
+  what the loop looks like and how the convergence rule breaks it.
+
+### Changed
+- `review-guard` and `security-guard` messages now name the delta-scoped path, so a
+  session facing a re-fired hook knows a full re-review is not what is being asked
+  (message prose only — no logic change). The comment floor/ceiling (4.31–4.33) is
+  untouched: the durable *why* still belongs in code; killing comments outright was
+  considered and rejected.
+
+---
+
 ## [0.62.0] — 2026-08-02
 
 Decision 4.87
