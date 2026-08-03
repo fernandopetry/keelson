@@ -54,7 +54,9 @@
   revisor sem reabrir os gates de comportamento; e a explicação da correção vai no
   report — **nunca em comentário no código**. Invocar um agent
   **não puxa o ciclo**: cada um devolve a sua tarefa e para; a orquestração é sempre do
-  Tech Lead, e commit só a pedido do Diretor. Só o trivial não-comportamental (typo de
+  Tech Lead, e — **regra deste modo, nunca do ciclo** — commit só a pedido do Diretor
+  (no ciclo o commit por TASK é do time: o `developer` commita a implementação e a
+  closure commita o fecho da task; decisão 4.91). Só o trivial não-comportamental (typo de
   comentário/doc) pode ser inline, declarado — **sem brief e sem card**. No **primeiro
   turno** da mudança, declare **quem escreve o código** (qual agent — ou por que será
   inline) **e sob qual card** (decisão 4.86): o Diretor citou uma key do tracker → ela
@@ -75,7 +77,9 @@
   `/keelson:report`; fecho com gate pendente se declara **parcial** e não convida ao
   commit — decisão 4.85) · decisões tomadas em seu nome · o que ficou fora de
   escopo ou pendente · estado do tracker (com `jira.enabled`) · e o que depende de você
-  (o commit é seu). O relatório é montado a partir do **ledger de sessão**
+  — **por modo** (decisão 4.91): no sob demanda, o commit é seu; no ciclo, a branch já
+  chega commitada TASK a TASK (e pushada pelo `/keelson:auto`) — seus atos são revisão,
+  PR e merge (decisão 4.41). O relatório é montado a partir do **ledger de sessão**
   (`thoughts/local/session-ledger/`), onde cada evento é escrito **quando acontece** — não
   se relê a sessão para produzi-lo, e o que o contexto comprimiu não se perde. Relatório
   perdido ou sessão retomada → `/keelson:report` reconstrói.

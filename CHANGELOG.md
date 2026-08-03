@@ -17,6 +17,26 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.65.1] — 2026-08-03
+
+Decision 4.91
+
+### Fixed
+- **The consumer block no longer talks the cycle out of committing.** Two phrases
+  born with the on-demand mode read as universal rules once inside the consumer's
+  `CLAUDE.md` — "commit only at the Director's request" (4.75) and a close-out bullet
+  scoped "on-demand **or cycle**" ending in "the commit is yours" (4.76). In a real
+  consumer run the session obeyed them mid-cycle: it opened the wave branch and
+  stopped committing per task, even though the cycle doctrine never changed (the
+  `developer` commits each TASK, the closure commits per task, autonomy ends at the
+  push — 4.41). Both phrases now carry their scope inside the sentence itself, and
+  the close-out states the contract per mode: on-demand → the commit is the
+  Director's; cycle → the branch arrives committed task by task (and pushed by
+  `/keelson:auto`) — the Director's acts are review, PR and merge. **Re-run
+  `/keelson:init` in consumer projects to refresh the block.**
+
+---
+
 ## [0.65.0] — 2026-08-03
 
 Decision 4.90
