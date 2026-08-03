@@ -62,7 +62,7 @@ Não leia a régua nem o perfil integralmente: quem os lê são os revisores (mo
 
 ## Etapa 2: briefing destilado
 
-Monte um briefing por revisor com o que ele de fato usa: comando de diff resolvido, SHA, lista de arquivos, comandos `quality.*` da ficha, caminho do perfil ativo e a seção a ler, decisões irreversíveis do INDEX (quando houver).
+Monte um briefing por revisor com o que ele de fato usa: comando de diff resolvido, SHA, lista de arquivos, comandos `quality.*` da ficha, caminho do perfil ativo e a seção a ler, decisões irreversíveis do INDEX (quando houver). É o **pacote de contexto de gate** (regra geral — montado uma vez, idêntico para os revisores, factual e nunca avaliativo: `core/CODE-REVIEW.md` §Orquestração, decisão 4.89).
 
 E o que é específico deste comando — **declare explicitamente**:
 

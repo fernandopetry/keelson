@@ -17,6 +17,35 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.64.0] — 2026-08-03
+
+Decision 4.89
+
+### Added
+- **Gate-round orchestration rule: parallel by default, one context package.** Field
+  data from the two ~1h45 sessions showed two silent costs beyond the re-gate loop:
+  reviewers running one at a time for no reason (the parallel rule lived only in
+  `/keelson:implement` and `/keelson:review` — the on-demand mode, where both slow
+  sessions ran, had no rule), and each reviewer re-reading the same ficha, profile,
+  anchor and diff the orchestrator already had (300–700KB agent transcripts that are
+  mostly context rediscovery, not reasoning). Now owned by
+  `guidelines/core/CODE-REVIEW.md` and binding for every invoker: applicable gates
+  (7 · 8 · 9 are mutually independent) are dispatched **in the same turn**, sequence
+  being a declared exception; and the invoker builds **one context package** —
+  resolved diff + SHA, literal acceptance criteria from the anchor, the ficha slices
+  (`quality.*`, `sensitiveGlobs`), the profile section to read, plus the previous
+  verdict + delta on a re-gate (4.88) — delivered identically to every reviewer.
+
+### Changed
+- Guardrails on the package, so speed never costs quality: it is **factual, never
+  evaluative** (the orchestrator's opinion of the diff stays out — reviewer
+  independence is what gives the gate its value), and it never replaces doctrine —
+  each reviewer keeps reading its own rulebook at runtime (4.20). The distilled
+  briefings already in `/keelson:implement` and `/keelson:review` are now declared
+  instances of the general rule, pointing at the owner.
+
+---
+
 ## [0.63.0] — 2026-08-03
 
 Decision 4.88

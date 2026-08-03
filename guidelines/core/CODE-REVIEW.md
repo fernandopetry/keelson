@@ -194,6 +194,31 @@ revisão independente **é** a prova.
 
 ---
 
+## Orquestração da rodada: paralelismo e pacote de contexto (decisão 4.89)
+
+Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
+
+- **Gates aplicáveis rodam em paralelo por padrão.** Os gates de uma rodada (7 ·
+  8 · 9) são independentes entre si: despache os agentes **no mesmo turno** e espere
+  os reports. Sequência é exceção **declarada** — só quando um gate consome a saída de
+  outro ou disputa recurso exclusivo; "um de cada vez" sem motivo é latência pura.
+- **Pacote de contexto único.** O invocador monta **uma vez** e entrega o mesmo pacote
+  a todos os revisores da rodada: diff resolvido + SHA · o artefato-âncora com os
+  critérios literais (ACs da TASK, critério de aceite do brief) · as fatias da ficha
+  que eles usam (`quality.*`, `sensitiveGlobs`) · a **seção** do perfil a ler · e, em
+  re-gate, o veredito anterior + o delta (régua de convergência abaixo). Cada revisor
+  redescobrindo o mesmo contexto por conta própria é o maior custo silencioso da
+  rodada.
+- **O pacote é factual, nunca avaliativo.** Ele carrega o *quê* (diff, âncoras, fatias),
+  jamais a opinião de quem o montou — sem hipótese de veredito, sem "acho que está ok,
+  confere só X". A revisão vale pelo **contexto limpo** (gerador ≠ avaliador, abaixo);
+  direcionar o revisor contamina a independência que dá valor ao gate.
+- **O pacote não substitui a régua.** Cada revisor continua lendo a própria régua em
+  runtime (este arquivo, `SECURITY.md`, a seção do perfil) — o pacote poupa a
+  redescoberta do contexto do trabalho, nunca resume doutrina de memória.
+
+---
+
 ## Convergência do re-gate (decisão 4.88)
 
 Vale para **todo invocador** da régua — ciclo (`/keelson:implement`), diff avulso
