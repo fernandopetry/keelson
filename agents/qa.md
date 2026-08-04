@@ -44,6 +44,10 @@ Invocado pelo `/keelson:auto` (Etapa 3.5) **antes** de existir código, sobre as
 
 ## Output: report de verificação
 
+**Somente o YAML** (duas camadas, decisão 4.103 — régua no `sdd-conventions.md`): evidência
+por AC em 1–2 linhas (`como`/`esperado`/`obtido` telegráficos); divergência carrega o
+acionável completo; o roteiro longo vive no `handoff_seed`, nunca em prosa solta.
+
 ```yaml
 task_id: TASK-MMM-XXX
 resultado: VERIFICADO | FALHOU | PARCIAL

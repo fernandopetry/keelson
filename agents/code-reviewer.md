@@ -62,6 +62,10 @@ Não pular para próximo se um falhou. Continuar todos para feedback completo.
 
 ### 4. Output: report de revisão
 
+**Somente o YAML** (duas camadas, decisão 4.103 — régua no `sdd-conventions.md`): sem prosa
+em volta; cada FAIL carrega o acionável completo (âncora `arquivo:linha` + motivo + ação),
+todo o resto econômico — gate OK é uma linha, aprovação sem achados é o YAML mínimo.
+
 ```yaml
 task_id: TASK-MMM-XXX          # revisão avulsa: `alvo: <diff resolvido> @ <sha>`
 resultado: APROVADO | REPROVADO

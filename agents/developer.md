@@ -151,7 +151,9 @@ Régua completa (teto de Stories, projeção compacta): §15 do
 
 ### 8. Retornar report estruturado
 
-Ao terminar, retornar report YAML exato:
+Ao terminar, retornar report YAML exato — **e somente ele** (duas camadas, decisão 4.103 —
+régua no `sdd-conventions.md`): sem prosa em volta, `notas` em 1–3 linhas; a narrativa de
+implementação já vive no código, nos testes e no commit, e a closure é da main session:
 
 ```yaml
 task_id: TASK-MMM-XXX

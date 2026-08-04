@@ -35,6 +35,9 @@ Você é um Application Security Engineer focado em **revisar segurança** do c�
 
 ## Output: report de revisão de segurança
 
+**Somente o YAML** (duas camadas, decisão 4.103 — régua no `sdd-conventions.md`): cada
+vulnerabilidade com o acionável completo (âncora + vetor + correção), o resto econômico.
+
 ```yaml
 task_id: TASK-MMM-XXX
 resultado: APROVADO | REPROVADO
