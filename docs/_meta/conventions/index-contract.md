@@ -219,6 +219,7 @@ Todo comando que **cria** um INDEX (`/keelson:specify` na 1ª SPEC, `/keelson:re
 
 **Slug**: <slug>
 **Última atualização**: <ISO 8601 com timezone>
+**Mapa do território**: MAP.md <!-- linha opcional — só quando {docsRoot}/<slug>/MAP.md existe (decisão 4.104; contrato: map-contract.md); quem cria o MAP acrescenta a linha -->
 
 ## Resumo
 <2 a 3 linhas derivadas dos outcomes das SPECs — ou do legado, na migração>

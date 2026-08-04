@@ -35,7 +35,7 @@ Você é o **Tech Lead** do time keelson (decisão 4.37), orquestrando implement
 
 1. Ler a **ficha** (`keelson.config.json`; campos: convenção comum — sdd-conventions.md) e o `CLAUDE.md` do projeto se existir.
 2. Carregar o **perfil de linguagem ativo** (doutrina `core/*`: vale sempre, carga conforme o mapa — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`, também dono da resolução e avisos do perfil); em mudança sensível, some a seção de segurança do perfil e o `QUALITY-CHARTER` (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/`); em queries pesadas, a seção de performance.
-3. **Memo de exploração**: se existe, use-o como mapa do domínio e **passe o caminho aos subagents** (convenção comum — sdd-conventions.md).
+3. **Memo de exploração e MAP do slug**: se existem, use-os como mapa do domínio e **passe os caminhos aos subagents** (memo: convenção comum — sdd-conventions.md; `{docsRoot}/<slug>/MAP.md`: contrato em `map-contract.md`, consumo sob 4.58).
 4. Validar consistência guideline ↔ PLAN.
 
 ### 0.3 Identificar e ler artefatos SDD
@@ -215,7 +215,7 @@ Falha: reportar específico, 1 retry, escalar.
 3. **Gate 9 consolidado do PLAN (decisão 4.90)** — SPEC **sem** FEATs, com efeito observável: invocar o `qa` 1× contra o DoD (fluxos de ponta a ponta, ACs literais no pacote). SPEC **com** FEATs: conferir que cada FEAT completada tem a linha `**Verificação (gate 9)**:` na SPEC (o §3.6 gravou; o grafo cobra — rode `graph.sh <slug> --check` e trate `feat-sem-verificacao`).
 4. Validar cada item da DoD.
 5. Validar aderência global à ficha e ao perfil de linguagem ativo.
-6. **Remover o memo de exploração** (`thoughts/local/exploration-<slug>.md`), se existir — a closure do PLAN encerra o ciclo de exploração.
+6. **Delta do MAP e remoção do memo** (decisão 4.104): slug com `{docsRoot}/<slug>/MAP.md` → anexe o delta da entrega (contrato: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/map-contract.md`, §3.2 — o que este PLAN criou/mudou que altera a interpretação de quem chega depois; corrija/re-date entradas que a entrega invalidou; o memo de exploração desagua no MAP no que passar o critério do §1) e rode `scripts/map-check.sh {docsRoot}/<slug>` declarando os avisos no output. Em seguida — com ou sem MAP — **remover o memo** (`thoughts/local/exploration-<slug>.md`), se existir: a closure do PLAN encerra o ciclo de exploração.
 7. **Handoff de verificação (gate 9 remoto)** — só quando `gates.screenVerify` está ativo: se alguma task fechou com `comportamento_gate9: pendente_handoff`, consolidar os `handoff_seed` de todas as tasks em **um** `{docsRoot}/<slug>/handoffs/HANDOFF-PLAN-MMM.md` no formato canônico do §8.2 (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`), preenchendo o `sonda:` do front-matter com as evidências de indisponibilidade e preservando o `realm` de cada item (projeto multi-realm). Deduplicar itens que exercitam o mesmo fluxo **no mesmo realm**. O doc entra no commit da entrega.
 8. **Pendência de deploy visível no INDEX (check determinístico — não é opinião)**: toda pendência de deploy que a branch introduz — migration, seed, mudança de schema, criação de índice, secret/variável de ambiente novos, qualquer passo manual que produção exija **além** de subir o código — **DEVE** estar declarada no `{docsRoot}/<slug>/INDEX.md`. Compare o que a branch **realmente acrescenta** com o que o INDEX **declara**:
 

@@ -87,6 +87,10 @@
   um fluxo, mapear consumidores, "de onde vem este dado?") é delegada ao `code-scout`,
   que devolve conclusão ancorada em `arquivo:linha` — os arquivos lidos não entram no
   contexto da sessão. Lookup pontual (um grep) segue inline.
+- **Slug com `MAP.md`** (`{docsRoot}/<slug>/MAP.md`): é o **primeiro insumo** de qualquer
+  exploração daquele domínio — leia-o antes de varrer; âncora que vira decisão se confere
+  (régua 4.58). Mudou o território numa entrega → o delta entra no MAP na closure
+  (contrato: `map-contract.md` do plugin).
 - **Definição de pronto (gates):** ACs cobertos por prova · testes passando · lint
   limpo · escopo respeitado · decisões respeitadas · aderência ao Charter + perfil ·
   code review · **segurança** e **comportamento verificado** (condicionais aos gates

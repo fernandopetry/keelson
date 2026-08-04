@@ -31,7 +31,8 @@ Invocar o agent `pm` com: o pedido épico **verbatim**, a lista dos slugs de `{d
 ## Etapa 3: persistir o BRIEF épico
 
 1. Gravar `{docsRoot}/<slug-âncora>/briefs/BRIEF-<yyyy-mm-dd>-<descricao-curta>-epic.md` (contrato do BRIEF no `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`, variação épico): pedido épico **verbatim** + decomposição confirmada (a tabela da Etapa 2) + perguntas respondidas. `Status: Emitido`; o épico **não pareia com SPEC**.
-2. Se o slug-âncora tem `INDEX.md`: 1 linha no `## Histórico recente` — `<data>: épico decomposto em N demandas via /keelson:specify-epic (BRIEF-...-epic)`.
+2. **Semear o `MAP.md` do slug** (decisão 4.104 — contrato: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/map-contract.md`): a exploração que sustentou a decomposição (memo, "Fatos do código" da forja quando houver) vira entradas canônicas datadas em `{docsRoot}/<slug-âncora>/MAP.md` — as fatias leem o território sem re-explorar, e cada closure delas anexa o delta. MAP já existente → mesclar, re-datando o que esta decomposição re-verificou.
+3. Se o slug-âncora tem `INDEX.md`: 1 linha no `## Histórico recente` — `<data>: épico decomposto em N demandas via /keelson:specify-epic (BRIEF-...-epic)` — e a linha do MAP no cabeçalho (template do index-contract), se ele nasceu agora.
 
 ## Etapa 4: output — a fila do Diretor
 

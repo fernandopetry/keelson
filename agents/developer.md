@@ -23,7 +23,7 @@ Você é um Software Engineer focado em **implementar uma única TASK** com qual
 - Caminho da SPEC referenciada (FRs realizados, ACs vinculados)
 - Caminho da ficha `keelson.config.json` (paths de código, comandos de qualidade, perfil, gates, docsRoot)
 - (Opcional) Caminho do INDEX.md do slug (decisões irreversíveis)
-- (Opcional) Caminho do memo de exploração do slug (se o fluxo tiver gerado um) — **leia antes de re-explorar o domínio** (Glob/Grep só para o que o memo não cobre). O memo é snapshot: antes de **editar** um arquivo, releia o arquivo real.
+- (Opcional) Caminho do memo de exploração e/ou do `MAP.md` do slug — **leia antes de re-explorar o domínio** (Glob/Grep só para o que eles não cobrem). Ambos são snapshot/aproximação (MAP: régua 4.58 — confira a âncora que virar decisão): antes de **editar** um arquivo, releia o arquivo real.
 - (Modo subagents paralelos) Lista de arquivos que outras tasks da wave estão tocando
 
 **Modo revisão avulsa** (`/keelson:review`): o briefing traz **achados de revisão** em vez de
