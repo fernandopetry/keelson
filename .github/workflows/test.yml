@@ -27,5 +27,11 @@ jobs:
       - name: Suíte do map (scripts/tests/map/run.sh)
         run: bash scripts/tests/map/run.sh
 
+      - name: Suíte do check de agents (scripts/tests/agents-mcp/run.sh)
+        run: bash scripts/tests/agents-mcp/run.sh
+
+      - name: Paridade MCP dos agents (scripts/check-agents.sh)
+        run: bash scripts/check-agents.sh
+
       - name: Checks de release (versões · CHANGELOG · MIRRORS · bash -n)
         run: bash scripts/check-release.sh

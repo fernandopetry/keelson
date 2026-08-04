@@ -1,0 +1,1 @@
+check-agents: paridade MCP ok em 5 agent(s).

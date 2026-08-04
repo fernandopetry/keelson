@@ -79,7 +79,7 @@ fi
 
 # --- 4. bash -n em todos os scripts ---
 bad=0
-for f in scripts/*.sh scripts/git-hooks/* scripts/tests/graph/run.sh; do
+for f in scripts/*.sh scripts/git-hooks/* scripts/tests/*/run.sh; do
   [ -f "$f" ] || continue
   if ! bash -n "$f" 2>/dev/null; then
     fail "bash -n falhou em $f"

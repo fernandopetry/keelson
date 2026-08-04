@@ -110,6 +110,34 @@ if printf '%s\n' "$staged" | grep -qE '^scripts/(map-check\.sh$|tests/map/)'; th
   fi
 fi
 
+# Paridade MCP dos agents: check quando agents/ ou o motor mudam; suíte quando o motor muda (4.105)
+if printf '%s\n' "$staged" | grep -qE '^(agents/[^/]+\.md$|scripts/check-agents\.sh$|scripts/tests/agents-mcp/)'; then
+  if [ -f scripts/check-agents.sh ]; then
+    if ! out="$(bash scripts/check-agents.sh 2>&1)"; then
+      printf '%s\n' "$out" | sed 's/^/    /' >&2
+      echo "[keelson pre-commit] BLOQUEADO: paridade MCP dos agents falhou (4.105)." >&2
+      echo "  Escape consciente: KEELSON_SKIP_TESTS=1" >&2
+      exit 1
+    fi
+  else
+    echo "[keelson pre-commit] aviso: scripts/check-agents.sh ausente — paridade MCP não conferida." >&2
+  fi
+  if printf '%s\n' "$staged" | grep -qE '^scripts/(check-agents\.sh$|tests/agents-mcp/)'; then
+    if [ -f scripts/tests/agents-mcp/run.sh ]; then
+      echo "[keelson pre-commit] check-agents.sh/suíte no commit — rodando scripts/tests/agents-mcp/run.sh" >&2
+      if ! out="$(bash scripts/tests/agents-mcp/run.sh 2>&1)"; then
+        printf '%s\n' "$out" | tail -25 | sed 's/^/    /' >&2
+        echo "[keelson pre-commit] BLOQUEADO: suíte do check-agents falhou (acima, resumida)." >&2
+        echo "  Escape consciente: KEELSON_SKIP_TESTS=1" >&2
+        exit 1
+      fi
+      printf '%s\n' "$out" | tail -1 | sed 's/^/[keelson pre-commit] /' >&2
+    else
+      echo "[keelson pre-commit] aviso: scripts/tests/agents-mcp/run.sh ausente — suíte não conferida." >&2
+    fi
+  fi
+fi
+
 # Checks de release: obrigatórios quando os arquivos de release mudam
 if printf '%s\n' "$staged" | grep -qE '^(\.claude-plugin/|CHANGELOG\.md$|README\.md$|scripts/publish-wiki\.sh$)'; then
   if [ -f scripts/check-release.sh ]; then

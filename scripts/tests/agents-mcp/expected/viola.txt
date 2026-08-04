@@ -1,0 +1,3 @@
+FALHA: sem-grant.md: corpo cita mcp__foo__… (linha 10) sem grant em tools: — acrescente mcp__foo__* (ou a ferramenta específica) ao frontmatter
+FALHA: sem-grant.md: corpo cita mcp__multi_word__… (linha 11) sem grant em tools: — acrescente mcp__multi_word__* (ou a ferramenta específica) ao frontmatter
+check-agents: 2 violação(ões) em 2 agent(s).
