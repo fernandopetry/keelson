@@ -15,6 +15,19 @@ Não. O rigor é **proporcional**:
 
 Na dúvida: `/keelson:triage "<descrição>"` — ele classifica e devolve o comando pronto.
 
+### Chegou bug de produção. E agora?
+
+Entre pelo `/keelson:triage` normalmente (cole o relato, ou `--from=<KEY>` se já virou
+card). Relato de **produção** dispara a etapa de severidade: antes de rotear, o triage
+pergunta o que decide o tier — *quem/quantos são afetados* e *há dado em risco* — e a
+classificação (🔴/🟠/🟡) nasce registrada na própria TASK/brief, junto do "como
+reproduzir". Caso grave (2+ sinais críticos — dado em risco, sistêmico, segurança,
+SLA), ele **reconhece um incidente maior**: roteia o conserto como demanda expressa e
+te devolve o **checklist de resolução** (sintoma ausente por janela, mitigação
+identificada, dado limpo, comunicação enviada) — coordenar a resposta, comunicar e
+declarar resolvido são atos **seus**; fechado o checklist, rode
+`/keelson:postmortem <episódio>` para a lição não se perder.
+
 ### Preciso digitar `/keelson:auto` toda vez?
 
 Não. O modo autônomo é o **padrão**: peça em linguagem natural e o ciclo corre. O comando

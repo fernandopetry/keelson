@@ -52,9 +52,11 @@ INDEX. Regra de corte:
 mudou o que o sistema **promete**, ou há decisão técnica entre alternativas → é ciclo,
 não avulso.
 
-**A SPEC também declara o que sustenta e como se prova** (decisões 4.96–4.99). Cada
+**A SPEC também declara o que sustenta e como se prova** (decisões 4.96–4.101). Cada
 premissa carrega um **selo de evidência** (`crença · anedota · entrevistas · medido`) —
-o selo nunca bloqueia; ele expõe a aposta para a crítica de mérito. Cada DEC do PLAN
+o selo nunca bloqueia; ele expõe a aposta para a crítica de mérito (aposta de **valor**
+no núcleo da demanda → o PO devolve pergunta formal à área de produto, com o menor
+teste que a falsifica anexo — o ciclo não faz discovery). Cada DEC do PLAN
 declara **`Reabrir se:`** — a condição observável que pede revisão da decisão (a que
 aparece em diff é vigiada pelo reviewer; a de mundo viaja ao INDEX). E a **métrica de
 sucesso** declara a **fonte de medição**; entregue o PLAN, a pendência de **veredito**

@@ -405,17 +405,18 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.67.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.68.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the product layer the cycle was missing — every bet declares
-its evidence, every decision its reopening condition, every metric its verdict**
-(decisions 4.96–4.99). SPEC premises carry evidence seals; DECs record when they must
-be reopened (gate 5 watches the diff-observable ones); the success metric declares its
-measurement source, enters the PLAN's DoD with a valve for externally-owned numbers,
-and stays a named pending in the INDEX until a verdict exists — chased by the next
-cycle, never blocking. No consumer block change in this batch.
+New in this release: **the two doors the product layer still had open** (decisions
+4.100–4.101, completing the 4.96–4.99 batch). A value premise resting on belief at the
+demand's core escalates as a formal question to the product area — proposal is the
+smallest falsifying test, default keeps the cycle moving. And production bugs enter
+structured: the triage asks the two tier-deciding questions (who's affected · data at
+risk) before routing, severity is born in the routed artifact, and a major incident is
+recognized — fix routed express, resolution checklist handed to the human — never
+commanded. No consumer block change in this batch.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

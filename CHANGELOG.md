@@ -17,6 +17,32 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.68.0] — 2026-08-04
+
+Decisions 4.100–4.101
+
+### Added
+- **A value premise escalates as a formal question to product (4.100).** Named instance
+  of the PO's escalation criterion 1 (the list stays taxative): a value premise sealed
+  `crença`/`anedota` holding up the demand's core is result-changing ambiguity. The
+  escalation ships via the Diretor as a formal question to the product area — proposal
+  = the smallest test that falsifies the premise (pass/fail criterion set **before**
+  running; recipe owned by `value-test-protocol.md`, read only on trigger), default =
+  proceed with the risk declared. The cycle detects and formalizes the evidence gap;
+  its owner resolves it — no discovery commands enter keelson.
+- **Structured production intake (4.101).** A new triage step fires only when the
+  demand reports a production defect: the two tier-deciding questions (who/how many
+  affected · data at risk) come before any severity; the objective ruler (🔴/🟠/🟡)
+  and the structured fields (severity, impact, how to reproduce, evidence) are born in
+  the routed artifact and feed the QA card for free. Two or more critical signals →
+  a **major incident is recognized, never commanded**: the fix routes as an express
+  demand and the Diretor receives the resolution checklist as *his* pending (symptom
+  absent for a declared window · mitigation identified · no data left in a bad state ·
+  owed communication sent — resolved ≠ mitigated). Ruler distilled per 4.72 (thresholds
+  are declared defaults); the postmortem names the production-incident episode.
+
+---
+
 ## [0.67.0] — 2026-08-04
 
 Decisions 4.96–4.99
