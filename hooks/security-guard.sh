@@ -53,6 +53,16 @@ fi
 active="$(printf '%s' "$input" | jq -r '.stop_hook_active // false' 2>/dev/null || echo false)"
 [ "$active" = "true" ] && exit 0
 
+# Ciclo formal em andamento → o gate 8 tem dono (rodada da wave no /keelson:implement,
+# 3.3/4.92); este hook é a rede da SESSÃO LIVRE, não um segundo cobrador
+# (decisão 4.103). run-state ativo → silêncio.
+for rs in "$proj"/thoughts/local/run-state-*.md; do
+  [ -f "$rs" ] || continue
+  if grep -q "^status: em_andamento" "$rs" 2>/dev/null; then
+    exit 0
+  fi
+done
+
 # gates.security desligado na ficha → não cutuca (default: ligado quando ausente).
 # Obs.: `//` do jq trata `false` como vazio, então NÃO serve aqui — testamos == false.
 sec_gate="$(jq -r 'if .gates.security == false then "off" else "on" end' "$config" 2>/dev/null || echo on)"
