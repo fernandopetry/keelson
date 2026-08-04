@@ -405,15 +405,17 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.66.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.67.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the lessons of a full 14-hour field cycle, closed at the
-source** (decisions 4.92–4.95). Closing a wave now takes an inventory against the
-artifacts instead of the session's own memory; a fixed verification command must prove
-it exercises something; the retry delta is reviewed as a diff in its own right; and
-the learning ledger writes serially. No consumer block change in this batch.
+New in this release: **the product layer the cycle was missing — every bet declares
+its evidence, every decision its reopening condition, every metric its verdict**
+(decisions 4.96–4.99). SPEC premises carry evidence seals; DECs record when they must
+be reopened (gate 5 watches the diff-observable ones); the success metric declares its
+measurement source, enters the PLAN's DoD with a valve for externally-owned numbers,
+and stays a named pending in the INDEX until a verdict exists — chased by the next
+cycle, never blocking. No consumer block change in this batch.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

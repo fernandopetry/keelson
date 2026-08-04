@@ -17,6 +17,46 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.67.0] — 2026-08-04
+
+Decisions 4.96–4.99
+
+### Added
+- **Evidence seals on SPEC premises (4.96).** Every §8 premise now carries, besides its
+  origin (`[assumido]`/`[confirmar]`), a seal declaring what backs it: `crença` (belief,
+  nothing observed) · `anedota` (1–2 reports) · `entrevistas` (pattern heard from 3+
+  sources) · `medido` (production/experiment number). The seal never blocks — a central
+  requirement resting on belief becomes explicit matter for the product-analyst critique
+  and the PO resolution against the brief. Scale owned by the common conventions;
+  spec-validator warns on a missing seal in Draft/Review only, so the existing archive
+  stays quiet. Distilled from RENATA v0.5.0 (MIT © Eric Luque / AInsteins); the
+  deliberate exclusions from that source are recorded in decision 4.96.
+- **DECs declare their reopening condition (4.97).** New template line
+  `Reabrir se: <observable condition | nunca — reason>` — the other half of the
+  trade-off every DEC already documents. Two declared reaches: conditions observable in
+  a diff are watched by gate 5 (a diff satisfying one becomes a finding citing the DEC —
+  reopening is declared, never silently patched around); world conditions ride the
+  existing irreversible-DEC propagation into the INDEX. plan-validator warns on the
+  missing line in Draft/Review only.
+- **Optional anti-persona line in SPEC §2 (4.98).** "Who this is NOT for" — a
+  scope-discipline tool the product-analyst uses as reference when present; never
+  required, never validated.
+- **The success metric closes the loop (4.99).** SPEC §1.3 now declares its
+  **measurement source** (`instrumentação` — an event/query the system will emit — or
+  `externa` — tool + owner of the number). The PLAN's DoD derives a metric item with a
+  valve so externally-owned metrics never make the DoD unsatisfiable; instrumentable
+  sources become component work and gate 9 shows the number exists. Delivery plants the
+  verdict pending in the INDEX active risks; the next cycle in the slug measures it
+  itself when the ficha's means allow, or ships a ready copy-paste question to the
+  product area (via the Diretor) in the report — never blocking, never forgetting.
+  Building on top of an unverdicted capability is treated as critical ambiguity; a ❌
+  verdict names the capability a sunset candidate (deciding is a product act). New
+  graph check `metrica-sem-veredito` — the catalog's first INFO severity — reminds
+  until the verdict exists; born with its fixture, suite 27/27 green, and SPECs without
+  the source line (pre-4.99 archive) are excluded by construction.
+
+---
+
 ## [0.66.0] — 2026-08-03
 
 Decisions 4.92–4.95

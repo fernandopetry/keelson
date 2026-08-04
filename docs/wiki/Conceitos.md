@@ -52,6 +52,17 @@ INDEX. Regra de corte:
 mudou o que o sistema **promete**, ou há decisão técnica entre alternativas → é ciclo,
 não avulso.
 
+**A SPEC também declara o que sustenta e como se prova** (decisões 4.96–4.99). Cada
+premissa carrega um **selo de evidência** (`crença · anedota · entrevistas · medido`) —
+o selo nunca bloqueia; ele expõe a aposta para a crítica de mérito. Cada DEC do PLAN
+declara **`Reabrir se:`** — a condição observável que pede revisão da decisão (a que
+aparece em diff é vigiada pelo reviewer; a de mundo viaja ao INDEX). E a **métrica de
+sucesso** declara a **fonte de medição**; entregue o PLAN, a pendência de **veredito**
+fica em "Riscos ativos" do INDEX até alguém medir — o ciclo seguinte mede sozinho
+quando os meios existem, ou devolve a pergunta pronta à área de produto no report.
+Feature que não moveu métrica é nomeada **candidata a sunset**; descontinuar é decisão
+do Diretor.
+
 Detalhe dos artefatos e IDs: [Contrato do INDEX](Contrato-do-INDEX).
 
 ## O time
