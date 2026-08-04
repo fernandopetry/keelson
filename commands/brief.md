@@ -28,6 +28,7 @@ O modo resolve por **estado em disco e forma da entrada** — regras determinís
 |---|---|---|
 | documento de produto (path ou colado) | sem BRIEF para a demanda | **Forja** (Etapas 1→4) |
 | slug ou path de BRIEF | BRIEF com `Status: aguardando-produto` | **Retomada** |
+| documento v2 + BRIEF existente | qualquer | **Reabertura** (diff de interpretação) |
 
 **Cortesia de roteamento (sugestão, nunca ramo)**: a entrada não é uma demanda de produto → não siga; aponte a porta certa e pare — bug/incidente de produção → `/keelson:triage` (Etapa 2.5 dele, 4.101) · 2+ capacidades independentes no documento → `/keelson:specify-epic` · pedido pontual já claro → `/keelson:auto` direto (a forja seria ritual).
 
@@ -90,6 +91,15 @@ Não se volta para a conversa antiga; **a conversa nova volta para o artefato**:
 2. Pergunte: *"chegaram respostas? cole-as, ou aponte o documento atualizado."*
 3. **Mapeie cada resposta ao seu Q-ID**: marque respondida (quem/quando) na seção `### Respondidas`; **promova o selo** da premissa destravada **só com evidência real** (`crença → entrevistas/medido` conforme o que veio — nunca por otimismo); re-analise **só o delta** — as partes que as respostas tocam, nunca a análise inteira (convergência da 4.88). Resposta que abre lacuna nova → volta ao loop (Etapas 1–3 no que mudou).
 4. **Resposta parcial é o caso normal**: Q respondida resolve, Q pendente permanece. Termine nas mesmas 3 saídas; ao gravar `pronto`, **retire a pendência de Riscos ativos** (+1 linha no Histórico recente do INDEX).
+
+## Modo reabertura (documento v2 + BRIEF existente)
+
+Produto mandou versão nova do documento. O original nunca foi editado (princípio 2), então o diff da fonte é limpo por construção:
+
+1. Salve/referencie a v2 na origem (**nunca** sobrescreva a v1) e atualize `**Origem**:` com a versão nova, mantendo a anterior como histórico.
+2. **Diff de interpretação, não de texto** — três perguntas: o que a v2 **muda** (itens do inventário alterados) · o que ela **responde** (Q-ID pendente resolvido → mapeie como na retomada, promovendo selo com a evidência) · o que ela **quebra** (fato do código, premissa aceita ou decisão já registrada no BRIEF que a v2 contradiz).
+3. Re-analise **só o delta** (4.88) e apresente o diff de interpretação ao Diretor **antes** de regravar o BRIEF; lacuna nova → volta ao loop (Etapas 1–3 no que mudou).
+4. Termine nas mesmas 3 saídas. BRIEF `pronto` contradito em ponto de núcleo → regride a `rascunho`/`aguardando-produto` — **declarado, nunca silencioso**. E se o ciclo **já consumiu** o BRIEF (a SPEC pareada existe), a reabertura **não reescreve história** — o BRIEF é trilha de auditoria da aceitação: a mudança segue o caminho normal de demanda nova (`/keelson:triage`), levando o diff de interpretação como insumo.
 
 ## Output final ao usuário
 
