@@ -384,7 +384,7 @@ Owner of the rule: `docs/_meta/conventions/commit-convention.md`. Governance: de
 ```
 keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
-├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer… + code-scout (tool, not a role)
+├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer… + tools (not roles): code-scout, scribe, tracker-sync
 ├── skills/            # spec / plan / task validators + status + screen-verify
 ├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard, jira-guard
 ├── guidelines/

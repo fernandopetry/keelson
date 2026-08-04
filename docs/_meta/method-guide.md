@@ -400,6 +400,7 @@ Os agents formam o **time** do keelson (modelo de time e contrato Diretor–PO �
 | `agile-coach` | **Agile Coach** — auto-aprendizado do processo | closure do `/keelson:implement`, `/keelson:auto`, `/keelson:review`, sob demanda |
 | `staff-engineer` | **Staff Engineer** — gera perfis de linguagem | `/keelson:init`, sob demanda |
 | `code-scout` | *(ferramenta, fora do elenco)* — reconhecimento de codebase, devolve conclusão ancorada em `arquivo:linha` | Tech Lead (main session), fases exploratórias e sessão livre |
+| `scribe` | *(ferramenta, fora do elenco)* — redige SPEC/PLAN/TASKs pelo contrato do comando; devolve sumário, não o conteúdo (4.103) | `/keelson:specify`, `/keelson:plan`, `/keelson:tasks` |
 
 Os validators (`spec-validator`, `plan-validator`, `task-validator`) e o `code-scout` ficam **fora do elenco de propósito**: são ferramentas do time, não papéis (decisões 4.37/4.73).
 
