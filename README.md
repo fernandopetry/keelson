@@ -405,16 +405,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.65.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.66.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the consumer block no longer talks the cycle out of
-committing** (decision 4.91). Two on-demand-mode phrases read as universal rules once
-inside the consumer's `CLAUDE.md`, and a real cycle run stopped committing per task;
-they now carry their scope inside the sentence — on-demand: the commit is the
-Director's; cycle: the branch arrives committed task by task. Re-run `/keelson:init`
-in consumer projects to refresh the block.
+New in this release: **the lessons of a full 14-hour field cycle, closed at the
+source** (decisions 4.92–4.95). Closing a wave now takes an inventory against the
+artifacts instead of the session's own memory; a fixed verification command must prove
+it exercises something; the retry delta is reviewed as a diff in its own right; and
+the learning ledger writes serially. No consumer block change in this batch.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

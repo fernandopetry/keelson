@@ -17,6 +17,49 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.66.0] — 2026-08-03
+
+Decisions 4.92–4.95
+
+### Changed
+- **Closing a wave now takes an inventory against the artifacts, not against the
+  session's memory (4.92).** A real 14-hour, 8-wave cycle shipped three process
+  reworks with one cause: one task forgotten in each of two waves, and the
+  review+security round run three times on one half of the stack and never on the
+  other — only the Stop hook kept three blocking findings off the main branch. Wave
+  close-out now confronts two named sources: the `### Wave N` checklist the task
+  breakdown already generates (every listed task dispatched and Done — a forgotten
+  task reopens the wave now, not at delivery) and the wave's own review round (a wave
+  without its round does not close).
+- **A fixed verification command must prove it exercises something (4.93).** A
+  ready-criterion command ran green because a test group excluded the entire class it
+  filtered on — the artifact was honored to the letter and nothing flagged it. The
+  command is now executed at fixation time and the evidence of a non-empty set enters
+  the criterion (N>0 tests executed; a predicate that excludes is fixed with a datum
+  it rejects; a captured baseline proves it is not empty).
+- **A finding's Solution names the condition, never just an instance of it (4.93).**
+  A corrective action written as a list of error codes missed one and the same gate
+  failed twice; the review doctrine now requires the condition ("every transport
+  error code"), with closed enumerations only alongside the test that proves them
+  complete.
+- **The retry delta is reviewed as a diff in its own right (4.94).** Three
+  regressions were born inside correction deltas and escaped delta-scoped re-review.
+  Round N+1 now answers two questions — "did the finding close?" and "what does this
+  delta break?" — applying gates 1–7 to the delta where it touches them, with the
+  mechanical checks (lint, typecheck, relevant suite) always re-run. Refines the 4.88
+  convergence rule.
+
+### Fixed
+- **The learning ledger writes serially (4.95).** Two concurrent `agile-coach` runs
+  allocated the same `LRN` id. The id is now allocated at write time (re-read the
+  ledger, take max+1) and serial invocation is part of the agent's contract — no
+  invoker dispatches two `agile-coach` in parallel.
+
+No consumer block change — no `/keelson:init` re-run needed for this batch (the 4.91
+re-run still applies if pending).
+
+---
+
 ## [0.65.1] — 2026-08-03
 
 Decision 4.91

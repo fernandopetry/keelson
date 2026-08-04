@@ -55,7 +55,7 @@ Pergunta-guia: *"qual instrução, se existisse/estivesse clara, teria prevenido
 
 ### 5. Registrar no ledger
 
-Acrescentar (ou atualizar, se reincidência) entrada em `<docsRoot>/_meta/learning-log.md`. O ledger é a memória de longo prazo: é ele que permite detectar reincidência e destilar depois. Ledger inexistente → crie-o com o cabeçalho abaixo; entrada sempre neste formato canônico:
+Acrescentar (ou atualizar, se reincidência) entrada em `<docsRoot>/_meta/learning-log.md`. O ledger é a memória de longo prazo: é ele que permite detectar reincidência e destilar depois. **ID alocado na escrita, invocação serializada (decisão 4.95)**: o número `LRN-NNN` é o maior do ledger **relido imediatamente antes** de acrescentar, +1 — e quem te invoca nunca despacha dois `agile-coach` em paralelo (contrato deste agent): o ledger é append de ID sequencial e escrita concorrente duplica o número. Ledger inexistente → crie-o com o cabeçalho abaixo; entrada sempre neste formato canônico:
 
 ````markdown
 # Ledger de aprendizado do processo

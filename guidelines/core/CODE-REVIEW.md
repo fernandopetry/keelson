@@ -250,6 +250,15 @@ ela converge ou escala.
   **delta da correção**; o que já foi aprovado permanece aprovado, salvo quando o delta
   o toca. Reler o diff inteiro do zero a cada rodada é retrabalho que só produz achado
   marginal novo — e é o motor do loop.
+- **O delta é um diff próprio, não um checklist do achado (decisão 4.94).** Código
+  nascido no retry ainda não passou por gate nenhum: a rodada N+1 responde **duas**
+  perguntas — "o achado fechou?" e "o que este delta quebra?" — aplicando ao delta os
+  gates 1–7 na medida em que ele os toca (escopo: a correção alcançou código fora do
+  achado?; comportamento observável mudou → reabre o gate 9 daquele recorte), e os
+  checks mecânicos do recorte (lint, typecheck, suíte relevante) re-rodam sobre ele
+  **sempre** — baratos, e é onde a regressão de retry aparece primeiro. O "salvo quando
+  o delta o toca" acima é obrigação ativa do revisor, não exceção que se espera
+  acontecer.
 - **Teto: 1 retry por gate, depois escala.** Achado → correção → re-review do delta. Se
   o gate reprova de novo, a 3ª rodada **não roda por decisão própria**: escale ao
   Diretor com o estado (o que passou · o que resta · proposta + default). É a mesma
@@ -286,3 +295,9 @@ ela converge ou escala.
 ❌ CORREÇÕES NECESSÁRIAS
 1. `arquivo:linha` — Problema → Solução
 ```
+
+A **Solução nomeia a condição, nunca só uma instância dela** — mesma régua da doutrina
+(4.32: regra = teste, não enumeração): "trate todo código de erro do transporte", não a
+lista dos códigos conhecidos hoje. Enumeração fechada só acompanhada do teste que prova
+completude. Instância cumprida à risca que diverge da condição nasce como correção
+incompleta — e nada acusa (decisão 4.93).

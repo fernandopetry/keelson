@@ -2,7 +2,7 @@
 
 > Memória institucional das decisões sobre como o keelson (spec-driven development) é praticado. Diferente da doutrina de código (QUALITY-CHARTER + perfil ativo, que regem o **código**), este arquivo rege o **processo de desenvolvimento**.
 
-**Última revisão**: 2026-07-30
+**Última revisão**: 2026-08-03
 **Status do documento**: vivo, atualizado conforme decisões evoluem
 
 > **Nota de rename (decisão 4.40, 2026-07-26)**: entradas anteriores à 0.21.0 citam agents pelos IDs antigos (`task-implementer`, `task-reviewer`, `task-verifier`, `security-reviewer`, `product-critic`, `process-tuner`, `profile-writer`). Histórico não se reescreve — o de-para completo está na decisão 4.40.
@@ -1285,6 +1285,38 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 **Decisão**: no bloco do consumidor, **frase que enuncia regra de um modo carrega o escopo dentro da própria frase** — o bloco fala com uma sessão que não leu os comandos, e o contexto do parágrafo não sobrevive à leitura em recorte. Aplicado aos dois pontos: (a) o bullet do sob demanda declara "**regra deste modo, nunca do ciclo** — commit só a pedido do Diretor" e nomeia o contraste na sequência (no ciclo o commit por TASK é do time: `developer` commita a implementação, closure commita o fecho); (b) o fecho 4.76 troca "(o commit é seu)" por formulação **por modo**: sob demanda → o commit é do Diretor; ciclo → a branch chega commitada TASK a TASK (e pushada pelo `/keelson:auto`) — os atos do Diretor são revisão, PR e merge (4.41). Nenhuma regra nova: só o escopo que já era a intenção, agora inambíguo no texto que a sessão de fato lê.
 
 **Aplicação**: `templates/CLAUDE.keelson-block.md` (bullets 4.75 e 4.76 — únicos donos da frase; method-guide e wiki não a replicam, nada a sincronizar). Correção de texto → patch: plugin 0.65.0 → 0.65.1. **Re-rodar `/keelson:init` nos consumidores** (bloco muda; um init cobre 4.85–4.91). Observar no próximo ciclo real num consumidor: commits por TASK aparecendo na branch da wave (`feat/fix` do developer + `chore(<slug>): close TASK-…` da closure).
+
+### 4.92 — Fechar wave exige inventário contra os artefatos: TASKs despachadas e rodada de gates, com fonte nomeada
+
+**Problema**: postmortem de um ciclo real longo (~14h, 8 waves, 14 TASKs, snapshot 0.65.0): três retrabalhos de processo com a mesma causa — uma TASK ficou fora do despacho na wave 1, outra na wave 2, e a rodada de revisão+segurança (4.90) rodou 3× numa metade da stack e **nenhuma vez** na outra; só o Stop hook (`wave-guard`) impediu três bloqueantes de irem à main, incluindo um em que a tela prometia dois registros e o servidor criava um em silêncio. Causa estrutural: o run-state existe para sobreviver à compressão de contexto (lido pelo hook fora do modelo — 4.23/4.24), mas guarda **contagem** (`waves_concluidas`), não **inventário**; e o item 1 do §3.6 do implement ("todas as tasks Done com closure") não nomeava fonte — a conferência era contra a narrativa da própria sessão, exatamente o que degrada num ciclo longo. O checklist `### Wave N` que o `/keelson:tasks` gera já era o inventário pronto; nada mandava confrontá-lo.
+
+**Decisão**: o fecho de wave confere **inventário contra artefato, nunca contra memória**, em dois eixos: (a) **TASKs** — reler o checklist `### Wave N` do doc de TASKs; cada TASK listada foi despachada e está Done com closure; TASK esquecida reabre a wave agora, não na Entrega; (b) **gates** — a rodada da §3.3 (reviewer sempre; security quando devido) rodou sobre o diff acumulado **desta** wave, report em mãos; wave sem rodada não fecha. O run-state continua contagem (o hook segue barato e fora do modelo); o inventário mora nos artefatos que já existem — não se cria segunda fonte.
+
+**Aplicação**: `commands/implement.md` (§3.6 item 1). Reincidir → o inventário vira mecânico (extensão do run-state ou check do grafo).
+
+### 4.93 — Critério e ação corretiva nomeiam a condição: instância concreta se fixa provando não-vacuidade
+
+**Problema**: dois sintomas do mesmo postmortem, uma causa em pontos diferentes do ciclo. (a) **Critério de pronto com comando vácuo**: o comando fixado (um `--filter` de suíte) rodava verde porque um `@group` excluía a classe inteira da execução — o artefato foi cumprido à risca e nada acusou; a régua da 4.52 já exigia falsificabilidade ("que estado faz este comando FALHAR?") e captura de baseline, mas não exigia provar que a instância **exercita algo**. (b) **Ação corretiva redigida como lista**: a solução de um achado enumerava códigos de erro; um código do transporte ficou de fora, a correção nasceu incompleta e o mesmo gate reprovou pela 2ª vez. Nos dois casos uma **instância concreta** (comando, lista) foi escrita no lugar da **condição** que deveria representar — e instância cumprida à risca que diverge da condição não acusa nada.
+
+**Decisão**: dois braços, um por lado do ciclo. **Gerador** (`/keelson:tasks`): falsificável no papel não basta — o comando fixado é **executado na fixação** e a evidência de conjunto não-vazio entra no critério (N>0 testes executados; predicado que exclui se fixa com um dado que ele rejeita; baseline capturada prova que não é vazia). **Avaliador** (`core/CODE-REVIEW.md`): a Solução de um achado **nomeia a condição**, nunca só uma instância dela ("todo código de erro do transporte", não a lista dos conhecidos hoje); enumeração fechada só com o teste que prova completude — é a régua da 4.32 (regra = teste, não enumeração) aplicada ao texto do achado.
+
+**Aplicação**: `commands/tasks.md` (verificação executável — prova de não-vacuidade) · `guidelines/core/CODE-REVIEW.md` (Formato de saída — como se escreve a Solução). Check mecânico no `task-validator` reservado para reincidência.
+
+### 4.94 — O delta do re-gate é diff próprio: a rodada N+1 pergunta também "o que este delta quebra?"
+
+**Problema**: primeira rodada real com retries sob a 4.88: a escalação disparou na 2ª reprova como desenhado — o loop **não** reincidiu —, mas **três regressões nasceram nos próprios deltas de correção**: uma correção alcançou código fora do achado (violando um NFR `[MUST]` de outra área), outra regrediu o type-check em 2 erros, e uma terceira reforçou texto de UI afirmando um comportamento que o servidor não tinha. A régua dizia "o que já foi aprovado permanece aprovado, **salvo quando o delta o toca**" — mas como cláusula de exceção passiva; na prática a rodada N+1 foi lida como "o achado fechou?", e código nascido no retry — que nunca passou por gate nenhum — escapou.
+
+**Decisão**: **o delta é um diff próprio, não um checklist do achado**. A rodada N+1 responde duas perguntas — "o achado fechou?" **e** "o que este delta quebra?" — aplicando ao delta os gates 1–7 na medida em que ele os toca (escopo: a correção alcançou código fora do achado?; comportamento observável mudou → reabre o gate 9 daquele recorte), e os checks mecânicos do recorte (lint, typecheck, suíte relevante) re-rodam sobre ele **sempre** — são baratos e é onde a regressão de retry aparece primeiro. "Salvo quando o delta o toca" vira obrigação ativa do revisor, não exceção que se espera acontecer. O contador mecânico reservado na 4.88 **permanece reservado**: o defeito não foi o loop antigo, foi ponto cego novo.
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (§Convergência do re-gate — bullet novo). Refina a 4.88; bloco do consumidor não muda.
+
+### 4.95 — Ledger de ID sequencial escreve serializado: número alocado na escrita, um agile-coach por vez
+
+**Problema**: colateral do mesmo postmortem — dois `agile-coach` concorrentes gravaram a **mesma entrada** `LRN-NNN` no learning-log do consumidor (renumerada à mão depois). O protocolo manda o agent ler o ledger e acrescentar a próxima entrada, mas nada serializa: invocações paralelas leem o mesmo topo e alocam o mesmo número. Mesma família da pendência "alocador único" da 4.86 (IDs de brief): ledger de ID sequencial + escritores concorrentes = colisão.
+
+**Decisão**: dupla guarda no contrato do agent: (a) o número LRN é **alocado na escrita** — o ledger é relido imediatamente antes de acrescentar, maior LRN + 1; (b) **invocação serializada é contrato do `agile-coach`** — o invocador nunca despacha dois em paralelo (subagent não tem primitiva de lock; a serialização é do orquestrador). Vale para qualquer invocador: closure, entrega, review, destilação.
+
+**Aplicação**: `agents/agile-coach.md` (passo 5). A pendência "alocador único" da 4.86 (briefs) continua aberta — mesma família, dono diferente.
 
 ---
 
