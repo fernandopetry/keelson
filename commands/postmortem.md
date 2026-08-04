@@ -51,7 +51,10 @@ contado + diagnóstico + diff literal proposto**, nunca doutrina pronta.
 **Sem argumento** (o modo padrão, fim de sessão): o alvo é a **sessão corrente** — as
 interações são o input, nada a perguntar. **Com argumento** apontando episódio de que
 esta sessão não participou: o insumo que só o Diretor tem é a lista do que doeu; se a
-invocação não a trouxe, pergunte **uma vez** — a única parada do comando.
+invocação não a trouxe, pergunte **uma vez** — a única parada do comando. Episódio =
+**incidente de produção** (4.101): a matéria-prima soma o registro do protocolo de
+entrada (severidade, blast radius, checklist de resolução) e os logs; a pergunta-
+mecanismo inclui "por que chegou a produção / por que a detecção demorou".
 
 ## Etapa 0: delimitar o episódio
 

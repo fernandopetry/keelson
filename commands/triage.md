@@ -72,6 +72,14 @@ Fazer até **3 perguntas** focadas para classificar a demanda. Adapte ao context
 
 > "Esta mudança no contrato é **adição** (nova capacidade) ou **alteração** de capacidade existente?"
 
+## Etapa 2.5: entrada de produção (bug/incidente — decisão 4.101)
+
+**Só dispara** quando a demanda relata defeito **em produção** (relato de usuário, ticket de suporte, alerta de monitoramento) — senão, esta etapa não existe. Leia o protocolo (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/production-intake-protocol.md` — **só neste ramo**) e aplique **antes** de rotear:
+
+1. **As duas perguntas decisivas** (quem/quantos afetados · há dado em risco) — classificar severidade sem elas é recusa; o que a entrada crua já traz (`--from`, texto colado) extraia sem reperguntar.
+2. **Severidade pela régua** (🔴/🟠/🟡, sinais objetivos do protocolo); os campos estruturados nascem **no artefato roteado** (TASK-fix/brief avulso da categoria 3) e alimentam o card de QA (4.77/4.78) de graça.
+3. **2+ sinais críticos → incidente maior**: reconheça e registre (impacto · blast radius · desde quando), roteie o **conserto** como demanda expressa e devolva ao Diretor o **checklist de resolução como pendência dele** (bloco do protocolo). Rebaixar em silêncio é violação. Você **nunca coordena** o incidente — timeline, comunicação externa e "resolvido" são atos do Diretor; o fecho aponta o `/keelson:postmortem` do episódio.
+
 ## Etapa 3: classificar e decidir o roteamento
 
 Classifique numa das categorias abaixo e componha você mesmo a mensagem de roteamento — classificação + motivo + comando pronto (com descrição/parâmetros sugeridos) + pedido de confirmação. A tabela abaixo é a **dona única** do roteamento (o method-guide apenas a resume):
@@ -91,6 +99,9 @@ quando a mudança **não muda o que o sistema promete** e a decomposição **nã
 escolher entre alternativas técnicas** (haveria uma DEC) — qualquer um dos dois → ciclo
 (categorias 1/2). Só repartir trabalho mecânico → avulso; um executor e um diff → brief
 sem TASKs. O trivial da categoria 5 continua **sem** brief (piso da 4.75).
+
+**Bug de produção** (categorias 3/4 vindas de produção): o roteamento acima só acontece
+**depois** da Etapa 2.5 — severidade e impacto entram no artefato roteado (4.101).
 
 ## Etapa 4: confirmação e execução opcional
 
