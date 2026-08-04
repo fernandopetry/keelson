@@ -1,6 +1,6 @@
 ---
 description: Forja um documento de produto num BRIEF lapidado antes do ciclo — inventário ancorado no código, entrevista com o Diretor e pendências formais a produto; reentrante por estado em disco (opcional, pré-ciclo)
-argument-hint: <documento (path ou colado) | slug | path de BRIEF>
+argument-hint: <documento (path ou colado) | slug | path de BRIEF> [--from=<KEY>]
 disable-model-invocation: true
 ---
 
@@ -81,14 +81,14 @@ O BRIEF nasce **na primeira invocação** e é atualizado durante a conversa —
 
 2. **Conversar mais** — volta à Etapa 3 (ou à 2, se surgiu pergunta de código).
 
-3. **Encerrar aguardando produto** — grave `Status: aguardando-produto` com as Q-IDs pendentes estruturadas e **plante a pendência em "Riscos ativos" do INDEX** (formato no index-contract) — é ela que faz o `/keelson:status` e qualquer ciclo futuro no slug esbarrarem na espera. Entregue ao Diretor o bloco das perguntas pronto para encaminhar a produto (mesmo padrão copy-paste do handoff, 4.99/4.100).
+3. **Encerrar aguardando produto** — grave `Status: aguardando-produto` com as Q-IDs pendentes estruturadas e **plante a pendência em "Riscos ativos" do INDEX** (formato no index-contract) — é ela que faz o `/keelson:status` e qualquer ciclo futuro no slug esbarrarem na espera. Entregue ao Diretor o bloco das perguntas pronto para encaminhar a produto (mesmo padrão copy-paste do handoff, 4.99/4.100). **Espelho no tracker (opcional)**: com `jira.enabled` **e** o BRIEF tendo issue de origem (rota pull — key em `**Jira**:`/`**Origem**:`), poste as perguntas pendentes como **comentário nessa issue** (protocolo de sync, §11; best-effort §0 — falhou → evento `tracker` no ledger, siga). **Nunca crie card** para isso: pré-SPEC não há projeção, e a pergunta pertence à demanda que já existe.
 
 ## Modo retomada (`Status: aguardando-produto` em disco)
 
 Não se volta para a conversa antiga; **a conversa nova volta para o artefato**:
 
 1. Leia o BRIEF do disco — ele é a fonte (o memo de exploração é cache: existe → aproveite; sumiu → re-derive só o que precisar).
-2. Pergunte: *"chegaram respostas? cole-as, ou aponte o documento atualizado."*
+2. Pergunte: *"chegaram respostas? cole-as, ou aponte o documento atualizado."* Com `--from=<KEY>` (e `jira.enabled`), **puxe os comentários novos da issue de origem** como as respostas — best-effort (§0): conector fora → peça para colar.
 3. **Mapeie cada resposta ao seu Q-ID**: marque respondida (quem/quando) na seção `### Respondidas`; **promova o selo** da premissa destravada **só com evidência real** (`crença → entrevistas/medido` conforme o que veio — nunca por otimismo); re-analise **só o delta** — as partes que as respostas tocam, nunca a análise inteira (convergência da 4.88). Resposta que abre lacuna nova → volta ao loop (Etapas 1–3 no que mudou).
 4. **Resposta parcial é o caso normal**: Q respondida resolve, Q pendente permanece. Termine nas mesmas 3 saídas; ao gravar `pronto`, **retire a pendência de Riscos ativos** (+1 linha no Histórico recente do INDEX).
 
