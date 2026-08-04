@@ -26,6 +26,13 @@ demanda que já tem card); destino SPEC (categoria 1) → gravar a key na linha 
 da SPEC (modo `link`). Conector indisponível → best-effort (§0): reporte e classifique
 só com o que o humano colou.
 
+**Entrada em forma de documento de produto** (decisão 4.102 — gatilho **objetivo**, pela
+forma: texto estruturado em títulos/seções, multiparágrafo — não uma frase de demanda —
+e sem BRIEF forjado no slug): antes de classificar, sugira a forja — *"isto parece um
+documento de produto não lapidado; recomendo `/keelson:brief` primeiro. Seguir com a
+triagem mesmo assim?"*. **Sugestão, nunca bloqueio**; frase de demanda comum não dispara
+isto (não invente ritual).
+
 ## Etapa 0: identificar slug afetado
 
 1. Se `--slug=<nome>` passado, usar.
