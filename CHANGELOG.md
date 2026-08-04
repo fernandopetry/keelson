@@ -17,6 +17,36 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.69.0] — 2026-08-04
+
+Decision 4.102
+
+### Added
+- **The BRIEF forge — `/keelson:brief` (4.102).** A human-only, optional pre-cycle
+  stage: the product area's document (PRD, demand doc, e-mail — path or pasted) is
+  inventoried against the sections the SPEC will demand (problem · outcome · metric
+  **with measurement source** · personas/anti-persona · scope IN/OUT · premises **with
+  evidence seals** · ACs · risks), never classified by "document type". Each gap is
+  answered at the cheapest source: the **code first** (code-scout → exploration memo the
+  specify already consumes), then the human **one question at a time**, and what only
+  the product area can answer becomes a **formal Q-ID pending** — never a blocker.
+  Three exits always: BRIEF `pronto` (+ copy-paste handoff to run `/keelson:auto` in a
+  clean session), keep talking, or `aguardando-produto` (pending planted in the INDEX
+  active risks). **Reentrant by state on disk**: the BRIEF is the state, the session is
+  disposable — resume maps answers to Q-IDs, promotes seals only on real evidence and
+  re-analyzes only the delta; the fresh-clone test gates `pronto`. No new artifact
+  type: additive sections on the paired BRIEF contract, NNN allocated by the single
+  allocator and inherited by the SPEC. `/keelson:auto` gains the sister route to reuse
+  a forged BRIEF without re-assembling; `/keelson:refine` keeps raw-idea polishing with
+  a reciprocal boundary line; triage and the auto kickoff **suggest** the forge on raw
+  structured documents (objective shape trigger — never a block); a reopening mode
+  turns a product doc v2 into an interpretation diff; pending questions mirror as a
+  comment on the origin issue when one exists (never a new card pre-SPEC), and resume
+  pulls answers via `--from`. Graph engine untouched by construction. **Consumer block
+  changed** (human-only commands note) — re-run `/keelson:init` on consumers.
+
+---
+
 ## [0.68.0] — 2026-08-04
 
 Decisions 4.100–4.101

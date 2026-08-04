@@ -406,18 +406,18 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.68.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.69.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the two doors the product layer still had open** (decisions
-4.100–4.101, completing the 4.96–4.99 batch). A value premise resting on belief at the
-demand's core escalates as a formal question to the product area — proposal is the
-smallest falsifying test, default keeps the cycle moving. And production bugs enter
-structured: the triage asks the two tier-deciding questions (who's affected · data at
-risk) before routing, severity is born in the routed artifact, and a major incident is
-recognized — fix routed express, resolution checklist handed to the human — never
-commanded. No consumer block change in this batch.
+New in this release: **the BRIEF forge** (`/keelson:brief`, decision 4.102) — the
+optional pre-cycle stage that turns a raw product document into a lapidated BRIEF:
+inventory mirrored on the SPEC sections, code answers before humans, one-question-at-
+a-time interview with the human, and what only the product area can answer becomes a
+formal Q-ID pending — reentrant by state on disk, so any fresh session resumes from
+the artifact, never from the old conversation. `/keelson:auto` reuses a forged BRIEF
+without re-assembling it. **Consumer block changed** (the human-only commands note) —
+re-run `/keelson:init` on consumers.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
