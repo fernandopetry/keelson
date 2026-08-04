@@ -153,6 +153,45 @@ nunca cópia; `## Avulsas` existe só no slug-morada. TASKs do brief vivem **no 
 brief**: a âncora `**Brief**:` não cruza slug — o grafo opera por diretório, e âncora
 cross-slug reprova como `ref-quebrada` por design.
 
+**Forja do BRIEF — pré-estados e seções aditivas (decisão 4.102)**: o BRIEF pareado
+pode nascer **antes** da SPEC, pela forja (`/keelson:brief`, estágio opcional
+pré-ciclo). Tudo aqui é aditivo — BRIEFs existentes continuam válidos sem alteração:
+
+- **Pré-estados do sabor pareado**: `rascunho` (forja em andamento) →
+  `aguardando-produto` (perguntas Q-ID pendentes fora do time) → `pronto` (nenhuma
+  `[bloqueia-núcleo]` aberta). Na largada, o `/keelson:auto` promove `pronto → Emitido`;
+  daí em diante vale o ciclo atual (`Emitido → Aceito | Vetado`).
+- **Numeração**: o par BRIEF↔SPEC pode se separar no tempo — a forja aloca o NNN pelo
+  **alocador único** (o arquivo em disco já reserva o número no max+1) e a SPEC pareada
+  **herda** o NNN do BRIEF.
+- **Origem**: além de `Diretor` e key do tracker, `**Origem**:` aceita o **documento de
+  produto** — path no repo (sugestão: `<docsRoot>/<slug>/origem/`, irmã de `briefs/`,
+  **só-leitura**: a forja nunca o edita) ou referência externa (URL, e-mail); a forja
+  nunca exige cópia (4.72 — o literal fica com o dono).
+- **Seções aditivas do BRIEF forjado** (opcionais; nenhum validator as exige — check
+  futuro nasceria WARNING `[legacy]`):
+
+  ```markdown
+  ## Fatos do código
+  <conclusões ancoradas do code-scout (arquivo:linha) que sustentam a interpretação>
+
+  ## Perguntas
+  ### Respondidas
+  - **Q-01** — <pergunta> · **Resposta** (<código | Diretor | produto>, <data>): <resposta>
+  ### Pendentes a produto
+  - **Q-02** `[bloqueia-núcleo]` — destrava: <premissa/FR> · contexto: <fato do código> · <pergunta> · **Resposta**: — (pendente desde <data>)
+
+  ## Riscos declarados
+  - <o que foi assumido conscientemente, com o selo de evidência (4.96)>
+  ```
+
+- **Pendência viva**: BRIEF `aguardando-produto` → 1 linha em **Riscos ativos** do INDEX
+  (`| BRF-NNN | BRIEF-NNN aguardando produto: <Q-IDs> pendente(s) desde <data> | retomar via /keelson:brief <slug> | BRIEF-NNN |`),
+  retirada quando o BRIEF fica `pronto` (+1 linha no Histórico recente).
+- A interpretação do BRIEF forjado segue o formato canônico de 4 seções cujo **dono é o
+  `/keelson:refine`** (Contexto · Pedido · Premissas decididas · Fora de escopo) — a
+  forja preenche mais fundo, nunca redefine a moldura; as premissas carregam selo (4.96).
+
 ### Contrato da tabela "PLANs" do INDEX (fonte única)
 
 Todo escritor do INDEX (`/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `/keelson:implement`, `/keelson:rebuild-index`) usa **exatamente** este formato — nenhum comando redefine header ou célula por conta própria:

@@ -338,6 +338,14 @@ Rede de segurança, não caminho normal (é humano-only): **toda mudança já fe
 
 A matéria-prima é o **ledger de sessão** (`thoughts/local/session-ledger/` — §3.0/`sdd-conventions.md`), onde cada evento foi escrito **quando aconteceu**, somado ao diff da branch e ao INDEX; a sessão **não** é relida (esse é o trabalho — e o custo — do `/keelson:postmortem`, que investiga *por que* o processo deixou passar, não *o que* aconteceu). Gate sem evento registrado nunca vira "aprovado": vira lacuna nomeada, e o gate que o diff exigir é declarado como pendente de rodar. Não commita, não corrige, não move card. Governança: decisão 4.76 de `decisions.md`.
 
+### 3.19 `/keelson:brief` — forjar documento de produto em BRIEF (opt-in, pré-ciclo)
+
+O estágio profundo pré-ciclo (humano-only — é uma conversa com você): recebe o **documento da área de produto** (PRD, doc de demanda, e-mail — path ou colado), inventaria o conteúdo contra as seções que a SPEC vai exigir (problema, outcome, métrica **com fonte**, personas, escopo, premissas **com selo**), responde pelo **código** o que o código responde (`code-scout`), pergunta a você **uma coisa por vez** só o que documento+código não cobriram, e formaliza como **Q-ID** o que só produto pode responder. Sai sempre por uma de 3 portas: BRIEF `pronto` (+ handoff copy-paste para o `/keelson:auto` em sessão limpa) · continuar a conversa · `aguardando-produto` (pendência plantada no INDEX; a retomada é em **sessão nova**, lendo o BRIEF — nunca a conversa antiga). Fronteira com o `/keelson:refine`: ideia crua e leve é lá; documento de produto e profundidade é aqui. Governança: decisão 4.102.
+
+```
+/keelson:brief <documento (path ou colado) | slug | path de BRIEF>
+```
+
 ---
 
 ## 4. Skills

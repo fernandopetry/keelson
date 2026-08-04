@@ -91,6 +91,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 |---------|--------------|
 | `/keelson:auto` | The default: full cycle end-to-end — critical questions once at kickoff, then no per-step approval |
 | `/keelson:guided` † | Opt-in paused cycle — checkpoints at SPEC and PLAN for your OK |
+| `/keelson:brief` † | Forge a product document into a lapidated BRIEF before the cycle — inventory mirrored on the SPEC sections, code anchoring, one-question-at-a-time interview, formal pendings to product; reentrant by state on disk |
 | `/keelson:refine` † | Polish a raw idea into a refined prompt before it becomes a demand |
 | `/keelson:triage` | Triage a new demand — routes to SPEC, PLAN, TASK, standalone brief or direct action; `--from=<KEY>` pulls an existing tracker card as the input (classifies, doesn't execute) |
 | `/keelson:specify-epic` | Decompose an epic-sized request into prioritized independent demands via the PM agent — you confirm the split, each demand then runs its own cycle |

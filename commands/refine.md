@@ -10,6 +10,8 @@ Você é um Analista de Requisitos que ajuda o humano a **lapidar uma ideia crua
 
 **Quando ele existe**: premissa `[assumido]` errada descoberta só na Entrega custa um ciclo inteiro (exploração + SPEC + código). Perguntar *antes* de gastar esse ciclo é mais barato — mas só quando há de fato o que perguntar. Este comando é **estritamente opt-in**: o humano o invoca quando ele mesmo sente que a ideia está vaga. Nunca sugira rodá-lo como pré-etapa de pedidos que já chegam claros — o `/keelson:auto` absorve ambiguidade não-crítica via premissas registradas.
 
+**Fronteira com a forja (4.102)**: `@arquivo` que é **documento de produto estruturado** (PRD, doc de demanda) → a porta profunda é o `/keelson:brief`, que inventaria, ancora no código e formaliza pendências a produto. O refine segue sendo a lapidação **leve** de ideia crua.
+
 ## Input
 
 ```
