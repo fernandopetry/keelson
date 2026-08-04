@@ -1,0 +1,32 @@
+edge	ac-covers	AC-001-001	FR-001-001	specs/SPEC-001-metrica-aberta.md:19
+edge	ac-covers	AC-002-001	FR-002-001	specs/SPEC-002-metrica-fechada.md:20
+edge	belongs-to	TASK-001-001	PLAN-001	tasks/TASK-001-001-coisa-a.md:4
+edge	belongs-to	TASK-002-001	PLAN-002	tasks/TASK-002-001-coisa-b.md:4
+edge	comp-realiza	COMP-001-001	FR-001-001	plans/PLAN-001-entrega-a.md:17
+edge	comp-realiza	COMP-002-001	FR-002-001	plans/PLAN-002-entrega-b.md:17
+edge	covers-ac	TASK-001-001	AC-001-001	tasks/TASK-001-001-coisa-a.md:18
+edge	covers-ac	TASK-002-001	AC-002-001	tasks/TASK-002-001-coisa-b.md:18
+edge	implements	TASK-001-001	COMP-001-001	tasks/TASK-001-001-coisa-a.md:6
+edge	implements	TASK-002-001	COMP-002-001	tasks/TASK-002-001-coisa-b.md:6
+edge	maps	FR-001-001	COMP-001-001	plans/PLAN-001-entrega-a.md:24
+edge	maps	FR-002-001	COMP-002-001	plans/PLAN-002-entrega-b.md:24
+edge	maps-ac	FR-001-001	AC-001-001	plans/PLAN-001-entrega-a.md:24
+edge	maps-ac	FR-002-001	AC-002-001	plans/PLAN-002-entrega-b.md:24
+edge	plan-covers	PLAN-001	FR-001-001	plans/PLAN-001-entrega-a.md:11
+edge	plan-covers	PLAN-002	FR-002-001	plans/PLAN-002-entrega-b.md:11
+edge	realiza	TASK-001-001	FR-001-001	tasks/TASK-001-001-coisa-a.md:5
+edge	realiza	TASK-002-001	FR-002-001	tasks/TASK-002-001-coisa-b.md:5
+edge	spec-ref	PLAN-001	SPEC-001	plans/PLAN-001-entrega-a.md:8
+edge	spec-ref	PLAN-002	SPEC-002	plans/PLAN-002-entrega-b.md:8
+node	AC	AC-001-001	specs/SPEC-001-metrica-aberta.md	
+node	AC	AC-002-001	specs/SPEC-002-metrica-fechada.md	
+node	COMP	COMP-001-001	plans/PLAN-001-entrega-a.md	
+node	COMP	COMP-002-001	plans/PLAN-002-entrega-b.md	
+node	FR	FR-001-001	specs/SPEC-001-metrica-aberta.md	
+node	FR	FR-002-001	specs/SPEC-002-metrica-fechada.md	
+node	PLAN	PLAN-001	plans/PLAN-001-entrega-a.md	status=Done
+node	PLAN	PLAN-002	plans/PLAN-002-entrega-b.md	status=Done
+node	SPEC	SPEC-001	specs/SPEC-001-metrica-aberta.md	status=Approved metrica=1
+node	SPEC	SPEC-002	specs/SPEC-002-metrica-fechada.md	status=Approved metrica=1 verd=1
+node	TASK	TASK-001-001	tasks/TASK-001-001-coisa-a.md	wave=1 status=Done tipo=feature
+node	TASK	TASK-002-001	tasks/TASK-002-001-coisa-b.md	wave=1 status=Done tipo=feature

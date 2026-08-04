@@ -93,6 +93,9 @@ Construir os mapas `FR → AC` e `AC → FR` para os dois primeiros checks.
 - AC fora de Given-When-Then
 - NFR vago: "rápido", "seguro", "user-friendly", "intuitivo", "escalável"
 - NFR sem valor numérico
+- Métrica de sucesso (1.3) sem linha `**Fonte de medição**:` (decisão 4.99) — **só em SPEC `Draft`/`Review`**; `Approved`+ é acervo anterior à régua: silêncio
+
+As linhas `**Fonte de medição**:` e `**Veredito de métrica**:` (esta gravada pós-entrega — 4.99) são conteúdo esperado da §1.3 — toleradas por todos os checks, nunca marcadas como tecnologia ou rastro estranho.
 
 ## Etapa 4.5: checks de funcionalidades (FEAT — camada opcional)
 

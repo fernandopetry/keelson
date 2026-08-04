@@ -70,6 +70,10 @@ runcase cobertura-plan-1         defeito-cobertura  1 defeito-cobertura--check-p
 runcase valido-avulso-check      valido-avulso      0 valido-avulso--check.txt        --check
 runcase valido-avulso-tsv        valido-avulso      0 valido-avulso--tsv.txt          --format=tsv
 runcase defeito-avulso-check     defeito-avulso     1 defeito-avulso--check.txt       --check
+# metrica-sem-veredito (decisão 4.99): SPEC-001 com fonte declarada + PLAN Done e sem
+# veredito → INFO (exit 0 — INFO nunca reprova); SPEC-002 com veredito prova o silêncio
+runcase metrica-veredito-check   defeito-metrica-veredito 0 defeito-metrica-veredito--check.txt --check
+runcase metrica-veredito-tsv     defeito-metrica-veredito 0 defeito-metrica-veredito--tsv.txt   --format=tsv
 
 # Determinismo: duas execuções idênticas byte a byte (AC-001-001)
 total=$((total + 1))

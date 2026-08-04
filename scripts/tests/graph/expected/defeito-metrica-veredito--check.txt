@@ -1,0 +1,1 @@
+INFO	metrica-sem-veredito	SPEC-001: fonte de medicao declarada, PLAN entregue e sem linha **Veredito de metrica**: (specs/SPEC-001-metrica-aberta.md)

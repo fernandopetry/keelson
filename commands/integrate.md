@@ -63,6 +63,7 @@ Se o repositório tiver template de PR, respeitá-lo.
 
 1. Adicionar entrada ao "Histórico recente" do `INDEX.md` do slug: `<data>: PR aberto para PLAN-MMM (#<n>), aguardando revisão/merge humano`.
 2. Repetir a sugestão (não a ação) de promover o Status do PLAN para Done manualmente, quando a DoD estiver satisfeita.
+2.5. SPEC do PLAN declara `**Fonte de medição**:` na §1.3 (decisão 4.99) → gravar a pendência de veredito de métrica em "Riscos ativos" (formato: index-contract.md), se ainda não plantada — a cobrança é do ciclo seguinte no slug.
 3. **Sincronização com Jira (opcional)**: só quando `jira.enabled` e não é `--dry-run`. Aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, §0–§1 + §11) para comentar/linkar a URL do PR na issue principal do slug. Não leia o protocolo inteiro: localize os §§ com `grep -nE "^#+ §"` no arquivo e leia §0 + §1 + os §§ citados neste gancho + os §§ que eles referenciarem internamente. Best-effort (§0): conector ausente/falha → aviso, sem bloquear a entrega — o aviso sai no formato da **§14** (seção de reconexão com o comando copy-paste), nunca como linha solta que se perde no output.
 
 ## Output ao usuário

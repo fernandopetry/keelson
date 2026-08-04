@@ -197,6 +197,14 @@ ftype == "S" && line ~ /^### FEAT-[0-9]+-[0-9]+/ {
 ftype == "S" && cur_feat != "" && line ~ /^\*\*Verifica[^*]*\*\*[ \t]*:/ {
   NVERIF[cur_feat_nd] = 1; next
 }
+# fonte de medicao e veredito de metrica da §1.3 (4.99); presenca basta, conteudo
+# livre — regex sem acento literal ([^*] cobre os bytes multibyte)
+ftype == "S" && cur_spec_nd > 0 && line ~ /^\*\*Fonte de medi[^*]*\*\*[ \t]*:/ {
+  NMETR[cur_spec_nd] = 1; next
+}
+ftype == "S" && cur_spec_nd > 0 && line ~ /^\*\*Veredito de m[^*]*\*\*[ \t]*:/ {
+  NVERD[cur_spec_nd] = 1; next
+}
 ftype == "S" && line ~ /^- \*\*FR-[0-9]+-[0-9]+\*\*/ {
   id = grabid(line, "FR-[0-9]+-[0-9]+")
   if (id != "") { node("FR", id); if (cur_feat != "") edge("feat-of", id, cur_feat) }
@@ -448,6 +456,8 @@ END {
     if (i in NTIPO) a = a (a == "" ? "" : " ") "tipo=" NTIPO[i]
     if (i in NCRIT) a = a (a == "" ? "" : " ") "crit=" NCRIT[i]
     if (i in NVERIF) a = a (a == "" ? "" : " ") "verif=" NVERIF[i]
+    if (i in NMETR) a = a (a == "" ? "" : " ") "metrica=" NMETR[i]
+    if (i in NVERD) a = a (a == "" ? "" : " ") "verd=" NVERD[i]
     print "node\t" NDT[i] "\t" NDI[i] "\t" NDF[i] "\t" a
   }
 }
@@ -576,11 +586,13 @@ $1 == "node" {
     if (match($5, /wave=[0-9]+/)) wave[id] = substr($5, RSTART + 5, RLENGTH - 5)
     if (index($5, "status=") > 0) {
       st = substr($5, index($5, "status=") + 7)
-      sub(/ (tipo|crit|verif)=.*$/, "", st)
+      sub(/ (tipo|crit|verif|metrica|verd)=.*$/, "", st)
       status[id] = st
     }
     if (match($5, /crit=[0-9]+/)) bcrit[id] = substr($5, RSTART + 5, RLENGTH - 5)
     if (match($5, /verif=1/)) fverif[id] = 1
+    if (match($5, /metrica=1/)) smetr[id] = 1
+    if (match($5, /verd=1/)) sverd[id] = 1
   }
   if (type == "TASK")  { TKN++; TK[TKN] = id }
   if (type == "COMP")  { CPN++; CP[CPN] = id }
@@ -593,6 +605,7 @@ $1 == "edge" {
   EN++; ET[EN] = $2; EF[EN] = $3; ETO[EN] = $4; EL[EN] = $5
   if ($2 == "task-dep")      { td[$3 SUBSEP $4] = $5 }
   if ($2 == "blocks")        { bl[$3 SUBSEP $4] = $5 }
+  if ($2 == "spec-ref")      { SRN++; SRF[SRN] = $3; SRT[SRN] = $4 }
   if ($2 == "belongs-to")    { belongs[$3] = $4 }
   if ($2 == "task-brief")    { tbrief[$3] = $4 }
   if ($2 == "plan-covers")   { pcov[$3 SUBSEP $4] = 1 }
@@ -659,6 +672,23 @@ END {
       finding("WARNING", "feat-sem-verificacao", det " [legacy]")
     else
       finding("ERROR", "feat-sem-verificacao", det)
+  }
+
+  # ---- metrica-sem-veredito (todo stage — 4.99) ----
+  # SPEC no regime da fonte declarada (linha **Fonte de medicao**:), entregue
+  # (>=1 PLAN Done que a referencia) e ainda sem linha **Veredito de metrica**:.
+  # SPEC sem a linha de fonte fica fora — acervo pre-4.99 nao gera ruido. INFO:
+  # lembrete vivo ate o loop fechar, nunca reprova (exit code intacto).
+  for (i = 1; i <= NN; i++) {
+    if (NTY[i] != "SPEC") continue
+    id = NID[i]
+    if (!(id in smetr)) continue
+    if (id in sverd) continue
+    delivered = 0
+    for (j = 1; j <= SRN; j++)
+      if (SRT[j] == id && status[SRF[j]] ~ /^Done/) delivered = 1
+    if (!delivered) continue
+    finding("INFO", "metrica-sem-veredito", id ": fonte de medicao declarada, PLAN entregue e sem linha **Veredito de metrica**: (" nodefile[id] ")")
   }
 
   # ---- ref-quebrada ----

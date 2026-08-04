@@ -78,7 +78,7 @@ Antes de gerar o PLAN: **stack proposto autorizado** pela ficha e pelo perfil de
    motivo — decisão 4.97). A condição é a outra metade do trade-off.
 4. **Stack vigente herdado** da ficha/perfil sem reescolher.
 5. **Mapeamento FR → componente**.
-6. **Definition of Done do PLAN**.
+6. **Definition of Done do PLAN** — SPEC com `**Fonte de medição**:` na §1.3 → a DoD inclui o item de métrica operacional (template §9; decisão 4.99). Sabor `instrumentação` → o trabalho de instrumentar entra nos componentes deste PLAN (sem componente que emita o evento, o item da DoD é insatisfazível).
 7. **IDs escopados**: `DEC-MMM-XXX`, `COMP-MMM-XXX`, `TRISK-MMM-XXX`.
 8. **DEC marcada como irreversível ou não**: cada DEC tem campo `Irreversível: sim | não`. Se sim, será propagada ao INDEX.
 
@@ -169,6 +169,7 @@ componente, nunca para este campo. -->
 - [ ] Decisões DEC refletidas no código
 - [ ] Aderência à ficha/perfil validada
 - [ ] Todos os ACs cobertos por teste (gate 1 dos quality gates)
+- [ ] Métrica da SPEC operacional (só quando a §1.3 declara `Fonte de medição` — 4.99): instrumentação entregue e provada (gate 9 exibe o evento/número existindo) | fonte externa + dono registrados no INDEX
 
 ## 10. Não coberto por este PLAN
 

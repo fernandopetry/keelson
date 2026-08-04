@@ -123,6 +123,7 @@ ateste ausência de defeito para aquela aresta.
 ### WARNING se:
 - DoD não menciona cobertura de teste
 - DoD não menciona aderência à ficha/perfil
+- SPEC referenciada declara `**Fonte de medição**:` na §1.3 e a DoD não tem o item de métrica operacional (decisão 4.99) — **só em PLAN `Draft`/`Review`**; `Approved`/`Done` é acervo: silêncio
 
 ## Etapa 7: checks de não-violação de SPEC
 

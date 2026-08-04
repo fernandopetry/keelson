@@ -41,6 +41,7 @@ Se `{docsRoot}/<slug>/INDEX.md` existe:
 2. Extrair glossário consolidado para reutilização.
 3. Extrair decisões irreversíveis para não contrariar.
 4. Identificar capacidades já implementadas e em desenvolvimento.
+5. Coletar pendências de **veredito de métrica** em "Riscos ativos" (decisão 4.99): a demanda atual **constrói sobre** a capacidade pendente → ambiguidade crítica (Etapa 1 — apostar sobre valor não provado muda o resultado); as demais seguem ao output (item 6.5).
 
 Se não existe: será criado ao final desta execução (Etapa 5).
 
@@ -104,6 +105,9 @@ interromper em último caso).
 ### 1.1 Problema
 ### 1.2 Outcome esperado
 ### 1.3 Métrica de sucesso
+<!-- Número + prazo + a linha de fonte (decisão 4.99) — sem fonte, a métrica é
+estimativa eterna e o veredito do ciclo seguinte não tem de onde sair: -->
+**Fonte de medição**: <instrumentação — evento/consulta que o sistema emitirá | externa — ferramenta + dono do número>
 
 ## 2. Personas e jobs-to-be-done
 <!-- Anti-persona (opcional, 1 linha — decisão 4.98): "para quem isto NÃO é", quando
@@ -195,5 +199,6 @@ Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira*
    - Crítica de produto (`product-analyst`): riscos de mérito e perguntas a decidir antes de `Approved`
    - Veredito do PO (quando há BRIEF): decisão, resoluções pelo brief e escalações com proposta + default
 6. Premissas `[assumido]` que precisam confirmação — destacando selo `crença`/`anedota` em requisito central (4.96).
+6.5. Vereditos de métrica pendentes no slug (4.99), com os vencidos destacados — no ciclo, a Entrega do `/keelson:auto` cobra (item 6.4); no specify avulso, repasse ao Diretor.
 7. Estado do INDEX após esta operação.
 8. Próximo comando: `/keelson:plan SPEC-NNN` ou `/keelson:plan SPEC-NNN --slice="..."` se errors == 0.

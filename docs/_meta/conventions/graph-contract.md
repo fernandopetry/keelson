@@ -96,6 +96,7 @@ ponta a ponta, e o validator decide com os próprios olhos (cobertura mista, §5
 | `brief-sem-criterio` | brief avulso sem heading `## Critério de aceite` (forma do esqueleto — decisão 4.86) | WARNING |
 | `task-ancora-dupla` | TASK com `Pertence a` **e** `Brief` preenchidos (âncora é exclusiva) | ERROR |
 | `feat-sem-verificacao` | FEAT com 1+ TASK declarante, **todas Done**, sem linha `**Verificação (gate 9)**:` sob o heading na SPEC (recorte do gate 9 por FEAT — decisão 4.90). A linha é livre no conteúdo (data e como, ou `n/a — motivo`); a **presença** é o declarado. SPEC `Status: Done` (ciclo fechado antes da 4.90) → `WARNING [legacy]`. TASK não-parseável sem status derruba o "todas Done" e o check silencia — degrada na direção segura, nunca inventa ERROR | ERROR · carência |
+| `metrica-sem-veredito` | SPEC com `**Fonte de medição**:` na §1.3 (regime da 4.99), **≥1 PLAN `Done`** que a referencia (`spec-ref`) e sem linha `**Veredito de métrica**:` — o loop measure-learn está aberto. SPEC sem a linha de fonte fica **fora** (acervo pré-4.99 não gera ruído; sem lógica de data). 1º check `INFO` do catálogo: lembrete vivo até o veredito, nunca muda o exit code | INFO |
 
 `ref-quebrada` cobre também a âncora avulsa (TASK com `**Brief**:` apontando BRIEF
 inexistente no slug) — não é check novo, é o genérico sobre `task-brief`. TASK sem

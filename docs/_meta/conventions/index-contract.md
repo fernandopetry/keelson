@@ -238,3 +238,24 @@ Todo comando que **atualiza** um INDEX existente aplica — mesclando, nunca sob
 1. Atualizar `Última atualização`.
 2. Refletir o artefato na tabela correspondente (SPECs/PLANs — contrato acima) e nas seções que ele afeta: capacidades (movendo entre "Especificadas" → "Em desenvolvimento" → "Implementadas" conforme o ciclo; por FEAT quando a SPEC as declara), glossário (termo já existente com definição diferente → **parar e reportar conflito**), decisões irreversíveis, riscos ativos.
 3. Adicionar entrada ao "Histórico recente" com timestamp e ação — **máximo 10 entradas**.
+
+### Pendência e veredito de métrica (decisão 4.99)
+
+Entrega de PLAN cuja SPEC declara `**Fonte de medição**:` na §1.3 planta a pendência em
+**"Riscos ativos"** — formato da linha (ID `MET-NNN`, NNN da SPEC):
+
+```markdown
+| MET-NNN | Métrica de SPEC-NNN sem veredito: <métrica, alvo> até <prazo> | medir via <fonte declarada> | SPEC-NNN |
+```
+
+O veredito, quando medido, é gravado **na SPEC**, sob a §1.3 — presença é o contrato,
+conteúdo legível (o padrão da linha de verificação do gate 9, 4.90):
+
+```markdown
+**Veredito de métrica**: ✅ confirmada | ❌ não movida | 🤔 inconclusiva — <data> · <medido vs alvo>
+```
+
+Gravado o veredito: a linha `MET-NNN` sai de "Riscos ativos" (+1 linha no Histórico
+recente); `❌` nomeia a capacidade **candidata a sunset** no report da Entrega —
+descontinuar é decisão de produto, nunca do ciclo. Enquanto a pendência existir, o
+check `metrica-sem-veredito` (INFO — graph-contract.md §3) a lembra a cada validação.
