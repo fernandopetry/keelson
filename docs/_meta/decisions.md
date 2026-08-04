@@ -1326,6 +1326,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `docs/_meta/conventions/sdd-conventions.md` (dono da escala) · `commands/specify.md` (princípio 7, template §8, output item 6) · `agents/product-analyst.md` (eixo 6) · `skills/spec-validator/SKILL.md` (Etapa 8). Leva 4.96–4.99 → minor 0.66.0 → 0.67.0. Observar na 1ª rodada real: selos nascendo honestos (nem tudo `medido` por inércia) e a crítica do analyst citando o selo.
 
+### 4.97 — Gatilho de revisão nas DECs: decisão registra em que condição deve ser reaberta
+
+**Problema**: a DEC documenta contexto, alternativas (com a mais simples e o motivo do descarte — princípio 3 do `/keelson:plan`) e consequências, mas não diz **quando deixa de valer**. Decisão sem condição de reabertura é fé: o trade-off aceito hoje é condicionado a um estado do mundo (volume, dependência, requisito ausente), e quando esse estado muda nada aponta que a decisão pedia revisão — o gate 5 cobra só "o código segue as DECs", então um diff que **satisfaz a condição de invalidação** passa limpo, contornando por remendo o que merecia reabertura declarada. (Formato Nygard, via análise da RENATA — 4.96: toda ADR registra gatilho de revisão e quem o vigia.)
+
+**Decisão**: (a) o template da DEC ganha a linha `**Reabrir se**: <condição observável>` — o evento que, ocorrendo, pede reabertura; `nunca — <motivo>` é valor válido (o motivo é obrigatório: "nunca" sem justificativa é a mesma fé, agora assinada). A condição acompanha o trade-off que o princípio 3 já exige — é a outra metade dele. (b) **Dois alcances, declarados**: condição **observável em diff** é vigiada pelo gate 5 (régua dos gates, dono `core/CODE-REVIEW.md`): diff que a satisfaz vira **achado com a DEC citada** — reabertura declarada, nunca remendo silencioso; condição **de mundo** (volume, prazo, dependência externa) não aparece em diff — ela viaja ao INDEX **de carona na propagação que já existe** (DEC irreversível → bloco "Decisões irreversíveis", `/keelson:plan` Etapa 7) e é matéria de quem lê o INDEX no ciclo seguinte. Nenhum mecanismo novo: os dois vigias já liam esses lugares. (c) `plan-validator`: DEC sem a linha → **WARNING calibrado por Status** (Draft/Review avisa; `Approved`/`Done` é acervo — silêncio; mesma régua da 4.96).
+
+**Aplicação**: `commands/plan.md` (princípio 3, template §6, Etapa 7 item 3) · `skills/plan-validator/SKILL.md` (Etapa 3) · `guidelines/core/CODE-REVIEW.md` (gate 5). Leva 4.96–4.99. Observar na 1ª rodada real: condição nascendo **observável** ("quando X exceder N", "quando Y lançar v2"), não vaga ("se precisar mudar").
+
 ---
 
 ## 5. Quality gates inegociáveis

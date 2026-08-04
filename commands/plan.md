@@ -73,7 +73,9 @@ Antes de gerar o PLAN: **stack proposto autorizado** pela ficha e pelo perfil de
 1. **Não revisar a SPEC**.
 2. **Decisões técnicas explícitas**: cada escolha vira `DEC-MMM-XXX` rastreável.
 3. **Trade-offs documentados**: cada DEC lista alternativas — incluindo a alternativa
-   mais simples (sem o padrão/abstração), com o motivo do descarte.
+   mais simples (sem o padrão/abstração), com o motivo do descarte — e declara **em que
+   condição deve ser reaberta** (`Reabrir se:`, condição observável; `nunca` exige
+   motivo — decisão 4.97). A condição é a outra metade do trade-off.
 4. **Stack vigente herdado** da ficha/perfil sem reescolher.
 5. **Mapeamento FR → componente**.
 6. **Definition of Done do PLAN**.
@@ -146,6 +148,7 @@ componente, nunca para este campo. -->
 **Alternativas consideradas**:
 - <alt>, descartada porque <motivo>
 **Consequências**: ...
+**Reabrir se**: <condição observável que invalida esta decisão | nunca — <motivo>>
 **Irreversível**: sim | não
 **Aderência à ficha/perfil**: herdada | nova | exceção
 
@@ -185,7 +188,7 @@ Aplicar a **receita de atualização do INDEX** (`${CLAUDE_PLUGIN_ROOT}/docs/_me
 
 1. **Linha nova na tabela "PLANs"** no formato canônico do contrato (index-contract.md — não redefina header nem célula), com Tasks `0/? ⏸` e Status `Draft`. (INDEX antigo sem tabela na seção → criar antes o header canônico de 5 colunas.)
 2. **Mover capacidade entre seções**: PLAN cobre 100% dos FRs da SPEC → **remover** a entrada de "Especificadas, ainda não planejadas"; cobertura parcial → manter, reduzindo o escopo descrito. Adicionar entrada em "Em desenvolvimento" com a capacidade que este PLAN entrega.
-3. **Adicionar DEC com `Irreversível: sim`** ao bloco "Decisões irreversíveis" e **TRISK altos** à tabela "Riscos ativos".
+3. **Adicionar DEC com `Irreversível: sim`** ao bloco "Decisões irreversíveis" — incluindo a condição `Reabrir se:` no texto curto quando houver (4.97: condição de mundo é vigiada por quem lê o INDEX) — e **TRISK altos** à tabela "Riscos ativos".
 
 ## Output final ao usuário
 

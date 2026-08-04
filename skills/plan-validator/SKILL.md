@@ -62,6 +62,8 @@ Caminho de um ou mais `PLAN-*.md`. Contexto a ler (protocolo §2): o PLAN, a SPE
 ### WARNING se:
 - DEC com apenas 1 alternativa (caminho único?)
 - DEC `Irreversível: sim` sem justificativa em "Consequências"
+- DEC sem linha `**Reabrir se**:` (decisão 4.97) — **só em PLAN `Draft`/`Review`**; `Approved`/`Done` é acervo anterior à régua: silêncio
+- `**Reabrir se**: nunca` sem motivo após o travessão ("nunca" sem justificativa é fé assinada)
 
 ### Auto-fix se:
 - `Irreversível: SIM` → `Irreversível: sim`

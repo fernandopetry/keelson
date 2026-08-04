@@ -90,9 +90,12 @@ condições (muda comportamento, atravessa arquivo, escopo novo rotulado de limp
 ### Gate 5: decisões DEC respeitadas
 
 O código segue as DEC do PLAN e as decisões irreversíveis do INDEX do slug; nenhuma
-alternativa descartada entrou por engano.
+alternativa descartada entrou por engano. Diff que **satisfaz a condição `Reabrir se:`**
+de uma DEC (do PLAN ou do INDEX) vira achado com a DEC citada: a decisão pede reabertura
+declarada, nunca remendo silencioso que a contorna (4.97).
 
-**Falha**: implementação contradiz uma DEC.
+**Falha**: implementação contradiz uma DEC; condição de reabertura satisfeita sem
+reabertura declarada.
 
 ### Gate 6: aderência ao Charter + perfil ativo
 
