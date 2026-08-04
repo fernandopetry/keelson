@@ -24,5 +24,8 @@ jobs:
       - name: Suíte do grafo (scripts/tests/graph/run.sh)
         run: bash scripts/tests/graph/run.sh
 
+      - name: Suíte do map (scripts/tests/map/run.sh)
+        run: bash scripts/tests/map/run.sh
+
       - name: Checks de release (versões · CHANGELOG · MIRRORS · bash -n)
         run: bash scripts/check-release.sh

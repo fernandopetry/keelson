@@ -1,0 +1,5 @@
+WARNING	map-forma	linha 8: entrada fora da sintaxe canonica (data/origem/ancora) - map-contract §2
+WARNING	map-ancora	linha 9: src/Nope.php nao existe no repo (map-contract §4)
+WARNING	map-ancora	linha 10: src/Old.php tem 5 linhas; ancora aponta :99
+WARNING	map-frescor	linha 11: src/Fresh.php mudou em 2026-07-01, entrada verificada em 2026-06-01 - possivelmente-stale (re-verifique no proximo consumo)
+INFO	map-teto	secao "Teto" com 41 entradas (teto ~40) - virou documentacao de outro tipo? (map-contract §1)
