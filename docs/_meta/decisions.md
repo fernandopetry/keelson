@@ -1350,6 +1350,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `commands/specify.md` (§1.3, Etapa 0.3, output 6.5) · `skills/spec-validator/SKILL.md` (Etapa 4) · `commands/plan.md` (princípio 6, DoD §9) · `skills/plan-validator/SKILL.md` (Etapa 6) · `commands/auto.md` (Entrega 6.4) · `commands/integrate.md` (Etapa 5) · `docs/_meta/conventions/index-contract.md` (formato da pendência e do veredito) · `scripts/graph.sh` + `graph-contract.md` §3 + fixture `defeito-metrica-veredito` + suíte. Leva 4.96–4.99 → 0.67.0. Observar na 1ª rodada real: item de DoD nascendo com o sabor certo; pendência plantada na 1ª entrega com métrica; pergunta formal saindo no report quando a fonte é externa.
 
+### 4.100 — Risco de valor detectado formaliza pergunta a produto: o ciclo não faz discovery
+
+**Problema**: com os selos da 4.96, o `product-analyst` passa a **ver** premissa de valor sustentada por crença no núcleo de uma demanda ("alguém quer isso?" — o risco que o TRISK, técnico, nunca cobriu). Mas ver não basta: sem rota, o achado vira ou opinião do time contra o documento de produto (o ciclo decidindo mérito que não é dele) ou risco engolido em silêncio. O fluxo real agrava: a demanda chega **pronta** da área de produto pelo `/keelson:auto` — o ciclo não faz discovery nem duplica o trabalho do dono; o que ele pode fazer é devolver a lacuna de evidência a quem a resolve.
+
+**Decisão**: (a) **Instância nomeada do critério 1** de escalação do PO — a lista continua **taxativa**, nada de 5º critério: premissa de valor com selo fraco (`crença`/`anedota`) sustentando o núcleo é "ambiguidade que muda o resultado" (se a premissa cair, o resultado muda). (b) A escalação assume a forma de **pergunta formal à área de produto**, via Diretor (o correio do time): *proposta* = o **menor teste que falsifica a premissa**, com critério de passa/falha definido **antes** de rodar; *default* = seguir com o risco declarado e o selo registrado — o `auto` nunca para por isso. (c) A receita do menor teste tem **dono único** em `docs/_meta/conventions/value-test-protocol.md`, lida pelo PO **só no disparo** (padrão 4.20 — custo zero no fluxo feliz). (d) O ciclo **detecta e formaliza**; quem resolve é o dono da lacuna — nenhum comando de discovery entra no keelson (exclusões registradas na 4.96).
+
+**Aplicação**: `agents/po.md` (instância do critério 1 + ponteiro à receita) · `docs/_meta/conventions/value-test-protocol.md` (novo — dono da receita). Leva 4.100–4.101 → minor 0.67.0 → 0.68.0. Observar na 1ª ocorrência real: a escalação nascendo como pergunta a produto com teste anexo, nunca como opinião do time sobre o mérito.
+
 ---
 
 ## 5. Quality gates inegociáveis
