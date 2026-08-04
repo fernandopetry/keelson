@@ -23,7 +23,7 @@ Você é um Tech Lead especialista em decompor planos arquiteturais em tarefas a
 ### 0.1 Carregar guidelines
 
 1. Ler a **ficha** (`keelson.config.json`) e o `CLAUDE.md` do projeto se existir.
-2. Carregar o **perfil de linguagem ativo** e suas convenções de teste (doutrina `core/*`: vale sempre, carga conforme o mapa da convenção comum — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`; resolução e avisos do perfil: mesma convenção), mais as demais seções do perfil conforme a área.
+2. Carregar o **perfil de linguagem ativo** e suas convenções de teste (doutrina `core/*`: vale sempre; carga, resolução e avisos conforme o mapa da convenção comum — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`), mais as demais seções do perfil conforme a área.
 3. Extrair: convenção de branch, padrão de commit, granularidade típica, DoD padrão, framework de teste (do perfil).
 
 ### 0.2 Resolver PLAN
@@ -36,10 +36,7 @@ Você é um Tech Lead especialista em decompor planos arquiteturais em tarefas a
 
 ### 0.3 Ler INDEX.md
 
-Ler `{docsRoot}/<slug>/INDEX.md`:
-1. Confirmar que o PLAN está listado.
-2. Identificar PLANs anteriores e suas contagens de tasks.
-3. Se INDEX não existe, parar e reportar.
+Ler `{docsRoot}/<slug>/INDEX.md`: confirmar que o PLAN está listado e identificar os PLANs anteriores e suas contagens de tasks. Se o INDEX não existe, parar e reportar.
 
 ### 0.4 Próximo XXX
 
@@ -50,9 +47,8 @@ Listar `TASK-MMM-*.md` em `{docsRoot}/<slug>/tasks/`. Próximo XXX = maior exist
 A decomposição e a redação das TASKs **não acontecem nesta janela**. Despache o agent
 `scribe` com o pacote:
 
-- **Contrato**: este arquivo (`${CLAUDE_PLUGIN_ROOT}/commands/tasks.md`), Etapas 1 a 4 —
-  princípios de decomposição, ordenação, template da TASK **e** o `TASK-MMM-INDEX.md`
-  (parte da autoria).
+- **Contrato**: este arquivo (`${CLAUDE_PLUGIN_ROOT}/commands/tasks.md`), Etapas 1 a 4 — princípios
+  de decomposição, ordenação, template da TASK **e** o `TASK-MMM-INDEX.md` (parte da autoria).
 - **Alvo resolvido**: slug, MMM, próximo XXX, caminhos (Etapa 0.4); flags `--max-size`/`--only`.
 - **Insumos** (caminhos): PLAN, SPEC (ACs e mapa FR→FEAT da 0.2), convenções extraídas na
   0.1 (resumo inline), memo de exploração e/ou `MAP.md` do slug.
@@ -65,34 +61,35 @@ declarado no output.
 ## Etapa 1: princípios de decomposição (contrato — executado pelo `scribe`)
 
 1. **Atomicidade**: executável e revisável em uma sessão.
-2. **Independência máxima**.
+2. **Independência máxima — mas a aresta entre tasks irmãs tem dono** (decisão 4.106).
+   Duas tasks da mesma wave cujo resultado só se completa combinado — mesmo consumidor
+   de dado (chave de metadata, campo de payload, nome de evento) ou uma cria a
+   superfície que a outra expõe (a rota/clique que abre o item que a irmã lista) — não
+   são independentes: uma cria e **nomeia** o símbolo/ponto de entrada (constante/enum,
+   nunca grafia solta); a que fecha a ponta carrega o item no próprio "Escopo > Inclui",
+   nunca deduzido depois por quem achar a lacuna. Casos reais: a mesma flag gravada `remember_me`
+   numa task e `remember` na irmã; listagem sem o clique para o detalhe criado pela irmã.
+   Nenhum gate enxerga duas tasks ao mesmo tempo — só a decomposição previne.
 3. **Verificabilidade**: critério de pronto observável.
 4. **Vertical slicing**.
 5. **Setup-first**: scaffolding/migration com IDs baixos.
 6. **Sem invenção de escopo — nem por dedução**: a TASK só afirma o que **verificou**.
    Caminho citado no "Inclui" foi confirmado pela **cadeia do dado** (*quem consome a
-   consulta/endpoint que esta entrega altera?*), nunca deduzido do nome — vizinhança de
-   nome aponta a tela errada e entrega a funcionalidade onde ela não renderiza. Sem
-   confirmar, descreva o consumidor ("a view que lista X") em vez de chutar o caminho.
-7. **Granularidade**:
-   - `small`: 1 arquivo principal, 1 a 3 testes, 30 min a 2 h
-   - `medium`: até 3 arquivos relacionados, 2 a 4 h
-   (sobrescrito pela ficha/`CLAUDE.md` se declarado)
+   consulta/endpoint que esta entrega altera?*), nunca deduzido do nome — vizinhança de nome
+   aponta a tela errada; sem confirmar, descreva o consumidor ("a view que lista X").
+7. **Granularidade** (sobrescrita pela ficha/`CLAUDE.md` se declarado): `small` = 1 arquivo
+   principal, 1 a 3 testes, 30 min a 2 h · `medium` = até 3 arquivos relacionados, 2 a 4 h.
 8. **Corte por risco, não por camada**. Cada TASK custa um ciclo developer + code-reviewer —
-   granularidade fina multiplica revisões, não qualidade:
-   - **Fatia sensível** (seed de permissão, autorização, endpoint novo, migração,
-     regra de negócio central) → TASK **própria**, mesmo que pequena, para receber
-     `security-engineer`/revisão focada.
-   - **Fatias mecânicas do mesmo fluxo** (as várias classes/módulos de um mesmo caso
-     de uso) → **agrupe numa TASK `medium`** com uma revisão só. NÃO crie uma TASK
-     por classe/camada quando nada nelas exige revisão dedicada.
-   - Heurística: se duas tasks só fazem sentido revisadas juntas, elas são uma.
+   granularidade fina multiplica revisões, não qualidade. **Fatia sensível** (seed de
+   permissão, autorização, endpoint novo, migração, regra de negócio central) → TASK
+   **própria**, mesmo pequena, para receber `security-engineer`/revisão focada. **Fatias
+   mecânicas do mesmo fluxo** (as classes/módulos de um mesmo caso de uso) → agrupe numa
+   TASK `medium` com uma revisão só; NÃO crie TASK por classe/camada quando nada exige
+   revisão dedicada. Heurística: se duas tasks só fazem sentido revisadas juntas, elas são uma.
 
 ## Etapa 2: ordenação (contrato — executado pelo `scribe`)
 
-1. Identificar dependências entre TASKs.
-2. Ordenar por dependência topológica. Tasks paralelizáveis recebem mesma wave.
-3. Numerar sequencialmente.
+Identificar dependências entre TASKs; ordenar topologicamente (paralelizáveis = mesma wave); numerar sequencialmente.
 
 ## Etapa 3: estrutura obrigatória de cada TASK (contrato — executado pelo `scribe`)
 
@@ -139,8 +136,7 @@ Um arquivo por task: `{docsRoot}/<slug>/tasks/TASK-MMM-XXX-<titulo-kebab>.md`.
 
 <Passos curtos, sem prescrever solução além do PLAN. Abra a seção com a frase:
 "Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critérios
-prevalecem; nunca siga um passo que enfraqueça um critério." (evita a leitura
-mais fraca).>
+prevalecem; nunca siga um passo que enfraqueça um critério." (evita a leitura mais fraca).>
 
 ## Critérios de pronto
 
@@ -192,27 +188,23 @@ mais fraca).>
 
 ### Campos de aresta — sintaxe canônica do grafo
 
-`Realiza (FRs)`, `AC violado`, `Depende de` e `Bloqueia` são **campos de aresta**:
-lista de IDs separados por vírgula, ou `nenhuma` — prosa vai para Contexto/Escopo. Os
-ACs citados em item `- [ ]` dos "Critérios de pronto" e no "Roteiro do gate 9" também
-viram aresta (cobertura); menção a AC em prosa corrida não conta como cobertura. A
-régua completa (sintaxe, catálogo, extrator) tem dono único:
-`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md`.
+`Realiza (FRs)`, `AC violado`, `Depende de` e `Bloqueia` são **campos de aresta**: lista
+de IDs separados por vírgula, ou `nenhuma` — prosa vai para Contexto/Escopo. Os ACs
+citados em item `- [ ]` dos "Critérios de pronto" e no "Roteiro do gate 9" também viram
+aresta (cobertura); menção a AC em prosa corrida não conta. A régua completa (sintaxe,
+catálogo, extrator) tem dono único: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md`.
 
 ### Campo `Funcionalidade` — derivado dos FRs, nunca inventado
 
 Só existe quando a SPEC declara FEATs na §5 — **SPEC sem FEATs → omitir a linha** (a
-funcionalidade é a própria SPEC). Task `chore` sem FR realizado pode omitir. Regras:
-- O conjunto listado é **exatamente** o conjunto de FEATs dos FRs de `Realiza (FRs)`
-  (via mapa FR→FEAT da Etapa 0.2) — nem a mais, nem a menos.
-- Uma FEAT é marcada `(primária)`: a que tem mais FRs realizados pela task (empate →
-  menor ID). Julgamento pode sobrescrever a heurística, mas a primária deve pertencer
-  ao conjunto derivado.
-- Task **transversal** (FRs de 2+ FEATs — ex.: um front único servindo login e
-  lançamento) lista todas.
-- **Sem primária honesta** (a task serve a todas/quase todas as FEATs e eleger uma seria
-  arbitrário): use a forma `**Funcionalidade**: transversal (FEAT-NNN-XXX, FEAT-NNN-YYY)`
-  — sem `(primária)` (projeção Jira: `jira-sync-feat.md`).
+funcionalidade é a própria SPEC); task `chore` sem FR realizado pode omitir. O conjunto
+listado é **exatamente** o conjunto de FEATs dos FRs de `Realiza (FRs)` (via mapa
+FR→FEAT da Etapa 0.2) — nem a mais, nem a menos. Uma FEAT é marcada `(primária)`: a que
+tem mais FRs realizados (empate → menor ID); julgamento pode sobrescrever a heurística,
+mas a primária pertence ao conjunto derivado. Task **transversal** (FRs de 2+ FEATs —
+ex.: um front único servindo login e lançamento) lista todas; **sem primária honesta**
+(eleger uma seria arbitrário) use `**Funcionalidade**: transversal (FEAT-NNN-XXX,
+FEAT-NNN-YYY)` — sem `(primária)` (projeção Jira: `jira-sync-feat.md`).
 
 ### Mapeamento de cada AC — camada que enforça, gate que verifica
 
@@ -220,9 +212,9 @@ Primeiro decida **qual camada enforça** o AC e liste-o nos "Critérios de pront
 
 Depois, cada AC mapeia para **exatamente um** gate de verificação. NÃO liste o mesmo AC em dois gates com exigências distintas (ex.: "testes cobrem AC-X" **e** "gate 9 cobre AC-X"): a ambiguidade faz o developer escolher a verificação mais fraca e um MUST fica sem teste falsificável (uma mutação passaria os testes verdes). Regra: **MUST testável em unidade → teste no gate 1**; o gate 9 (comportamento verificado / caminhada de tela quando `gates.screenVerify`) só **confirma** o fluxo ponta-a-ponta, nunca substitui o teste. Respeite o gate que a DoD do PLAN atribui ao AC — nunca rebaixe de gate 1 (teste) para gate 9 (manual).
 
-Todo item de **gate 1** registra a **verificação executável** — comando + saída/efeito esperado — **antes** do código: o critério nasce do AC, nunca do diff (gerador ≠ avaliador). Critério de teste sem comando+esperado → `task-validator` reprova (ERROR).
+Todo item de **gate 1** registra a **verificação executável** — comando + saída/efeito esperado — **antes** do código: o critério nasce do AC, nunca do diff (gerador ≠ avaliador); critério de teste sem comando+esperado → `task-validator` reprova (ERROR). O par tem de ser **falsificável**: pergunte "que estado faz este comando FALHAR?" — sem resposta, o critério aprova qualquer coisa. Atenção ao **esperado por ausência** (saída vazia, caminho que não aparece, nenhum resultado): ausência é o estado default de um comando mal ancorado, então o comando precisa de âncora explícita — `git diff --name-only main...HEAD`, nunca `git diff --name-only`, que compara com o índice e devolve vazio depois do commit, aprovando qualquer diff. Esperado do tipo "não piorou" (suíte, baseline de tipos) exige a baseline capturada **antes** de começar, dentro do próprio critério. E todo **exemplo literal** que ilustra um critério é conferido contra qualquer regra formal (regex, formato) já mandatória em **outra seção da mesma TASK** — nunca inventado à parte: se o Escopo fixa um padrão, o dado do exemplo tem de casá-lo (caso real: Escopo exigia regex de chave com prefixo de 2+ letras e o critério de dedupe ilustrava com `B-2, A-1` — chaves que o próprio regex nunca casa; o developer notou, mas custou uma rodada de correção na closure).
 
-O par comando+esperado tem de ser **falsificável**: pergunte "que estado faz este comando FALHAR?" — sem resposta, o critério aprova qualquer coisa. Atenção ao **esperado por ausência** (saída vazia, caminho que não aparece, nenhum resultado): ausência é o estado default de um comando mal ancorado, então o comando precisa de âncora explícita — `git diff --name-only main...HEAD`, nunca `git diff --name-only`, que compara com o índice e devolve vazio depois do commit, aprovando qualquer diff. Esperado do tipo "não piorou" (suíte, baseline de tipos) exige a baseline capturada **antes** de começar, dentro do próprio critério. E todo **exemplo literal** que ilustra um critério é conferido contra qualquer regra formal (regex, formato) já mandatória em **outra seção da mesma TASK** — nunca inventado à parte: se o Escopo fixa um padrão, o dado do exemplo tem de casá-lo (caso real: Escopo exigia regex de chave com prefixo de 2+ letras e o critério de dedupe ilustrava com `B-2, A-1` — chaves que o próprio regex nunca casa; o developer notou, mas custou uma rodada de correção na closure).
+O critério também tem de **resistir a contorno** (decisão 4.107) — três testes na fixação: (a) valor **literal** no comando ou critério (nome de serviço, credencial, símbolo/constante de convenção do projeto) é conferido contra a **fonte real** (arquivo de infra, grep do padrão já em uso) antes de escrito, nunca presumido — credencial chutada custa uma volta ao developer; pior, literal fixado contra a convenção real faz o cumprimento à risca **quebrar** o código certo; (b) invariante **estrutural** (chamada proibida, camada que não pode importar outra) verificado por `grep` que casa **caminho**+conteúdo é satisfeito por **relocação** — mover a chamada para um arquivo cujo caminho não bate no padrão zera o comando sem mudar a substância; ancore por **símbolo** (FQCN/método) num guard fail-closed, nunca por padrão de caminho; (c) AC cuja camada de persistência introduz um predicado de **escopo** (tenant, dono, agregado pai) exige, já no gate 1, um critério de **mutação** sobre esse predicado — fixture com **dois** pais (duas instâncias/donos) e o predicado neutralizado **reprovando** o teste, fixado na TASK e nunca deixado para o gate 8 descobrir com o código pronto: fixture de um pai só não tem o que vazar, o predicado fica decorativo e a suíte inteira segue verde com ele removido (caso real: três rodadas de gate 8 no mesmo ciclo, pela mesma causa).
 
 Falsificável no papel não basta: **o comando é executado na fixação** e a evidência de conjunto não-vazio entra no critério, junto do par comando+esperado (ex.: `OK (12 tests)` — nunca `No tests executed`). Comando verde sobre o vazio — filtro que não casa classe nenhuma, grupo excluído da suíte, glob que não resolve — cumpre o critério à risca e aprova qualquer coisa. Corolário: predicado que **exclui** se fixa com um dado que ele **rejeita**; baseline capturada prova que não é vazia (decisão 4.93).
 
@@ -231,6 +223,8 @@ E a cobertura fecha **de trás para frente**: o mapeamento AC→critério não a
 ### Roteiro do gate 9 — fixado antes do código
 
 Com `gates.screenVerify` ativo e algum AC atribuído ao gate 9, a TASK carrega a seção `## Roteiro do gate 9 (fixado ANTES do código)` (ver template). Ela abre com **ambiente** (URLs digitáveis — com a base de rota real do app — + realm), **sujeito concreto** (qual identidade loga, com que credencial) e **pré-condição com receita** — como montar o estado e como restaurá-lo ao fim; "com um usuário sem permissão" não é pré-condição, é desejo. **Um passo por AC**: AC de gate 9 sem passo é AC sem gate. Antes de escrever, leia os handoffs anteriores do slug (`{docsRoot}/<slug>/handoffs/`): cenário já registrado ali como não-exercitável neste ambiente **não vira passo por herança** — reaproveite a receita e a prova substitutiva já aceitas, ou prescreva nova tentativa **nomeando o que mudou** desde o registro ("não exercitável" é registro datado, não veredicto permanente; a revisita é decisão consciente, nunca desconhecimento do handoff).
+
+AC de interação **hierárquica** (arrastar/reordenar itens dentro de um agrupamento — contêiner, pasta, grupo) inclui, além do passo interno, um passo que **cruza a fronteira** do agrupamento — mover o item para outro contêiner (decisão 4.107): o código que reordena "dentro" raramente é o que resolve "entre", é a classe de defeito mais provável da estrutura, e um roteiro que só exercita o reordenar interno não a alcança.
 
 ## Etapa 4: índice de tasks do PLAN (contrato — executado pelo `scribe`)
 
@@ -284,14 +278,10 @@ Criar/atualizar `{docsRoot}/<slug>/tasks/TASK-MMM-INDEX.md`:
 
 Após gerar todas as TASKs e o TASK-MMM-INDEX, **conferir o grafo mecanicamente**:
 `${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh {docsRoot}/<slug> --check --stage=tasks --plan MMM`
-(contrato: `graph-contract.md`). Ciclo, wave incoerente ou referência quebrada aqui é
-defeito de geração — corrija as TASKs antes do gate, não deixe para o validator.
-Script indisponível/falhou → siga ao gate declarando a degradação.
-
-Em seguida, invocar a skill `task-validator` em modo batch (apontando para o TASK-MMM-INDEX).
-
-**Se errors == 0**: prosseguir.
-**Se errors > 0**: reportar errors específicos por TASK. INDEX do slug ainda é atualizado, mas Status das tasks com error fica `Blocked`.
+(contrato: `graph-contract.md`). Ciclo, wave incoerente ou referência quebrada aqui é defeito
+de geração — corrija antes do gate; script indisponível/falhou → siga declarando a degradação.
+Em seguida, invocar a skill `task-validator` em modo batch (apontando para o TASK-MMM-INDEX):
+**errors == 0** → prosseguir; **errors > 0** → reportar por TASK — o INDEX do slug ainda é atualizado, mas o Status das tasks com error fica `Blocked`.
 
 ## Etapa 6: atualização do INDEX.md do slug
 
@@ -303,12 +293,8 @@ Só quando a ficha tem `jira.enabled: true`: **despache o agent `tracker-sync`**
 
 ## Output final ao usuário
 
-1. Quantidade de tasks geradas e tamanho dominante.
-2. Convenções aplicadas (da ficha/perfil).
-3. Caminho do TASK-MMM-INDEX.md.
-4. Caminho do INDEX.md do slug atualizado.
-5. Resultado da validação: errors, warnings.
-6. Tasks da Wave 1 (por onde começar).
-7. Gaps detectados (FRs sem TASK ou ACs sem verificação).
-8. Cobertura por funcionalidade (FEAT → TASKs), se a SPEC declara FEATs.
-9. Próximo comando: `/keelson:implement PLAN-MMM` ou `--dry-run` primeiro.
+1. Quantidade de tasks geradas, tamanho dominante e convenções aplicadas (da ficha/perfil).
+2. Caminhos: TASK-MMM-INDEX.md e INDEX.md do slug atualizado.
+3. Resultado da validação (errors, warnings) e gaps detectados (FRs sem TASK, ACs sem verificação).
+4. Tasks da Wave 1 (por onde começar); cobertura por funcionalidade (FEAT → TASKs), se a SPEC declara FEATs.
+5. Próximo comando: `/keelson:implement PLAN-MMM` ou `--dry-run` primeiro.
