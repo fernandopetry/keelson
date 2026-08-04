@@ -141,6 +141,11 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   literal no consumidor (ficha/docs dele). Teste antes de registrar: a frase funciona
   para qualquer projeto? Se só faz sentido conhecendo aquele consumidor, ainda é
   específica demais.
+- **Proposta de consumidor tem fila no mantenedor** (decisão 4.111): `PROPOSTA_PLUGIN`
+  que chega (postmortem, ledger, mensagem) é registrada em `docs/_meta/proposal-inbox.md`
+  **antes do parecer** e fechada na leva que a aplica/recusa (`aplicada (4.x)` /
+  `recusada (motivo)`). Nada entra em doutrina sem passar pela fila; reincidência
+  referencia a linha anterior.
 - Hooks são bash 3.2-compatível com **fallback gracioso** (sem `jq`/ficha → `exit 0`,
   nunca travar o fluxo) e anti-renudge por fingerprint. Validar com `bash -n` + teste
   sintético (repo temporário no scratchpad).

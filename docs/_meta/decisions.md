@@ -1438,6 +1438,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `guidelines/core/CODE-REVIEW.md` (Convergência do re-gate, bullet "Teto: 1 retry por gate, depois escala"). Origem: ledger de consumidor real (julgamento do próprio condutor, ratificado pelo Diretor ao aplicar esta leva) — fechada na fila da 4.111.
 
+### 4.111 — Propostas de consumidores ganham fila rastreada no mantenedor
+
+**Problema**: o ciclo de aprendizado dos consumidores funciona — o `agile-coach` em modo consumidor produz `PROPOSTA_PLUGIN` com diff literal contra a versão instalada — mas o lado do mantenedor não tinha fila nem estado: a proposta chegava ao Diretor como texto e dependia de memória para virar leva. Custo provado num mesmo postmortem, duas vezes: (1) proposta correta, escrita no momento certo, ficou 12 dias sem aplicação e a mesma causa-raiz reincidiu noutra superfície (aresta entre TASKs irmãs — virou a 4.106); (2) defeito estrutural do plugin (grant MCP do `qa` — virou a 4.105) foi registrado como **workaround de projeto** no consumidor e nunca escalado — a sessão seguinte redescobriu do zero, pagando a mesma investigação, incluindo dois bloqueios do `agent-guard`. O mecanismo gera **diagnóstico** e não gera **imunidade**: sem o elo de aplicação fechado, cada lição pode custar duas sessões.
+
+**Decisão**: `docs/_meta/proposal-inbox.md` — fila viva no repo do plugin, com contrato de quatro regras: **registrar na chegada** (a sessão que recebe postmortem/ledger/mensagem com propostas escreve a linha **antes** do parecer — origem abstraída na forma da 4.72, mantendo só o id do registro no ledger de origem para rastreio); **fechar na leva** (`aplicada (4.x)` com a decisão que a absorveu, ou `recusada (motivo curto)`; `recebida` que atravessa uma leva é pendência visível, não backlog silencioso); **reincidência referencia a linha anterior**; **ponteiros, nunca texto de doutrina** (o dono da regra continua sendo o arquivo dela). A fila não é um 4º lugar de sincronização — é rastreio de estado, como o INDEX dos slugs nos consumidores.
+
+**Aplicação**: `docs/_meta/proposal-inbox.md` (novo — nasce com as 8 propostas desta leva registradas e fechadas nas 4.105–4.110) · `CLAUDE.md` (seção "Registro e governança", bullet novo). Observar na próxima chegada real: a linha nascendo na mesma sessão do parecer, e nenhuma proposta `recebida` sobrevivendo a uma leva em silêncio.
+
 ---
 
 ## 5. Quality gates inegociáveis
