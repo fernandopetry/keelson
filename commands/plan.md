@@ -68,7 +68,24 @@ registrada no PLAN.
 
 Antes de gerar o PLAN: **stack proposto autorizado** pela ficha e pelo perfil de linguagem ativo; **decisões irreversíveis** (perfil/`guidelines/core/` ou INDEX.md) tocadas → parar e reportar. Conflito irresolvível: parar antes de escrever.
 
-## Etapa 4: princípios obrigatórios
+## Etapa 3.5: redação delegada ao `scribe` (decisão 4.103)
+
+A redação do PLAN **não acontece nesta janela**. Despache o agent `scribe` com o pacote:
+
+- **Contrato**: este arquivo (`${CLAUDE_PLUGIN_ROOT}/commands/plan.md`), Etapas 4 e 5.
+- **Alvo resolvido**: slug, MMM e caminho (Etapa 0.4).
+- **Insumos** (caminhos): SPEC alvo, INDEX.md, perfil de linguagem (as **seções** da carga
+  da 0.1 — o scribe lê por seção, não o arquivo inteiro), memo de exploração e/ou `MAP.md`
+  do slug, e a **conclusão ancorada do `code-scout`** da Etapa 2 (inline no prompt — é curta).
+- **Decisões desta execução**: cobertura alvo da Etapa 1 (caso A–D), respostas da triagem
+  técnica (Etapa 2) e restrições da Etapa 3.
+
+Receba o sumário estruturado (`agents/scribe.md`): `duvidas` não-vazias → ambiguidade da
+Etapa 2 (pergunte; no modo autônomo, escada) e re-despache só o delta. As DEC do sumário
+(`insumos_index.decs_irreversiveis`) alimentam a Etapa 7 sem reler o PLAN. Agent
+indisponível → executar as Etapas 4–5 inline é o fallback, declarado no output.
+
+## Etapa 4: princípios obrigatórios (contrato de forma — executado pelo `scribe`)
 
 1. **Não revisar a SPEC**.
 2. **Decisões técnicas explícitas**: cada escolha vira `DEC-MMM-XXX` rastreável.
@@ -82,7 +99,7 @@ Antes de gerar o PLAN: **stack proposto autorizado** pela ficha e pelo perfil de
 7. **IDs escopados**: `DEC-MMM-XXX`, `COMP-MMM-XXX`, `TRISK-MMM-XXX`.
 8. **DEC marcada como irreversível ou não**: cada DEC tem campo `Irreversível: sim | não`. Se sim, será propagada ao INDEX.
 
-## Etapa 5: estrutura obrigatória do arquivo PLAN
+## Etapa 5: estrutura obrigatória do arquivo PLAN (contrato de forma — executado pelo `scribe`)
 
 ```markdown
 # PLAN-MMM: <Título>

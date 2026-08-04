@@ -64,7 +64,25 @@ Ambiguidade não crítica vira premissa `[assumido]`.
 não pausam — aplique a escada de reação do auto (decidir e registrar → estacionar →
 interromper em último caso).
 
-## Etapa 2: princípios obrigatórios
+## Etapa 1.5: redação delegada ao `scribe` (decisão 4.103)
+
+A redação da SPEC **não acontece nesta janela** — os insumos dela ficariam residentes no
+contexto do Tech Lead até o fim do ciclo. Despache o agent `scribe` com o pacote:
+
+- **Contrato**: este arquivo (`${CLAUDE_PLUGIN_ROOT}/commands/specify.md`), Etapas 2 e 3
+  — a régua de forma que ele lê na fonte.
+- **Alvo resolvido** (Etapa 0.2): slug, NNN, caminho do arquivo; `Brief: BRIEF-NNN` quando houver.
+- **Insumos** (caminhos, nunca conteúdo colado): BRIEF e/ou documento de origem, INDEX.md
+  (glossário/decisões extraídos na 0.3 podem ir resumidos), memo de exploração e/ou
+  `MAP.md` do slug, recorte do `CLAUDE.md` do projeto (0.1).
+- **Decisões desta execução**: premissas resolvidas na Etapa 1 (o scribe as aplica, não as reabre).
+
+Receba o **sumário estruturado** (contrato de output no `agents/scribe.md`): `artefatos`,
+`insumos_index`, `premissas_marcadas`, `duvidas`. `duvidas` não-vazias → trate como
+ambiguidade da Etapa 1 (pergunte; no modo autônomo, escada) e re-despache **só o delta**.
+Agent indisponível → executar as Etapas 2–3 inline é o fallback, declarado no output.
+
+## Etapa 2: princípios obrigatórios (contrato de forma — executado pelo `scribe`)
 
 1. **Outcome-first**: comece pelo resultado esperado.
 2. **Ubiquitous Language**: defina termos no glossário, reutilize do glossário consolidado do INDEX.md (canônico — Etapa 0.4).
@@ -87,7 +105,7 @@ interromper em último caso).
    sem os três estados está incompleta; cada estado vira AC verificável (e os gates 1 e 9
    herdam a prova de graça).
 
-## Etapa 3: estrutura obrigatória do arquivo SPEC
+## Etapa 3: estrutura obrigatória do arquivo SPEC (contrato de forma — executado pelo `scribe`)
 
 ```markdown
 # SPEC-NNN: <Nome>
@@ -176,7 +194,7 @@ A crítica **não bloqueia** a criação da SPEC nem a atualização do INDEX (a
 
 ### 5.1 Criar INDEX se não existe
 
-Criar do zero seguindo o **template canônico do INDEX** (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`), preenchido com a SPEC recém-criada: linha na tabela "SPECs", capacidade em "Especificadas, ainda não planejadas" (derivada do outcome esperado), glossário e riscos da SPEC, Histórico recente com `SPEC-NNN criada via /keelson:specify`.
+Criar do zero seguindo o **template canônico do INDEX** (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`), preenchido com a SPEC recém-criada: linha na tabela "SPECs", capacidade em "Especificadas, ainda não planejadas" (derivada do outcome esperado), glossário e riscos da SPEC, Histórico recente com `SPEC-NNN criada via /keelson:specify`. Fonte: os `insumos_index` do sumário do scribe — releia seções da SPEC só para o que faltar neles.
 
 ### 5.2 Atualizar INDEX se já existe
 

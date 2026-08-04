@@ -45,7 +45,24 @@ Ler `{docsRoot}/<slug>/INDEX.md`:
 
 Listar `TASK-MMM-*.md` em `{docsRoot}/<slug>/tasks/`. Próximo XXX = maior existente para esse MMM + 1, zero-padded. Criar pasta `tasks/` se não existir.
 
-## Etapa 1: princípios de decomposição
+## Etapa 0.5: redação delegada ao `scribe` (decisão 4.103)
+
+A decomposição e a redação das TASKs **não acontecem nesta janela**. Despache o agent
+`scribe` com o pacote:
+
+- **Contrato**: este arquivo (`${CLAUDE_PLUGIN_ROOT}/commands/tasks.md`), Etapas 1 a 4 —
+  princípios de decomposição, ordenação, template da TASK **e** o `TASK-MMM-INDEX.md`
+  (parte da autoria).
+- **Alvo resolvido**: slug, MMM, próximo XXX, caminhos (Etapa 0.4); flags `--max-size`/`--only`.
+- **Insumos** (caminhos): PLAN, SPEC (ACs e mapa FR→FEAT da 0.2), convenções extraídas na
+  0.1 (resumo inline), memo de exploração e/ou `MAP.md` do slug.
+
+Receba o sumário estruturado (`agents/scribe.md`): `insumos_index.contagens` (TASKs/waves)
+alimenta a Etapa 6; `duvidas` não-vazias → resolva (pergunte; no modo autônomo, escada) e
+re-despache só o delta. Agent indisponível → executar as Etapas 1–4 inline é o fallback,
+declarado no output.
+
+## Etapa 1: princípios de decomposição (contrato — executado pelo `scribe`)
 
 1. **Atomicidade**: executável e revisável em uma sessão.
 2. **Independência máxima**.
@@ -71,13 +88,13 @@ Listar `TASK-MMM-*.md` em `{docsRoot}/<slug>/tasks/`. Próximo XXX = maior exist
      por classe/camada quando nada nelas exige revisão dedicada.
    - Heurística: se duas tasks só fazem sentido revisadas juntas, elas são uma.
 
-## Etapa 2: ordenação
+## Etapa 2: ordenação (contrato — executado pelo `scribe`)
 
 1. Identificar dependências entre TASKs.
 2. Ordenar por dependência topológica. Tasks paralelizáveis recebem mesma wave.
 3. Numerar sequencialmente.
 
-## Etapa 3: estrutura obrigatória de cada TASK
+## Etapa 3: estrutura obrigatória de cada TASK (contrato — executado pelo `scribe`)
 
 Um arquivo por task: `{docsRoot}/<slug>/tasks/TASK-MMM-XXX-<titulo-kebab>.md`.
 
@@ -215,7 +232,7 @@ E a cobertura fecha **de trás para frente**: o mapeamento AC→critério não a
 
 Com `gates.screenVerify` ativo e algum AC atribuído ao gate 9, a TASK carrega a seção `## Roteiro do gate 9 (fixado ANTES do código)` (ver template). Ela abre com **ambiente** (URLs digitáveis — com a base de rota real do app — + realm), **sujeito concreto** (qual identidade loga, com que credencial) e **pré-condição com receita** — como montar o estado e como restaurá-lo ao fim; "com um usuário sem permissão" não é pré-condição, é desejo. **Um passo por AC**: AC de gate 9 sem passo é AC sem gate. Antes de escrever, leia os handoffs anteriores do slug (`{docsRoot}/<slug>/handoffs/`): cenário já registrado ali como não-exercitável neste ambiente **não vira passo por herança** — reaproveite a receita e a prova substitutiva já aceitas, ou prescreva nova tentativa **nomeando o que mudou** desde o registro ("não exercitável" é registro datado, não veredicto permanente; a revisita é decisão consciente, nunca desconhecimento do handoff).
 
-## Etapa 4: índice de tasks do PLAN
+## Etapa 4: índice de tasks do PLAN (contrato — executado pelo `scribe`)
 
 Criar/atualizar `{docsRoot}/<slug>/tasks/TASK-MMM-INDEX.md`:
 
