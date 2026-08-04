@@ -17,6 +17,49 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.70.0] — 2026-08-04
+
+Decisions 4.103, 4.104
+
+### Added
+- **`scribe` agent — SDD authorship in its own window (4.103).** The writing of
+  SPEC/PLAN/TASKs no longer happens in the main session: `/keelson:specify`, `plan`
+  and `tasks` dispatch the new out-of-cast tool agent with the input paths and the
+  command's own form stages as the contract; it returns a structured summary (INDEX
+  inputs, assumptions, doubts) instead of the full content. Measured driver: ~55% of a
+  real cycle's window growth came from inline authorship. Validation, product critique,
+  PO approval and Status promotion stay with the main session.
+- **`tracker-sync` agent — Jira hooks leave the main window (4.103).** All protocol
+  hooks (specify, tasks, wave dispatch, closure, delivery reconciliation — and
+  mid-session `/keelson:jira-sync`) dispatch a tool agent that reads the protocol
+  sections, absorbs the connector payloads, writes only the designated key lines and
+  returns the canonical tracker summary plus degradation events for the ledger.
+- **Slug MAP — living code-territory mirror (4.104).** Optional `docs/<slug>/MAP.md`
+  with dated, anchored entries (`- [date · origin] fact — file:line @ "hint"`): seeded
+  by `/keelson:specify-epic` from the decomposition exploration, delta-appended at every
+  closure in the slug (the exploration memo drains into it before removal), consumed as
+  first exploration input under the "verified, not deduced" rule. Single-owner contract
+  in `docs/_meta/conventions/map-contract.md`; INDEX template gains an optional pointer
+  line; the consumer block gains the read trigger (**re-run `/keelson:init`**).
+- **`scripts/map-check.sh` + frozen-fixture suite (4.104).** Sibling engine to
+  `graph.sh` (bash 3.2 + POSIX awk + git, read-only): `map-forma`, `map-ancora`,
+  `map-frescor` (anchored file committed after the entry date → `possivelmente-stale`)
+  as WARNING and `map-teto` as INFO — never ERROR. Suite builds deterministic git repos
+  per fixture; wired into pre-commit and CI.
+
+### Changed
+- **Two-layer subagent reports (4.103).** An agent's return is now only its contract
+  YAML (text fields 1–3 lines); narrative belongs to the durable artifact (TASK
+  closure, ledger, INDEX, commit). Findings stay complete on the actionable
+  (file:line + reason + action), lean everywhere else. Owner: `sdd-conventions.md`.
+- **Review/security stop-guards go silent during a formal cycle (4.103).** With
+  `run-state` at `em_andamento` the wave orchestration already owns the gates; the Stop
+  hooks are the free-session safety net (measured: 33 renudges in one real cycle).
+- **Rereading is a declared exception (4.103, reinforcing 4.35).** Files already in the
+  window are re-read by section only; profile load is always sectioned.
+
+---
+
 ## [0.69.1] — 2026-08-04
 
 Decision 4.102 (folder-name correction)

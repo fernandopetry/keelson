@@ -406,18 +406,17 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.69.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.70.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the BRIEF forge** (`/keelson:brief`, decision 4.102) — the
-optional pre-cycle stage that turns a raw product document into a lapidated BRIEF:
-inventory mirrored on the SPEC sections, code answers before humans, one-question-at-
-a-time interview with the human, and what only the product area can answer becomes a
-formal Q-ID pending — reentrant by state on disk, so any fresh session resumes from
-the artifact, never from the old conversation. `/keelson:auto` reuses a forged BRIEF
-without re-assembling it. **Consumer block changed** (the human-only commands note) —
-re-run `/keelson:init` on consumers.
+New in this release: **the Tech Lead context diet + the slug MAP** (decisions
+4.103/4.104) — SDD authorship and Jira hooks move to tool agents (`scribe`,
+`tracker-sync`) with their own windows, subagent reports become two-layer (YAML signal
+back, narrative in the durable artifact), stop-guards go silent inside a formal cycle,
+and `docs/<slug>/MAP.md` becomes a living, mechanically-checked mirror of the code
+territory shared across an epic's slices (`scripts/map-check.sh`). **Consumer block
+changed** (MAP read trigger) — re-run `/keelson:init` on consumers.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

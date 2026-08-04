@@ -85,8 +85,10 @@ O keelson simula um time real, e os IDs dos agents **são** os nomes dos papéis
 | `agile-coach` | Agile Coach | Aprendizado do processo |
 | `staff-engineer` | Staff Engineer | Gera perfis de linguagem novos |
 
-Os validators e o `code-scout` ficam **fora da metáfora**: são ferramentas do time, não
-pessoas.
+Os validators, o `code-scout`, o `scribe` (redige SPEC/PLAN/TASKs pelo contrato do
+comando, para os insumos não ocuparem a janela da sessão principal) e o `tracker-sync`
+(executa os ganchos do Jira e devolve só o resumo) ficam **fora da metáfora**: são
+ferramentas do time, não pessoas.
 
 ### O contrato Diretor–PO
 
@@ -193,11 +195,29 @@ devolve?*
 As âncoras de uma linha são deliberadas: elas formam o **grafo de navegação** que leva do
 código à decisão que o moldou.
 
+## O MAP do slug — memória de território entre demandas
+
+Num domínio com várias demandas (um épico fatiado, manutenção recorrente), o
+conhecimento sobre **o código** — onde as coisas vivem, que padrões valem, as pegadinhas
+— era redescoberto a cada sessão. O `MAP.md`, na raiz do slug, guarda esse conhecimento
+em **entradas datadas e ancoradas** (`- [data · origem] fato — arquivo:linha`):
+
+- **Nasce** na decomposição de um épico (ou quando uma entrega julgar útil); cada ciclo
+  seguinte no slug **anexa o delta** na closure — só o que muda a interpretação de quem
+  chega depois.
+- **É acelerador, não fonte de verdade**: o time confere a âncora antes de decidir por
+  ela; entrada antiga não é inválida — é "confira antes de usar".
+- **A idade é vigiada por script** (`map-check.sh`): âncora quebrada e arquivo que mudou
+  depois da verificação viram avisos (`possivelmente-stale`) — nunca bloqueiam nada.
+
+Você não gerencia o MAP: o time o semeia, atualiza e consome sozinho. Se quiser lê-lo,
+é markdown simples — e vale como documentação residual do domínio.
+
 ## Onde cada coisa mora
 
 | Peça | Lugar |
 |---|---|
-| Artefatos da demanda | `<docsRoot>/<slug>/` — `briefs/`, `specs/`, `plans/`, `tasks/`, `INDEX.md` |
+| Artefatos da demanda | `<docsRoot>/<slug>/` — `briefs/`, `specs/`, `plans/`, `tasks/`, `INDEX.md`, `MAP.md` (opcional) |
 | Configuração do projeto | `keelson.config.json` (versionado) |
 | Credenciais de ambiente local | `keelson.local.json` (**fora** do git) |
 | Rascunho de sessão, evidência efêmera | `thoughts/` (fora do git) |
