@@ -1334,6 +1334,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `commands/plan.md` (princípio 3, template §6, Etapa 7 item 3) · `skills/plan-validator/SKILL.md` (Etapa 3) · `guidelines/core/CODE-REVIEW.md` (gate 5). Leva 4.96–4.99. Observar na 1ª rodada real: condição nascendo **observável** ("quando X exceder N", "quando Y lançar v2"), não vaga ("se precisar mudar").
 
+### 4.98 — Anti-persona na §2: declarar para quem NÃO é disciplina o escopo
+
+**Problema**: a §2 da SPEC declara personas/JTBD e o escopo tem out-of-scope simétrico (§4.2), mas nenhum campo captura **para quem a capacidade não é** — e "serve todo mundo" é o sinal clássico de persona genérica, que o `product-analyst` (eixo 4) hoje só pega por faro. Listar o que não está é mais difícil e mais valioso que listar o que está (princípio da fonte da 4.96) — o keelson já aplica isso ao escopo, faltava aplicá-lo à persona.
+
+**Decisão**: linha **opcional** de anti-persona no template da §2, guiada por comentário ("para quem isto NÃO é — 1 linha, quando disciplinar o escopo"); o `product-analyst` (eixo 4) a usa como referência quando presente. Sem check novo, sem obrigação, sem carência: é ferramenta de disciplina do autor, não campo de formulário — a régua contra enumeração defensiva (4.32) vale para o próprio processo.
+
+**Aplicação**: `commands/specify.md` (template §2) · `agents/product-analyst.md` (eixo 4). Leva 4.96–4.99. Observar: a linha sendo usada quando o escopo pedir, não por ritual.
+
 ---
 
 ## 5. Quality gates inegociáveis

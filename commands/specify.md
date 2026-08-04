@@ -106,6 +106,8 @@ interromper em último caso).
 ### 1.3 Métrica de sucesso
 
 ## 2. Personas e jobs-to-be-done
+<!-- Anti-persona (opcional, 1 linha — decisão 4.98): "para quem isto NÃO é", quando
+disciplinar o escopo. Capacidade que "serve todo mundo" é sinal de persona genérica. -->
 
 ## 3. Glossário (Ubiquitous Language)
 
