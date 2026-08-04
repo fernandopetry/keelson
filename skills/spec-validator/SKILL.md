@@ -162,6 +162,7 @@ Varrer seções 5, 6, 7 buscando palavras-bandeira:
 ### WARNING se:
 - Nenhuma premissa listada
 - Nenhum risco em seção 9
+- Premissa sem selo de evidência `[evidência: crença|anedota|entrevistas|medido]` (decisão 4.96; escala: sdd-conventions.md) — **só em SPEC `Draft`/`Review`**; `Approved`+ é acervo anterior à régua: silêncio, sem lógica de data
 
 ## Fechamento
 

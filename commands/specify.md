@@ -76,7 +76,7 @@ interromper em último caso).
 4. **RFC 2119**: MUST, SHOULD, MAY em maiúsculas.
 5. **IDs escopados ao SPEC**: `FR-NNN-001`, `NFR-NNN-001`, `AC-NNN-001`, `RISK-NNN-001`, `FEAT-NNN-001`.
 6. **Funcionalidades (FEAT)** — só quando há 2+ fluxos entregáveis: regra completa no comentário do template da §5 (Etapa 3).
-7. **Suposições explícitas**: `[confirmar]` ou `[assumido]`.
+7. **Suposições explícitas**: `[confirmar]` ou `[assumido]` — e cada premissa da §8 carrega o **selo de evidência** `[evidência: crença | anedota | entrevistas | medido]` (escala e regra: convenção comum, sdd-conventions.md — decisão 4.96). O selo declara o que sustenta a aposta; nunca bloqueia.
 8. **Escopo e não-escopo simétricos**.
 9. **Três estados da ação de UI** (decisão 4.67): FR de ação iniciada pelo usuário na
    interface DEVE especificar o comportamento **observável** dos três estados — *em
@@ -141,7 +141,7 @@ dela; AC atravessando FEATs é cenário mal fatiado: divida o AC. Régua:
 ${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md §1. -->
 
 ## 8. Premissas e decisões prévias
-- **A-NNN-001** [assumido] ...
+- **A-NNN-001** [assumido] [evidência: crença] ...
 
 ## 9. Riscos e questões abertas
 - **RISK-NNN-001** ...
@@ -192,6 +192,6 @@ Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira*
    - Warnings relevantes
    - Crítica de produto (`product-analyst`): riscos de mérito e perguntas a decidir antes de `Approved`
    - Veredito do PO (quando há BRIEF): decisão, resoluções pelo brief e escalações com proposta + default
-6. Premissas `[assumido]` que precisam confirmação.
+6. Premissas `[assumido]` que precisam confirmação — destacando selo `crença`/`anedota` em requisito central (4.96).
 7. Estado do INDEX após esta operação.
 8. Próximo comando: `/keelson:plan SPEC-NNN` ou `/keelson:plan SPEC-NNN --slice="..."` se errors == 0.
