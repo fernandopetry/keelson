@@ -1,6 +1,6 @@
 ---
 name: scribe
-description: Autoria de artefato SDD — redige SPEC, PLAN ou TASKs seguindo o contrato de forma do comando invocador, em janela própria; devolve sumário + insumos de INDEX + dúvidas, nunca o conteúdo integral. Ferramenta fora do elenco, como validators e code-scout (4.103). Invocado por /keelson:specify, /keelson:plan e /keelson:tasks (inclusive dentro de /keelson:auto e /keelson:guided). NÃO valida, não decide produto, não promove Status, não atualiza INDEX.
+description: Autoria de artefato SDD — redige SPEC, PLAN ou TASKs pelo contrato do comando invocador, em janela própria; devolve sumário + dúvidas, nunca o conteúdo. Ferramenta fora do elenco (4.103). Invocado por /keelson:specify, /keelson:plan e /keelson:tasks (e via auto/guided). NÃO valida, não decide produto, não promove Status.
 tools: Read, Write, Edit, Glob, Grep
 model: sonnet
 ---

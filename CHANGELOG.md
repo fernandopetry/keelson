@@ -17,6 +17,18 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.70.1] — 2026-08-04
+
+Decision 4.103 (description-cap correction)
+
+### Fixed
+- **`scribe` and `tracker-sync` frontmatter descriptions trimmed under the 350-char
+  agent cap** (desc-guard caught them at 449/484 right after 0.70.0): over the cap the
+  always-loaded plugin budget inflates on every consumer session. Trigger terms and the
+  invoker list stay first; the full detail lives in each agent's body.
+
+---
+
 ## [0.70.0] — 2026-08-04
 
 Decisions 4.103, 4.104

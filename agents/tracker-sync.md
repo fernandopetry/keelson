@@ -1,6 +1,6 @@
 ---
 name: tracker-sync
-description: Executa um gancho do protocolo de sync Jira (criação/vínculo, marcos, closure, reconciliação de fecho, comentário de entrega) lendo o protocolo e absorvendo os payloads do conector MCP na própria janela; devolve o resumo canônico do tracker + eventos de degradação. Ferramenta fora do elenco (4.103). Invocado pelos ganchos de /keelson:specify, /keelson:tasks, /keelson:implement e /keelson:auto — e pelo /keelson:jira-sync. Best-effort sempre (§0): falha aqui nunca bloqueia o ciclo.
+description: Executa um gancho do protocolo de sync Jira (criação, marcos, closure, reconciliação); protocolo e payloads do conector MCP ficam na janela dele; devolve o resumo canônico + eventos de degradação. Ferramenta fora do elenco (4.103). Invocado pelos ganchos de specify, tasks, implement e auto, e pelo /keelson:jira-sync. Best-effort (§0).
 model: sonnet
 ---
 
