@@ -17,6 +17,69 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.71.0] — 2026-08-04
+
+Decisions 4.105–4.111
+
+### Added
+- **`scripts/check-agents.sh` — MCP parity guard for the agent cast (4.105).** Every
+  `mcp__<server>` cited in an agent's body must be granted in that agent's own `tools:`
+  frontmatter (server, wildcard or specific-tool form). An explicit `tools:` list never
+  inherits MCP tools, so a missing grant structurally disables the role in every
+  invocation. Frozen-fixture suite in `scripts/tests/agents-mcp/` (including a case that
+  runs the check on the real cast), wired into pre-commit and CI; `check-release.sh` now
+  runs `bash -n` on every suite runner (`scripts/tests/*/run.sh`).
+- **Consumer proposal inbox (4.111).** `docs/_meta/proposal-inbox.md` tracks every
+  `PROPOSTA_PLUGIN` arriving from consumer ledgers: registered on arrival (before the
+  verdict, origin abstracted per 4.72), closed by the batch that applies or declines it,
+  recurrences pointing at the previous line. Born with this batch's 8 proposals
+  registered and closed. Motivated by two proven recurrences caused by the missing lane —
+  a correct proposal sat unapplied for 12 days, and a structural defect stayed a project
+  workaround until a later session rediscovered it from scratch.
+
+### Changed
+- **`/keelson:tasks`: the edge between same-wave sibling tasks has a named owner
+  (4.106).** Two tasks whose result only completes combined — same shared data consumer,
+  or one creating the entry point the other exposes — declare the edge at decomposition:
+  one task creates and names the symbol/entry point, the closing task carries the item
+  in its own "Escopo > Inclui". Both real episodes (divergent spellings of a shared key;
+  a listing shipped without the click into its sibling's detail screen) were caught
+  outside every gate — only decomposition sees both tasks at once.
+- **`/keelson:tasks`: done-criteria must resist gaming (4.107).** Three fixation tests:
+  literals (service names, credentials, convention symbols) verified against the real
+  source before being written; structural invariants anchored by symbol in a fail-closed
+  guard, never by path patterns (a path-matching grep is satisfied by relocation); scope
+  predicates (tenant/owner) born with a two-parent fixture and a gate-1 mutation
+  criterion instead of being discovered by gate 8 after the code exists. Hierarchical
+  gate-9 scripts must include a step that crosses the container boundary. The command
+  file was distilled back under its 300-line cap (314 → 300, prose-only compression;
+  embedded templates unchanged).
+- **`/keelson:plan`: API surface and schema verified against the real source (4.108).**
+  New mandatory principle 9: walk each new entity's construction invariants and confirm
+  a route satisfies them before they are needed (a missing upload-first endpoint made a
+  MUST unrealizable via API in a real PLAN); column types are read from the real
+  schema/migrations, never assumed from domain convention.
+- **Review closure covers every subject the source requirement names (4.109).** A
+  finding derived from a multi-subject MUST ("for each A, B and C") is closed against
+  the source FR/AC text — not just the subjects the finding happened to cite, which
+  leaves the uncited subject with contract data and no consumer, unflagged.
+- **Missing-proof findings count toward the retry cap (4.110).** "The reviewer already
+  believes the code is right, only the proof is missing" is not an exception category:
+  unproven behavior is unverified behavior, and the party mid-retry has the incentive to
+  classify findings as mechanical. Genuinely mechanical closures go in the escalation
+  proposal (with an apply-and-close default), never as a reason to skip escalating.
+
+### Fixed
+- **The `qa` agent can actually drive the browser it is told to drive (4.105).** The
+  4.49 migration to Playwright MCP updated the `qa` body and the screen-verify skill but
+  not the frontmatter `tools:` list — so every screen gate 9 degraded to a handoff seed
+  regardless of environment, and redispatching was (correctly) blocked twice by the
+  agent-guard. `tools:` now includes `mcp__playwright__*`. Found via a real consumer
+  postmortem — the second occurrence; the first had been recorded as a project
+  workaround and never escalated (see 4.111).
+
+---
+
 ## [0.70.1] — 2026-08-04
 
 Decision 4.103 (description-cap correction)

@@ -406,17 +406,19 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.70.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.71.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the Tech Lead context diet + the slug MAP** (decisions
-4.103/4.104) — SDD authorship and Jira hooks move to tool agents (`scribe`,
-`tracker-sync`) with their own windows, subagent reports become two-layer (YAML signal
-back, narrative in the durable artifact), stop-guards go silent inside a formal cycle,
-and `docs/<slug>/MAP.md` becomes a living, mechanically-checked mirror of the code
-territory shared across an epic's slices (`scripts/map-check.sh`). **Consumer block
-changed** (MAP read trigger) — re-run `/keelson:init` on consumers.
+New in this release: **the consumer feedback loop closes** (decisions 4.105–4.111) —
+the `qa` agent finally holds the Playwright MCP grant its screen gate always assumed
+(plus a mechanical MCP-parity guard over the whole cast), `/keelson:tasks` names the
+edge between sibling tasks and hardens done-criteria against gaming, `/keelson:plan`
+verifies API surface and schema against the real source, review closure covers every
+subject of the source requirement, missing-proof findings count toward the retry cap,
+and consumer proposals get a tracked inbox on the maintainer side
+(`docs/_meta/proposal-inbox.md`). No consumer block change — no `/keelson:init` re-run
+needed; update the plugin to pick up the `qa` fix.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
