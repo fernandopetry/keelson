@@ -36,7 +36,7 @@ O modo resolve por **estado em disco e forma da entrada** — regras determinís
 
 1. Resolver o **slug** pela regra canônica (Etapa 0.2 do `/keelson:specify` — o documento normalmente diz o domínio; na dúvida, pergunte apresentando os slugs existentes). Legado sem `INDEX.md` → migrar primeiro, como sempre.
 2. Ler o `INDEX.md` do slug (capacidades, decisões irreversíveis, riscos ativos — inclusive vereditos de métrica pendentes, 4.99) e a ficha.
-3. Registrar a **origem**: path do documento no repo (sugestão: `{docsRoot}/<slug>/origem/`, só-leitura) ou referência externa (URL/e-mail + data/versão) — a forja nunca exige cópia (4.72).
+3. Registrar a **origem**: path do documento no repo (sugestão: `{docsRoot}/<slug>/origin/`, só-leitura) ou referência externa (URL/e-mail + data/versão) — a forja nunca exige cópia (4.72).
 
 ## Etapa 1: inventário (a forja não classifica documento — inventaria conteúdo)
 

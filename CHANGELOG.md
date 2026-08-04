@@ -17,6 +17,20 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.69.1] — 2026-08-04
+
+Decision 4.102 (folder-name correction)
+
+### Changed
+- **Suggested product-document folder renamed `origem/` → `origin/`.** The sibling
+  folders in the slug tree are all English (`specs/`, `plans/`, `tasks/`, `briefs/`,
+  `handoffs/`, `legacy/`) — the house convention is English folders, Portuguese fields —
+  and the original name broke that pattern. Cosmetic by construction: the folder is a
+  suggestion, nothing mechanical globs it, and no consumer had adopted it yet (renamed
+  minutes after 0.69.0).
+
+---
+
 ## [0.69.0] — 2026-08-04
 
 Decision 4.102

@@ -165,9 +165,10 @@ pré-ciclo). Tudo aqui é aditivo — BRIEFs existentes continuam válidos sem a
   **alocador único** (o arquivo em disco já reserva o número no max+1) e a SPEC pareada
   **herda** o NNN do BRIEF.
 - **Origem**: além de `Diretor` e key do tracker, `**Origem**:` aceita o **documento de
-  produto** — path no repo (sugestão: `<docsRoot>/<slug>/origem/`, irmã de `briefs/`,
-  **só-leitura**: a forja nunca o edita) ou referência externa (URL, e-mail); a forja
-  nunca exige cópia (4.72 — o literal fica com o dono).
+  produto** — path no repo (sugestão: `<docsRoot>/<slug>/origin/`, irmã de `briefs/`,
+  **em inglês como as pastas irmãs da árvore**; **só-leitura**: a forja nunca o edita)
+  ou referência externa (URL, e-mail); a forja nunca exige cópia (4.72 — o literal fica
+  com o dono).
 - **Seções aditivas do BRIEF forjado** (opcionais; nenhum validator as exige — check
   futuro nasceria WARNING `[legacy]`):
 

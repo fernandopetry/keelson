@@ -105,7 +105,7 @@ Ele classifica a demanda e diz qual comando usar — **não executa nada sem con
 ## Recebeu um documento da área de produto?
 
 ```
-/keelson:brief docs/<slug>/origem/PRD-exemplo.md
+/keelson:brief docs/<slug>/origin/PRD-exemplo.md
 ```
 
 A **forja do BRIEF** é o estágio profundo antes do ciclo: inventaria o documento contra
