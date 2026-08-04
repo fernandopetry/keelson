@@ -268,6 +268,15 @@ ela converge ou escala.
   régua que o `/keelson:implement` sempre teve ("1 retry, depois escala humano"),
   valendo agora em qualquer invocação. Achado de **segurança** persistente escala como
   **bloqueio** — o Diretor decide o rumo; nunca se contorna nem se commita por cima.
+  Achado de **ausência de prova** sobre código que o revisor já julga correto (falta o
+  teste que mate o mutante, falta cobertura falsificável) **conta para o teto como
+  qualquer achado** — não é categoria de exceção (decisão 4.110): o Charter trata
+  comportamento sem prova externa e falsificável como **não verificado**, e quem está no
+  meio dos retries tem exatamente o incentivo de classificar o restante como "mecânico"
+  para não escalar — o conflito que "gerador ≠ avaliador" existe para eliminar, aplicado
+  à própria decisão de escalar, que a régua tira das mãos de quem rodou os retries. Caso
+  genuinamente mecânico vai **na proposta** da escalação (estado + ação nomeada + default
+  "aplicar e fechar"), nunca como justificativa para pulá-la.
 - **Achado só-texto não reabre o ciclo.** Correção cujo delta é **inerte** (comentário,
   docblock, doc — teste mecânico em `./TESTING.md`, "Diff inerte") re-verifica com o
   **mesmo revisor**, sobre o delta, e nada mais: os gates de comportamento (1/2/9)
@@ -304,3 +313,11 @@ A **Solução nomeia a condição, nunca só uma instância dela** — mesma ré
 lista dos códigos conhecidos hoje. Enumeração fechada só acompanhada do teste que prova
 completude. Instância cumprida à risca que diverge da condição nasce como correção
 incompleta — e nada acusa (decisão 4.93).
+
+E quando o achado deriva de um requisito **MUST multi-sujeito** (ex.: "para cada A, B
+e C"), o **fechamento** re-lê o texto do FR/AC de **origem** e confirma cobertura de
+**todos** os sujeitos nomeados — não só os que o Problema citou (decisão 4.109). Achado
+que cita 2 de 3 e retry que fecha exatamente os 2 citados deixa o terceiro com dado no
+contrato e **sem consumidor**, sem que nada acuse; a régua acima não alcança este caso —
+o achado não era enumeração fechada de instâncias, era citação parcial e honesta de um
+requisito — e a re-leitura da origem é o complemento.

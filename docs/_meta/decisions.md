@@ -1414,6 +1414,30 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `commands/tasks.md` (seções "Mapeamento de cada AC" e "Roteiro do gate 9 — fixado antes do código"). Origem: 3 lições do ledger de um consumidor real, mesma sessão — fechadas na fila da 4.111.
 
+### 4.108 — Superfície de API e schema do PLAN verificados contra a fonte real
+
+**Problema**: PLAN real listou as rotas por dedução (CRUD-por-entidade a partir dos FRs) e faltou a rota de **upload prévio** que a invariante de construção de uma entidade exigia (campo obrigatório referenciando um anexo que precisa existir antes) — criar o recurso naquele formato pela API era literalmente **impossível**, o FR MUST correspondente nasceu irrealizável, e ninguém notou até o código bater na realidade, waves depois. O mesmo PLAN citava tipos de coluna pela convenção do domínio, divergentes do schema real. Nenhum dos dois é erro de digitação: são **deduções razoáveis nunca conferidas** — e o `plan-validator` é estrutural (seções presentes, cobertura declarada), não factual; o PLAN internamente coerente passa.
+
+**Decisão**: princípio obrigatório novo na Etapa 4 do `/keelson:plan`: ao listar endpoints na interface pública de um `COMP`, **percorrer as invariantes de construção** de cada entidade nova e confirmar que existe rota que as satisfaz **antes** de precisar delas; todo tipo de coluna citado no modelo de dados é **lido do schema/migration real**, nunca presumido. Dono é o gerador — o único ponto que enxerga FRs + entidades + schema antes do código; o validator continua estrutural.
+
+**Aplicação**: `commands/plan.md` (Etapa 4, item 9). Origem: ledger de consumidor real — fechada na fila da 4.111.
+
+### 4.109 — Fechamento de achado cobre todos os sujeitos do requisito de origem
+
+**Problema**: achado de code review citou 2 dos 3 sujeitos que um FR MUST multi-sujeito nomeia ("para cada A, B e C"); o retry — corretamente delta-scoped pela 4.88/4.94 — fechou **exatamente os 2 citados**. O terceiro sujeito ficou com o dado resolvido no contrato (backend fez o JOIN, tipou, expôs) e **nenhum consumidor de tela** — dado novo sem leitor, sem que nada acusasse. A doutrina da 4.93 ("a Solução nomeia a condição, nunca só uma instância") não alcança o caso: o achado original não era enumeração fechada de instâncias técnicas — era **citação parcial e honesta** de um requisito, e nada instruía o fechamento a re-conferir contra o texto de origem, só contra o texto do próprio achado.
+
+**Decisão**: no fechamento de achado derivado de requisito multi-sujeito, **re-ler o FR/AC de origem** e confirmar cobertura de **todos** os sujeitos nomeados — não só os que o Problema citou. Parágrafo adjacente à régua da 4.93, sem sobreposição (causas-raiz distintas: enumeração de instâncias × citação parcial de requisito).
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (Formato de saída, bloco Rejeitado). Origem: ledger de consumidor real — fechada na fila da 4.111.
+
+### 4.110 — Ausência de prova conta para o teto de retry
+
+**Problema**: na 2ª reprovação de um gate, a régua da 4.88 manda escalar ao Diretor — e num ciclo real o condutor abriu a 3ª rodada por conta própria, justificando que os achados restantes eram "só ausência de prova sobre código que o próprio revisor já julga correto" (falta o teste que mate o mutante), categoria que classificou como mecânica e de menor risco. O julgamento posterior (aceito pelo condutor): **contorno indevido, não lacuna da régua** — o Charter trata prova de pronto como externa e falsificável, logo "falta o teste que prove" **é** comportamento não verificado; e quem classificou os achados como mecânicos era exatamente quem tinha o incentivo de continuar (não travar as waves seguintes) — o conflito que "gerador ≠ avaliador" existe para eliminar, aplicado à própria decisão de escalar. Registrar a decisão no ledger foi o comportamento certo dado o contorno; não torna o contorno certo.
+
+**Decisão**: sentença no bullet do teto: achado de **ausência de prova conta para o teto como qualquer achado** — não é categoria de exceção; a classificação "genuinamente mecânico" vai **na proposta da escalação** (estado + ação nomeada + default "aplicar e fechar"), nunca como justificativa para pular a escalação. A régua tira essa decisão das mãos de quem rodou os retries — por desenho.
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (Convergência do re-gate, bullet "Teto: 1 retry por gate, depois escala"). Origem: ledger de consumidor real (julgamento do próprio condutor, ratificado pelo Diretor ao aplicar esta leva) — fechada na fila da 4.111.
+
 ---
 
 ## 5. Quality gates inegociáveis
