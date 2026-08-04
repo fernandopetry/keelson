@@ -299,7 +299,7 @@ Aplicar a **receita de atualização do INDEX** (`${CLAUDE_PLUGIN_ROOT}/docs/_me
 
 ## Etapa 7: sincronização com Jira (opcional)
 
-Só quando a ficha tem `jira.enabled: true`: aplicar o **protocolo de sync Jira** (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`) — ler §0-§5 + §6.2 (receita de descrição para humanos) + §7 + §8 + §10, mais `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md` quando a projeção de 3 níveis está ativa (SPEC declara FEATs ∧ `issueType.feature` preenchido). Não leia o protocolo inteiro: localize os §§ com `grep -nE "^#+ §"` e leia apenas os listados + os que eles referenciarem internamente. Criar uma **sub-task** por TASK e gravar a key no campo `Jira:` da closure de cada TASK (best-effort — §0). Degradou (conector fora, caiu no meio, escrita falhou)? → evento `tracker` no ledger de sessão e **seção de reconexão da §14** no fecho deste comando; num `/keelson:auto`, o evento desagua no item 7.4 da Entrega.
+Só quando a ficha tem `jira.enabled: true`: **despache o agent `tracker-sync`** (decisão 4.103) com o gancho **`tasks`**: caminhos do protocolo (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`; §§ do gancho: §6.2, §7, §8, §10; mais `jira-sync-feat.md` quando a projeção de 3 níveis está ativa), da ficha, da SPEC e das TASKs geradas. Ele cria uma **sub-task por TASK**, grava a key no campo `Jira:` da closure de cada uma e devolve o resumo canônico. Best-effort (§0): `eventos_tracker` no retorno → evento `tracker` no ledger + **seção de reconexão da §14** no fecho deste comando; num `/keelson:auto`, desagua no item 7.4 da Entrega. Agent indisponível → aplicar o protocolo inline (mesmos §§) é o fallback, declarado no output.
 
 ## Output final ao usuário
 

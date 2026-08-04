@@ -18,6 +18,10 @@ disponível depois.
 3º nível: `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-feat.md`). Este comando só o orquestra sobre um
 slug inteiro — a reconciliação usa quase todos os §§: leia o protocolo **inteiro**.
 
+**Invocado no meio de outra sessão de trabalho** (não como sessão dedicada): despache a
+execução das Etapas 0–2 ao agent `tracker-sync` (gancho `reconciliacao` — decisão 4.103)
+e reporte pelo resumo canônico dele; sessão dedicada a sync pode seguir inline.
+
 ## Input
 
 ```
