@@ -17,6 +17,24 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.75.1] — 2026-08-05
+
+Decision 4.122 — same-day amendment of 4.121.
+
+### Changed
+- **The mutation gate now fires in the default flow (4.122).** 4.121 hung mutation
+  testing only on `/keelson:integrate` — but the default flow (`/keelson:auto`)
+  delivers with a push and no PR, so a consumer who never runs integrate had the gate
+  installed and never fired. The auto close now runs `quality.mutation` too (delivery
+  pre-check, before PO acceptance; same rules — exit-code verdict, declared absence,
+  inert diff waives). A green run is recorded in the slug's INDEX with the SHA it ran
+  on, and integrate skips the repeat with a declared waiver only when the diff from
+  that SHA to HEAD is inert (the same mechanical anchor as the inert-diff rule) — a
+  mark without a SHA, or any code change since, means it runs again: verified, not
+  deduced (4.58).
+
+---
+
 ## [0.75.0] — 2026-08-05
 
 Decision 4.121

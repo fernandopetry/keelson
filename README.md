@@ -406,13 +406,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.75.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.75.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
 New in this release: **the test suite itself goes under proof** (decision 4.121) —
 mutation testing joins the gauntlet as an opt-in `quality.mutation` command in the
-project sheet, run by `/keelson:integrate` right after the full suite goes green. It is
+project sheet, run at delivery — by the `/keelson:auto` close and by
+`/keelson:integrate` — right after the full suite goes green; a green run recorded at
+a SHA is reused, with a declared waiver, while the code hasn't changed (4.122). It is
 the mechanical version of the "assertions that prove" rule: mutate production code and
 prove the suite fails. Exit code is the verdict (scope and threshold live in the
 consumer's own command), absence is declared rather than silent, and no doctrine-level
