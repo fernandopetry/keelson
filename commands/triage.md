@@ -94,7 +94,7 @@ Classifique numa das categorias abaixo e componha você mesmo a mensagem de rote
 | Categoria | Critérios | Roteamento proposto |
 |---|---|---|
 | **1. Nova SPEC** | Muda FRs, ACs ou escopo; capacidade nova que não cabe em SPEC existente | `/keelson:specify` no slug do domínio, com sugestão de descrição inicial |
-| **2. Novo PLAN da mesma SPEC** | Contrato não muda; estratégia técnica nova | `/keelson:plan SPEC-NNN --slice='...'`, inferindo os FRs a cobrir |
+| **2. Novo PLAN da mesma SPEC** | Contrato não muda; estratégia técnica nova | `/keelson:plan <caminho da SPEC> --slice='...'` (caminho, não ID nu — 4.124), inferindo os FRs a cobrir |
 | **3. TASK de bugfix** | Implementação viola um AC; SPEC e PLAN estão certos. **Sem PLAN aplicável** (bug em área sem artefato SDD) → destino vira **brief avulso** | Com PLAN: TASK `TASK-MMM-XXX-fix-<descrição>.md` pré-preenchida apontando ao PLAN original, citando o AC violado. Sem PLAN: `briefs/BRIEF-MMM-<descrição>-avulso.md` (contrato no `index-contract.md`, decisão 4.86; MMM do alocador único), TASKs só se o trabalho reparte |
 | **4. TASK de refactor** | Comportamento observável não muda; objetivo é melhorar código. **Sem PLAN aplicável** → **brief avulso**, como na 3 | Com PLAN: TASK `TASK-MMM-XXX-refactor-<descrição>.md` pré-preenchida; alertar: testes verdes antes, verdes depois. Sem PLAN: brief avulso (idem 3) |
 | **5. Trivial** | Texto, copy, cor, espaçamento; sem impacto em contrato | Direto no código, commit no padrão do projeto, sem SDD (se crescer, nova triagem) |

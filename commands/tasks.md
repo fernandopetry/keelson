@@ -297,4 +297,4 @@ Só quando a ficha tem `jira.enabled: true`: **despache o agent `tracker-sync`**
 2. Caminhos: TASK-MMM-INDEX.md e INDEX.md do slug atualizado.
 3. Resultado da validação (errors, warnings) e gaps detectados (FRs sem TASK, ACs sem verificação).
 4. Tasks da Wave 1 (por onde começar); cobertura por funcionalidade (FEAT → TASKs), se a SPEC declara FEATs.
-5. Próximo comando: `/keelson:implement PLAN-MMM` ou `--dry-run` primeiro.
+5. Próximo comando, com o **caminho** do PLAN (4.124): `/keelson:implement {docsRoot}/<slug>/plans/PLAN-MMM-<nome>.md` ou `--dry-run` primeiro.

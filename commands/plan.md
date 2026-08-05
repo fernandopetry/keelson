@@ -218,4 +218,4 @@ Aplicar a **receita de atualização do INDEX** (`${CLAUDE_PLUGIN_ROOT}/docs/_me
 5. Resultado da validação: errors, warnings.
 6. Alertas: overlap, gap, conflito de guideline.
 7. Estado do INDEX.
-8. Próximo comando: `/keelson:tasks PLAN-MMM`.
+8. Próximo comando, com o **caminho** do PLAN criado (4.124): `/keelson:tasks {docsRoot}/<slug>/plans/PLAN-MMM-<nome>.md`.

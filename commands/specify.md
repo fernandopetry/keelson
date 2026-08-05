@@ -230,4 +230,4 @@ Só quando a ficha tem `jira.enabled: true`: **despache o agent `tracker-sync`**
 6. Premissas `[assumido]` que precisam confirmação — destacando selo `crença`/`anedota` em requisito central (4.96).
 6.5. Vereditos de métrica pendentes no slug (4.99), com os vencidos destacados — no ciclo, a Entrega do `/keelson:auto` cobra (item 6.4); no specify avulso, repasse ao Diretor.
 7. Estado do INDEX após esta operação.
-8. Próximo comando: `/keelson:plan SPEC-NNN` ou `/keelson:plan SPEC-NNN --slice="..."` se errors == 0.
+8. Próximo comando, com o **caminho** da SPEC criada (4.124 — o ID se repete entre slugs): `/keelson:plan {docsRoot}/<slug>/specs/SPEC-NNN-<nome>.md` (com `--slice="..."` se aplicável) se errors == 0.

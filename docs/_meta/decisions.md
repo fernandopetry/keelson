@@ -1542,6 +1542,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `commands/mutation-setup.md` (novo) · tabela *Commands* do `README.md` · §3.20 do method-guide · nota humano-only do `templates/CLAUDE.keelson-block.md` (**re-rodar init nos consumidores**) · `commands/init.md` (ponteiro na detecção) · wiki `Ficha-do-projeto.md` (ponteiro). Observar na 1ª execução real: a rodada-amostra flagra config quebrada antes de gravar?; o gate informativo gera a calibração de threshold ou vira permanente?
 
+### 4.124 — Artefato SDD citado fora do slug viaja com o caminho, nunca só o ID
+
+**Problema**: relato de campo do Diretor — o relatório de fecho de uma sessão de consumidor entregou como comando de retomada `/keelson:implement PLAN-002`, ID nu. A numeração de artefato é **por slug**, e naquele repositório o mesmo `PLAN-002` existia em **9 slugs**: o comando, copiado para uma sessão limpa, não apontava para nada — só era inequívoco na sessão original porque um `--slug=` vinha antes, e num copy-paste as duas partes raramente viajam juntas. Os comandos aceitam caminho por contrato desde sempre; o que faltava era doutrina mandando o texto que **sai do slug** usá-lo — e os próprios templates de "próximo comando" dos comandos ensinavam o hábito errado (`/keelson:tasks PLAN-MMM`).
+
+**Decisão**: o ID nu só identifica algo **dentro** do próprio slug. Texto que sai do slug — próximo comando, comando de retomada, report, boletim, escalação, tudo que o Diretor pode copiar para uma sessão limpa — cita o **caminho relativo do arquivo real**, nunca o ID nu. No sentido inverso (entrada), ID nu que casar arquivo em mais de um slug **para e lista os candidatos com caminho**, nunca escolhe por conta. Dentro de artefatos do próprio slug, o ID curto continua canônico — a regra não infla artefato interno com caminhos.
+
+**Aplicação**: regra com dono em `docs/_meta/conventions/sdd-conventions.md` · templates de próximo-comando corrigidos em `commands/specify.md`, `plan.md`, `tasks.md`, `implement.md` (Etapa 4.2 + desambiguação na resolução 0.3) e `triage.md` (tabela de roteamento) · FAQ da wiki (por que o relatório cita o caminho). Sem re-init — nada muda no bloco do consumidor. Observar na próxima rodada real: o comando de retomada do report nasce com caminho?
+
 ---
 
 ## 5. Quality gates inegociáveis

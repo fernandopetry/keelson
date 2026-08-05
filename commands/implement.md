@@ -40,7 +40,7 @@ Você é o **Tech Lead** do time keelson (decisão 4.37), orquestrando implement
 
 ### 0.3 Identificar e ler artefatos SDD
 
-Buscar PLAN-MMM em `{docsRoot}/*/plans/` e ler o conjunto completo: PLAN, SPEC referenciada, TASK-MMM-INDEX.md e cada TASK-MMM-XXX.md.
+Buscar PLAN-MMM em `{docsRoot}/*/plans/` e ler o conjunto completo: PLAN, SPEC referenciada, TASK-MMM-INDEX.md e cada TASK-MMM-XXX.md. ID nu que casar arquivo em mais de um slug → parar e listar os candidatos com caminho (4.124), nunca escolher por conta.
 
 ### 0.4 Ler INDEX.md do slug
 
@@ -245,7 +245,7 @@ Se todas condições verdadeiras (tasks Done com closure, DoD satisfeita, aderê
 
 > "Todas as condições para Status do PLAN = Done estão satisfeitas. A promoção a Done é decisão sua, na entrega: atualize o front-matter do PLAN-MMM-*.md para `Status: Done` ao concluir o merge."
 
-E sugira `/keelson:integrate PLAN-MMM` para preparar a entrega (não execute; merge e deploy permanecem humanos).
+E sugira `/keelson:integrate {docsRoot}/<slug>/plans/PLAN-MMM-<nome>.md` — com o **caminho**, não o ID nu (4.124) — para preparar a entrega (não execute; merge e deploy permanecem humanos).
 
 ## Etapa 5: output final ao usuário
 
