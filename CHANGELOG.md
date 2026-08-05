@@ -17,6 +17,27 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.73.1] — 2026-08-04
+
+Decisions 4.117–4.118 — field corollaries of the forge batch, both observed live in the
+same measured session.
+
+### Fixed
+- **Correction rewrites preserve every edge the fix does not target (4.117).** The first
+  real consolidated correction package (16 adjustments) rewrote a TASK in full — as
+  4.112 mandates — and dropped the coverage of an AC no adjustment touched; the delta
+  revalidation caught it, but prevention is cheaper than the extra lap. The scribe now
+  checks, before writing, that the original file's edge fields and criterion-cited ACs
+  survive the rewrite.
+- **Waiting on a subagent is never polling (4.118).** Third sleep-loop occurrence in one
+  session (two graph polls during TASK correction, then a 2.1-min poll on a wave
+  developer's commit during implementation). General rule in the shared conventions:
+  subagent results arrive by awaited return or by harness notification — the main
+  session never probes filesystem/graph/commits in a loop; `graph-contract.md` §4.1
+  becomes a declared instance of the rule.
+
+---
+
 ## [0.73.0] — 2026-08-04
 
 Decision 4.116

@@ -406,11 +406,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.73.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.73.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the forge gets fast** (decisions 4.112–4.116) — telemetry from a
+New in this release: **the forge gets fast** (decisions 4.112–4.118) — telemetry from a
 real 3-hour brief→tasks session exposed the wall-clock sinks: the `scribe` now writes
 whole documents in a single pass (a real SPEC took 69 incremental edits where one write
 sufficed), form/merit/tracker checks run in parallel after authoring instead of in
