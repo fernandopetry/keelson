@@ -106,7 +106,10 @@ Responde: *como se prova comportamento nesta linguagem?*
 - runner canônico + comando exato (alimenta `keelson.config.json → quality.test`);
 - convenção de nome e organização (ex.: arranjo-ação-asserção);
 - como cobrir comportamento (não implementação); o que mockar e o que não;
-- onde ficam fixtures/dados de teste compartilhados (evitar duplicação — Art. 3).
+- onde ficam fixtures/dados de teste compartilhados (evitar duplicação — Art. 3);
+- `[opcional]` a ferramenta canônica de **mutation testing** da linguagem e o comando
+  típico com escopo de diff (alimenta `keelson.config.json → quality.mutation`,
+  opt-in — decisão 4.121; a régua de quando roda é de `core/TESTING.md`).
 
 ## 8. Dependências `[obrigatória]`  → Charter Art. 2, 8
 

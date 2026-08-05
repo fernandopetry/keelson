@@ -1518,6 +1518,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `agents/developer.md` (§7 Commit, frase na regra de staging). Origem: análise de sessão do mantenedor — comportamento observado em 3 commits reais da mesma sessão.
 
+### 4.121 — Mutation testing prova a suíte no integrate (opt-in)
+
+**Problema**: a única defesa contra teste tautológico é a régua "Asserções que provam" de `guidelines/core/TESTING.md`, aplicada por **revisão** no gate 1 — um avaliador lendo o teste. Nada prova **mecanicamente** que a suíte falharia se o comportamento regredisse: uma suíte verde de asserções fracas atravessa todos os gates. É o único ponto do ciclo em que a régua "gerador ≠ avaliador" do Charter depende de leitura, não de execução. (Insumo externo — postagem pública sobre cercar agents de restrições executáveis — confrontado com o inventário dos gates: unit/gherkin/QA/métricas já existem; mutation testing era o furo com melhor encaixe na doutrina.)
+
+**Decisão**: mutation testing entra como **prova mecânica da suíte**, opt-in e no ponto mais barato do ciclo. Campo `quality.mutation` na ficha (default `null`), valor = **comando literal** do consumidor — escopo (ex.: diff-only) e threshold (ex.: score mínimo) são calibração dele, dentro do próprio comando; o motor fica agnóstico: **exit code é o veredito**, como em `quality.test`. Roda **só no `/keelson:integrate`**, após a suíte verde — nunca por TASK/wave (custo; o gate 2 já é a rede fina). Falhou → para e não abre PR, mesma regra do teste vermelho. Campo `null` → linha declarada no output e no PR (`Mutação: não configurada (opt-in)`), nunca silêncio; diff inerte dispensa junto com a suíte. **Score nunca vira meta de doutrina** (anti-Goodhart): o keelson reporta resultado e mutantes sobreviventes como sinal; a régua de qualidade de asserção continua no gate 1.
+
+**Aplicação**: `guidelines/core/TESTING.md` (dono da régua, seção "Mutação: a suíte também está sob prova") · `commands/integrate.md` (Etapa 2 + output + descrição do PR) · `commands/init.md` (detecção à la 4.80 + self-check) · `guidelines/_meta/PROFILE-OUTLINE.md` §7 (nomear a ferramenta canônica) · `templates/keelson.config.example.json` · wiki `Ficha-do-projeto.md`. Perfis existentes **não** são tocados (php.md é `reviewed: true`); a ferramenta chega pela detecção do init. Observar na 1ª rodada real com o campo ativo: custo de parede no integrate, acionabilidade do report de sobreviventes, e se aparece tautologia que escapou do gate 1 — esse dado decide se diff-coverage entra numa leva futura.
+
 ---
 
 ## 5. Quality gates inegociáveis

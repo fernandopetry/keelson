@@ -75,6 +75,32 @@ bloqueante no gate 1 — `./CODE-REVIEW.md`):
 
 ---
 
+## Mutação: a suíte também está sob prova (decisão 4.121)
+
+As regras acima são verificadas por **revisão** (gate 1 — um avaliador lendo o teste).
+Mutation testing é a versão **mecânica** da mesma régua: muta o código de produção e
+prova que a suíte **falha** — "gerador ≠ avaliador" do Charter aplicado à própria suíte.
+Um mutante sobrevivente é um comportamento que pode regredir sem que teste algum acuse.
+
+- **Opt-in pela ficha**: campo `quality.mutation` (default `null`). O valor é o
+  **comando literal** do projeto; escopo (ex.: restringir ao diff) e threshold (ex.:
+  score mínimo) são calibração do consumidor, **dentro do próprio comando** — o motor não
+  interpreta score: **exit code é o veredito**, como em `quality.test`.
+- **Roda na entrega** (`/keelson:integrate`), após a suíte verde — nunca por TASK ou
+  wave: mutation é caro, e a rede fina já é o gate 2. Falhou → a entrega para, mesma
+  regra do teste vermelho. Diff inerte dispensa junto com a suíte.
+- **Ausência é declarada, nunca silêncio**: campo `null` → o report registra
+  `mutação: não configurada (opt-in)` — mesma régua de declaração desta doutrina.
+- **Score não é meta**: número de doutrina algum define "cobertura de mutação boa" —
+  meta numérica ensina a matar mutante sem provar comportamento (o Goodhart desta
+  camada). O report de sobreviventes é **sinal** para o revisor; a régua de qualidade
+  de asserção continua sendo a da seção anterior, no gate 1.
+
+A ferramenta canônica de cada linguagem é assunto do perfil (`PROFILE-OUTLINE.md` §7);
+o `/keelson:init` detecta as comuns e oferece o campo.
+
+---
+
 ## Fixtures e dados compartilhados (Art. 3)
 
 Schema de teste e construtores de dados são **centralizados**, não declarados inline em
