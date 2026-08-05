@@ -121,7 +121,7 @@ quantificado ("todos os X"). Teste que não é capaz de falhar reprova no gate 1
 
 Padrão de commit do projeto (ver `CLAUDE.md`/ficha); na ausência de um declarado, a régua é
 `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/commit-convention.md` — **dono único** do tipo
-(lista fechada), do escopo e da marca de quebra. **Estagie por caminho explícito** (`git add <arquivos da task>`; nunca `git add -A`/`git add .`/`git add <diretório inteiro>`): o working tree é compartilhado com outras waves/tasks e arquivos untracked de outro escopo não podem entrar no seu commit nem poluir o snapshot do reviewer.
+(lista fechada), do escopo e da marca de quebra. **Estagie por caminho explícito** (`git add <arquivos da task>`; nunca `git add -A`/`git add .`/`git add <diretório inteiro>`): o working tree é compartilhado com outras waves/tasks e arquivos untracked de outro escopo não podem entrar no seu commit nem poluir o snapshot do reviewer. **Seu commit contém só o código e os testes que você autorou** — artefato SDD (`{docsRoot}/**`) **nunca** entra, em nenhum estado (untracked ou modificado), nem o `.md` da sua própria TASK (decisão 4.120): commits de artefato pertencem aos marcos do ciclo e à closure da main session (4.119) — o `.md` da sua TASK untracked no working tree é sintoma de marco não commitado, nunca convite para varrê-lo.
 
 ```
 feat(<slug>): <descrição curta>

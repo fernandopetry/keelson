@@ -1510,6 +1510,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `docs/_meta/conventions/sdd-conventions.md` (bullet novo, dono) · `commands/auto.md` (Etapa 0.5 item 7; Entrega item 1) · `commands/implement.md` (closure item 6 incondicional; item 5 ajustado) · `commands/guided.md` (nota de marco pós-checkpoint). Origem: análise de sessão do mantenedor, padrão confirmado em 2 sessões. Observar na próxima rodada real: papelada da forja no git antes da primeira wave, e o SHA de cada closure contendo a própria closure.
 
+### 4.120 — Artefato SDD nunca entra em commit de developer
+
+**Problema**: na mesma sessão-fonte da 4.119, os developers das primeiras waves **varreram o `.md` da própria TASK** (untracked, porque a forja nunca commitou) para dentro dos commits de código — 3 commits `feat` reais carregando cada um a sua TASK inteira. A leitura deles da regra vigente é defensável: o contrato manda estagiar por caminho explícito e proíbe untracked "**de outro escopo**" — e o doc da própria TASK não é outro escopo. O salvamento improvisado, porém, é pior que o sintoma: entra a **versão pré-closure** do artefato (campos vazios, que a closure suja de novo — o SHA da closure segue sem conter a closure), mistura autoria (o doc é do scribe/main session) na composição de diff que o PO aceita, e salva 3 de 20 arquivos deixando o resto exposto.
+
+**Decisão**: fronteira explícita no contrato do developer — o commit dele contém **só o código e os testes que ele autorou**; `{docsRoot}/**` nunca entra, em nenhum estado (untracked ou modificado), nem o `.md` da própria TASK. Commits de artefato pertencem aos marcos do ciclo e à closure da main session (4.119). O `.md` da TASK untracked no working tree é **sintoma de marco não commitado** — se reporta, não se varre. Fecha a fresta pelos dois lados: a 4.119 garante que docs são commitados no lugar certo; esta, que não são commitados no lugar errado.
+
+**Aplicação**: `agents/developer.md` (§7 Commit, frase na regra de staging). Origem: análise de sessão do mantenedor — comportamento observado em 3 commits reais da mesma sessão.
+
 ---
 
 ## 5. Quality gates inegociáveis
