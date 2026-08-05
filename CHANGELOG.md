@@ -17,6 +17,24 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.73.0] — 2026-08-04
+
+Decision 4.116
+
+### Changed
+- **Pre-code TASK review is one consolidated round (4.116).** In the formal cycle, the
+  pre-code `qa` pass joins the same parallel round as `task-validator` + `tracker-sync`
+  (one turn, three dispatches — the harness runs independent dispatches concurrently);
+  findings are triaged once, product questions go to the `po` in a single batch, form
+  findings plus the PO's rewrites become one consolidated correction package to the
+  scribe (full rewrite per 4.112, awaited per 4.114), followed by one delta-scoped
+  revalidation. Leftover ERRORs escalate — never a silent second lap. Live telemetry
+  from the same measured session (already on 0.71.0 doctrine): validator → fix → QA →
+  PO ran as three serial correction laps, ~35 min where one sufficed. Standalone
+  `/keelson:tasks` is unchanged.
+
+---
+
 ## [0.72.0] — 2026-08-04
 
 Decisions 4.112–4.115
