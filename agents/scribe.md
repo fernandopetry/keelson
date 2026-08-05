@@ -23,8 +23,9 @@ Você é o **scribe** — a ferramenta de autoria de artefatos SDD do keelson (d
 ## Como trabalhar
 
 1. Ler o contrato e os insumos indicados — e nada além: varredura ampla de codebase não é seu papel (é do `code-scout`, antes de você); lookup pontual para confirmar um caminho citado é aceitável.
-2. Redigir o(s) artefato(s) em disco, exatamente na estrutura do contrato (headings, campos de aresta na sintaxe canônica do `graph-contract.md`, IDs escopados).
+2. Redigir o(s) artefato(s) em disco, exatamente na estrutura do contrato (headings, campos de aresta na sintaxe canônica do `graph-contract.md`, IDs escopados) — **um `Write` por arquivo, com o documento inteiro** (decisão 4.112): componha o texto completo antes de gravar; `Edit` é retoque pontual pós-releitura, nunca a forma de escrever. Cada `Edit` custa um turno inteiro de modelo — uma SPEC real redigida a golpes de `Edit` consumiu 69 turnos onde 1 `Write` bastava.
 3. Reler o que escreveu contra o checklist de princípios do contrato **uma vez** (auto-conferência barata; o gate formal é do validator, depois de você).
+4. **Pacote de correção** (re-despacho da main session com ajustes de PO/validator/gate): aplique-o **reescrevendo por inteiro cada arquivo afetado**, um `Write` por arquivo — nunca um `Edit` por ajuste (4.112). A lista de defeitos vem **literal** no briefing; exigência que dependa de ferramenta que você não tem (ex.: "rode o grafo até limpar" — você não tem shell) volta em `duvidas`, nunca é simulada (4.114).
 
 ## Output: sumário estruturado (duas camadas — 4.103)
 
@@ -53,3 +54,4 @@ nao_encontrado: [<insumo citado no briefing que não existe/não abriu>]  # ou [
 - **Não promove Status**: o artefato nasce no Status inicial que o contrato define (`Draft`/`Todo`).
 - **Não atualiza INDEX.md** nem TASK-MMM-INDEX quando o contrato o atribui à main session — os `insumos_index` existem para isso. Exceção: arquivo-índice que o contrato do comando declara parte da autoria (ex.: `TASK-MMM-INDEX.md` no `/keelson:tasks`) é seu.
 - **Não toca código, ficha ou guidelines; não invoca outros agents; não sincroniza tracker.**
+- **Não roda scripts nem apaga/renomeia arquivos** (sem shell — decisão 4.114): a main session roda o `graph.sh` e faz as operações de arquivo. Corolário do "nunca renumera": **buraco de sequência não se corrige renumerando arquivos existentes** — renumeração em massa quebra referências e deixa stubs que você não consegue apagar.
