@@ -17,6 +17,28 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.74.0] — 2026-08-04
+
+Decision 4.119
+
+### Changed
+- **SDD artifacts are committed at the milestone that closes them (4.119).** A real
+  cycle reached implementation with the entire forge output outside git — BRIEF, SPEC,
+  PLAN, 20 TASKs untracked, closures and INDEX dirty — while code commits flowed
+  normally: no forge command committed, the paperwork commit only happened at delivery
+  ("sweep at the end"), and the closure commit was conditional on parallel mode. Now the
+  work branch is born at kickoff (one per demand — same epic never reuses another
+  demand's branch, which was mixing leftovers between deliveries), each cycle stage
+  closes with a `docs(<slug>): …` commit (SPEC with BRIEF, PLAN, TASKs after the
+  consolidated round; in guided, after the checkpoint OK), and the TASK closure commit
+  (`chore(<slug>): close TASK-MMM-XXX`) runs in every orchestration mode — so the SHA
+  cited in a closure finally contains the closure itself. Standalone commands outside
+  the cycle still never commit (the trail belongs to the human). Delivery keeps
+  acceptance and push, but stops being the only save point — maximum loss is one
+  milestone. Owner: `sdd-conventions.md`, "Commit por marco".
+
+---
+
 ## [0.73.1] — 2026-08-04
 
 Decisions 4.117–4.118 — field corollaries of the forge batch, both observed live in the

@@ -406,21 +406,21 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.73.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.74.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the forge gets fast** (decisions 4.112–4.118) — telemetry from a
-real 3-hour brief→tasks session exposed the wall-clock sinks: the `scribe` now writes
-whole documents in a single pass (a real SPEC took 69 incremental edits where one write
-sufficed), form/merit/tracker checks run in parallel after authoring instead of in
-single file, graph-error correction follows an owned protocol (literal error list,
-awaited delta, no renumbering, no filesystem polling), the `spec-validator` warns when
-a SPEC reaches epic size (>30 FRs) while slicing is still cheap, and pre-code TASK
-review becomes one consolidated round — validator, QA and tracker dispatched in a
-single turn, findings triaged once, one correction package, one delta revalidation
-(three serial correction laps cost ~35 min in the field where one sufficed). No
-consumer block change — no `/keelson:init` re-run needed.
+New in this release: **the forge gets fast, and the paperwork gets saved** (decisions
+4.112–4.119) — telemetry from a real 3-hour brief→tasks session exposed the wall-clock
+sinks: the `scribe` now writes whole documents in a single pass, form/merit/tracker
+checks run in parallel after authoring, graph-error correction follows an owned
+protocol (literal error list, awaited delta, no renumbering, no polling), the
+`spec-validator` warns at epic size (>30 FRs), and pre-code TASK review is one
+consolidated round — one turn of reviewers, one correction package, one delta
+revalidation. And SDD artifacts now commit at the milestone that closes them: the work
+branch is born at kickoff (one per demand), so the forge output stops living
+uncommitted for hours and every closure SHA contains its own closure. No consumer
+block change — no `/keelson:init` re-run needed.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
