@@ -177,18 +177,29 @@ Arquitetura, stack, modelagem de dados e plano de tarefas vão para `/keelson:pl
 
 ## Etapa 4: gate de validação
 
-Após gerar a SPEC, invocar a skill `spec-validator` no arquivo.
+Com o scribe encerrado (sumário recebido, sem re-despacho pendente), despache **numa
+mesma rodada, em paralelo** (decisão 4.113): a skill `spec-validator` (forma), o agent
+`product-analyst` (mérito — Etapa 4.1) e, quando `jira.enabled`, o `tracker-sync`
+(Etapa 5.3). Nenhum depende do outro — validator e analyst só leem a SPEC; o sync só
+escreve as linhas de key. A única exclusão: **nunca com o scribe ainda editando** o
+arquivo (pacote de ajustes pendente → primeiro ele termina). Encadeá-los em fila é puro
+custo de relógio: numa sessão real foram 3 × ~6 min seriais onde 1 × ~6 min bastava.
 
-**Se errors == 0**: prosseguir para Etapa 4.1 (crítica de produto) e Etapa 5 (atualização do INDEX).
-**Se errors > 0**: manter Status = Draft, pular a Etapa 4.1 e reportar os errors — mas **executar a Etapa 5 mesmo assim**: a existência da SPEC é fato e o INDEX é derivado dos arquivos (mesma filosofia do `/keelson:plan`); a linha na tabela "SPECs" entra com Status Draft.
+**Se errors == 0**: prosseguir para Etapa 5 (atualização do INDEX).
+**Se errors > 0**: manter Status = Draft e reportar os errors — a crítica do
+`product-analyst` (que rodou em paralelo) é reportada do mesmo jeito (mérito não depende
+de forma), e **executar a Etapa 5 mesmo assim**: a existência da SPEC é fato e o INDEX é
+derivado dos arquivos (mesma filosofia do `/keelson:plan`); a linha na tabela "SPECs"
+entra com Status Draft.
 
 ## Etapa 4.1: crítica de produto (mérito)
 
-Com a forma validada (errors == 0), invocar o agent `product-analyst` na SPEC. Ele **não** checa forma — questiona **mérito**: problema vs solução, qualidade da métrica de sucesso, cenários faltantes, premissas arriscadas, conflito com capacidades/decisões do INDEX.
+Despachado em paralelo com o `spec-validator` (Etapa 4 — decisão 4.113), o agent
+`product-analyst` **não** checa forma — questiona **mérito**: problema vs solução, qualidade da métrica de sucesso, cenários faltantes, premissas arriscadas, conflito com capacidades/decisões do INDEX.
 
 A crítica **não bloqueia** a criação da SPEC nem a atualização do INDEX (a SPEC nasce em `Draft`); o resultado é reportado ao usuário.
 
-**Com BRIEF pareado** (front-matter `Brief:` preenchido — a demanda entrou pelo ciclo com brief): após a crítica, invocar o agent `po` em **modo aprovação** (BRIEF + SPEC + crítica + INDEX). O veredito (`APROVAR | ESCALAR`, com resoluções e decisões em nome do Diretor) entra no output final; quem age sobre ele é o invocador — `/keelson:auto` promove ou aplica a escada; `/keelson:guided` o apresenta como recomendação no CHECKPOINT 1. **Sem BRIEF** (specify avulso): não invocar o `po` — a promoção a `Approved` permanece com o humano.
+**Com BRIEF pareado** (front-matter `Brief:` preenchido — a demanda entrou pelo ciclo com brief): após a crítica **e o veredito de forma** (o PO consome ambos — ele fica fora da rodada paralela), invocar o agent `po` em **modo aprovação** (BRIEF + SPEC + crítica + INDEX). O veredito (`APROVAR | ESCALAR`, com resoluções e decisões em nome do Diretor) entra no output final; quem age sobre ele é o invocador — `/keelson:auto` promove ou aplica a escada; `/keelson:guided` o apresenta como recomendação no CHECKPOINT 1. **Sem BRIEF** (specify avulso): não invocar o `po` — a promoção a `Approved` permanece com o humano.
 
 ## Etapa 5: atualização do INDEX.md
 
@@ -202,7 +213,7 @@ Aplicar a **receita de atualização do INDEX** (index-contract.md). Específico
 
 ### 5.3 Sincronização com Jira (opcional)
 
-Só quando a ficha tem `jira.enabled: true`: **despache o agent `tracker-sync`** (decisão 4.103 — os payloads do conector e o protocolo ficam na janela dele) com o gancho **`specify`**: caminhos do protocolo (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`; §§ do gancho: §6.2, §7.0 — pré-check de hierarquia —, §8, §10; mais `jira-sync-feat.md` quando a SPEC declara FEATs ∧ `issueType.feature` preenchido), da ficha e da SPEC recém-criada. Ele cria/vincula a issue principal (e Stories de FEAT, ou a Story implícita do degrau (0) do §7.0), **grava as keys nas linhas `**Jira**:`/`**Jira Story**:`** da SPEC e devolve o resumo canônico. Best-effort (§0): `eventos_tracker` no retorno → grave-os como evento `tracker` no ledger de sessão e monte a **seção de reconexão da §14** no fecho deste comando; num `/keelson:auto`, o evento desagua no item 7.4 da Entrega. Agent indisponível → aplicar o protocolo inline (mesmos §§) é o fallback, declarado no output.
+Só quando a ficha tem `jira.enabled: true`: **despache o agent `tracker-sync`** (decisão 4.103 — os payloads do conector e o protocolo ficam na janela dele) **na rodada paralela da Etapa 4** (decisão 4.113 — sync é best-effort e nunca ocupa o caminho crítico sozinho) com o gancho **`specify`**: caminhos do protocolo (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`; §§ do gancho: §6.2, §7.0 — pré-check de hierarquia —, §8, §10; mais `jira-sync-feat.md` quando a SPEC declara FEATs ∧ `issueType.feature` preenchido), da ficha e da SPEC recém-criada. Ele cria/vincula a issue principal (e Stories de FEAT, ou a Story implícita do degrau (0) do §7.0), **grava as keys nas linhas `**Jira**:`/`**Jira Story**:`** da SPEC e devolve o resumo canônico. Best-effort (§0): `eventos_tracker` no retorno → grave-os como evento `tracker` no ledger de sessão e monte a **seção de reconexão da §14** no fecho deste comando; num `/keelson:auto`, o evento desagua no item 7.4 da Entrega. Agent indisponível → aplicar o protocolo inline (mesmos §§) é o fallback, declarado no output.
 
 ## Output final ao usuário
 

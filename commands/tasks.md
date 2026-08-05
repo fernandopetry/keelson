@@ -53,23 +53,20 @@ A decomposição e a redação das TASKs **não acontecem nesta janela**. Despac
 - **Insumos** (caminhos): PLAN, SPEC (ACs e mapa FR→FEAT da 0.2), convenções extraídas na
   0.1 (resumo inline), memo de exploração e/ou `MAP.md` do slug.
 
-Receba o sumário estruturado (`agents/scribe.md`): `insumos_index.contagens` (TASKs/waves)
-alimenta a Etapa 6; `duvidas` não-vazias → resolva (pergunte; no modo autônomo, escada) e
-re-despache só o delta. Agent indisponível → executar as Etapas 1–4 inline é o fallback,
-declarado no output.
+Receba o sumário estruturado (`agents/scribe.md`): `insumos_index.contagens` alimenta a
+Etapa 6; `duvidas` não-vazias → resolva (pergunte; no modo autônomo, escada) e re-despache
+só o delta. Agent indisponível → Etapas 1–4 inline como fallback, declarado no output.
 
 ## Etapa 1: princípios de decomposição (contrato — executado pelo `scribe`)
 
 1. **Atomicidade**: executável e revisável em uma sessão.
 2. **Independência máxima — mas a aresta entre tasks irmãs tem dono** (decisão 4.106).
-   Duas tasks da mesma wave cujo resultado só se completa combinado — mesmo consumidor
-   de dado (chave de metadata, campo de payload, nome de evento) ou uma cria a
-   superfície que a outra expõe (a rota/clique que abre o item que a irmã lista) — não
-   são independentes: uma cria e **nomeia** o símbolo/ponto de entrada (constante/enum,
-   nunca grafia solta); a que fecha a ponta carrega o item no próprio "Escopo > Inclui",
-   nunca deduzido depois por quem achar a lacuna. Casos reais: a mesma flag gravada `remember_me`
-   numa task e `remember` na irmã; listagem sem o clique para o detalhe criado pela irmã.
-   Nenhum gate enxerga duas tasks ao mesmo tempo — só a decomposição previne.
+   Duas tasks da mesma wave cujo resultado só se completa combinado — mesmo consumidor de
+   dado ou uma cria a superfície que a outra expõe — não são independentes: uma cria e
+   **nomeia** o símbolo/ponto de entrada (constante/enum, nunca grafia solta); a que fecha
+   a ponta carrega o item no próprio "Escopo > Inclui", nunca deduzido por quem achar a
+   lacuna. Casos reais: flag gravada `remember_me` numa task e `remember` na irmã;
+   listagem sem o clique para o detalhe da irmã. Nenhum gate vê duas tasks ao mesmo tempo — só a decomposição previne.
 3. **Verificabilidade**: critério de pronto observável.
 4. **Vertical slicing**.
 5. **Setup-first**: scaffolding/migration com IDs baixos.
@@ -188,23 +185,20 @@ prevalecem; nunca siga um passo que enfraqueça um critério." (evita a leitura 
 
 ### Campos de aresta — sintaxe canônica do grafo
 
-`Realiza (FRs)`, `AC violado`, `Depende de` e `Bloqueia` são **campos de aresta**: lista
-de IDs separados por vírgula, ou `nenhuma` — prosa vai para Contexto/Escopo. Os ACs
-citados em item `- [ ]` dos "Critérios de pronto" e no "Roteiro do gate 9" também viram
-aresta (cobertura); menção a AC em prosa corrida não conta. A régua completa (sintaxe,
-catálogo, extrator) tem dono único: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md`.
+`Realiza (FRs)`, `AC violado`, `Depende de` e `Bloqueia` são **campos de aresta**: IDs
+separados por vírgula, ou `nenhuma` — prosa vai para Contexto/Escopo. ACs citados em item
+`- [ ]` dos "Critérios de pronto" e do "Roteiro do gate 9" também viram aresta (cobertura);
+menção em prosa corrida não conta. Régua completa: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md`.
 
 ### Campo `Funcionalidade` — derivado dos FRs, nunca inventado
 
 Só existe quando a SPEC declara FEATs na §5 — **SPEC sem FEATs → omitir a linha** (a
 funcionalidade é a própria SPEC); task `chore` sem FR realizado pode omitir. O conjunto
-listado é **exatamente** o conjunto de FEATs dos FRs de `Realiza (FRs)` (via mapa
-FR→FEAT da Etapa 0.2) — nem a mais, nem a menos. Uma FEAT é marcada `(primária)`: a que
-tem mais FRs realizados (empate → menor ID); julgamento pode sobrescrever a heurística,
-mas a primária pertence ao conjunto derivado. Task **transversal** (FRs de 2+ FEATs —
-ex.: um front único servindo login e lançamento) lista todas; **sem primária honesta**
-(eleger uma seria arbitrário) use `**Funcionalidade**: transversal (FEAT-NNN-XXX,
-FEAT-NNN-YYY)` — sem `(primária)` (projeção Jira: `jira-sync-feat.md`).
+listado é **exatamente** o das FEATs dos FRs de `Realiza (FRs)` (mapa FR→FEAT da Etapa
+0.2) — nem a mais, nem a menos. Uma FEAT é marcada `(primária)`: a com mais FRs
+realizados (empate → menor ID); julgamento pode sobrescrever a heurística, mas a primária
+pertence ao conjunto derivado. Task **transversal** (FRs de 2+ FEATs) lista todas; **sem
+primária honesta** use `**Funcionalidade**: transversal (FEAT-NNN-XXX, FEAT-NNN-YYY)` — sem `(primária)` (projeção Jira: `jira-sync-feat.md`).
 
 ### Mapeamento de cada AC — camada que enforça, gate que verifica
 
@@ -280,7 +274,13 @@ Após gerar todas as TASKs e o TASK-MMM-INDEX, **conferir o grafo mecanicamente*
 `${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh {docsRoot}/<slug> --check --stage=tasks --plan MMM`
 (contrato: `graph-contract.md`). Ciclo, wave incoerente ou referência quebrada aqui é defeito
 de geração — corrija antes do gate; script indisponível/falhou → siga declarando a degradação.
-Em seguida, invocar a skill `task-validator` em modo batch (apontando para o TASK-MMM-INDEX):
+
+**Correção** (decisão 4.114): delta ao `scribe`, **aguardado**, com a lista literal de
+ERRORs; buraco de numeração não é defeito, arquivo existente nunca se renumera — protocolo do invocador: `graph-contract.md` §4.1.
+
+Com o grafo limpo (e o scribe encerrado), invocar a skill `task-validator` em modo batch
+(apontando para o TASK-MMM-INDEX) — em paralelo com o `tracker-sync` da Etapa 7 quando o
+sync está ativo (decisão 4.113: o validator só lê; o sync só escreve linhas `Jira:`):
 **errors == 0** → prosseguir; **errors > 0** → reportar por TASK — o INDEX do slug ainda é atualizado, mas o Status das tasks com error fica `Blocked`.
 
 ## Etapa 6: atualização do INDEX.md do slug
@@ -289,7 +289,7 @@ Aplicar a **receita de atualização do INDEX** (`${CLAUDE_PLUGIN_ROOT}/docs/_me
 
 ## Etapa 7: sincronização com Jira (opcional)
 
-Só quando a ficha tem `jira.enabled: true`: **despache o agent `tracker-sync`** (decisão 4.103) com o gancho **`tasks`**: caminhos do protocolo (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`; §§ do gancho: §6.2, §7, §8, §10; mais `jira-sync-feat.md` quando a projeção de 3 níveis está ativa), da ficha, da SPEC e das TASKs geradas. Ele cria uma **sub-task por TASK**, grava a key no campo `Jira:` da closure de cada uma e devolve o resumo canônico. Best-effort (§0): `eventos_tracker` no retorno → evento `tracker` no ledger + **seção de reconexão da §14** no fecho deste comando; num `/keelson:auto`, desagua no item 7.4 da Entrega. Agent indisponível → aplicar o protocolo inline (mesmos §§) é o fallback, declarado no output.
+Só quando a ficha tem `jira.enabled: true`: **despache o agent `tracker-sync`** (decisão 4.103) — na rodada paralela com o `task-validator` da Etapa 5 (decisão 4.113); nunca com o scribe ainda editando as TASKs — com o gancho **`tasks`**: caminhos do protocolo (`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`; §§ do gancho: §6.2, §7, §8, §10; mais `jira-sync-feat.md` quando a projeção de 3 níveis está ativa), da ficha, da SPEC e das TASKs geradas. Ele cria uma **sub-task por TASK**, grava a key no campo `Jira:` da closure de cada uma e devolve o resumo canônico. Best-effort (§0): `eventos_tracker` no retorno → evento `tracker` no ledger + **seção de reconexão da §14** no fecho deste comando; num `/keelson:auto`, desagua no item 7.4 da Entrega. Agent indisponível → aplicar o protocolo inline (mesmos §§) é o fallback, declarado no output.
 
 ## Output final ao usuário
 
