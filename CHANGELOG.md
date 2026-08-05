@@ -17,6 +17,37 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.72.0] — 2026-08-04
+
+Decisions 4.112–4.115
+
+### Changed
+- **`scribe` writes whole documents in one pass (4.112).** One `Write` per file with the
+  full document composed up front; `Edit` is for post-read touch-ups, never the writing
+  method. Correction packages (PO/validator adjustments) are applied by rewriting each
+  affected file in a single `Write` — never one `Edit` per adjustment. Telemetry from a
+  real forge session: a ~1,000-line PLAN took 28.6 min (1 write + 25 edits) and a SPEC
+  absorbed a 56-adjustment package as 69 serial edits, each a full model turn.
+- **Forge gates run in parallel after the scribe (4.113).** `/keelson:specify` dispatches
+  `spec-validator`, `product-analyst` and `tracker-sync` in the same round once the
+  scribe is done (merit critique no longer waits for — or is suppressed by — form
+  errors); `/keelson:tasks` pairs `task-validator` with the tracker sync after the graph
+  is clean. The `po` verdict stays sequential (it consumes form + critique). Tracker sync
+  remains best-effort and never holds the critical path alone; the serialized chain cost
+  ~25 wall-clock minutes in the measured session.
+- **Graph-error correction gets an owned protocol (4.114).** New §4.1 in
+  `graph-contract.md`: the main session runs `graph.sh` and hands the scribe the literal
+  ERROR list (never "run the graph until clean" — the scribe has no shell); the
+  correction delta is awaited, never backgrounded and polled; a numbering hole is not a
+  defect and existing files are never renumbered (mass renumbering broke references and
+  left 9 undeletable stubs in the field); file removal/renames belong to the main
+  session. `commands/tasks.md` distilled back to its 300-line cap in the same batch.
+- **`spec-validator` warns at epic size (4.115).** More than 30 FRs → WARNING suggesting
+  `/keelson:specify-epic` while slicing is still cheap. Never an ERROR — slicing is a
+  product decision; the measured session forged a 50-FR, 51-AC SPEC as a single demand.
+
+---
+
 ## [0.71.0] — 2026-08-04
 
 Decisions 4.105–4.111

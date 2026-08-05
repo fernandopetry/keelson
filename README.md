@@ -406,19 +406,18 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.71.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.72.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the consumer feedback loop closes** (decisions 4.105–4.111) —
-the `qa` agent finally holds the Playwright MCP grant its screen gate always assumed
-(plus a mechanical MCP-parity guard over the whole cast), `/keelson:tasks` names the
-edge between sibling tasks and hardens done-criteria against gaming, `/keelson:plan`
-verifies API surface and schema against the real source, review closure covers every
-subject of the source requirement, missing-proof findings count toward the retry cap,
-and consumer proposals get a tracked inbox on the maintainer side
-(`docs/_meta/proposal-inbox.md`). No consumer block change — no `/keelson:init` re-run
-needed; update the plugin to pick up the `qa` fix.
+New in this release: **the forge gets fast** (decisions 4.112–4.115) — telemetry from a
+real 3-hour brief→tasks session exposed the wall-clock sinks: the `scribe` now writes
+whole documents in a single pass (a real SPEC took 69 incremental edits where one write
+sufficed), form/merit/tracker checks run in parallel after authoring instead of in
+single file, graph-error correction follows an owned protocol (literal error list,
+awaited delta, no renumbering, no filesystem polling), and the `spec-validator` warns
+when a SPEC reaches epic size (>30 FRs) while slicing is still cheap. No consumer block
+change — no `/keelson:init` re-run needed.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
