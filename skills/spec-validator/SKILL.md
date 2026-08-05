@@ -156,6 +156,9 @@ Varrer seções 5, 6, 7 buscando palavras-bandeira:
 ### WARNING se:
 - Out-of-scope com <2 itens
 - In-scope com detalhe técnico
+- **Porte de épico** (decisão 4.115): mais de 30 FRs na §5 — o custo de forja (redação,
+  validação, crítica, decomposição) cresce mais que linear com o porte; sugerir fatiar
+  via `/keelson:specify-epic` antes de `Approved`. Nunca ERROR: fatiar é decisão de produto.
 
 ## Etapa 8: checks de premissas e riscos
 
