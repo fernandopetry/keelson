@@ -17,6 +17,32 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.75.0] — 2026-08-05
+
+Decision 4.121
+
+### Added
+- **Mutation testing proves the suite at delivery (4.121).** Until now, the only
+  defense against tautological tests was the "assertions that prove" rule, enforced by
+  *review* in gate 1 — an evaluator reading the test. A green suite of weak assertions
+  passed every gate. Mutation testing closes that: mutate production code and prove the
+  suite fails — the Charter's "generator ≠ evaluator" rule applied to the suite itself.
+  New opt-in `quality.mutation` field in the project sheet (default `null`): the value
+  is the consumer's literal command — scope (e.g. diff-only) and threshold (e.g. minimum
+  score) are the consumer's calibration inside that command; the engine stays agnostic
+  and reads only the exit code, like `quality.test`. Runs exclusively in
+  `/keelson:integrate` after the full suite goes green (never per TASK/wave — mutation
+  is expensive; gate 2 is already the fine net); a failure stops the delivery like a red
+  test. Absence is declared (`mutation: not configured (opt-in)`), never silent; an
+  inert diff waives it together with the suite. No doctrine-level score target exists
+  (anti-Goodhart): surviving mutants are reported as a signal for reviewers — assertion
+  quality remains gate 1's ruler. `/keelson:init` detects common tools (Infection,
+  Stryker, mutmut, PIT, cargo-mutants) in the project manifests and offers the field;
+  existing language profiles are untouched. Owner of the ruler:
+  `guidelines/core/TESTING.md`, "Mutação: a suíte também está sob prova".
+
+---
+
 ## [0.74.1] — 2026-08-05
 
 Decision 4.120 — corollary of 4.119, observed live in the same measured session.
