@@ -79,11 +79,17 @@ Execute `/keelson:plan` cobrindo os FRs/NFRs da SPEC.
 
 ## Etapa 3: TASKS (feature)
 
-Execute `/keelson:tasks` para decompor o PLAN. Sem bloqueio → siga direto para implementar.
+Execute `/keelson:tasks` para decompor o PLAN. No ciclo formal, `ERROR` do `task-validator` **não dispara volta de correção própria** — o achado desagua na rodada consolidada da Etapa 3.5 (decisão 4.116). Sem bloqueio → siga direto para implementar.
 
-## Etapa 3.5: verificabilidade pré-código (sinal QA → PO; só no ciclo formal com TASKs do `/keelson:tasks`)
+## Etapa 3.5: verificabilidade pré-código (rodada consolidada — só no ciclo formal com TASKs do `/keelson:tasks`)
 
-Antes de implementar, despache o `qa` em **modo pré-código** sobre as TASKs geradas: AC não verificável, caso de borda sem resposta, verificação executável (4.34) que não prova o AC vinculado. Com achados → invoque o `po` (**modo resolução**) para respondê-los pelo brief; cada resposta é aplicada **reescrevendo o critério/AC ambíguo na própria TASK** (o texto do critério fica verificável — nunca em campo de closure, que é do `/keelson:implement`) + entrada nas decisões em nome do Diretor; achado irresolvível pelo brief → escada (pelos critérios de escalação do PO). Sem achados → siga direto. Esta é a pergunta mais barata do ciclo — acontece antes de existir código. (Bug/refactor/trivial e TASK avulsa de risco: esta etapa não existe.)
+**Uma rodada de revisão, uma volta de correção** (decisão 4.116). Com o grafo limpo, o `qa` em **modo pré-código** (AC não verificável, caso de borda sem resposta, verificação executável — 4.34 — que não prova o AC vinculado) entra **na mesma rodada paralela** do `task-validator` + `tracker-sync` da Etapa 5 do `/keelson:tasks` (4.113) — um turno, três despachos. Com os dois retornos na mão, **triagem única dos achados**:
+
+1. Achado que exige **decisão de produto** (do QA, ou ERROR do validator que esbarra em ambiguidade) → **um único despacho** ao `po` (**modo resolução**) com todos em lote; cada resposta reescreve o critério/AC ambíguo **na própria TASK** (o texto fica verificável — nunca em campo de closure, que é do `/keelson:implement`) + entrada nas decisões em nome do Diretor; irresolvível pelo brief → escada (critérios de escalação do PO).
+2. Achado **mecânico/de forma** + as reescritas resolvidas pelo PO → **um pacote de correção consolidado** ao scribe (reescrita integral por arquivo — 4.112), aguardado (4.114).
+3. **Uma revalidação, delta-scoped** (espírito 4.88): `graph.sh` + `task-validator` só nas TASKs corrigidas. Sobrou ERROR → escada — nunca uma segunda volta silenciosa.
+
+Sem achados → siga direto. Esta é a pergunta mais barata do ciclo — acontece antes de existir código; **consolidar as voltas é o que a mantém barata** (caso real: validator → correção → QA → PO em série custaram 3 voltas e ~35 min onde 1 bastava). (Bug/refactor/trivial e TASK avulsa de risco: esta etapa não existe.)
 
 ## Etapa 4: IMPLEMENT
 

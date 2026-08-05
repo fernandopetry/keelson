@@ -1478,6 +1478,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `skills/spec-validator/SKILL.md` (Etapa 7, WARNING). Origem: análise de sessão do mantenedor.
 
+### 4.116 — Revisão pré-código das TASKs é uma rodada consolidada: um turno de revisores, uma volta de correção
+
+**Problema**: na continuação da mesma sessão analisada nas 4.112–4.115 (agora já sob a 4.113), o trecho pós-decomposição rodou como **uma volta de correção por revisor**: `task-validator` batch (11,9 min) → 6 TASKs bloqueadas → correção ao scribe (~10 min de espera) → revalidação → `qa` pré-código (8,5 min) → 7 lacunas → despacho ao `po` → nova correção. Três voltas em série, ~35 min, sendo que validator e QA são **leitores independentes das mesmas TASKs** e cada correção reabre custo de spawn + releitura. A 4.113 paralelizou validator + sync, mas o QA pré-código (Etapa 3.5 do auto) ficou fora da rodada — e nada consolidava os achados antes de corrigir. O formato ideal para o harness é o oposto: despachos independentes saem **num único turno** (execução paralela), e a correção sai **uma vez**, com tudo na mão.
+
+**Decisão**: no ciclo formal, a revisão pré-código é **uma rodada consolidada**, dona na Etapa 3.5 do `/keelson:auto`: (1) o `qa` pré-código entra **na mesma rodada paralela** do `task-validator` + `tracker-sync` da Etapa 5 do `/keelson:tasks` — um turno, três despachos; (2) **triagem única** dos retornos: achados que exigem decisão de produto vão ao `po` (modo resolução) **num único lote**; (3) achados mecânicos + reescritas resolvidas pelo PO viram **um pacote de correção consolidado** ao scribe (reescrita integral, 4.112; aguardado, 4.114); (4) **uma revalidação delta-scoped** (`graph.sh` + validator só nas TASKs corrigidas — espírito 4.88); sobrou ERROR → escada, nunca segunda volta silenciosa. O `/keelson:tasks` avulso não muda (sem QA/PO no avulso); no ciclo, ele reporta e **não corrige por conta própria**.
+
+**Aplicação**: `commands/auto.md` (Etapas 3 e 3.5 — heading da 3.5 preservado; `agents/po.md` aponta para ele) · `commands/tasks.md` (Etapa 5, cláusula de ciclo — teto de 300 mantido por compressão equivalente). Origem: análise de sessão do mantenedor (telemetria, abstraída pela 4.72). Observar na próxima forja real: os 3 despachos num turno só, o PO invocado no máximo 1× no trecho, e nenhuma correção parcial antes da triagem.
+
 ---
 
 ## 5. Quality gates inegociáveis

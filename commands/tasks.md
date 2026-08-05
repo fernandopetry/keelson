@@ -44,8 +44,7 @@ Listar `TASK-MMM-*.md` em `{docsRoot}/<slug>/tasks/`. Próximo XXX = maior exist
 
 ## Etapa 0.5: redação delegada ao `scribe` (decisão 4.103)
 
-A decomposição e a redação das TASKs **não acontecem nesta janela**. Despache o agent
-`scribe` com o pacote:
+A decomposição e a redação das TASKs **não acontecem nesta janela** — despache o agent `scribe` com o pacote:
 
 - **Contrato**: este arquivo (`${CLAUDE_PLUGIN_ROOT}/commands/tasks.md`), Etapas 1 a 4 — princípios
   de decomposição, ordenação, template da TASK **e** o `TASK-MMM-INDEX.md` (parte da autoria).
@@ -72,8 +71,7 @@ só o delta. Agent indisponível → Etapas 1–4 inline como fallback, declarad
 5. **Setup-first**: scaffolding/migration com IDs baixos.
 6. **Sem invenção de escopo — nem por dedução**: a TASK só afirma o que **verificou**.
    Caminho citado no "Inclui" foi confirmado pela **cadeia do dado** (*quem consome a
-   consulta/endpoint que esta entrega altera?*), nunca deduzido do nome — vizinhança de nome
-   aponta a tela errada; sem confirmar, descreva o consumidor ("a view que lista X").
+   consulta/endpoint alterado?*) — vizinhança de nome aponta a tela errada; sem confirmar, descreva o consumidor ("a view que lista X").
 7. **Granularidade** (sobrescrita pela ficha/`CLAUDE.md` se declarado): `small` = 1 arquivo
    principal, 1 a 3 testes, 30 min a 2 h · `medium` = até 3 arquivos relacionados, 2 a 4 h.
 8. **Corte por risco, não por camada**. Cada TASK custa um ciclo developer + code-reviewer —
@@ -272,16 +270,18 @@ Criar/atualizar `{docsRoot}/<slug>/tasks/TASK-MMM-INDEX.md`:
 
 Após gerar todas as TASKs e o TASK-MMM-INDEX, **conferir o grafo mecanicamente**:
 `${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh {docsRoot}/<slug> --check --stage=tasks --plan MMM`
-(contrato: `graph-contract.md`). Ciclo, wave incoerente ou referência quebrada aqui é defeito
-de geração — corrija antes do gate; script indisponível/falhou → siga declarando a degradação.
+(contrato: `graph-contract.md`). Defeito de geração (ciclo, wave incoerente, referência quebrada) → corrija antes do gate; script indisponível/falhou → siga declarando a degradação.
 
 **Correção** (decisão 4.114): delta ao `scribe`, **aguardado**, com a lista literal de
 ERRORs; buraco de numeração não é defeito, arquivo existente nunca se renumera — protocolo do invocador: `graph-contract.md` §4.1.
 
 Com o grafo limpo (e o scribe encerrado), invocar a skill `task-validator` em modo batch
 (apontando para o TASK-MMM-INDEX) — em paralelo com o `tracker-sync` da Etapa 7 quando o
-sync está ativo (decisão 4.113: o validator só lê; o sync só escreve linhas `Jira:`):
-**errors == 0** → prosseguir; **errors > 0** → reportar por TASK — o INDEX do slug ainda é atualizado, mas o Status das tasks com error fica `Blocked`.
+sync está ativo (4.113: o validator só lê; o sync só escreve linhas `Jira:`) e, no ciclo
+formal, com o `qa` pré-código na mesma rodada (Etapa 3.5 do auto — 4.116): **errors == 0**
+→ prosseguir; **errors > 0** → reportar por TASK — INDEX atualizado mesmo assim, Status
+`Blocked` nas tasks com error; no ciclo, o achado desagua na **rodada consolidada do
+invocador** (4.116), sem volta de correção própria deste comando.
 
 ## Etapa 6: atualização do INDEX.md do slug
 
