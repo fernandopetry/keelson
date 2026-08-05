@@ -17,6 +17,29 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.76.0] — 2026-08-05
+
+Decision 4.123
+
+### Added
+- **Guided setup for the mutation gate: `/keelson:mutation-setup` (4.123).** 4.121/4.122
+  assume a consumer who knows how to assemble the mutation command — tool, config, diff
+  scope, threshold. Direct report from the field, same day: *"I don't know how to
+  configure mutation"*. An opt-in field nobody knows how to fill is a dead gate. The new
+  human-only command detects the stack from the ficha, proposes the canonical tool
+  (Infection · Stryker · mutmut · PIT · cargo-mutants) and installs it with explicit
+  confirmation (a project dependency never lands silently), generates the tool config
+  from what the ficha already knows (`codePaths`, `quality.test`), composes the command
+  diff-scoped and **without a threshold** (first adoption is informative — a minimum
+  score is measured over 1–2 real deliveries, by the human, never guessed at setup),
+  proves the whole pipeline with a one-file sample run before writing anything (a
+  phantom command is worse than an empty field), and writes `quality.mutation`
+  merge-preserving. Committing the setup remains the human's act. `/keelson:init` now
+  points at the command when it detects no tool, instead of silently leaving `null`.
+  Consumer block note updated — **re-run `/keelson:init` in consumer projects**.
+
+---
+
 ## [0.75.1] — 2026-08-05
 
 Decision 4.122 — same-day amendment of 4.121.
