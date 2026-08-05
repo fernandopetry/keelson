@@ -88,6 +88,11 @@ Use `null` no que não existe. Campo com comando errado é pior que campo vazio.
 > `--min-msi=80`) vão dentro do comando; o keelson só lê o exit code. Mutante
 > sobrevivente derruba a entrega **se o seu threshold mandar** — e a lista de
 > sobreviventes sai no report como sinal para revisão.
+>
+> **Não sabe montar esse comando?** Rode `/keelson:mutation-setup`: ele detecta a
+> stack, instala a ferramenta (com a sua confirmação), gera a config, prova com uma
+> rodada-amostra e grava o campo para você — sem threshold no início, para você
+> calibrar depois de observar uma ou duas entregas.
 
 ### `gates`
 

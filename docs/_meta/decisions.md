@@ -1534,6 +1534,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `commands/auto.md` (Entrega, item 2.3) · `commands/integrate.md` (Etapa 2, reaproveitamento) · `guidelines/core/TESTING.md` (dono — bullet "a mesma prova não se repete") · method-guide §3.8/§3.9 · wiki (`Ficha-do-projeto.md`, `Solucao-de-problemas.md`). Emenda do mesmo dia sobre a 4.121, motivada por pergunta do Diretor ("a mutação roda no auto?") — o furo era de desenho, não de campo.
 
+### 4.123 — Setup guiado do gate de mutação (`/keelson:mutation-setup`)
+
+**Problema**: as 4.121/4.122 assumem um consumidor que sabe montar o comando de mutação — ferramenta, config, escopo de diff, threshold. Relato direto do Diretor no mesmo dia: *"eu não sei configurar o mutation"*. O `/keelson:init` deliberadamente não instala nada (fricção certa para o init), mas isso deixa o gate opt-in atrás de conhecimento que o consumidor típico não tem — campo que ninguém sabe preencher é gate morto.
+
+**Decisão**: comando **humano-only** `/keelson:mutation-setup`: detecta a stack pela ficha, propõe a ferramenta canônica e **instala com confirmação** (dependência de projeto nunca entra em silêncio), gera a config a partir do que a ficha já sabe (`codePaths`, `quality.test`), compõe o comando **diff-scoped e sem threshold** (primeira adoção é informativa — calibrar score mínimo é medição de 1–2 entregas, ato do Diretor, nunca chute de setup), **prova com rodada-amostra** em escopo mínimo antes de gravar (comando fantasia é pior que campo vazio — régua do init) e grava `quality.mutation` merge-preserving. Commit do setup é ato do Diretor. O init passa a **apontar o comando** quando não detecta ferramenta, em vez de só silenciar com `null`.
+
+**Aplicação**: `commands/mutation-setup.md` (novo) · tabela *Commands* do `README.md` · §3.20 do method-guide · nota humano-only do `templates/CLAUDE.keelson-block.md` (**re-rodar init nos consumidores**) · `commands/init.md` (ponteiro na detecção) · wiki `Ficha-do-projeto.md` (ponteiro). Observar na 1ª execução real: a rodada-amostra flagra config quebrada antes de gravar?; o gate informativo gera a calibração de threshold ou vira permanente?
+
 ---
 
 ## 5. Quality gates inegociáveis

@@ -346,6 +346,14 @@ O estágio profundo pré-ciclo (humano-only — é uma conversa com você): rece
 /keelson:brief <documento (path ou colado) | slug | path de BRIEF>
 ```
 
+### 3.20 `/keelson:mutation-setup` — configurar o gate de mutação (humano-only)
+
+Setup guiado do gate de mutação (decisões 4.121–4.123) para quem não conhece a ferramenta: detecta a stack pela ficha, propõe a ferramenta canônica (Infection · Stryker · mutmut · PIT · cargo-mutants) e **instala com a sua confirmação**, gera a config a partir de `codePaths`/`quality.test`, **prova o pipeline com uma rodada-amostra** (escopo de um arquivo — nunca a base toda) e só então grava `quality.mutation` na ficha. O comando nasce com escopo de diff e **sem threshold** (gate informativo): o report termina com a instrução de calibrar o score mínimo após 1–2 entregas observadas — travar o threshold é ato seu. Não roda a mutação completa (isso é da entrega), não commita o setup.
+
+```
+/keelson:mutation-setup [--base=<branch>] [--dry-run]
+```
+
 ---
 
 ## 4. Skills

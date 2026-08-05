@@ -110,6 +110,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:rebuild-index` | Rebuild a slug's `INDEX.md` from scratch out of its artifacts |
 | `/keelson:verify-handoff` † | Close a pending screen-verification `HANDOFF` — consolidates the branch, exercises each item in the real environment; no merge (points to `/keelson:integrate`) |
 | `/keelson:postmortem` † | End-of-session postmortem — re-reads the whole session's interactions (corrections, retries, failed gates), separates defects from new scope, traces each gap to the mechanism that let it through, and produces the copy-paste maintainer message (with literal diffs via the agile-coach) that evolves the plugin |
+| `/keelson:mutation-setup` † | Guided setup of the mutation gate — detects the stack from the ficha, installs the canonical tool with confirmation, generates its config, proves the pipeline with a sample run and writes `quality.mutation` (diff-scoped, no threshold at first) |
 | `/keelson:update` † | Update the installed plugin to the latest marketplace version via the Claude Code CLI (marketplace refresh + plugin update, in that order); the running session keeps the old version until restarted |
 | `/keelson:report` † | Rebuild the closing report from the session ledger — safety net for a resumed session or a report lost in the scroll; every change already closes with one automatically |
 
@@ -406,22 +407,25 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.75.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.76.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the test suite itself goes under proof** (decision 4.121) —
-mutation testing joins the gauntlet as an opt-in `quality.mutation` command in the
-project sheet, run at delivery — by the `/keelson:auto` close and by
-`/keelson:integrate` — right after the full suite goes green; a green run recorded at
-a SHA is reused, with a declared waiver, while the code hasn't changed (4.122). It is
-the mechanical version of the "assertions that prove" rule: mutate production code and
-prove the suite fails. Exit code is the verdict (scope and threshold live in the
-consumer's own command), absence is declared rather than silent, and no doctrine-level
-score target exists — surviving mutants are a signal for reviewers, never a metric to
-game. `/keelson:init` detects common tools (Infection, Stryker, mutmut, PIT,
-cargo-mutants) and offers the field. No consumer block change — the sheet completes
-itself on use; no `/keelson:init` re-run needed.
+New in this release: **the test suite itself goes under proof, and setting that up is
+guided** (decisions 4.121–4.123) — mutation testing joins the gauntlet as an opt-in
+`quality.mutation` command in the project sheet, run at delivery (by the
+`/keelson:auto` close and by `/keelson:integrate`) right after the full suite goes
+green; a green run recorded at a SHA is reused, with a declared waiver, while the code
+hasn't changed. It is the mechanical version of the "assertions that prove" rule:
+mutate production code and prove the suite fails. Exit code is the verdict (scope and
+threshold live in the consumer's own command), absence is declared rather than silent,
+and no doctrine-level score target exists — surviving mutants are a signal for
+reviewers, never a metric to game. And for consumers who don't know the tooling, the
+new human-only `/keelson:mutation-setup` installs the canonical tool with
+confirmation, generates its config from the sheet, proves the pipeline with a sample
+run and writes the field — threshold-free at first, calibrated by the human after
+observing real deliveries. Consumer block note changed — **re-run `/keelson:init` in
+consumer projects**.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
