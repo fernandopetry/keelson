@@ -13,7 +13,8 @@
     "lint": "vendor/bin/php-cs-fixer fix --dry-run --diff",
     "typecheck": null,
     "build": null,
-    "boot": null
+    "boot": null,
+    "mutation": null
   },
   "gates": {
     "security": true,

@@ -39,14 +39,15 @@ Você é um Release Engineer especialista em integração assistida por IA. Sua 
 
 1. Rodar a suíte completa pelos comandos de qualidade da ficha: `quality.test`; quando houver frontend, também `quality.lint` + `quality.typecheck` — se o comportamento de UI só se prova em tela e `gates.screenVerify` está ativo, ele é coberto pela verificação de tela (handoff), não por suíte automatizada. **Dispensa por diff inerte**: branch cujo diff contra a base não toca código que a suíte exercita (régua e âncora mecânica em `guidelines/core/TESTING.md`, "Diff inerte") dispensa a suíte — a seção Testes do output declara `dispensada: diff sem código` em vez de N/N.
 2. Regressão ou teste vermelho → **parar**, reportar a task/área provável, não abrir PR.
-3. Rodar lint/auditoria de dependências disponível (conforme o perfil de linguagem ativo) e reportar.
+3. **Mutação da suíte** (decisão 4.121): `quality.mutation` presente na ficha → rodar o comando **após a suíte verde**. Exit code ≠ 0 → **parar**, não abrir PR — mesma regra do teste vermelho; o report lista os mutantes sobreviventes como sinal para o revisor (score/threshold são calibração do consumidor, dentro do comando). Campo `null` → declarar `mutação: não configurada (opt-in)` na seção Testes — nunca silêncio. Suíte dispensada por diff inerte → mutação dispensada junto, com a mesma declaração.
+4. Rodar lint/auditoria de dependências disponível (conforme o perfil de linguagem ativo) e reportar.
 
 ## Etapa 3: descrição do PR
 
 Gerar a descrição a partir dos artefatos SDD:
 - **Título**: `<tipo>(<slug>): <capacidade entregue>` no padrão de commit do projeto.
 - **Resumo**: outcome da SPEC + o que o PLAN entregou.
-- **Cobertura**: FRs/ACs cobertos; resultado dos testes; resultado do gate de segurança (se rodou) e da verificação funcional (se rodou).
+- **Cobertura**: FRs/ACs cobertos; resultado dos testes; resultado da mutação da suíte (score/sobreviventes, ou `não configurada`); resultado do gate de segurança (se rodou) e da verificação funcional (se rodou).
 - **Rastreabilidade**: SPEC-NNN, PLAN-MMM, TASKs incluídas (com SHAs de closure).
 - **Riscos/Notas**: TRISKs remanescentes; o que ficou fora (seção 10 do PLAN); **handoff de verificação pendente** (se houver): `⚠️ Verificação de tela pendente — ver {docsRoot}/<slug>/handoffs/HANDOFF-<id>.md (N itens)` — mergear assim é decisão consciente.
 - **Checklist de revisão humana**: itens sensíveis (segurança, migração, breaking) que exigem olhar humano.
@@ -76,6 +77,7 @@ Se o repositório tiver template de PR, respeitá-lo.
 
 ## Testes
 - Suíte: <N/N> · Lint/audit: <ok|achados>
+- Mutação: <ok — score X% | N sobreviventes (lista) | não configurada (opt-in) | dispensada: diff inerte>
 
 ## Pull Request
 - URL: <link> (ou "[dry-run] não aberto")

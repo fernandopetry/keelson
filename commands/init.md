@@ -47,6 +47,7 @@ Para cada valor que **não** inferiu com confiança, pergunte com opções fecha
 - **Se há frontend** — *"Quantas áreas logadas (realms) a aplicação tem?"* — ex.: só a admin; ou admin **+** portal de usuários finais, com URL e usuário distintos. Cada realm vira uma entrada em `screenVerify.realms` do `keelson.local.json` (Etapa 4.5), com `description` dizendo do que se trata o acesso, `baseUrl`, rota de login e usuário de dev próprios.
 - *"Detectei o script `test` — usar `<comando>` como `quality.test`?"*
 - *"Como se sobe a app deste projeto para exercício local?"* → `quality.boot` (decisão 4.71). É o comando que o `qa` roda antes de declarar `app_fora_do_ar` — sem ele, "app fora do ar" vira waiver barato. `null` é resposta válida (ambiente permanente), mas **escolhida**, nunca default silencioso.
+- **Mutação da suíte** (decisão 4.121, mesma mecânica de detecção da 4.80): antes de perguntar, procure ferramenta de mutation testing nos manifests — `composer.json` (`infection/infection`), `package.json` (`@stryker-mutator/*`), `pyproject.toml`/`setup.cfg` (`mutmut`, `cosmic-ray`), `pom.xml`/`build.gradle*` (PIT/`pitest`), `Cargo.toml` (`cargo-mutants`). Achou → *"Detectei `<ferramenta>` — configurar `quality.mutation` com `<comando>`? (opt-in; roda só no `/keelson:integrate`, depois da suíte verde)"*. Não achou → **não ofereça instalar**; `mutation: null` sem pergunta — o campo se completa pelo uso quando o projeto adotar a ferramenta. Escopo e threshold são do consumidor, dentro do comando gravado.
 - *"O código de backend fica em `<path>`?"*
 
 Não pergunte o que já sabe. Não faça perguntas de implementação que você mesmo pode resolver.
@@ -185,7 +186,7 @@ Com `method: skill:screen-verify`, garanta **também** a linha `.playwright-mcp/
 ## Etapa 6 — Self-check (falsificável, não confie na configuração)
 
 Prove que a ficha funciona:
-- `quality.test`/`quality.lint` declarados **existem/rodam** (execução rápida ou `--help`/dry-run);
+- `quality.test`/`quality.lint`/`quality.mutation` declarados **existem/rodam** (execução rápida ou `--help`/dry-run — para mutação, nunca a rodada completa: ela é cara e pertence ao `/keelson:integrate`);
 - `quality.boot` declarado → o que ele invoca **existe no disco** (binário no PATH, compose file, script) — não suba a app aqui, prove só que o comando não é fantasia; campo ausente numa ficha antiga → complete com a pergunta da Etapa 2 (Regra de merge);
 - os `codePaths` existem no disco;
 - `sensitiveGlobs` **cobre os arquivos de segredo que existem no projeto** (decisão 4.71): enumere os candidatos em disco (`.env*` em **qualquer** nível — raiz inclusive —, `*.pem`/`*.key`, arquivos de credencial do projeto) e prove **por matching real** que cada um casa com algum glob — mesma régua da 4.51: inferir da leitura dos globs não vale (caso medido: ficha cobrindo os `.env*` de subdiretórios, `.env` da raiz descoberto). Candidato sem cobertura → acrescente o glob do caminho exato;

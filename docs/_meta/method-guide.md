@@ -189,7 +189,7 @@ Regenera o `INDEX.md` de um slug a partir dos arquivos individuais (SPECs, PLANs
 
 ### 3.8 `/keelson:integrate` — preparar entrega (suíte + PR)
 
-Após a implementação de um PLAN concluída (TASKs Done, DoD satisfeita), valida a DoD, roda a suíte completa (comando `quality.test` da ficha), gera a descrição e **abre o Pull Request**.
+Após a implementação de um PLAN concluída (TASKs Done, DoD satisfeita), valida a DoD, roda a suíte completa (comando `quality.test` da ficha) — e, quando a ficha declara `quality.mutation`, a **mutação da suíte** logo depois dela (opt-in, exit code é o veredito — decisão 4.121) —, gera a descrição e **abre o Pull Request**.
 
 ```
 /keelson:integrate <PLAN-MMM ou caminho> [--base=<branch>] [--draft] [--dry-run]

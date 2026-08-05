@@ -22,7 +22,8 @@ fixo nunca é assumido: se não está na ficha, o keelson pergunta ou reporta pe
     "lint": "vendor/bin/php-cs-fixer fix --dry-run --diff",
     "typecheck": null,
     "build": null,
-    "boot": null
+    "boot": null,
+    "mutation": null
   },
   "gates": {
     "security": true,
@@ -78,8 +79,15 @@ Os comandos reais do projeto. **Este é o campo que mais causa falha boba:** se 
 | `typecheck` | Checagem de tipos, quando separada do lint | Ignorado |
 | `build` | Build, quando existe | Ignorado |
 | `boot` | Como subir a aplicação localmente | A verificação de tela não sabe levantar o app |
+| `mutation` | Mutation testing — prova que a **suíte** falharia se o comportamento regredisse. Opt-in; roda só no `/keelson:integrate`, depois da suíte verde | Linha `mutação: não configurada (opt-in)` no report da entrega — nada bloqueia |
 
 Use `null` no que não existe. Campo com comando errado é pior que campo vazio.
+
+> **`mutation` na prática**: o valor é o comando completo do **seu** projeto — escopo
+> (ex.: só o diff, via `--git-diff-base=main` no Infection) e score mínimo (ex.:
+> `--min-msi=80`) vão dentro do comando; o keelson só lê o exit code. Mutante
+> sobrevivente derruba a entrega **se o seu threshold mandar** — e a lista de
+> sobreviventes sai no report como sinal para revisão.
 
 ### `gates`
 
