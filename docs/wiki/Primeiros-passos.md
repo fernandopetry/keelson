@@ -44,9 +44,10 @@ Ou explicitamente:
    esperar** — é uma janela de veto: silêncio significa "pode ir"; se você corrigir, o
    brief é reemitido.
 3. **O ciclo corre:** SPEC → PLAN → TASKs → implementação wave a wave, com os quality
-   gates a cada tarefa.
-4. **Entrega:** branch criada, commits feitos e push, **sem PR** — com o relatório de
-   aceitação do PO (a entrega bate com o brief?) e a lista do que ficou pendente para você.
+   gates a cada tarefa — numa branch criada já na largada (uma por demanda), com cada
+   etapa commitada ao fechar: a papelada nunca fica horas fora do git.
+4. **Entrega:** push da branch, **sem PR** — com o relatório de aceitação do PO (a
+   entrega bate com o brief?) e a lista do que ficou pendente para você.
 
 Você não precisa ficar olhando. O ciclo não para entre waves para pedir permissão.
 

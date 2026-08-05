@@ -58,6 +58,8 @@ Com a triagem e a exploração em mãos, feche o entendimento **enquanto o Diret
 
 6. **Relógio do ciclo (medido, nunca estimado)**: na largada, rode `TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z` e registre a marca — no front-matter do BRIEF (`**Largada**:`, contrato em `index-contract.md`) na rota formal; embutida na própria mensagem de largada nas rotas sem arquivo. Ao concluir cada etapa (1–4), rode o mesmo comando e anexe uma linha ao `## Cronologia` do BRIEF. As marcas existem só para a linha de duração do report (Entrega, item 6.3) — duração é transparência ao Diretor, **jamais gatilho**: "fôlego não é gatilho" permanece intacta.
 
+7. **Branch da demanda nasce na largada** (decisão 4.119 — regra com dono: `sdd-conventions.md`, "Commit por marco"): rota que produz artefato SDD (feature/risco) cria e usa `feat/<slug>-<descrição-curta>` **antes da Etapa 1** — **nova por demanda**, nunca a de outra demanda (mesmo épico ≠ mesma branch). A partir daqui, cada etapa fecha com o commit do seu marco: Etapa 1 → `docs(<slug>): SPEC-NNN …` (inclui BRIEF e INDEX); Etapa 2 → `docs(<slug>): PLAN-MMM …`; Etapa 3.5 (após a revalidação limpa) → `docs(<slug>): decompose PLAN-MMM into N tasks`. Trivial/bug/refactor inline: sem branch aqui — a Entrega (Etapa 5, item 1) cobre.
+
 ## Etapa 1: SPEC (feature)
 
 Execute `/keelson:specify` (incluindo a Etapa 0.2 dele).
@@ -118,7 +120,7 @@ Uma entrega com gate 9 furado **nunca é silenciosa**. Antes da Entrega:
 
 ## Etapa 5: Entrega
 
-1. **Branch**: se estiver em `main` (ou na branch default), crie `feat/<slug>-<descrição-curta>` (kebab-case) e use-a. Se já estiver numa branch de trabalho, use-a. **Nunca** trabalhe direto na `main`.
+1. **Branch**: no ciclo formal ela existe desde a largada (Etapa 0.5, item 7 — 4.119). Rotas inline: se estiver em `main` (ou na branch default), crie `feat/<slug>-<descrição-curta>` (kebab-case) e use-a; se já estiver numa branch de trabalho **desta demanda**, use-a — nunca a de outra demanda. **Nunca** trabalhe direto na `main`.
 2. **Pré-check de gates (determinístico — não é opinião)**: a Entrega exige **evidência** de gate, não lembrança de gate. Confira contra o **diff da branch**, em qualquer rota (formal ou inline):
    - Diff toca área sensível (gatilhos do gate 8) com `gates.security` ativo → o report da Entrega **DEVE** citar o veredito do `security-engineer` sobre o **diff final**, com `revisado_por ≠ implementado_por`. "Verifiquei a segurança ao construir" **não satisfaz** — gerador não é avaliador (decisão 4.30); a auto-revisão da rota inline cobre os gates 1–7, nunca o gate 8 sensível. Veredito ausente → rode o gate **agora**, antes do push; reprovou → o achado **não entra na branch** (Etapa 4).
    - Mudança com efeito observável → gate 9 registrado como `verificado` ou `pendente_handoff` com sondagem (Etapa 4.6) — nunca ausente.

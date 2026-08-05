@@ -1502,6 +1502,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `docs/_meta/conventions/sdd-conventions.md` (bullet novo) · `docs/_meta/conventions/graph-contract.md` (§4.1 item 2 aponta para a régua geral). Origem: análise de sessão do mantenedor — 3ª ocorrência do padrão na mesma sessão.
 
+### 4.119 — Artefato SDD commita no marco que o fecha; branch nasce na largada, nova por demanda
+
+**Problema**: observado ao vivo (e reincidente — o Diretor já tinha notado o padrão noutra sessão): um ciclo real chegou à implementação com **toda a papelada da forja fora do git** — BRIEF, SPEC, PLAN, 20 TASKs e TASK-INDEX untracked, closures e INDEX modificados sem commit — enquanto os commits de **código** saíam normalmente. Três fatos da doutrina se combinavam: nenhum comando da forja commita; a branch e o commit da papelada só nascem na Entrega (desenho "commit varredor no fim"); e o commit de closure era condicional a "modo paralelo" — no modo padrão (SUBAGENTS, branch única), nada salva. Consequências: horas de trabalho documental expostas a um `checkout`/`stash` errado; SHA citado na closure **não contém a própria closure** (fura a auditoria da 4.30); pré-checks da Entrega comparam o diff da branch e não enxergam docs nunca commitados; e a regra "se já estiver numa branch de trabalho, use-a" fez a demanda 2 continuar na branch da demanda 1, misturando sobras entre entregas.
+
+**Decisão**: **commit por marco**, com dono único nas convenções comuns: no ciclo formal, a branch de trabalho nasce **na largada** (nova por demanda — mesmo épico ≠ mesma branch) e cada etapa fecha com o commit dos seus artefatos (`docs(<slug>): …` para SPEC/PLAN/TASKs — no auto, ao fim das Etapas 1, 2 e 3.5; no guided, após o OK do checkpoint); a **closure de TASK commita sempre** (`chore(<slug>): close TASK-MMM-XXX`), em qualquer modo de orquestração. Comando avulso fora do ciclo **não commita** (o rastro é do humano — coerente com o `/keelson:review`). A Entrega continua dona da aceitação e do push; deixa de ser o único ponto de salvamento — a perda máxima passa a ser um marco.
+
+**Aplicação**: `docs/_meta/conventions/sdd-conventions.md` (bullet novo, dono) · `commands/auto.md` (Etapa 0.5 item 7; Entrega item 1) · `commands/implement.md` (closure item 6 incondicional; item 5 ajustado) · `commands/guided.md` (nota de marco pós-checkpoint). Origem: análise de sessão do mantenedor, padrão confirmado em 2 sessões. Observar na próxima rodada real: papelada da forja no git antes da primeira wave, e o SHA de cada closure contendo a própria closure.
+
 ---
 
 ## 5. Quality gates inegociáveis

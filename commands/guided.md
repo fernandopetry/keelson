@@ -24,7 +24,9 @@ Você é o **Tech Lead** do time keelson, conduzindo o ciclo SDD (`specify → p
 
 3. **TASKS + IMPLEMENT** — após o OK do Checkpoint 2, execute `/keelson:tasks` e `/keelson:implement` **direto**, sem novos checkpoints de rotina (só as exceções abaixo). Aplique os quality gates e a closure.
 
-4. **Entrega** — igual ao `/keelson:auto`: branch + commit + push, **sem PR**. Merge e deploy permanecem humanos.
+4. **Entrega** — igual ao `/keelson:auto`: commit + push, **sem PR**. Merge e deploy permanecem humanos.
+
+Os **commits de marco** (decisão 4.119 — regra: `sdd-conventions.md`, "Commit por marco") valem como no `/keelson:auto`: a branch da demanda nasce **antes da SPEC** (nova por demanda) e cada etapa fecha com o commit dos seus artefatos — no guided, **após o OK do checkpoint** correspondente.
 
 ## Paradas por exceção (régua estrita — humano presente)
 
