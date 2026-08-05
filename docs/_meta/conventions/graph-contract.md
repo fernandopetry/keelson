@@ -131,6 +131,23 @@ scripts/graph.sh <dir-do-slug> [--check] [--stage=plan|tasks] [--format=tsv|merm
 - Exit: `0` sem ERROR · `1` com ERROR · `2` uso incorreto. Read-only sobre o slug.
 - Bash 3.2+ (macOS `/bin/bash`, Linux, Git Bash), awk POSIX, sem dependências novas.
 
+## §4.1. Reação do invocador a ERRORs na geração (decisão 4.114)
+
+Quando o `--check` acusa ERROR logo após a geração de artefatos (Etapa 5 do
+`/keelson:tasks` e análogos), a correção segue quatro regras:
+
+1. **Quem roda o script é quem tem shell**: a main session executa o `graph.sh` e entrega
+   ao `scribe` a **lista literal de ERRORs** no re-despacho — nunca a instrução "rode o
+   grafo até limpar" (o scribe não tem Bash; exigência impossível volta em `duvidas`).
+2. **Correção é aguardada**: o re-despacho é síncrono do ponto de vista do fluxo — a main
+   session espera o retorno e re-roda o script ela mesma. Agent em background + polling
+   de filesystem é anti-padrão (caso real: ~14 min de `sleep`-loop para um delta).
+3. **Buraco de numeração não é defeito**: sequência com lacuna não gera check e não se
+   "corrige" — e **arquivo existente nunca se renumera** (renumeração em massa quebra
+   referências e deixa stubs que o scribe não consegue apagar).
+4. **Operação de arquivo é da main session**: remoção/renomeação, quando necessária,
+   acontece depois do retorno do scribe, nunca durante as edições dele.
+
 ## §5. O fato no validator — degradação e cobertura mista
 
 Os validators executam o script e citam a saída como **fato** (formato no relatório:
