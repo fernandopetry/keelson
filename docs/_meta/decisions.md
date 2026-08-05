@@ -1446,6 +1446,38 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `docs/_meta/proposal-inbox.md` (novo — nasce com as 8 propostas desta leva registradas e fechadas nas 4.105–4.110) · `CLAUDE.md` (seção "Registro e governança", bullet novo). Observar na próxima chegada real: a linha nascendo na mesma sessão do parecer, e nenhuma proposta `recebida` sobrevivendo a uma leva em silêncio.
 
+### 4.112 — Scribe redige por Write único; pacote de ajustes é reescrita, nunca rajada de Edits
+
+**Problema**: análise de telemetria de uma sessão real de forja (brief → SPEC → PLAN → TASKs, ~3h de relógio) mostrou que ~40% do tempo foi o `scribe` redigindo: 28,6 min para um PLAN de ~1.000 linhas (1 `Write` + 25 `Edits`), e uma SPEC construída com **69 `Edits`** — o pacote de 56 ajustes do PO/validator foi aplicado **um `Edit` por ajuste**, cada um custando um turno inteiro de modelo (12,4 min só de espera da main session). O contrato do scribe dizia *o que* escrever, mas não *como* gravar — e o modo natural do modelo (editar incrementalmente) é o pior caso de latência para documento longo.
+
+**Decisão**: disciplina de gravação no contrato do scribe — **um `Write` por arquivo, com o documento inteiro** composto antes de gravar; `Edit` é retoque pontual pós-releitura, nunca a forma de escrever. **Pacote de correção** (ajustes de PO/validator/gate) se aplica **reescrevendo por inteiro cada arquivo afetado** num `Write` único — 56 ajustes ≠ 56 Edits.
+
+**Aplicação**: `agents/scribe.md` ("Como trabalhar", itens 2 e 4 novo). Origem: análise de sessão do mantenedor (telemetria de consumidor real, abstraída pela 4.72).
+
+### 4.113 — Gates de forja despacham em paralelo após o scribe; tracker-sync nunca ocupa o caminho crítico sozinho
+
+**Problema**: na mesma sessão, a cadeia pós-redação do specify rodou em fila indiana — Jira sync (6,2 min) → spec-validator (6,1) → product-analyst (6,2) → PO (6,9) — quando validator e analyst são leitores independentes da mesma SPEC e o sync (best-effort por doutrina, §0) só escreve linhas de key: ~12 min de relógio puro perdidos por serialização; nas TASKs, mais 13 min de sync bloqueante depois do validator. A 4.89 já paraleliza os gates do implement; a forja ficou para trás.
+
+**Decisão**: com o scribe encerrado (nunca durante edições dele), o invocador despacha **numa mesma rodada, em paralelo**: no specify — `spec-validator` + `product-analyst` + `tracker-sync` (quando ativo); no tasks — `task-validator` + `tracker-sync` (após grafo limpo). A crítica de mérito **não espera** o veredito de forma (errors > 0 não a suprime — mérito independe de forma); o `po` fica **fora** da rodada (consome forma + crítica). Sync continua best-effort: atraso dele nunca atrasa o fluxo.
+
+**Aplicação**: `commands/specify.md` (Etapas 4, 4.1 e 5.3) · `commands/tasks.md` (Etapas 5 e 7). Origem: análise de sessão do mantenedor.
+
+### 4.114 — Correção de grafo: delta aguardado com ERRORs literais; buraco de numeração não se renumera
+
+**Problema**: ainda na mesma sessão, os ERRORs do grafo pós-decomposição foram re-despachados ao `scribe` em background com a exigência "rode o grafo até limpar" — ferramenta que ele **não tem** (sem shell). O scribe, para fechar um buraco de sequência (que nenhum check acusa), **renumerou** as TASKs — contra o próprio contrato ("nunca renumera") — deixando 9 stubs que não podia apagar; a main session ficou ~14 min em `sleep`-loop de polling do filesystem e terminou apagando os stubs à mão. Três violações encadeadas de um protocolo que não existia.
+
+**Decisão**: protocolo de reação a ERRORs de geração com dono único no `graph-contract.md` (§4.1): (1) quem roda o script é quem tem shell — o re-despacho leva a **lista literal de ERRORs**, nunca "rode até limpar"; (2) a correção é **aguardada** — sem background + polling; (3) **buraco de numeração não é defeito** e arquivo existente nunca se renumera; (4) remoção/renomeação de arquivo é ato da main session, após o retorno. Corolários no contrato do scribe: exigência que dependa de ferramenta que ele não tem volta em `duvidas`, nunca é simulada.
+
+**Aplicação**: `docs/_meta/conventions/graph-contract.md` (§4.1 novo) · `commands/tasks.md` (Etapa 5, ponteiro — arquivo destilado de volta ao teto de 300 da 4.35 na mesma leva) · `agents/scribe.md` ("Como trabalhar" item 4, Limites). Origem: análise de sessão do mantenedor.
+
+### 4.115 — Porte de épico é WARNING do spec-validator
+
+**Problema**: a SPEC da sessão analisada fechou com 3 FEATs, 50 FRs, 6 NFRs e 51 ACs — porte de épico num ciclo de demanda única. O custo de forja (redação, 56 ajustes, validação, crítica, decomposição em 21 TASKs) cresce mais que linear com o porte, e nada no fluxo sinaliza "isto deveria ter passado pelo `/keelson:specify-epic`" enquanto ainda é barato fatiar.
+
+**Decisão**: check novo no `spec-validator` (Etapa 7, escopo): **mais de 30 FRs → WARNING** sugerindo fatiar via `/keelson:specify-epic` antes de `Approved`. Nunca ERROR — fatiar é decisão de produto; o validator apenas dá o sinal no momento em que ele ainda é acionável. (Check de skill, prosa — fora do catálogo mecânico do `graph.sh`; não exige fixture da 4.82.)
+
+**Aplicação**: `skills/spec-validator/SKILL.md` (Etapa 7, WARNING). Origem: análise de sessão do mantenedor.
+
 ---
 
 ## 5. Quality gates inegociáveis
