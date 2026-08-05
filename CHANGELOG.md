@@ -17,6 +17,24 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.74.1] — 2026-08-05
+
+Decision 4.120 — corollary of 4.119, observed live in the same measured session.
+
+### Fixed
+- **SDD artifacts never enter a developer commit (4.120).** Wave developers swept their
+  own TASK `.md` (untracked, because the forge had never committed) into three real
+  `feat` commits — a defensible reading of the staging rule, which only barred untracked
+  files "from another scope". The improvised salvage is worse than the symptom: it
+  commits the pre-closure version of the artifact (the closure SHA still doesn't contain
+  the closure), mixes authorship into the diff composition the PO accepts, and saves 3
+  of 20 files. The developer contract now draws the boundary explicitly: a developer
+  commit contains only the code and tests the developer authored — `{docsRoot}/**` never
+  enters, in any state, not even the task's own `.md`; an untracked TASK file is a
+  symptom of an uncommitted milestone (4.119), to be reported, never swept.
+
+---
+
 ## [0.74.0] — 2026-08-04
 
 Decision 4.119
