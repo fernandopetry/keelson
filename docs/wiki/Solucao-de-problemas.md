@@ -35,11 +35,13 @@ O `quality.test` da [ficha](Ficha-do-projeto) não é o comando real do projeto 
 está rodando outra coisa (ou nada). Corrija na ficha e rode de novo. Mesma causa vale para
 `lint`, `typecheck` e `build`.
 
-### A entrega (`/keelson:integrate`) parou por mutantes sobreviventes
+### A entrega parou por mutantes sobreviventes
 
 A suíte passou, mas o comando `quality.mutation` da [ficha](Ficha-do-projeto) saiu com
 erro — mutantes sobreviveram além do threshold que **você** configurou no próprio
-comando. Isso significa que existe comportamento que pode regredir sem que teste algum
+comando. Vale tanto no fecho do `/keelson:auto` quanto no `/keelson:integrate` (que
+reaproveita, com dispensa declarada, uma rodada verde do ciclo quando o código não
+mudou desde ela). Isso significa que existe comportamento que pode regredir sem que teste algum
 acuse: o report lista os sobreviventes. Dois caminhos legítimos: fortalecer as asserções
 dos testes apontados, ou recalibrar o threshold no comando da ficha (decisão sua — o
 keelson não define score mínimo). Remover o campo desliga o gate por completo: ele é

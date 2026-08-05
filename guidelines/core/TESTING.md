@@ -86,9 +86,15 @@ Um mutante sobrevivente é um comportamento que pode regredir sem que teste algu
   **comando literal** do projeto; escopo (ex.: restringir ao diff) e threshold (ex.:
   score mínimo) são calibração do consumidor, **dentro do próprio comando** — o motor não
   interpreta score: **exit code é o veredito**, como em `quality.test`.
-- **Roda na entrega** (`/keelson:integrate`), após a suíte verde — nunca por TASK ou
-  wave: mutation é caro, e a rede fina já é o gate 2. Falhou → a entrega para, mesma
-  regra do teste vermelho. Diff inerte dispensa junto com a suíte.
+- **Roda na entrega** — no fecho do ciclo (`/keelson:auto`) e na preparação do PR
+  (`/keelson:integrate`) —, após a suíte verde; nunca por TASK ou wave: mutation é
+  caro, e a rede fina já é o gate 2. Falhou → a entrega para, mesma regra do teste
+  vermelho. Diff inerte dispensa junto com a suíte.
+- **A mesma prova não se repete** (decisão 4.122): rodada verde registrada no INDEX do
+  slug **com o SHA** em que rodou dispensa a repetição no integrate quando o diff
+  daquele SHA ao HEAD é **inerte** (âncora mecânica acima) — dispensa sempre declarada.
+  Marca sem SHA, ou qualquer código no diff desde então → roda de novo; "já rodou" por
+  lembrança não é prova.
 - **Ausência é declarada, nunca silêncio**: campo `null` → o report registra
   `mutação: não configurada (opt-in)` — mesma régua de declaração desta doutrina.
 - **Score não é meta**: número de doutrina algum define "cobertura de mutação boa" —

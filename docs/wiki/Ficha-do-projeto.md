@@ -79,7 +79,7 @@ Os comandos reais do projeto. **Este é o campo que mais causa falha boba:** se 
 | `typecheck` | Checagem de tipos, quando separada do lint | Ignorado |
 | `build` | Build, quando existe | Ignorado |
 | `boot` | Como subir a aplicação localmente | A verificação de tela não sabe levantar o app |
-| `mutation` | Mutation testing — prova que a **suíte** falharia se o comportamento regredisse. Opt-in; roda só no `/keelson:integrate`, depois da suíte verde | Linha `mutação: não configurada (opt-in)` no report da entrega — nada bloqueia |
+| `mutation` | Mutation testing — prova que a **suíte** falharia se o comportamento regredisse. Opt-in; roda na entrega (fecho do `/keelson:auto` e `/keelson:integrate`), depois da suíte verde — rodada verde não se repete enquanto o código não mudar | Linha `mutação: não configurada (opt-in)` no report da entrega — nada bloqueia |
 
 Use `null` no que não existe. Campo com comando errado é pior que campo vazio.
 

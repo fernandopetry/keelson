@@ -1526,6 +1526,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `guidelines/core/TESTING.md` (dono da régua, seção "Mutação: a suíte também está sob prova") · `commands/integrate.md` (Etapa 2 + output + descrição do PR) · `commands/init.md` (detecção à la 4.80 + self-check) · `guidelines/_meta/PROFILE-OUTLINE.md` §7 (nomear a ferramenta canônica) · `templates/keelson.config.example.json` · wiki `Ficha-do-projeto.md`. Perfis existentes **não** são tocados (php.md é `reviewed: true`); a ferramenta chega pela detecção do init. Observar na 1ª rodada real com o campo ativo: custo de parede no integrate, acionabilidade do report de sobreviventes, e se aparece tautologia que escapou do gate 1 — esse dado decide se diff-coverage entra numa leva futura.
 
+### 4.122 — O gate de mutação dispara no fluxo padrão; rodada verde não se repete
+
+**Problema**: a 4.121 pendurou a mutação **só** no `/keelson:integrate` — mas o fluxo padrão (`/keelson:auto`) entrega com push e **sem PR**, e o integrate é comando opcional: consumidor que nunca o roda tem o gate instalado e jamais disparado (degrau do gauntlet atrás de um comando que ninguém pisa). Rodar nos dois pontos cegamente, porém, duplicaria o passo mais caro do gauntlet — e "já rodou" por lembrança seria waiver barato.
+
+**Decisão**: o fecho do `/keelson:auto` também roda `quality.mutation` (pré-check da Entrega, antes da aceitação do PO; mesmas réguas da 4.121 — exit code é o veredito, ausência declarada, diff inerte dispensa). Rodada verde é **registrada no INDEX do slug com o SHA** em que rodou (rota inline sem INDEX: só a linha do report — o integrate não consome essas rotas). O `/keelson:integrate` **dispensa a repetição, declarando**, apenas quando o registro existe **e** o diff do SHA registrado até o HEAD é **inerte** (mesma âncora mecânica do "diff inerte" de TESTING.md) — marca sem SHA, ou qualquer código no diff desde então → roda de novo. Verificado, não deduzido (4.58).
+
+**Aplicação**: `commands/auto.md` (Entrega, item 2.3) · `commands/integrate.md` (Etapa 2, reaproveitamento) · `guidelines/core/TESTING.md` (dono — bullet "a mesma prova não se repete") · method-guide §3.8/§3.9 · wiki (`Ficha-do-projeto.md`, `Solucao-de-problemas.md`). Emenda do mesmo dia sobre a 4.121, motivada por pergunta do Diretor ("a mutação roda no auto?") — o furo era de desenho, não de campo.
+
 ---
 
 ## 5. Quality gates inegociáveis
