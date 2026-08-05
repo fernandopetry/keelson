@@ -1486,6 +1486,22 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `commands/auto.md` (Etapas 3 e 3.5 — heading da 3.5 preservado; `agents/po.md` aponta para ele) · `commands/tasks.md` (Etapa 5, cláusula de ciclo — teto de 300 mantido por compressão equivalente). Origem: análise de sessão do mantenedor (telemetria, abstraída pela 4.72). Observar na próxima forja real: os 3 despachos num turno só, o PO invocado no máximo 1× no trecho, e nenhuma correção parcial antes da triagem.
 
+### 4.117 — Reescrita de correção preserva toda aresta que o ajuste não mira
+
+**Problema**: o pacote de correção consolidado (16 ajustes, na sessão-fonte das 4.112–4.116) reescreveu uma TASK por inteiro — como a 4.112 manda — e, no processo, **derrubou a cobertura de um AC que nenhum ajuste pedia para mudar**: o critério que o citava foi reescrito e a citação sumiu. A revalidação delta do grafo pegou (a rede da 4.116 funcionou), mas a volta custou uma correção inline que a prevenção tornaria desnecessária. É o trade-off previsto da reescrita integral: o `Write` único regrava também o que estava certo, e o que estava certo pode não voltar.
+
+**Decisão**: sentença no contrato do pacote de correção do scribe — antes de gravar a reescrita, **conferir que os campos de aresta e os ACs citados em critérios do arquivo original continuam presentes**; aresta só some quando um ajuste explicitamente a mira. A revalidação continua obrigatória (defesa em profundidade — o check barato no gerador não substitui a rede do invocador).
+
+**Aplicação**: `agents/scribe.md` ("Como trabalhar", item 4). Origem: análise de sessão do mantenedor — regressão observada ao vivo na primeira aplicação real do padrão de pacote.
+
+### 4.118 — Espera de subagent nunca é polling
+
+**Problema**: a mesma sessão fez `sleep`-loop três vezes para saber se um agent em background tinha terminado — duas sondando o grafo durante a correção das TASKs (~14 min, viraram a 4.114) e uma terceira, **já na implementação**, sondando o commit de um developer de wave (2,1 min). A 4.114 proibiu o polling só no fluxo de correção do grafo; o padrão é geral: cada volta de poll queima um turno e contexto, e o harness já notifica a conclusão de agent em background — o poll não compra informação nenhuma que a notificação não entregue de graça.
+
+**Decisão**: régua geral nas convenções comuns — resultado de subagent chega por **retorno** (despacho aguardado) ou por **notificação do harness** (background); a main session nunca sonda filesystem/grafo/commit em loop. Precisa do resultado para o próximo passo → despacha e aguarda; pode seguir com outra frente → segue e reage à notificação. O §4.1 do `graph-contract.md` vira instância declarada da régua.
+
+**Aplicação**: `docs/_meta/conventions/sdd-conventions.md` (bullet novo) · `docs/_meta/conventions/graph-contract.md` (§4.1 item 2 aponta para a régua geral). Origem: análise de sessão do mantenedor — 3ª ocorrência do padrão na mesma sessão.
+
 ---
 
 ## 5. Quality gates inegociáveis

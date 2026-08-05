@@ -141,7 +141,8 @@ Quando o `--check` acusa ERROR logo após a geração de artefatos (Etapa 5 do
    grafo até limpar" (o scribe não tem Bash; exigência impossível volta em `duvidas`).
 2. **Correção é aguardada**: o re-despacho é síncrono do ponto de vista do fluxo — a main
    session espera o retorno e re-roda o script ela mesma. Agent em background + polling
-   de filesystem é anti-padrão (caso real: ~14 min de `sleep`-loop para um delta).
+   de filesystem é anti-padrão (caso real: ~14 min de `sleep`-loop para um delta; régua
+   geral de espera de subagent: `sdd-conventions.md` — 4.118).
 3. **Buraco de numeração não é defeito**: sequência com lacuna não gera check e não se
    "corrige" — e **arquivo existente nunca se renumera** (renumeração em massa quebra
    referências e deixa stubs que o scribe não consegue apagar).
