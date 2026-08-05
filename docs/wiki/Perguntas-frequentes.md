@@ -49,6 +49,15 @@ Não. Ele é gerado pelos comandos e sobrescrito. Errado? `/keelson:rebuild-inde
 A área de demanda — o agrupador dos artefatos de um mesmo assunto, em
 `<docsRoot>/<slug>/`. Ex.: `relatorios`, `checkout`, `autenticacao`.
 
+### Por que os relatórios citam o caminho inteiro em vez de só `PLAN-002`?
+
+Porque a numeração é **por slug**: `PLAN-002` pode existir em vários slugs ao mesmo
+tempo, e um comando de retomada copiado para uma sessão nova não carrega o contexto de
+qual slug era. Por isso todo texto que sai do slug (relatório, próximo comando,
+retomada) cita o caminho do arquivo — `docs/<slug>/plans/PLAN-002-<nome>.md` — que os
+comandos aceitam no lugar do ID. Se você digitar um ID nu que existe em mais de um
+slug, o comando para e lista os candidatos em vez de escolher um.
+
 ### Quem promove um artefato para `Approved` ou `Done`?
 
 Nunca o validator (ele só bloqueia errors). No ciclo com brief, quem promove é o PO pelo

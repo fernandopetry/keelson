@@ -17,6 +17,26 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.77.0] — 2026-08-05
+
+Decision 4.124
+
+### Changed
+- **SDD artifacts cited outside their slug now travel with their relative path,
+  never the bare ID (4.124).** Artifact numbering is per slug, so the same `PLAN-002`
+  exists in as many slugs as the repo has — a field report caught a session-closing
+  resume command (`/keelson:implement PLAN-002`) that matched **9 files** when pasted
+  into a fresh session. Doctrine now lives in `sdd-conventions.md`: anything that
+  leaves the slug — next-command lines, resume commands, reports, bulletins,
+  escalations — cites the real file path (`docs/<slug>/plans/PLAN-MMM-<name>.md`);
+  the short ID stays canonical inside the slug's own artifacts. The next-command
+  templates in `specify`, `plan`, `tasks`, `implement` and `triage` were teaching the
+  bare-ID habit and now print the path. On the input side, a bare ID matching files
+  in more than one slug makes the command stop and list the candidates with paths
+  instead of picking one. No re-init needed — the consumer block is unchanged.
+
+---
+
 ## [0.76.0] — 2026-08-05
 
 Decision 4.123
