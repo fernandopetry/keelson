@@ -122,7 +122,10 @@ chegarem. Documento pequeno ou pedido claro não precisa da forja — vá direto
 1. **Não edite `INDEX.md`.** Ele é gerado. Se ficou errado: `/keelson:rebuild-index <slug>`.
 2. **Projeto legado primeiro migra, depois muda.** Pasta de docs sem `INDEX.md` →
    `/keelson:migrate-legacy <slug>` antes de qualquer outra coisa.
-3. **Trivial pula o ciclo.** Typo, texto, cor: mudança direta, sem SPEC.
+3. **Trivial pula o ciclo — mas trivial é raio de dano, não tamanho.** Typo, texto,
+   cor: mudança direta, sem SPEC. Já uma linha que muda o que o sistema promete (shape
+   de id, chave de payload, default de API) entra no ciclo por menor que pareça: todo
+   consumidor quebra junto. Na dúvida, `/keelson:triage` decide.
 
 Continue por [Conceitos](Conceitos) para entender o modelo, ou pelo
 [Guia do método](Guia-do-metodo) para a referência completa dos comandos.
