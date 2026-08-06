@@ -33,5 +33,11 @@ jobs:
       - name: Paridade MCP dos agents (scripts/check-agents.sh)
         run: bash scripts/check-agents.sh
 
+      - name: Suíte do check de sincronização (scripts/tests/sync/run.sh)
+        run: bash scripts/tests/sync/run.sh
+
+      - name: Sincronização de comandos/agents (scripts/check-sync.sh)
+        run: bash scripts/check-sync.sh
+
       - name: Checks de release (versões · CHANGELOG · MIRRORS · bash -n)
         run: bash scripts/check-release.sh

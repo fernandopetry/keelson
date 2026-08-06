@@ -47,7 +47,7 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 - **Fora de escopo / pendente**: <achados estacionados, handoff aberto, parte recusada, lição pendente de merge>
 - **Tracker**: Jira: <KEY> (Épico) · Story: <KEY | —> em <coluna atual> (teto: <coluna>) · sub-tarefas: K/N · transições: <n aplicadas | nenhuma> (transition: <modo>)   # só com jira.enabled; sync pulado/falho aparece AQUI com o motivo, jamais some
 - **Fila do épico**: <fatia marcada `entregue` · próximo passo pronto: /keelson:continue <slug-âncora>>   # só demanda com **Epico**:
-- **Duração**: <total> (largada HH:MM → entrega HH:MM, horário de Brasília) · specify <n>min · plan <n>min · tasks <n>min · implement <n>min   # etapa que a rota não teve não aparece; marca ausente → o que foi medido + lacuna nomeada
+- **Duração**: <total> (largada HH:MM → entrega HH:MM, horário de Brasília) · specify <n>min · plan <n>min · tasks <n>min · implement <n>min · janela pico ~<N>k tokens   # etapa que a rota não teve não aparece; marca ausente → o que foi medido + lacuna nomeada; janela só quando o log existe
 - **Pendente de você**: <revisão da branch · merge · resposta a pergunta estacionada · handoff · nada>
 
 ## Relatório de aceitação (PO)                    # rotas com brief/espelho
@@ -69,6 +69,14 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 A **linha de duração** é relógio de parede — inclui esperas — e jamais vira gatilho de
 parada ("fôlego não é gatilho", 4.23/4.24). Fontes das marcas: `Cronologia` do BRIEF na
 rota formal; eventos `marco` do ledger nas rotas sem arquivo (`sdd-conventions.md`).
+A cauda **`janela pico`** (decisão 4.148) segue a mesma régua da duração — **medida ou
+omitida, nunca estimada**: a fonte é `thoughts/local/session-window.log` (uma linha
+`<ts> janela=<tokens>` por Stop, escrita pelo hook `window-marker` fora do contexto do
+modelo); o pico é o maior valor do log (`sort` numérico da coluna). Sem log (hook
+indisponível, projeto sem ficha) → a cauda é omitida, sem lacuna declarada — ela é
+telemetria da dieta de contexto (meta da 4.103: ≤600k), não obrigação do report. O
+fecho que move o ledger para `reported-*/` move o log junto — mesma razão: sem o corte,
+o pico da próxima rodada herda o da anterior.
 
 ## §3. O que cada invocador acrescenta
 

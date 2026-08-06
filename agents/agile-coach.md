@@ -40,7 +40,7 @@ Erro de **processo** = um artefato de processo do keelson (command/agent/skill) 
 Ler `<docsRoot>/_meta/learning-log.md` e procurar entrada com a mesma causa-raiz (não o mesmo sintoma).
 
 - **Inédita** → siga para o passo 3 como caso novo.
-- **Reincidente** → a regra aplicada da outra vez **falhou**. Não adicione uma segunda regra: localize a existente no artefato, **reformule-a** (mais específica, mais imperativa, movida para perto do ponto de decisão, ou convertida em check do validator — o que atacar a causa da falha) e incremente `reincidencia:` na entrada do ledger.
+- **Reincidente** → a regra aplicada da outra vez **falhou**. Não adicione uma segunda regra: localize a existente no artefato, **reformule-a** (mais específica, mais imperativa, movida para perto do ponto de decisão, ou convertida em check do validator — o que atacar a causa da falha) e incremente `reincidencia:` na entrada do ledger. **Escada de promoção (decisão 4.149)**: com `reincidencia: ≥ 2`, texto reformulado deixa de ser resposta suficiente — sua proposta (patch ou `PROPOSTA_PLUGIN`) **inclui o check mecânico ou autocheck desenhado** (o que prova a regra fora do contexto do modelo); classe imecanizável → declare por quê, e manter só texto vira decisão explícita do Diretor.
 
 ### 3. Identificar o artefato dono
 

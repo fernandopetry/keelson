@@ -138,6 +138,34 @@ if printf '%s\n' "$staged" | grep -qE '^(agents/[^/]+\.md$|scripts/check-agents\
   fi
 fi
 
+# Sincronização de comandos/agents: check quando as fontes mudam; suíte quando o motor muda (4.147)
+if printf '%s\n' "$staged" | grep -qE '^(commands/[^/]+\.md$|agents/[^/]+\.md$|README\.md$|docs/_meta/method-guide\.md$|templates/CLAUDE\.keelson-block\.md$|scripts/check-sync\.sh$|scripts/tests/sync/)'; then
+  if [ -f scripts/check-sync.sh ]; then
+    if ! out="$(bash scripts/check-sync.sh 2>&1)"; then
+      printf '%s\n' "$out" | sed 's/^/    /' >&2
+      echo "[keelson pre-commit] BLOQUEADO: sincronização de comandos/agents falhou (4.147)." >&2
+      echo "  Escape consciente: KEELSON_SKIP_TESTS=1" >&2
+      exit 1
+    fi
+  else
+    echo "[keelson pre-commit] aviso: scripts/check-sync.sh ausente — sincronização não conferida." >&2
+  fi
+  if printf '%s\n' "$staged" | grep -qE '^scripts/(check-sync\.sh$|tests/sync/)'; then
+    if [ -f scripts/tests/sync/run.sh ]; then
+      echo "[keelson pre-commit] check-sync.sh/suíte no commit — rodando scripts/tests/sync/run.sh" >&2
+      if ! out="$(bash scripts/tests/sync/run.sh 2>&1)"; then
+        printf '%s\n' "$out" | tail -25 | sed 's/^/    /' >&2
+        echo "[keelson pre-commit] BLOQUEADO: suíte do check-sync falhou (acima, resumida)." >&2
+        echo "  Escape consciente: KEELSON_SKIP_TESTS=1" >&2
+        exit 1
+      fi
+      printf '%s\n' "$out" | tail -1 | sed 's/^/[keelson pre-commit] /' >&2
+    else
+      echo "[keelson pre-commit] aviso: scripts/tests/sync/run.sh ausente — suíte não conferida." >&2
+    fi
+  fi
+fi
+
 # Checks de release: obrigatórios quando os arquivos de release mudam
 if printf '%s\n' "$staged" | grep -qE '^(\.claude-plugin/|CHANGELOG\.md$|README\.md$|scripts/publish-wiki\.sh$)'; then
   if [ -f scripts/check-release.sh ]; then

@@ -1,0 +1,11 @@
+FALHA: README marca /keelson:falsodagger com † mas o comando não tem disable-model-invocation
+FALHA: /keelson:oculto é humano-only (disable-model-invocation) mas a linha do README não tem o marcador †
+FALHA: /keelson:oculto é humano-only mas não aparece na nota do bloco (templates/CLAUDE.keelson-block.md)
+AVISO: commands/semguia.md sem heading `/keelson:semguia` no method-guide (§3.x)
+FALHA: commands/semreadme.md sem linha na tabela Commands do README.md
+FALHA: README lista /keelson:fantasma mas não existe commands/fantasma.md nem skills/fantasma/
+FALHA: agents/errado.md com frontmatter name: 'outro' ≠ nome do arquivo
+FALHA: agents/errado.md sem linha na tabela §5 do method-guide
+FALHA: tabela §5 do method-guide lista `inexistente` mas não existe agents/inexistente.md
+
+check-sync: 8 violação(ões), 1 aviso(s).

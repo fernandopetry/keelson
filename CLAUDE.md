@@ -28,7 +28,8 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   decisão 4.63): antes de numerar decisão ou bumpar, `git fetch` e confira o topo da main.
   O hook `scripts/git-hooks/pre-commit` bloqueia commit na `main` atrás do `origin/main`
   **e roda a guarda de qualidade** (4.83: `bash -n` nos scripts staged; suíte do grafo
-  quando o motor muda; `check-release.sh` quando versão/CHANGELOG/wiki mudam) — ative
+  quando o motor muda; `check-release.sh` quando versão/CHANGELOG/wiki mudam;
+  `check-sync.sh` quando comando/agent/README/method-guide mudam, 4.147) — ative
   uma vez por clone: `git config core.hooksPath scripts/git-hooks`. O CI (`test.yml`)
   repete o conjunto em Linux a cada push/PR.
 
@@ -38,10 +39,14 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   do `README.md` · §3.x do `docs/_meta/method-guide.md`. Comando humano-only
   (`disable-model-invocation`) → também a nota do `templates/CLAUDE.keelson-block.md`.
   Continuam **3** — a página da wiki é derivada do method-guide (4.81); não escreva a
-  quarta cópia.
+  quarta cópia. **Provado mecanicamente** por `scripts/check-sync.sh` (pre-commit + CI,
+  decisão 4.147): linha do README, marcador `†` ⇔ flag, nota do bloco e (AVISO) seção
+  do method-guide.
 - Agent novo/renomeado → sincronizar: `agents/*.md` (arquivo + `name:` + `# Subagent:`) ·
   tabela §5 do `method-guide.md` · comentário de `agents/` no `README.md` · §2/§3 do
   `decisions.md` (convenção de nomes) — e a description declara **todos** os invocadores.
+  A parte mecânica (arquivo/`name:`/heading/tabela §5, ambos os sentidos) também é
+  provada pelo `check-sync.sh`; comentário do README e decisions.md seguem humanos.
 - **Um dono por regra**: o core (`guidelines/core/`) diz *o quê* (agnóstico); o perfil diz
   *como* na linguagem. Não duplicar regra entre eles. Blocos compartilhados dos comandos
   têm dono único em `docs/_meta/conventions/` — `sdd-conventions.md` (convenções comuns,

@@ -7,6 +7,8 @@
 
 Papel do ledger: memória de longo prazo do auto-aprendizado. É ele que permite (a) detectar **reincidência** — se a mesma causa-raiz volta, a regra anterior falhou e deve ser **reformulada**, não duplicada; (b) rodar a **destilação** (fundir/remover regras nos artefatos sem perder o histórico). Entradas nunca são apagadas; no máximo marcadas `estado: destilada`.
 
+**Escada de promoção por contagem (decisão 4.149)** — o campo `reincidencia:` não é só registro, é gatilho: `1` → a regra existente é **reformulada** (nunca duplicada — regra acima); `≥ 2` → texto provou duas vezes que não segura sozinho, e a proposta **obrigatoriamente vem com o check mecânico ou autocheck desenhado** (script, validator, fixture, autocheck de agent — o que provar a regra fora do contexto do modelo); se a classe for imecanizável, a proposta **declara por quê** e a aceitação do texto-de-novo vira decisão explícita do Diretor, nunca default. A contagem é o fato que dispara — não o juízo de quem propõe (precedente: LRN-038 e LRN-046 seguiram exatamente esta escada, caso a caso; a 4.149 a torna regra).
+
 > **Origem das entradas abaixo**: são o registro de gênese, herdado do projeto que deu origem ao keelson. Referências a slugs/PLANs/ACs concretos (ex.: `jira`, `professionals`, `team-map`) são a **proveniência real** de cada lição — preservada porque genericizá-la falsearia o histórico. Os caminhos de artefato (`commands/`, `skills/`, `agents/`) já estão no layout do keelson.
 
 ## Formato canônico

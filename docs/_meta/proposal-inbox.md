@@ -14,7 +14,7 @@ registrada aqui **antes do parecer**, e nenhuma entra em doutrina sem passar por
 - **Fechar na leva**: a leva que aplica/recusa atualiza o Estado — `aplicada (4.x)` com a
   decisão que a absorveu, ou `recusada (motivo curto)`. `recebida` que atravessa uma leva
   é pendência visível, não backlog silencioso.
-- **Reincidência referencia a linha anterior** — é o sinal de que o elo falhou uma vez.
+- **Reincidência referencia a linha anterior** — é o sinal de que o elo falhou uma vez. A partir da **2ª reincidência**, a proposta chega com o **check mecânico/autocheck desenhado** ou com a justificativa de imecanizável (escada da 4.149 — dono: `learning-log.md`); proposta de texto-de-novo sem uma das duas volta para o proponente.
 - A fila carrega **ponteiros, nunca texto de doutrina** — o dono da regra é o arquivo dela.
 
 | Data | Origem | Padrão proposto | Alvo | Estado |

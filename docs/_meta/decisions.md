@@ -2,7 +2,7 @@
 
 > Memória institucional das decisões sobre como o keelson (spec-driven development) é praticado. Diferente da doutrina de código (QUALITY-CHARTER + perfil ativo, que regem o **código**), este arquivo rege o **processo de desenvolvimento**.
 
-**Última revisão**: 2026-08-03
+**Última revisão**: 2026-08-06
 **Status do documento**: vivo, atualizado conforme decisões evoluem
 
 > **Nota de rename (decisão 4.40, 2026-07-26)**: entradas anteriores à 0.21.0 citam agents pelos IDs antigos (`task-implementer`, `task-reviewer`, `task-verifier`, `security-reviewer`, `product-critic`, `process-tuner`, `profile-writer`). Histórico não se reescreve — o de-para completo está na decisão 4.40.
@@ -1737,6 +1737,46 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 **Decisão**: toda pergunta de escalação passa no teste — **o Diretor decide lendo só o bloco da escalação**, sem abrir artefato: (a) é uma **pergunta em linguagem do Diretor**, terminando em `?` — rótulo, heading ou ID de requisito não é pergunta; (b) carrega **uma linha de "por que importa"** — a consequência prática no produto, não no artefato (o custo do ramo da 4.136 frequentemente a satisfaz; não duplicar quando já satisfaz); (c) **uma decisão por pergunta**; (d) aceitar o default custa uma palavra. Vale para todo papel que escala "como toda escalação" (mesma cláusula da 4.136).
 
 **Aplicação**: `agents/po.md` (contrato de escalação — dono; os invocadores já apontam para a régua dele).
+
+---
+
+### 4.146 — Re-âncora pós-compactação: o disco volta ao contexto assim que a janela é comprimida
+
+**Problema**: o keelson persiste estado fora do contexto (run-state, ledger, artefatos SDD) exatamente porque a sumarização come detalhe de orquestração — mas a ponte de volta era passiva: depois de uma compactação no meio de wave, a sessão seguia com o resumo comprimido até algum guard de Stop reagir (tarde: o `wave-guard` só age quando o turno tenta encerrar) ou até o modelo, por disciplina, reler o disco. Entre a compactação e a releitura, despachos podem correr sobre estado deduzido do resumo — a janela medida do ciclo (867k/1M, 4.103) torna o cenário rotineiro, não hipotético. (Benchmark do affaan-m/ECC, 2026-08-06: o par pre-compact/session-start de lá persiste e restaura contexto na fronteira da compactação; aqui a persistência já existia — faltava só a restauração ativa.)
+
+**Decisão**: hook **`compact-anchor`** (SessionStart, matcher `compact`): no primeiro instante pós-compactação, lê o disco fora do contexto do modelo e **reinjeta os fatos** — campos dos `run-state-*.md` com `status: em_andamento` (com a instrução de reler os artefatos de `retomada:` antes do próximo despacho) e a contagem de eventos ativos do ledger. Só espelha o disco: não decide, não bloqueia; sem run e sem ledger → silêncio. Doutrina dos hooks preservada (bash 3.2, fallback gracioso).
+
+**Aplicação**: `hooks/compact-anchor.sh` + entrada SessionStart no `hooks/hooks.json`; nota no bullet do run-state em `sdd-conventions.md`. Teste sintético no scratchpad (com/sem run ativo, sem cwd, source errado). Observar na 1ª compactação real de ciclo: o despacho seguinte relê a retomada?
+
+---
+
+### 4.147 — Sincronização de comandos e agents vira fato mecânico (check-sync no pre-commit e CI)
+
+**Problema**: a regra dos "3 lugares" (comando → `commands/` + tabela do README + §3.x do method-guide; humano-only → nota do bloco; agent → arquivo + `name:` + `# Subagent:` + tabela §5) era convenção manual do CLAUDE.md — a mesma classe de regra que a 4.48 já provou que falha em silêncio quando só existe como texto (e o repo carregava duas carências não-declaradas: `init` e `verify-handoff` sem seção no method-guide). Release e paridade MCP já são provados mecanicamente (4.83, 4.105); a sincronização, não. (Benchmark do affaan-m/ECC, 2026-08-06: o AgentShield de lá linta estaticamente os próprios artefatos do harness — a ideia adaptada ao que o keelson realmente sincroniza à mão.)
+
+**Decisão**: **`scripts/check-sync.sh`** prova, nos dois sentidos: comando ⇔ linha na tabela do README; marcador `†` ⇔ `disable-model-invocation`; humano-only presente na nota do bloco; agent ⇔ `name:`/heading/tabela §5. Linha do README sem arquivo aceita skill homônima (`skills/<nome>/`). Comando sem heading no method-guide degrada em **AVISO** (carência conhecida declarada, nunca ERROR inventado — mesma filosofia do grafo, 4.82); as duas carências existentes ficam visíveis a cada rodada até alguém decidi-las. Fora do alcance (honesto): comentário de `agents/` no README e §2/§3 do decisions.md são prosa — seguem humanos. Roda no pre-commit quando as fontes mudam e no CI; suíte com fixtures + expected congelado + caso repo-real (`scripts/tests/sync/`), mesma régua das suítes do grafo/map/agents.
+
+**Aplicação**: `scripts/check-sync.sh` · `scripts/tests/sync/` · `scripts/git-hooks/pre-commit` · `.github/workflows/test.yml` · CLAUDE.md (a regra agora aponta a prova).
+
+---
+
+### 4.148 — Janela de contexto medida por hook e citada no report (telemetria da dieta)
+
+**Problema**: a dieta de contexto tem meta numérica (janela ≤600k, 4.103) e a linha de duração do report é "relógio medido, nunca estimativa" (4.56) — mas a janela em si não era medida por ninguém: a base da 4.103 (867k/1M, US$ 193/ciclo) saiu de observação manual, e "observar a janela nas próximas levas" ficou sem instrumento. Métrica sem medidor vira impressão. (Benchmark do affaan-m/ECC, 2026-08-06: o cost tracker de lá emite marcadores leves por Stop — a versão keelson mede a janela, que é a métrica que a doutrina já persegue.)
+
+**Decisão**: hook **`window-marker`** (Stop): a cada Stop, lê o final do transcript fora do contexto do modelo e appenda `<ts> janela=<tokens>` (input + cache da última mensagem) em `thoughts/local/session-window.log`. Só age em projeto keelson (ficha ou `thoughts/local/` presentes); nunca bloqueia; custo constante (lê só a cauda do arquivo). A linha de duração do report ganha a cauda **`janela pico ~<N>k tokens`** — medida do log ou **omitida** (telemetria, não obrigação: sem lacuna declarada); o fecho move o log para `reported-*/` junto do ledger, senão o pico da próxima rodada herda o desta. Dono da régua: `report-contract.md`.
+
+**Aplicação**: `hooks/window-marker.sh` + entrada Stop no `hooks.json`; `report-contract.md` (linha + parágrafo da fonte); item 10 da Entrega do `/keelson:auto` (corte do log). Observar nas próximas levas do LMS: a meta ≤600k sai de impressão para série medida.
+
+---
+
+### 4.149 — Escada de promoção por reincidência contável: 2ª volta exige check, não texto melhor
+
+**Problema**: o ledger já conta reincidência (`reincidencia:`) e a 1ª volta já tem regra (reformular, nunca duplicar) — mas a 2ª volta em diante era juízo caso a caso: "check mecânico reservado para reincidência" aparece como promessa em várias levas, e a decisão de mecanizar dependia de alguém lembrar e defender. O acervo prova os dois lados: LRN-038 só virou check (`check-agents.sh`) na 2ª ocorrência porque a 1ª nunca escalou; LRN-046 nomeou o princípio ("regra que existe verbatim e reincide não ganha mais texto") — para um caso. Faltava o gatilho ser **a contagem**, não a memória. (Benchmark do affaan-m/ECC, 2026-08-06: os instincts de lá promovem comportamento por escore de confiança que sobe com repetição; a versão keelson troca o pseudo-número pelo fato que o ledger já registra — a contagem de reincidência.)
+
+**Decisão**: o campo `reincidencia:` vira **gatilho de escada**: `1` → reformular a regra existente (inalterado); **`≥ 2` → a proposta obrigatoriamente inclui o check mecânico ou autocheck desenhado** (script, validator, fixture, autocheck de agent — o que provar a regra fora do contexto do modelo); classe imecanizável → a proposta declara por quê, e manter só texto vira decisão explícita do Diretor, nunca default. Na fila do mantenedor, proposta de 2ª reincidência sem check nem justificativa **volta ao proponente**. Dono da escada: `learning-log.md` (cabeçalho); o `agile-coach` a executa.
+
+**Aplicação**: `docs/_meta/learning-log.md` (cabeçalho — dono) · `agents/agile-coach.md` (bullet Reincidente) · `docs/_meta/proposal-inbox.md` (contrato da fila). Observar na próxima reincidência real: a proposta chega com o check desenhado ou com a justificativa?
 
 ---
 
