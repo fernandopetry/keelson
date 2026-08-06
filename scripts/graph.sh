@@ -685,6 +685,21 @@ END {
       finding("ERROR", "feat-sem-verificacao", det)
   }
 
+  # ---- fr-sem-ac (todo stage — 4.153) ----
+  # FR declarado na SPEC sem nenhum AC que o cubra (aresta ac-covers). E o lado
+  # interno da verificabilidade (o fr-sem-task/ac-sem-task olham TASK, nao a SPEC).
+  # SPEC Done = acervo legado -> WARNING [legacy].
+  for (i = 1; i <= NN; i++) {
+    if (NTY[i] != "FR") continue
+    fr = NID[i]
+    hit = 0
+    for (j = 1; j <= ACN; j++) if (ACT[j] == fr) { hit = 1; break }
+    if (hit) continue
+    det = fr " sem nenhum AC que o cubra na SPEC (" nodefile[fr] ")"
+    if (status["SPEC-" mmm(fr)] == "Done") finding("WARNING", "fr-sem-ac", det " [legacy]")
+    else finding("ERROR", "fr-sem-ac", det)
+  }
+
   # ---- metrica-sem-veredito (todo stage — 4.99) ----
   # SPEC no regime da fonte declarada (linha **Fonte de medicao**:), entregue
   # (>=1 PLAN Done que a referencia) e ainda sem linha **Veredito de metrica**:.
@@ -742,6 +757,27 @@ END {
       if (!(t in tclos)) continue
       if (status[t] != "Done")
         finding("WARNING", "status-vs-closure", t ": closure preenchida (Data conclusao/Commit SHA) mas Status \"" status[t] "\" (" nodefile[t] ")")
+    }
+
+    # ---- plan-status-vs-tasks (4.153) ----
+    # PLAN promovido a Done com TASK dele ainda aberta: a promocao correu na frente
+    # da execucao (irmao PLAN-level do status-vs-closure). TASK sem status parseavel
+    # nao conta como aberta — degrada na direcao segura, nunca inventa achado.
+    for (i = 1; i <= NN; i++) {
+      if (NTY[i] != "PLAN") continue
+      p = NID[i]
+      if (status[p] !~ /^Done/) continue
+      if (PLANF != "" && mmm(p) + 0 != PLANF + 0) continue
+      open = 0; ex = ""
+      for (j = 1; j <= TKN; j++) {
+        t = TK[j]
+        if (planof[t] != p) continue
+        if (status[t] == "" || status[t] == "Done") continue
+        open++
+        ex = (ex == "" ? t : ex ", " t)
+      }
+      if (open > 0)
+        finding("WARNING", "plan-status-vs-tasks", p " com Status Done e " open " TASK(s) aberta(s): " ex)
     }
 
     # ---- fr-sem-task / ac-sem-task ----

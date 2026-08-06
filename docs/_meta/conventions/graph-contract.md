@@ -83,6 +83,8 @@ ponta a ponta, e o validator decide com os próprios olhos (cobertura mista, §5
 | `id-duplicado` | mesmo ID de nó declarado 2+ vezes (precedente §4.63) | ERROR (sempre) |
 | `pertence-vs-arquivo` | MMM da âncora (`Pertence a` ou `Brief`) ≠ MMM do nome do arquivo/ID | ERROR |
 | `wave-incoerente` | `wave(T) ≤ wave(dep)` no **mesmo** PLAN (cross-PLAN não se aplica) | ERROR · carência |
+| `fr-sem-ac` | FR declarado na SPEC sem nenhum AC que o cubra (aresta `ac-covers`) — o lado interno da verificabilidade; `fr-sem-task`/`ac-sem-task` olham TASK, este olha a própria SPEC (decisão 4.153). SPEC `Status: Done` → `WARNING [legacy]` | ERROR · carência |
+| `plan-status-vs-tasks` | PLAN com `Status: Done` e ≥1 TASK dele com status aberto — a promoção correu na frente da execução (irmão PLAN-level do `status-vs-closure`; decisão 4.153). TASK sem status parseável não conta como aberta — degrada na direção segura | WARNING |
 | `fr-sem-task` | FR coberto pelo PLAN sem `realiza` de TASK dele (NFR não entra: NFR não é realizado por TASK — verifica-se na DoD do PLAN) | ERROR · carência |
 | `ac-sem-task` | AC de FR coberto sem `covers-ac` de TASK do PLAN | ERROR · carência |
 | `realiza-fora-cobertura` | TASK realiza FR que o PLAN dela não cobre | ERROR |
@@ -116,7 +118,7 @@ scripts/graph.sh <dir-do-slug> [--check] [--stage=plan|tasks] [--format=tsv|merm
   briefing (prefixo antes de `/skills/`).
 - `--stage=plan` roda só o computável sem TASKs (`ciclo-comp`, `ref-quebrada` do lado
   PLAN/SPEC, `id-duplicado`, `fr-mapeado-fora-cobertura`, `fr-sem-comp`, `comp-sem-fr`,
-  `realiza-vs-mapeamento`) — PLAN recém-criado sem `tasks/` sai 0. `--stage=tasks`
+  `realiza-vs-mapeamento`, `fr-sem-ac`) — PLAN recém-criado sem `tasks/` sai 0. `--stage=tasks`
   (ou sem flag) roda tudo. `--plan MMM` restringe ao PLAN indicado — MMM numérico
   (com ou sem zero-padding); PLAN inexistente no slug é uso incorreto (exit 2),
   nunca "verde em silêncio".

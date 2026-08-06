@@ -77,6 +77,11 @@ runcase metrica-veredito-tsv     defeito-metrica-veredito 0 defeito-metrica-vere
 # status-vs-closure (decisão 4.131): closure preenchida (Data conclusão/Commit SHA) com
 # Status ≠ Done → WARNING (exit 0 — nunca reprova); Done com closure prova o silêncio
 runcase status-closure-check     defeito-status-closure 0 defeito-status-closure--check.txt --check
+# fr-sem-ac + plan-status-vs-tasks (decisão 4.153): FR sem AC na SPEC (ERROR; SPEC Done
+# → WARNING [legacy]) e PLAN Done com TASK aberta (WARNING). No --stage=plan só o
+# fr-sem-ac roda (o plan-status-vs-tasks é task-side)
+runcase estado-check             defeito-estado 1 defeito-estado--check.txt --check
+runcase estado-stage-plan        defeito-estado 1 defeito-estado--check-stage-plan.txt --check --stage=plan
 
 # Determinismo: duas execuções idênticas byte a byte (AC-001-001)
 total=$((total + 1))

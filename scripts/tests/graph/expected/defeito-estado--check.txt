@@ -1,0 +1,3 @@
+ERROR	fr-sem-ac	FR-001-002 sem nenhum AC que o cubra na SPEC (specs/SPEC-001-pedidos.md)
+WARNING	fr-sem-ac	FR-002-001 sem nenhum AC que o cubra na SPEC (specs/SPEC-002-antiga.md) [legacy]
+WARNING	plan-status-vs-tasks	PLAN-001 com Status Done e 1 TASK(s) aberta(s): TASK-001-001

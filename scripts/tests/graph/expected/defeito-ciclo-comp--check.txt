@@ -1,3 +1,4 @@
+ERROR	ac-sem-task	AC-001-001 (cobre FR-001-001, PLAN-001) sem TASK que o cubra em criterio ou roteiro
 ERROR	ciclo-comp	COMP-001-001 -> COMP-001-002 -> COMP-001-001
 ERROR	fr-sem-task	FR-001-001 coberto por PLAN-001 sem TASK que o realize
 WARNING	comp-sem-fr	COMP-001-002 sem linha no Mapeamento FR -> componente (§7)
