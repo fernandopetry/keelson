@@ -32,7 +32,7 @@ Você é o executor da **verificação de tela remota** (gate `screenVerify`): f
 3. **Base atualizada** (para as correções que possam surgir): `git -C <root> fetch origin`; se a base (`main`) está atrás → `git -C <root> pull --ff-only origin main`; divergida → relatar (não bloqueia, mas registre).
 4. **Resolver o alvo**:
    - **Com `[slug|branch]`**: localizar a branch e os `{docsRoot}/<slug>/handoffs/HANDOFF-*.md` com `status: Pendente`. Slug → a branch que carrega o trabalho (via `git worktree list`/`git branch`); branch → o slug sai do handoff que ela contém.
-   - **Sem argumento**: para cada worktree de `git worktree list`, procurar `{docsRoot}/*/handoffs/HANDOFF-*.md` com `status: Pendente`; montar a lista `(slug, branch, HANDOFF-id, nº de itens V* pendentes)` e **pedir ao humano que escolha** (via AskUserQuestion). Nenhum pendente → reportar e encerrar.
+   - **Sem argumento**: a lista `(worktree, branch, slug, HANDOFF-id, itens V* pendentes)` chega como fato — `bash "${CLAUDE_PLUGIN_ROOT}/scripts/handoff-scan.sh" --repo <root>` (4.154) — e o humano **escolhe** (via AskUserQuestion). Nenhum pendente → reportar e encerrar.
 5. **Branch salva no remoto**: `git -C <root> log origin/<branch>..<branch>` (e o `status` do worktree da branch) — nada pode se perder ao consolidar. Trabalho não pushado/uncommitado → **parar** e pedir commit+push antes.
 
 `--dry-run` para aqui, imprimindo alvo + plano.

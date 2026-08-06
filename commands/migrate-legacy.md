@@ -46,13 +46,18 @@ Cada item extraído referencia o arquivo de origem, para revisão.
 
 ## Etapa 2: organizar arquivos legados
 
-Se **não** for `--keep-in-place`:
+Se **não** for `--keep-in-place`, a movimentação é mecânica e **transacional**:
 
-1. Criar `{docsRoot}/<slug>/legacy/`.
-2. Mover **todos** os `.md` da raiz de `{docsRoot}/<slug>/` para `legacy/`, preservando nomes.
-3. Usar `git mv` se for repositório git (preserva histórico).
-4. **Não mexer** em subpastas existentes que não sejam SDD (ex: `assets/`, `images/`).
-5. **Se já existirem** `specs/`, `plans/`, `tasks/`: deixar como estão (caso especial, alertar usuário).
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/legacy-move.sh" {docsRoot}/<slug>
+```
+
+(4.154: move os `.md` da raiz para `legacy/` com `git mv` quando rastreado, preserva
+subpastas não-SDD, e falha no meio **desfaz sozinha** — rollback de memória é o que dá
+errado sob falha). Linhas `aviso sdd-parcial` (specs/plans/tasks já existentes com
+conteúdo) → deixar como estão e **alertar o usuário** (caso especial). Exit 1 → nada
+foi migrado; reporte a causa. Script indisponível → mova à mão pela mesma régua,
+declarando.
 
 Se `--keep-in-place`: deixar arquivos onde estão, apenas referenciar no INDEX.
 
@@ -110,7 +115,7 @@ Corrija no `legacy/TRIAGE-<data>.md` (fonte durável — princípio 2) e reespel
 
 ## Comportamento em caso de falha
 
-- **Falha ao mover arquivos ou ao criar o INDEX**: rollback (mover de volta os já movidos, remover o INDEX criado), reportar.
+- **Falha ao mover arquivos**: o `legacy-move.sh` já desfez a movimentação sozinho (exit 1) — reportar a causa. **Falha ao criar o INDEX**: remover o INDEX criado e reportar (os arquivos seguem em `legacy/`, que é estado final válido).
 - **Conflito stack legado vs ficha/perfil**: warning, não bloqueia — migração registra o que encontrou, não corrige.
 
 ## Limites

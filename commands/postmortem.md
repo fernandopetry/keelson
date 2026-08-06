@@ -60,8 +60,10 @@ mecanismo inclui "por que chegou a produção / por que a detecção demorou".
 
 1. Resolver o alvo: a sessão corrente (janela: do início até agora), ou slug/branch/range
    (→ INDEX, PLANs, TASKs, handoffs do intervalo). Registrar commits e janela cobertos.
-2. Ler a ficha (`keelson.config.json`) e capturar a **versão instalada do plugin** (da
-   instalação local) — sem ela o mantenedor não sabe se a doutrina vigente já cobre o caso.
+2. Ler a ficha (`keelson.config.json`) e capturar os fatos de cabeçalho — versão
+   instalada do plugin, branch/HEAD e janela de commits — via
+   `bash "${CLAUDE_PLUGIN_ROOT}/scripts/postmortem-facts.sh" --repo <raiz> [--since <ref>]`
+   (4.154); sem a versão o mantenedor não sabe se a doutrina vigente já cobre o caso.
 3. Episódio não delimitável (sem sessão relevante, sem slug, sem relato) → parar e dizer
    o que falta.
 

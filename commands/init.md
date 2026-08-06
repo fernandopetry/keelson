@@ -187,7 +187,14 @@ Com `method: skill:screen-verify`, garanta **também** a linha `.playwright-mcp/
 
 ## Etapa 6 — Self-check (falsificável, não confie na configuração)
 
-Prove que a ficha funciona:
+A parte que o disco e o git provam sozinhos chega como **fato** (4.154): rode
+`bash "${CLAUDE_PLUGIN_ROOT}/scripts/init-selfcheck.sh" <raiz>` — codePaths, binários
+dos `quality.*`, matching real dos `sensitiveGlobs`, resolução/`reviewed`/`charter`
+do perfil, `keelson.local.*` (versionamento, gitignore provado, placeholders),
+`check-ignore` dos diretórios de artefato, flags efetivas do Playwright por escopo e
+campos mínimos do Jira. Cada linha `falha`/`aviso` vira item do relatório. O que exige
+MCP vivo continua seu, abaixo (runtime de browser respondendo; conector Jira com
+chamada de prova). Prove o restante:
 - `quality.test`/`quality.lint`/`quality.mutation` declarados **existem/rodam** (execução rápida ou `--help`/dry-run — para mutação, nunca a rodada completa: ela é cara e pertence ao `/keelson:integrate`);
 - `quality.boot` declarado → o que ele invoca **existe no disco** (binário no PATH, compose file, script) — não suba a app aqui, prove só que o comando não é fantasia; campo ausente numa ficha antiga → complete com a pergunta da Etapa 2 (Regra de merge);
 - os `codePaths` existem no disco;

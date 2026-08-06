@@ -1812,6 +1812,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `scripts/graph.sh` + `graph-contract.md` (§3 catálogo, §4 stage) + fixture `defeito-estado` (com o caso `[legacy]` plantado) · `rebuild-index.md` cita os checks como fato · suíte do grafo: 30 casos.
 
+### 4.154 — A fila adiada da 4.151 fecha: sondagem, self-check, épico, handoffs, migração, postmortem e arestas viram fato
+
+**Problema**: a 4.151 adiou sete mecanizações "por gatilho de reincidência" para manter aquela leva coerente — mas o Diretor pediu a aplicação completa: o self-check do init (que roda a cada upgrade em todo consumidor e cuja régua "cobertura se verifica, não se infere" é exatamente o argumento contra deixá-lo com o modelo), a sondagem de ambiente do `qa` (cuja saída literal É a `evidencia_indisponibilidade` exigida), a derivação de estado do `/keelson:continue` (autodeclarada determinística), a varredura de HANDOFFs por worktree, o mover/rollback do migrate-legacy (rollback de memória sob falha é o modo de erro clássico), os fatos de cabeçalho do postmortem e a prova de preservação de arestas da reescrita do scribe (4.117 — até aqui, conferida "mentalmente" por quem não tem shell).
+
+**Decisão**: sete scripts fecham a fila, no mesmo contrato da 4.151 (suíte congelada, pre-commit/CI, degradação declarada, doutrina cita fato): **`init-selfcheck.sh`** (a parte que disco+git provam: codePaths, binários, matching real de `sensitiveGlobs`, perfil/`charter:`, `keelson.local.*` com `check-ignore` provado, flags efetivas do Playwright por escopo, campos mínimos do Jira — o que exige MCP vivo continua do comando); **`probe-env.sh`** (causas `credencial_ausente`/`credencial_placeholder`/`app_fora_do_ar` com evidência literal, boot da 4.71 tentado e registrado, senha nunca ecoada — runtime de browser continua do `qa`); **`epic-state.sh`** (fila do BRIEF épico × artefatos filhos, primeira regra que casa, divergências apontadas — proposta e dependência entre fatias continuam do comando); **`handoff-scan.sh`** (Pendentes por worktree com contagem de V* abertos — dedupe semântica continua do comando); **`legacy-move.sh`** (transacional: falha no meio desfaz sozinha; `git mv` quando rastreado); **`postmortem-facts.sh`** (versão instalada, branch/HEAD, janela de commits); **`edge-diff.sh`** (campos de aresta + ACs de critérios antes/depois da reescrita — `perdida` não pedida volta no re-despacho).
+
+**Aplicação**: `scripts/*.sh` + `scripts/tests/{init-selfcheck,probe-env,epic-state,handoff-scan,legacy-move,postmortem-facts,edge-diff}/` (43 casos) · pre-commit/CI · doutrina: `init.md` (Etapa 6), `agents/qa.md`, `continue.md` (Etapa 1), `verify-handoff.md`/`integrate.md`, `migrate-legacy.md` (Etapas 2 e falhas), `postmortem.md` (Etapa 0), `graph-contract.md` §4.1 (edge-diff no fluxo de correção). A lista adiada da 4.151 fica **vazia**.
+
 ---
 
 ## 5. Quality gates inegociáveis

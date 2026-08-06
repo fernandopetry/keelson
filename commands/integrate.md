@@ -28,7 +28,7 @@ Você é um Release Engineer especialista em integração assistida por IA. Sua 
 1. Resolver PLAN-MMM em `{docsRoot}/*/plans/` e ler o slug, a SPEC e o `TASK-MMM-INDEX.md`.
 2. Confirmar que **todas** as TASKs do PLAN estão `Done` com closure preenchida. Se houver TASK aberta/Blocked → parar e reportar (rode o `/keelson:implement` antes).
 3. Detectar repositório git e a branch atual. Confirmar que há commits à frente da base.
-4. **Handoff de verificação pendente** (só quando `gates.screenVerify` está ativo): checar `{docsRoot}/<slug>/handoffs/HANDOFF-*.md` com `status: Pendente` (ver `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`). Se o ambiente atual **tem** acesso a tela → parar e sugerir fechar o handoff antes do PR (a verificação virou possível). Senão → **não bloqueia**, mas a pendência é destacada na descrição do PR (Etapa 3) e no output.
+4. **Handoff de verificação pendente** (só quando `gates.screenVerify` está ativo): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/handoff-scan.sh" --repo <raiz> --no-worktrees` lista os `status: Pendente` do slug como fato (contrato: `handoff-protocol.md`). Se o ambiente atual **tem** acesso a tela → parar e sugerir fechar o handoff antes do PR (a verificação virou possível). Senão → **não bloqueia**, mas a pendência é destacada na descrição do PR (Etapa 3) e no output.
 
 ## Etapa 1: validar a Definition of Done do PLAN
 
