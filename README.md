@@ -408,15 +408,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.81.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.82.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the `agent-guard` anti-renudge valve now holds under parallel
-dispatch** (decision 4.141). The blocked-call marker became an append-only window of
-recent fingerprints instead of a single slot, so two legitimate generic spawns blocked
-in the same turn no longer cancel each other's retry. No re-init needed — consumers
-only update the plugin.
+New in this release: **the cycle now closes both ways** (decisions 4.142–4.145). A
+convergence pass at delivery re-reads the whole SPEC against the final code — including
+the inverse question, "was everything that exists actually requested?" — pending
+`[confirmar]` markers get a budget of 3 per SPEC, and escalation questions must be
+answerable from their own block alone. No re-init needed — consumers only update the
+plugin.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

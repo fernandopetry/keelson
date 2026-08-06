@@ -17,6 +17,49 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.82.0] — 2026-08-06
+
+Decisions 4.142–4.145 — the cycle closes both ways: a delivery convergence pass,
+a budget for pending uncertainty, and escalation questions readable on their own.
+Distilled from a benchmark of github/spec-kit (2026-08-06).
+
+### Added
+- **Gate 4 now asks the inverse question** (decision 4.142,
+  `guidelines/core/CODE-REVIEW.md`). Every new or changed behavior in the diff
+  must have a declared parent — an AC/criterion that requires it, a direct
+  technical need of one, or a declared scout within the Charter Art. 6
+  conditions. Behavior with no parent is an `unrequested` finding, routed as
+  out-of-scope signal to the Tech Lead; it either becomes a recorded assumption
+  or leaves the diff — silent permanence is the failure. AC-driven review proves
+  the requested exists; this check proves the unrequested doesn't.
+- **Delivery convergence pass: the whole SPEC against the final code**
+  (decision 4.143, `guidelines/core/CODE-REVIEW.md` owns the rule;
+  `agents/code-reviewer.md` gains a convergence mode; wired into
+  `/keelson:auto` delivery and `/keelson:integrate`). The cycle proves by parts
+  (tests per task, review per wave, behavior per feature); this pass proves the
+  whole: each gap is typed `missing` / `partial` / `contradicts` / `unrequested`
+  with the FR/AC/DEC it cites, anchored on `graph.sh` structural facts. Gaps are
+  fixed before push or parked as explicit questions — never pushed silently. A
+  green pass is recorded in the INDEX with the SHA and reused by
+  `/keelson:integrate` while the diff since then is inert (same pattern as
+  mutation testing, 4.122). The delivery report gains a convergence line
+  (`docs/_meta/conventions/report-contract.md`).
+- **Pending `[confirmar]` markers get a budget: at most 3 per SPEC**
+  (decision 4.144, `commands/specify.md`; new WARNING in
+  `skills/spec-validator/SKILL.md`, Draft/Review only). Candidates beyond the
+  cap are ranked scope > security/privacy > UX > technical detail; the cut ones
+  become `[assumido]` assumptions with the chosen default declared in place. A
+  real pending item changes the outcome; a preference with a reasonable industry
+  default doesn't spend the budget.
+- **Escalation questions must be answerable from their own block**
+  (decision 4.145, `agents/po.md` — the escalation contract owner). The test:
+  the Director decides reading only the escalation block — a real question in
+  the Director's language ending in `?` (a label or requirement ID is not a
+  question), one "why it matters" line about the product consequence, one
+  decision per question, and accepting the default costs one word.
+
+---
+
 ## [0.81.1] — 2026-08-06
 
 Decision 4.141 — fixes the 4.42 anti-renudge valve under parallel dispatch.
