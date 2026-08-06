@@ -79,6 +79,8 @@ O BRIEF nasce **na primeira invocação** e é atualizado durante a conversa —
 
    (Um comando não limpa o contexto da própria sessão — o handoff explícito é o mecanismo correto; o auto reconhece o BRIEF `pronto` e o reutiliza sem re-montar.)
 
+   **Variante de decomposição (decisão 4.128)**: a forja revelou **2+ capacidades independentes** que a cortesia da entrada não pegou → conclua o inventário normalmente, grave `Status: pronto` e o handoff aponta a outra porta — `/keelson:specify-epic {docsRoot}/<slug>/briefs/BRIEF-NNN.md` — onde o BRIEF é entrada de primeira classe: fatos do código, premissas com selo e Q-IDs pendentes viajam para as fatias. Mesma mecânica, destino diferente; o critério do clone fresco vale igual.
+
 2. **Conversar mais** — volta à Etapa 3 (ou à 2, se surgiu pergunta de código).
 
 3. **Encerrar aguardando produto** — grave `Status: aguardando-produto` com as Q-IDs pendentes estruturadas e **plante a pendência em "Riscos ativos" do INDEX** (formato no index-contract) — é ela que faz o `/keelson:status` e qualquer ciclo futuro no slug esbarrarem na espera. Entregue ao Diretor o bloco das perguntas pronto para encaminhar a produto (mesmo padrão copy-paste do handoff, 4.99/4.100). **Espelho no tracker (opcional)**: com `jira.enabled` **e** o BRIEF tendo issue de origem (rota pull — key em `**Jira**:`/`**Origem**:`), poste as perguntas pendentes como **comentário nessa issue** (protocolo de sync, §11; best-effort §0 — falhou → evento `tracker` no ledger, siga). **Nunca crie card** para isso: pré-SPEC não há projeção, e a pergunta pertence à demanda que já existe.
