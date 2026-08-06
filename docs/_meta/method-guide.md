@@ -300,13 +300,13 @@ Sem TASK não há AC, escopo declarado nem DEC: os gates 1, 4 e 5 **degradam** (
 
 ### 3.15 `/keelson:specify-epic` — decompor um pedido grande (épico)
 
-Quando o pedido é grande demais para uma demanda (2+ capacidades independentes, 2+ slugs prováveis, um roadmap numa frase), o **PM** do time decompõe em demandas independentes e priorizadas — cada uma segue depois o ciclo normal (`/keelson:auto`) com o seu PO. Você (Diretor) **confirma a decomposição** — é a única parada, e é intencional: decomposição errada contamina N ciclos. O comando grava o **BRIEF épico** no slug-âncora e devolve a fila com o comando pronto para a demanda 1; **disparar cada ciclo é decisão sua** (nada roda sozinho).
+Quando o pedido é grande demais para uma demanda (2+ capacidades independentes, 2+ slugs prováveis, um roadmap numa frase), o **PM** do time decompõe em demandas independentes e priorizadas — cada uma segue depois o ciclo normal (`/keelson:auto`) com o seu PO. Você (Diretor) **confirma a decomposição e a estratégia de branch** (default: branch **única** do épico, com sync da main a cada fronteira de fatia — 4.126) — é a única parada, e é intencional: decomposição errada contamina N ciclos. O comando grava o **BRIEF épico** no slug-âncora com a **fila viva** (estado por fatia, atualizado pelos ciclos filhos — 4.125) e devolve a fila com o comando da demanda 1 **e a porta de retomada**: `/keelson:continue <slug>` (§3.21) é tudo que alguém precisa decorar para seguir depois. **Disparar cada ciclo é decisão sua** (nada roda sozinho).
 
 ```
 /keelson:specify-epic <pedido épico ou @arquivo> [--slug=<âncora>]
 ```
 
-Rotas de chegada: direto, pela categoria 7 do `/keelson:triage`, ou proposto pelo `/keelson:auto` na triagem de rigor (pré-largada; pós-largada, expansão de escopo é escalação do PO, nunca re-decomposição). Governança: decisões 4.37 e 4.39 de `decisions.md`.
+Rotas de chegada: direto, pela categoria 7 do `/keelson:triage`, proposto pelo `/keelson:auto` na triagem de rigor (pré-largada; pós-largada, expansão de escopo é escalação do PO, nunca re-decomposição) — ou pelo handoff da forja (`/keelson:brief`), cujo BRIEF é **entrada de primeira classe**: fatos do código, premissas com selo e perguntas pendentes a produto viajam para as fatias (4.128). Governança: decisões 4.37, 4.39, 4.125–4.128 de `decisions.md`.
 
 ### 3.16 `/keelson:update` — atualizar o plugin instalado
 
@@ -353,6 +353,16 @@ Setup guiado do gate de mutação (decisões 4.121–4.123) para quem não conhe
 ```
 /keelson:mutation-setup [--base=<branch>] [--dry-run]
 ```
+
+### 3.21 `/keelson:continue` — retomar um slug de onde parou (humano-only)
+
+A porta única de retomada (decisão 4.127): você — ou qualquer pessoa do seu time — aponta um slug e o comando descobre onde o trabalho parou, mostra o "você está aqui" (a fila do épico com estados, ou o ponto do ciclo avulso) e propõe **um** próximo passo com default: retomar a forja `aguardando-produto`, retomar a implementação na wave interrompida, disparar a próxima fatia (com o sync da main na largada), ou apontar o `/keelson:integrate` quando a fila acabou. Confirmou → executa na própria sessão. Ele **deriva tudo dos artefatos commitados** (a fila viva do BRIEF épico, closures de TASK, status dos briefs — nunca guarda estado próprio, nunca lê `thoughts/local/`), e divergência entre fila e artefatos resolve pelos artefatos (4.58). Depois de um fim de semana, ninguém precisa lembrar de nada: `continue` + o slug.
+
+```
+/keelson:continue <slug | caminho de BRIEF épico>
+```
+
+Não dispara nada sem a sua confirmação — apontar o slug é o seu ato (4.41); não re-decompõe épico, não faz merge nem PR. Governança: decisões 4.125–4.127 de `decisions.md`.
 
 ---
 

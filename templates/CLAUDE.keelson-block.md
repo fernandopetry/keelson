@@ -106,6 +106,8 @@ Humanos-only (não aparecem na listagem): `/keelson:guided` (ciclo com checkpoin
 `/keelson:refine` (lapidar ideia) · `/keelson:audit` (auditoria de dependências) ·
 `/keelson:review` (code review de um diff avulso, sem artefato SDD) ·
 `/keelson:verify-handoff` (fechar gate de tela remoto) ·
+`/keelson:continue` (retomar um slug de onde parou — fila do épico, wave interrompida
+ou próxima fatia, derivado dos artefatos commitados) ·
 `/keelson:mutation-setup` (instalar e configurar o mutation testing — grava
 `quality.mutation` na ficha após prova) ·
 `/keelson:update` (atualizar o plugin instalado — vale após reiniciar a sessão) ·
