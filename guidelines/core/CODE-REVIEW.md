@@ -75,6 +75,11 @@ adicionado agora.
 Rode o lint **escopado aos arquivos tocados**, nunca o repo inteiro: lint global em repo
 com dívida herdada mede erro de terceiros e dá **falso REPROVADO**.
 
+Ficha **sem `quality.lint`** → o gate degrada **declarado**: reporte `lint: não
+configurado na ficha — avaliação por leitura, seção 2 do perfil` e siga; nunca
+improvise uma régua própria nem silencie (régua que varia conforme quem revisa é o
+pior dos dois mundos — decisão 4.132). A rota para fechar o buraco é `/keelson:init`.
+
 **Falha**: warning/erro novo nos arquivos tocados.
 
 ### Gate 4: escopo respeitado
@@ -205,6 +210,11 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   8 · 9) são independentes entre si: despache os agentes **no mesmo turno** e espere
   os reports. Sequência é exceção **declarada** — só quando um gate consome a saída de
   outro ou disputa recurso exclusivo; "um de cada vez" sem motivo é latência pura.
+  Gate cujo mecanismo de prova **muta** arquivos do diff (mutation testing, injeção
+  de falha) trata a working tree como recurso exclusivo: roda em `git worktree`
+  isolada — nunca a mesma árvore de outro gate concorrente que também mute. Disciplina
+  de restaurar ao fim não basta: o risco é a **leitura** na janela em que dois mutantes
+  convivem, não a limpeza depois (decisão 4.134, caso real de campo).
 - **Pacote de contexto único.** O invocador monta **uma vez** e entrega o mesmo pacote
   a todos os revisores da rodada: diff resolvido + SHA · o artefato-âncora com os
   critérios literais (ACs da TASK, critério de aceite do brief) · as fatias da ficha

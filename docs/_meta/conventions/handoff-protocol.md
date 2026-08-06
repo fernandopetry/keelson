@@ -18,6 +18,7 @@ Quando o ciclo roda num ambiente **sem acesso a testes de tela** — worktree se
 | Ferramentas `mcp__playwright__*` carregadas e respondendo (deferred: carregue antes de concluir) | **runtime de browser ausente** | o comando que resolve — `claude mcp add playwright -s user npx -- @playwright/mcp@latest --headless --isolated` e/ou `npx playwright install chromium` (Linux: `--with-deps`); Node < 18 é sub-causa e se diz por extenso |
 | `keelson.local.json` existe e tem o realm alvo preenchido (sem placeholder) | **credencial ausente** | qual realm, qual campo — e que o caminho é `/keelson:init` ou preencher o arquivo; **nunca** chutar credencial |
 | `baseUrl` do realm responde (ex.: `curl -sI`), ou a app sobe pelo método do projeto | **app fora do ar** | o que foi tentado e o retorno (código HTTP, erro de conexão) — com `quality.boot` declarado na ficha, a tentativa de boot (comando, saída, re-sondagem) é parte obrigatória do registro (decisão 4.71) |
+| A ação foi tentada e a plataforma a **negou** (permissão do harness, classificador de segurança) | **permissão de ambiente** (`permissao_ambiente`) | a ação exata, a negativa **literal** e que a rota é o Diretor executá-la/autorizá-la na máquina dele. **Negativa de permissão não é flakiness** (decisão 4.133): a 2ª barrada idêntica **prova** a causa — pare e registre; repetir não converge e só consome turnos (caso real: 6 tentativas contra o mesmo bloqueio) |
 
 Uma causa não encobre a outra: app no ar com runtime ausente é `runtime de browser ausente`, não "ambiente sem tela". E **runtime ausente não vira fallback silencioso** para outro browser — o método é único por decisão de projeto (4.49); trocar de motor por conta própria produz evidência que ninguém consegue reproduzir.
 
@@ -39,7 +40,7 @@ status: Pendente               # Pendente | Concluído
 criado: <ISO 8601>
 origem: PLAN-MMM | inline
 commits: [<SHAs curtos>]
-motivo: <causa nomeada — runtime_browser | credencial | app_fora_do_ar (§8.1)>
+motivo: <causa nomeada — runtime_browser | credencial | app_fora_do_ar | permissao_ambiente (§8.1)>
 sonda: <evidência da sondagem que falhou, por realm — o que foi tentado, o que retornou e a saída que resolve>
 ---
 
