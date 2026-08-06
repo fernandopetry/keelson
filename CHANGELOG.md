@@ -17,6 +17,47 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.83.0] — 2026-08-06
+
+Decisions 4.146–4.149 — facts survive outside the model's context: re-anchoring
+after compaction, a measured context window, mechanically proved synchronization,
+and a countable promotion ladder for recurring lessons. Distilled from a benchmark
+of affaan-m/ECC (2026-08-06).
+
+### Added
+- **Post-compaction re-anchor hook** (decision 4.146, `hooks/compact-anchor.sh`,
+  SessionStart/`compact`). The instant the context window is compacted, the hook
+  reads the on-disk state — active `run-state` files and the session-ledger event
+  count — and re-injects it as context, instructing the session to re-derive wave
+  state from the `retomada:` artifacts instead of trusting the compressed summary.
+  Mirror only: it never decides or blocks, and stays silent when there is nothing
+  in flight.
+- **Context-window telemetry hook** (decision 4.148, `hooks/window-marker.sh`,
+  Stop). On every Stop it appends `<ts> janela=<tokens>` (input + cache of the last
+  assistant message) to `thoughts/local/session-window.log` — keelson projects
+  only, constant cost, never blocks. The closing report's duration line gains an
+  optional `janela pico ~<N>k tokens` tail: measured from the log or omitted,
+  never estimated (`report-contract.md` owns the rule); the delivery moves the log
+  into `reported-*/` alongside the ledger.
+- **Command/agent synchronization is now a mechanical fact** (decision 4.147,
+  `scripts/check-sync.sh` + `scripts/tests/sync/`). The "3 places" rule is proved
+  in both directions on pre-commit and CI: command ⇔ README table row, `†` marker ⇔
+  `disable-model-invocation`, human-only commands present in the consumer block
+  note, agent ⇔ `name:`/heading/§5 table. A command missing its method-guide
+  section degrades to a declared WARNING (two known gaps: `init`,
+  `verify-handoff`), never an invented error.
+- **Promotion ladder for recurring lessons** (decision 4.149,
+  `docs/_meta/learning-log.md` — owner). The existing `reincidencia:` counter
+  becomes the trigger: first recurrence still reformulates the rule; from the
+  second on, the proposal must include a designed mechanical check or autocheck —
+  or declare why the class cannot be mechanized, making "text again" an explicit
+  Director decision. The maintainer queue returns second-recurrence proposals that
+  carry neither.
+
+### Changed
+- `CLAUDE.md` sync rules now point at their mechanical proof (`check-sync.sh`);
+  the pre-commit quality guard and the CI workflow run the new check and suite.
+
 ## [0.82.0] — 2026-08-06
 
 Decisions 4.142–4.145 — the cycle closes both ways: a delivery convergence pass,
