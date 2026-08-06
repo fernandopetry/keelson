@@ -408,20 +408,20 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.80.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.81.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **every fork in the road now states what the rejected branch
-costs** (decisions 4.136–4.137). Escalations to the Director carry — besides the
-existing proposal + default — the concrete cost of the branch not taken, because that
-fact is what moves the decision and it belongs in the escalation, never after it;
-architectural decisions (DECs) discard alternatives by naming what is lost or broken,
-never by adjective, with a validator warning to match. And triage gains the explicit
-routing test: what decides the route is the cost of being plausibly wrong, never diff
-size — a one-line change to a published contract goes through the full cycle, a large
-mechanical codemod doesn't get promoted for volume. No re-init needed — consumers only
-update the plugin.
+New in this release: **what the team already learned now reaches the next TASK as a
+criterion, not as reading** (decisions 4.138–4.140). TASK generation cross-checks the
+target files against `lessons.md` and turns a matching lesson into a verifiable Done
+criterion; an inherited spelled-out criterion gets an address (the file that fulfils it
+joins the task's scope, or it becomes its own TASK); scope-predicate mutation criteria
+close by count — N methods in scope, N proofs — never by instance list; a pending item
+from a previous gate finding is edited into the receiving TASK's criteria before
+dispatch; and the gate-9 package reconciles the pre-code script against the wave's
+gate 7/8 findings. Both `tasks.md` and `implement.md` were distilled back under the
+300-line ceiling to pay for it. No re-init needed — consumers only update the plugin.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

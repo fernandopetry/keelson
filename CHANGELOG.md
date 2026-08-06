@@ -17,6 +17,41 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.81.0] — 2026-08-06
+
+Decisions 4.138–4.140
+
+### Changed
+- **TASK generation cross-checks `lessons.md` and addresses inherited criteria**
+  (decision 4.138, `commands/tasks.md`). `guidelines/project/lessons.md` becomes an
+  input of the scribe, and a lesson that names a task's target files (or the pattern
+  they embody) turns into a verifiable Done criterion — never recommended reading. An
+  inherited spelled-out criterion (a requirement/NFR/lesson quoted in full) gets an
+  address: it names the file+action that fulfil it and that file joins the task's
+  Escopo > Inclui — otherwise the criterion becomes its own TASK in the same wave.
+- **Scope-predicate mutation criteria close by count, never by list** (decision
+  4.139). Item (c) of decision 4.107 reformulated: every method whose WHERE carries
+  the scope needs a second-instance scenario whose mutation fails the test — N
+  methods in scope, N proofs, plus one case per predicate branch on reads; a named
+  method is a non-exhaustive illustration, never the full list.
+- **Gate findings travel to the next dispatch as criteria** (decision 4.140,
+  `commands/implement.md`). A pending item inherited from a previous gate finding is
+  edited into the receiving TASK's Done criteria before dispatch — never prose in the
+  Contexto field — with the same yardstick as the originating finding; and the
+  per-FEAT gate-9 package now carries the wave's gate 7/8 findings, reconciling the
+  pre-code verification script against them before the `qa` dispatch (steps
+  invalidated by later corrections are rewritten; steps missing the external proof a
+  correction required gain the missing count command).
+- **Both command files distilled back under the 300-line ceiling** (per decision
+  4.135): `commands/tasks.md` 300→298 and `commands/implement.md` 326→295 with all
+  five patches inside. Sibling rules were fused, `implement.md` dropped the Input
+  section that duplicated the frontmatter (`--guidelines` moved to the argument-hint)
+  and now points at `core/CODE-REVIEW.md` for the gates 1–7 yardstick instead of
+  replicating the list. No rule was dropped. No re-init needed — consumers only
+  update the plugin.
+
+---
+
 ## [0.80.0] — 2026-08-06
 
 Decisions 4.136–4.137
