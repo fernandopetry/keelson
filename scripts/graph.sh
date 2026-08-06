@@ -342,6 +342,7 @@ ftype == "T" && line ~ /^# TASK-[0-9]+-[0-9]+/ {
 ftype == "T" && line ~ /^## / {
   if (line ~ /^## Crit/) sect = "crit"
   else if (line ~ /^## Roteiro do gate 9/) sect = "gate9"
+  else if (line ~ /^## Hist/) sect = "hist"
   else sect = ""
   next
 }
@@ -378,6 +379,13 @@ ftype == "T" && cur_task != "" && line ~ /^\*\*Status\*\*[ \t]*:/ {
 }
 ftype == "T" && cur_task != "" && line ~ /^\*\*Tipo\*\*[ \t]*:/ {
   NTIPO[cur_nd] = trimtok(fieldrest(line)); next
+}
+# closure preenchida (secao "## Historico de execucao"): Data conclusao ou Commit SHA
+# com valor nao-vazio marca o atributo closure=1 (check status-vs-closure, 4.131)
+ftype == "T" && cur_task != "" && sect == "hist" && line ~ /^\*\*(Data conclus|Commit SHA)/ {
+  v = trimtok(fieldrest(line))
+  if (v != "") NCLOS[cur_nd] = 1
+  next
 }
 ftype == "T" && cur_task != "" && line ~ /^\*\*Funcionalidade\*\*[ \t]*:/ {
   v = fieldrest(line)
@@ -452,6 +460,8 @@ END {
   for (i = 1; i <= ND; i++) {
     a = ""
     if (i in NWAVE) a = "wave=" NWAVE[i]
+    # closure antes de status: o parser do checker/mermaid re-junta tudo apos "status="
+    if (i in NCLOS) a = a (a == "" ? "" : " ") "closure=1"
     if (i in NSTAT) a = a (a == "" ? "" : " ") "status=" NSTAT[i]
     if (i in NTIPO) a = a (a == "" ? "" : " ") "tipo=" NTIPO[i]
     if (i in NCRIT) a = a (a == "" ? "" : " ") "crit=" NCRIT[i]
@@ -589,6 +599,7 @@ $1 == "node" {
       sub(/ (tipo|crit|verif|metrica|verd)=.*$/, "", st)
       status[id] = st
     }
+    if (match($5, /closure=1/)) tclos[id] = 1
     if (match($5, /crit=[0-9]+/)) bcrit[id] = substr($5, RSTART + 5, RLENGTH - 5)
     if (match($5, /verif=1/)) fverif[id] = 1
     if (match($5, /metrica=1/)) smetr[id] = 1
@@ -718,6 +729,19 @@ END {
         if (status[t] == "Done") finding("WARNING", "wave-incoerente", det " [legacy]")
         else finding("ERROR", "wave-incoerente", det)
       }
+    }
+
+    # ---- status-vs-closure (4.131) ----
+    # closure preenchida (Data conclusao/Commit SHA) com Status do cabecalho != Done:
+    # a TASK foi fechada mas o campo que todo mundo le ficou para tras (caso real:
+    # 5 TASKs com status errado por 7 waves — so o sync do tracker viu). WARNING:
+    # nunca reprova — TASK no meio da propria closure e estado transitorio legitimo.
+    for (i = 1; i <= TKN; i++) {
+      t = TK[i]
+      if (!inplan(nodefile[t])) continue
+      if (!(t in tclos)) continue
+      if (status[t] != "Done")
+        finding("WARNING", "status-vs-closure", t ": closure preenchida (Data conclusao/Commit SHA) mas Status \"" status[t] "\" (" nodefile[t] ")")
     }
 
     # ---- fr-sem-task / ac-sem-task ----

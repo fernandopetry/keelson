@@ -1,0 +1,1 @@
+WARNING	status-vs-closure	TASK-001-002: closure preenchida (Data conclusao/Commit SHA) mas Status "Todo" (tasks/TASK-001-002-login-invalido.md)

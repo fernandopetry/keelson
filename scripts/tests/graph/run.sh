@@ -74,6 +74,9 @@ runcase defeito-avulso-check     defeito-avulso     1 defeito-avulso--check.txt 
 # veredito → INFO (exit 0 — INFO nunca reprova); SPEC-002 com veredito prova o silêncio
 runcase metrica-veredito-check   defeito-metrica-veredito 0 defeito-metrica-veredito--check.txt --check
 runcase metrica-veredito-tsv     defeito-metrica-veredito 0 defeito-metrica-veredito--tsv.txt   --format=tsv
+# status-vs-closure (decisão 4.131): closure preenchida (Data conclusão/Commit SHA) com
+# Status ≠ Done → WARNING (exit 0 — nunca reprova); Done com closure prova o silêncio
+runcase status-closure-check     defeito-status-closure 0 defeito-status-closure--check.txt --check
 
 # Determinismo: duas execuções idênticas byte a byte (AC-001-001)
 total=$((total + 1))
