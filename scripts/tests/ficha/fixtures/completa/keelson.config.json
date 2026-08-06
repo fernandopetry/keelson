@@ -1,0 +1,27 @@
+{
+  "profile": {
+    "backend": { "lang": "php", "version": "8.5", "file": "plugin:backend/php.md" },
+    "frontend": { "lang": "vue", "version": "3", "file": "guidelines/project/frontend/vue-3.md" }
+  },
+  "codePaths": {
+    "backend": ["src", "app"],
+    "frontend": ["resources/js"]
+  },
+  "sensitiveGlobs": ["src/**", ".env*"],
+  "quality": {
+    "test": "composer test",
+    "lint": "vendor/bin/php-cs-fixer fix --dry-run --diff",
+    "typecheck": null,
+    "build": null,
+    "boot": "docker compose up -d",
+    "mutation": null
+  },
+  "gates": {
+    "security": true,
+    "review": true,
+    "reviewThreshold": { "files": 2, "lines": 30 },
+    "screenVerify": { "enabled": true, "method": "skill:screen-verify", "artifactsDir": "thoughts/screen-verify" }
+  },
+  "docsRoot": "docs",
+  "jira": { "enabled": false }
+}

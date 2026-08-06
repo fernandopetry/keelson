@@ -1,0 +1,1 @@
+WARNING	index-ausente	sem-index sem INDEX.md apesar de ter artefatos SDD (rode /keelson:rebuild-index)

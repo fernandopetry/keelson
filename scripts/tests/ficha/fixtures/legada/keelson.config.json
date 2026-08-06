@@ -1,0 +1,15 @@
+{
+  "profile": {
+    "backend": { "lang": "php", "version": "7.4" }
+  },
+  "codePaths": {
+    "backend": ["src"]
+  },
+  "quality": {
+    "test": "vendor/bin/phpunit"
+  },
+  "gates": {
+    "security": false,
+    "screenVerify": true
+  }
+}

@@ -1,0 +1,9 @@
+INFO	index-historico-teto	"Historico recente" com 11 entradas (teto 10 - index-contract.md)
+WARNING	index-capacidade-adiantada	linha 10: capacidade em "Implementadas" cita PLAN-001 com 1/2 TASKs Done
+WARNING	index-plan-fantasma	PLAN-008 listado na tabela PLANs sem arquivo plans/PLAN-008-*.md
+WARNING	index-plan-fora	PLAN-003 existe em plans/ e nao esta na tabela PLANs
+WARNING	index-secao-ausente	secao "## Resumo" ausente do INDEX (template no index-contract.md)
+WARNING	index-spec-fantasma	SPEC-009 listada na tabela SPECs sem arquivo specs/SPEC-009-*.md
+WARNING	index-spec-fora	SPEC-002 existe em specs/ e nao esta na tabela SPECs
+WARNING	index-status-verbatim	PLAN-001: coluna Status "Done" difere do Status do arquivo "Approved"
+WARNING	index-tasks-cell	PLAN-001: celula Tasks "2/2 ✅" difere do computado "1/2 🟡" (1 Done de 2)
