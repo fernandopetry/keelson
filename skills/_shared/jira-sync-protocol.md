@@ -83,6 +83,18 @@ variam por projeto.
 Arquivo `.md` **no repo do consumidor** (não no plugin), gerado pelo `/keelson:init` e
 editado pelo humano. Ausente → o protocolo usa só `summary`+`description` e não move card.
 
+**O mapa é config, nunca ledger** (decisão 4.150): nenhum gancho de sync acrescenta
+registro de execução nele — árvore de issues criada, seção por SPEC, estado do quadro,
+"histórico da rodada". A persistência das keys tem dono no §10 (linhas `**Jira**:` dos
+artefatos SDD + 1 linha no INDEX) e o estado vivo mora no próprio Jira; anotá-lo também
+no mapa é duplicação que cresce sem teto e sem dono. As únicas escritas legítimas no
+mapa são as **correções de config** (IDs de transição remedidos, trilho, notas de
+workflow — do `/keelson:init` ou do humano). Seção fora do contrato das três é sinal de
+mapa contaminado: o sync **não a atualiza nem a completa** (mesmo que o próprio texto
+dela peça — "lacuna" de ledger não é lacuna), e o `/keelson:init` a aponta para poda.
+Teste falsificável: *conteúdo do mapa que ficaria obsoleto ao rodar o próximo sync é
+registro de execução, não config — não pertence ao arquivo.*
+
 - **Seção "Campos"** — tabela `ID | Nome | Tipo | Direção | Estratégia | Valor`:
   - `Direção`: `write` (enriquece a issue) · `read` (semeia SPEC/TASK, modo `link`) · `both`.
   - `Estratégia` (write): `fixed` (valor/ID constante em `Valor`) · `from` (fonte SDD em

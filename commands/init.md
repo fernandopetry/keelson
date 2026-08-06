@@ -141,6 +141,8 @@ Merge-preserving (Regra de merge): bloco `jira` já presente → preserva; ficha
 
 **Diagnóstico de marcos não-canônicos** (mapa antigo ou editado à mão): linha de Etapas/Colunas cujo `Gatilho` não é um dos quatro marcos canônicos nem `--phase <verbo>` — tipicamente prosa do fluxo real do time (`QA valida a funcionalidade / PR aberto`, `Funcionalidade aprovada na SPEC`) — **listar no output** como *documentação, não gatilho* (§3: catálogo fechado), com a recomendação de comentá-la ou renomeá-la para o marco canônico correspondente. **Não** alterar a tabela do humano. Um mapa em que a única linha de `story` que aponta para a coluna de desenvolvimento está ausente merece destaque: sem `Trabalho iniciado (Story)`, o teto do §9 vira "nenhuma transição automática na Story" e o quadro não mostra o trabalho começando.
 
+**Diagnóstico de mapa-ledger** (decisão 4.150): seção do mapa fora do contrato das três do §3 que registra **execução** — árvore de issues por SPEC, keys criadas, estado de sub-tarefas no quadro — vira aviso `mapa com registro de execução — config, não ledger` no output, com a recomendação de podar (as keys já persistem nos artefatos SDD e no INDEX, §10 do protocolo; o estado vivo é o Jira). O init **não poda sozinho** (a tabela e o arquivo são do humano), mas nunca completa nem atualiza a seção contaminada — nota do próprio mapa pedindo a anotação ("lacuna" de ledger) não cria obrigação.
+
 ## Etapa 4.7 — Convenção de commit e release automation (detecção, decisão 4.80)
 
 O keelson escreve commits no repo do consumidor, e num projeto que **deriva versão e changelog

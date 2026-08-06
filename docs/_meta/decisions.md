@@ -1780,6 +1780,16 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.150 — O mapa Jira é config, nunca ledger: registro de execução não mora no `mapFile`
+
+**Problema**: em consumidor real, o `jira.<PROJECT>.md` — definido no §3 do protocolo como config de três seções (Campos, Etapas/Colunas, Trilho) — acumulou uma seção-ledger por SPEC sincronizada: a árvore de issues criada, keys, estado das sub-tarefas no quadro. Nada na doutrina mandava: a persistência das keys tem dono no §10 (linhas `**Jira**:` dos artefatos + 1 linha no INDEX) e o estado vivo é o próprio Jira. Uma sessão começou a anotar, as seguintes copiaram a convenção local do arquivo, e o padrão virou auto-perpetuante — o mapa passou a declarar como "⚠️ lacuna" a SPEC que *não* foi anotada, ensinando cada sessão nova que anotar é obrigação. Resultado: arquivo de config com mais de um terço de ledger redundante e crescimento sem teto (1 seção por SPEC, para sempre). A causa raiz é lacuna da doutrina: o §3 dizia o que o mapa **é**, mas nunca proibiu acrescentar.
+
+**Decisão**: o §3 ganha a regra explícita — **o mapa é config, nunca ledger**. Nenhum gancho de sync acrescenta registro de execução nele; as únicas escritas legítimas são correções de config (IDs de transição remedidos, trilho, notas de workflow — do `/keelson:init` ou do humano). Seção fora do contrato das três é mapa contaminado: o sync não a atualiza nem a completa (mesmo que o texto dela peça — "lacuna" de ledger não é lacuna), e o `/keelson:init` a aponta para poda em aviso (`mapa com registro de execução — config, não ledger`), sem podar sozinho (o arquivo é do humano). Teste falsificável: *conteúdo do mapa que ficaria obsoleto ao rodar o próximo sync é registro de execução, não config.*
+
+**Aplicação**: `skills/_shared/jira-sync-protocol.md` (§3 — dono da regra) · `commands/init.md` (diagnóstico de mapa-ledger, ao lado do de marcos não-canônicos) · `docs/wiki/Solucao-de-problemas.md` (sintoma reconhecível). Observar no próximo sync de consumidor com mapa contaminado: o aviso aparece e a seção deixa de crescer?
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

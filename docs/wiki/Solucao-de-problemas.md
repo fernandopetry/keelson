@@ -175,6 +175,18 @@ Isso é bug, não sucesso. O estado-alvo ao fim do ciclo é: sub-tasks concluíd
 coluna de "pronto para QA" esperando você, Epic intocado. Concluir a Story é **ato seu**
 (`/keelson:jira-sync <slug> --phase finish-dev`, ou na mão).
 
+### O `jira.<PROJECT>.md` está crescendo com listas de issues
+
+O mapa é **config, nunca ledger**: as três seções do protocolo (Campos, Etapas/Colunas,
+Trilho do board) mais notas de manutenção — e só. Se ele acumulou seções por SPEC com a
+árvore de issues criada (keys, sub-tarefas, estado do quadro), isso é contaminação de
+alguma sessão antiga que virou "convenção" do arquivo: nada na doutrina manda anotar ali,
+e a informação já vive nos artefatos SDD (linhas `**Jira**:`) e no próprio Jira. **Pode
+podar sem perder nada.** O `/keelson:init` aponta o problema
+(`mapa com registro de execução — config, não ledger`), mas a poda é sua — o arquivo é
+do humano. Atenção a notas do próprio mapa que pedem a anotação ("lacuna declarada"):
+lacuna de ledger não é lacuna, é o sintoma se perpetuando.
+
 ## Nada disso resolveu
 
 - `/keelson:status <slug>` mostra o estado real do slug.
