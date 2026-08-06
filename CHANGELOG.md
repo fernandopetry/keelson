@@ -17,6 +17,50 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.85.0] — 2026-08-06
+
+Decisions 4.151–4.153 — deterministic work that the model used to re-derive in prose
+on every cycle now runs as scripts with contracts and frozen regression suites; the
+doctrine cites their output as fact and never duplicates the rule.
+
+### Added
+- **Six new scripts** (each with its own test suite, wired into pre-commit and CI):
+  `ficha.sh` (single reader for `keelson.config.json` — dotted `--get`, legacy
+  boolean `screenVerify` normalization, `plugin:` profile-path resolution; named
+  degradation on exit 3), `next-id.sh` (the 4.86 single allocator plus per-plan task
+  numbering and brief↔SPEC pairing check), `index-check.sh` (slug `INDEX.md` checker —
+  tables vs files, `X/Y` tasks cell, status verbatim, capacity moved too early,
+  history cap; WARNING/INFO only), `diff-facts.sh` (the executable anchor of the
+  TESTING.md "inert diff" rule, plus report diff composition and the deploy-pendency
+  check that previously shipped as a bash template with placeholders), `run-state.sh`
+  (canonical writer for the wave-guard sentinel) and `ledger.sh` (session-ledger
+  mechanics: sortable names, measured timestamps, closed type catalog, archive that
+  preserves pending events).
+- **`artifact-lint.sh` + `lint-contract.md`** (4.152): the mechanical subset of the
+  three validators (header/enum checks, required sections, ID format, EARS/RFC 2119
+  patterns, threshold counts, technology wordlist) is now computed and cited as fact.
+  Severity comes in two classes — unambiguous facts keep the validator's severity,
+  pattern-based checks are born WARNING and only the validator escalates; `Done`
+  artifacts downgrade ERROR to `WARNING [legacy]`.
+- **Two new graph checks** (4.153): `fr-sem-ac` (an FR no AC covers, inside the SPEC
+  itself; ERROR with legacy relief, also in `--stage=plan`) and `plan-status-vs-tasks`
+  (a PLAN marked Done while its tasks are still open; WARNING). `done-sem-closure`
+  was deliberately **not** added — legacy Done-without-closure archives are modeled
+  as clean, so that direction stays with the task-validator, which sees context.
+
+### Changed
+- The three validator skills were rewritten around "mechanical facts first": they run
+  `artifact-lint.sh` (and `graph.sh`) and keep only judgment checks
+  (spec-validator shrank from 176 to 82 lines).
+- Commands now invoke the scripts instead of carrying the prose: ID allocation in
+  `specify`/`plan`/`tasks`/`brief`, diff composition and ledger/run-state lifecycle in
+  `auto`/`implement`/`report`, INDEX verification in `implement`/`rebuild-index` and
+  the `status` skill, deploy-pendency in `implement`.
+- `TESTING.md` ("inert diff"), `sdd-conventions.md` (ficha, run-state, ledger) and
+  `index-contract.md` (allocator, INDEX checks) now name the canonical executors.
+
+---
+
 ## [0.84.0] — 2026-08-06
 
 Decision 4.150 — the Jira map file is configuration, never a ledger. Motivated by a

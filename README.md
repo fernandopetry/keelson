@@ -408,16 +408,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.84.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.85.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the Jira map file is configuration, never a ledger** (decision
-4.150). No sync hook appends execution records to `jira.<PROJECT>.md` — key
-persistence stays in the SDD artifacts and the slug INDEX, live status stays in Jira —
-and `/keelson:init` now flags contaminated maps for pruning. No re-init needed —
-consumers only update the plugin (and prune their map once if it accumulated issue
-listings).
+New in this release: **deterministic work moved from prose to scripts** (decisions
+4.151–4.153). Seven script contracts — ficha reader, ID allocator, INDEX checker,
+diff facts (inert/composition/deploy), run-state and ledger writers, artifact form
+lint — now compute what the model used to re-derive by hand, each with a frozen
+regression suite running on pre-commit and CI; validators and commands cite their
+output as fact. No re-init needed — consumers only update the plugin.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
