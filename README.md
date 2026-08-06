@@ -408,25 +408,22 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.78.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.79.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the test suite itself goes under proof, and setting that up is
-guided** (decisions 4.121–4.123) — mutation testing joins the gauntlet as an opt-in
-`quality.mutation` command in the project sheet, run at delivery (by the
-`/keelson:auto` close and by `/keelson:integrate`) right after the full suite goes
-green; a green run recorded at a SHA is reused, with a declared waiver, while the code
-hasn't changed. It is the mechanical version of the "assertions that prove" rule:
-mutate production code and prove the suite fails. Exit code is the verdict (scope and
-threshold live in the consumer's own command), absence is declared rather than silent,
-and no doctrine-level score target exists — surviving mutants are a signal for
-reviewers, never a metric to game. And for consumers who don't know the tooling, the
-new human-only `/keelson:mutation-setup` installs the canonical tool with
-confirmation, generates its config from the sheet, proves the pipeline with a sample
-run and writes the field — threshold-free at first, calibrated by the human after
-observing real deliveries. Consumer block note changed — **re-run `/keelson:init` in
-consumer projects**.
+New in this release: **the close-of-session report becomes a literal skeleton with a
+single owner** (decisions 4.130–4.135) — a real consumer delivery shipped without its
+mandatory duration, diff-composition and tracker lines, and with the maintainer
+messages summarized instead of forwarded, so the report contract now lives in
+`docs/_meta/conventions/report-contract.md`: mandatory lines are blanks to fill (a
+missing input names its gap, never disappears), conditional sections carry
+ready-to-forward copy-paste blocks. Alongside it: a new graph check flags a filled
+closure whose header `Status` was left behind, gate 3 degrades declaredly when the
+sheet has no lint command, permission denials become a named handoff cause with a
+two-strike ceiling, mutating gates get isolated worktrees, and the developer gains a
+self-check that removes retry narration from comments before reporting. No re-init
+needed — consumers only update the plugin.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

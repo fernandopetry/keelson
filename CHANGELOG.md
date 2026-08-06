@@ -17,6 +17,47 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.79.0] — 2026-08-06
+
+Decisions 4.130–4.135
+
+### Added
+- **The close-of-session report now has a literal canonical skeleton with a single owner**
+  (`docs/_meta/conventions/report-contract.md`, decision 4.130), emitted by the
+  `/keelson:auto` delivery, the on-demand mode close and `/keelson:report`. A mandatory
+  line is a blank to fill (missing input → the gap is named on the line, never the line
+  omitted); a conditional section either exists with its ready-to-forward copy-paste
+  block or doesn't exist — prose summaries no longer substitute for either. Born from a
+  real consumer delivery that shipped without the duration line, diff composition,
+  tracker line and maintainer-message blocks. Mirrored to the wiki as
+  `Contrato-do-relatorio`.
+- **New graph check `status-vs-closure`** (decision 4.131): a TASK whose closure is
+  filled (`Data conclusão`/`Commit SHA`) while the header `Status:` is not `Done` is
+  flagged as WARNING — the field every reader trusts, left stale for 7 waves in the
+  field case, now has a mechanical watcher. New fixture + suite case (28/28 green).
+- **`permissao_ambiente` joins the closed enum of handoff causes** (decision 4.133):
+  a platform/permission classifier denying an action is a named cause with its own
+  probe row — and a ceiling: the second identical denial proves the cause; retrying
+  is anti-pattern (real case: six attempts against the same block).
+
+### Changed
+- **Gate 3 without `quality.lint` degrades declaredly** (decision 4.132): the reviewer
+  reports `lint: not configured` and falls back to profile-guided reading — never an
+  improvised per-reviewer ruler, never silence.
+- **Gates that mutate files run in an isolated worktree** (decision 4.134, consumer
+  proposal LRN-045): the working tree is an exclusive resource between concurrent
+  mutating gates; restoring afterwards is not enough.
+- **Developer self-check before reporting a retry** (decision 4.135, consumer proposal
+  LRN-046): comments introduced in the retry that narrate the round/finding fail the
+  delete-test by definition and are removed before Done — a rule that already existed
+  verbatim now has a mechanical checkpoint instead of a second wording.
+- Five further consumer proposals (LRN-043/044, recurrences of LRN-015/LRN-034,
+  LRN-047) are registered in the proposal inbox with a favorable verdict, **held**:
+  applying them requires compensatory distillation of `tasks.md` (at the 300-line
+  ceiling) and `implement.md` (above it) — its own release batch.
+
+---
+
 ## [0.78.1] — 2026-08-06
 
 Decision 4.129

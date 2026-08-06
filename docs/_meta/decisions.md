@@ -1590,6 +1590,54 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `templates/CLAUDE.keelson-block.md` (frase antes da regra da 4.85 — **re-rodar init nos consumidores**). Origem: 2ª ocorrência de campo do padrão (a 1ª virou a 4.85). Observar na próxima sessão de consumidor com a política ativa: a pergunta desaparece e a escalação da 4.85 continua disparando só no conflito real?
 
+### 4.130 — Relatório de fecho tem esqueleto literal com dono único
+
+**Problema**: entrega real de consumidor (PLAN de 20 TASKs/8 waves, 2026-08-05) saiu sem **quatro** itens obrigatórios do report — linha de duração (4.56), composição do diff, linha do tracker (com `jira.enabled`) e os blocos copy-paste (prompt de handoff; 4 mensagens ao mantenedor, resumidas numa frase — o Diretor ficou sem o que encaminhar). A causa é a da 4.77: as regras da Entrega do `/keelson:auto` eram **prosa** (itens 6–8), e prosa sobre forma é parafraseável — no fim de sessão longa, com contexto comprimido, a narrativa sobrevive e as linhas mecânicas evaporam. O `/keelson:report` (rede de segurança) já tinha esqueleto literal; o caminho normal, não.
+
+**Decisão**: o relatório de fecho ganha **esqueleto canônico com dono único** — `docs/_meta/conventions/report-contract.md` — emitido pela Entrega do `/keelson:auto`, pelo fecho do modo sob demanda e pelo `/keelson:report`. Réguas do contrato: linha obrigatória é lacuna a preencher (insumo ausente → lacuna **nomeada**, nunca linha omitida); seção condicional existe ou não existe, e carrega o **bloco copy-paste pronto** — resumo em prosa não substitui; tudo medido, nunca estimado. Os itens da Entrega viram ponteiros com os gatilhos; a numeração (6–10) é preservada (é referenciada por outros arquivos).
+
+**Aplicação**: `docs/_meta/conventions/report-contract.md` (novo dono) · `commands/auto.md` Etapa 5 (itens 6–8 compactados) · `commands/report.md` Etapa 2 (esqueleto → ponteiro) · `CLAUDE.md` (lista de convenções) · `method-guide.md` §3 · espelho novo na wiki (`Contrato-do-relatorio`). O output do `/keelson:implement` avulso mantém template próprio. Observar na próxima entrega real de consumidor: as linhas de duração/composição/tracker saem preenchidas ou com lacuna nomeada?
+
+### 4.131 — Check `status-vs-closure`: closure preenchida cobra o Status do cabeçalho
+
+**Problema**: na mesma entrega, 5 TASKs da wave 1 ficaram com `Status:` errado no cabeçalho por 7 waves — a closure preencheu o histórico completo e esqueceu o campo; só o sync do Jira viu, porque é o único que lê aquela fonte. Inconsistência mecânica, invisível a todos os leitores humanos do artefato.
+
+**Decisão**: check novo no catálogo do grafo — `status-vs-closure`: TASK com closure preenchida (`**Data conclusão**:` ou `**Commit SHA**:` não-vazios sob `## Histórico de execução`) e `Status:` ≠ `Done` → **WARNING**. Nunca ERROR: TASK no meio da própria closure é estado transitório legítimo (o falso-positivo num artefato legítimo é o pior defeito desta camada).
+
+**Aplicação**: `scripts/graph.sh` (extrator: attr `closure=1`; checker) · `docs/_meta/conventions/graph-contract.md` §3 · fixture `defeito-status-closure` (defeito plantado + caso negativo Done) e caso no `run.sh` — suíte 28/28. Observar: validators citando o WARNING na 1ª rodada real.
+
+### 4.132 — Gate 3 sem `quality.lint` degrada declarado, nunca improvisa régua
+
+**Problema**: consumidor com backend sem lint declarado na ficha — "a régua do gate 3 varia conforme quem revisa" (achado da própria entrega). Cada revisor improvisando a própria régua é pior que não ter lint: o veredito muda de rodada para rodada sem que nada acuse.
+
+**Decisão**: ficha sem `quality.lint` → o gate 3 **degrada declarado** — `lint: não configurado na ficha — avaliação por leitura, seção 2 do perfil` — e segue; nunca régua própria, nunca silêncio. A rota para fechar o buraco é `/keelson:init`.
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (Gate 3 — dono da régua dos gates). Observar: a linha declarada aparece no report do reviewer quando a ficha não tem o comando?
+
+### 4.133 — Negativa de permissão não é flakiness: 2ª barrada prova a causa
+
+**Problema**: gate 9 real bateu **seis vezes** contra o mesmo bloqueio do classificador de permissão antes de virar handoff. Chamada negada por política/permissão não converge por repetição — cada nova tentativa só consome turno — e o enum fechado de causas do §8.1 (`runtime_browser | credencial | app_fora_do_ar`) não tinha onde registrar a causa real, convidando à classificação errada.
+
+**Decisão**: o enum de causas ganha o 4º valor — **`permissao_ambiente`** (a plataforma nega a ação; registro: ação exata + negativa literal + rota = o Diretor executa/autoriza na máquina dele) — e a régua de teto: **a 2ª barrada idêntica prova a causa** — pare, registre e siga para a seed; insistir é anti-padrão.
+
+**Aplicação**: `docs/_meta/conventions/handoff-protocol.md` §8.1 (linha nova na tabela de sondagem + enum do template) · citações do enum em `commands/implement.md` (gate 9) e `agents/qa.md` (report). Quem concede o waiver continua não ampliando o catálogo (4.71) — este valor entra pelo dono.
+
+### 4.134 — Gate que muta arquivos roda em worktree isolada (LRN-045 da fila)
+
+**Problema**: proposta de consumidor (fila 4.111): gates 7/8 da mesma wave, ambos usando mutação como mecanismo de prova, despachados em paralelo sobre a **mesma working tree** — dois mutantes vivos simultâneos, resultado ilegível até a restauração. Nenhum falso-verde no caso real, mas o desenho não impede.
+
+**Decisão**: a exceção de "recurso exclusivo" da regra de paralelismo (4.89) ganha o caso nomeado: gate cujo mecanismo de prova **muta** arquivos do diff (mutation testing, injeção de falha) trata a working tree como recurso exclusivo — roda em `git worktree` isolada, nunca a árvore de outro gate concorrente que também mute. Disciplina de restaurar não basta: o risco é a leitura na janela com dois mutantes vivos.
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (Orquestração da rodada — dono do paralelismo, vale para todo invocador). Fila: LRN-045 → aplicada.
+
+### 4.135 — Regra verbatim que reincide vira autocheck, não mais texto (LRN-046 da fila)
+
+**Problema**: proposta de consumidor que "se desmontou na investigação": a regra violada ("narrativa de correção não vira comentário") **já existia palavra por palavra** no contrato do developer — mais texto não corrige quem não releu o que escreveu. 2ª ocorrência da classe na mesma base.
+
+**Decisão**: o item 5 do developer ganha **autocheck mecânico antes do report**: releia os comentários que você introduziu/alterou neste retry — qualquer um que cite rodada, achado, revisor ou identificador de achado falha o teste de apagar por definição; remova antes de reportar Done, não deixe para o gate 7 achar. Padrão geral confirmado: reincidência de regra existente → autocheck no ponto de escrita, nunca segunda redação da mesma regra.
+
+**Aplicação**: `agents/developer.md` (item 5). Fila: LRN-046 → aplicada. As demais propostas do lote (LRN-043/044, LRN-015 e LRN-034 reincidentes, LRN-047) ficam **recebidas com parecer favorável, represadas**: `tasks.md` está no teto (300/300) e `implement.md` acima (326/300) — aplicá-las exige destilação compensatória dos dois arquivos, leva própria.
+
 ---
 
 ## 5. Quality gates inegociáveis
