@@ -13,163 +13,69 @@ Você é um Quality Engineer: valide a SPEC contra os checks abaixo.
 
 Caminho de um ou mais `SPEC-*.md`. Contexto a ler (protocolo §2): a SPEC completa, o slug (do caminho) e o glossário de SPECs anteriores do mesmo slug.
 
-## Etapa 1: checks estruturais
+## Etapa 0: fato mecânico primeiro
 
-### Front-matter (ERROR se ausente)
-- Campo `Slug` presente e não-vazio
-- Campo `Status` em `{Draft, Review, Approved}`
-- Campo `Versão` presente
-- Campo `Autor` presente (como `<preencher>` gera WARNING)
-- Campo `Data` no formato `YYYY-MM-DD` (auto-fix se formato comum)
-
-### Seções obrigatórias (ERROR se ausente)
-1. Contexto e objetivo (com 1.1, 1.2, 1.3)
-2. Personas e jobs-to-be-done
-3. Glossário (Ubiquitous Language)
-4. Escopo (com 4.1 e 4.2)
-5. Requisitos funcionais (EARS)
-6. Requisitos não-funcionais
-7. Critérios de aceitação (Given-When-Then)
-8. Premissas e decisões prévias
-9. Riscos e questões abertas
-10. Fora deste documento
-
-### IDs (ERROR)
-- Formato: `FR-NNN-XXX`, `NFR-NNN-XXX`, `AC-NNN-XXX`, `RISK-NNN-XXX`, `A-NNN-XXX`, `Q-NNN-XXX`, `FEAT-NNN-XXX`
-- NNN é o número da SPEC, XXX sequencial zero-padded em 3 dígitos
-- Auto-fix se zero-padding ausente
-- Auto-fix se sequência tem buraco
-
-## Etapa 2: checks EARS (seção 5)
-
-Cada FR deve casar com um padrão:
+A forma da SPEC tem **dono único e execução mecânica** — catálogo, severidades e régua
+de rebaixamento em `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/lint-contract.md`.
+Execute (num subagent executor sem a env var, derive a raiz do plugin do caminho deste
+SKILL.md — o prefixo antes de `/skills/`):
 
 ```
-Ubiquitous:        O <sistema> deve <resposta>.
-Event-driven:      Quando <gatilho>, o <sistema> deve <resposta>.
-State-driven:      Enquanto <estado>, o <sistema> deve <resposta>.
-Optional feature:  Onde <feature presente>, o <sistema> deve <resposta>.
-Unwanted behavior: Se <gatilho indesejado>, então o <sistema> deve <resposta>.
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/artifact-lint.sh" <caminho-da-SPEC>
 ```
 
-### ERROR se:
-- FR não casa com nenhum padrão
-- Verbo "deve" ausente
-- Sujeito implícito ou vago
+Chega como fato (`spec-*` do lint-contract §3): cabeçalho/enum de Status, seções e
+subseções obrigatórias, IDs fora do número da SPEC e sem zero-padding, RFC 2119
+ausente/fora de forma, "deve" ausente, FR fora dos padrões EARS, FR >30 palavras,
+razão de MUST e ausência de SHOULD/MAY, porte de épico (>30 FRs — 4.115), partição
+FR↔FEAT e FEAT vazia/única/fora da §5/sem descrição, métrica sem número/sem fonte
+(4.99), out-of-scope vazio/curto, in-scope idêntico ao out-of-scope, wordlist de
+tecnologia, NFR vago/sem número, AC fora de Dado-Quando-Então, premissa sem
+marcador/sem selo (4.96), teto de `[confirmar]` (4.144), glossário não usado.
 
-### Auto-fix se:
-- "quando" em minúsculo no início → "Quando"
-- "se" sem "então" depois → adicionar "então"
-- "o" ausente antes de "sistema" → adicionar
+O lado interno da verificabilidade também chega como fato, do **grafo**: `fr-sem-ac`
+(FR sem AC que o cubra) e `ref-quebrada` (AC cobrindo FR inexistente) —
+`bash "${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh" {docsRoot}/<slug> --check --stage=plan`
+(achado sobre artefato que não é esta SPEC não entra no seu relatório).
 
-### WARNING se:
-- FR tem múltiplos verbos coordenados (FR composto)
-- FR ultrapassa 30 palavras
+Cada achado entra como `**[artifact-lint]**`/`**[graph.sh]** SEVERIDADE check —
+detalhe`. **Degradação por resultado** e **cobertura mista**: réguas do §5 do
+graph-contract.md — sem saída válida, aplique os mesmos checks por leitura e declare a
+degradação; a calibração final é sua (protocolo §1/§3).
 
-## Etapa 3: checks RFC 2119
+## Etapa 1: checks que permanecem seus (o script não computa)
 
-### ERROR se:
-- FR não tem `[MUST]`, `[SHOULD]` ou `[MAY]` no início
+### EARS e redação (seção 5)
 
-### Auto-fix se:
-- `[must]`, `[should]`, `[may]` em minúsculo → maiúsculo
-- Sem colchetes → adicionar
-- Sinônimos: `[obrigatório]` → `[MUST]`, `[recomendado]` → `[SHOULD]`, `[opcional]` → `[MAY]`
+- ERROR: sujeito implícito ou vago no FR ("o sistema" genérico quando a SPEC nomeia atores distintos).
+- WARNING: FR com múltiplos verbos coordenados (FR composto).
+- Escalar `spec-ears-nao-casa`/`spec-tecnologia` (fatos WARNING) para ERROR quando o padrão é claro: verbo imperativo sobre tecnologia ("usar", "implementar com", "armazenar no", "deploy em") ou menção a estrutura de arquivo, pasta, namespace, classe.
 
-### WARNING se:
-- >70% dos FRs são MUST (sem priorização real)
-- Nenhum SHOULD ou MAY
+### Auto-fix (protocolo §3)
 
-## Etapa 4: checks de verificabilidade
+- "quando" minúsculo no início → "Quando" · "se" sem "então" → adicionar · "o" ausente antes de "sistema" → adicionar
+- `[must]`/`[should]`/`[may]` → maiúsculo · sem colchetes → adicionar · `[obrigatório]` → `[MUST]`, `[recomendado]` → `[SHOULD]`, `[opcional]` → `[MAY]`
+- Zero-padding ausente em ID → completar · formato comum de `Data` → normalizar
 
-Construir os mapas `FR → AC` e `AC → FR` para os dois primeiros checks.
+### Verificabilidade e métrica
 
-### ERROR se:
-- FR sem AC vinculado
-- AC referencia FR inexistente
-- Métrica de sucesso (1.3) sem número e prazo
+- ERROR: métrica de sucesso (1.3) com número mas **sem prazo** (o fato `spec-metrica-sem-numero` cobre só o número).
+- As linhas `**Fonte de medição**:` e `**Veredito de métrica**:` (4.99) são conteúdo esperado da §1.3 — toleradas por todos os checks, nunca marcadas como tecnologia ou rastro estranho.
 
-### WARNING se:
-- AC fora de Given-When-Then
-- NFR vago: "rápido", "seguro", "user-friendly", "intuitivo", "escalável"
-- NFR sem valor numérico
-- Métrica de sucesso (1.3) sem linha `**Fonte de medição**:` (decisão 4.99) — **só em SPEC `Draft`/`Review`**; `Approved`+ é acervo anterior à régua: silêncio
+### Funcionalidades (FEAT)
 
-As linhas `**Fonte de medição**:` e `**Veredito de métrica**:` (esta gravada pós-entrega — 4.99) são conteúdo esperado da §1.3 — toleradas por todos os checks, nunca marcadas como tecnologia ou rastro estranho.
+- WARNING: nome de FEAT que não é um fluxo verificável (ex.: "melhorias gerais", "ajustes").
+- As linhas `**Jira**:`, `**Jira Story**:` e `**Verificação (gate 9)**:` (4.90) são **toleradas e ignoradas**: rastro de execução/tracker, não conteúdo de especificação.
 
-## Etapa 4.5: checks de funcionalidades (FEAT — camada opcional)
+### Glossário e escopo
 
-Nenhum heading `### FEAT-` na seção 5 → **pular esta etapa sem aviso** (colapso válido: a
-funcionalidade é a própria SPEC). A filiação FR→FEAT é posicional (o FR está sob o heading);
-os ACs derivam a filiação do FR que cobrem — não há vínculo AC→FEAT literal a validar.
+- ERROR: termo usado em FR não está no glossário.
+- WARNING: termo definido diferente em SPEC anterior do mesmo slug · sinônimo detectado (dois termos com significado próximo) · in-scope com detalhe técnico.
 
-### ERROR se:
-- FR fora de qualquer heading FEAT quando ao menos uma FEAT existe (partição parcial)
-- FEAT sem nenhum FR sob o heading
-- Heading `### FEAT-` fora da seção 5
+### Premissas
 
-### WARNING se:
-- Exatamente 1 FEAT declarada (sugerir colapso: remover a camada, a funcionalidade é a SPEC)
-- FEAT sem a linha de descrição `>` (o QA não sabe o que testar de ponta a ponta)
-- Nome de FEAT que não é um fluxo verificável (ex.: "melhorias gerais", "ajustes")
-
-As linhas `**Jira**:` (sob o heading da FEAT ou no cabeçalho da SPEC), `**Jira Story**:` (no
-cabeçalho — Story implícita da SPEC sem FEAT) e `**Verificação (gate 9)**:` (sob o heading da
-FEAT — registro da verificação de comportamento, gravado pelo `/keelson:implement`, decisão
-4.90) são **toleradas e ignoradas** pelos checks: são rastro de execução/tracker, não conteúdo
-de especificação.
-
-## Etapa 5: checks de domínio vs tecnologia
-
-Varrer seções 5, 6, 7 buscando palavras-bandeira:
-
-**Linguagens**: PHP, Python, Java, JavaScript, TypeScript, Ruby, Go, Rust, Node.js, .NET
-**Frameworks**: Vue, React, Angular, Laravel, Symfony, Django, Flask, Spring, Rails, Express, FastAPI
-**Bancos**: MySQL, PostgreSQL, MongoDB, Redis, Elasticsearch, DynamoDB, BigQuery
-**Padrões**: REST, GraphQL, gRPC, WebSocket, microservice, monolith, event-sourcing, CQRS
-**Cloud**: AWS, GCP, Azure, Lambda, S3, EC2, Cloud Run, Kubernetes, Docker
-**Libs**: jQuery, Axios, Lodash, Pinia, Vuex, Redux
-
-### Tratamento
-- **WARNING** com contexto. Pode ser falso positivo.
-
-### ERROR em padrões claros:
-- Verbos imperativos sobre tecnologia: "usar", "implementar com", "armazenar no", "deploy em"
-- Menção a estrutura de arquivo, pasta, namespace, classe
-
-## Etapa 6: checks de glossário
-
-### ERROR se:
-- Termo usado em FR não está no glossário
-
-### WARNING se:
-- Termo definido diferente em SPEC anterior do mesmo slug
-- Glossário com termos não usados
-- Sinônimo detectado (dois termos com significado próximo)
-
-## Etapa 7: checks de escopo
-
-### ERROR se:
-- Out-of-scope (4.2) vazio
-- Item In-scope igual a Out-of-scope
-
-### WARNING se:
-- Out-of-scope com <2 itens
-- In-scope com detalhe técnico
-- **Porte de épico** (decisão 4.115): mais de 30 FRs na §5 — o custo de forja (redação,
-  validação, crítica, decomposição) cresce mais que linear com o porte; sugerir fatiar
-  via `/keelson:specify-epic` antes de `Approved`. Nunca ERROR: fatiar é decisão de produto.
-
-## Etapa 8: checks de premissas e riscos
-
-### ERROR se:
-- Item em "Premissas" sem `[assumido]` nem `[confirmado]` (nenhum marcador). NÃO é ERROR `[assumido]` sem "confirmar com": a frase é **opcional**; `[assumido]` simples é o padrão do `/keelson:specify` e das SPECs aprovadas (ex.: uma premissa marcada `[assumido]` com nota "confirmar na entrega").
-
-### WARNING se:
-- Nenhuma premissa listada
-- Nenhum risco em seção 9
-- Premissa sem selo de evidência `[evidência: crença|anedota|entrevistas|medido]` (decisão 4.96; escala: sdd-conventions.md) — **só em SPEC `Draft`/`Review`**; `Approved`+ é acervo anterior à régua: silêncio, sem lógica de data
-- Mais de 3 `[confirmar]` na SPEC inteira (`confirmar-acima-do-teto`, decisão 4.144: o excedente deveria ter virado `[assumido]` com default declarado, priorizando escopo > segurança/privacidade > UX > detalhe técnico) — **só em SPEC `Draft`/`Review`**; `Approved`+ é acervo anterior à régua: silêncio. Nunca ERROR: cortar pendência é juízo, não forma
+- `[assumido]` simples é o padrão (a frase "confirmar com" é opcional) — não é ERROR.
+- O selo de evidência (4.96) e o teto de `[confirmar]` (4.144) chegam como fato; o **mérito** (crença sustentando requisito central, corte de pendência) é da crítica de produto e do PO, nunca seu.
 
 ## Fechamento
 

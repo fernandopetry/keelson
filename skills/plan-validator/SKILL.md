@@ -13,62 +13,45 @@ Você é um Quality Engineer: valide o PLAN contra os checks abaixo.
 
 Caminho de um ou mais `PLAN-*.md`. Contexto a ler (protocolo §2): o PLAN, a SPEC referenciada e o `INDEX.md` do slug.
 
-## Etapa 1: checks estruturais
+## Etapa 1: fato mecânico primeiro — forma
 
-### Front-matter (ERROR se ausente)
-- `Slug`, `Status` em `{Draft, Review, Approved, Done}`, `Versão`, `Autor`, `Data`
-- Data em `YYYY-MM-DD` (auto-fix se formato comum)
+A forma do PLAN tem **dono único e execução mecânica** — catálogo, severidades e régua
+de rebaixamento em `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/lint-contract.md`.
+Execute (num subagent executor sem a env var, derive a raiz do plugin do caminho deste
+SKILL.md — o prefixo antes de `/skills/`):
 
-### Seções obrigatórias (ERROR se ausente)
-- Aderência a guidelines
-- Cobertura
-- 1. Visão técnica
-- 2. Stack e dependências
-- 3. Componentes
-- 4. Fluxos principais
-- 5. Modelo de dados (pode estar vazio se sem persistência)
-- 6. Decisões arquiteturais
-- 7. Mapeamento FR → componente
-- 8. Riscos técnicos
-- 9. Definition of Done
-- 10. Não coberto por este PLAN
+```
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/artifact-lint.sh" <caminho-do-PLAN>
+```
 
-### IDs (ERROR)
-- `DEC-MMM-XXX`, `COMP-MMM-XXX`, `TRISK-MMM-XXX` no formato correto
-- MMM = número deste PLAN
-- Auto-fix se zero-padding ausente
+Chega como fato (`plan-*` do lint-contract §3): cabeçalho/enum de Status, seções
+obrigatórias (Aderência, Cobertura, §1–§10), IDs fora do MMM e sem zero-padding,
+Cobertura sem SPEC referenciada/FRs cobertos vazios/agregada ausente, anatomia dos
+blocos DEC (campos obrigatórios, zero ou uma alternativa, enum e forma do
+`Irreversível`, `Reabrir se` ausente — 4.97 — ou `nunca` sem motivo), §7 sem linhas,
+DoD vazia/com placeholder/sem menção a teste ou ficha/perfil. Invocado com o
+**diretório do slug**, acrescenta `plan-overlap-fr` (FR coberto por 2+ PLANs).
+Auto-fixes que continuam seus (protocolo §3): `Irreversível: SIM` → `sim` ·
+`Irreversivel:` → `Irreversível:` · zero-padding · formato de `Data`.
 
-## Etapa 2: checks de cobertura
+Cada achado entra como `**[artifact-lint]** SEVERIDADE check — detalhe`; degradação
+por resultado e cobertura mista seguem o §5 do graph-contract.md.
 
-### ERROR se:
-- Seção "Cobertura" não declara `SPEC referenciada`
-- Lista `FRs cobertos` vazia
-- "Cobertura agregada do slug" ausente ou inconsistente
+## Etapa 2: checks de cobertura que permanecem seus
 
 (A **existência** da SPEC referenciada e dos FRs/NFRs cobertos chega como fato —
 `ref-quebrada` em `spec-ref`/`plan-covers`, Etapa 4 — não a re-derive aqui.)
 
 ### WARNING se:
-- Algum FR coberto também em PLAN anterior (overlap não justificado)
+- Overlap de FR apontado pelo fato sem justificativa no texto (o script mede; o "não justificado" é seu)
 - Gap restante listado sem comentário sobre quando será coberto
+- "Cobertura agregada do slug" presente porém **inconsistente** com o INDEX
 
-## Etapa 3: checks de decisões arquiteturais (DEC)
-
-### ERROR se:
-- DEC sem `Contexto`, `Decisão`, `Alternativas consideradas`, `Consequências`, `Irreversível`
-- DEC sem ao menos 1 alternativa
-- DEC com `Irreversível: <valor diferente de sim ou não>`
+## Etapa 3: checks de decisões arquiteturais (DEC) que permanecem seus
 
 ### WARNING se:
-- DEC com apenas 1 alternativa (caminho único?)
 - DEC `Irreversível: sim` sem justificativa em "Consequências"
-- DEC sem linha `**Reabrir se**:` (decisão 4.97) — **só em PLAN `Draft`/`Review`**; `Approved`/`Done` é acervo anterior à régua: silêncio
-- `**Reabrir se**: nunca` sem motivo após o travessão ("nunca" sem justificativa é fé assinada)
-- Descarte de alternativa sem custo concreto — só adjetivo ("mais complexa", "pior"), sem nomear o que se perde ou quebra ao escolhê-la (decisão 4.136) — **só em PLAN `Draft`/`Review`**, mesma carência da régua acima
-
-### Auto-fix se:
-- `Irreversível: SIM` → `Irreversível: sim`
-- `Irreversivel:` → `Irreversível:`
+- Descarte de alternativa sem custo concreto — só adjetivo ("mais complexa", "pior"), sem nomear o que se perde ou quebra ao escolhê-la (decisão 4.136) — **só em PLAN `Draft`/`Review`**, mesma carência da régua do `Reabrir se`
 
 ## Etapa 4: checks do grafo de componentes (FR → COMP e COMP → COMP)
 
@@ -76,9 +59,7 @@ Caminho de um ou mais `PLAN-*.md`. Contexto a ler (protocolo §2): o PLAN, a SPE
 
 A parte estrutural desta etapa tem **dono único e execução mecânica** — catálogo,
 severidades e carência de legado em
-`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md`. Execute (num subagent
-executor sem a env var, derive a raiz do plugin do caminho deste SKILL.md — o prefixo
-antes de `/skills/`):
+`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md`. Execute:
 
 ```
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh" {docsRoot}/<slug> --check --stage=plan --plan MMM
@@ -87,15 +68,13 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh" {docsRoot}/<slug> --check --stage=
 Chega como fato: SPEC referenciada ou FR/NFR coberto inexistente (`ref-quebrada` em
 `spec-ref`/`plan-covers`), FR coberto sem linha na §7 (`fr-sem-comp`), §7 referenciando
 COMP ou AC inexistente (`ref-quebrada`), FR mapeado fora da cobertura, COMP sem FR
-(`comp-sem-fr`), divergência entre o `Realiza` dos COMPs e a §7, ciclo COMP → COMP e
-ID duplicado. Cada achado entra no relatório como `**[graph.sh]** SEVERIDADE check —
-detalhe`; a calibração final é sua (protocolo §1/§3). **Degradação por resultado** e
-**cobertura mista**: réguas do §5 do graph-contract.md — sem saída válida, aplique os
-mesmos checks por leitura e declare a degradação; artefato com `nao-parseavel`, não
-ateste ausência de defeito para aquela aresta.
-
-### ERROR se (seus):
-- Tabela "Mapeamento FR -> componente" ausente
+(`comp-sem-fr`), divergência entre o `Realiza` dos COMPs e a §7, ciclo COMP → COMP,
+ID duplicado e FR da SPEC sem AC (`fr-sem-ac` — 4.153). Cada achado entra no relatório
+como `**[graph.sh]** SEVERIDADE check — detalhe`; a calibração final é sua (protocolo
+§1/§3). **Degradação por resultado** e **cobertura mista**: réguas do §5 do
+graph-contract.md — sem saída válida, aplique os mesmos checks por leitura e declare a
+degradação; artefato com `nao-parseavel`, não ateste ausência de defeito para aquela
+aresta.
 
 ### WARNING se (seus):
 - Muitos FRs no mesmo COMP (COMP doing too much)
@@ -106,7 +85,6 @@ ateste ausência de defeito para aquela aresta.
 ## Etapa 5: checks de aderência à ficha/perfil (CLAUDE.md complementar)
 
 ### ERROR se:
-- Seção "Aderência a guidelines" ausente
 - Stack declarado contradiz o **perfil de linguagem ativo da ficha** (a fonte de que o `/keelson:plan` gera)
 - Decisão irreversível tocada sem entrar em "Exceções aos guidelines"
 
@@ -115,15 +93,12 @@ ateste ausência de defeito para aquela aresta.
 - Stack introduz lib não declarada sem mencionar
 - Stack contradiz convenção que o `CLAUDE.md` **declara explicitamente** (complementar — nunca ERROR: o gerador não usa o CLAUDE.md como fonte primária de convenção)
 
-## Etapa 6: checks de Definition of Done
+## Etapa 6: checks de Definition of Done que permanecem seus
 
 ### ERROR se:
-- Seção 9 vazia ou com placeholders
 - Itens não-verificáveis sem critério objetivo
 
 ### WARNING se:
-- DoD não menciona cobertura de teste
-- DoD não menciona aderência à ficha/perfil
 - SPEC referenciada declara `**Fonte de medição**:` na §1.3 e a DoD não tem o item de métrica operacional (decisão 4.99) — **só em PLAN `Draft`/`Review`**; `Approved`/`Done` é acervo: silêncio
 
 ## Etapa 7: checks de não-violação de SPEC

@@ -25,43 +25,42 @@ régua (escopo, verificação executável, closure, convenções, tipo) vale **i
 
 **Batch com FEATs**: validar também a seção "Cobertura por funcionalidade" do TASK-MMM-INDEX — ERROR se divergente dos campos `Funcionalidade` das TASKs; WARNING se alguma FEAT da SPEC com FR coberto pelo PLAN não tem nenhuma TASK que a liste. (As divergências de **waves** e das tabelas de **FR/AC** do TASK-MMM-INDEX já chegam como fato — check `index-desatualizado` da Etapa 2; a seção de funcionalidade permanece sua.)
 
-## Etapa 1: checks estruturais
+## Etapa 1: fato mecânico primeiro — forma
 
-### Front-matter (ERROR se ausente)
-- `Slug`
-- Âncora presente: `Pertence a` (ciclo) **ou** `Brief` (modo avulso) — exatamente um dos dois (existência e exclusividade chegam como fato — `ref-quebrada`/`task-ancora-dupla`, Etapa 2)
-- `Realiza (FRs)` listado (ciclo; n/a no modo avulso)
-- `Funcionalidade` — obrigatório **somente** quando a SPEC do PLAN declara FEATs (headings
-  `### FEAT-` na §5) e a TASK realiza FRs (ERROR se ausente nesse caso). Presente com SPEC
-  **sem** FEATs → WARNING + auto-fix de remoção da linha. `chore` sem FR → pode omitir.
-- `Componente` presente (a existência do COMP apontado chega como fato — `ref-quebrada`, Etapa 2)
-- `Wave` declarada
-- `Tamanho estimado` em `{small, medium}`
-- `Status` em `{Todo, In Progress, Done, Blocked}`
-- `Tipo` em `{feature, bugfix, refactor, chore}` (auto-fix para `feature` se ausente)
+A forma da TASK tem **dono único e execução mecânica** — catálogo, severidades e régua
+de rebaixamento (`Done` → `WARNING [legacy]`) em
+`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/lint-contract.md`. Execute (num subagent
+executor sem a env var, derive a raiz do plugin do caminho deste SKILL.md — o prefixo
+antes de `/skills/`):
 
-### Seções obrigatórias
-- Convenções (do projeto) — o nome que o template do `/keelson:tasks` gera
-- Dependências
-- Contexto
-- Escopo (com Inclui e Não inclui)
-- Implementação sugerida
-- Critérios de pronto
-- Riscos específicos (pode estar vazio)
-- Histórico de execução (mesmo vazio, para /keelson:implement preencher)
+```
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/artifact-lint.sh" <caminho-da-TASK>
+```
 
-### Nome do arquivo (WARNING)
-- Convenção: `TASK-MMM-XXX-<titulo-kebab>.md`
-- Bugfix: `-fix-` no nome se Tipo=bugfix
-- Refactor: `-refactor-` no nome se Tipo=refactor
+Chega como fato (`task-*` do lint-contract §3): campos e enums do cabeçalho (`Slug`,
+`Wave`, `Tamanho estimado`, `Status`, `Tipo` — ausente → auto-fix `feature`), as 8
+seções obrigatórias (+ Inclui/Não inclui), marcador `-fix-`/`-refactor-`/`-chore-` do
+nome vs `Tipo`, Wave 2+ sem dependência, 2+ FEATs sem `(primária)` nem forma
+`transversal (…)` e transversal com 1 FEAT, critérios de pronto vazios ou sem menção a
+AC, bugfix sem `**AC violado**:` (forma antiga dentro de `Realiza` → INFO, não
+reprova), refactor sem "comportamento observável idêntico", `Done` com gate desmarcado
+sem consolidação declarada (4.90). Invocado com o **diretório do slug** (batch),
+acrescenta `task-overlap-fr` (FR realizado por 2+ TASKs do mesmo PLAN).
+
+Cada achado entra como `**[artifact-lint]** SEVERIDADE check — detalhe`; degradação
+por resultado e cobertura mista seguem o §5 do graph-contract.md.
+
+### Permanecem seus (o script não computa):
+- Âncora presente: `Pertence a` (ciclo) **ou** `Brief` (avulso) — ERROR se nenhuma (exclusividade e existência chegam como fato — Etapa 2)
+- `Realiza (FRs)` listado (ciclo; n/a no avulso) · `Componente` presente
+- `Funcionalidade` obrigatória **somente** quando a SPEC do PLAN declara FEATs e a TASK realiza FRs (ERROR se ausente nesse caso). Presente com SPEC **sem** FEATs → WARNING + auto-fix de remoção da linha. `chore` sem FR → pode omitir.
 
 ## Etapa 2: fato mecânico do grafo (vinculação, dependências, cobertura)
 
 Os checks estruturais desta etapa têm **dono único e execução mecânica** — catálogo de
 checks, severidades e carência de legado em
 `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md`. Execute (diretório do
-slug já resolvido via `docsRoot`; num subagent executor sem a env var, derive a raiz do
-plugin do caminho deste SKILL.md — o prefixo antes de `/skills/`):
+slug já resolvido via `docsRoot`):
 
 ```
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh" {docsRoot}/<slug> --check --stage=tasks --plan MMM
@@ -70,7 +69,9 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh" {docsRoot}/<slug> --check --stage=
 Chega como fato: referência quebrada (PLAN, FR, COMP, AC, FEAT ou TASK inexistente), FR
 de `Realiza` fora da cobertura do PLAN, conjunto/primária de `Funcionalidade` divergente
 do derivado, ciclo de dependência, wave incoerente, ID duplicado, `Pertence a` vs
-arquivo, FR/AC coberto sem TASK e assimetria Depende de/Bloqueia.
+arquivo, FR/AC coberto sem TASK, assimetria Depende de/Bloqueia, PLAN Done com TASK
+aberta (`plan-status-vs-tasks` — 4.153) e closure preenchida com Status ≠ Done
+(`status-vs-closure`).
 
 - Cada achado entra no relatório como **fato** — `**[graph.sh]** SEVERIDADE check —
   detalhe` — somado à lista da severidade correspondente. A calibração final é sua
@@ -82,23 +83,10 @@ arquivo, FR/AC coberto sem TASK e assimetria Depende de/Bloqueia.
   defeito como fato para os checks que dependem daquela aresta — para esse artefato
   valem seus próprios olhos, declarado no relatório.
 
-## Etapa 3: checks de vinculação que permanecem seus (o script não computa)
+## Etapa 3: checks de critérios de pronto que permanecem seus
 
 ### ERROR se:
-- Com FEATs na SPEC: com 2+ FEATs listadas, nem uma marcada `(primária)` nem a forma
-  `transversal (FEAT-..., FEAT-...)` — uma das duas é obrigatória; forma
-  `transversal (...)` com apenas 1 FEAT (transversal exige 2+)
-
-### WARNING se:
-- TASK realiza FR também coberto por outra TASK do mesmo PLAN (overlap)
-- TASK em Wave 2+ sem declarar nenhuma dependência (suspeito — heurística, não bloqueia)
-
-## Etapa 4: checks de critérios de pronto
-
-### ERROR se:
-- Seção "Critérios de pronto" vazia
-- Nenhum critério menciona AC
-- AC vinculado ao FR realizado não aparece
+- AC vinculado ao FR realizado não aparece em nenhum critério
 - Critério de teste (gate 1) sem verificação executável anexada — comando + saída/efeito esperado (só TASK em `Todo`/`In Progress`; `Done` legada não reprova por isso)
 
 ### WARNING se:
@@ -106,7 +94,7 @@ arquivo, FR/AC coberto sem TASK e assimetria Depende de/Bloqueia.
 - Falta critério explícito de cobertura de teste
 - Falta critério explícito de aderência à ficha/perfil
 
-## Etapa 5: checks de escopo
+## Etapa 4: checks de escopo
 
 ### ERROR se:
 - Escopo > Inclui vazio
@@ -117,12 +105,11 @@ arquivo, FR/AC coberto sem TASK e assimetria Depende de/Bloqueia.
 - Inclui menciona conceitos não mapeados no PLAN
 - Não inclui menciona trivial/óbvio
 
-## Etapa 6: checks de convenções
+## Etapa 5: checks de convenções
 
 A fonte primária de convenções é a **ficha/perfil** (o que o `/keelson:tasks` usa para gerar); o CLAUDE.md só conta quando **declara** a convenção explicitamente.
 
 ### ERROR se:
-- Seção "Convenções" ausente
 - Padrão de commit declarado contradiz convenção **explícita** do perfil ou do CLAUDE.md (nenhuma declaração → vale o default do gerador, Conventional Commits, sem ERROR)
 
 ### WARNING se:
@@ -131,30 +118,17 @@ A fonte primária de convenções é a **ficha/perfil** (o que o `/keelson:tasks
 ### Auto-fix se:
 - Convenções vazias mas ficha/perfil/CLAUDE.md têm dados: preencher
 
-## Etapa 7: checks do histórico de execução
+## Etapa 6: checks do histórico de execução
 
 ### ERROR se:
-- Seção "Histórico de execução" ausente
-- Status = `Done` mas campos do histórico vazios (closure não foi feita)
-- Status ≠ `Done` mas histórico preenchido (inconsistente)
+- Status = `Done` mas campos do histórico vazios (closure não foi feita) — **exceto acervo legado** (TASK de PLAN mergeado antes da disciplina de closure): registre INFO
+- Status ≠ `Done` mas histórico preenchido (o fato `status-vs-closure` da Etapa 2 aponta; a inconsistência inversa é sua)
 
-### WARNING se:
-- Status = `Done` mas Quality gates do histórico têm item desmarcado — **exceto** gate com consolidação declarada (decisão 4.90): `aprovado (wave N)`, `consolidado (FEAT-...)` ou `consolidado (DoD, Etapa 4)` são estados válidos, não pendência
+## Etapa 7: checks específicos por tipo que permanecem seus
 
-## Etapa 8: checks específicos por tipo
-
-### Tipo = bugfix
-- ERROR se: campo `**AC violado**:` ausente ou vazio (a existência do AC citado já
-  chega como fato — `ref-quebrada` da Etapa 2). Acervo legado que ainda traz o AC
-  dentro de `Realiza (FRs)` (forma antiga `FR-X / AC-n`) não reprova: registre INFO.
-- WARNING se: descrição não cita comportamento atual vs esperado.
-
-### Tipo = refactor
-- ERROR se: "Critérios de pronto" não menciona "comportamento observável idêntico".
-- WARNING se: PLAN referenciado é Done e não há PLAN novo cobrindo o refactor.
-
-### Tipo = chore
-- INFO: chore não precisa FR vinculado.
+- **bugfix** — WARNING se: descrição não cita comportamento atual vs esperado.
+- **refactor** — WARNING se: PLAN referenciado é Done e não há PLAN novo cobrindo o refactor.
+- **chore** — INFO: chore não precisa FR vinculado.
 
 ## Fechamento
 

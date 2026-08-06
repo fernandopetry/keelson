@@ -1,0 +1,3 @@
+WARNING	plan-overlap-fr	FR-001-001 coberto por 2 PLANs (PLAN-001-antigo.md, PLAN-002-sobreposto.md) — overlap nao justificado?
+WARNING	spec-feat-unica	exatamente 1 FEAT declarada (sugerir colapso: a funcionalidade e a propria SPEC) (SPEC-001-antiga.md)
+WARNING	spec-out-of-scope-vazio	out-of-scope (4.2) vazio [legacy] (SPEC-001-antiga.md)
