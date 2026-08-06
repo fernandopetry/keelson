@@ -51,13 +51,12 @@ Componha você mesmo o resumo executivo em markdown, calibrado ao foco — sem t
 - **`--focus=in-progress`**: por PLAN em andamento — capacidade, tasks abertas, bloqueios, próximas tasks da wave atual.
 - **`--focus=decisions`**: decisões irreversíveis expandidas (contexto, decisão, alternativas descartadas) + "considere antes de mexer" (o que cada decisão impede).
 
-## Etapa 3: detecção de inconsistências
+## Etapa 3: detecção de inconsistências (fato mecânico)
 
-Ao ler INDEX e arquivos, **silenciosamente verificar**:
-
-1. PLANs no INDEX vs arquivos
-2. Tasks contadas no INDEX vs reais
-3. Capacidades em "Implementadas" vs PLANs em status Done
+Execute `bash "${CLAUDE_PLUGIN_ROOT}/scripts/index-check.sh" {docsRoot}/<slug>` —
+tabelas × arquivos, célula Tasks × TASKs reais, capacidade adiantada, seções e teto do
+histórico chegam como fato (catálogo: index-contract.md). Read-only; indisponível →
+confira por leitura e nomeie a causa.
 
 Se inconsistência:
 - Não bloquear resposta.

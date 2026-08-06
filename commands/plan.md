@@ -36,7 +36,7 @@ Se INDEX não existe, parar e reportar: "INDEX.md do slug não encontrado. /keel
 
 ### 0.4 Próximo PLAN-MMM
 
-Listar `PLAN-*.md` em `{docsRoot}/<slug>/plans/`. Próximo = maior + 1, zero-padded. Criar pasta `plans/` se não existir.
+Próximo MMM pelo alocador único (4.86): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/next-id.sh" {docsRoot}/<slug> alloc` — nunca de cabeça. Criar pasta `plans/` se não existir.
 
 ## Etapa 1: análise de cobertura
 

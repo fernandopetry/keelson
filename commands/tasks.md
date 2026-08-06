@@ -40,7 +40,7 @@ Ler `{docsRoot}/<slug>/INDEX.md`: confirmar que o PLAN está listado e identific
 
 ### 0.4 Próximo XXX
 
-Listar `TASK-MMM-*.md` em `{docsRoot}/<slug>/tasks/`. Próximo XXX = maior existente para esse MMM + 1, zero-padded. Criar pasta `tasks/` se não existir.
+Próximo XXX: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/next-id.sh" {docsRoot}/<slug> task <MMM>` — nunca de cabeça. Criar pasta `tasks/` se não existir.
 
 ## Etapa 0.5: redação delegada ao `scribe` (decisão 4.103)
 

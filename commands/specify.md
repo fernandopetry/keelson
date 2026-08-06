@@ -30,7 +30,7 @@ Você é um Senior Product Engineer especialista em escrever especificações fu
    - **Slug de domínio relacionado, porém legado (sem `INDEX.md`)** → **pare e rode `/keelson:migrate-legacy <slug>` primeiro** (regra de ouro: "legado primeiro migra, depois muda"); só então retome esta SPEC nesse slug. **Nunca** crie um slug novo para contornar o legado.
    - **Nenhum slug relacionado (domínio genuinamente novo)** → proponha um slug kebab-case e **confirme com o humano**, apresentando os slugs existentes mais próximos. Um slug próprio só se justifica para um **domínio/capacidade de alto nível distinto**, **não** para uma regra/faceta de um domínio já existente.
 4. Garantir `{docsRoot}/<slug>/specs/`: criar se não existir.
-5. Próximo SPEC-NNN: maior em `specs/` + 1, zero-padded.
+5. Próximo SPEC-NNN pelo alocador único (4.86): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/next-id.sh" {docsRoot}/<slug> alloc` — nunca de cabeça.
 6. Nome do arquivo: `SPEC-NNN-<titulo-kebab>.md`, máximo 5 palavras.
 7. **Ciclo com BRIEF** (invocado pelo `/keelson:auto`/`/keelson:guided` com brief já emitido): o slug e o NNN **foram resolvidos na largada** (Etapa 0.5 do auto) — **reutilize-os** (não renumere; divergência com `briefs/BRIEF-NNN.md` → pare e reporte) e preencha o front-matter `Brief: BRIEF-NNN` da SPEC na Etapa 3.
 

@@ -31,12 +31,13 @@ Ledger vazio **e** branch sem mudanças → diga isso em uma linha e pare (não 
 
 ## Etapa 1: reunir a matéria-prima
 
-1. **Ledger de sessão** — `thoughts/local/session-ledger/` na raiz do repo principal (mecanismo
+1. **Ledger de sessão** — `bash "${CLAUDE_PLUGIN_ROOT}/scripts/ledger.sh" <raiz> list` (mecanismo
    e formato: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`). Leia os
    eventos **ativos** em ordem de timestamp. `reported-*/` é histórico já entregue: só entra se
    o Diretor pediu explicitamente o consolidado de uma sessão anterior.
-2. **Diff da branch** — a composição real do que mudou (produção · teste · documentação ·
-   migration/config), medida com `git diff --stat` contra a base, nunca estimada.
+2. **Diff da branch** — a composição real do que mudou, medida com
+   `bash "${CLAUDE_PLUGIN_ROOT}/scripts/diff-facts.sh" --base <base> --compose`
+   (produção · teste · documentação · migração · config, com linhas contadas), nunca estimada.
 3. **INDEX do slug** (quando houver) — `## Histórico recente`, riscos ativos e pendências de
    deploy. É a fonte durável; o ledger é a fonte do que aconteceu **nesta** sessão.
 4. **Ficha** (`keelson.config.json`) — `docsRoot`, gates ativos e `jira.enabled`.

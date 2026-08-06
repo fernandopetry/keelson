@@ -164,11 +164,15 @@ asset estático sem passo de build — rodá-la não prova nada de novo: a rodad
 **dispensada** (rigor proporcional — `./WORKFLOW.md`).
 
 O teste é mecânico e **ancorado**, nunca impressão: `git diff --name-only <base>...HEAD`
-confrontado com os `codePaths` da ficha e as árvores de teste do projeto. Conta como
-código — e obriga a rodada — todo arquivo que o runtime ou o runner carregam: fonte,
-teste, fixture, manifesto/lockfile de dependência, configuração de runtime, script de
-build, template executável. **Na dúvida, rode** — a dispensa é exceção que se prova, não
-default.
+confrontado com os `codePaths` da ficha e as árvores de teste do projeto. O executor
+canônico da âncora é `${CLAUDE_PLUGIN_ROOT}/scripts/diff-facts.sh --base <ref> --inert`
+(decisão 4.151): exit 0 = inerte, exit 1 = tem código, listando quem forçou a rodada —
+cite a saída como fato; script indisponível → aplique a âncora à mão e declare. Conta
+como código — e obriga a rodada — todo arquivo que o runtime ou o runner carregam:
+fonte, teste, fixture, manifesto/lockfile de dependência, configuração de runtime,
+script de build, template executável. **Na dúvida, rode** — a dispensa é exceção que se
+prova, não default (é o default do próprio script: arquivo não classificável conta como
+código).
 
 A dispensa obedece à régua de declaração desta doutrina (abaixo): o report registra
 `não rodei: diff sem código que a suíte exercita` e a lista dos arquivos do diff. Vale

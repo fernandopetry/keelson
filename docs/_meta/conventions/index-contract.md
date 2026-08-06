@@ -38,7 +38,10 @@ Nomes de arquivo de TASK por tipo: `-fix-` (bugfix), `-refactor-` (refactor), `-
 
 **Alocação de número (decisão 4.86)**: número novo de artefato numerado do slug — SPEC
 (com seu BRIEF pareado), PLAN ou brief avulso — sai de um **alocador único**:
-`max(todos os NNN e MMM já usados no slug) + 1`. Consequências: nunca nascem dois
+`max(todos os NNN e MMM já usados no slug) + 1`. O executor canônico é
+`${CLAUDE_PLUGIN_ROOT}/scripts/next-id.sh <dir-do-slug> alloc` (e `task <MMM>` para o
+próximo XXX de TASK — decisão 4.151); o `--check` confere o pareamento brief ↔ SPEC.
+Alocar de cabeça é o que colide. Consequências: nunca nascem dois
 artefatos novos com o mesmo número (a colisão de nome BRIEF-pareado × BRIEF-avulso é
 impossível por construção); pares NNN/MMM iguais pré-4.86 (ex.: SPEC-001 + PLAN-001)
 permanecem válidos; **densidade por tipo não é contrato** — PLAN-002 seguido de PLAN-004
@@ -314,6 +317,7 @@ Todo comando que **atualiza** um INDEX existente aplica — mesclando, nunca sob
 1. Atualizar `Última atualização`.
 2. Refletir o artefato na tabela correspondente (SPECs/PLANs — contrato acima) e nas seções que ele afeta: capacidades (movendo entre "Especificadas" → "Em desenvolvimento" → "Implementadas" conforme o ciclo; por FEAT quando a SPEC as declara), glossário (termo já existente com definição diferente → **parar e reportar conflito**), decisões irreversíveis, riscos ativos.
 3. Adicionar entrada ao "Histórico recente" com timestamp e ação — **máximo 10 entradas**.
+4. **Conferir com o checker** (decisão 4.151): `${CLAUDE_PLUGIN_ROOT}/scripts/index-check.sh <dir-do-slug>` — irmão do `map-check.sh`, saída no formato do `graph.sh`, catálogo sem ERROR (o INDEX é derivado; divergência se corrige regenerando). Checks: `index-ausente` · `index-secao-ausente` · `index-spec-fantasma`/`-fora` · `index-plan-fantasma`/`-fora` · `index-tasks-cell` (célula `X/Y M` vs TASKs reais) · `index-status-verbatim` (coluna vs arquivo, exceção `Done (sugerido)`) · `index-capacidade-adiantada` (capacidade em "Implementadas" com TASK aberta) · `index-historico-teto` (INFO, >10). Achado é fato a corrigir na mesma edição; suíte em `scripts/tests/index/`.
 
 ### Pendência e veredito de métrica (decisão 4.99)
 

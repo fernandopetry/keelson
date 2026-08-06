@@ -93,13 +93,13 @@ O status efetivo posiciona a capacidade na seção "Capacidades". SPEC que decla
 
 Detectar e listar:
 
-1. **FRs referenciados por TASKs mas inexistentes na SPEC** (órfãos).
-2. **PLANs cuja SPEC referenciada não existe**.
-3. **TASKs cuja PLAN referenciado não existe**.
+1. **FRs referenciados por TASKs mas inexistentes na SPEC** (órfãos) — fato: `ref-quebrada` do `graph.sh --check`.
+2. **PLANs cuja SPEC referenciada não existe** — fato: `ref-quebrada`.
+3. **TASKs cuja PLAN referenciado não existe** — fato: `ref-quebrada`.
 4. **DECs irreversíveis conflitantes** (decisões opostas marcadas como irreversíveis).
 5. **Glossário com definições conflitantes**.
-6. **Status incoerente**: PLAN Done com tasks Todo.
-7. **Par brief ↔ SPEC órfão**: SPEC com front-matter `Brief:` apontando para BRIEF inexistente, ou BRIEF cuja SPEC pareada não existe. Brief **épico** (sufixo `-epic`) não pareia com SPEC — nunca é órfão por isso; demandas-filhas dele podem viver em outros slugs e são conferidas **best-effort** (jamais falham o rebuild deste slug).
+6. **Status incoerente**: PLAN Done com tasks Todo — fato: `plan-status-vs-tasks` (4.153).
+7. **Par brief ↔ SPEC órfão** — fato: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/next-id.sh" {docsRoot}/<slug> --check` (`spec-brief-divergente`/`spec-brief-orfao`). Brief **épico** (sufixo `-epic`) não pareia com SPEC — nunca é órfão por isso; demandas-filhas dele podem viver em outros slugs e são conferidas **best-effort** (jamais falham o rebuild deste slug).
 
 **Inconsistências críticas (1, 2, 3, 6)**: listar e **perguntar antes de prosseguir**.
 
@@ -107,7 +107,7 @@ Detectar e listar:
 
 ## Etapa 3: gerar o INDEX
 
-Construir o INDEX seguindo o **template canônico** (contrato do INDEX — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`), com a variação do rebuild descrita lá: linha extra no aviso (`> Última reconstrução completa via /keelson:rebuild-index: <ISO 8601>`) e, se houver, a seção final `## Inconsistências conhecidas` (descrição + ação sugerida).
+Construir o INDEX seguindo o **template canônico** (contrato do INDEX — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`), com a variação do rebuild descrita lá: linha extra no aviso (`> Última reconstrução completa via /keelson:rebuild-index: <ISO 8601>`) e, se houver, a seção final `## Inconsistências conhecidas` (descrição + ação sugerida). Gerado o arquivo, prove-o: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/index-check.sh" {docsRoot}/<slug>` — achado remanescente é defeito da reconstrução, corrija antes do output.
 
 **Slug migrado**: as seções Resumo/Capacidades/Glossário/Decisões/Riscos incorporam os achados do TRIAGE (itens 📜 e `LEGACY-DEC-*`, abrindo com `> Fonte durável: legacy/TRIAGE-<data>.md`), mesclados com o que vier de SPECs/PLANs/TASKs.
 
