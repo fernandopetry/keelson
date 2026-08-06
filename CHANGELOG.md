@@ -17,6 +17,42 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.86.0] — 2026-08-06
+
+Decision 4.154 — the deferred list from 4.151 closes: the remaining seven pieces of
+deterministic work move from prose to scripts, under the same contract (frozen
+regression suites on pre-commit and CI, named degradation, doctrine citing facts).
+
+### Added
+- **`init-selfcheck.sh`**: the disk-and-git provable part of `/keelson:init` step 6 —
+  codePaths, quality binaries, real-match proof of `sensitiveGlobs` against secrets on
+  disk, profile resolution/`reviewed`/`charter` drift, `keelson.local.*` hygiene
+  (versioned example, gitignore proven via `check-ignore`, placeholders), effective
+  Playwright MCP flags across the three config scopes, minimum Jira fields. MCP-alive
+  checks stay with the command.
+- **`probe-env.sh`**: the QA environment probe with named causes
+  (`credencial_ausente`/`credencial_placeholder`/`app_fora_do_ar`) and literal
+  evidence ready for the handoff `sonda:`; `quality.boot` attempt is executed and
+  recorded (4.71); passwords never echo.
+- **`epic-state.sh`**: the deterministic state derivation of `/keelson:continue` —
+  epic queue vs child artifacts, first matching rule, queue divergences flagged.
+- **`handoff-scan.sh`**: pending verification handoffs per worktree with open V-item
+  counts, for `verify-handoff`, `integrate` and delivery reports.
+- **`legacy-move.sh`**: transactional root-`.md` move for `/keelson:migrate-legacy`
+  (`git mv` when tracked; mid-failure rolls itself back).
+- **`postmortem-facts.sh`**: installed plugin version, branch/HEAD and commit window
+  for the postmortem header.
+- **`edge-diff.sh`**: proves the 4.117 rewrite rule — edge fields and criteria ACs
+  before/after a scribe rewrite; lost edges nobody asked for go back in the next
+  redispatch.
+
+### Changed
+- Doctrine now cites these scripts as fact: `init.md`, `agents/qa.md`, `continue.md`,
+  `verify-handoff.md`, `integrate.md`, `migrate-legacy.md`, `postmortem.md` and
+  `graph-contract.md` §4.1.
+
+---
+
 ## [0.85.0] — 2026-08-06
 
 Decisions 4.151–4.153 — deterministic work that the model used to re-derive in prose

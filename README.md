@@ -408,16 +408,18 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.85.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.86.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **deterministic work moved from prose to scripts** (decisions
-4.151–4.153). Seven script contracts — ficha reader, ID allocator, INDEX checker,
-diff facts (inert/composition/deploy), run-state and ledger writers, artifact form
-lint — now compute what the model used to re-derive by hand, each with a frozen
-regression suite running on pre-commit and CI; validators and commands cite their
-output as fact. No re-init needed — consumers only update the plugin.
+New in this release: **the mechanical fact layer is complete** (decisions
+4.151–4.154). Fourteen script contracts now compute what the model used to re-derive
+by hand — ficha reader, ID allocator, INDEX checker, diff facts, run-state/ledger
+writers, artifact form lint, init self-check, environment probe, epic queue state,
+handoff scan, transactional legacy move, postmortem facts and rewrite edge-diff —
+each with a frozen regression suite on pre-commit and CI; validators, commands and
+agents cite their output as fact. No re-init needed — consumers only update the
+plugin.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
