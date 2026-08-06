@@ -48,8 +48,10 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   ex-§3.0), `index-contract.md` (artefatos/IDs + contrato/template/receita do INDEX, ex-§6),
   `handoff-protocol.md` (handoff de verificação de tela, ex-§8), `commit-convention.md`
   (tipo/escopo/quebra da mensagem de commit no consumidor — o bloco de keys do tracker
-  continua no §15 do protocolo Jira) e `graph-contract.md` (sintaxe canônica de aresta,
-  catálogo de arestas/checks do grafo e contrato do `scripts/graph.sh` — decisão 4.82);
+  continua no §15 do protocolo Jira), `graph-contract.md` (sintaxe canônica de aresta,
+  catálogo de arestas/checks do grafo e contrato do `scripts/graph.sh` — decisão 4.82)
+  e `report-contract.md` (esqueleto canônico do relatório de fecho — Entrega do auto,
+  modo sob demanda e `/keelson:report` — decisão 4.130);
   o `method-guide.md`
   segue guia humano, com os headings §3.0/§6/§8 preservados como ponteiros. A moldura dos
   validators vive em `skills/_shared/validator-protocol.md`; a **régua dos gates 1–7**

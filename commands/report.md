@@ -48,29 +48,12 @@ plugin).
 
 ## Etapa 2: emitir o relatório
 
-Mesmo contrato do fecho automático, narrado em **linguagem de time** (Tech Lead, Developer,
-Code Reviewer, QA, Security, PO — IDs técnicos ficam nos artefatos):
-
-```markdown
-# Fecho de sessão: <slug | branch | "sessão livre">
-
-- **Mudanças**: <resumo em 1–3 linhas do que foi feito>
-- **Composição do diff**: <N> produção · <N> teste · <N> doc · <N> migration/config
-  <+ o que entrou fora do escopo, com o motivo em meia linha>
-- **Gates**: <gate: veredito (implementado_por → revisado_por)>, um por linha
-  <gate condicional não aplicável → "n/a (<motivo>)"; não rodado → "não rodado", nunca omitido>
-- **Decisões tomadas em seu nome**: <1 linha cada — decisão + porquê>
-- **Fora de escopo / pendente**: <achados estacionados, handoff aberto, parte recusada>
-- **Tracker**: <linha de estado do Jira — só com jira.enabled>
-- **Duração**: <pelas marcas `marco` do ledger; sem marcas, omita e nomeie a lacuna>
-- **Pendente de você**: <commit · revisão da branch · resposta a pergunta estacionada · nada>
-
-## Tracker fora de sincronia — reconexão   # OMITIR se nada degradou
-<bloco da §14 do protocolo de sync, com o comando de reconciliação em copy-paste>
-
-## Cobertura deste relatório
-<o que foi medido do repositório × o que veio do ledger × o que ficou sem registro>
-```
+Mesmo contrato do fecho automático: preencha o **esqueleto canônico** de
+`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/report-contract.md` (decisão 4.130),
+narrado em **linguagem de time** (Tech Lead, Developer, Code Reviewer, QA, Security,
+PO — IDs técnicos ficam nos artefatos). Específico desta rede de segurança (contrato
+§3): a duração sai das marcas `marco` do ledger (sem marcas → lacuna nomeada) e a
+seção **"Cobertura deste relatório"** é sempre presente.
 
 - **Gate sem evento no ledger não vira "aprovado"**: reporte `sem registro` e, se o diff exigir
   aquele gate (área sensível com `gates.security` ativo, comportamento observável), diga que
