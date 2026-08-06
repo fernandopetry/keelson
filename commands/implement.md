@@ -1,6 +1,6 @@
 ---
 description: Executa um PLAN aprovado wave a wave via subagents (developer → code-reviewer + gates dedicados), com quality gates e closure obrigatória por task
-argument-hint: <PLAN-MMM ou caminho> [--max-parallel=N] [--dry-run] [--only-wave=N] [--force-mode=teams|subagents]
+argument-hint: <PLAN-MMM ou caminho> [--max-parallel=N] [--dry-run] [--only-wave=N] [--guidelines=arquivo] [--force-mode=teams|subagents]
 ---
 
 # /keelson:implement
@@ -16,12 +16,6 @@ Você é o **Tech Lead** do time keelson (decisão 4.37), orquestrando implement
 **Princípio inviolável 4**: a orquestração usa **Subagents** (modo padrão deste ambiente); `--force-mode=teams` habilita Agent Teams quando disponível, com estrutura idêntica.
 
 **Princípio inviolável 5**: a cada closure de task e a cada conclusão de PLAN, o `INDEX.md` do slug é atualizado.
-
-## Input
-
-```
-/keelson:implement <PLAN-MMM ou caminho> [--max-parallel=<N>] [--dry-run] [--only-wave=<N>] [--guidelines=<arquivo>] [--force-mode=<teams|subagents>]
-```
 
 ## Etapa 0: detecção, guidelines e setup
 
@@ -98,21 +92,15 @@ Se esses subagents não existirem, usar subagents genéricos com instruções in
 
 Passe no prompt de cada agente os **inputs**: caminhos de TASK, PLAN, SPEC, ficha (`keelson.config.json`), INDEX.md e (se existir) do memo de exploração `thoughts/local/exploration-<slug>.md`. O fluxo de trabalho (status, implementação, testes, lint, commit) é o system prompt do `developer` — não o repita. **Espere de volta** o report próprio do agent (formato definido no `developer` — **não** o 3.4.1, que é consolidado depois pela main session), no contrato de **duas camadas** (4.103, `sdd-conventions.md`): só o YAML; retorno com prosa longa em volta é report fora do contrato — use o YAML e ignore o resto.
 
+**Pendência herdada entra como critério, nunca como prosa** (decisão 4.140): pendência que um achado anterior deixou para uma TASK ainda não implementada — lição de retry desta sessão ou achado de gate roteado a uma TASK de wave futura do mesmo PLAN — entra no despacho como item **explícito** do "Critérios de pronto" da TASK que a recebe (edite o arquivo da TASK **antes** do despacho), nunca como prosa no Contexto: nomeie a verificação com a **mesma régua do achado de origem** (ex.: mutante arquivo+alteração e o veredito esperado nos dois estados). Requisito que chega como narrativa é implementado e narrado; só o Critério de pronto é lido como algo a provar (caso real: 3 TASKs herdaram o mesmo requisito de posse de transação — nas 2 que o receberam como critério o teste nasceu junto; na que o recebeu como prosa o código nasceu correto e sem prova, e neutralizar a guarda manteve a suíte inteira verde).
+
 **Marco de início no Jira (opcional)**: só quando `jira.enabled`. No **despacho** de cada wave, **despache também o agent `tracker-sync`** (decisão 4.103; em paralelo — nunca atrasa os developers) com o gancho **`despacho`** (§9) e as TASKs da wave: marco `TASK iniciada` em cada sub-task com key — e `Trabalho iniciado (Story)` quando é a primeira da Story — sob a política de `transition`, o teto e a **não-regressão** do §9. TASK **sem key** → ele pula em silêncio (criar é papel dos ganchos de `/keelson:tasks`/closure/reconciliação, nunca do despacho). Best-effort (§0): `eventos_tracker` do retorno → ledger.
 
 ### 3.3 Quality gates (revisão independente — 1× por wave, decisão 4.90)
 
 Revisão por agentes independentes (o developer **nunca** revisa o próprio trabalho), com os guidelines ativos em contexto. **Recorte** (dono: `core/CODE-REVIEW.md` §Orquestração): a rodada de revisão roda **uma vez por wave**, depois que todas as TASKs da wave retornam do developer — sobre o **diff acumulado da wave**, com o pacote de contexto (4.89) incluindo o **mapa TASK→arquivos** e os reports dos developers. Cada TASK continua provada individualmente pelos próprios testes (gate 2, no report do developer). Achado é **roteado à TASK de origem**: o retry vai ao developer daquela TASK e o re-review é sobre o delta (4.88).
 
-**Sempre — via `code-reviewer` (1× por wave):**
-
-1. Cobertura de ACs
-2. Testes passando
-3. Lint limpo
-4. Escopo respeitado
-5. DEC respeitadas
-6. Aderência à ficha e ao perfil de linguagem ativo (stack, padrão, naming, teste, anti-padrões, decisões irreversíveis)
-7. Code review qualitativo
+**Sempre — via `code-reviewer` (1× por wave)**: gates **1–7** — 1 cobertura de ACs · 2 testes passando · 3 lint · 4 escopo respeitado · 5 DECs respeitadas · 6 aderência à ficha e ao perfil ativo (stack, naming, anti-padrões, decisões irreversíveis) · 7 review qualitativo. A régua de cada gate tem dono único em `guidelines/core/CODE-REVIEW.md` — não a replique aqui.
 
 **Proporcional ao risco — gates dedicados:**
 
@@ -175,14 +163,7 @@ Report incompleto ou inválido: rejeitar, refazer.
    - Mencionar no output quais lições foram registradas/patcheadas (e quais viraram proposta). **A lição gravada vive no commit da closure** (item 6) — ela só entra **em vigor** quando a branch mergear na main (ato do Diretor); até lá é lição *pendente de merge* e a Entrega (Etapa 5) a declara como tal (decisão 4.71). Relatar uma lição como "registrada" sem esse estado é o mesmo falso verde do gate: parece em vigor, não está.
 6. Commit das atualizações de closure com `chore(<slug>): close TASK-MMM-XXX` — **em qualquer modo de orquestração** (decisão 4.119; antes restrito ao paralelo, o que deixava closure e INDEX sujos até a Entrega no modo padrão e furava a auditoria: o SHA citado na closure não continha a própria closure). Incluir as mudanças em `guidelines/` se houver lição registrada — com `jira.enabled`, as keys da TASK fechada abrem a descrição conforme a §15 do protocolo (`chore(<slug>): PROJ-12 PROJ-34 PROJ-56 close TASK-MMM-XXX`).
 
-Closure falha se:
-- Arquivo TASK não atualizado
-- TASK-INDEX não atualizado
-- INDEX.md do slug não atualizado
-- Status no arquivo TASK ≠ Done
-- Campos obrigatórios vazios
-
-Falha: reportar específico, 1 retry, escalar.
+Closure falha se qualquer alvo dos itens 1–3 ficou desatualizado, o Status no arquivo da TASK ≠ Done ou campo obrigatório ficou vazio — reportar o campo específico, 1 retry, escalar.
 
 ### 3.5 Sinais laterais na wave (coordenação, furo no plano, fora de escopo)
 
@@ -201,7 +182,7 @@ Falha: reportar específico, 1 retry, escalar.
 ### 3.6 Final da wave
 
 1. **Inventário da wave contra os artefatos, nunca contra a memória (decisão 4.92)** — num ciclo longo a própria narrativa degrada (compressão de contexto), então a conferência tem fonte nomeada, em dois eixos: (a) **TASKs**: reler o checklist `### Wave N` do doc de TASKs — cada TASK listada foi despachada e está Done com closure; TASK esquecida reabre a wave agora, não na Entrega; (b) **gates**: a rodada da 3.3 (reviewer sempre; security quando devido) rodou sobre o diff acumulado **desta** wave, report em mãos — wave sem rodada não fecha.
-2. **Gate 9 por FEAT (decisão 4.90)**: para cada FEAT que **completou nesta wave** (check do item 3 da closure — todas as TASKs que a listam Done), invocar o `qa` com o pacote da FEAT: nome e propósito, ACs literais dos FRs dela, telas/endpoints envolvidos, mapa TASK→arquivos. O `qa` prova o comportamento **de ponta a ponta** (fluxo, não diffs isolados; screen-verify quando `gates.screenVerify` e efeito de tela). Resultado → gravar na SPEC, sob o heading da FEAT, a linha `**Verificação (gate 9)**: <data> — <como/por quem>` (ou `n/a — <motivo>` quando não há efeito observável) — o grafo cobra essa linha (check `feat-sem-verificacao`); `pendente_handoff` → a seed vai para a Etapa 4 e a linha registra o estado. Falha do `qa` → tratar como falha de gate (retry roteado, convergência 4.88). Nenhuma FEAT completou → pular, sem menção.
+2. **Gate 9 por FEAT (decisão 4.90)**: para cada FEAT que **completou nesta wave** (check do item 3 da closure — todas as TASKs que a listam Done), invocar o `qa` com o pacote da FEAT: nome e propósito, ACs literais dos FRs dela, telas/endpoints envolvidos, mapa TASK→arquivos, e os **achados dos gates 7/8** desta wave (e das anteriores da mesma FEAT) que tocam os ACs/telas do roteiro — **reconcilie o roteiro fixado no `/keelson:tasks` contra eles antes de despachar** (decisão 4.140): passo cuja pré-condição, contagem de estados ou mecanismo de recarga uma DEC/correção posterior invalidou é reescrito nomeando o que mudou, nunca executado como estava (daria falso negativo); passo cuja correção correspondente exigia prova externa e não a menciona ganha o comando de contagem que falta (senão dá falso positivo). O `qa` prova o comportamento **de ponta a ponta** (fluxo, não diffs isolados; screen-verify quando `gates.screenVerify` e efeito de tela). Resultado → gravar na SPEC, sob o heading da FEAT, a linha `**Verificação (gate 9)**: <data> — <como/por quem>` (ou `n/a — <motivo>` quando não há efeito observável) — o grafo cobra essa linha (check `feat-sem-verificacao`); `pendente_handoff` → a seed vai para a Etapa 4 e a linha registra o estado. Falha do `qa` → tratar como falha de gate (retry roteado, convergência 4.88). Nenhuma FEAT completou → pular, sem menção.
 3. Rodar a suíte **relevante ao escopo da wave** no working tree principal — ampla o bastante para pegar regressão cross-task (não só os `--filter` de cada task), mas **não** a suíte completa a cada wave. A completa roda 1× na Etapa 4 (verificação forte e única). **Dispensa por diff inerte**: se o diff da wave não toca código que a suíte exercita (só docs/artefatos SDD — régua e âncora mecânica em `core/TESTING.md`, "Diff inerte"), a rodada é dispensada e **declarada no boletim**, nunca omitida.
 4. Regressão: parar e reportar.
 5. Atualizar `waves_concluidas` no `thoughts/local/run-state-<slug>.md` (o `status` continua `em_andamento` até a Entrega).
@@ -254,15 +235,9 @@ E sugira `/keelson:integrate {docsRoot}/<slug>/plans/PLAN-MMM-<nome>.md` — com
 ```markdown
 # Implementação concluída: PLAN-MMM
 
-## Modo usado
-- Orquestração: AGENT_TEAMS | SUBAGENTS | SINGLE_THREAD
-- Paralelismo: máximo <N>
-- Branches: <lista>
-
 ## Resumo
-- Tasks executadas: N
-- Tempo total: ~Tmin
-- Tokens consumidos: ~Z
+- Orquestração: AGENT_TEAMS | SUBAGENTS | SINGLE_THREAD · paralelismo máx <N> · branches: <lista>
+- Tasks executadas: N · tempo total: ~Tmin · tokens: ~Z
 
 ## Quality gates
 - Aprovadas 1ª tentativa: N | retry: M | falhadas: 0
@@ -278,19 +253,13 @@ E sugira `/keelson:integrate {docsRoot}/<slug>/plans/PLAN-MMM-<nome>.md` — com
 - TASK-MMM-INDEX.md: atualizado
 - Commits de closure: <SHAs>
 
-## Aderência aos guidelines
-- Ficha/perfil de linguagem: 100% aderente
-- Stack/arquitetura/commit: conforme declarado
-
-## Cobertura
+## Aderência e cobertura
+- Ficha/perfil de linguagem: 100% aderente · stack/arquitetura/commit conforme declarado
 - FRs implementados: 100% | ACs verificados: 100% | NFRs verificados: 100%
 
 ## Estado do INDEX após esta execução
-- N SPECs no slug
-- N PLANs (X concluídos, Y em andamento, Z em draft)
-- N capacidades implementadas, N em desenvolvimento, N especificadas-não-planejadas
-- N decisões irreversíveis ativas
-- N riscos ativos
+- N SPECs · N PLANs (X concluídos, Y em andamento, Z em draft) · N decisões irreversíveis ativas · N riscos ativos
+- Capacidades: N implementadas, N em desenvolvimento, N especificadas-não-planejadas
 
 ## Lições registradas                        # OMITIR se nenhuma lição foi registrada no ciclo
 - <lição> → <guidelines/project/lessons.md | proposta ao humano> — em vigor | **pendente de merge** (branch <nome>)

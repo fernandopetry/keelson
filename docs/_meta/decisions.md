@@ -1660,6 +1660,36 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.138 — Conhecimento herdado chega à TASK como critério endereçado (LRN-043 e LRN-044 da fila)
+
+**Problema**: duas propostas da mesma família na fila (4.111), leva de destilação prevista na 4.135: (a) `guidelines/project/lessons.md` é, por desenho, a memória de longo prazo do projeto — mas nenhum passo da geração de TASKs a consulta: lição registrada numa wave, **nomeando o arquivo-alvo**, foi violada pelo método novo no mesmo arquivo uma wave depois, achada só no gate 8 — uma rodada de retry para um defeito com nome, causa e arquivo escritos antes do código nascer; (b) critério herdado escrito **por extenso** (exatamente para não evaporar por ID — 4.106) ainda evapora por **endereço**: o único arquivo onde ele se cumpria ficou fora do "Escopo > Inclui" de todas as TASKs da wave — o developer seguiu o próprio contrato ("só toque o que o Inclui autoriza"), reportou Done com verdade, e o defeito que o critério existia para prevenir foi amplificado pela tela nova, achado só por leitura no gate 7.
+
+**Decisão**: a geração da TASK (Etapa 3 do `/keelson:tasks`) ganha as duas réguas irmãs. **Lessons.md é insumo do scribe** (Etapa 0.5) e, antes de fixar os Critérios de pronto, os arquivos-alvo do Inclui são cruzados contra ela: lição que nomeia esses arquivos (ou o padrão que encarnam) vira item **verificável** do Critério de pronto — nunca leitura recomendada; lição não reforçada como critério na próxima TASK que toca o mesmo arquivo é lição inerte. E **critério herdado por extenso ganha endereço**: nomeia arquivo+ação que o cumprem e o Inclui da task que o recebe o incorpora — senão vira TASK própria na mesma wave. Teste comum: verificação que não aponta para arquivo que o Inclui autoriza tocar está mal endereçada — cumprida à risca, o requisito segue violado sem grep nenhum acusar.
+
+**Aplicação**: `commands/tasks.md` (Etapa 0.5 — insumo; Etapa 3 — os dois parágrafos), com **destilação compensatória** (4.135): fusão dos parágrafos irmãos "falsificável × executado na fixação" e "roteiro interno × cruza-fronteira" — 300→298 linhas com os 3 patches da leva dentro. Fila: LRN-043 e LRN-044 → aplicadas. Observar na 1ª geração real: a lição vira critério com comando, ou vira parágrafo de Contexto?
+
+---
+
+### 4.139 — Critério de mutação de escopo fecha por contagem, não por lista (refina o item (c) da 4.107; LRN-034, 2ª reincidência)
+
+**Problema**: a régua da 4.107(c) foi cumprida **nominalmente**: a TASK enumerou a prova de mutação para 2 dos 4 métodos novos cujo WHERE carrega o escopo — os outros 2 saíram sem cenário de segunda instância e 5 mutantes sobreviveram com a suíte 100% verde. Lista de instâncias lida à risca parece cobertura completa; nada no texto aplicado forçava um fechamento.
+
+**Decisão**: o item (c) é **reformulado** (substituição, não soma): o critério exige fechamento **contável** — "todo método cujo WHERE carrega esse escopo tem cenário de segunda instância cuja mutação reprova: N métodos no Escopo, N provas", mais um caso por ramo do predicado nos métodos de leitura; método nomeado entra como ilustração **não-exaustiva**, nunca como a lista completa. Padrão geral confirmado (mesma família da 4.92): regra que aceita enumeração convida ao cumprimento parcial — a forma robusta é a **condição fechada com a contagem que a prova**.
+
+**Aplicação**: `commands/tasks.md` (Etapa 3, item (c) do "resiste a contorno"). Fila: LRN-034 (2ª reincidência) → aplicada. 3ª reincidência da família → check mecânico no `task-validator`.
+
+---
+
+### 4.140 — O que os gates já acharam viaja para o próximo despacho como critério (LRN-015 reformulada e LRN-047 da fila)
+
+**Problema**: dois elos quebrados entre achado de gate e despacho posterior, no mesmo ciclo real. (a) Pendência de um achado de gate 8 roteada a 3 TASKs da wave seguinte: nas 2 que a receberam como item do Critério de pronto, o teste nasceu junto; na que a recebeu como **prosa no Contexto**, o código nasceu correto e **sem prova** — trocar a guarda por uma constante manteve a suíte inteira verde, e uma regressão de integridade real passaria por 3 gates sem nenhum acusar. A proposta original de LRN-015 ("injeta como check explícito no contexto") não distinguia prosa de critério — a distinção decidiu o caso. (b) O roteiro do gate 9, fixado antes do código (correto por desenho), **envelhece**: 5 passos em 2 TASKs descreviam pré-condição, contagem de estados ou mecanismo de recarga que DECs e correções posteriores dos gates 7/8 invalidaram — dois dariam falso negativo, um falso positivo; só a memória humana os religou.
+
+**Decisão**: dois fechos no orquestrador. (a) **Pendência herdada entra como item explícito do "Critérios de pronto"** da TASK que a recebe — o arquivo da TASK é editado **antes** do despacho — nunca como prosa no Contexto, e a verificação usa a **mesma régua do achado de origem**: requisito que chega como narrativa é implementado e narrado; só o Critério de pronto é lido como algo a provar. (b) O **pacote do gate 9 por FEAT inclui os achados dos gates 7/8** da wave (e das anteriores da mesma FEAT) que tocam os ACs/telas do roteiro, e o orquestrador **reconcilia o roteiro** contra eles antes de despachar — passo invalidado por correção posterior é reescrito nomeando o que mudou; passo sem a prova externa que a correção exigia ganha o comando de contagem que falta. O §3.6 é o único ponto do ciclo que vê os dois lados (roteiro fixado antes + achados que vieram depois).
+
+**Aplicação**: `commands/implement.md` (§3.2 — parágrafo novo; §3.6 item 2), com **destilação compensatória** (4.135): seção Input removida (duplicava o frontmatter; `--guidelines` migrou para o `argument-hint`), lista dos gates 1–7 colapsada em ponteiro para o dono (`core/CODE-REVIEW.md`), "Closure falha se" fundida aos itens 1–3 da §3.4.2, template de output compactado — 326→295 linhas com os 2 patches dentro. Fila: LRN-015 (reincidente ×1) e LRN-047 → aplicadas. Observar na 1ª rodada real: a pendência chega editada na TASK antes do despacho, e a reconciliação do roteiro aparece declarada no pacote do `qa`?
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
