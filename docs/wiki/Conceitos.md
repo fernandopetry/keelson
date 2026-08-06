@@ -125,6 +125,12 @@ a existir de ponta a ponta — como um QA de time real, que testa a funcionalida
 commit. Nada disso é gate pulado: cada consolidação fica declarada na tarefa, e a
 verificação da funcionalidade fica registrada na própria SPEC, cobrada mecanicamente.
 
+E no fecho, antes do push, a **convergência**: uma releitura da SPEC inteira contra o
+código como ele ficou. Ela responde as duas perguntas que os gates por parte não fazem —
+*tudo que foi pedido existe?* e *tudo que existe foi pedido?* (código extra que ninguém
+solicitou também é achado). Cada lacuna sai classificada e citando o requisito de origem;
+a entrega só segue com a lacuna corrigida ou virada em pergunta explícita para você.
+
 Falhou? Um retry, depois escala para você. E a régua que atravessa tudo:
 
 > **Gerador ≠ avaliador.** A prova de que um artigo do Charter foi cumprido é externa e

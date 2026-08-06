@@ -1700,6 +1700,46 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.142 — Gate 4 faz também a pergunta inversa: comportamento sem pai declarado é achado `não solicitado`
+
+**Problema**: o gate 4 confere arquivos contra o escopo declarado, e o Charter Art. 6 disciplina o colateral (escoteiro) — ambos respondem "o que foi tocado era permitido tocar?". Nenhum gate responde a pergunta inversa: "tudo que o diff **faz** foi pedido?". Capacidade nova dentro de arquivo em escopo — endpoint a mais, flag de config "que pode ser útil", comportamento além do AC — passa pelos 7 gates sem que nada acuse: não viola escopo de arquivo, não é colateral de limpeza e tem teste (quem a escreveu o escreveu junto). Revisão orientada a AC prova a presença do pedido, nunca a ausência do não-pedido. (Benchmark do github/spec-kit, 2026-08-06: a taxonomia de gaps de lá nomeia exatamente este cego — `unrequested`.)
+
+**Decisão**: o gate 4 ganha a **pergunta inversa** — todo comportamento novo ou alterado no diff tem **pai declarado**: um AC/critério da TASK que o exige, necessidade técnica direta do que o AC exige, ou escoteiro dentro das três condições do Art. 6. Comportamento sem pai é achado **`não solicitado`**: roteado como achado fora de escopo (sinal lateral Reviewer → Tech Lead), e o destino é decisão declarada — vira requisito assumido registrado (decisão em nome do Diretor, quando pequeno e reversível) ou sai do diff; permanência silenciosa é a falha. Sem artefato SDD, a degradação já existente cobre ("o diff faz uma coisa só").
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (gate 4 — dono da régua). Observar na 1ª rodada real: o achado nasce com a rota certa (fora de escopo → Tech Lead) ou vira FAIL genérico?
+
+---
+
+### 4.143 — Convergência de fecho: a SPEC inteira contra o código final, com registro reaproveitável
+
+**Problema**: o ciclo prova por partes — testes por TASK, revisão por wave, comportamento por FEAT (4.90), aceitação contra o brief — e nenhum passo relê a **SPEC inteira** contra o **estado final** do código. O todo pode falhar com todas as partes verdes: FR coberto pela metade entre duas TASKs, DEC contradita por correção tardia de retry, capacidade não pedida acumulada. O `graph.sh` prova a cobertura **estrutural** (FR→AC→TASK no texto); ninguém prova a **semântica** (o código realiza o que o texto pede). (Benchmark do github/spec-kit, 2026-08-06: o passo `converge` de lá fecha este buraco — mas por inferência de keyword, sem grafo; aqui a âncora mecânica já existe.)
+
+**Decisão**: o fecho do ciclo formal ganha uma **rodada de convergência**: o `code-reviewer` (modo próprio, read-only) recebe SPEC + DECs do PLAN + diff acumulado da branch + saída do `graph.sh` (fato estrutural — citado, nunca re-derivado) e classifica cada lacuna em **4 tipos**, sempre com source-ref (FR/AC/DEC citado): `ausente` · `parcial` · `contradiz` · `não solicitado` (a régua da 4.142 aplicada ao acumulado). Outcome declarado: `convergiu` ou a lista de gaps. Gap segue o fluxo normal — correção antes do push (re-gate 4.88, 1 retry) ou parte estacionada com a pergunta pronta na Entrega; push silencioso com gap aberto é a falha que o passo impede. Rodada `convergiu` é registrada no INDEX com o SHA (padrão da 4.122) e o `/keelson:integrate` a reaproveita quando o diff desde então é inerte; sem registro válido, a rodada corre lá. A linha entra no esqueleto do report.
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (régua — dono único), `agents/code-reviewer.md` (modo convergência + invocadores), `commands/auto.md` (Etapa 5, item 2.4), `commands/integrate.md` (Etapa 2), `docs/_meta/conventions/report-contract.md` (linha do esqueleto), method-guide/wiki (resumo). Observar na 1ª rodada real: a convergência acha gap que os gates por parte não acharam, ou é redundância paga?
+
+---
+
+### 4.144 — Pendência `[confirmar]` tem orçamento: no máximo 3 por SPEC, o excedente vira premissa com default declarado
+
+**Problema**: a Etapa 1 do `/keelson:specify` tem teto de perguntas (4) — mas a SPEC não tem teto de **pendências**: `[confirmar]` ilimitados passam pelo validator e empurram a decisão para o meio do ciclo, onde ela custa mais (plan/tasks herdam a ambiguidade; cada `[confirmar]` é uma pergunta pendurada que ninguém é obrigado a responder). Sem orçamento, o incentivo de quem escreve é marcar pendência em vez de assumir com registro — parece prudência, é adiamento. (Benchmark do github/spec-kit, 2026-08-06: teto de marcadores de incerteza com ordem de prioridade + seção de premissas obrigatória.)
+
+**Decisão**: a SPEC carrega **no máximo 3** `[confirmar]`. Candidatos além do teto se resolvem por prioridade — **escopo > segurança/privacidade > experiência do usuário > detalhe técnico** — e os cortados viram `[assumido]` com o **default escolhido declarado na própria premissa** (o palpite + por que é razoável, com o selo de evidência da 4.96). O teto força a distinção que importa: pendência de verdade (a resposta muda o resultado) versus preferência com default razoável de indústria. `spec-validator`: WARNING `confirmar-acima-do-teto` — só em SPEC `Draft`/`Review` (acervo `Approved`+ é anterior à régua); nunca ERROR: cortar pendência é juízo, não forma.
+
+**Aplicação**: `commands/specify.md` (Etapa 2, item 7), `skills/spec-validator/SKILL.md` (Etapa 8). Observar na 1ª SPEC real: o teto derruba pendência de verdade (falso corte)?
+
+---
+
+### 4.145 — Pergunta de escalação se responde lendo só o bloco dela
+
+**Problema**: proposta + default (4.37) e o custo do ramo (4.136) disciplinam a **resposta** da escalação; a **pergunta** não tem régua de forma. Escalação chega como rótulo técnico ("matriz de aceitação FR-023", "estratégia de retenção da fila") que obriga o Diretor a abrir SPEC/PLAN para entender o que está sendo perguntado — o custo de decidir sobe, a resposta atrasa ou vem de contexto incompleto. (Benchmark do github/spec-kit, 2026-08-06: a disciplina de forma de pergunta do `clarify` — nunca rótulo, sempre pergunta, com "why it matters".)
+
+**Decisão**: toda pergunta de escalação passa no teste — **o Diretor decide lendo só o bloco da escalação**, sem abrir artefato: (a) é uma **pergunta em linguagem do Diretor**, terminando em `?` — rótulo, heading ou ID de requisito não é pergunta; (b) carrega **uma linha de "por que importa"** — a consequência prática no produto, não no artefato (o custo do ramo da 4.136 frequentemente a satisfaz; não duplicar quando já satisfaz); (c) **uma decisão por pergunta**; (d) aceitar o default custa uma palavra. Vale para todo papel que escala "como toda escalação" (mesma cláusula da 4.136).
+
+**Aplicação**: `agents/po.md` (contrato de escalação — dono; os invocadores já apontam para a régua dele).
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

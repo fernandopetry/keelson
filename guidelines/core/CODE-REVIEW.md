@@ -89,8 +89,18 @@ nenhum arquivo do "não inclui" foi tocado. Mudança colateral (não realiza AC 
 auxiliar) é legítima **somente** se declarada como escoteiro e dentro das três condições
 do Charter Art. 6.
 
+E a **pergunta inversa** (decisão 4.142): todo comportamento novo ou alterado no diff tem
+**pai declarado** — um AC/critério da TASK que o exige, necessidade técnica direta do que
+o AC exige, ou escoteiro dentro das três condições. Capacidade a mais dentro de arquivo em
+escopo (endpoint extra, flag "que pode ser útil", comportamento além do AC) é achado
+**`não solicitado`**: roteado como achado fora de escopo (sinal ao Tech Lead), e o destino
+é decisão declarada — vira requisito assumido registrado ou sai do diff; permanência
+silenciosa é a falha. A revisão orientada a AC prova a presença do pedido; este check
+prova a ausência do não-pedido.
+
 **Falha**: arquivo fora do escopo; colateral não declarado; "escoteiro" fora das três
-condições (muda comportamento, atravessa arquivo, escopo novo rotulado de limpeza).
+condições (muda comportamento, atravessa arquivo, escopo novo rotulado de limpeza);
+comportamento sem pai declarado mantido sem decisão (`não solicitado`).
 
 ### Gate 5: decisões DEC respeitadas
 
@@ -298,6 +308,36 @@ ela converge ou escala.
   o defeito que ele mesmo reprova). O **porquê durável** continua obrigatório no código
   pelo piso do Art. 7 — o endereço muda para a prosa de processo, não a régua de
   conteúdo.
+
+---
+
+## Convergência de fecho: a SPEC inteira contra o código final (decisão 4.143)
+
+O ciclo prova por partes — testes por TASK, revisão por wave, comportamento por FEAT
+(4.90). Este passo prova o **todo**: no fecho do ciclo formal, o `code-reviewer` (modo
+convergência, read-only) relê a SPEC contra o **estado final** do código e responde o que
+nenhum gate por parte responde — o código realiza o que o texto pede, e só o que ele pede?
+
+- **Pacote**: SPEC (FRs/ACs) + DECs do PLAN + diff acumulado da branch + saída do
+  `graph.sh` sobre o slug. O grafo é o fato **estrutural** (cobertura FR→AC→TASK no
+  texto) — cite-o, não o re-derive; a rodada acrescenta a camada **semântica** (a
+  realização no código).
+- **Cada lacuna tem um de 4 tipos**, sempre com o source-ref (FR/AC/DEC citado):
+  `ausente` — requisito sem realização alguma · `parcial` — existe mas não satisfaz o
+  requisito por inteiro · `contradiz` — o código conflita com um FR ou uma DEC ·
+  `não solicitado` — capacidade sem pai declarado (a régua do gate 4/4.142 aplicada ao
+  acumulado da branch).
+- **Outcome declarado, nunca implícito**: `convergiu` ou a lista de gaps. Gap segue o
+  fluxo normal — correção antes do push (régua de re-gate acima, 1 retry) ou parte
+  estacionada com a pergunta pronta na Entrega; push silencioso com gap aberto é a
+  falha que o passo existe para impedir.
+- **Registro reaproveitável** (padrão da 4.122): rodada `convergiu` entra no "Histórico
+  recente" do INDEX como `<data>: convergência de fecho verde em <SHA>`; o
+  `/keelson:integrate` a reaproveita quando `git diff <SHA>...HEAD` é inerte (régua em
+  `./TESTING.md`, "Diff inerte") — sem registro válido, a rodada corre lá.
+
+Sem SPEC (rotas inline, TASK avulsa) o passo não existe — o espelho do brief e a
+aceitação do PO são o fecho proporcional dessas rotas.
 
 ---
 

@@ -42,6 +42,7 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 - **Gates**: <gate: veredito (implementado_por → revisado_por)>, um por linha
   <condicional não aplicável → "n/a (<motivo>)"; não rodado → "não rodado", nunca omitido>
 - **Mutação da suíte**: <verde em <SHA> | reaproveitada de <SHA> | não configurada (opt-in) | dispensada: diff inerte>   # OMITIR quando a régua 4.121 não alcança a rota
+- **Convergência (SPEC ↔ código)**: <convergiu em <SHA> | N gaps: <tipo — source-ref, 1 por linha>>   # só ciclo formal com SPEC (decisão 4.143) — OMITIR nas demais rotas
 - **Decisões tomadas em seu nome**: <1 linha cada — decisão + porquê; inclui premissas [assumido], DECs, resoluções do PO, gates resolvidos com ajuste>
 - **Fora de escopo / pendente**: <achados estacionados, handoff aberto, parte recusada, lição pendente de merge>
 - **Tracker**: Jira: <KEY> (Épico) · Story: <KEY | —> em <coluna atual> (teto: <coluna>) · sub-tarefas: K/N · transições: <n aplicadas | nenhuma> (transition: <modo>)   # só com jira.enabled; sync pulado/falho aparece AQUI com o motivo, jamais some

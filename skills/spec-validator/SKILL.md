@@ -169,6 +169,7 @@ Varrer seções 5, 6, 7 buscando palavras-bandeira:
 - Nenhuma premissa listada
 - Nenhum risco em seção 9
 - Premissa sem selo de evidência `[evidência: crença|anedota|entrevistas|medido]` (decisão 4.96; escala: sdd-conventions.md) — **só em SPEC `Draft`/`Review`**; `Approved`+ é acervo anterior à régua: silêncio, sem lógica de data
+- Mais de 3 `[confirmar]` na SPEC inteira (`confirmar-acima-do-teto`, decisão 4.144: o excedente deveria ter virado `[assumido]` com default declarado, priorizando escopo > segurança/privacidade > UX > detalhe técnico) — **só em SPEC `Draft`/`Review`**; `Approved`+ é acervo anterior à régua: silêncio. Nunca ERROR: cortar pendência é juízo, não forma
 
 ## Fechamento
 

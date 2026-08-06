@@ -95,7 +95,7 @@ Agent indisponível → executar as Etapas 2–3 inline é o fallback, declarado
 4. **RFC 2119**: MUST, SHOULD, MAY em maiúsculas.
 5. **IDs escopados ao SPEC**: `FR-NNN-001`, `NFR-NNN-001`, `AC-NNN-001`, `RISK-NNN-001`, `FEAT-NNN-001`.
 6. **Funcionalidades (FEAT)** — só quando há 2+ fluxos entregáveis: regra completa no comentário do template da §5 (Etapa 3).
-7. **Suposições explícitas**: `[confirmar]` ou `[assumido]` — e cada premissa da §8 carrega o **selo de evidência** `[evidência: crença | anedota | entrevistas | medido]` (escala e regra: convenção comum, sdd-conventions.md — decisão 4.96). O selo declara o que sustenta a aposta; nunca bloqueia.
+7. **Suposições explícitas**: `[confirmar]` ou `[assumido]` — e cada premissa da §8 carrega o **selo de evidência** `[evidência: crença | anedota | entrevistas | medido]` (escala e regra: convenção comum, sdd-conventions.md — decisão 4.96). O selo declara o que sustenta a aposta; nunca bloqueia. **Orçamento de pendência (decisão 4.144)**: no máximo **3** `[confirmar]` por SPEC — candidatos além do teto se resolvem por prioridade (**escopo > segurança/privacidade > experiência do usuário > detalhe técnico**) e os cortados viram `[assumido]` com o default escolhido declarado na própria premissa (o palpite + por que é razoável). Pendência de verdade é a que muda o resultado; preferência com default razoável de indústria não gasta o orçamento.
 8. **Escopo e não-escopo simétricos**.
 9. **Três estados da ação de UI** (decisão 4.67): FR de ação iniciada pelo usuário na
    interface DEVE especificar o comportamento **observável** dos três estados — *em
