@@ -64,6 +64,7 @@ Caminho de um ou mais `PLAN-*.md`. Contexto a ler (protocolo §2): o PLAN, a SPE
 - DEC `Irreversível: sim` sem justificativa em "Consequências"
 - DEC sem linha `**Reabrir se**:` (decisão 4.97) — **só em PLAN `Draft`/`Review`**; `Approved`/`Done` é acervo anterior à régua: silêncio
 - `**Reabrir se**: nunca` sem motivo após o travessão ("nunca" sem justificativa é fé assinada)
+- Descarte de alternativa sem custo concreto — só adjetivo ("mais complexa", "pior"), sem nomear o que se perde ou quebra ao escolhê-la (decisão 4.136) — **só em PLAN `Draft`/`Review`**, mesma carência da régua acima
 
 ### Auto-fix se:
 - `Irreversível: SIM` → `Irreversível: sim`

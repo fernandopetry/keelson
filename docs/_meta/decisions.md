@@ -1640,6 +1640,26 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.136 — Escalação e DEC carregam o custo concreto do ramo não escolhido
+
+**Problema**: o contrato de escalação (4.37) exige proposta + default — diz onde o time está, mas não o que a alternativa **custa**. O fato com mais chance de virar a decisão tende a aparecer só depois dela, onde lê como justificativa em vez de insumo; e um either/or equilibrado, sem recomendação, parece neutralidade mas é opinião retida. A mesma lacuna existe nas DECs do PLAN: "descartada porque `<motivo>`" aceita um adjetivo ("mais complexa") sem a consequência concreta, e o leitor não consegue re-julgar a decisão sem refazer a análise.
+
+**Decisão**: toda escalação carrega, além de proposta + default, **o custo concreto do ramo não escolhido** — uma cláusula dizendo o que se perde ou quebra se o Diretor recusar a proposta; esse fato entra **na escalação**, nunca depois dela. Either/or equilibrado sem recomendação é o mesmo defeito da escalação sem default. Nas DECs, o motivo do descarte nomeia o custo concreto da alternativa (o que se perde ou quebra ao escolhê-la), nunca só um adjetivo. Se uma recomendação genuinamente não pode ser formada, declare isso e diga **o que a destravaria** — também é informação.
+
+**Aplicação**: `agents/po.md` (contrato de escalação — dono; vale para todo papel que escala "como toda escalação"), `commands/plan.md` (Etapa 4 item 3 + template da §6), `skills/plan-validator/SKILL.md` (WARNING novo, só em PLAN `Draft`/`Review` — acervo `Approved`/`Done` é anterior à régua).
+
+---
+
+### 4.137 — O que decide a rota do triage é o custo de estar plausivelmente errado, não o tamanho do diff
+
+**Problema**: o roteamento do `/keelson:triage` classifica por natureza, e a categoria trivial é definida por tipo de conteúdo (texto, copy, cor). Isso deixa passar o caso inverso ao que a régua da 4.86 já cobre: uma mudança de **uma linha** num contrato publicado (shape de id, chave de payload, default de API) parece trivial e tem raio de dano máximo — todo consumidor quebra junto. No sentido oposto, mudança extensa mas mecânica é empurrada para o ciclo só por parecer grande.
+
+**Decisão**: a régua de destino ganha o teste explícito — **o que decide a rota é o custo de estar plausivelmente errado, nunca o tamanho do diff**. Uma linha que muda o que o sistema promete roteia para o ciclo por menor que pareça; mudança extensa cujo diff é auto-evidentemente certo ou errado (codemod, rename mecânico) não sobe de categoria por volume. Aparência de trivial não resiste a raio de dano: na dúvida sobre quem consome o que muda, promova.
+
+**Aplicação**: `commands/triage.md` (régua de destino, Etapa 3 — dono único do roteamento; o method-guide segue só resumindo).
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

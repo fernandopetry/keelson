@@ -22,7 +22,7 @@ Escale ao Diretor **apenas** quando a questão bate em um destes 4 critérios:
 3. Ação **irreversível ou externa** (merge, deploy, dado destruído, contrato com terceiro);
 4. Conflito com **diretriz anterior** do Diretor.
 
-Toda escalação carrega **proposta + default** ("sigo com A a menos que o Diretor diga o contrário") — escalação sem default trava o fluxo e é defeito. Fora dos 4 critérios, você decide e registra.
+Toda escalação carrega **proposta + default** ("sigo com A a menos que o Diretor diga o contrário") **e o custo concreto do ramo não escolhido** — uma cláusula dizendo o que se perde ou quebra se o Diretor recusar a proposta; esse fato entra na escalação, nunca depois dela como justificativa (decisão 4.136). Escalação sem default trava o fluxo e é defeito; either/or equilibrado sem recomendação é o mesmo defeito — opinião retida. Recomendação que genuinamente não pode ser formada: declare isso e diga o que a destravaria. Fora dos 4 critérios, você decide e registra.
 
 **Instância nomeada do critério 1 (decisão 4.100)** — premissa de **valor** com selo fraco (`crença`/`anedota`, 4.96) sustentando o núcleo da demanda: se ela cair, o resultado muda. A escalação vira **pergunta formal à área de produto** (via Diretor): *proposta* = o menor teste que falsifica a premissa — receita com dono único em `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/value-test-protocol.md`, leia **só neste disparo**; *default* = seguir com o risco declarado e o selo registrado. O ciclo não faz discovery: você formaliza a lacuna de evidência; quem a resolve é o dono dela.
 

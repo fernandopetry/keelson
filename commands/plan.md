@@ -92,7 +92,10 @@ indisponível → executar as Etapas 4–5 inline é o fallback, declarado no ou
 3. **Trade-offs documentados**: cada DEC lista alternativas — incluindo a alternativa
    mais simples (sem o padrão/abstração), com o motivo do descarte — e declara **em que
    condição deve ser reaberta** (`Reabrir se:`, condição observável; `nunca` exige
-   motivo — decisão 4.97). A condição é a outra metade do trade-off.
+   motivo — decisão 4.97). A condição é a outra metade do trade-off. O motivo do
+   descarte nomeia o **custo concreto** da alternativa — o que se perde ou quebra ao
+   escolhê-la —, nunca só um adjetivo ("mais complexa", "menos performática"): é esse
+   custo que permite re-julgar a decisão sem refazer a análise (decisão 4.136).
 4. **Stack vigente herdado** da ficha/perfil sem reescolher.
 5. **Mapeamento FR → componente**.
 6. **Definition of Done do PLAN** — SPEC com `**Fonte de medição**:` na §1.3 → a DoD inclui o item de métrica operacional (template §9; decisão 4.99). Sabor `instrumentação` → o trabalho de instrumentar entra nos componentes deste PLAN (sem componente que emita o evento, o item da DoD é insatisfazível).
@@ -164,7 +167,7 @@ componente, nunca para este campo. -->
 **Contexto**: ...
 **Decisão**: ...
 **Alternativas consideradas**:
-- <alt>, descartada porque <motivo>
+- <alt>, descartada porque <custo concreto: o que se perde ou quebra ao escolhê-la>
 **Consequências**: ...
 **Reabrir se**: <condição observável que invalida esta decisão | nunca — <motivo>>
 **Irreversível**: sim | não

@@ -107,6 +107,13 @@ escolher entre alternativas técnicas** (haveria uma DEC) — qualquer um dos do
 (categorias 1/2). Só repartir trabalho mecânico → avulso; um executor e um diff → brief
 sem TASKs. O trivial da categoria 5 continua **sem** brief (piso da 4.75).
 
+**O que decide a rota é o custo de estar plausivelmente errado, nunca o tamanho do diff
+(decisão 4.137)**: uma linha que muda o que o sistema promete — shape de id, chave de
+payload, default de API — roteia para o ciclo por menor que pareça, porque todo
+consumidor quebra junto; mudança extensa mas mecânica, cujo diff é auto-evidentemente
+certo ou errado (codemod, rename em massa), não sobe de categoria por volume. Aparência
+de trivial não resiste a raio de dano: na dúvida sobre quem consome o que muda, promova.
+
 **Bug de produção** (categorias 3/4 vindas de produção): o roteamento acima só acontece
 **depois** da Etapa 2.5 — severidade e impacto entram no artefato roteado (4.101).
 
