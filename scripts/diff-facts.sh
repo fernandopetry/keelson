@@ -35,6 +35,8 @@
 # Read-only. Bash 3.2-compatível, awk POSIX, sem dependências novas.
 
 set -u
+# git herdado de contexto de hook aponta para OUTRO repo — neutralizar antes de qualquer git
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_PREFIX
 LC_ALL=C
 export LC_ALL
 
