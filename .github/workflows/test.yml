@@ -57,6 +57,27 @@ jobs:
       - name: Suíte do ledger.sh (scripts/tests/ledger/run.sh)
         run: bash scripts/tests/ledger/run.sh
 
+      - name: Suíte do init-selfcheck.sh (scripts/tests/init-selfcheck/run.sh)
+        run: bash scripts/tests/init-selfcheck/run.sh
+
+      - name: Suíte do probe-env.sh (scripts/tests/probe-env/run.sh)
+        run: bash scripts/tests/probe-env/run.sh
+
+      - name: Suíte do epic-state.sh (scripts/tests/epic-state/run.sh)
+        run: bash scripts/tests/epic-state/run.sh
+
+      - name: Suíte do handoff-scan.sh (scripts/tests/handoff-scan/run.sh)
+        run: bash scripts/tests/handoff-scan/run.sh
+
+      - name: Suíte do legacy-move.sh (scripts/tests/legacy-move/run.sh)
+        run: bash scripts/tests/legacy-move/run.sh
+
+      - name: Suíte do postmortem-facts.sh (scripts/tests/postmortem-facts/run.sh)
+        run: bash scripts/tests/postmortem-facts/run.sh
+
+      - name: Suíte do edge-diff.sh (scripts/tests/edge-diff/run.sh)
+        run: bash scripts/tests/edge-diff/run.sh
+
       - name: Sincronização de comandos/agents (scripts/check-sync.sh)
         run: bash scripts/check-sync.sh
 
