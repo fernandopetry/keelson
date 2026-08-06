@@ -59,12 +59,14 @@ fi
 
 # Anti-renudge: mesma chamada (tipo + texto) só é bloqueada uma vez — a segunda
 # tentativa passa (válvula para uso genérico intencional, ex.: exploração).
+# O marker é uma janela append-only dos últimos fingerprints bloqueados (não um
+# slot único): spawns paralelos no mesmo turno não se sobrescrevem (4.141).
 git_dir="$(git -C "$proj" rev-parse --absolute-git-dir 2>/dev/null || true)"
 marker="" fingerprint=""
 if [ -n "$git_dir" ]; then
-  marker="$git_dir/keelson-agent-guard.last"
+  marker="$git_dir/keelson-agent-guard.recent"
   fingerprint="$(printf '%s\n%s' "$stype" "$texto" | git hash-object --stdin 2>/dev/null || true)"
-  if [ -n "$fingerprint" ] && [ -f "$marker" ] && [ "$(cat "$marker" 2>/dev/null)" = "$fingerprint" ]; then
+  if [ -n "$fingerprint" ] && [ -f "$marker" ] && grep -qxF "$fingerprint" "$marker" 2>/dev/null; then
     exit 0
   fi
 fi
@@ -81,7 +83,14 @@ EOF
 )"
 
 if [ -n "$marker" ] && [ -n "$fingerprint" ]; then
-  printf '%s' "$fingerprint" > "$marker" 2>/dev/null || true
+  printf '%s\n' "$fingerprint" >> "$marker" 2>/dev/null || true
+  rm -f "$git_dir/keelson-agent-guard.last" 2>/dev/null || true   # marker de slot único pré-4.141
+  # Truncamento fora do caminho quente: só reescreve quando a janela passa de 40
+  # linhas (mantém as 20 mais recentes); append puro no resto evita que dois
+  # hooks paralelos percam entradas um do outro.
+  if [ "$(wc -l < "$marker" 2>/dev/null || echo 0)" -gt 40 ]; then
+    tail -n 20 "$marker" > "$marker.$$" 2>/dev/null && mv -f "$marker.$$" "$marker" 2>/dev/null || rm -f "$marker.$$" 2>/dev/null || true
+  fi
 fi
 
 jq -n --arg reason "$reason" '{hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: "deny", permissionDecisionReason: $reason}}'

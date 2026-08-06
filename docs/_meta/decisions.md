@@ -1690,6 +1690,16 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.141 — Válvula anti-renudge do agent-guard vira janela de fingerprints (corrige a 4.42 sob paralelismo)
+
+**Problema**: a válvula da 4.42 ("repita a chamada e este aviso não se repete") era um marker de **slot único** (`keelson-agent-guard.last`) guardando só o último fingerprint bloqueado. Em sessão real (2026-08-06), dois spawns genéricos legítimos despachados **em paralelo no mesmo turno** foram bloqueados; na repetição idêntica, o fingerprint de um sobrescreveu o do outro e **nenhum dos dois passou** — a promessa da válvula só valia para chamada solitária. Até uma repetição solo falhava se outro bloqueio acontecesse no meio.
+
+**Decisão**: o marker vira uma **janela append-only** dos últimos fingerprints bloqueados (`keelson-agent-guard.recent`): o hook checa com `grep -qx` contra a janela inteira antes de negar, e cada bloqueio novo faz append puro — dois hooks paralelos não perdem entradas um do outro. Truncamento fica fora do caminho quente (só reescreve quando a janela passa de 40 linhas, mantendo as 20 mais recentes), porque o risco de uma reescrita concorrente perder um append recente é exatamente o defeito que esta decisão corrige. O marker legado de slot único é removido na primeira escrita. A promessa da 4.42 não muda — agora ela vale também sob paralelismo.
+
+**Aplicação**: `hooks/agent-guard.sh` (checagem + escrita da janela). Teste sintético no padrão dos hooks (repo temporário no scratchpad) cobrindo bloqueios intercalados + repetição, repetição solo, bloqueios disparados de fato em paralelo, truncamento e migração do marker legado — 14/14 verde. Bash 3.2 + fallback gracioso preservados.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
