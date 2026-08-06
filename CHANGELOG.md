@@ -17,6 +17,31 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.84.0] — 2026-08-06
+
+Decision 4.150 — the Jira map file is configuration, never a ledger. Motivated by a
+real consumer whose map had accumulated one issue-tree section per synced SPEC —
+redundant with the SDD artifacts and Jira itself, and growing without bound.
+
+### Added
+- **Explicit config-only rule for the map** (§3 of the sync protocol): no sync hook
+  appends execution records (created issue trees, per-SPEC sections, board state) to
+  `jira.<PROJECT>.md`. Key persistence stays where §10 puts it — `**Jira**:` lines in
+  the SDD artifacts plus one line in the slug INDEX — and live status lives in Jira.
+  Legitimate writes remain config maintenance only (re-measured transition ids, rail,
+  workflow notes — by `/keelson:init` or the human). A contaminated section is never
+  updated or completed by the sync, even when its own text asks for it; falsifiable
+  test: *map content that the next sync run would make stale is an execution record,
+  not config*.
+- **Ledger diagnostic in `/keelson:init`**: a map section outside the three-section
+  contract that records execution now raises the warning
+  `mapa com registro de execução — config, não ledger`, recommending pruning. The init
+  never prunes by itself — the file belongs to the human.
+- Troubleshooting entry on the wiki for the recognizable symptom (map file growing
+  with issue listings).
+
+---
+
 ## [0.83.0] — 2026-08-06
 
 Decisions 4.146–4.149 — facts survive outside the model's context: re-anchoring

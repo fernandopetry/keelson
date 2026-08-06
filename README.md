@@ -408,17 +408,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.83.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.84.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **facts survive outside the model's context** (decisions
-4.146–4.149). A hook re-anchors the session on on-disk state right after context
-compaction, another measures the context window per turn so the closing report cites a
-measured peak, command/agent synchronization is now proved mechanically in pre-commit
-and CI, and a lesson that recurs twice must arrive with a mechanical check designed —
-better prose is no longer an accepted fix. No re-init needed — consumers only update
-the plugin.
+New in this release: **the Jira map file is configuration, never a ledger** (decision
+4.150). No sync hook appends execution records to `jira.<PROJECT>.md` — key
+persistence stays in the SDD artifacts and the slug INDEX, live status stays in Jira —
+and `/keelson:init` now flags contaminated maps for pruning. No re-init needed —
+consumers only update the plugin (and prune their map once if it accumulated issue
+listings).
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
