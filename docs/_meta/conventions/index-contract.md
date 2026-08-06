@@ -86,13 +86,48 @@ a regra (formato, degradação sem marca) é do `/keelson:auto`, Etapa 5 item 6.
 nunca apagado. A SPEC pareada grava `**Brief**: BRIEF-NNN` no front-matter; o par
 brief ↔ SPEC é a trilha de auditoria da aceitação.
 
-**Variação épico (decisão 4.39)**: brief de nível portfólio, gravado pelo
+**Variação épico (decisões 4.39, 4.125, 4.126)**: brief de nível portfólio, gravado pelo
 `/keelson:specify-epic` no slug-âncora como `briefs/BRIEF-<yyyy-mm-dd>-<descricao>-epic.md`
 (id por data, precedente dos handoffs — o épico **não pareia com SPEC**, então não usa a
-numeração NNN nem a linha `**SPEC**:`). Conteúdo: pedido épico verbatim + decomposição
-confirmada do PM (demandas-filhas: prioridade, título, resumo, slug de destino,
-dependências, riscos). Cada filha ganha seu `BRIEF-NNN` normal **no slug de destino**
-quando o ciclo dela começa, com a linha `**Epico**:` apontando ao pai.
+numeração NNN nem a linha `**SPEC**:`). Cabeçalho:
+
+```markdown
+# BRIEF épico: <título da iniciativa>
+
+**Slug**: <slug-âncora>
+**Status**: Emitido | em execução | concluído
+**Data**: <YYYY-MM-DD>
+**Origem**: <caminho do BRIEF forjado (4.128) | pedido em sessão>
+**Branch**: feat/<slug>-<descricao-curta>
+**Estratégia**: unica | por-fatia
+```
+
+Conteúdo: pedido épico verbatim + **fila viva** (decisão 4.125) — a decomposição
+confirmada do PM como tabela com estado por fatia:
+
+```markdown
+## Fila
+
+| # | Fatia | Slug de destino | Estado |
+|---|---|---|---|
+| 1 | <título/resumo> | <slug> | entregue (<YYYY-MM-DD>) |
+| 2 | <título/resumo> | <slug> | em ciclo (<caminho do BRIEF filho>) |
+| 3 | <título/resumo> | <slug> | aguardando-produto (Q-07) |
+| 4 | <título/resumo> | <slug> | pendente |
+```
+
+(dependências e riscos por fatia seguem em seções próprias, fora da tabela). Quem
+escreve o estado é o **marco do ciclo filho**: a largada do `/keelson:auto` marca
+`em ciclo` (junto do `**Epico**:` no filho); a Entrega marca `entregue` — a fila é
+registro curado, nunca segunda fonte: divergência resolve pelos artefatos filhos
+(4.58). `Status` do épico: `Emitido` → `em execução` (1ª fatia larga) → `concluído`
+(última fatia entregue; merge final continua ato do Diretor). `**Branch**` +
+`**Estratégia**` (default `unica`, decisão 4.126) registram onde as fatias vivem —
+é esse registro que separa reuso **deliberado** de branch do acidental que a 4.119
+proíbe. Cada filha ganha seu `BRIEF-NNN` normal **no slug de destino** quando o
+ciclo dela começa, com a linha `**Epico**:` apontando ao pai. BRIEF forjado
+decomposto em épico (4.128) recebe `Status: decomposto` + o caminho do épico — o
+NNN reservado dele não gera SPEC, e o rastro explica o buraco na numeração.
 
 **Variação avulsa (decisão 4.86)**: a tarefa do dia a dia — bugfix, melhoria pequena,
 chore **sem SPEC/PLAN aplicável** — nasce como brief avulso em
