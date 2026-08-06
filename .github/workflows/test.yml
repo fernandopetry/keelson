@@ -36,6 +36,27 @@ jobs:
       - name: Suíte do check de sincronização (scripts/tests/sync/run.sh)
         run: bash scripts/tests/sync/run.sh
 
+      - name: Suíte do ficha.sh (scripts/tests/ficha/run.sh)
+        run: bash scripts/tests/ficha/run.sh
+
+      - name: Suíte do next-id.sh (scripts/tests/next-id/run.sh)
+        run: bash scripts/tests/next-id/run.sh
+
+      - name: Suíte do index-check.sh (scripts/tests/index/run.sh)
+        run: bash scripts/tests/index/run.sh
+
+      - name: Suíte do diff-facts.sh (scripts/tests/diff-facts/run.sh)
+        run: bash scripts/tests/diff-facts/run.sh
+
+      - name: Suíte do artifact-lint.sh (scripts/tests/artifact-lint/run.sh)
+        run: bash scripts/tests/artifact-lint/run.sh
+
+      - name: Suíte do run-state.sh (scripts/tests/run-state/run.sh)
+        run: bash scripts/tests/run-state/run.sh
+
+      - name: Suíte do ledger.sh (scripts/tests/ledger/run.sh)
+        run: bash scripts/tests/ledger/run.sh
+
       - name: Sincronização de comandos/agents (scripts/check-sync.sh)
         run: bash scripts/check-sync.sh
 
