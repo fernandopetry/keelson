@@ -17,6 +17,32 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.80.0] — 2026-08-06
+
+Decisions 4.136–4.137
+
+### Changed
+- **Escalations and DECs now carry the concrete cost of the branch not taken**
+  (decision 4.136). The escalation contract (`agents/po.md`, inherited by every role
+  that escalates) adds a third mandatory element to proposal + default: one clause
+  stating what is lost or broken if the Director refuses the proposal — that fact goes
+  *in* the escalation, never after it as justification. A balanced either/or with no
+  recommendation is the same defect as an escalation with no default: a withheld
+  opinion. When a recommendation genuinely cannot be formed, the escalation says so and
+  names what would settle it. On the PLAN side, a DEC discards an alternative by naming
+  its concrete cost, never by adjective ("more complex"); the DEC template shows the
+  expected shape and the `plan-validator` warns on adjective-only discards (Draft/Review
+  PLANs only — the existing back-catalog is exempt, same grace as the `Reopen if` rule).
+- **Triage routes by the cost of being plausibly wrong, never by diff size**
+  (decision 4.137, `commands/triage.md`). A one-line change to what the system promises
+  — an id shape, a payload key, an API default — goes through the full cycle no matter
+  how small it looks, because every consumer breaks with it; a large but mechanical
+  change whose diff is self-evidently right or wrong is not promoted for volume.
+  Looking trivial does not survive blast radius: when in doubt about who consumes what
+  changed, promote.
+
+---
+
 ## [0.79.0] — 2026-08-06
 
 Decisions 4.130–4.135

@@ -408,22 +408,20 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.79.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.80.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the close-of-session report becomes a literal skeleton with a
-single owner** (decisions 4.130–4.135) — a real consumer delivery shipped without its
-mandatory duration, diff-composition and tracker lines, and with the maintainer
-messages summarized instead of forwarded, so the report contract now lives in
-`docs/_meta/conventions/report-contract.md`: mandatory lines are blanks to fill (a
-missing input names its gap, never disappears), conditional sections carry
-ready-to-forward copy-paste blocks. Alongside it: a new graph check flags a filled
-closure whose header `Status` was left behind, gate 3 degrades declaredly when the
-sheet has no lint command, permission denials become a named handoff cause with a
-two-strike ceiling, mutating gates get isolated worktrees, and the developer gains a
-self-check that removes retry narration from comments before reporting. No re-init
-needed — consumers only update the plugin.
+New in this release: **every fork in the road now states what the rejected branch
+costs** (decisions 4.136–4.137). Escalations to the Director carry — besides the
+existing proposal + default — the concrete cost of the branch not taken, because that
+fact is what moves the decision and it belongs in the escalation, never after it;
+architectural decisions (DECs) discard alternatives by naming what is lost or broken,
+never by adjective, with a validator warning to match. And triage gains the explicit
+routing test: what decides the route is the cost of being plausibly wrong, never diff
+size — a one-line change to a published contract goes through the full cycle, a large
+mechanical codemod doesn't get promoted for volume. No re-init needed — consumers only
+update the plugin.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
