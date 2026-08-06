@@ -408,20 +408,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.81.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.81.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **what the team already learned now reaches the next TASK as a
-criterion, not as reading** (decisions 4.138–4.140). TASK generation cross-checks the
-target files against `lessons.md` and turns a matching lesson into a verifiable Done
-criterion; an inherited spelled-out criterion gets an address (the file that fulfils it
-joins the task's scope, or it becomes its own TASK); scope-predicate mutation criteria
-close by count — N methods in scope, N proofs — never by instance list; a pending item
-from a previous gate finding is edited into the receiving TASK's criteria before
-dispatch; and the gate-9 package reconciles the pre-code script against the wave's
-gate 7/8 findings. Both `tasks.md` and `implement.md` were distilled back under the
-300-line ceiling to pay for it. No re-init needed — consumers only update the plugin.
+New in this release: **the `agent-guard` anti-renudge valve now holds under parallel
+dispatch** (decision 4.141). The blocked-call marker became an append-only window of
+recent fingerprints instead of a single slot, so two legitimate generic spawns blocked
+in the same turn no longer cancel each other's retry. No re-init needed — consumers
+only update the plugin.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

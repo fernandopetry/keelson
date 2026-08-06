@@ -17,6 +17,23 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.81.1] — 2026-08-06
+
+Decision 4.141 — fixes the 4.42 anti-renudge valve under parallel dispatch.
+
+### Fixed
+- **`agent-guard` anti-renudge valve now works for parallel spawns**
+  (decision 4.141, `hooks/agent-guard.sh`). The blocked-call marker was a
+  single-slot file holding only the last fingerprint, so two legitimate generic
+  spawns blocked in the same turn overwrote each other and neither retry passed —
+  the promise "repeat the call and this warning won't repeat" only held for a
+  solitary call. The marker is now an append-only window of recent fingerprints
+  (checked in full before denying, truncated off the hot path), so interleaved and
+  parallel blocks no longer cancel each other's retry. Bash 3.2 and graceful
+  fallback preserved; the legacy single-slot marker is cleaned up on first write.
+
+---
+
 ## [0.81.0] — 2026-08-06
 
 Decisions 4.138–4.140
