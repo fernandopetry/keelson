@@ -136,6 +136,14 @@ Não — é o gate `screenVerify`, opcional. Ligado, ele loga no seu app **local
 Playwright MCP e exercita a tela de verdade, headless por padrão. Desligado, o gate de
 comportamento se apoia nos testes.
 
+### Voltei de um fim de semana e não lembro onde o épico parou. E agora?
+
+`/keelson:continue <slug>`. Ele lê a fila viva do épico e os artefatos commitados,
+mostra o "você está aqui" e propõe o próximo passo com o comando já montado — retomar
+a wave interrompida, disparar a próxima fatia ou abrir o PR. Nada roda sem a sua
+confirmação, mas nada depende da sua memória. O passo a passo completo está em
+[Fluxo de épicos](Fluxo-de-epicos).
+
 ### O keelson publica release?
 
 Não. Ele **alimenta** a automação de release escrevendo o histórico no formato que ela

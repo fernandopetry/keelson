@@ -9,6 +9,7 @@
 
 **Usar**
 
+- [Fluxo de épicos](Fluxo-de-epicos)
 - [A ficha do projeto](Ficha-do-projeto)
 - [Guia do método](Guia-do-metodo)
 - [Solução de problemas](Solucao-de-problemas)
