@@ -94,7 +94,8 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:brief` † | Forge a product document into a lapidated BRIEF before the cycle — inventory mirrored on the SPEC sections, code anchoring, one-question-at-a-time interview, formal pendings to product; reentrant by state on disk |
 | `/keelson:refine` † | Polish a raw idea into a refined prompt before it becomes a demand |
 | `/keelson:triage` | Triage a new demand — routes to SPEC, PLAN, TASK, standalone brief or direct action; `--from=<KEY>` pulls an existing tracker card as the input (classifies, doesn't execute) |
-| `/keelson:specify-epic` | Decompose an epic-sized request into prioritized independent demands via the PM agent — you confirm the split, each demand then runs its own cycle |
+| `/keelson:specify-epic` | Decompose an epic-sized request into prioritized independent demands via the PM agent — you confirm the split and the branch strategy (default: one epic branch, synced with main at every slice boundary), the living queue tracks per-slice state, each demand then runs its own cycle |
+| `/keelson:continue` † | Resume a slug from wherever it stopped — derives the state from committed artifacts (epic queue, TASK closures, brief statuses), shows "you are here" and proposes the single next step with a default; after a weekend nobody needs to remember anything |
 
 **Support:**
 
@@ -407,7 +408,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.77.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.78.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 

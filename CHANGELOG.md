@@ -17,6 +17,53 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.78.0] — 2026-08-05
+
+Decisions 4.125–4.128 — the epic becomes operable without human memory. Motivated by a
+direct field report: a team being onboarded kept getting lost right after
+`/keelson:specify-epic`, because resuming an epic required remembering which slice was
+next and how to compose the `/keelson:auto` command.
+
+### Added
+- **`/keelson:continue <slug>` — the single resume door (4.127, human-only).** Derives
+  the state from **committed** artifacts only (epic queue, TASK closures, brief
+  statuses — never `thoughts/local/`, which is per-clone), shows a "you are here" map
+  and proposes exactly one next step with a default: resume an interrupted wave,
+  dispatch the next slice, resume a forge waiting on product answers, or point at
+  `/keelson:integrate` when the queue is done. Nothing runs without confirmation —
+  pointing at the slug is the human act; it just no longer requires memory.
+- **Living queue in the epic BRIEF (4.125).** Each slice row carries state
+  (`pendente` · `em ciclo` · `aguardando-produto` · `entregue`), written by the child
+  cycle's milestones (kickoff marks `em ciclo`, delivery marks `entregue`); the epic
+  itself moves `Emitido → em execução → concluído`. The queue is a curated record,
+  never a second source of truth — divergence resolves by the child artifacts.
+- **Epics wiki page (`Fluxo-de-epicos`)** — an operator's guide from product document
+  to PR, written so a developer can run the whole flow without a tutor; linked from
+  the sidebar and the FAQ.
+
+### Changed
+- **One branch per epic, synced at slice boundaries (4.126, refines 4.119).** The
+  branch strategy is confirmed with the decomposition and recorded in the epic BRIEF
+  (`**Branch**:` + `**Estratégia**:`, default `unica`): slices stack on the epic's
+  branch, each building on the previous one. Every slice boundary syncs with main —
+  merge, never rebase — on **both** sides: at slice close the full suite runs
+  **post-merge** and red is a failed gate (no push with a broken sync); at the next
+  slice's kickoff a cheap re-check runs with the human present. 4.119's ban now
+  targets *undeclared* branch reuse; deliberate, recorded sharing is the epic default.
+  Final PR and merge remain human.
+- **Forged BRIEF is a first-class input to `/keelson:specify-epic` (4.128).** The PM
+  receives the whole BRIEF: code facts inform the slicing and seed the MAP, sealed
+  assumptions travel to the slices that use them, and pending product questions are
+  distributed — a `[bloqueia-núcleo]` Q-ID marks its slice `aguardando-produto` in the
+  queue so `continue` won't propose it until answers arrive. The forge also gained the
+  matching exit: an epic revealed mid-interview hands off to `specify-epic` instead of
+  `auto`, closing the routing gap that only existed at the door.
+
+Re-run `/keelson:init` in consumer projects to refresh the human-only command note in
+the injected block.
+
+---
+
 ## [0.77.0] — 2026-08-05
 
 Decision 4.124
