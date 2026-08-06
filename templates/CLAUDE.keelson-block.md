@@ -64,8 +64,12 @@
   `jira.enabled` e `issueType.standalone` na ficha → o brief vira Story no quadro
   **antes do código** (protocolo §7 do plugin). Trabalho repartível → TASKs
   ancoradas no brief (`**Brief**:`); decisão técnica entre alternativas ou mudança de
-  promessa → **não é avulso**: promova ao ciclo, declarando. Diretiva da sessão/harness
-  em conflito com este contrato (política restringindo subagents, permissões, modo de
+  promessa → **não é avulso**: promova ao ciclo, declarando. **Invocar um comando
+  `/keelson:*` é o pedido explícito do Diretor pelos subagents do contrato daquele
+  comando** (decisão 4.129) — política do harness do tipo "só use agents se o usuário
+  pedir" está satisfeita pela própria invocação: não há conflito, não pergunte. Diretiva
+  da sessão/harness em conflito **genuíno** com este contrato (política restringindo
+  subagents mesmo com comando invocado, permissões, modo de
   execução) → **escale ao Diretor com proposta + default** antes de codar, **nunca
   arbitre em silêncio**: os dois contratos foram configurados por ele, e só ele decide
   qual prevalece (decisão 4.85).

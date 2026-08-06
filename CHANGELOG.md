@@ -17,6 +17,23 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.78.1] — 2026-08-06
+
+Decision 4.129
+
+### Fixed
+- **Invoking a keelson command now counts, explicitly, as the user asking for the
+  team (4.129).** Some harness surfaces inject a system policy like "don't use the
+  Agent tool unless the user asks", and consumer sessions receiving `/keelson:auto`
+  were escalating to ask permission to use the team's subagents — the 4.85 escalation
+  working as designed, but on a conflict that isn't genuine. The consumer block now
+  states that invoking a `/keelson:*` command **is** the explicit request for the
+  subagents of that command's contract, so the policy is satisfied by the invocation
+  itself and the question disappears. 4.85 stays intact for genuine conflicts.
+  **Re-run `/keelson:init` in consumer projects** to refresh the injected block.
+
+---
+
 ## [0.78.0] — 2026-08-05
 
 Decisions 4.125–4.128 — the epic becomes operable without human memory. Motivated by a

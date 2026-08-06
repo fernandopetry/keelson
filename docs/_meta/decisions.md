@@ -1582,6 +1582,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `commands/brief.md` (saída 1 — variante de decomposição) · `commands/specify-epic.md` (input + Etapas 1/3) · `docs/_meta/conventions/index-contract.md` (status `decomposto` no ciclo de vida do BRIEF forjado). Observar na 1ª forja real que revelar épico: as Q-IDs pendentes aparecem nas fatias certas?
 
+### 4.129 — Invocar comando keelson é o pedido explícito pelos subagents do contrato
+
+**Problema**: reincidência do padrão que gerou a 4.85, agora em sessão de consumidor real (print do Diretor, 2026-08-05): o harness da superfície injeta no system prompt uma política do tipo "não use o Agent tool a menos que o usuário peça", e a sessão que recebe `/keelson:auto` escala ao Diretor perguntando se pode usar o time — a escalação da 4.85 funcionou como desenhada, mas a colisão **não é genuína**: o comando invocado **é** o pedido do usuário, e a pergunta vira ruído recorrente (uma por sessão que colidir), pior para um time em treinamento que não sabe por que o sistema pede permissão para ser ele mesmo.
+
+**Decisão**: o bloco do consumidor declara a resolução na fonte de instruções: **invocar um comando `/keelson:*` é o pedido explícito do Diretor pelos subagents do contrato daquele comando** — política de harness do tipo "só com pedido do usuário" está **satisfeita pela invocação**, não há conflito e não se pergunta. A 4.85 continua intacta para conflito **genuíno** (política que restringe subagents mesmo com comando invocado, permissões, modo de execução): escalação com proposta + default, nunca arbitragem silenciosa.
+
+**Aplicação**: `templates/CLAUDE.keelson-block.md` (frase antes da regra da 4.85 — **re-rodar init nos consumidores**). Origem: 2ª ocorrência de campo do padrão (a 1ª virou a 4.85). Observar na próxima sessão de consumidor com a política ativa: a pergunta desaparece e a escalação da 4.85 continua disparando só no conflito real?
+
 ---
 
 ## 5. Quality gates inegociáveis
