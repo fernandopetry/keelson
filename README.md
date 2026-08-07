@@ -386,7 +386,7 @@ Owner of the rule: `docs/_meta/conventions/commit-convention.md`. Governance: de
 ```
 keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
-├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer… + tools (not roles): code-scout, scribe, tracker-sync
+├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer, performance-engineer… + tools (not roles): code-scout, scribe, tracker-sync
 ├── skills/            # spec / plan / task validators + status + screen-verify
 ├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard, jira-guard
 ├── guidelines/
@@ -408,7 +408,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.86.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.87.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 

@@ -17,6 +17,36 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.87.0] — 2026-08-07
+
+Decision 4.155 — performance becomes a dedicated quality gate (gate 10), mirroring the
+proven gate-8 design: a specialist reviewer, a canonical trigger list, the checklist
+owner read at runtime, and a verdict that is always declared — never silence.
+
+### Added
+- **`performance-engineer` agent (gate 10)**: reviews the delivered diff against
+  `core/PERFORMANCE.md` plus the active profile's performance section whenever the
+  change touches cost-sensitive surface (queries/ORM, loops over variable-size data,
+  large-volume processing, cache/invalidation, network calls/timeouts, jobs/queues,
+  heavy list/UI rendering, bundle/imports, data migrations/backfills). Runs once per
+  wave in the parallel review round, in `/keelson:review`, and in on-demand mode;
+  outside the trigger the verdict is a declared `n/a`, never an omission.
+- Task closure gains a `performance_gate10` field and the final report a gate-10
+  column, so a delivery states explicitly that performance was validated.
+
+### Changed
+- The delivery pre-check in `/keelson:auto` now demands evidence of the gate-10
+  verdict on the final diff when it touches cost-sensitive surface — same rule as
+  gate 8 (`revisado_por ≠ implementado_por`; missing verdict → the gate runs before
+  the push).
+- Severity is calibrated by Charter Art. 8: known pathological cost patterns (query
+  in a loop, unbounded materialization, missing pagination/timeouts) are blocking
+  findings; any optimization beyond the catalog requires a cited measurement and
+  surfaces as a suggestion, never a rejection — the gate does not demand speculative
+  optimization or stress testing.
+- Consumer block updated (the on-demand team now includes the `performance-engineer`
+  trigger) — re-run `/keelson:init` in consumer projects to refresh the block.
+
 ## [0.86.0] — 2026-08-06
 
 Decision 4.154 — the deferred list from 4.151 closes: the remaining seven pieces of
