@@ -5,6 +5,11 @@
 > Aplicar após features com grandes volumes, consultas complexas ou renderização pesada.
 > As ferramentas e APIs **concretas** (profiler, plano de consulta, lazy-load da UI)
 > ficam no perfil de linguagem.
+>
+> Este arquivo é o **gabarito do gate 10** (performance — decisão 4.155): o
+> `performance-engineer` o lê em runtime, nunca o replica (padrão da 4.20). Padrão de
+> custo patológico deste catálogo é achado **bloqueante** no review; otimização além
+> dele só entra com **medição citada** — sem medição, é sugestão, nunca reprovação.
 
 ---
 

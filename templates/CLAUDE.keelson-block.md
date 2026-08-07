@@ -28,7 +28,8 @@
 
 - **Modo padrão = autônomo** (`/keelson:auto` — não precisa digitar o comando): pedido
   não-trivial em linguagem natural entra no ciclo `specify → plan → tasks → implement`
-  conduzido pelo **time** keelson (po, developer, code-reviewer, qa, security-engineer),
+  conduzido pelo **time** keelson (po, developer, code-reviewer, qa, security-engineer,
+  performance-engineer),
   sob o contrato Diretor–PO: o brief é emitido na largada (janela de veto — o fluxo
   segue sem esperar), o PO valida SPEC e entrega **contra o brief**, e a entrega fecha
   com o **relatório de aceitação do PO**. Você é o **Diretor**: veto, PR, merge e
@@ -42,7 +43,9 @@
   `index-contract.md` do plugin; decisão 4.86; mudança que cruza slugs → **um brief só**,
   no slug dominante — onde viveria a SPEC — com 1 linha de rastro no INDEX dos demais,
   decisão 4.87) —, delega ao `developer` e passa o diff
-  pelo `code-reviewer` (régua avulsa); `security-engineer` em mudança sensível e `qa`
+  pelo `code-reviewer` (régua avulsa); `security-engineer` em mudança sensível,
+  `performance-engineer` quando o diff toca superfície de custo (consulta/ORM, laço
+  sobre volume variável, cache, rede, render pesado — gate 10) e `qa`
   quando há comportamento observável — mesmos gatilhos do ciclo. Os gates aplicáveis
   da rodada rodam **em paralelo, no mesmo turno**, sobre um **pacote de contexto
   único** montado por você — diff + SHA, critérios literais da âncora, fatias da

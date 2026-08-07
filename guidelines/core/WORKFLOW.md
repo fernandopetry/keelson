@@ -115,7 +115,7 @@ Aplicado em rigor **proporcional ao risco** da mudança:
 | Mudança | Como executar |
 |---|---|
 | Feature nova / mudança de contrato | Ciclo SDD completo: `specify → plan → tasks → implement` |
-| Risco (auth, segurança, migração/schema, breaking) ou que toque um slug com PLAN ativo | Protocolo formal: TASK avulsa + subagents (`developer` → `code-reviewer`, mais `security-engineer`/`qa` quando aplicável) + closure no INDEX |
+| Risco (auth, segurança, migração/schema, breaking) ou que toque um slug com PLAN ativo | Protocolo formal: TASK avulsa + subagents (`developer` → `code-reviewer`, mais `security-engineer`/`qa`/`performance-engineer` quando aplicável) + closure no INDEX |
 | Bug / refactor pequeno | Inline: implementa (escopo restrito) + testes + auto-revisão pelos gates + 1 linha no INDEX. Sem subagent nem TASK |
 | Trivial (typo, copy, cor, espaçamento) | Direto no código, sem SDD |
 
@@ -136,8 +136,11 @@ camadas continua sendo "bug/refactor pequeno" — roteie pela **calibração de 
    mudança toca área sensível (lista canônica: description do `security-engineer`)
 9. **Comportamento verificado** (`qa`) — quando a mudança tem efeito
    observável
+10. **Performance** (`performance-engineer`, `./PERFORMANCE.md`) — quando o diff toca
+    superfície de custo (lista canônica: description do `performance-engineer`); padrão
+    patológico bloqueia, otimização sem medição é sugestão (Art. 8)
 
-Gatilhos e condições dos gates 8–9: detalhe operacional do `/keelson:implement`.
+Gatilhos e condições dos gates 8–10: detalhe operacional do `/keelson:implement`.
 
 Para bug/refactor, o protocolo é o **modo de executar** — não exige criar SPEC/PLAN/TASK
 formais.

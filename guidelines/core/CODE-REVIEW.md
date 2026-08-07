@@ -6,8 +6,10 @@
 > diff avulso (via `/keelson:review`, modo degradado). Os fluxos trazem o próprio
 > protocolo — input, output, retry —, nunca uma segunda cópia da régua.
 >
-> A **segurança** (gate 8) e o **comportamento verificado** (gate 9) têm revisores dedicados
-> (`security-engineer`, `qa`) e doutrina própria — ver `./WORKFLOW.md`.
+> A **segurança** (gate 8), o **comportamento verificado** (gate 9) e a **performance**
+> (gate 10) têm revisores dedicados (`security-engineer`, `qa`, `performance-engineer`)
+> e doutrina própria — ver `./WORKFLOW.md` (gate 10: gabarito em `./PERFORMANCE.md`,
+> decisão 4.155).
 >
 > A revisão confere o código contra a **constituição** (`../_meta/QUALITY-CHARTER.md`), a
 > doutrina de `core/` e o **perfil de linguagem** ativo. Detalhes idiomáticos da stack
@@ -217,7 +219,7 @@ revisão independente **é** a prova.
 Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
 
 - **Gates aplicáveis rodam em paralelo por padrão.** Os gates de uma rodada (7 ·
-  8 · 9) são independentes entre si: despache os agentes **no mesmo turno** e espere
+  8 · 9 · 10) são independentes entre si: despache os agentes **no mesmo turno** e espere
   os reports. Sequência é exceção **declarada** — só quando um gate consome a saída de
   outro ou disputa recurso exclusivo; "um de cada vez" sem motivo é latência pura.
   Gate cujo mecanismo de prova **muta** arquivos do diff (mutation testing, injeção
@@ -245,12 +247,14 @@ segue a natureza do que ele prova, não é uniforme por TASK:
 
 - **Testes por TASK** (gate 2, executados pelo developer) são a rede fina — intocados;
   é o que permite à wave seguinte construir sobre base provada.
-- **Revisão independente (gates 1–7) e segurança (gate 8) rodam 1× por wave**, sobre o
-  diff acumulado da wave, com o mapa TASK→arquivos no pacote de contexto. A wave é a
-  unidade de integração do ciclo; revisar por TASK re-lê o mesmo entorno N vezes, e o
-  security **ganha** vendo a interação entre TASKs. Achado é roteado à TASK de origem;
-  o retry segue a convergência abaixo. Vulnerabilidade continua **rejeição imediata** —
-  o recorte por wave nunca a adia além da própria wave.
+- **Revisão independente (gates 1–7), segurança (gate 8) e performance (gate 10) rodam
+  1× por wave**, sobre o diff acumulado da wave, com o mapa TASK→arquivos no pacote de
+  contexto. A wave é a unidade de integração do ciclo; revisar por TASK re-lê o mesmo
+  entorno N vezes, e tanto o security quanto o performance **ganham** vendo a interação
+  entre TASKs (a guarda relaxada e o N+1 que atravessam TASKs não aparecem em revisão
+  isolada). Achado é roteado à TASK de origem; o retry segue a convergência abaixo.
+  Vulnerabilidade continua **rejeição imediata** — o recorte por wave nunca a adia além
+  da própria wave.
 - **Comportamento (gate 9) roda por FEAT/história**, na primeira wave em que a FEAT
   completa — é quando o comportamento de ponta a ponta passa a existir; provar "metade
   de uma feature" por TASK duplica o gate 2 ou prova parcial. SPEC sem FEATs → 1× na
