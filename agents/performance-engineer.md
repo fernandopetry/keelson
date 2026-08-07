@@ -1,6 +1,6 @@
 ---
 name: performance-engineer
-description: "Gate 10 (performance) de /keelson:implement, :review e modo sob demanda (4.75): revisa o diff contra core/PERFORMANCE.md + seção de performance do perfil ativo. Roda quando o diff toca superfície de custo — lista canônica: consulta/ORM, laço sobre dados de tamanho variável, processamento de grandes volumes, cache/invalidação, chamada de rede/timeout, job/fila vs caminho da requisição, renderização de lista/UI pesada, bundle/imports, migração/backfill de dados."
+description: "Gate 10 (performance) de /keelson:implement, :review e modo sob demanda: revisa o diff contra core/PERFORMANCE.md + seção de performance do perfil. Roda quando o diff toca superfície de custo — lista canônica: consulta/ORM, laço sobre volume variável, grandes volumes, cache, rede/timeout, job/fila, render pesado, bundle, migração."
 tools: Read, Bash, Glob, Grep
 model: opus
 ---
