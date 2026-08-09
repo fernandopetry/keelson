@@ -4,7 +4,9 @@
 # Monta árvores docs/ sintéticas com BRIEF épico + slugs filhos e prova a tabela de
 # regras da Etapa 1 do /keelson:continue: 1 (forja aguardando produto), 2 (parcial),
 # 3 (fila desatualizada), 4 (próxima pendente), 5 (aguardando-produto na frente),
-# 6 (tudo entregue) — sempre a PRIMEIRA que casa.
+# 6 (tudo entregue) — sempre a PRIMEIRA que casa. Desde a 4.156, também o formato
+# de campo da fila (| # | Fatia | Estado | Âncora |, estados em negrito, caminho na
+# Âncora) e a degradação `aviso` + regra `-` para estado fora do vocabulário.
 #
 # Uso: scripts/tests/epic-state/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -54,7 +56,7 @@ runcase() { # nome raiz regra-esperada [trecho-esperado-na-saida]
   total=$((total + 1))
   out="$( cd "$r" && bash "$ES" docs/ancora/briefs/BRIEF-2026-08-06-plataforma-epic.md --docs-root docs 2>"$TMP/err" )"
   st=$?
-  got="$(printf '%s\n' "$out" | sed -n 's/^regra\t\([0-9]\).*/\1/p')"
+  got="$(printf '%s\n' "$out" | sed -n 's/^regra\t\([0-9-]\).*/\1/p')"
   if [ "$st" -ne 0 ] || [ "$got" != "$want" ]; then
     echo "FAIL $name: regra $got (esperada $want), exit $st"
     printf '%s\n' "$out" | sed 's/^/  /'; sed 's/^/  stderr: /' "$TMP/err"
@@ -108,6 +110,33 @@ runcase regra-6 "$R" 6 "fila toda entregue"
 R="$(mkepic r2b '| 1 | Relatórios | lms | em ciclo (docs/lms/briefs/BRIEF-002.md) |')"
 mkchild "$R" lms Emitido SPEC-002 "" ""
 runcase regra-2-pre-task "$R" 2 "pre-task"
+
+# ---- formato de campo (4.156): | # | Fatia | Estado | Âncora | ----
+
+mkepic_legado() { # $1=nome $2=linhas-da-fila; ecoa o caminho do brief
+  r="$TMP/$1"
+  mkdir -p "$r/docs/ancora/briefs"
+  {
+    printf '# BRIEF épico: Plataforma\n\n**Slug**: ancora\n**Status**: em execução\n**Data**: 2026-08-06\n**Branch**: feat/ancora-plataforma\n**Estratégia**: unica\n\n## Fila\n\n'
+    printf '| # | Fatia | Estado | Âncora |\n| --- | --- | --- | --- |\n'
+    printf '%s\n' "$2"
+  } > "$r/docs/ancora/briefs/BRIEF-2026-08-06-plataforma-epic.md"
+  printf '%s\n' "$r"
+}
+
+# fila de campo: entregue em negrito + âncora com backtick → regra 4 na pendente
+R="$(mkepic_legado leg4 '| 1 | Login | **entregue** (2026-08-01) | `briefs/BRIEF-001.md` · 13/13 TASKs Done |
+| 2 | Digest | pendente | — |')"
+runcase legado-regra-4 "$R" 4 "proxima fatia pendente (2)"
+
+# fila de campo: em ciclo com data no estado e caminho na Âncora → verifica pelo filho
+R="$(mkepic_legado leg2 '| 1 | Digest | **em ciclo** (2026-08-09) | `briefs/BRIEF-002.md` |')"
+mkchild "$R" ancora Emitido SPEC-002 002 "Done Todo"
+runcase legado-em-ciclo "$R" 2 "parcial"
+
+# estado fora do vocabulário → aviso + regra -, nunca inventa fatia
+R="$(mkepic_legado legav '| 1 | Login | esperando aprovacao | — |')"
+runcase legado-nao-parseavel "$R" - "nao-parseavel"
 
 # cabeçalho do épico ecoado
 total=$((total + 1))

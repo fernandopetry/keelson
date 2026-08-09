@@ -18,8 +18,15 @@
 #   epico<TAB>status<TAB>branch<TAB>estrategia
 #   fatia<TAB><n>-<TAB><slug><TAB><declarado><TAB><verificado>
 #   divergencia<TAB><n><TAB><declarado> vs <verificado>
-#   regra<TAB><1..6><TAB><rótulo da tabela do continue>
+#   aviso<TAB><n><TAB><detalhe>            (estado fora do vocabulário — degradação 4.156)
+#   regra<TAB><1..6 | -><TAB><rótulo da tabela do continue>
 # Verificado: aguardando-produto · parcial · pre-task · entregue · - (não verificável).
+# Colunas da fila mapeadas PELO HEADER da tabela (4.156): além do contrato canônico
+# (| # | Fatia | Slug de destino | Estado |), aceita o formato de campo
+# (| # | Fatia | Estado | Âncora |) — negrito/backtick no estado é removido e o
+# caminho do brief filho pode vir da coluna Âncora. Estado fora do vocabulário
+# fechado (pendente · em ciclo · entregue · aguardando-produto) degrada com `aviso`
+# e nunca elege fatia por conta (regra `-` quando não sobra fato parseável).
 # Exit: 0 ok · 2 uso incorreto. Read-only; bash 3.2 + awk POSIX.
 
 set -u
@@ -27,7 +34,7 @@ LC_ALL=C
 export LC_ALL
 
 die2() { echo "ERRO: $*" >&2; exit 2; }
-usage() { sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'; }
 
 BRIEF=""
 DOCSROOT=""
@@ -54,28 +61,62 @@ E_BRANCH="$(hdr Branch "$BRIEF")"
 E_ESTR="$(hdr 'Estrat[^*]*' "$BRIEF")"
 printf 'epico\t%s\t%s\t%s\n' "${E_STATUS:--}" "${E_BRANCH:--}" "${E_ESTR:--}"
 
-# ---- fila: | # | Fatia | Slug de destino | Estado | ----
+# ---- fila: colunas mapeadas pelo header (4.156) ----
+# Canônico: | # | Fatia | Slug de destino | Estado | (index-contract.md).
+# Legado de campo: | # | Fatia | Estado | Âncora | — sem coluna de slug, caminho
+# do brief filho na Âncora. Sem header reconhecível, vale o default canônico.
 TMP="$(mktemp -d)" || die2 "mktemp falhou."
 trap 'rm -rf "$TMP"' EXIT
 awk '
   function trim(s) { sub(/^[ \t]+/, "", s); sub(/[ \t]+$/, "", s); return s }
+  BEGIN { slugcol = 4; estcol = 5; anccol = 0 }
   /^## Fila/ { on = 1; next }
   /^## /     { on = 0 }
   on && /^\|/ {
     n = split($0, c, "|")
-    if (n < 5) next
+    if (n < 4) next
     num = trim(c[2])
+    if (num == "#") {                       # header: mapeia as colunas pelo nome
+      slugcol = 0; estcol = 0; anccol = 0
+      for (i = 3; i < n; i++) {
+        col = tolower(trim(c[i]))
+        if (col ~ /slug/)   slugcol = i
+        if (col ~ /estado/) estcol = i
+        if (col ~ /ncora/)  anccol = i      # "Âncora" — casa pelo sufixo ASCII
+      }
+      if (estcol == 0) estcol = 5           # header sem "Estado" → default canônico
+      next
+    }
     if (num !~ /^[0-9]+$/) next
-    printf "%s\t%s\t%s\n", num, trim(c[4]), trim(c[5])
+    if (n <= estcol) next
+    slug = (slugcol > 0 ? trim(c[slugcol]) : "-")
+    est = trim(c[estcol])
+    gsub(/[*`]/, "", est); est = trim(est)  # **entregue** (…) → entregue (…)
+    anc = (anccol > 0 && n > anccol ? trim(c[anccol]) : "")
+    gsub(/`/, "", anc)
+    printf "%s\t%s\t%s\t%s\n", num, slug, est, anc
   }
 ' "$BRIEF" > "$TMP/fila.tsv"
 [ -s "$TMP/fila.tsv" ] || die2 "BRIEF sem seção '## Fila' parseável (contrato: index-contract.md, variação épico)."
+EPICDIR="$(cd "$(dirname "$BRIEF")/.." && pwd)"   # slug-âncora: resolve caminho relativo da Âncora legada
 
 # verificação de uma fatia "em ciclo": estado real pelos artefatos do filho
-verifica() { # $1 = estado declarado (com o caminho do brief filho entre parênteses)
+verifica() { # $1 = estado declarado (parênteses podem ter o caminho) $2 = âncora (formato legado)
   path="$(printf '%s' "$1" | sed -n 's/.*(\(.*\)).*/\1/p')"
+  case "$path" in
+    *.md) ;;                                 # caminho plausível
+    *) path="" ;;                            # ex.: data "(2026-08-09)" no formato legado
+  esac
+  if [ -z "$path" ] && [ -n "${2:-}" ]; then
+    path="$(printf '%s\n' "$2" | awk '{ for (i = 1; i <= NF; i++) if ($i ~ /\.md$/) { print $i; exit } }')"
+  fi
   child=""
-  [ -n "$path" ] && { [ -f "$path" ] && child="$path" || { [ -f "$DOCSROOT/../$path" ] && child="$DOCSROOT/../$path"; }; }
+  if [ -n "$path" ]; then
+    if   [ -f "$path" ]; then child="$path"
+    elif [ -f "$DOCSROOT/../$path" ]; then child="$DOCSROOT/../$path"
+    elif [ -f "$EPICDIR/$path" ]; then child="$EPICDIR/$path"
+    fi
+  fi
   if [ -z "$child" ]; then
     printf 'sem-artefatos\n'
     return
@@ -109,12 +150,13 @@ verifica() { # $1 = estado declarado (com o caminho do brief filho entre parênt
 
 regra=""; regra_det=""
 all_entregue=1
+nao_parseavel=0
 prox_estado=""; prox_n=""
-while IFS='	' read -r n slug estado; do
+while IFS='	' read -r n slug estado ancora; do
   case "$estado" in
     "em ciclo"*)
       all_entregue=0
-      v="$(verifica "$estado")"
+      v="$(verifica "$estado" "$ancora")"
       printf 'fatia\t%s\t%s\t%s\t%s\n' "$n" "$slug" "$estado" "$v"
       case "$v" in
         aguardando-produto)
@@ -128,10 +170,16 @@ while IFS='	' read -r n slug estado; do
       esac ;;
     entregue*)
       printf 'fatia\t%s\t%s\t%s\t%s\n' "$n" "$slug" "$estado" "entregue" ;;
-    *)
+    pendente*|aguardando-produto*)
       all_entregue=0
       printf 'fatia\t%s\t%s\t%s\t%s\n' "$n" "$slug" "$estado" "-"
       if [ -z "$prox_estado" ]; then prox_estado="$estado"; prox_n="$n"; fi ;;
+    *)
+      # vocabulário desconhecido → degradar, nunca eleger fatia por conta (4.156)
+      all_entregue=0
+      nao_parseavel=1
+      printf 'fatia\t%s\t%s\t%s\t%s\n' "$n" "$slug" "$estado" "-"
+      printf 'aviso\t%s\testado nao-parseavel: "%s" — fila fora do contrato (index-contract.md); derive dos artefatos\n' "$n" "$estado" ;;
   esac
 done < "$TMP/fila.tsv"
 
@@ -140,13 +188,13 @@ if [ -z "$regra" ]; then
     regra=6; regra_det="fila toda entregue — apontar /keelson:integrate (PR do epico, ato do Diretor)"
   elif [ -n "$prox_estado" ]; then
     case "$prox_estado" in
-      pendente*)
-        regra=4; regra_det="proxima fatia pendente ($prox_n) — propor /keelson:auto com o epico no titulo (sync de largada 4.126)" ;;
       aguardando-produto*)
         regra=5; regra_det="proxima fatia aguardando produto ($prox_n) — mostrar a pendencia; fatia posterior nao bloqueada pode ser proposta (julgamento do comando)" ;;
       *)
-        regra=4; regra_det="proxima fatia nao-entregue ($prox_n: $prox_estado) — propor retomada" ;;
+        regra=4; regra_det="proxima fatia pendente ($prox_n) — propor /keelson:auto com o epico no titulo (sync de largada 4.126)" ;;
     esac
+  elif [ "$nao_parseavel" = 1 ]; then
+    regra='-'; regra_det="fila com estado nao-parseavel e nenhum fato restante — derive dos artefatos e corrija a fila declarando"
   else
     regra=6; regra_det="fila toda entregue — apontar /keelson:integrate (PR do epico, ato do Diretor)"
   fi

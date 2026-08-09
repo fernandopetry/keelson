@@ -13,6 +13,8 @@
 #            com o cabeçalho canônico; o corpo (2–3 linhas) entra pelo stdin.
 #            Tipos (catálogo FECHADO): gate decisao fora_de_escopo pendencia tracker marco.
 #            Timestamp medido (TZ=America/Sao_Paulo); --ts <iso> só para testes.
+#            A linha `ts:` do cabeçalho é DESTE script — linha `ts:` no início do
+#            stdin é descartada (4.156: ts estimado de memória não entra no evento).
 #            Colisão de segundo ganha sufixo -2, -3… Ecoa o caminho criado.
 #   list     eventos ativos (um por linha, ordenados); --archived lista os consumidos
 #   count    contagem de eventos ativos por tipo
@@ -27,7 +29,7 @@ LC_ALL=C
 export LC_ALL
 
 die2() { echo "ERRO: $*" >&2; exit 2; }
-usage() { sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,26p' "$0" | sed 's/^# \{0,1\}//'; }
 
 ROOT="${1:-}"
 [ -n "$ROOT" ] || { usage >&2; exit 2; }
@@ -82,6 +84,10 @@ case "$ACTION" in
       f="$base-$n.md"
     done
     corpo="$(cat)"
+    # cabeçalho é do script: linha ts: duplicada no stdin (formato pré-4.151) sai
+    case "$corpo" in
+      "ts: "*|"ts:"*) corpo="$(printf '%s\n' "$corpo" | sed 1d)" ;;
+    esac
     {
       printf 'ts: %s · tipo: %s · origem: %s · slug: %s\n' "$iso" "$TIPO" "$ORIGEM" "$SLUG"
       if [ -n "$corpo" ]; then printf '%s\n' "$corpo"; fi

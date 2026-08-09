@@ -30,8 +30,9 @@ Reduzir chamados de acesso em 30% até 2026-12-01.
 
 | Termo | Definição | Origem |
 |-------|-----------|--------|
-| Credencial | Par identificador-senha do operador | esta SPEC |
-| Bloqueio | Suspensão temporária de acesso | esta SPEC |
+| **Credencial** | Par identificador-senha do operador | esta SPEC |
+| **Bloqueio (acesso)** | Suspensão temporária de acesso | esta SPEC |
+| **Operador, Sessão** *(reutilizados, sem redefinição)* | Ver glossário consolidado do INDEX.md do slug | INDEX |
 
 ## 4. Escopo
 
@@ -51,8 +52,8 @@ Reduzir chamados de acesso em 30% até 2026-12-01.
 
 > Operador entra na conta com credencial própria e sessão criada.
 
-- **FR-001-001** [MUST] Quando o operador submete a credencial, o sistema deve validar o par identificador-senha.
-- **FR-001-002** [SHOULD] O sistema deve registrar cada tentativa de acesso.
+- **FR-001-001** [MUST] Quando o operador submete a credencial, o sistema DEVE validar o par identificador-senha.
+- **FR-001-002** [SHOULD] O sistema deve registrar cada tentativa de acesso, e NÃO DEVE registrar a senha em claro.
 
 ### FEAT-001-002: Bloqueio de acesso
 
@@ -67,7 +68,10 @@ Reduzir chamados de acesso em 30% até 2026-12-01.
 
 ## 7. Critérios de aceitação (Given-When-Then)
 
-- **AC-001-001** (cobre FR-001-001) Dado um operador cadastrado, quando submete a credencial correta, então a sessão é criada.
+- **AC-001-001** (cobre FR-001-001)
+  **Dado** um operador cadastrado,
+  **Quando** submete a credencial correta,
+  **Então** a sessão é criada.
 - **AC-001-002** (cobre FR-001-003) Dado um operador com quatro falhas, quando a quinta falha ocorre, então o bloqueio é aplicado.
 
 ## 8. Premissas e decisões prévias

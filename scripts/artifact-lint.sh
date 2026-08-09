@@ -73,6 +73,7 @@ sect == "" && line ~ /^\*\*[A-Z]/ {
 }
 
 /^## / {
+  flushfr(); flushac()
   h = trim(substr(line, 4))
   if (h ~ /^1\./)  { sec[1] = 1;  sect = "1" }
   if (h ~ /^2\./)  { sec[2] = 1;  sect = "2" }
@@ -89,6 +90,7 @@ sect == "" && line ~ /^\*\*[A-Z]/ {
   next
 }
 /^### / {
+  flushfr(); flushac()
   h = trim(substr(line, 5))
   if (sect == "1" && h ~ /^1\.1/) s11 = 1
   if (sect == "1" && h ~ /^1\.2/) s12 = 1
@@ -129,37 +131,26 @@ sub14 == "out" && /^- / { nout++; outod[nout] = tolower(trim(substr(line, 3))); 
 # FEAT: linha de descricao ">" antes do primeiro FR
 sect == "5" && cur_feat != "" && /^> / { FDESC[cur_feat] = 1; next }
 
-# FRs (secao 5)
+# FRs (secao 5) — bloco multi-linha no formato de campo (4.156): o texto do FR
+# quebra em ~100 colunas e o "DEVE" pode cair na continuacao; acumula e checa o bloco
 sect == "5" && line ~ /^- \*\*FR-[0-9]+/ {
+  flushfr()
   nfr++
-  if (match(line, /FR-[0-9]+-[0-9]+/)) { id = substr(line, RSTART, RLENGTH); checkid(id) }
+  if (match(line, /FR-[0-9]+-[0-9]+/)) { frid = substr(line, RSTART, RLENGTH); checkid(frid) }
+  else frid = "FR-?"
   if (cur_feat != "") FFR[cur_feat]++
   else frFora++
-  txt = line
-  sub(/^- \*\*FR-[0-9-]+\*\*[ \t]*/, "", txt)
-  # RFC 2119
-  if (txt ~ /\[(MUST|SHOULD|MAY)\]/) {
-    if (txt ~ /\[MUST\]/) nmust++
-    else nsm++
-  } else if (txt ~ /\[(must|should|may|obrigat|recomendado|opcional)/) {
-    emit("WARNING", "spec-rfc-forma", id ": marcador RFC 2119 fora da forma canonica [MUST]/[SHOULD]/[MAY]")
-    nsm++
-  } else {
-    emit("ERROR", "spec-fr-sem-rfc", id ": FR sem [MUST]/[SHOULD]/[MAY]")
-  }
-  sub(/^\[[A-Za-z]+\][ \t]*/, "", txt)
-  # EARS
-  if (txt !~ / deve[ m]/ && txt !~ / deve$/) {
-    emit("ERROR", "spec-fr-sem-deve", id ": FR sem o verbo \"deve\"")
-  } else if (txt !~ /^O[s]? .+ deve/ && txt !~ /^Quando .+, [oa]s? .+ deve/ && \
-             txt !~ /^Enquanto .+, [oa]s? .+ deve/ && txt !~ /^Onde .+, [oa]s? .+ deve/ && \
-             txt !~ /^Se .+ ent..o [oa]s? .+ deve/) {
-    emit("WARNING", "spec-ears-nao-casa", id ": FR fora dos 5 padroes EARS")
-  }
-  if (split(txt, wtmp, /[ \t]+/) > 30)
-    emit("WARNING", "spec-fr-palavras", id ": FR com mais de 30 palavras")
+  frbuf = line
+  # porte: régua inalterada da 4.151 — mede a 1ª linha do FR (quebra de linha do
+  # formato de campo não é porte; mudar a régua seria decisão à parte)
+  w1 = line
+  sub(/^- \*\*FR-[0-9-]+\*\*[ \t]*/, "", w1)
+  sub(/^\[[A-Za-z]+\][ \t]*/, "", w1)
+  if (split(w1, wtmp, /[ \t]+/) > 30)
+    emit("WARNING", "spec-fr-palavras", frid ": FR com mais de 30 palavras")
   next
 }
+sect == "5" && frid != "" && line !~ /^[-#>]/ { frbuf = frbuf " " trim(line); next }
 
 # NFRs (secao 6)
 sect == "6" && line ~ /^- \*\*NFR-[0-9]+/ {
@@ -172,15 +163,17 @@ sect == "6" && line ~ /^- \*\*NFR-[0-9]+/ {
   next
 }
 
-# ACs (secao 7)
+# ACs (secao 7) — o bloco e multi-linha no formato de campo (4.156): o Dado/Quando/
+# Entao vem nas linhas seguintes ao bullet; acumula ate o proximo item e checa o bloco
 sect == "7" && line ~ /^- \*\*AC-[0-9]+/ {
+  flushac()
   nac++
-  if (match(line, /AC-[0-9]+-[0-9]+/)) { id = substr(line, RSTART, RLENGTH); checkid(id) }
-  low = tolower(line)
-  if (!(index(low, "dado") > 0 && index(low, "quando") > 0 && (index(low, "ent\303\243o") > 0 || index(low, "entao") > 0)))
-    emit("WARNING", "spec-ac-fora-gwt", id ": AC fora de Dado-Quando-Entao")
+  if (match(line, /AC-[0-9]+-[0-9]+/)) { acid = substr(line, RSTART, RLENGTH); checkid(acid) }
+  else acid = "AC-?"
+  acbuf = tolower(line)
   next
 }
+sect == "7" && acid != "" { acbuf = acbuf " " tolower(trim(line)); next }
 
 # demais IDs numerados
 line ~ /^- \*\*(RISK|A|Q)-[0-9]+/ {
@@ -200,11 +193,16 @@ sect == "8" && /^- / {
 sect == "9" && /^- / { nrisco++ }
 
 # tecnologia (secoes 5, 6, 7) + glossario (secao 3)
+# 4.156: o formato de campo escreve o termo em **negrito** e agrega os termos
+# reutilizados numa linha "*(reutilizados, sem redefinição)*" — negrito/backtick
+# saem antes da comparacao e a linha agregada nao entra no check de uso.
 sect == "3" && /^\|/ {
   n = split(line, c, "|")
   if (n >= 3) {
     t = trim(c[2])
-    if (t != "" && t !~ /^Termo$/ && t !~ /^[-: ]+$/) { ngl++; gloss[ngl] = t }
+    gsub(/[*`]/, "", t)
+    t = trim(t)
+    if (t != "" && t !~ /^Termo$/ && t !~ /^[-: ]+$/ && tolower(t) !~ /reutilizad/) { ngl++; gloss[ngl] = t }
   }
   next
 }
@@ -221,7 +219,45 @@ function checkid(id,   parts, n, nnn, xxx) {
     emit("WARNING", "spec-id-zero-pad", id ": XXX sem zero-padding de 3 digitos")
 }
 
+# fecha o bloco acumulado do FR corrente e roda RFC 2119 + EARS + porte (4.156)
+function flushfr(   txt, ltxt, wtmp) {
+  if (frid == "") return
+  txt = frbuf
+  sub(/^- \*\*FR-[0-9-]+\*\*[ \t]*/, "", txt)
+  # RFC 2119
+  if (txt ~ /\[(MUST|SHOULD|MAY)\]/) {
+    if (txt ~ /\[MUST\]/) nmust++
+    else nsm++
+  } else if (txt ~ /\[(must|should|may|obrigat|recomendado|opcional)/) {
+    emit("WARNING", "spec-rfc-forma", frid ": marcador RFC 2119 fora da forma canonica [MUST]/[SHOULD]/[MAY]")
+    nsm++
+  } else {
+    emit("ERROR", "spec-fr-sem-rfc", frid ": FR sem [MUST]/[SHOULD]/[MAY]")
+  }
+  sub(/^\[[A-Za-z]+\][ \t]*/, "", txt)
+  # EARS — case-insensitive: o formato de campo usa "DEVE"/"NAO DEVE" maiusculo;
+  # o verbo pode vir seguido de pontuacao ("DEVE, uma vez por dia, …")
+  ltxt = tolower(txt)
+  if (ltxt !~ / devem?[^a-z]/ && ltxt !~ / devem?$/) {
+    emit("ERROR", "spec-fr-sem-deve", frid ": FR sem o verbo \"deve\"")
+  } else if (ltxt !~ /^o[s]? .+ deve/ && ltxt !~ /^quando .+, [oa]s? .+ deve/ && \
+             ltxt !~ /^enquanto .+, [oa]s? .+ deve/ && ltxt !~ /^onde .+, [oa]s? .+ deve/ && \
+             ltxt !~ /^se .+ ent..o [oa]s? .+ deve/) {
+    emit("WARNING", "spec-ears-nao-casa", frid ": FR fora dos 5 padroes EARS")
+  }
+  frid = ""; frbuf = ""
+}
+
+# fecha o bloco acumulado do AC corrente e roda o check Dado-Quando-Entao (4.156)
+function flushac() {
+  if (acid == "") return
+  if (!(index(acbuf, "dado") > 0 && index(acbuf, "quando") > 0 && (index(acbuf, "ent\303\243o") > 0 || index(acbuf, "entao") > 0)))
+    emit("WARNING", "spec-ac-fora-gwt", acid ": AC fora de Dado-Quando-Entao")
+  acid = ""; acbuf = ""
+}
+
 END {
+  flushfr(); flushac()
   for (i = 1; i <= 10; i++)
     if (!(i in sec)) emit("ERROR", "spec-secao-ausente", "secao \"## " i ".\" ausente")
   if ((1 in sec) && !s11) emit("ERROR", "spec-secao-ausente", "subsecao 1.1 ausente")
@@ -271,10 +307,13 @@ END {
   if ((9 in sec) && nrisco == 0) emit("WARNING", "spec-sem-risco", "nenhum risco listado na secao 9")
   if (nconf > 3 && (STATUS == "Draft" || STATUS == "Review"))
     emit("WARNING", "spec-confirmar-teto", nconf " [confirmar] na SPEC (teto 3 — excedente vira [assumido] com default, 4.144)")
-  # glossario nao usado
-  for (i = 1; i <= ngl; i++)
-    if (index(body567, tolower(gloss[i])) == 0)
+  # glossario nao usado — termo com qualificador "(…)" tambem casa pela base (4.156)
+  for (i = 1; i <= ngl; i++) {
+    g = tolower(gloss[i])
+    g2 = g; sub(/ *\(.*\)$/, "", g2); g2 = trim(g2)
+    if (index(body567, g) == 0 && (g2 == g || g2 == "" || index(body567, g2) == 0))
       emit("WARNING", "spec-glossario-nao-usado", "termo \"" gloss[i] "\" do glossario nao aparece nas secoes 5-7")
+  }
 }
 AWK
 

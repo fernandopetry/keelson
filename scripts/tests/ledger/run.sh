@@ -42,6 +42,15 @@ TASK-003 aprovada no retry (gate 4)
 ref: docs/meu-slug/tasks/TASK-003.md"
 if [ "$(cat "$f" 2>/dev/null)" = "$want" ]; then ok append-corpo; else falha "append-corpo: [$(cat "$f" 2>/dev/null)]"; fi
 
+# linha ts: duplicada no stdin (formato pré-4.151) é descartada — o cabeçalho é do
+# script (4.156). Repo próprio para não poluir as contagens dos casos seguintes.
+total=$((total + 1))
+RTS="$TMP/repo-ts"; mkdir -p "$RTS"
+fts="$(printf 'ts: 2026-01-01T00:00:00-0300 · tipo: gate · origem: qa · slug: meu-slug\ncorpo real do evento\n' | bash "$LG" "$RTS" append gate qa meu-slug --ts "2026-08-06T14:23:11-0300" 2>/dev/null)"
+want="ts: 2026-08-06T14:23:11-0300 · tipo: gate · origem: qa · slug: meu-slug
+corpo real do evento"
+if [ "$(cat "$fts" 2>/dev/null)" = "$want" ]; then ok append-ts-duplicado-descartado; else falha "append-ts-duplicado-descartado: [$(cat "$fts" 2>/dev/null)]"; fi
+
 # colisão de segundo ganha sufixo
 total=$((total + 1))
 f2="$(printf 'segundo evento no mesmo segundo\n' | bash "$LG" "$R" append gate code-reviewer meu-slug --ts "$TS1" 2>/dev/null)"
