@@ -17,6 +17,42 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.87.1] — 2026-08-09
+
+Decision 4.156 — first real consumer round of the mechanical-fact scripts (4.151/4.154):
+the parsers now match the format the plugin actually produces in the field, and degrade
+with a declared warning instead of inventing a fact where they cannot parse.
+
+### Fixed
+
+- `epic-state.sh` maps the epic queue columns **by the table header** (canonical
+  `| # | Fatia | Slug de destino | Estado |` and the field variant
+  `| # | Fatia | Estado | Âncora |`), strips bold/backtick from the state, resolves the
+  child brief path from the Âncora column, and emits an `aviso` line plus rule `-` for a
+  state outside the closed vocabulary — it no longer picks the wrong slice with the
+  confidence of a fact (in the field round it labeled delivered slices as not delivered).
+- `artifact-lint.sh` no longer floods a legitimate SPEC with false positives: FR and AC
+  blocks are accumulated across wrapped lines before checking (the field format breaks at
+  ~100 columns, so `DEVE` and `Dado/Quando/Então` land on continuation lines), the EARS
+  checks are case-insensitive and accept punctuation after the verb, and glossary terms
+  are compared without bold/backtick markers — a term with a `(…)` qualifier also matches
+  by its base, and the aggregated `*(reutilizados…)*` row is skipped.
+- `ledger.sh append` discards a `ts:` line arriving via stdin: the measured-timestamp
+  header belongs to the script, so a model-estimated timestamp can no longer end up in
+  the event (the convention example that still showed the old format was updated).
+
+### Changed
+
+- `/keelson:auto` names the mechanical ID allocator (`next-id.sh … alloc`) at brief
+  creation time — the slice launch had numbered a BRIEF from memory and collided with a
+  PLAN in the same single-allocator sequence.
+- `/keelson:continue` documents the degraded output (`aviso` line / rule `-`) as the
+  same derive-from-artifacts order it already prescribed.
+- Regression suites for the three scripts gained cases in the **real consumer format**
+  (bold states, anchor column, multi-line FR/AC, bold glossary, duplicated `ts:`).
+
+---
+
 ## [0.87.0] — 2026-08-07
 
 Decision 4.155 — performance becomes a dedicated quality gate (gate 10), mirroring the

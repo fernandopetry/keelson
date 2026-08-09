@@ -408,18 +408,18 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.87.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.87.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the mechanical fact layer is complete** (decisions
-4.151–4.154). Fourteen script contracts now compute what the model used to re-derive
-by hand — ficha reader, ID allocator, INDEX checker, diff facts, run-state/ledger
-writers, artifact form lint, init self-check, environment probe, epic queue state,
-handoff scan, transactional legacy move, postmortem facts and rewrite edge-diff —
-each with a frozen regression suite on pre-commit and CI; validators, commands and
-agents cite their output as fact. No re-init needed — consumers only update the
-plugin.
+New in this release: **the mechanical fact layer survives its first field round**
+(decision 4.156). The epic-queue reader now maps the queue table by its header row
+and degrades instead of guessing when a state is unparseable; the artifact lint
+accepts the real field format (uppercase DEVE, multi-line FR/AC blocks, bold
+glossary terms), eliminating a class of systematic false positives; the ledger
+stamps the only `ts:` line itself; and the cycle start names the mechanical ID
+allocator. Every fix landed with a fixture in the real consumer format. No re-init
+needed — consumers only update the plugin.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
