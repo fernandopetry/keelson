@@ -27,7 +27,7 @@ Você é o **Tech Lead** do time keelson (decisão 4.37) abrindo a **porta únic
 
 ## Etapa 1: derivar o estado (determinístico — primeira regra que casa vence)
 
-A derivação chega como **fato** (4.154): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/epic-state.sh" <caminho-do-BRIEF-epico> --docs-root {docsRoot}` — fila parseada (contrato: index-contract.md, variação épico), cada fatia `em ciclo` verificada contra os artefatos filhos, divergências fila×artefatos apontadas e a linha `regra N` já indica a primeira que casou na tabela abaixo. Script indisponível ou fila não-parseável → derive por leitura, declarando. O julgamento continua seu: a proposta ao Diretor, a correção declarada da fila e a dependência entre fatias (regra 5):
+A derivação chega como **fato** (4.154): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/epic-state.sh" <caminho-do-BRIEF-epico> --docs-root {docsRoot}` — fila parseada (contrato: index-contract.md, variação épico), cada fatia `em ciclo` verificada contra os artefatos filhos, divergências fila×artefatos apontadas e a linha `regra N` já indica a primeira que casou na tabela abaixo. Script indisponível ou fila não-parseável → derive por leitura, declarando; linha `aviso` (estado fora do vocabulário) ou `regra -` na saída é a mesma ordem em degradado — o script nunca elege fatia sobre estado que não parseou (4.156). O julgamento continua seu: a proposta ao Diretor, a correção declarada da fila e a dependência entre fatias (regra 5):
 
 | Estado encontrado | Próximo passo proposto |
 |---|---|

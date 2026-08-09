@@ -29,12 +29,12 @@
     ```md
     thoughts/local/session-ledger/<yyyymmdd-hhmmss>-<tipo>-<origem>.md
 
-    ts: 2026-07-31T14:23:10-03:00 · tipo: gate · origem: code-reviewer · slug: <slug>
+    ts: 2026-07-31T14:23:10-03:00 · tipo: gate · origem: code-reviewer · slug: <slug>   ← linha do ledger.sh, nunca do corpo
     TASK-003 aprovada no retry (gate 4: duplicação em <arquivo>) · revisado_por ≠ implementado_por
     ref: {docsRoot}/<slug>/tasks/TASK-003-*.md
     ```
 
-    O caminho resolve **sempre na raiz do repo principal** (`git rev-parse --show-toplevel` do working tree principal), nunca dentro do worktree do agent. Timestamp medido (`TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z`), jamais estimado.
+    O caminho resolve **sempre na raiz do repo principal** (`git rev-parse --show-toplevel` do working tree principal), nunca dentro do worktree do agent. Timestamp medido pelo próprio `ledger.sh` (decisão 4.156): o corpo passado pelo stdin são **só as 2–3 linhas de conteúdo** — a linha `ts:` do cabeçalho e a `ref:` (via `--ref`) são do script, e linha `ts:` escrita de memória no stdin é **descartada** no append (ts estimado não entra em evento).
   - **Quem escreve é o Tech Lead** (main session). Os avaliadores (`code-reviewer`, `qa`, `security-engineer`, `performance-engineer`) são read-only por desenho e **não ganham `Write` para isso**: quem recebe o report do agent anota o evento em 2–3 linhas. No modo teams, o Tech Lead anota ao consolidar a wave.
   - **Catálogo fechado** — só estes tipos entram; o que não está aqui não vira evento (senão o ledger vira log de tudo e custa mais do que economiza): `gate` (resultado + `implementado_por`/`revisado_por`) · `decisao` (decisão em nome do Diretor) · `fora_de_escopo` · `pendencia` (estacionada, handoff, achado não corrigido) · `tracker` (sync degradado, com a evidência literal do que a chamada devolveu) · `marco` (largada/etapa/entrega, para a linha de duração).
   - **Não duplica dono.** Fato que **sobrevive à sessão** continua indo para onde já ia — `INDEX.md` (furo no plano, sync pulado, riscos ativos, closure), `Cronologia` do BRIEF (tempo, na rota formal), `learning-log.md` (lição de processo, do `agile-coach`). O ledger guarda o que hoje **só existe no contexto** e morre com ele. Régua: *sobrevive à sessão → INDEX; serve ao report desta sessão → ledger*.
