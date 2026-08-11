@@ -44,9 +44,19 @@ Proponha e **espere o OK do Diretor** antes de instalar (dependência de projeto
 
 A partir da ficha, nunca de template cego — mostre o arquivo **antes** de escrever:
 
-- `playwright.config.ts` (`.js` se o projeto não usa TS): `testDir: 'e2e'` · `outputDir: 'test-results'` · `baseURL` de `process.env.E2E_BASE_URL`, com comentário apontando a `baseUrl` do realm default do `keelson.local.json` como valor de dev — **URL e credencial nunca hardcoded no config versionado**.
-- **Auth por realm** (se `screenVerify.realms` do `keelson.local.json` tem login): gere o esqueleto padrão do Playwright — setup project que loga e salva `storageState` por realm, lendo usuário/senha do `keelson.local.json` **em runtime** (arquivo gitignored); estado salvo em `e2e/.auth/` (gitignored). Um projeto por realm preserva o isolamento que a verificação de tela exige (skill `screen-verify`).
-- **`.gitignore`**: garanta `test-results/`, `playwright-report/` e `e2e/.auth/` — spec é código versionado; artefato de execução e sessão, nunca.
+- **Runtime consolidado numa casa só** (decisão 4.168): todo artefato de execução vai
+  para subpastas de **`thoughts/e2e/`** (na raiz do projeto — a mesma casa transitória
+  do `thoughts/screen-verify/`), nunca três pastas soltas. App em subdiretório → o
+  config vive no diretório do app e os caminhos apontam para o `thoughts/` da raiz
+  (relativos ao config, ex.: `../thoughts/e2e/...`).
+- `playwright.config.ts` (`.js` se o projeto não usa TS): `testDir: 'e2e'` ·
+  `outputDir: '<thoughts>/e2e/test-results'` · reporter `html` com
+  `outputFolder: '<thoughts>/e2e/report'` e `open: 'never'` · `baseURL` de
+  `process.env.E2E_BASE_URL`, com comentário apontando a `baseUrl` do realm default do
+  `keelson.local.json` como valor de dev — **URL e credencial nunca hardcoded no config
+  versionado**.
+- **Auth por realm** (se `screenVerify.realms` do `keelson.local.json` tem login): gere o esqueleto padrão do Playwright — setup project que loga e salva `storageState` por realm, lendo usuário/senha do `keelson.local.json` **em runtime** (arquivo gitignored); estado salvo em `<thoughts>/e2e/.auth/<realm>.json`. Um projeto por realm preserva o isolamento que a verificação de tela exige (skill `screen-verify`).
+- **`.gitignore`**: a linha `thoughts/` cobre a casa inteira — **prove** com `git check-ignore thoughts/e2e/x` (cobertura se verifica, não se infere — 4.51); sem cobertura, acrescente a linha. Spec é código versionado; artefato de execução e sessão, nunca.
 - **Primeiro spec**: `e2e/smoke.spec.ts` — abre a `baseURL` e asserta um elemento estável da app. Serve de exemplo vivo da convenção de tags da 4.166 (comentário no arquivo: `@<slug>` por arquivo, `@AC-NNN-XXX` por teste — régua em `guidelines/core/TESTING.md`, "Specs E2E").
 
 ## Etapa 4: prova falsificável antes de gravar

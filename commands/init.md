@@ -186,7 +186,7 @@ Memos de exploração e backups do keelson vivem em `thoughts/local/`; os artefa
 
 Com `method: skill:screen-verify`, garanta **também** a linha `.playwright-mcp/`: é o diretório de saída **default** do servidor, usado sempre que o `--output-dir` estiver ausente ou divergente — e screenshot de sessão autenticada não pode ficar a um `git add .` de distância do repositório. **Atenção**: só o `keelson.local.json` fica de fora; o `keelson.local.example.json` **é versionado** (não o adicione ao `.gitignore`).
 
-Com `quality.e2e` preenchido (decisão 4.166), garanta as linhas dos artefatos de execução do runner — para Playwright, `test-results/` e `playwright-report/`: os **specs** são código versionado, mas screenshot, trace e report de execução são transitórios e não entram no git.
+Com `quality.e2e` preenchido (decisão 4.166), garanta a cobertura dos artefatos de execução do runner: no setup guiado (`/keelson:e2e-setup`) eles consolidam em `thoughts/e2e/` (decisão 4.168) — já sob a linha `thoughts/`, prove com `check-ignore`; config própria do projeto nos defaults do Playwright → linhas `test-results/` e `playwright-report/` (e o diretório do `storageState`, se houver). Os **specs** são código versionado; screenshot, trace e report de execução são transitórios e não entram no git.
 
 ## Etapa 6 — Self-check (falsificável, não confie na configuração)
 

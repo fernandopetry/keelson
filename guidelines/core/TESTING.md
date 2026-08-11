@@ -121,7 +121,9 @@ que asserção não captura (layout, tema, estado visual).
 - **O spec é código, e o developer o entrega**: AC com efeito observável em tela → o
   spec que o prova faz parte da task; o `qa` executa, nunca escreve (gerador ≠
   avaliador). Commitado como qualquer teste; artefato de execução (screenshot, trace,
-  `test-results/`) fica em pasta gitignored.
+  report, estado de auth) fica em pasta gitignored — consolidado numa casa só
+  (`thoughts/e2e/` no setup guiado, decisão 4.168), nunca espalhado em diretórios
+  soltos.
 - **Tags são o recorte**: cada arquivo de spec carrega a tag do slug (`@<slug>`) e cada
   teste as tags dos ACs que prova (`@AC-NNN-XXX`). Recorte da task:
   `<quality.e2e> --grep "@AC-NNN-XXX"`; regressão do slug: `--grep "@<slug>"`;
