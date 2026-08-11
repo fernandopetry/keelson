@@ -1952,6 +1952,16 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.168 — Artefato de runtime consolida numa casa só, nunca em diretórios soltos
+
+**Problema**: primeira rodada real do `/keelson:e2e-setup` (mesma sessão de campo da 4.167): o setup gerou **três diretórios gitignored espalhados** no diretório do app — `test-results/`, `playwright-report/` e `e2e/.auth/` (os defaults do Playwright, cada um pedindo sua linha de `.gitignore`) — e o consumidor perguntou por que não uma pasta com subpastas. Ele tem razão, e o keelson **já tem** essa casa: `thoughts/` é o diretório transitório canônico (o screen-verify guarda os dele em `thoughts/screen-verify/`), coberto por uma única linha que o init garante. Aceitar o default de cada ferramenta espalha superfície de gitignore e polui a raiz do app.
+
+**Decisão**: todo artefato de execução do E2E consolida em subpastas de **`thoughts/e2e/`** na raiz do projeto — `test-results/` (outputDir), `report/` (reporter html, `open: 'never'`) e `.auth/<realm>.json` (storageState) — nunca diretórios soltos. App em subdiretório: o config vive no diretório do app e aponta para o `thoughts/` da raiz por caminho relativo. Cobertura de `.gitignore` **provada** com `check-ignore` (régua da 4.51), não inferida da linha `thoughts/`. Projeto com config Playwright própria pré-existente mantém seus paths (o setup não briga com config consolidada de outro dono) — aí valem as linhas individuais no `.gitignore`. Regra geral extraída: ferramenta nova que produz artefato transitório aponta para a casa `thoughts/` por configuração, em vez de ganhar diretório próprio na raiz.
+
+**Aplicação**: `commands/e2e-setup.md` (Etapa 3) · `commands/init.md` (Etapa 5.5) · `guidelines/core/TESTING.md` ("Specs E2E"). Consumidor que já rodou o setup com os defaults: re-rodar `/keelson:e2e-setup` (modo reparo) ou mover os três paths na config.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

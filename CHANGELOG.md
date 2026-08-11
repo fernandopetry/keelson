@@ -17,6 +17,29 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.92.1] — 2026-08-11
+
+Decision 4.168 — field feedback from the first real `/keelson:e2e-setup` run: the setup
+scattered three gitignored runtime directories (`test-results/`, `playwright-report/`,
+`e2e/.auth/`) across the app root, each needing its own `.gitignore` line.
+
+### Fixed
+
+- **E2E runtime artifacts consolidate into one home**: `thoughts/e2e/` at the project
+  root (subfolders `test-results/`, `report/`, `.auth/<realm>.json`) — the same
+  transitory house as `thoughts/screen-verify/`, covered by the single `thoughts/`
+  ignore line (coverage still proven with `check-ignore`, per 4.51). Apps in a
+  subdirectory point at the root `thoughts/` via relative paths. Pre-existing Playwright
+  configs keep their own paths (the setup does not fight an established config) — the
+  individual ignore lines apply there. General rule extracted: a new tool producing
+  transitory artifacts is configured toward `thoughts/`, never granted its own root
+  directory.
+
+Consumers that already ran the setup with the defaults: re-run `/keelson:e2e-setup`
+(repair mode) or move the three paths in the config.
+
+---
+
 ## [0.92.0] — 2026-08-11
 
 Decision 4.167 — first real `/keelson:init` run after 4.166 exposed the adoption gap:
