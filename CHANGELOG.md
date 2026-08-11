@@ -17,6 +17,37 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.88.0] — 2026-08-10
+
+Decision 4.157 — vertical slicing stops being a decorative principle: it gains a
+falsifiable test, and the structure around it (granularity by file count, single-component
+TASKs) stops contradicting it. Prompted by a benchmark of mattpocock/skills, whose
+`to-tickets` skill reaches the same rules independently (tracer bullets, blocking edges,
+expand–contract).
+
+### Changed
+
+- `/keelson:tasks` decomposition principle 4: a finished TASK must deliver behaviour
+  verifiable **on its own** — if its behaviour check only exists once a sibling from a
+  later wave lands, the cut was horizontal and must be re-sliced by behaviour. Slices
+  sharing a surface declare their blocking edge; the first slice opens the skeleton.
+- Granularity (principle 7) is measured by effort and delivered behaviour, never by file
+  count — a typical vertical slice touches one file per layer and stays atomic.
+- The TASK `Componente` field accepts a list with a `(principal)` marker — a vertical
+  slice crosses as many PLAN components as the behaviour requires. The PLAN's FR→COMP
+  map documents architecture and no longer dictates TASK granularity. The graph parser
+  already accepted lists and parenthetical markers, and no check consumes the
+  `implements` edge: engine untouched, no new fixture.
+- Named exceptions stay explicit: sensitive slices keep their own TASK (risk cut,
+  principle 8 unchanged), and wide mechanical refactors are sequenced as
+  **expand–contract** (expand beside the old form → migrate call sites in batches →
+  contract when no caller remains).
+- Wave scheduling, barriers and parallel dispatch are untouched — the autonomous cycle
+  keeps its parallelism. Whether vertical cuts alone reduce wave counts is the
+  observation that will feed the pending pipeline-vs-barrier decision (4.112–4.120).
+
+---
+
 ## [0.87.1] — 2026-08-09
 
 Decision 4.156 — first real consumer round of the mechanical-fact scripts (4.151/4.154):
