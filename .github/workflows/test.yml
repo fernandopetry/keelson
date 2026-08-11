@@ -78,6 +78,9 @@ jobs:
       - name: Suíte do edge-diff.sh (scripts/tests/edge-diff/run.sh)
         run: bash scripts/tests/edge-diff/run.sh
 
+      - name: Suíte do e2e-coverage.sh (scripts/tests/e2e-coverage/run.sh)
+        run: bash scripts/tests/e2e-coverage/run.sh
+
       - name: Sincronização de comandos/agents (scripts/check-sync.sh)
         run: bash scripts/check-sync.sh
 

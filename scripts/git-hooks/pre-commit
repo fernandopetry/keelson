@@ -192,7 +192,7 @@ for par in "ficha:ficha diff-facts" "next-id:next-id" "index-check:index" \
            "init-selfcheck:init-selfcheck" "probe-env:probe-env" \
            "epic-state:epic-state" "handoff-scan:handoff-scan" \
            "legacy-move:legacy-move" "postmortem-facts:postmortem-facts" \
-           "edge-diff:edge-diff"; do
+           "edge-diff:edge-diff" "e2e-coverage:e2e-coverage"; do
   motor="${par%%:*}"; suites="${par#*:}"
   dirs_re="$(printf '%s' "$suites" | sed 's/ /|/g')"
   if printf '%s\n' "$staged" | grep -qE "^scripts/($motor\.sh\$|tests/($dirs_re)/)"; then

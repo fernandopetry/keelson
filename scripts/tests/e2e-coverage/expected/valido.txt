@@ -1,0 +1,1 @@
+INFO	e2e-cobertura	2/2 ACs de demo com spec E2E (@demo)
