@@ -17,6 +17,32 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.92.0] — 2026-08-11
+
+Decision 4.167 — first real `/keelson:init` run after 4.166 exposed the adoption gap:
+a project without an E2E runner got `e2e: null` and nothing else. An opt-in gate with
+no guided door is opt-in only for those who already know the tool (same finding that
+produced `/keelson:mutation-setup`, 4.123).
+
+### Added
+
+- **`/keelson:e2e-setup` (human-only)**: guided E2E setup mirroring `mutation-setup` —
+  detects an existing runner (a consolidated non-Playwright engine is never swapped;
+  it becomes the ficha command, with the tag-scoping caveat), installs
+  `@playwright/test` and the browser binary with confirmation, generates the config
+  from the ficha (`testDir: e2e/`, gitignored outputs, `baseURL` via env, per-realm
+  auth skeleton reading `keelson.local.json` at runtime — no committed secrets), writes
+  a smoke spec as a living example of the tag convention, proves the pipeline with
+  `npx playwright test --list` and only then writes `quality.e2e`. AC specs remain the
+  developer's per-task deliverable.
+
+### Changed
+
+- `/keelson:init` now points at `/keelson:e2e-setup` in its report line when no E2E
+  runner is detected — instead of leaving `e2e: null` with no next step.
+
+---
+
 ## [0.91.0] — 2026-08-11
 
 Decision 4.166 — screen verification gains a durable, re-runnable layer: verified UI

@@ -140,7 +140,8 @@ Se o projeto declara `quality.e2e` na ficha (opt-in), a tela verificada uma vez 
 **spec E2E versionado**, tagueado por slug e AC: a regressão roda por comando
 (`--grep` para o recorte, suíte completa no `/keelson:integrate`), e o browser dirigido
 fica só para comportamento novo e julgamento visual. Prints e traces continuam fora do
-git; só o código do spec é commitado.
+git; só o código do spec é commitado. Não sabe configurar? `/keelson:e2e-setup` monta
+tudo (instalação com confirmação, config, smoke spec) e grava o campo após prova.
 
 ### Voltei de um fim de semana e não lembro onde o épico parou. E agora?
 

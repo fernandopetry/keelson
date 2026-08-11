@@ -1942,6 +1942,16 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.167 — Gate opt-in sem porta de adoção guiada é opt-in só para quem já sabe
+
+**Problema**: primeira rodada real do `/keelson:init` pós-4.166: projeto sem runner E2E recebeu `e2e: null` e **nada mais** — nenhuma sugestão de instalação ou configuração, e o Diretor que não conhece Playwright ficou sem próximo passo. É o mesmo furo que a mutação tinha antes da 4.123: a doutrina mandava "não instale nada aqui" sem apontar a porta guiada, porque a porta não existia.
+
+**Decisão**: `/keelson:e2e-setup` (humano-only), espelho do `/keelson:mutation-setup`: detecta runner existente (motor consolidado de outro fornecedor **não é trocado** — vira o comando da ficha, com a ressalva do recorte por tag), instala `@playwright/test` + binário do navegador com confirmação, gera a config a partir da ficha (`testDir: e2e/`, saídas gitignored, `baseURL` por env, esqueleto de auth por realm lendo `keelson.local.json` **em runtime** — URL e credencial nunca hardcoded em arquivo versionado), cria um smoke spec como exemplo vivo da convenção de tags, **prova com `--list`** (rodada real só com app de pé) e só então grava `quality.e2e`. O `/keelson:init` passa a apontar o comando na linha do relatório quando não detecta runner — mesma régua da 4.123. Specs de AC continuam entregáveis do developer (4.166); o setup prepara infraestrutura, nunca escreve verificação de comportamento.
+
+**Aplicação**: `commands/e2e-setup.md` (novo) · `commands/init.md` (linha do relatório) · sync de comando novo (README · method-guide §3.22 · nota do bloco, humano-only). Observar: rodada real do setup no consumidor que motivou a decisão.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
