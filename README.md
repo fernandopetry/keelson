@@ -408,20 +408,18 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.88.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.89.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **vertical slicing gets its falsifiable test** (decision 4.157).
-A finished TASK must deliver behaviour verifiable on its own — a slice whose
-behaviour check only exists once a sibling from another layer lands was cut
-horizontally. Granularity is measured by effort and delivered behaviour, never by
-file count; the TASK `Componente` field accepts a list (a vertical slice crosses as
-many PLAN components as the behaviour requires); wide mechanical refactors are
-sequenced as expand–contract. Wave scheduling and parallel dispatch are untouched.
-The follow-up audit gave SPEC scope symmetry the same treatment (decision 4.158):
-the out-of-scope section must name the neighbours a reader would assume included.
-No re-init needed — consumers only update the plugin.
+New in this release: **bugfix proof starts red** (decision 4.159). The gate-1
+verification pair of a bugfix TASK is born from a repro that reproduces the exact
+symptom of the violated AC and fails when executed at fixation; after the fix the
+same command passes and becomes the regression test — a test that was never red
+proves the imagined diagnosis, not the fix. Doctrine pruning also gained its
+maintainer-side ruler (no-op / sediment / leading-word, decision 4.160). This closes
+the mattpocock/skills benchmark sweep that produced 4.157–4.158 (vertical slicing
+and scope symmetry). No re-init needed — consumers only update the plugin.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

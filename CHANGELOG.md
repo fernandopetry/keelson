@@ -17,6 +17,30 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.89.0] — 2026-08-11
+
+Decisions 4.159–4.160 — the full sweep of the mattpocock/skills benchmark lands its two
+remaining borrowings: bugfix proof starts red, and doctrine pruning gets a method.
+
+### Added
+
+- **Bugfix TASKs require the red repro** (4.159): the gate-1 command/expected pair of a
+  `Tipo: bugfix` TASK is born from a repro that reproduces the exact symptom of the
+  violated AC and **fails when executed at fixation** — the captured red evidence enters
+  the criterion (in place of the non-emptiness evidence other task types carry). After
+  the fix, the same command passes and becomes the regression test. A test that was
+  never red proves the imagined diagnosis, not the fix. Closes the "prova do vermelho"
+  step deferred on the 4.123 ladder. Mechanical check in `task-validator` stays behind
+  the recurrence trigger.
+- **Doctrine pruning ruler** (4.160, maintainer-side only): distillation batches now
+  test every sentence — no-op (does it change behaviour vs. the model's default? no →
+  delete the whole sentence), sediment (does it still match current behaviour?), and
+  leading-word collapse (a three-sentence definition a pretrained concept carries in one
+  token). Prohibitions that fit as positive targets are rewritten positively. Lives in
+  the repo's `CLAUDE.md`; never enters consumer doctrine or validators.
+
+---
+
 ## [0.88.1] — 2026-08-11
 
 Decision 4.158 — the audit that followed 4.157 (same gap class: a principle declared
