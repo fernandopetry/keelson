@@ -1882,6 +1882,56 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.161 — Critério ancorado em texto vira check mecânico: `task-criterio-grep-nao-ancorado`
+
+**Problema**: ciclo real de consumidor (proposal-inbox 2026-08-11, LRN-031 reincidente ×1 pós-4.107) produziu **12 critérios de gate 1** com `grep`/`rg` de padrão textual sobre arquivo inteiro para provar condição **estrutural**. A 4.107(b) cobre a classe "satisfeito por relocação" (recall); a classe nova é de **precisão**: o grep de palavra casa prosa/docblock — o developer chegou a redigir documentação **evitando a palavra** que o critério griparia — ou fixa o nome do símbolo da **camada errada** (campo do VO em camelCase onde o payload usa snake_case: cumprir à risca **reproduzia o bug que a task corrigia**; noutro caso, mandava capturar um tipo de exceção que uma wave anterior já substituíra — seguido à risca, a exceção real cairia no catch genérico). A regra em texto foi lida duas vezes e não preveniu; `commands/tasks.md` não tem folga para uma terceira redação — é o gatilho exato da escada da 4.149 (reincidência → check mecânico).
+
+**Decisão**: o `artifact-lint.sh` ganha o check **WARNING** `task-criterio-grep-nao-ancorado`: linha da seção "Critérios de pronto" com comando `grep`/`egrep`/`rg` sem nenhum sinal de ancoragem (`\b`, `::`, `->`, `class `/`function `, `Reflection`, exclusão `-v`, padrão iniciado em `^`) sai como fato. O `task-validator` aplica o julgamento: condição estrutural (assinatura, campo, projeção, predicado, chave de payload) → escala para ERROR; condição legitimamente textual → o WARNING fica. E o item (b) da 4.107 em `commands/tasks.md` passa a nomear a **classe geral** (texto falha nos dois sentidos: relocação e falso-positivo de prosa/símbolo de outra camada), não só o mecanismo da relocação.
+
+**Aplicação**: `scripts/artifact-lint.sh` (+ fixtures/expected da suíte — o defeito plantado nasce do artefato de campo: `grep -icE "confirm"` sobre arquivo inteiro; a fixture válida prova o não-falso-positivo com âncora `::`) · `docs/_meta/conventions/lint-contract.md` §3 · `skills/task-validator/SKILL.md` (Etapas 1 e 3) · `commands/tasks.md` item (b). Observar na 1ª rodada real: taxa de falso-positivo do WARNING em critério legitimamente textual.
+
+---
+
+### 4.162 — Verificação com alcance: símbolo compartilhado exige comando que alcance os outros consumidores
+
+**Problema**: mesma rodada de campo (LRN-048): quatro TASKs alteraram SQL/schema **compartilhado** e fixaram o critério de gate 1 como `--filter <ClasseDaPrópriaTASK>` — falsificável, evidência de não-vacuidade presente, tudo que a régua exigia. As quatro vezes a suíte de integração de outro consumidor do mesmo símbolo quebrou pós-merge, achada pelos gates **fora do critério**. O `tasks.md` já fazia a pergunta "quem mais consome?" para o **escopo** (princípio 6, cadeia do dado), nunca para a **verificação**. Achado adjacente no mesmo bloco: uma TASK fixou `git diff` vazio esperado em 3 arquivos **e** asserção nova exigida nos mesmos 3 — contradição interna que só não virou código porque o developer parou.
+
+**Decisão**: o bloco "resiste a contorno" (4.107) ganha dois testes: **(d)** AC que altera arquivo/símbolo compartilhado exige comando de verificação que **alcance os outros consumidores conhecidos** — filtro da própria classe é insuficiente sozinho; **(e)** dois critérios da mesma TASK nunca se **contradizem** sobre o mesmo arquivo (ausência de mudança vs. presença de mudança).
+
+**Aplicação**: `commands/tasks.md` (itens (d)/(e) do bloco "resiste a contorno"). Check mecânico adiado por reincidência (escada da 4.149): (d) exige saber quem consome — julgamento; (e) é mecanizável se reincidir.
+
+---
+
+### 4.163 — Commit por pathspec: o índice nunca é confiável sob concorrência
+
+**Problema**: a regra "estagie por caminho explícito" (`git add <arquivos>`, viva desde a gênese — LRN-005) é **necessária e insuficiente**: protege só quando o índice está limpo no instante do `add`. No modo SUBAGENTS (padrão — múltiplos agents na mesma working tree, sem worktree por developer), o índice pode carregar trabalho staged de outro agente, e o `commit` sem pathspec varre tudo. Três colisões na rodada de campo (LRN-049, reincidência de LRN-005): a segunda foi um commit de **marco do orquestrador** — a regra só estava escrita para o developer e nunca alcançou o Tech Lead; a terceira foi a mais grave — um mutante de segurança (predicado de tenant neutralizado de propósito para provar que o teste reprova, conforme TESTING.md) foi varrido por commit concorrente sem pathspec e o bypass esteve, brevemente, na branch.
+
+**Decisão**: a garantia deixa de ser textual (lembrar de estagiar com cuidado) e passa a ser do próprio git: **todo ator** que commita na working tree compartilhada usa `git commit -m "<msg>" -- <arquivos>` — a flag `--` ignora o índice para o que não foi listado, determinístico sob qualquer concorrência. Dono único da regra: `sdd-conventions.md` (mesmo bullet-família de "Commit por marco"); `agents/developer.md` §7 **cita**, não duplica. Fica registrado como decisão maior, **não** tomada aqui: worktree por developer no modo SUBAGENTS com N>1 (o pathspec fecha o buraco de *commitar* o alheio, não o de *ler* o mutante alheio numa janela de teste).
+
+**Aplicação**: `docs/_meta/conventions/sdd-conventions.md` (bullet novo) · `agents/developer.md` §7 (reescrito para citar). Observar: colisão de índice zerada nas próximas rodadas multi-agent.
+
+---
+
+### 4.164 — Decomposição 3+ camadas: a camada do meio tem dono no Escopo
+
+**Problema**: rodada de campo (LRN-050): AC repartido "metade repositório, metade tela" — e o caso de uso **entre** as pontas, com lista fixa de chaves, descartava dois campos que o repositório já calculava. Nenhuma task da wave tinha o arquivo no "Escopo > Inclui": "repassar campo que já existe" não pareceu trabalho novo o bastante para nomear. A 4.106 cobre **aresta sem dono entre tasks que existem**; aqui o nó intermediário **nunca virou task** — dois developers pararam antes de codar sobre a lacuna (mecanismo de desvio funcionando), mas nenhum gate teria alcançado: o código errado nunca chegou a existir.
+
+**Decisão**: cláusula no princípio 2 do `tasks.md`: dado que atravessa **3+ camadas** (persistência → aplicação → apresentação) com decomposição nomeando só as duas pontas exige item **próprio** no "Escopo > Inclui" de alguma task da wave para a camada intermediária — mesmo quando parece só repasse.
+
+**Aplicação**: `commands/tasks.md` (princípio 2). Observar se o scribe aplica na próxima decomposição multi-camada.
+
+---
+
+### 4.165 — Wave-guard cutuca por estado do run, não por turno
+
+**Problema**: o `wave-guard` (4.23) bloqueia **todo** encerramento de turno com `status: em_andamento` — premissa de quando encerrar o turno significava abandonar o run. Com agents em background + task-notification (modelo pós-4.103/4.118), encerrar o turno com agents em voo é o desenho **correto** (anti-polling): o harness reacorda a main a cada conclusão. Medição em sessão real de 8 waves: **41 bloqueios**, um por notificação colhida — um turno extra de inferência cada, com a janela grande da main. A 4.156 já tinha marcado anti-polling como classe a mecanizar na reincidência.
+
+**Decisão**: o guard cutuca **uma vez por estado do run**: fingerprint dos campos exibidos (slug/plan/waves_concluidas/waves_total/retomada) numa janela append-only (mesmo desenho da válvula do agent-guard, 4.141, com o mesmo truncamento fora do caminho quente). Estado já cutucado → exit 0; `waves_concluidas` avançou → fingerprint novo → cutuca de novo, uma vez. O cenário-núcleo da 4.23 (querer parar no meio da wave overnight) continua coberto: a primeira tentativa em cada estado é bloqueada com a instrução completa; e a parada legítima continua exigindo `status: encerrado` — a válvula não muda o contrato, só remove o pedágio das colheitas. Sem git dir para a janela, degrada para o comportamento antigo (fail-closed).
+
+**Aplicação**: `hooks/wave-guard.sh` (validado com `bash -n` + teste sintético de 6 cenários no scratchpad: bloqueia 1ª/passa 2ª no mesmo estado, re-bloqueia na wave nova, respeita `encerrado`, `stop_hook_active` e o fallback sem git). Observar na próxima sessão real: contagem de bloqueios ≈ nº de waves, não nº de notificações.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
