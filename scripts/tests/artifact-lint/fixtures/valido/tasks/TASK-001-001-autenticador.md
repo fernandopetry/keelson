@@ -44,6 +44,7 @@ Seguir o contrato do COMP-001-001.
 
 - [ ] AC-001-001 coberto por teste de integração
 - [ ] Registro de tentativa coberto por teste
+- [ ] Caminho legado ausente — verificação executável: `grep -c 'Autenticador::legado' src/` → 0
 
 ## Roteiro do gate 9 (fixado ANTES do código)
 

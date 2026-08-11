@@ -41,6 +41,7 @@ Cobrir o caso vazio antes da validação.
 ## Critérios de pronto
 
 - [ ] AC-001-001 verificado com credencial vazia
+- [ ] Sem parâmetro de confirmação — verificação executável: `grep -icE "confirm" src/Login.php` → 0
 
 ## Riscos específicos
 

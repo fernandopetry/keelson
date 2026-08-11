@@ -524,6 +524,16 @@ sect == "" && line ~ /^\*\*[A-Z]/ {
 sect == "dep" && line ~ /^- \*\*Depende de\*\*[ \t]*:/ {
   v = line; sub(/^[^:]*:/, "", v); DEP = trim(v); next
 }
+sect == "crit" && line ~ /(^|[ `|(])(grep|egrep|rg) / {
+  # 4.161: grep de padrao textual sem ancora de simbolo/fronteira em criterio de
+  # verificacao — casa prosa/docblock quando a condicao e estrutural. Contam como
+  # ancora: \b, ::, ->, "class ", "function ", Reflection, exclusao (-v) ou
+  # padrao ancorado em inicio de linha ('^ / "^).
+  if (line !~ /\\b/ && line !~ /::/ && line !~ /->/ && line !~ /class / && \
+      line !~ /function / && line !~ /Reflection/ && line !~ / -[a-zA-Z]*v/ && \
+      line !~ /['"]\^/)
+    nGrepSolto++
+}
 sect == "crit" && line ~ /^- \[[ xX]\]/ {
   ncrit++
   crit = crit " " line
@@ -603,6 +613,9 @@ END {
   # done com gate aberto
   if (STATUS == "Done" && nGateAberto > 0)
     emit("WARNING", "task-done-gate-aberto", nGateAberto " item(ns) de Quality gates desmarcado(s) sem consolidacao declarada (4.90)")
+  # criterio com grep de texto sem ancora
+  if (nGrepSolto > 0)
+    emit("WARNING", "task-criterio-grep-nao-ancorado", nGrepSolto " criterio(s) com grep/rg de padrao textual sem ancora de simbolo/fronteira — condicao estrutural verificada por texto casa prosa/comentario (4.161)")
 }
 AWK
 

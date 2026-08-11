@@ -42,7 +42,8 @@ Chega como fato (`task-*` do lint-contract §3): campos e enums do cabeçalho (`
 seções obrigatórias (+ Inclui/Não inclui), marcador `-fix-`/`-refactor-`/`-chore-` do
 nome vs `Tipo`, Wave 2+ sem dependência, 2+ FEATs sem `(primária)` nem forma
 `transversal (…)` e transversal com 1 FEAT, critérios de pronto vazios ou sem menção a
-AC, bugfix sem `**AC violado**:` (forma antiga dentro de `Realiza` → INFO, não
+AC, critério com `grep`/`rg` de padrão textual sem âncora de símbolo/fronteira (4.161),
+bugfix sem `**AC violado**:` (forma antiga dentro de `Realiza` → INFO, não
 reprova), refactor sem "comportamento observável idêntico", `Done` com gate desmarcado
 sem consolidação declarada (4.90). Invocado com o **diretório do slug** (batch),
 acrescenta `task-overlap-fr` (FR realizado por 2+ TASKs do mesmo PLAN).
@@ -88,6 +89,7 @@ aberta (`plan-status-vs-tasks` — 4.153) e closure preenchida com Status ≠ Do
 ### ERROR se:
 - AC vinculado ao FR realizado não aparece em nenhum critério
 - Critério de teste (gate 1) sem verificação executável anexada — comando + saída/efeito esperado (só TASK em `Todo`/`In Progress`; `Done` legada não reprova por isso)
+- Fato `task-criterio-grep-nao-ancorado` (4.161) **e** a condição do critério é estrutural — assinatura, campo, projeção, predicado, chave de payload: escale para ERROR quando o padrão de texto não resiste a prosa/comentário ou nomeia símbolo de **outra camada** (ex.: campo do VO em camelCase onde o payload usa snake_case — cumprir à risca ensina o bug de volta); condição legitimamente textual (docstring exigida, mensagem literal) → o WARNING fica como está
 
 ### WARNING se:
 - Critério não-verificável ("usuário fica feliz")
