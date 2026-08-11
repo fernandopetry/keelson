@@ -364,6 +364,14 @@ A porta única de retomada (decisão 4.127): você — ou qualquer pessoa do seu
 
 Não dispara nada sem a sua confirmação — apontar o slug é o seu ato (4.41); não re-decompõe épico, não faz merge nem PR. Governança: decisões 4.125–4.127 de `decisions.md`.
 
+### 3.22 `/keelson:e2e-setup` — configurar a suíte E2E (humano-only)
+
+Setup guiado da suíte E2E (decisões 4.166–4.167) para quem não conhece a ferramenta: detecta runner existente (outro motor consolidado não é trocado — vira o comando da ficha, com a ressalva do recorte por tag), **instala o Playwright com a sua confirmação** (inclusive o binário do navegador, em cache do usuário), gera `playwright.config` a partir da ficha (`testDir: e2e/`, saídas gitignored, `baseURL` por env — URL e credencial nunca hardcoded), o esqueleto de auth por realm lendo o `keelson.local.json` em runtime, e um smoke spec de exemplo com a convenção de tags. **Prova com `npx playwright test --list`** (rodada real só com a app de pé) e só então grava `quality.e2e`. Os specs de AC não nascem aqui — são entregáveis do developer, task a task. Não roda a regressão completa (isso é da entrega), não commita o setup.
+
+```
+/keelson:e2e-setup [--dry-run]
+```
+
 ---
 
 ## 4. Skills

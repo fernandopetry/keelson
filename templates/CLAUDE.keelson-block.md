@@ -117,6 +117,8 @@ Humanos-only (não aparecem na listagem): `/keelson:guided` (ciclo com checkpoin
 ou próxima fatia, derivado dos artefatos commitados) ·
 `/keelson:mutation-setup` (instalar e configurar o mutation testing — grava
 `quality.mutation` na ficha após prova) ·
+`/keelson:e2e-setup` (instalar e configurar a suíte E2E Playwright — grava
+`quality.e2e` na ficha após prova) ·
 `/keelson:update` (atualizar o plugin instalado — vale após reiniciar a sessão) ·
 `/keelson:report` (refazer o relatório de fecho — sessão retomada ou report perdido) ·
 `/keelson:postmortem` (postmortem de fim de sessão — relê as interações e produz a

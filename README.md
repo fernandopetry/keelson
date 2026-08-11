@@ -112,6 +112,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:verify-handoff` † | Close a pending screen-verification `HANDOFF` — consolidates the branch, exercises each item in the real environment; no merge (points to `/keelson:integrate`) |
 | `/keelson:postmortem` † | End-of-session postmortem — re-reads the whole session's interactions (corrections, retries, failed gates), separates defects from new scope, traces each gap to the mechanism that let it through, and produces the copy-paste maintainer message (with literal diffs via the agile-coach) that evolves the plugin |
 | `/keelson:mutation-setup` † | Guided setup of the mutation gate — detects the stack from the ficha, installs the canonical tool with confirmation, generates its config, proves the pipeline with a sample run and writes `quality.mutation` (diff-scoped, no threshold at first) |
+| `/keelson:e2e-setup` † | Guided setup of the E2E suite (Playwright) — installs with confirmation, generates the config and a smoke spec from the ficha (auth skeleton per realm, no committed secrets), proves the pipeline with `--list` and writes `quality.e2e` |
 | `/keelson:update` † | Update the installed plugin to the latest marketplace version via the Claude Code CLI (marketplace refresh + plugin update, in that order); the running session keeps the old version until restarted |
 | `/keelson:report` † | Rebuild the closing report from the session ledger — safety net for a resumed session or a report lost in the scroll; every change already closes with one automatically |
 
@@ -408,17 +409,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.91.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.92.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **screen verification gains a durable memory** (decision 4.166).
-With the opt-in `quality.e2e` ficha field, UI behavior verified once through the driven
-browser is codified into versioned E2E specs tagged by slug and AC — task-scoped runs via
-`--grep`, full regression at `/keelson:integrate`, and a mechanical AC→spec coverage
-script. Assertions stay deterministic (DOM/text/state/network — no committed reference
-images), and rewriting a red spec green without a cited AC change is a gate-2 finding.
-Consumers adopting the field should re-run `/keelson:init`.
+New in this release: **the E2E gate gains its guided door** (decision 4.167, closing the
+adoption gap of 4.166's versioned E2E specs). `/keelson:e2e-setup` installs Playwright
+with confirmation, generates the config and a smoke spec from the ficha — per-realm auth
+skeleton, no committed secrets — proves the pipeline with `--list` and writes
+`quality.e2e`; `/keelson:init` now points at it when no runner is detected. Consumers
+adopting E2E should re-run `/keelson:init`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
