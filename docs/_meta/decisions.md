@@ -1852,6 +1852,16 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.158 — Simetria de escopo ganha teste: o vizinho assumido se nomeia no Out-of-scope
+
+**Problema**: a auditoria que se seguiu à 4.157 (mesma classe de furo: princípio declarado sem teste falsificável) encontrou uma reincidência da forma no `/keelson:specify` — o princípio 8, "Escopo e não-escopo simétricos", era um bullet sem teste nem âncora, exatamente o que "Vertical slicing" era antes da 4.157. Sem definição do que "simétrico" exige, o Out-of-scope pode nascer vazio ou genérico ("não inclui refatorações") sem que o `spec-validator` tenha o que acusar — e a rede downstream não cobre o caso: a pergunta inversa do gate 4 (`não solicitado`, 4.143) julga **código** em excesso contra a SPEC, mas só é julgável se a SPEC declarou a fronteira; escopo mal declarado na origem deixa o excesso como opinião. (Da mesma auditoria, absolvidos com motivo: `plan.md` — COMP sem grão virou lacuna benigna pós-4.157, legislar agora seria enumeração defensiva sem caso real (4.32); `brief.md` — o teste do clone fresco já é falsificável; `pm.md` — o critério "testável sem esperar as irmãs" já é o teste da fatia em escala de portfólio.)
+
+**Decisão**: o princípio 8 ganha o teste — cada item do In-scope tem o **vizinho que um leitor assumiria incluído nomeado no Out-of-scope**, com resposta escrita (dentro ou fora); Out-of-scope vazio ou genérico com In-scope não-trivial é o sinal do princípio violado. A simetria fica declarada como o que torna o `não solicitado` do gate 4 julgável. Check mecânico no `spec-validator` fica **adiado por gatilho de reincidência** (escada da 4.149): só se a 1ª rodada real mostrar Out-of-scope vazio passando.
+
+**Aplicação**: `commands/specify.md` (princípio 8 da Etapa 2). Custo zero fora do texto: validator, grafo e template intocados.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
