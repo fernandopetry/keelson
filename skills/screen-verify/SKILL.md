@@ -1,6 +1,6 @@
 ---
 name: screen-verify
-description: Gate `screenVerify`: verificação visual autenticada em ambiente LOCAL via Playwright MCP (headless). Ativar para subir a app, LOGAR e inspecionar uma tela — screenshot, repro de bug ou fechar um HANDOFF. Credenciais DEV no keelson.local.json.
+description: "Gate `screenVerify`: verificação visual autenticada em ambiente LOCAL via Playwright MCP (headless). Ativar para subir a app, LOGAR e inspecionar uma tela — screenshot, repro de bug ou fechar um HANDOFF. Credenciais DEV no keelson.local.json."
 ---
 
 # Skill: screen-verify

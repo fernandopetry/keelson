@@ -1,6 +1,6 @@
 ---
 description: Instala e configura o mutation testing do projeto — detecta a stack pela ficha, instala a ferramenta com confirmação, gera a config, prova com rodada-amostra e grava quality.mutation
-argument-hint: [--base=<branch>] [--dry-run]
+argument-hint: "[--base=<branch>] [--dry-run]"
 disable-model-invocation: true
 ---
 

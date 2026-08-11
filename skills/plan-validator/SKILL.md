@@ -1,6 +1,6 @@
 ---
 name: plan-validator
-description: Valida PLANs SDD ({docsRoot}/*/plans/PLAN-*.md): cobertura explícita, DEC com alternativas, mapeamento FR-componente. Ativar após /keelson:plan (gate de qualidade) ou sob demanda quando pedirem validação, revisão ou lint de PLAN.
+description: "Valida PLANs SDD ({docsRoot}/*/plans/PLAN-*.md): cobertura explícita, DEC com alternativas, mapeamento FR-componente. Ativar após /keelson:plan (gate de qualidade) ou sob demanda quando pedirem validação, revisão ou lint de PLAN."
 ---
 
 # Skill: plan-validator

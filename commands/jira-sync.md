@@ -1,5 +1,5 @@
 ---
-description: Reconcilia um slug (ou uma SPEC dele) com o Jira via conector MCP Atlassian: cria/vincula épico, stories e sub-tasks, alinha o status e, com --phase (start-dev/finish-dev), move a árvore no quadro — idempotente (opcional, best-effort)
+description: "Reconcilia um slug (ou uma SPEC dele) com o Jira via conector MCP Atlassian: cria/vincula épico, stories e sub-tasks, alinha o status e, com --phase (start-dev/finish-dev), move a árvore no quadro — idempotente (opcional, best-effort)"
 argument-hint: <slug | PLAN-MMM | SPEC-NNN ou caminho da SPEC> [--dry-run] [--refresh-descriptions] [--phase start-dev|finish-dev]
 ---
 

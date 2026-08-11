@@ -1,6 +1,6 @@
 ---
 description: Refaz o relatório de fecho da sessão a partir do ledger de eventos — para sessão retomada, report perdido no scroll ou trabalho que passou por várias mudanças sem fecho consolidado
-argument-hint: [slug — sem argumento: o que o ledger e a branch corrente indicarem]
+argument-hint: "[slug — sem argumento: o que o ledger e a branch corrente indicarem]"
 disable-model-invocation: true
 ---
 

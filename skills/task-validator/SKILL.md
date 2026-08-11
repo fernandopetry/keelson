@@ -1,6 +1,6 @@
 ---
 name: task-validator
-description: Valida TASKs SDD ({docsRoot}/*/tasks/TASK-*.md): vínculo ao PLAN (ou brief avulso), FRs realizados, ACs cobertos, dependências sem ciclos, campos de closure. Ativar após /keelson:tasks (gate de qualidade) ou sob demanda. Reporta por severidade.
+description: "Valida TASKs SDD ({docsRoot}/*/tasks/TASK-*.md): vínculo ao PLAN (ou brief avulso), FRs realizados, ACs cobertos, dependências sem ciclos, campos de closure. Ativar após /keelson:tasks (gate de qualidade) ou sob demanda. Reporta por severidade."
 ---
 
 # Skill: task-validator

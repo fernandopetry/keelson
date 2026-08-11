@@ -1,6 +1,6 @@
 ---
 description: Revisa um diff avulso (working tree, último commit, N commits, range ou branch) contra a doutrina keelson via revisores independentes; sob seu OK, despacha a correção ao developer e re-revisa
-argument-hint: [alvo] [--fix] [--no-security] [--paths=<a,b>]
+argument-hint: "[alvo] [--fix] [--no-security] [--paths=<a,b>]"
 disable-model-invocation: true
 ---
 

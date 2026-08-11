@@ -1,6 +1,6 @@
 ---
 description: Postmortem de fim de sessão — relê as interações (correções, retries, gates reprovados), separa defeito de escopo novo, rastreia cada furo ao mecanismo que o deixou passar e produz a mensagem ao mantenedor para evoluir o plugin
-argument-hint: [slug | branch | descrição do episódio — sem argumento: a sessão corrente]
+argument-hint: "[slug | branch | descrição do episódio — sem argumento: a sessão corrente]"
 disable-model-invocation: true
 ---
 
