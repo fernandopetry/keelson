@@ -107,6 +107,13 @@ esperado independente do código sob teste (nunca calculado chamando produção)
 para requisito de unicidade, um caso por ramo de fallback, tabela para requisito
 quantificado ("todos os X"). Teste que não é capaz de falhar reprova no gate 1.
 
+**Spec E2E como entregável** (`quality.e2e` na ficha — decisão 4.166): AC com efeito
+observável em tela → o spec E2E que o prova faz parte da task, tagueado `@<slug>` no
+arquivo e `@AC-NNN-XXX` por teste; asserção de DOM/texto/estado/rede, nunca comparação
+com imagem commitada (régua completa: `TESTING.md`, "Specs E2E"). Editar spec
+**existente** exige citar em `notas` a mudança de AC/SPEC que o justifica — reescrever
+asserção para esverdear um vermelho é a violação do repro (4.159) e reprova no gate 2.
+
 ### 6. Rodar testes e lint localmente
 
 1. Executar a suíte via `quality.test` da ficha (mínimo: testes novos verdes) e comparar

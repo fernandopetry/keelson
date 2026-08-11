@@ -14,7 +14,8 @@
     "typecheck": null,
     "build": null,
     "boot": null,
-    "mutation": null
+    "mutation": null,
+    "e2e": null
   },
   "gates": {
     "security": true,

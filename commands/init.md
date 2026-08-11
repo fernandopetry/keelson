@@ -48,6 +48,7 @@ Para cada valor que **não** inferiu com confiança, pergunte com opções fecha
 - *"Detectei o script `test` — usar `<comando>` como `quality.test`?"*
 - *"Como se sobe a app deste projeto para exercício local?"* → `quality.boot` (decisão 4.71). É o comando que o `qa` roda antes de declarar `app_fora_do_ar` — sem ele, "app fora do ar" vira waiver barato. `null` é resposta válida (ambiente permanente), mas **escolhida**, nunca default silencioso.
 - **Mutação da suíte** (decisão 4.121, mesma mecânica de detecção da 4.80): antes de perguntar, procure ferramenta de mutation testing nos manifests — `composer.json` (`infection/infection`), `package.json` (`@stryker-mutator/*`), `pyproject.toml`/`setup.cfg` (`mutmut`, `cosmic-ray`), `pom.xml`/`build.gradle*` (PIT/`pitest`), `Cargo.toml` (`cargo-mutants`). Achou → *"Detectei `<ferramenta>` — configurar `quality.mutation` com `<comando>`? (opt-in; roda só no `/keelson:integrate`, depois da suíte verde)"*. Não achou → **não instale nada aqui**; `mutation: null` sem pergunta, e **uma linha no relatório** apontando `/keelson:mutation-setup` para quem quiser o gate (decisão 4.123 — o setup guiado instala, configura e prova antes de gravar). Escopo e threshold são do consumidor, dentro do comando gravado.
+- **Suíte E2E** (decisão 4.166, mesma mecânica de detecção): procure runner E2E nos manifests — `package.json` (`@playwright/test`) ou config na raiz (`playwright.config.*`). Achou → *"Detectei `<ferramenta>` — usar `<comando>` como `quality.e2e`? (opt-in; specs versionados com tags `@<slug>`/`@AC-NNN-XXX` dão o recorte por task, regressão completa roda no `/keelson:integrate` — régua em `guidelines/core/TESTING.md`, 'Specs E2E')"*. Não achou → `e2e: null` sem pergunta — o gate de tela continua coberto pelo método da Etapa 2.
 - *"O código de backend fica em `<path>`?"*
 
 Não pergunte o que já sabe. Não faça perguntas de implementação que você mesmo pode resolver.
@@ -185,6 +186,8 @@ Memos de exploração e backups do keelson vivem em `thoughts/local/`; os artefa
 
 Com `method: skill:screen-verify`, garanta **também** a linha `.playwright-mcp/`: é o diretório de saída **default** do servidor, usado sempre que o `--output-dir` estiver ausente ou divergente — e screenshot de sessão autenticada não pode ficar a um `git add .` de distância do repositório. **Atenção**: só o `keelson.local.json` fica de fora; o `keelson.local.example.json` **é versionado** (não o adicione ao `.gitignore`).
 
+Com `quality.e2e` preenchido (decisão 4.166), garanta as linhas dos artefatos de execução do runner — para Playwright, `test-results/` e `playwright-report/`: os **specs** são código versionado, mas screenshot, trace e report de execução são transitórios e não entram no git.
+
 ## Etapa 6 — Self-check (falsificável, não confie na configuração)
 
 A parte que o disco e o git provam sozinhos chega como **fato** (4.154): rode
@@ -195,7 +198,7 @@ do perfil, `keelson.local.*` (versionamento, gitignore provado, placeholders),
 campos mínimos do Jira. Cada linha `falha`/`aviso` vira item do relatório. O que exige
 MCP vivo continua seu, abaixo (runtime de browser respondendo; conector Jira com
 chamada de prova). Prove o restante:
-- `quality.test`/`quality.lint`/`quality.mutation` declarados **existem/rodam** (execução rápida ou `--help`/dry-run — para mutação, nunca a rodada completa: ela é cara e pertence ao `/keelson:integrate`);
+- `quality.test`/`quality.lint`/`quality.mutation`/`quality.e2e` declarados **existem/rodam** (execução rápida ou `--help`/dry-run — para mutação e E2E, nunca a rodada completa: são caros e pertencem ao `/keelson:integrate`; Playwright prova com `--list`, que enumera os specs sem subir a app);
 - `quality.boot` declarado → o que ele invoca **existe no disco** (binário no PATH, compose file, script) — não suba a app aqui, prove só que o comando não é fantasia; campo ausente numa ficha antiga → complete com a pergunta da Etapa 2 (Regra de merge);
 - os `codePaths` existem no disco;
 - `sensitiveGlobs` **cobre os arquivos de segredo que existem no projeto** (decisão 4.71): enumere os candidatos em disco (`.env*` em **qualquer** nível — raiz inclusive —, `*.pem`/`*.key`, arquivos de credencial do projeto) e prove **por matching real** que cada um casa com algum glob — mesma régua da 4.51: inferir da leitura dos globs não vale (caso medido: ficha cobrindo os `.env*` de subdiretórios, `.env` da raiz descoberto). Candidato sem cobertura → acrescente o glob do caminho exato;

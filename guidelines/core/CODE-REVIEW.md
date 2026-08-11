@@ -66,8 +66,14 @@ nenhuma rodada que **contornou** a falha vale como evidência (filtro estreitado
 excluir o vermelho, flag de "passa sem testes", hook de commit pulado — `./TESTING.md`,
 "Verificação que falha não se contorna").
 
+**Spec E2E editado no diff** (`quality.e2e` na ficha — decisão 4.166): a edição de
+asserção/seletor de spec existente cita a mudança intencional de AC/SPEC que a
+justifica (dono da régua: `./TESTING.md`, "Specs E2E"). Spec vermelho reescrito para
+verde sem AC alterado é achado deste gate — mesma violação do repro vermelho (4.159).
+
 **Falha**: teste novo vermelho; vermelho novo vs. baseline; vermelho pré-existente
-omitido do report; evidência produzida por contorno.
+omitido do report; evidência produzida por contorno; edição de spec E2E sem a mudança
+de AC/SPEC que a justifique.
 
 ### Gate 3: lint limpo
 

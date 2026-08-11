@@ -107,6 +107,43 @@ o `/keelson:init` detecta as comuns e oferece o campo.
 
 ---
 
+## Specs E2E: a verificação de tela vira memória (decisão 4.166)
+
+A verificação de tela exploratória (gate 9 via browser dirigido) prova o comportamento
+uma vez — e re-paga o custo inteiro a cada rodada. Com `quality.e2e` declarado na ficha
+(opt-in, default `null`), o comportamento aprovado é **codificado em spec E2E
+versionado**: o spec é a memória durável do gate, re-executável por qualquer clone sem
+browser dirigido; a exploração fica reservada ao comportamento **novo** e ao julgamento
+que asserção não captura (layout, tema, estado visual).
+
+- **Opt-in pela ficha**: `quality.e2e` é o **comando literal** da suíte E2E do projeto
+  (ex.: `npx playwright test`); como em `quality.test`, **exit code é o veredito**.
+- **O spec é código, e o developer o entrega**: AC com efeito observável em tela → o
+  spec que o prova faz parte da task; o `qa` executa, nunca escreve (gerador ≠
+  avaliador). Commitado como qualquer teste; artefato de execução (screenshot, trace,
+  `test-results/`) fica em pasta gitignored.
+- **Tags são o recorte**: cada arquivo de spec carrega a tag do slug (`@<slug>`) e cada
+  teste as tags dos ACs que prova (`@AC-NNN-XXX`). Recorte da task:
+  `<quality.e2e> --grep "@AC-NNN-XXX"`; regressão do slug: `--grep "@<slug>"`;
+  regressão completa: o comando puro. A cobertura AC→spec é fato mecânico —
+  `bash "${CLAUDE_PLUGIN_ROOT}/scripts/e2e-coverage.sh" <dir-do-slug> <dir-dos-specs>`
+  (`WARNING` para tag órfã, `INFO` para AC sem spec: nem todo AC é de tela, a
+  calibração é do gate 9).
+- **Asserção determinística**: spec E2E asserta DOM, texto, estado e rede — nunca
+  comparação com imagem de referência commitada (infla o repositório e flakeia entre
+  máquinas/OS). Screenshot continua sendo capturado como evidência, no diretório
+  gitignored do gate; imagem não entra no git.
+- **Spec vermelho não se reescreve para verde**: editar asserção/seletor de spec
+  existente exige citar a **mudança intencional de AC/SPEC** que a justifica — sem
+  ela, o vermelho é bug (ou flakiness a corrigir na causa), nunca "teste
+  desatualizado". É a régua do repro vermelho do bugfix (4.159) aplicada à camada E2E;
+  o gate 2 verifica.
+- **Regressão completa roda na entrega** (`/keelson:integrate`), após a suíte de
+  testes verde — mesma posição do gate de mutação; ambiente de tela indisponível →
+  causa nomeada (`handoff-protocol.md` §8.1), nunca silêncio.
+
+---
+
 ## Fixtures e dados compartilhados (Art. 3)
 
 Schema de teste e construtores de dados são **centralizados**, não declarados inline em

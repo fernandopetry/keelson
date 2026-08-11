@@ -151,6 +151,17 @@ Sintomas de ambiente que imitam bug de UI:
 
 Um sintoma desses só vira bug depois de re-medido com o estado estável e o viewport são.
 
+## Divisão com a suíte E2E (`quality.e2e` — decisão 4.166)
+
+Projeto com `quality.e2e` na ficha tem specs E2E versionados como **memória** desta
+verificação: comportamento que já tem spec se prova rodando o recorte
+(`<quality.e2e> --grep "@AC-NNN-XXX"`), sem browser dirigido. Esta skill entra no
+comportamento **novo** (ainda sem spec) e no julgamento que asserção não captura —
+layout, tema, estado visual. O que você verificar e aprovar aqui é insumo para o
+developer codificar em spec na própria task (régua:
+`${CLAUDE_PLUGIN_ROOT}/guidelines/core/TESTING.md`, "Specs E2E"); os artefatos de
+execução continuam nas pastas gitignored acima, e imagem nunca vira asserção commitada.
+
 ## 4. Regras de segurança (não-negociáveis)
 
 Além da fronteira local-only e do sigilo da senha (acima): alterar permissões/senha, mesmo
