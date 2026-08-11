@@ -153,6 +153,12 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   **antes do parecer** e fechada na leva que a aplica/recusa (`aplicada (4.x)` /
   `recusada (motivo)`). Nada entra em doutrina sem passar pela fila; reincidência
   referencia a linha anterior.
+- **Poda de doutrina tem régua** (decisão 4.160): em leva de destilação/refino de
+  comando, agent ou skill, cada frase passa por três testes — **no-op** (muda o
+  comportamento vs. o default do modelo? não → deletar a frase inteira, nunca só
+  encurtá-la), **sedimento** (ainda corresponde ao comportamento/mundo atual?) e
+  **leading word** (definição de três frases que um conceito do pretraining carrega num
+  token colapsa nele). Proibição que couber como alvo positivo é reescrita positiva.
 - Hooks são bash 3.2-compatível com **fallback gracioso** (sem `jq`/ficha → `exit 0`,
   nunca travar o fluxo) e anti-renudge por fingerprint. Validar com `bash -n` + teste
   sintético (repo temporário no scratchpad).

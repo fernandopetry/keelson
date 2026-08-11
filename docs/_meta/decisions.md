@@ -1862,6 +1862,26 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.159 — Bugfix exige o repro vermelho: o par do gate 1 nasce falhando
+
+**Problema**: a TASK `Tipo: bugfix` carrega o `AC violado` (4.27), mas nada exigia que o critério de teste nascesse de um **repro que falha antes do fix**. O developer pode consertar o que diagnosticou de cabeça e escrever o teste depois — verde desde o nascimento, amarrado ao diagnóstico imaginado e não ao bug real; se o diagnóstico errou, o teste passa e o sintoma continua. A regra geral do gate 1 já executava o comando na fixação exigindo evidência de conjunto **não-vazio** — para bugfix, a evidência análoga é o **vermelho**, e o degrau estava explicitamente adiado na escada da 4.123 (observar → calibrar gate 1 → prova do vermelho). (Benchmark mattpocock/skills, varredura de 2026-08-11: a skill `diagnosing-bugs` fixa o mesmo — "red-capable command" que reproduz o sintoma exato antes de qualquer hipótese, minimizado vira o teste de regressão.)
+
+**Decisão**: em TASK `Tipo: bugfix`, o par comando+esperado do gate 1 nasce do **repro vermelho**: o comando reproduz o sintoma exato do `AC violado`, é executado na fixação **falhando**, e a evidência do vermelho entra no critério (no lugar da evidência de não-vacuidade dos demais tipos). Após o fix, o mesmo comando passa e vira o teste de regressão. O restante do protocolo de diagnóstico da fonte (minimização, hipóteses ranqueadas, instrumentação etiquetada) **não** entra — seria enumeração defensiva sem caso real (4.32); entra só o invariante que o keelson já persegue em toda prova: gerador ≠ avaliador, e o avaliador tem de saber falhar.
+
+**Aplicação**: `commands/tasks.md` (parágrafo próprio na seção de fixação do gate 1). Check mecânico no `task-validator` adiado por reincidência (escada da 4.149). Observar na 1ª rodada real de bugfix: o repro nasce vermelho ou o scribe parafraseia a regra?
+
+---
+
+### 4.160 — Poda de doutrina ganha régua: no-op, sedimento e leading word
+
+**Problema**: a doutrina dos comandos cresce por acreção — cada leva adiciona parágrafos e nenhuma remove — e a 4.35 já mediu o custo disso na janela. As levas de destilação (4.138–4.140) drenaram filas de pendência, mas não havia **método de corte**: o que autoriza deletar uma frase de doutrina? Sem régua, remover parece arriscado e o default é sedimentar. (Benchmark mattpocock/skills, varredura de 2026-08-11: a skill `writing-for-agents` fornece os três testes prontos, com o detalhe operacional que faltava — frase reprovada se **deleta inteira**, nunca se encurta, porque encurtar preserva o custo de atenção sem preservar o conteúdo.)
+
+**Decisão**: leva de destilação/refino de comando, agent ou skill aplica três testes por frase: **no-op** — muda o comportamento vs. o default do modelo? (teste relativo ao modelo, resolvido rodando, não debatendo); não → deletar a frase inteira; **sedimento** — ainda corresponde ao comportamento/mundo atual? camada morta sai; **leading word** — definição de três frases que um conceito do pretraining carrega num token (ex.: "tight", "fail-closed") colapsa no token. E proibição que couber como alvo positivo é reescrita positiva — negação ativa o conceito proibido em vez de suprimi-lo. A régua é do **mantenedor** (este repo): não entra em doutrina de consumidor nem nos validators.
+
+**Aplicação**: `CLAUDE.md` (bullet em "Registro e governança"). Primeira aplicação real: a próxima leva de dieta dos comandos (candidato natural: `tasks.md`, hoje o contrato mais denso).
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
