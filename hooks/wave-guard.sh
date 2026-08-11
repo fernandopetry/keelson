@@ -16,8 +16,17 @@
 # o arquivo) antes de encerrar. O guard só garante que parar seja um ato
 # deliberado e registrado, nunca esquecimento ou "ponto limpo" inventado.
 #
+# Cutuca 1× por ESTADO do run, não por turno (decisão 4.165): com agents em
+# background, encerrar o turno e ser reacordado pela task-notification é o
+# desenho correto (anti-polling, 4.118) — bloquear todo encerramento cobrava um
+# turno extra por notificação colhida (41 numa sessão real de 8 waves). O
+# fingerprint dos campos do run-state entra numa janela append-only (mesmo
+# desenho do agent-guard, 4.141): estado igual já cutucado → passa; a wave
+# avançou (waves_concluidas mudou) → cutuca de novo, uma vez.
+#
 # Fallback gracioso: sem python3, sem cwd, sem arquivo de estado → exit 0
-# (nunca trava o fluxo). stop_hook_active evita loop: cutuca 1× por encerramento.
+# (nunca trava o fluxo); sem git dir para a janela → comporta-se como antes
+# (cutuca 1× por encerramento). stop_hook_active evita loop dentro do turno.
 
 set -euo pipefail
 
@@ -49,13 +58,32 @@ if [ "$n" -eq 0 ]; then
   exit 0
 fi
 
+# Válvula por estado (4.165): fingerprint dos campos do run — janela append-only.
+git_dir="$(git -C "$cwd" rev-parse --absolute-git-dir 2>/dev/null || true)"
+marker="" fingerprint=""
+if [ -n "$git_dir" ]; then
+  marker="$git_dir/keelson-wave-guard.recent"
+  fingerprint="$(printf '%s' "$detalhes" | git hash-object --stdin 2>/dev/null || true)"
+  if [ -n "$fingerprint" ] && [ -f "$marker" ] && grep -qxF "$fingerprint" "$marker" 2>/dev/null; then
+    exit 0
+  fi
+fi
+
 reason="Guarda de waves (decisão 4.23): há run do keelson com status EM ANDAMENTO — encerrar o turno agora deixaria o trabalho parado no meio, com o humano ausente.
 ${detalhes}
 
 Fôlego não é gatilho: sessão longa, contexto sumarizado ou \"ponto limpo\" não autorizam parar. Faça agora UMA das duas coisas:
-1. CONTINUE: leia os artefatos apontados em 'retomada' (INDEX do slug + TASK-INDEX), execute a próxima wave e siga até a Entrega. Os artefatos SDD são o checkpoint — nada se perdeu.
+1. CONTINUE: leia os artefatos apontados em 'retomada' (INDEX do slug + TASK-INDEX), execute a próxima wave e siga até a Entrega. Os artefatos SDD são o checkpoint — nada se perdeu. (Agents em voo em background contam como continuar: encerre o turno e reaja às notificações — este aviso não se repete para este mesmo estado do run.)
 2. Se a parada é LEGÍTIMA (Entrega já concluída, degrau 3 da escada com a pergunta já disparada, ou pedido explícito do humano NESTA execução): atualize o arquivo acima para 'status: encerrado — <motivo>' (ou remova-o) e aí sim encerre.
 Não encerre sem fazer uma das duas."
+
+if [ -n "$marker" ] && [ -n "$fingerprint" ]; then
+  printf '%s\n' "$fingerprint" >> "$marker" 2>/dev/null || true
+  # Truncamento fora do caminho quente (mesma régua do agent-guard, 4.141).
+  if [ "$(wc -l < "$marker" 2>/dev/null || echo 0)" -gt 40 ]; then
+    tail -n 20 "$marker" > "$marker.$$" 2>/dev/null && mv -f "$marker.$$" "$marker" 2>/dev/null || rm -f "$marker.$$" 2>/dev/null || true
+  fi
+fi
 
 printf '%s' "$reason" | python3 -c 'import sys,json; print(json.dumps({"decision": "block", "reason": sys.stdin.read()}))' 2>/dev/null || exit 0
 
