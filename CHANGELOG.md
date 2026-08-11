@@ -17,6 +17,55 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.90.0] — 2026-08-11
+
+Decisions 4.161–4.165 — a real consumer cycle (26 tasks, 8 waves, ~60 commits) lands its
+four proposals plus one maintainer finding from the same session's transcript: text-anchored
+criteria become a mechanical check, verification gains reach, commits gain pathspecs, the
+middle layer gets an owner, and the wave guard stops taxing every turn.
+
+### Added
+
+- **New lint check `task-criterio-grep-nao-ancorado`** (4.161, WARNING): a "Critérios de
+  pronto" line whose `grep`/`egrep`/`rg` command carries no anchoring signal (`\b`, `::`,
+  `->`, `class `/`function `, `Reflection`, a `-v` exclusion, or a `^`-anchored pattern)
+  now surfaces as a lint fact; the `task-validator` escalates to ERROR when the condition
+  being proven is structural (signature, field, projection, payload key). Field data: 12
+  text-anchored criteria in one delivery — two of which, followed to the letter, would
+  have taught the bug back (wrong exception type; camelCase VO field where the payload
+  uses snake_case). Item (b) of the contorno block now names the general class (text
+  fails both by relocation and by prose/wrong-layer false-positives).
+- **Contorno tests (d) and (e)** (4.162): an AC that alters a shared file/symbol
+  (SQL/schema, trait, shared builder) requires a verification command that **reaches the
+  other known consumers** — `--filter` on the task's own class is insufficient alone
+  (field data: 4 tasks, 4 post-merge breaks in another consumer's suite); and two
+  criteria of the same TASK must never contradict each other over the same file (empty
+  diff expected vs. new assertion required).
+- **Middle-layer clause in decomposition principle 2** (4.164): data crossing 3+ layers
+  with only the two ends named in the decomposition requires an explicit "Escopo >
+  Inclui" item for the intermediate layer in some task of the wave — a node that never
+  became a task is not an edge any gate can reach.
+
+### Changed
+
+- **Commit by pathspec** (4.163): every actor committing in the shared working tree —
+  developer and the orchestrator's milestone/closure commits alike — now uses
+  `git commit -m "<msg>" -- <files>`, never `add`-then-`commit` without `--`. The `--`
+  pathspec makes the guarantee git's own, deterministic regardless of what other agents
+  staged (field incident: a milestone commit without pathspec swept a deliberately
+  neutralized tenant predicate onto the branch). Single owner in `sdd-conventions.md`;
+  `agents/developer.md` cites it.
+- **Wave guard nudges once per run state, not per turn** (4.165): with background agents
+  and task notifications, ending the turn mid-run is the correct anti-polling behavior —
+  the guard now fingerprints the run-state fields into an append-only window (same valve
+  design as the agent guard, 4.141) and stays silent for an already-nudged state,
+  re-arming when `waves_concluidas` advances. Measured before the change: 41 blocked
+  turn-ends in one 8-wave session, one per collected notification. The core scenario
+  (stopping mid-wave overnight) still gets the full nudge on first attempt, and
+  legitimate stops still require `status: encerrado`.
+
+---
+
 ## [0.89.0] — 2026-08-11
 
 Decisions 4.159–4.160 — the full sweep of the mattpocock/skills benchmark lands its two

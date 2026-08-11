@@ -408,18 +408,18 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.89.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.90.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **bugfix proof starts red** (decision 4.159). The gate-1
-verification pair of a bugfix TASK is born from a repro that reproduces the exact
-symptom of the violated AC and fails when executed at fixation; after the fix the
-same command passes and becomes the regression test — a test that was never red
-proves the imagined diagnosis, not the fix. Doctrine pruning also gained its
-maintainer-side ruler (no-op / sediment / leading-word, decision 4.160). This closes
-the mattpocock/skills benchmark sweep that produced 4.157–4.158 (vertical slicing
-and scope symmetry). No re-init needed — consumers only update the plugin.
+New in this release: **a real 26-task consumer cycle lands its four proposals plus one
+transcript finding** (decisions 4.161–4.165). Gate-1 criteria that anchor a structural
+condition in file text become a mechanical lint check (`task-criterio-grep-nao-ancorado`);
+verification of shared symbols must reach the other consumers; every commit in the shared
+working tree closes with a `--` pathspec; the intermediate layer of a 3+ layer chain gets
+its own scope owner; and the wave guard now nudges once per run state instead of taxing
+every turn-end (41 blocked turns measured in one session). No re-init needed — consumers
+only update the plugin.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
