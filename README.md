@@ -408,7 +408,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.88.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.88.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
@@ -419,6 +419,8 @@ horizontally. Granularity is measured by effort and delivered behaviour, never b
 file count; the TASK `Componente` field accepts a list (a vertical slice crosses as
 many PLAN components as the behaviour requires); wide mechanical refactors are
 sequenced as expand–contract. Wave scheduling and parallel dispatch are untouched.
+The follow-up audit gave SPEC scope symmetry the same treatment (decision 4.158):
+the out-of-scope section must name the neighbours a reader would assume included.
 No re-init needed — consumers only update the plugin.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in

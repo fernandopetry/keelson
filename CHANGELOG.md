@@ -17,6 +17,23 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.88.1] — 2026-08-11
+
+Decision 4.158 — the audit that followed 4.157 (same gap class: a principle declared
+without a falsifiable test) found one recurrence of the shape, in `/keelson:specify`.
+
+### Fixed
+
+- SPEC principle 8 ("scope and non-scope symmetric") gains its test: every in-scope item
+  has the neighbour a reader would assume included **named** in the out-of-scope section,
+  with a written answer either way. An empty or generic out-of-scope next to a
+  non-trivial in-scope is the violation signal. The symmetry is what makes gate 4's
+  "unrequested" question (4.143) judgeable — without a declared boundary, scope excess
+  is opinion. Validator, graph and template untouched; a mechanical check in
+  `spec-validator` stays deferred behind the recurrence trigger.
+
+---
+
 ## [0.88.0] — 2026-08-10
 
 Decision 4.157 — vertical slicing stops being a decorative principle: it gains a
