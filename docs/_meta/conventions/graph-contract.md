@@ -40,7 +40,7 @@ separados por vírgula** ou a palavra **`nenhuma`**:
 | `comp-dep` | COMP → COMP | `**Dependências**:` do bloco COMP |
 | `belongs-to` | TASK → PLAN | `**Pertence a**:` |
 | `realiza` | TASK → FR | `**Realiza (FRs)**:` |
-| `implements` | TASK → COMP | `**Componente**:` |
+| `implements` | TASK → COMP | `**Componente**:` (aceita lista — fatia vertical atravessa 2+ COMPs; a anotação `(principal)` é tolerada pelo parser e não emite aresta própria — 4.157) |
 | `declares-feat` | TASK → FEAT | `**Funcionalidade**:` (formas `(primária)` / `transversal (…)`) — a marca `(primária)` emite também a aresta auxiliar `feat-primaria` (TASK → FEAT), consumida pelo check `feat-divergente` |
 | `violates` | TASK → AC | `**AC violado**:` (só bugfix) |
 | `task-dep` | TASK → TASK | `- **Depende de**:` |

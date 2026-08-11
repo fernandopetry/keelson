@@ -67,13 +67,28 @@ só o delta. Agent indisponível → Etapas 1–4 inline como fallback, declarad
    lacuna. Casos reais: flag gravada `remember_me` numa task e `remember` na irmã;
    listagem sem o clique para o detalhe da irmã. Nenhum gate vê duas tasks ao mesmo tempo — só a decomposição previne.
 3. **Verificabilidade**: critério de pronto observável.
-4. **Vertical slicing**.
+4. **Vertical slicing — com teste** (decisão 4.157): concluída, a TASK entrega um
+   comportamento verificável **sozinho** — o critério de gate 1 (e o roteiro de gate 9,
+   quando houver) executa sem esperar TASK de outra camada. Se a verificação de
+   comportamento só existe quando uma irmã de wave posterior terminar, o corte foi
+   horizontal: refatie pelo comportamento, atravessando as camadas que ele exigir
+   (`Componente` aceita lista). O mapa FR→COMP do PLAN documenta arquitetura — **não
+   dita granularidade de TASK**. Fatias do mesmo fluxo que disputam a mesma superfície
+   declaram a aresta (princípio 2): a primeira fatia abre o esqueleto, as seguintes
+   adicionam. Exceções com nome: fatia sensível destacada (princípio 8) e **refactor
+   largo** — mudança mecânica cujo raio de dano atravessa a base inteira não cabe em
+   fatia vertical; sequencie como **expand–contract**: expandir (a forma nova nasce ao
+   lado da velha, nada quebra), migrar os call sites em lotes dimensionados pelo raio
+   (cada lote uma TASK dependente do expand, suíte verde a cada lote), contrair (apagar
+   a forma velha numa TASK que depende de todos os lotes).
 5. **Setup-first**: scaffolding/migration com IDs baixos.
 6. **Sem invenção de escopo — nem por dedução**: a TASK só afirma o que **verificou**.
    Caminho citado no "Inclui" foi confirmado pela **cadeia do dado** (*quem consome a
    consulta/endpoint alterado?*) — vizinhança de nome aponta a tela errada; sem confirmar, descreva o consumidor ("a view que lista X").
-7. **Granularidade** (sobrescrita pela ficha/`CLAUDE.md` se declarado): `small` = 1 arquivo
-   principal, 1 a 3 testes, 30 min a 2 h · `medium` = até 3 arquivos relacionados, 2 a 4 h.
+7. **Granularidade** (sobrescrita pela ficha/`CLAUDE.md` se declarado): medida por
+   **esforço e comportamento entregue, nunca por contagem de arquivos** — a fatia
+   vertical típica toca 1 arquivo por camada e continua atômica. `small` = comportamento
+   único e raso, 30 min a 2 h · `medium` = um caso de uso fim-a-fim, 2 a 4 h.
 8. **Corte por risco, não por camada**. Cada TASK custa um ciclo developer + code-reviewer —
    granularidade fina multiplica revisões, não qualidade. **Fatia sensível** (seed de
    permissão, autorização, endpoint novo, migração, regra de negócio central) → TASK
@@ -98,7 +113,7 @@ Um arquivo por task: `{docsRoot}/<slug>/tasks/TASK-MMM-XXX-<titulo-kebab>.md`.
 **Realiza (FRs)**: FR-NNN-XXX, FR-NNN-YYY <!-- lista de IDs ou `nenhuma` (chore sem FR) -->
 **AC violado**: AC-NNN-XXX <!-- só Tipo=bugfix: o AC que o bug viola; omitir a linha nos demais tipos -->
 **Funcionalidade**: FEAT-NNN-XXX (primária)[, FEAT-NNN-YYY]
-**Componente**: COMP-MMM-XXX
+**Componente**: COMP-MMM-XXX (principal)[, COMP-MMM-YYY] <!-- os COMPs que a fatia atravessa; principal = onde vive o núcleo da mudança -->
 **Wave**: <número>
 **Tamanho estimado**: small | medium
 **Tipo**: feature | bugfix | refactor | chore
@@ -183,8 +198,8 @@ prevalecem; nunca siga um passo que enfraqueça um critério." (evita a leitura 
 
 ### Campos de aresta — sintaxe canônica do grafo
 
-`Realiza (FRs)`, `AC violado`, `Depende de` e `Bloqueia` são **campos de aresta**: IDs
-separados por vírgula, ou `nenhuma` — prosa vai para Contexto/Escopo. ACs citados em item
+`Realiza (FRs)`, `AC violado`, `Componente`, `Depende de` e `Bloqueia` são **campos de
+aresta**: IDs separados por vírgula, ou `nenhuma` — prosa vai para Contexto/Escopo. ACs citados em item
 `- [ ]` dos "Critérios de pronto" e do "Roteiro do gate 9" também viram aresta (cobertura);
 menção em prosa corrida não conta. Régua completa: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/graph-contract.md`.
 
