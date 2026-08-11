@@ -123,7 +123,10 @@ que asserção não captura (layout, tema, estado visual).
   avaliador). Commitado como qualquer teste; artefato de execução (screenshot, trace,
   report, estado de auth) fica em pasta gitignored — consolidado numa casa só
   (`thoughts/e2e/` no setup guiado, decisão 4.168), nunca espalhado em diretórios
-  soltos.
+  soltos. Em suíte autenticada essa saída é **material sensível** (4.169): o contexto
+  de erro de uma falha carrega snapshot da página — credencial inclusa — mesmo com
+  trace e screenshot desligados; o diretório gitignored é a contenção, e a saída nunca
+  vira artefato publicado de CI.
 - **Tags são o recorte**: cada arquivo de spec carrega a tag do slug (`@<slug>`) e cada
   teste as tags dos ACs que prova (`@AC-NNN-XXX`). Recorte da task:
   `<quality.e2e> --grep "@AC-NNN-XXX"`; regressão do slug: `--grep "@<slug>"`;

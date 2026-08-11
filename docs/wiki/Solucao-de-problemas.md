@@ -101,6 +101,17 @@ Pasta de docs sem `INDEX.md` é slug legado:
 Migre **antes** de qualquer outra coisa naquele slug. A migração não cria SPECs
 retroativas — o histórico keelson começa ali.
 
+### Apareceu senha em trace, screenshot ou contexto de erro do E2E
+
+A saída de execução da suíte E2E autenticada é **material sensível**: o setup de login
+digita a credencial, e qualquer captura ativa naquele momento a grava. O setup guiado
+atual (`/keelson:e2e-setup`) já gera o esqueleto com `trace: 'off'` e `screenshot: 'off'`
+nos projects de setup — se o seu foi gerado antes disso, re-rode o comando (modo reparo)
+ou aplique os dois `off` à mão. Duas coisas não mudam com config: o contexto de erro de
+uma falha sempre carrega snapshot da página (credencial inclusa), então a pasta de saída
+(`thoughts/e2e/`) precisa estar gitignored **comprovadamente** (`git check-ignore`); e
+essa saída nunca deve virar artefato publicado de CI.
+
 ### A sessão não encerra o turno
 
 Há um ciclo em andamento. O hook de wave lê o arquivo de estado da execução

@@ -1960,6 +1960,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `commands/e2e-setup.md` (Etapa 3) · `commands/init.md` (Etapa 5.5) · `guidelines/core/TESTING.md` ("Specs E2E"). Consumidor que já rodou o setup com os defaults: re-rodar `/keelson:e2e-setup` (modo reparo) ou mover os três paths na config.
 
+### 4.169 — Infra E2E que digita credencial nasce com captura desligada
+
+**Problema**: primeiro gate 8 rodado sobre o scaffold do `/keelson:e2e-setup` (mesma sessão de campo das 4.167/4.168) devolveu três achados médios no código que a Etapa 3 induz — todos da mesma família: a credencial que o setup project digita vazava para artefato de execução. (1) `trace` e `screenshot` ativos durante o login gravavam a senha no trace e na imagem de falha; (2) o caminho do `storageState` era composto com o nome do realm sem validação — um realm com `../` gravaria cookies de sessão dentro da árvore versionada; (3) `JSON.parse` do `keelson.local.json` sem guarda — a mensagem do parser ecoa uma janela do arquivo de credencial. E uma ressalva **não eliminável por config**: qualquer falha gera o contexto de erro do runner com snapshot da página, valor do campo de senha incluso. No mesmo diff, um `.gitignore` de consumidor que listava subpastas de `thoughts/` uma a uma deixou `thoughts/e2e/` descoberto — a régua da prova por `check-ignore` (4.168) foi o que pegou; cobertura continua se verificando, nunca se inferindo.
+
+**Decisão**: o esqueleto de auth da Etapa 3 nasce endurecido, e a doutrina nomeia a saída como sensível. (a) Os projects de setup — os únicos que digitam credencial — nascem com `trace: 'off'` e `screenshot: 'off'`; os demais projects mantêm o default. (b) O nome do realm é validado como slug (`^[A-Za-z0-9_-]+$`, falhando fechado) antes de compor qualquer caminho. (c) A leitura do `keelson.local.json` tem guarda própria que nunca repassa a mensagem do parser. (d) Regra geral no `TESTING.md`: **saída de execução E2E de suíte autenticada é material sensível** — o destino gitignored é a contenção, e ela nunca vira artefato publicado de CI; o config gerado carrega essa nota em comentário, onde quem for configurar CI vai ler.
+
+**Aplicação**: `commands/e2e-setup.md` (Etapa 3) · `guidelines/core/TESTING.md` ("Specs E2E") · `docs/wiki/Solucao-de-problemas.md`. Consumidor que já rodou o setup com auth: re-rodar `/keelson:e2e-setup` (modo reparo) ou aplicar (a)–(c) à mão.
+
 ---
 
 ## 5. Quality gates inegociáveis
