@@ -1842,6 +1842,16 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.157 — Fatia vertical ganha teste falsificável; `Componente` vira lista e deixa de induzir corte horizontal
+
+**Problema**: "Vertical slicing" era o princípio 4 da Etapa 1 do `/keelson:tasks` — um bullet sem teste, violando a própria régua "regra = teste + âncora" (4.32). E a estrutura ao redor o contradizia: a granularidade definia `small` por **contagem de arquivos** ("1 arquivo principal"), e o template amarrava a TASK a um único `Componente` — como o PLAN decompõe em COMPs (que tendem a camadas/módulos), o corte horizontal era o caminho de menor resistência **por construção**. Consequências observadas em rodadas reais: waves existem para remontar o comportamento que o corte desmontou (forja com 8 barreiras — a pendência de medição da leva 4.112–4.120); o gate 9 só encontra comportamento verificável quando a última wave horizontal completa a FEAT; e a costura entre camadas vira fronteira entre tasks irmãs — a família de defeitos que a 4.106 documenta (flag `remember_me` numa task, `remember` na irmã) nasce desse corte. (Benchmark mattpocock/skills, 2026-08-10: a skill `to-tickets` chega às mesmas réguas por caminho independente — tracer bullets demoáveis sozinhos, arestas de bloqueio, expand–contract para refactor largo, "file paths go stale fast" ≈ 4.107b.)
+
+**Decisão**: o princípio 4 ganha o **teste falsificável** — concluída, a TASK entrega comportamento verificável **sozinho**; se a verificação só existe quando uma irmã de wave posterior terminar, o corte foi horizontal e se refatia pelo comportamento. Granularidade passa a medir **esforço e comportamento entregue**, nunca contagem de arquivos. `Componente` vira **lista com principal** (mesmo padrão do `Funcionalidade`); o mapa FR→COMP do PLAN segue documentando arquitetura sem ditar granularidade de TASK. Exceções com nome: fatia sensível destacada (princípio 8, inalterado) e **refactor largo**, sequenciado como **expand–contract** (expandir ao lado da forma velha → migrar call sites em lotes, cada lote TASK dependente do expand → contrair quando nenhum caller resta). **O scheduler não muda**: waves, barreiras e despacho paralelo ficam como estão — o ciclo autônomo não perde paralelismo; fatias que disputam superfície declaram a aresta (4.106) e a primeira fatia abre o esqueleto. Se o corte vertical sozinho derrubar a contagem de waves nas próximas rodadas reais, a decisão pipeline-vs-barreira (pendência da 4.112–4.120) se toma aí, com medição — nunca antes dela.
+
+**Aplicação**: `commands/tasks.md` (princípios 4 e 7 da Etapa 1, linha `Componente` do template, enumeração dos campos de aresta) · `docs/_meta/conventions/graph-contract.md` (aresta `implements` documenta a lista). Custo mecânico zero: o `parselist` do `graph.sh` já divide por vírgula e tolera anotação parentética, e nenhum check consome `implements` — parser intocado, sem fixture nova. Observar na 1ª rodada real de `/keelson:tasks`: contagem de waves geradas vs. histórico e se o `task-validator` tropeça na lista.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
