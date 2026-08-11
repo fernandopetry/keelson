@@ -17,6 +17,47 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.91.0] — 2026-08-11
+
+Decision 4.166 — screen verification gains a durable, re-runnable layer: verified UI
+behavior is codified into versioned E2E specs, so regression stops re-paying the cost
+of live browser exploration.
+
+### Added
+
+- **`quality.e2e` (opt-in ficha field)**: the project's literal E2E suite command (e.g.
+  `npx playwright test`); exit code is the verdict, like `quality.test` (4.166).
+- **E2E specs as gate-9 memory**: behavior verified once via the driven browser (MCP) is
+  codified by the developer into a committed spec, tagged `@<slug>` per file and
+  `@AC-NNN-XXX` per test — task-scoped runs via `--grep`, full regression at
+  `/keelson:integrate` (same position as the mutation gate). The driven browser is
+  reserved for new behavior and visual judgment. Owner ruler: `guidelines/core/TESTING.md`,
+  "Specs E2E".
+- **`scripts/e2e-coverage.sh` + test suite**: mechanical AC→spec coverage facts —
+  `WARNING e2e-tag-orfa` (tag pointing at a nonexistent AC, scoped to slug-tagged files),
+  `INFO ac-sem-spec-e2e` (not every AC is a screen AC — calibration stays with gate 9)
+  and `INFO e2e-cobertura` (M/N). Wired into pre-commit and CI.
+- **Spec-edit ruler (gate 2)**: editing an existing spec's assertion/selector requires
+  citing the intentional AC/SPEC change that justifies it — rewriting a red spec green
+  without one is the red-repro violation (4.159) at the E2E layer.
+- **No committed reference images**: specs assert DOM/text/state/network only;
+  screenshots remain runtime evidence in gitignored folders (`test-results/`,
+  `playwright-report/` added to the init `.gitignore` step).
+
+### Changed
+
+- `/keelson:init` detects `@playwright/test`/`playwright.config.*` and offers
+  `quality.e2e` (opt-in, proven with `--list` — never a full run); `/keelson:integrate`
+  runs the full E2E regression after the green suite, declaring absence or an unavailable
+  screen environment by named cause, never silently. `qa` proves already-covered behavior
+  by running the tag-scoped suite and cites the coverage facts; `screen-verify` documents
+  the division of labor with the versioned suite.
+
+Consumers adopting the field should re-run `/keelson:init` (new ficha key + `.gitignore`
+lines); projects without an E2E runner are untouched (`e2e: null`).
+
+---
+
 ## [0.90.0] — 2026-08-11
 
 Decisions 4.161–4.165 — a real consumer cycle (26 tasks, 8 waves, ~60 commits) lands its

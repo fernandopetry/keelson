@@ -1932,6 +1932,16 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.166 — Spec E2E versionado: a verificação de tela vira memória re-executável
+
+**Problema**: o gate 9 de tela re-paga o custo inteiro a cada rodada — cada verificação via browser dirigido (skill `screen-verify`) é exploração ao vivo: cara em tokens, não-reproduzível por outro clone, e a evidência durável é só o texto no HANDOFF/INDEX. Não existe camada onde o comportamento de tela **já provado** fique re-executável — regressão de UI exige repetir a exploração ou confiar na memória do time.
+
+**Decisão**: specs E2E versionados como memória do gate 9, opt-in pela ficha (`quality.e2e`, comando literal — exit code é o veredito, como `quality.test`). Divisão de motores: o browser dirigido (Playwright MCP, 4.49) verifica comportamento **novo** e julgamento visual que asserção não captura; o comportamento aprovado é **codificado em spec pelo developer na própria task** (o `qa` executa, nunca escreve — gerador ≠ avaliador). Tags dão o recorte: `@<slug>` por arquivo + `@AC-NNN-XXX` por teste — recorte da task via `--grep`, regressão completa na entrega (`/keelson:integrate`, mesma posição do gate de mutação). Asserção determinística (DOM/texto/estado/rede); **imagem de referência commitada é proibida** (infla o repositório e flakeia entre máquinas/OS) — screenshot continua evidência em pasta gitignored. **Editar spec existente exige citar a mudança intencional de AC/SPEC** — reescrever asserção para esverdear um vermelho é a violação do repro vermelho (4.159) nesta camada; o gate 2 verifica. Cobertura AC→spec é fato mecânico: `scripts/e2e-coverage.sh <dir-do-slug> <dir-dos-specs>` — `WARNING e2e-tag-orfa` (tag que não existe nas SPECs do slug, restrita a arquivos tagueados `@<slug>`: AC-NNN-XXX só é inequívoco dentro do slug), `INFO ac-sem-spec-e2e` (nem todo AC é de tela — a calibração é do gate 9) e `INFO e2e-cobertura` (M/N). Fica **fora** do catálogo do `graph.sh` por decisão: spec E2E é código, não artefato SDD, e o contrato do grafo (4.82) é o diretório do slug.
+
+**Aplicação**: `guidelines/core/TESTING.md` ("Specs E2E" — dono da régua) · `guidelines/core/CODE-REVIEW.md` (gate 2) · `agents/developer.md` (etapa 5) · `agents/qa.md` (fluxo 3, UI) · `skills/screen-verify/SKILL.md` (divisão) · `commands/init.md` (detecção opt-in, validação `--list`, `.gitignore` de `test-results/`/`playwright-report/`) · `commands/integrate.md` (etapa 2, regressão) · `templates/keelson.config.example.json` · `scripts/e2e-coverage.sh` + suíte `scripts/tests/e2e-coverage/` (pre-commit + CI). Observar na primeira rodada real: o developer entrega spec junto da task sem nudge, e a proporção recorte-por-tag vs. exploração MCP.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

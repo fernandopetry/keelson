@@ -136,6 +136,12 @@ Não — é o gate `screenVerify`, opcional. Ligado, ele loga no seu app **local
 Playwright MCP e exercita a tela de verdade, headless por padrão. Desligado, o gate de
 comportamento se apoia nos testes.
 
+Se o projeto declara `quality.e2e` na ficha (opt-in), a tela verificada uma vez vira
+**spec E2E versionado**, tagueado por slug e AC: a regressão roda por comando
+(`--grep` para o recorte, suíte completa no `/keelson:integrate`), e o browser dirigido
+fica só para comportamento novo e julgamento visual. Prints e traces continuam fora do
+git; só o código do spec é commitado.
+
 ### Voltei de um fim de semana e não lembro onde o épico parou. E agora?
 
 `/keelson:continue <slug>`. Ele lê a fila viva do épico e os artefatos commitados,

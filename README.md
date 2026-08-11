@@ -408,18 +408,17 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.90.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.91.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **a real 26-task consumer cycle lands its four proposals plus one
-transcript finding** (decisions 4.161–4.165). Gate-1 criteria that anchor a structural
-condition in file text become a mechanical lint check (`task-criterio-grep-nao-ancorado`);
-verification of shared symbols must reach the other consumers; every commit in the shared
-working tree closes with a `--` pathspec; the intermediate layer of a 3+ layer chain gets
-its own scope owner; and the wave guard now nudges once per run state instead of taxing
-every turn-end (41 blocked turns measured in one session). No re-init needed — consumers
-only update the plugin.
+New in this release: **screen verification gains a durable memory** (decision 4.166).
+With the opt-in `quality.e2e` ficha field, UI behavior verified once through the driven
+browser is codified into versioned E2E specs tagged by slug and AC — task-scoped runs via
+`--grep`, full regression at `/keelson:integrate`, and a mechanical AC→spec coverage
+script. Assertions stay deterministic (DOM/text/state/network — no committed reference
+images), and rewriting a red spec green without a cited AC change is a gate-2 finding.
+Consumers adopting the field should re-run `/keelson:init`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
