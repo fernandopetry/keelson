@@ -409,7 +409,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.92.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.92.2` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
@@ -419,7 +419,10 @@ with confirmation, generates the config and a smoke spec from the ficha — per-
 skeleton, no committed secrets — proves the pipeline with `--list` and writes
 `quality.e2e`; `/keelson:init` now points at it when no runner is detected. Consumers
 adopting E2E should re-run `/keelson:init`. Patch 0.92.1 (4.168): E2E runtime artifacts
-consolidate under `thoughts/e2e/` instead of scattering three root directories.
+consolidate under `thoughts/e2e/` instead of scattering three root directories. Patch
+0.92.2 (4.169): the auth skeleton is born hardened — credential-typing setup projects
+disable trace/screenshot, realm names are validated, the credential-file read is
+guarded, and E2E run output is declared sensitive (never a published CI artifact).
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

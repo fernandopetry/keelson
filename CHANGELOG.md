@@ -17,6 +17,32 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.92.2] — 2026-08-11
+
+Decision 4.169 — first gate 8 run over the `/keelson:e2e-setup` scaffold (same field
+session as 4.167/4.168): three medium findings, all one family — the credential typed
+by the auth setup project leaked into run artifacts.
+
+### Fixed
+
+- **The generated auth skeleton is born hardened**: setup projects — the only ones that
+  type credentials — carry `trace: 'off'` and `screenshot: 'off'` (other projects keep
+  the default); the realm name is validated as a slug (`^[A-Za-z0-9_-]+$`, failing
+  closed) before composing the `storageState` path; and the `keelson.local.json` read
+  gets its own guard, since the parser's error message echoes a window of the
+  credential file and must never be passed through.
+- **E2E run output declared sensitive** (`guidelines/core/TESTING.md`): even with
+  capture off, any failure produces the runner's error context with a page snapshot —
+  password field value included. The gitignored destination is the containment
+  (coverage proven with `check-ignore`, per 4.168); the output must never become a
+  published CI artifact — the generated config carries this note where whoever wires
+  CI will read it.
+
+Consumers that already ran the setup with auth: re-run `/keelson:e2e-setup` (repair
+mode) or apply the three adjustments by hand.
+
+---
+
 ## [0.92.1] — 2026-08-11
 
 Decision 4.168 — field feedback from the first real `/keelson:e2e-setup` run: the setup
