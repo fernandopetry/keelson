@@ -302,7 +302,16 @@ Todo comando que **cria** um INDEX (`/keelson:specify` na 1ª SPEC, `/keelson:re
 - <YYYY-MM-DD HH:MM>: <ação> via /keelson:<comando>
 ```
 
-Seção ainda sem conteúdo leva nota curta do que a preenche (ex.: "(vazio até /keelson:plan)"). Variações por comando:
+Seção ainda sem conteúdo leva nota curta do que a preenche (ex.: "(vazio até /keelson:plan)").
+
+**Risco/pendência tem dono em artefato-fonte (decisão 4.179)**: a coluna `Origem` de
+"Riscos ativos" aponta um artefato **versionado** (TASK, PLAN, SPEC, brief) que carrega o
+mesmo registro — o INDEX é derivado, e um rebuild o reescreve dos artefatos: pendência cuja
+única morada é o INDEX morre no rebuild sem rastro. Quem estaciona um débito registra
+primeiro no artefato de origem e então espelha aqui. Caso real: débito de sessão registrado
+só no INDEX; o code-reviewer pegou antes do rebuild apagar.
+
+Variações por comando:
 
 - **`/keelson:rebuild-index`**: acrescenta ao aviso a linha `> Última reconstrução completa via /keelson:rebuild-index: <ISO 8601>` e, se houver, a seção final `## Inconsistências conhecidas` (descrição + ação sugerida).
 - **`/keelson:migrate-legacy`**: acrescenta `**Origem**: migrado de legado em <YYYY-MM-DD> via /keelson:migrate-legacy`; capacidades legadas entram em `### Implementadas (legado, sem rastreabilidade SDD)` com marcador 📜 e origem (`legacy/<arquivo>`); decisões extraídas viram `LEGACY-DEC-*`; "SPECs"/"PLANs" ficam vazios com nota de que não há artefatos retroativos; seção extra `## Documentação legada` lista os arquivos preservados.

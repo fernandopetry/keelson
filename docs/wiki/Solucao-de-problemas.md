@@ -121,6 +121,15 @@ explicitamente para parar — aí o estado é encerrado com o motivo registrado.
 
 ## Ciclo e comportamento do time
 
+### Digitei um comando no meio de um ciclo e ele não rodou
+
+Mensagem enviada **enquanto o time trabalha** entra numa fila e chega como texto dentro do
+turno — não como comando. Para comandos comuns o modelo compensa e segue o fluxo, mas
+comandos **humano-only** (`/keelson:postmortem`, `/keelson:e2e-setup`, `/keelson:mutation-setup`…)
+são bloqueados por desenho quando o modelo tenta invocá-los por você: você verá algo como
+*"digite o comando numa mensagem própria"*. Não é defeito: espere o turno terminar e envie
+o comando **sozinho, numa mensagem nova** — aí ele roda como comando de verdade.
+
 ### Pedi uma coisa e veio outra
 
 Leia o **brief** (`<docsRoot>/<slug>/briefs/BRIEF-NNN.md`): é contra ele que o PO valida a
