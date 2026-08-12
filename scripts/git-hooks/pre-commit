@@ -76,6 +76,18 @@ for f in $staged; do
   esac
 done
 
+# Bit de execução dos hooks: hooks.json invoca hooks/*.sh DIRETAMENTE (sem prefixo bash),
+# então 644 no índice vira "Permission denied" silencioso a cada disparo no consumidor (4.180).
+# Confere o índice inteiro — um git ls-files, custo zero, e pega drift mesmo em commit alheio.
+hx_bad="$(git ls-files -s -- 'hooks/*.sh' 2>/dev/null | grep -v '^100755' || true)"
+if [ -n "$hx_bad" ]; then
+  echo "[keelson pre-commit] BLOQUEADO: hook sem bit de execução no índice — o harness o invoca direto e a falha é silenciosa (4.180):" >&2
+  printf '%s\n' "$hx_bad" | sed 's/^/    /' >&2
+  echo "  Corrija: chmod +x hooks/*.sh && git add hooks/" >&2
+  echo "  Escape consciente: KEELSON_SKIP_TESTS=1" >&2
+  exit 1
+fi
+
 # Suíte do grafo: obrigatória quando o motor ou as fixtures mudam
 if printf '%s\n' "$staged" | grep -qE '^scripts/(graph\.sh$|tests/graph/)'; then
   if [ -f scripts/tests/graph/run.sh ]; then

@@ -2048,6 +2048,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `docs/_meta/conventions/index-contract.md` · `commands/implement.md` (§ ledger). Sem re-init.
 
+### 4.180 — Artefato executado direto pelo harness tem bit de execução provado, não presumido
+
+**Problema**: `hooks/window-marker.sh` (4.148) e `hooks/compact-anchor.sh` (4.146) entraram no git como `644` — nasceram via Write, que cria arquivo sem `+x`, e os hooks anteriores só tinham o bit por acaso histórico. Como o `hooks.json` invoca os hooks **diretamente** (sem prefixo `bash`), o consumidor recebeu `Permission denied` a cada disparo: 269 falhas de `Stop` em 3 dias num projeto real, e a âncora de compactação **nunca funcionou em campo** — tudo silencioso, porque falha de hook não bloqueia nada. Nenhuma guarda mecânica conferia o bit (`bash -n` não o exige; `scripts/*.sh` não sofrem disso porque a doutrina os invoca com `bash ...`). Achado por um diagnóstico externo na sessão do consumidor, 6 dias depois do release.
+
+**Decisão**: o que o harness executa diretamente tem o bit de execução **provado mecanicamente**, nunca presumido: (a) pre-commit e CI bloqueiam qualquer `hooks/*.sh` com modo ≠ `100755` no índice — check incondicional, custo de um `git ls-files`, fecha a classe (todo hook futuro nascido via Write); (b) o `init-selfcheck.sh` ganha o item `hooks-executaveis` (detecção no consumidor com reparo indicado — o `chmod` no cache é paliativo e evapora no update; a correção durável viaja no git do plugin, que preserva o modo).
+
+**Aplicação**: `hooks/window-marker.sh` e `hooks/compact-anchor.sh` (chmod +x commitado) · `scripts/git-hooks/pre-commit` · `.github/workflows/test.yml` · `scripts/init-selfcheck.sh` + suíte · `commands/init.md` (Etapa 6) · wiki `Solucao-de-problemas.md`. Sem re-init — o consumidor recebe a correção no próximo `/keelson:update`.
+
 ---
 
 ## 5. Quality gates inegociáveis

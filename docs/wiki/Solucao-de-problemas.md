@@ -27,6 +27,20 @@ Você está fora da raiz do repositório, ou o projeto ainda não foi configurad
 `/keelson:init` **de dentro da raiz** do repositório consumidor (é lá que mora
 `keelson.config.json`).
 
+### Hook do plugin falha com `Permission denied`
+
+Sintoma: erro repetido do tipo `/bin/sh: .../hooks/<nome>.sh: Permission denied` a cada
+resposta (hooks de `Stop`) ou na compactação de contexto. O hook perdeu o bit de
+execução no cache do plugin. Reparo imediato:
+
+```
+chmod +x ~/.claude/plugins/cache/keelson/keelson/<versão>/hooks/*.sh
+```
+
+Esse reparo **evapora no próximo update** do plugin. A correção durável viaja no
+próprio pacote (versões ≥ 0.93.2 provam o bit no CI); rode `/keelson:update` — e o
+`/keelson:init` também detecta o caso (item `hooks-executaveis` do self-check).
+
 ## Gates que reprovam
 
 ### O gate de testes reprova, mas os testes passam na minha mão

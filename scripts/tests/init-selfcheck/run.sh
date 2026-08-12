@@ -32,6 +32,9 @@ PR="$TMP/plugin"
 mkdir -p "$PR/guidelines/_meta" "$PR/guidelines/backend"
 printf '# QUALITY-CHARTER\n\n> **Versão: 0.5.1** — é esta versão que o campo `charter:`...\n' > "$PR/guidelines/_meta/QUALITY-CHARTER.md"
 printf -- '---\nlang: php\nversion: "8.5"\ncharter: 0.5.1\nreviewed: true\n---\n# PHP\n' > "$PR/guidelines/backend/php.md"
+mkdir -p "$PR/hooks"
+printf '#!/bin/sh\nexit 0\n' > "$PR/hooks/guarda.sh"
+chmod +x "$PR/hooks/guarda.sh"
 
 mkrepo() { r="$TMP/$1"; mkdir -p "$r"; git -C "$r" init -q; git -C "$r" config user.email t@t; git -C "$r" config user.name t; printf '%s\n' "$r"; }
 
@@ -71,6 +74,7 @@ got="$(bash "$SC" "$R" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 
 want="ok	artefatos-ignorados	artifactsDir e .playwright-mcp/ ignorados (provado)
 ok	codepaths-existem	todos os codePaths existem
 ok	ficha-legivel	keelson.config.json parseado
+ok	hooks-executaveis	todos os hooks do plugin têm bit de execução
 ok	local-example	exemplo presente e versionado
 ok	local-json-ignorado	keelson.local.json coberto pelo .gitignore (check-ignore)
 ok	local-placeholder	keelson.local.json sem placeholder
@@ -117,9 +121,22 @@ falha	local-json-ignorado	keelson.local.json está VERSIONADO — segredo no rep
 falha	playwright-flags	nenhum mcpServers.playwright em .mcp.json, escopo do projeto ou global
 falha	sensitive-globs	candidato de segredo sem glob que o cubra: config/id_rsa.key
 ok	ficha-legivel	keelson.config.json parseado
+ok	hooks-executaveis	todos os hooks do plugin têm bit de execução
 ok	perfil-resolve	perfis da ficha resolvem em arquivo"
 if [ "$st" -eq 1 ] && [ "$got" = "$want" ]; then echo "ok   defeituoso"
 else echo "FAIL defeituoso (exit $st)"; diff <(printf '%s\n' "$want") <(printf '%s\n' "$got") | sed 's/^/  /'; fail=$((fail + 1)); fi
+
+# ---- hook do plugin sem bit de execução → falha nomeada, exit 1 (4.180) ----
+PR2="$TMP/plugin2"
+cp -R "$PR" "$PR2"
+printf '#!/bin/sh\nexit 0\n' > "$PR2/hooks/quebrado.sh"   # nasce 644, como um Write
+total=$((total + 1))
+got="$(bash "$SC" "$R" --plugin-root "$PR2" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
+case "$got" in
+  "falha	hooks-executaveis	hook sem bit de execução (falha silenciosa a cada disparo) — repare: chmod +x em quebrado.sh"*)
+    [ "$st" -eq 1 ] && echo "ok   hook-sem-x" || { echo "FAIL hook-sem-x: exit $st"; fail=$((fail + 1)); } ;;
+  *) echo "FAIL hook-sem-x:"; printf '%s\n' "$got" | sed -n 1,3p | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
 
 # ---- ficha ausente → falha nomeada, exit 1 ----
 R3="$(mkrepo sem-ficha)"

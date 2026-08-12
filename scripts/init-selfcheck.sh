@@ -8,10 +8,10 @@
 # Uso: init-selfcheck.sh <raiz-do-projeto> [--plugin-root <dir>] [--claude-json <path>]
 #
 # Saída: ok|aviso|falha<TAB>item<TAB>detalhe  (ordenada por item; LC_ALL=C)
-# Itens: ficha-legivel · codepaths-existem · quality-existe · sensitive-globs ·
-#        perfil-resolve · perfil-reviewed · perfil-charter · local-example ·
-#        local-json-ignorado · local-placeholder · artefatos-ignorados ·
-#        playwright-flags · jira-campos
+# Itens: hooks-executaveis · ficha-legivel · codepaths-existem · quality-existe ·
+#        sensitive-globs · perfil-resolve · perfil-reviewed · perfil-charter ·
+#        local-example · local-json-ignorado · local-placeholder ·
+#        artefatos-ignorados · playwright-flags · jira-campos
 # Exit: 0 sem falha · 1 com falha · 2 uso incorreto.
 #
 # Bash 3.2-compatível; JSON via ficha.sh (irmão) e python3 (playwright/local.json;
@@ -58,6 +58,23 @@ fget() { bash "$FICHA_SH" "$ROOT" --get "$1" 2>/dev/null; }
 have_git=0
 if command -v git >/dev/null 2>&1 && git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
   have_git=1
+fi
+
+# ---- hooks do plugin executáveis (4.180) ----
+# hooks.json invoca hooks/*.sh diretamente: sem bit de execução o hook falha em
+# silêncio a cada disparo (caso de campo: 269 falhas de Stop em 3 dias). O chmod no
+# cache local evapora no próximo update — a correção durável é no git do plugin.
+if [ -d "$PLUGROOT/hooks" ]; then
+  hx_bad=""
+  for h in "$PLUGROOT"/hooks/*.sh; do
+    [ -f "$h" ] || continue
+    [ -x "$h" ] || hx_bad="$hx_bad $(basename "$h")"
+  done
+  if [ -n "$hx_bad" ]; then
+    emit falha hooks-executaveis "hook sem bit de execução (falha silenciosa a cada disparo) — repare: chmod +x em$hx_bad"
+  else
+    emit ok hooks-executaveis "todos os hooks do plugin têm bit de execução"
+  fi
 fi
 
 # ---- ficha legível ----

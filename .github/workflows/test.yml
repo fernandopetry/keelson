@@ -21,6 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Bit de execução dos hooks (4.180 — hooks.json invoca direto, 644 falha em silêncio)
+        run: |
+          bad="$(git ls-files -s -- 'hooks/*.sh' | grep -v '^100755' || true)"
+          if [ -n "$bad" ]; then echo "hook sem bit de execução:"; echo "$bad"; exit 1; fi
+
       - name: Suíte do grafo (scripts/tests/graph/run.sh)
         run: bash scripts/tests/graph/run.sh
 

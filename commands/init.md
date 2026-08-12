@@ -191,11 +191,16 @@ Com `quality.e2e` preenchido (decisão 4.166), garanta a cobertura dos artefatos
 ## Etapa 6 — Self-check (falsificável, não confie na configuração)
 
 A parte que o disco e o git provam sozinhos chega como **fato** (4.154): rode
-`bash "${CLAUDE_PLUGIN_ROOT}/scripts/init-selfcheck.sh" <raiz>` — codePaths, binários
+`bash "${CLAUDE_PLUGIN_ROOT}/scripts/init-selfcheck.sh" <raiz>` — bit de execução dos
+hooks do plugin instalado, codePaths, binários
 dos `quality.*`, matching real dos `sensitiveGlobs`, resolução/`reviewed`/`charter`
 do perfil, `keelson.local.*` (versionamento, gitignore provado, placeholders),
 `check-ignore` dos diretórios de artefato, flags efetivas do Playwright por escopo e
-campos mínimos do Jira. Cada linha `falha`/`aviso` vira item do relatório. O que exige
+campos mínimos do Jira. Cada linha `falha`/`aviso` vira item do relatório. Exceção com
+reparo imediato: `falha` em `hooks-executaveis` (hook sem `+x` falha em **silêncio** a
+cada disparo — decisão 4.180) → aplique o `chmod +x` que a linha indica no cache do
+plugin, declare no relatório que o reparo local **evapora no próximo update** e
+recomende `/keelson:update` (a correção durável vem do próprio pacote). O que exige
 MCP vivo continua seu, abaixo (runtime de browser respondendo; conector Jira com
 chamada de prova). Prove o restante:
 - `quality.test`/`quality.lint`/`quality.mutation`/`quality.e2e` declarados **existem/rodam** (execução rápida ou `--help`/dry-run — para mutação e E2E, nunca a rodada completa: são caros e pertencem ao `/keelson:integrate`; Playwright prova com `--list`, que enumera os specs sem subir a app);
