@@ -18,7 +18,8 @@
 #   epico<TAB>status<TAB>branch<TAB>estrategia
 #   fatia<TAB><n>-<TAB><slug><TAB><declarado><TAB><verificado>
 #   divergencia<TAB><n><TAB><declarado> vs <verificado>
-#   aviso<TAB><n><TAB><detalhe>            (estado fora do vocabulário — degradação 4.156)
+#   aviso<TAB><n><TAB><detalhe>            (estado fora do vocabulário — degradação 4.156 —
+#                                           ou fatia em ciclo sem brief filho resolvível, 4.170)
 #   regra<TAB><1..6 | -><TAB><rótulo da tabela do continue>
 # Verificado: aguardando-produto · parcial · pre-task · entregue · - (não verificável).
 # Colunas da fila mapeadas PELO HEADER da tabela (4.156): além do contrato canônico
@@ -127,11 +128,14 @@ verifica() { # $1 = estado declarado (parênteses podem ter o caminho) $2 = ânc
   esac
   spec="$(hdr SPEC "$child")"
   sdir="$(cd "$(dirname "$child")/.." && pwd)"
-  if [ -z "$spec" ] || [ ! -d "$sdir/plans" ]; then
+  # o header de campo carrega decoração ('SPEC-008 (a criar na Etapa 1)') ou caminho
+  # (4.124) — o vínculo BRIEF→PLAN casa pelo ID, nunca pela string crua (4.170)
+  specid="$(printf '%s\n' "$spec" | sed -n 's/.*\(SPEC-[0-9][0-9]*\).*/\1/p')"
+  if [ -z "$specid" ] || [ ! -d "$sdir/plans" ]; then
     printf 'pre-task\n'
     return
   fi
-  mmms="$(grep -l "^\*\*SPEC referenciada\*\*[ 	]*:[ 	]*$spec" "$sdir"/plans/PLAN-*.md 2>/dev/null \
+  mmms="$(grep -El "^\\*\\*SPEC referenciada\\*\\*[[:space:]]*:.*${specid}([^0-9]|\$)" "$sdir"/plans/PLAN-*.md 2>/dev/null \
           | sed -n 's/.*PLAN-\([0-9][0-9]*\)[-.].*/\1/p')"
   [ -n "$mmms" ] || { printf 'pre-task\n'; return; }
   tot=0; done_=0
@@ -165,6 +169,11 @@ while IFS='	' read -r n slug estado ancora; do
         entregue)
           printf 'divergencia\t%s\t%s vs %s\n' "$n" "$estado" "$v"
           [ -n "$regra" ] || { regra=3; regra_det="fatia $n: tudo entregue nos artefatos — corrigir a fila declarando e propor a proxima"; } ;;
+        sem-artefatos)
+          # em ciclo declarado sem brief filho resolvível: a resolução falhou ou a
+          # âncora está ausente — degradação visível, nunca rota eleita em silêncio (4.170)
+          printf 'aviso\t%s\tfatia em ciclo sem brief filho resolvivel — ancora ausente ou caminho errado; derive por leitura\n' "$n"
+          [ -n "$regra" ] || { regra=2; regra_det="fatia $n: retomar a implementacao onde parou (sem-artefatos — confirme por leitura)"; } ;;
         *)
           [ -n "$regra" ] || { regra=2; regra_det="fatia $n: retomar a implementacao onde parou ($v)"; } ;;
       esac ;;

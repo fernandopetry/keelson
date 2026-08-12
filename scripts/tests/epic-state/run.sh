@@ -37,13 +37,13 @@ mkepic() { # $1=nome $2=linhas-da-fila; ecoa o caminho do brief
   printf '%s\n' "$r"
 }
 
-mkchild() { # $1=raiz $2=slug $3=brief-status $4=spec $5=plan-mmm $6=lista de status das tasks ("" = sem plan/tasks)
+mkchild() { # $1=raiz $2=slug $3=brief-status $4=spec $5=plan-mmm $6=lista de status das tasks ("" = sem plan/tasks) $7=spec citada no PLAN (default: $4)
   d="$1/docs/$2"
   mkdir -p "$d/briefs"
   printf '# BRIEF-002: Fatia\n\n**Slug**: %s\n**Status**: %s\n**SPEC**: %s\n' "$2" "$3" "$4" > "$d/briefs/BRIEF-002.md"
   [ -n "$5" ] || return 0
   mkdir -p "$d/plans" "$d/tasks"
-  printf '# PLAN-%s: Fatia\n\n**Status**: Approved\n\n## Cobertura\n\n**SPEC referenciada**: %s\n' "$5" "$4" > "$d/plans/PLAN-$5-fatia.md"
+  printf '# PLAN-%s: Fatia\n\n**Status**: Approved\n\n## Cobertura\n\n**SPEC referenciada**: %s\n' "$5" "${7:-$4}" > "$d/plans/PLAN-$5-fatia.md"
   i=0
   for st in $6; do
     i=$((i + 1))
@@ -137,6 +137,28 @@ runcase legado-em-ciclo "$R" 2 "parcial"
 # estado fora do vocabulário → aviso + regra -, nunca inventa fatia
 R="$(mkepic_legado legav '| 1 | Login | esperando aprovacao | — |')"
 runcase legado-nao-parseavel "$R" - "nao-parseavel"
+
+# ---- vínculo BRIEF→PLAN por ID (4.170 — fixture do artefato de campo) ----
+
+# header do BRIEF filho decorado ('SPEC-008 (a criar na Etapa 1)') e PLAN citando só o
+# ID: o casamento cru classificava fatia adiantada como pre-task; por ID resolve
+R="$(mkepic_legado id1 '| 1 | Quiz | **em ciclo** (2026-08-10) | `briefs/BRIEF-002.md` |')"
+mkchild "$R" ancora Emitido "SPEC-008 (a criar na Etapa 1)" 010 "Done Todo" "SPEC-008"
+runcase id-header-decorado "$R" 2 "parcial"
+
+# PLAN citando a SPEC pelo caminho (4.124) e BRIEF pelo ID → também casa por ID
+R="$(mkepic_legado id2 '| 1 | Quiz | **em ciclo** (2026-08-10) | `briefs/BRIEF-002.md` |')"
+mkchild "$R" ancora Emitido "SPEC-008" 010 "Done Done" "docs/ancora/specs/SPEC-008-quiz.md"
+runcase id-plan-por-caminho "$R" 3 "divergencia"
+
+# ID não pode casar prefixo: SPEC-01 no BRIEF não casa SPEC-010 no PLAN → pre-task
+R="$(mkepic_legado id3 '| 1 | Quiz | **em ciclo** (2026-08-10) | `briefs/BRIEF-002.md` |')"
+mkchild "$R" ancora Emitido "SPEC-01" 010 "Done Done" "SPEC-010"
+runcase id-sem-casar-prefixo "$R" 2 "pre-task"
+
+# em ciclo com âncora para brief inexistente → aviso de degradação, nunca rota em silêncio
+R="$(mkepic_legado sa1 '| 1 | Quiz | **em ciclo** (2026-08-10) | `briefs/BRIEF-999.md` |')"
+runcase em-ciclo-sem-artefatos "$R" 2 "aviso	1	fatia em ciclo sem brief filho resolvivel"
 
 # cabeçalho do épico ecoado
 total=$((total + 1))
