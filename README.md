@@ -409,21 +409,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.93.1` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.93.2` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the field session that re-ran the gates taught the doctrine six
-new rules** (decisions 4.170–4.179). Class-wide findings now close with the sweep as
-the deliverable (command + swept range + empty output — the reviewer re-runs it);
-re-gates also ask "did the proof get weaker?" via mutation compared against the parent
-commit; correlated predicates require the neighbor-aggregate mutant; batch reads treat
-absent keys as denial; cost fixes are proven on the named path; and concurrent
-limit/uniqueness invariants close on the write side, proven by counting rows.
-`epic-state.sh` now matches BRIEF→PLAN by extracted SPEC id (a decorated header had
-misclassified an advanced slice as `pre-task`), and `/keelson:e2e-setup` runs gate 8
-before writing the ficha and recognizes Node manifests living in a subdirectory
-(postmortem proposals M1/M4 applied). No consumer re-init needed.
+New in this release: **hooks ship with the execute bit proven, not presumed**
+(decision 4.180). Two hooks had entered git as mode 644 and were failing silently on
+every trigger in a consumer project; the bit is now committed, pre-commit and CI block
+any non-executable `hooks/*.sh`, and `/keelson:init` detects a broken plugin cache
+(`hooks-executaveis` self-check item) with the repair indicated. No consumer re-init
+needed — the fix arrives with `/keelson:update`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

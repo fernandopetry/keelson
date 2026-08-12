@@ -17,6 +17,31 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.93.2] — 2026-08-12
+
+Decision 4.180 — an external diagnostic on a consumer project caught two plugin hooks
+shipping without the execute bit: `window-marker.sh` failed silently on every `Stop`
+(269 failures in 3 days) and `compact-anchor.sh` never ran on compaction. Both were
+born via Write (mode 644) in the 4.146–4.149 batch; nothing mechanical checked the bit.
+
+### Fixed
+
+- `hooks/window-marker.sh` and `hooks/compact-anchor.sh` are executable again (mode
+  committed to git, so every consumer gets the fix on the next `/keelson:update` —
+  a local `chmod` on the plugin cache evaporates on update).
+
+### Added
+
+- Pre-commit and CI now block any `hooks/*.sh` whose index mode is not `100755` —
+  hooks are invoked directly by the harness, so a missing bit fails silently; the
+  check closes the class (any future hook created via Write), not just the instance.
+- `init-selfcheck.sh` gains the `hooks-executaveis` item: `/keelson:init` detects a
+  broken plugin cache on the consumer side, applies the indicated `chmod` as an
+  immediate repair and recommends `/keelson:update` for the durable fix. New
+  regression case in the suite; troubleshooting page documents the symptom.
+
+---
+
 ## [0.93.1] — 2026-08-11
 
 Human re-review of the `backend/php.md` §10 lock-trap block added by 4.177, with every
