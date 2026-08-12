@@ -494,6 +494,16 @@ query/round-trip em laço sobre volume variável; otimização não óbvia cita 
 **Armadilha comum:** `fetchAll()` num resultado grande e depois iterar — dobra o pico de
 memória à toa; o `fetch()` em cursor faz o mesmo trabalho com pegada constante.
 
+**Armadilha de lock (MySQL/InnoDB — instância da corrida de limite, `core/SECURITY.md`,
+4.177):** `FOR SHARE`/`FOR UPDATE` no topo da instrução **não trava as linhas lidas por
+subconsulta aninhada** — a decisão derivada (contagem num `CASE`, correlacionada) continua
+leitura de snapshot em `REPEATABLE READ`, e a corrida passa. E lock de leitura sobre índice
+único segura next-key/gap lock **compartilhado** até o COMMIT — duas transações no mesmo
+gap pedindo *insert intention* fecham deadlock determinístico entre agregados vizinhos.
+Invariante concorrente em MySQL fecha **na escrita**: `INSERT … SELECT`/`UPDATE` condicional
+com o predicado embutido (`rowCount() === 0` é a recusa) ou `UNIQUE` sobre valor **não
+derivado**; a prova conta linhas no fim, com N conexões concorrentes no motor real.
+
 ---
 
 ## 11. Gotchas da versão (8.5) → Charter Art. 1, 7

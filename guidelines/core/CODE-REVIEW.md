@@ -307,6 +307,23 @@ ela converge ou escala.
   à própria decisão de escalar, que a régua tira das mãos de quem rodou os retries. Caso
   genuinamente mecânico vai **na proposta** da escalação (estado + ação nomeada + default
   "aplicar e fechar"), nunca como justificativa para pulá-la.
+- **Achado de classe fecha com a varredura como entregável (decisão 4.173).** Quando o
+  achado nomeia um padrão repetível por busca (comentário, chamada, import, nomenclatura)
+  e cita exemplos, os exemplos são **ilustração, nunca a lista de tarefas**: o retry
+  entrega a varredura — comando literal, universo/range varrido, saída final vazia,
+  falsos positivos separados com justificativa e exclusões com dono. O revisor
+  **re-executa o comando**; é isso que ele valida — declaração de "varri tudo" sem o
+  comando não fecha o achado, porque não distingue "a classe fechou" de "os exemplos que
+  o revisor viu fecharam". Caso real: 4 rodadas corrigindo os exemplos citados; na 3ª, o
+  report declarou 3 arquivos e a mesma string sobrevivia em 8 outros dentro do range.
+- **O re-gate também pergunta "a prova ficou mais fraca?" (decisão 4.174).** Delta que
+  muda a semântica de um caso já provado (inverter um default, trocar a condição de um
+  ramo) **acrescenta** teste ao lado — o teste do ramo antigo permanece com o fixture
+  discriminante. Reescrever o existente deixa um teste com nome plausível, passando, que
+  não discrimina mais — e nenhuma leitura acusa. O fechamento é comparado: o mutante que
+  neutraliza o valor alterado morre **no delta e no commit pai**; sobreviver só no delta
+  é regressão de prova, achado bloqueante. Caso real: o único teste do ramo invertido foi
+  reaproveitado e a suíte inteira (4107 verdes) deixou de provar que o gate bloqueava.
 - **Achado só-texto não reabre o ciclo.** Correção cujo delta é **inerte** (comentário,
   docblock, doc — teste mecânico em `./TESTING.md`, "Diff inerte") re-verifica com o
   **mesmo revisor**, sobre o delta, e nada mais: os gates de comportamento (1/2/9)

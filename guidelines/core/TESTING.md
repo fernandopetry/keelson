@@ -72,6 +72,16 @@ bloqueante no gate 1 — `./CODE-REVIEW.md`):
 - **Quantificador vira tabela**: requisito quantificado ("todos os locales", "cada
   tipo", "os N países") exige um caso por elemento — ou por classe de equivalência
   **demonstrada** — via tabela de casos. Só o caso default testado = AC não coberto.
+- **Predicado correlacionado exige o agregado vizinho (decisão 4.175)**: predicado que
+  vincula filho ao pai (escopo de tenant, correlação de subconsulta, junção por dono)
+  tem **dois** modos de falha e por isso duas provas — apagar o **predicado** (morre com
+  um agregado só) e apagar a **correlação** (só morre com um segundo agregado no
+  fixture: duas linhas, uma satisfazendo e outra não). Fixture de um agregado deixa o
+  mutante de maior raio invisível por construção — caso real: apagar a correlação
+  sobreviveu a 51/51 testes, e em produção recusaria toda submissão de todo usuário.
+  Corolário para invariante **fotografado** (valor congelado no filho × config vigente
+  no pai): os defaults do builder compartilhado nascem **divergentes** — pai e filho com
+  o mesmo valor tornam ler um ou outro indistinguível, e a guarda vira decoração.
 
 ---
 

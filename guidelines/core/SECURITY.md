@@ -42,6 +42,7 @@ categoria muda de nome/posição. Texto integral de cada edição: <https://gith
 | **Mass Assignment** | Preencher a entidade com todo o payload | Allowlist explícita de campos |
 | **IDOR** | Aceitar um id de recurso sem checar acesso | Verificar que o solicitante pode acessar **aquele** registro |
 | **Race Condition** | *Check-then-act* sem exclusão | Transação/lock; operação atômica |
+| **Corrida de limite/unicidade** (decisão 4.177) | Fechar com lock de **leitura** sobre a decisão (contagem/CASE lido antes de gravar — em subconsulta, o lock nem alcança a leitura) | Fechar **na escrita**: escrita condicional (o INSERT/UPDATE carrega o predicado; zero linhas afetadas **é** a recusa) ou constraint única. Prova **conta linhas** no fim, N concorrentes contra o motor real — cronometrar espera de lock já aprovou limite furado |
 | **Information Disclosure** | Stack trace em produção; erro interno devolvido cru na resposta | Mensagem genérica; sanear o **mesmo** valor no sink de resposta, não só no de log |
 | **Clickjacking** | Sem proteção de enquadramento | Negar enquadramento (frame-ancestors/`X-Frame-Options`) |
 | **File Upload** | Aceitar qualquer arquivo | Allowlist de tipo/extensão; validar o conteúdo real |
@@ -68,6 +69,15 @@ para qualquer stack:
   população, vindo da **sessão do lado do servidor** — nunca de header, query ou path.
   Leitores negam por padrão quando ele está ausente (nunca um default permissivo como
   "assume o tenant 1").
+- **Leitura em lote devolve mapa parcial — ausência é negação (decisão 4.176):** quando
+  o escopo (tenant, dono, permissão) é aplicado **no próprio filtro** da consulta em
+  lote, o id fora do escopo simplesmente não volta — o "não" é implícito, e nada obriga
+  o consumidor a tratá-lo. O consumidor trata chave ausente do mapa como **negação**
+  (pula ou lança), nunca como default de negócio — `?? default` sobre mapa indexado é
+  permissivo por construção. O teste do consumidor cobre o **mapa incompleto**; havendo
+  chunking, o vetor fora de escopo entra no **segundo** lote, com um controle dentro do
+  escopo no mesmo lote — sem o controle, o teste passa por vacuidade com o lote inteiro
+  descartado.
 - **Serializadores de dado sensível:** default **fail-closed** — omitir o dado sensível
   por padrão, ou exigir um parâmetro explícito para incluí-lo. Nunca "inclui tudo a menos
   que peçam para não".

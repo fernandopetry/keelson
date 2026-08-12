@@ -18,6 +18,10 @@
 - **Sem N+1:** nunca uma consulta **dentro de um laço** sobre dados de tamanho variável.
   Resolva com **uma** consulta que já traz o necessário (junção/agregação). Este é o
   padrão de custo mais comum e o de melhor relação impacto/esforço para corrigir.
+  O N+1 também nasce por **composição** (decisão 4.178): ao injetar um colaborador que
+  consulta num serviço de domínio, procure os chamadores — se algum o invoca dentro de
+  laço, a consulta nova é N+1 por construção, sem estar inteira em nenhum dos dois
+  arquivos.
 - **Traga só o necessário:** selecione as colunas/campos que a unidade usa; evite puxar o
   registro inteiro por hábito.
 - **Índices** nas colunas de filtro e ordenação; confirme o plano com a ferramenta de
@@ -58,3 +62,11 @@ Princípios agnósticos de renderização (o mecanismo idiomático está no perf
 
 - **Régua (Art. 8):** não há consulta/round-trip dentro de laço sobre dados de tamanho
   variável; qualquer otimização não óbvia **cita a medição** que a justifica.
+- **Correção de custo se prova no caminho nomeado pelo achado, nunca no método tocado
+  (decisão 4.178):** conte **todas** as idas ao banco/rede do caminho (contador no
+  driver ou métrica da sessão) em **pelo menos dois volumes**, e mostre que a contagem
+  não cresce com N. Medir só a consulta corrigida deixa a metade cara onde estava —
+  e dublê que conta chamadas de **um** colaborador deixa o laço do outro invisível: o
+  invariante fixa a chamada em lote **e** a ausência de cada chamada de item único do
+  mesmo laço. Chunking paga a parte invariante da consulta uma vez **por lote** — só é
+  barato com essa parte escopada ao que a consulta realmente pergunta.
