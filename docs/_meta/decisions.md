@@ -1968,6 +1968,86 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `commands/e2e-setup.md` (Etapa 3) · `guidelines/core/TESTING.md` ("Specs E2E") · `docs/wiki/Solucao-de-problemas.md`. Consumidor que já rodou o setup com auth: re-rodar `/keelson:e2e-setup` (modo reparo) ou aplicar (a)–(c) à mão.
 
+### 4.170 — epic-state.sh casa BRIEF→PLAN pelo ID, nunca pela string crua
+
+**Problema**: numa retomada de campo, o `epic-state.sh` classificou como `pre-task` uma fatia `em ciclo` com 26 TASKs e implementação adiantada. Causa-raiz nos artefatos: o header do BRIEF filho era `**SPEC**: SPEC-008 (a criar na Etapa 1)` — decoração deixada pela forja — e o script casava a string **crua** contra `**SPEC referenciada**: SPEC-008` do PLAN; sem match, nenhum PLAN "existia". O casamento cru também aceitava **prefixo falso** (SPEC-01 casava SPEC-010, provado por fixture). A sessão se salvou pelo "verificado, não deduzido" (4.58), mas o script propôs rota errada — e a régua da 4.156 é que o extrator degrada visível, nunca inventa.
+
+**Decisão**: o vínculo BRIEF→PLAN casa pelo **ID extraído** (`SPEC-[0-9]+`, com fronteira numérica) dos dois lados — o header do filho pode carregar decoração ou caminho (4.124), o PLAN também. E fatia declarada `em ciclo` cujo brief filho **não resolve** (`sem-artefatos`) ganha linha de `aviso` na saída — a resolução falhou ou a âncora está errada; a rota proposta declara "confirme por leitura" em vez de eleger em silêncio.
+
+**Aplicação**: `scripts/epic-state.sh` · `scripts/tests/epic-state/run.sh` (4 fixtures novas nascidas do artefato de campo, com repro vermelho provado contra o script antigo — 4.156/4.159). Sem re-init.
+
+### 4.171 — Comando de setup com diff sensível por desenho roda gate 8 no fecho
+
+**Problema**: o postmortem da sessão de campo que estreou o `/keelson:e2e-setup` (M1) mostrou o fecho declarado completo **sem gate 8**, num diff que instala dependência de terceiro e gera código que lê credencial e persiste sessão autenticada — sensível pelos gatilhos canônicos do próprio gate. Quem segurou foi um stop hook de consumidor, que é heurístico e opcional: noutro consumidor os três defeitos da 4.169 teriam sido gravados na ficha como setup pronto. Assimetria interna: o `/keelson:init` tem self-check falsificável; o comando que gera código de autenticação fechava sem gate.
+
+**Decisão**: a invocação de um comando segue o contrato **daquele comando** — então o contrato declara: quando o diff do comando é sensível por desenho, o gate 8 é etapa do fecho, antes de gravar na ficha. No `/keelson:e2e-setup`: com `gates.security` ativo, `security-engineer` sobre o diff do working tree antes do `quality.e2e`; gate desativado → o report declara a ausência. Hook que cobre o mesmo terreno é rede, nunca o gate.
+
+**Aplicação**: `commands/e2e-setup.md` (Etapa 5). Fila: proposta M1 do postmortem → aplicada. Sem re-init (o comando vive no plugin).
+
+### 4.172 — Pré-requisito Node do e2e-setup reconhece manifesto em subdiretório
+
+**Problema**: a Etapa 2 do `/keelson:e2e-setup` modelava dois estados — `package.json` na raiz ou ausente ("proponha criar um mínimo") — e o terceiro, comum em backend não-Node com SPA, é **existe, em subdiretório**. Seguir o texto ao pé da letra criaria um segundo ecossistema Node na raiz, contra sinais disponíveis sem perguntar: a ficha já usava `--prefix` nos comandos `quality.*` e o gitignore da raiz rejeitava `package-lock.json` de propósito. No campo, a main session desviou por discrição e levou ao Diretor (M4 do postmortem) — o desvio certo que o próximo consumidor não fará.
+
+**Decisão**: o pré-requisito tem **três** estados; manifesto em subdiretório → instalar lá e prefixar os caminhos das Etapas 3–4 (a detecção da Etapa 1 também olha o subdiretório do app). Criar manifesto na raiz só quando nenhum existe.
+
+**Aplicação**: `commands/e2e-setup.md` (Etapas 1–2). Fila: proposta M4 do postmortem → aplicada. Sem re-init.
+
+### 4.173 — Achado de classe fecha com a varredura como entregável
+
+**Problema**: um achado de classe ("comentários narram a rodada de revisão") consumiu **quatro** rodadas de re-gate na sessão de campo — mesmo com o autocheck da 4.135 vigente. Mecanismo: quando o revisor cita exemplos de um defeito sistêmico, os exemplos viram a lista de tarefas; cada rodada corrigia os citados e declarava a varredura completa, e a declaração não é falsificável — na 3ª rodada o report dizia "3 arquivos" e a mesma string sobrevivia em 8 outros dentro do range. Reincidência pós-regra (escada da 4.149): mais texto não fecha; o que faltava era a **forma do fechamento**.
+
+**Decisão**: achado que nomeia padrão repetível por busca fecha com a **varredura** como entregável — comando literal, universo varrido, saída final vazia, falsos positivos com justificativa, exclusões com dono — e o revisor **re-executa o comando** em vez de acreditar no report. Exemplos citados são ilustração, nunca a lista.
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (Convergência do re-gate). Sem re-init.
+
+### 4.174 — O re-gate pergunta "a prova ficou mais fraca?", por mutação comparada
+
+**Problema**: num retry de campo que inverteu a semântica de uma ausência (default permissivo → recusa), o único teste do ramo antigo foi **reescrito** para o valor novo — continuou existindo, com nome plausível, passando, e a suíte inteira (4107 verdes) deixou de provar que o caminho em lote bloqueava. Nenhum gate acusa: a pergunta que os gates fazem é "há prova?", e havia — mais fraca do que era. O reviewer só pegou rodando o mutante contra o delta (sobrevive) **e contra o commit pai** (morre).
+
+**Decisão**: delta que muda a semântica de caso já provado **acrescenta** teste ao lado — o do ramo antigo permanece com fixture discriminante. Fechamento do retry: mutante que neutraliza o valor alterado morre no delta **e** no commit pai; sobreviver só no delta é regressão de prova, achado bloqueante. Família da 4.159 (prova comparada entre estados).
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (Convergência do re-gate). Sem re-init.
+
+### 4.175 — Predicado correlacionado exige o mutante do agregado vizinho
+
+**Problema**: três achados independentes da mesma entrega de campo tiveram a mesma forma — a prova montava **um** agregado e o mutante de maior raio escapava. O caso agudo: apagar a **correlação** de um `NOT EXISTS` (`filho.pai_id = pai.id`) sobreviveu a 51/51 testes; em produção, recusaria toda submissão de todo usuário à primeira linha satisfatória no sistema. O mutante óbvio (apagar o predicado inteiro) morre com um agregado; o de correlação exige um segundo no fixture — e ninguém o escreve, porque o cenário do achado tinha um.
+
+**Decisão**: predicado que vincula filho a pai (escopo, correlação, junção por dono) entrega **duas** provas — apagar o predicado e apagar a correlação, esta com agregado vizinho no fixture (duas linhas, uma satisfazendo e outra não). Corolário do invariante fotografado: defaults do builder compartilhado nascem **divergentes** entre pai e filho — iguais, ler um ou outro é indistinguível e a guarda vira decoração.
+
+**Aplicação**: `guidelines/core/TESTING.md` ("Asserções que provam"). Sem re-init.
+
+### 4.176 — Leitura em lote devolve mapa parcial: ausência é negação
+
+**Problema**: consulta em lote de campo aplicava o escopo de tenant **no filtro** — id fora do escopo simplesmente não volta — e o consumidor traduzia a chave ausente no valor mais permissivo do gate: a matrícula fora do escopo seguia para conclusão. Diferente do item único (que devolve objeto ou nada e força uma decisão), o "não" implícito da linha que não volta não obriga tratamento — e `?? default` é o idioma natural de mapa indexado, permissivo por construção.
+
+**Decisão**: consumidor de leitura em lote com escopo no filtro trata chave ausente como **negação** (pula ou lança), nunca default de negócio. O teste cobre o mapa incompleto; havendo chunking, o vetor fora de escopo entra no **segundo** lote com um controle in-scope no mesmo lote — sem o controle, o teste passa por vacuidade.
+
+**Aplicação**: `guidelines/core/SECURITY.md` (Padrões de autorização). Sem re-init.
+
+### 4.177 — Invariante concorrente fecha na escrita, e a prova conta linhas
+
+**Problema**: o gate 8 de campo reprovou **quatro vezes** o mesmo limite de tentativas, cada rodada derrubando um mecanismo de lock de leitura: `FOR UPDATE` serializa mas a decisão lê snapshot; `FOR SHARE` no topo **não alcança a subconsulta correlacionada** onde a contagem vivia; e o lock sobre índice único transformou deadlock esporádico em determinístico entre agregados vizinhos (gap lock compartilhado + insert intention). Fechou por **escrita condicional** — o INSERT carrega o predicado e zero linhas afetadas é a recusa — provada **contando linhas** com N concorrentes no motor real; cronometrar espera de lock tinha aprovado o limite furado.
+
+**Decisão**: a doutrina nomeia o padrão: corrida de limite/unicidade fecha **na escrita** (escrita condicional ou constraint sobre valor não derivado), nunca com lock de leitura sobre decisão derivada; a prova conta linhas no fim, sob concorrência real. O detalhe de motor (MySQL/InnoDB: subconsulta fora do alcance do lock, next-key/gap) é instância do perfil.
+
+**Aplicação**: `guidelines/core/SECURITY.md` (tabela "Outras vulnerabilidades") · `guidelines/backend/php.md` §10 (**pende re-olhada humana** — perfil `reviewed: true`). Sem re-init.
+
+### 4.178 — Correção de custo se prova no caminho nomeado pelo achado
+
+**Problema**: um N+1 de campo dentro de transação foi "corrigido" batchando **uma** das duas consultas do laço; a medição (55,8→2,2 ms) e o invariante cobriam só a batchada, e o caminho — declarado constante — continuou linear pela metade cara. O dublê contava chamadas de um colaborador e deixava o outro laço invisível. E o N+1 seguinte nasceu por **composição**: colaborador novo injetado num serviço chamado dentro de `foreach` de outro arquivo — não estava inteiro em lugar nenhum.
+
+**Decisão**: correção de custo se prova no **caminho** nomeado pelo achado: contar todas as idas ao banco/rede em ≥2 volumes e mostrar que a contagem não cresce com N; o invariante fixa a chamada em lote e a **ausência** de cada chamada de item único do mesmo laço. Colaborador que consulta, injetado em serviço de domínio → grep dos chamadores antes de aprovar. Chunking só é barato com a parte invariante escopada.
+
+**Aplicação**: `guidelines/core/PERFORMANCE.md` (Backend + Régua). Sem re-init.
+
+### 4.179 — Pendência durável tem dono em artefato-fonte; o INDEX espelha
+
+**Problema**: na sessão de campo, dois débitos de entrega foram registrados **só no INDEX** — que é arquivo derivado: um `/keelson:rebuild-index` o reescreve dos artefatos e o débito morre sem rastro. O code-reviewer pegou; a doutrina não dizia onde pendência durável vive. No mesmo tema de registro: o catálogo de eventos do ledger em `commands/implement.md` omitia `decisao` (o `ledger.sh` já o aceita desde a 4.76) — a sessão o usou corretamente para registrar escolha do Diretor em escalação, por conta própria.
+
+**Decisão**: risco/pendência estacionado registra **primeiro no artefato-fonte versionado** (TASK, PLAN, SPEC, brief) e o INDEX espelha, com a coluna `Origem` apontando o dono — regra no contrato do INDEX. E o catálogo de eventos do `/keelson:implement` passa a nomear `decisao` (escolha do Diretor em escalação), alinhando o texto ao script.
+
+**Aplicação**: `docs/_meta/conventions/index-contract.md` · `commands/implement.md` (§ ledger). Sem re-init.
+
 ---
 
 ## 5. Quality gates inegociáveis

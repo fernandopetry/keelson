@@ -17,6 +17,67 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.93.0] — 2026-08-11
+
+Decisions 4.170–4.179. A 15-hour field session re-running the quality gates on an
+advanced slice (4 gate-8 rounds on one concurrency bug, 8 escalations — all inside the
+retry-ceiling contract) taught the doctrine six new rules and exposed one mechanical
+defect and two open postmortem proposals (M1/M4).
+
+### Added
+
+- `core/CODE-REVIEW.md` (re-gate convergence): **class-wide findings close with the sweep
+  as the deliverable** — literal command, swept range, empty final output, justified
+  false positives, owned exclusions; the reviewer re-runs the command instead of trusting
+  the report (4.173 — a real finding burned four rounds being fixed example-by-example).
+- `core/CODE-REVIEW.md` (re-gate convergence): re-gates also ask **"did the proof get
+  weaker?"** — deltas that flip the semantics of a proven case add a test beside the old
+  one, and closure requires the neutralizing mutant to die on the delta **and** on the
+  parent commit (4.174).
+- `core/TESTING.md`: **correlated predicates require two mutants** — delete the predicate
+  and delete the correlation, the latter only killable with a neighbor aggregate in the
+  fixture; snapshot invariants get deliberately divergent parent/child builder defaults
+  (4.175).
+- `core/SECURITY.md`: **batch reads return partial maps — an absent key is a denial**,
+  never a business default; tests cover the incomplete map and cross the chunk boundary
+  with an in-scope control (4.176).
+- `core/SECURITY.md` + `backend/php.md` §10: **concurrent limit/uniqueness invariants
+  close on the write side** (conditional write or constraint), proven by counting rows
+  under real concurrency — read locks don't reach decisions taken in subqueries (4.177;
+  the php.md addition is pending human re-review).
+- `core/PERFORMANCE.md`: **cost fixes are proven on the path named by the finding** — 
+  count all round-trips at two volumes; composition-born N+1 (new collaborator injected
+  into a service called in a loop) requires grepping callers (4.178).
+- `docs/wiki/Solucao-de-problemas.md`: new entry — commands typed mid-turn arrive as
+  text; human-only commands must be sent standalone.
+
+### Changed
+
+- `/keelson:e2e-setup`: the close now runs **gate 8 before writing `quality.e2e`** when
+  `gates.security` is on — the command's diff is sensitive by design (installs a
+  third-party dependency, generates credential-reading code); a stop hook is a net,
+  never the gate (4.171, postmortem proposal M1). The Node manifest prerequisite gains
+  its third state — **exists in a subdirectory** (signals: `--prefix` in the ficha's
+  quality commands, root gitignore) — instead of proposing a root manifest that would
+  create a second Node ecosystem (4.172, proposal M4).
+- `commands/implement.md`: the ledger event catalog now names `decisao` (Director's
+  choice at an escalation), aligning the text with what `ledger.sh` already accepts
+  (4.179).
+- `docs/_meta/conventions/index-contract.md`: **durable risks/debts live in a versioned
+  source artifact first**; the INDEX mirrors them with `Origem` pointing at the owner — 
+  the INDEX is derived and a rebuild erases anything that lives only there (4.179).
+
+### Fixed
+
+- `scripts/epic-state.sh`: the BRIEF→PLAN link now matches by **extracted SPEC id** with
+  a numeric boundary instead of the raw header string — a field BRIEF carrying
+  `**SPEC**: SPEC-008 (a criar na Etapa 1)` had made the script classify an advanced
+  in-cycle slice as `pre-task` (and the raw match also accepted false prefixes:
+  `SPEC-01` matched `SPEC-010`). An in-cycle slice whose child brief cannot be resolved
+  now emits a visible `aviso` line instead of silently electing a route. Four new
+  fixtures born from the field artifact, red-repro-proven against the old script
+  (4.170).
+
 ## [0.92.2] — 2026-08-11
 
 Decision 4.169 — first gate 8 run over the `/keelson:e2e-setup` scaffold (same field
