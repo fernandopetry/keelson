@@ -29,14 +29,14 @@ Você é um engenheiro de infraestrutura de testes. Sua função é deixar a su�
 
 ## Etapa 1: detectar runner existente
 
-- `@playwright/test` no `package.json` ou `playwright.config.*` na raiz → pule a Etapa 2 e reaproveite a config existente (confira só o alinhamento da Etapa 3: `outputDir` gitignored, `testDir` conhecido).
+- `@playwright/test` no `package.json` ou `playwright.config.*` — na raiz **ou no subdiretório do app** (onde a ficha aponta via `--prefix`/`cd`, decisão 4.172) → pule a Etapa 2 e reaproveite a config existente (confira só o alinhamento da Etapa 3: `outputDir` gitignored, `testDir` conhecido).
 - **Outro runner E2E consolidado** (ex.: Cypress) → **não troque de motor por conta própria**: componha `quality.e2e` com o comando dele e diga no report que a receita de recorte por tag (`--grep`, 4.166) é do Playwright — o filtro equivalente é calibração do consumidor. Troca de motor é decisão do Diretor, não efeito colateral de setup.
 
 ## Etapa 2: instalar (sempre com confirmação)
 
 Proponha e **espere o OK do Diretor** antes de instalar (dependência de projeto não entra em silêncio):
 
-1. **Pré-requisito**: Node ≥ 18 e um `package.json`. Backend não-Node (ex.: PHP) sem `package.json` na raiz → proponha criar um mínimo (dev-only, com confirmação) — é assim que projetos não-Node adotam o Playwright.
+1. **Pré-requisito**: Node ≥ 18 e um `package.json`. O manifesto tem **três** estados, não dois (decisão 4.172): **na raiz** → use-o; **em subdiretório do app** (sinais que dispensam pergunta: `--prefix`/`cd` nos comandos `quality.*` da ficha, gitignore da raiz rejeitando `package-lock.json` de propósito) → instale **lá** e prefixe os caminhos das Etapas 3–4 de acordo; **nenhum** → proponha criar um mínimo na raiz (dev-only, com confirmação) — é assim que projetos não-Node adotam o Playwright. Criar manifesto na raiz quando o app já tem o seu instala um segundo ecossistema Node no repositório.
 2. **Pacote**: `npm i -D @playwright/test` (ou o gerenciador detectado — `pnpm`/`yarn`).
 3. **Binário do navegador**: `npx playwright install chromium` (Linux: `--with-deps`) — cache **do usuário**, fora do repositório (mesma nota do `/keelson:init`, Etapa 4.4); diga o que foi instalado e onde.
 
@@ -67,11 +67,12 @@ A partir da ficha, nunca de template cego — mostre o arquivo **antes** de escr
 3. **Rodada real só com app de pé**: sondagem barata na `baseUrl` (ex.: `curl -sI`); respondeu → rode o smoke de verdade; fora do ar → `--list` basta, **declarado** no report (nunca deixe de gravar por isso — a suíte completa pertence ao `/keelson:integrate`).
 4. Falhou → nomeie a causa (Node < 18 · binário do navegador ausente · config errada) e **não grave** o comando; conserte ou reporte o bloqueio.
 
-## Etapa 5: gravar e reportar
+## Etapa 5: gate de segurança, gravar e reportar
 
-1. Gravar `quality.e2e` na ficha (merge-preserving — só esta chave), com o comando literal (ex.: `npx playwright test`).
-2. Report: o que foi instalado (ou reaproveitado) · arquivos criados (config, smoke, auth) · resultado da prova · **próximo passo** (specs de AC nascem nas tasks — o developer os entrega, o qa os executa; recorte via `--grep "@AC-NNN-XXX"`) · lembrete de que manifesto/lockfile/config estão no working tree — **o commit do setup é ato do Diretor**.
-3. `--dry-run`: imprime tudo acima sem instalar nem gravar.
+1. **Gate 8 antes de gravar** (decisão 4.171): o diff deste comando é mudança sensível **por desenho** — instala dependência de terceiro e gera código que lê credencial e persiste sessão autenticada. Com `gates.security` ativo na ficha, despache o `security-engineer` sobre o diff do working tree (config, esqueleto de auth, manifesto) antes de gravar; achado crítico/alto → corrigir e re-verificar o delta (régua de convergência do `core/CODE-REVIEW.md`). Gate desativado na ficha → siga, **declarando no report** que o fecho não teve gate 8. Stop hook que cobre o mesmo terreno é rede de segurança, nunca o gate.
+2. Gravar `quality.e2e` na ficha (merge-preserving — só esta chave), com o comando literal (ex.: `npx playwright test`).
+3. Report: o que foi instalado (ou reaproveitado) · arquivos criados (config, smoke, auth) · resultado da prova · veredito do gate 8 (ou a declaração de ausência) · **próximo passo** (specs de AC nascem nas tasks — o developer os entrega, o qa os executa; recorte via `--grep "@AC-NNN-XXX"`) · lembrete de que manifesto/lockfile/config estão no working tree — **o commit do setup é ato do Diretor**.
+4. `--dry-run`: imprime tudo acima sem instalar nem gravar.
 
 ## Limites
 
