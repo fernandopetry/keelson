@@ -2030,7 +2030,7 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Decisão**: a doutrina nomeia o padrão: corrida de limite/unicidade fecha **na escrita** (escrita condicional ou constraint sobre valor não derivado), nunca com lock de leitura sobre decisão derivada; a prova conta linhas no fim, sob concorrência real. O detalhe de motor (MySQL/InnoDB: subconsulta fora do alcance do lock, next-key/gap) é instância do perfil.
 
-**Aplicação**: `guidelines/core/SECURITY.md` (tabela "Outras vulnerabilidades") · `guidelines/backend/php.md` §10 (**pende re-olhada humana** — perfil `reviewed: true`). Sem re-init.
+**Aplicação**: `guidelines/core/SECURITY.md` (tabela "Outras vulnerabilidades") · `guidelines/backend/php.md` §10 (re-olhada feita na 0.93.1: claims conferidos contra a doc oficial do InnoDB; a frase do gap lock foi condicionada a varredura de faixa/prefixo — igualdade plena em chave única trava só o registro). Sem re-init.
 
 ### 4.178 — Correção de custo se prova no caminho nomeado pelo achado
 

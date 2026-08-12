@@ -17,6 +17,22 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.93.1] — 2026-08-11
+
+Human re-review of the `backend/php.md` §10 lock-trap block added by 4.177, with every
+claim checked against the official InnoDB documentation (8.4).
+
+### Fixed
+
+- `backend/php.md` §10: the gap-lock sentence was over-broad — it said a locking read
+  **on a unique index** holds next-key/gap locks. Per the InnoDB docs, equality on the
+  full unique key locks *only the record, not the gap*; next-key/gap locks apply to
+  **range or prefix scans** (including the prefix of a composite `UNIQUE`) and
+  non-unique indexes — which was the actual field case. The sentence now states the
+  condition and the record-only exception. The other claims (outer locking clause does
+  not reach nested subqueries; locks held until COMMIT; insert-intention × shared gap
+  deadlock) were confirmed verbatim and stand unchanged.
+
 ## [0.93.0] — 2026-08-11
 
 Decisions 4.170–4.179. A 15-hour field session re-running the quality gates on an
