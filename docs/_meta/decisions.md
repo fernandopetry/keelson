@@ -2184,6 +2184,38 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `skills/_shared/jira-sync-protocol.md` §17 · `commands/auto.md` (item 6 do relógio) · `docs/_meta/conventions/index-contract.md` (variação avulsa) · `docs/_meta/conventions/report-contract.md` (linha nova) · wiki `Solucao-de-problemas.md` (sintoma reconhecível). Fila: linha de 2026-08-13 fechada como aplicada.
 
+### 4.197 — Inventário de fim de wave enumera todos os gates por-wave; gate 10 se confronta contra a lista canônica, nunca contra a lembrança
+
+**Problema**: postmortem de consumidor (LRN-058, 1ª rodada real do gate 10 pós-4.155): a Etapa 3.3 do `/keelson:implement` já mandava, em prosa, o gate 10 rodar 1× por wave quando ela toca superfície de custo — mas o checklist mecânico de fim de wave (Etapa 3.6, item 1b, fruto da 4.92) enumerava literalmente "reviewer sempre; security quando devido" e nunca citava performance. A wave que implementou exatamente um gatilho canônico (laço de até 200 iterações chamando `save()`) fechou sem o gate; o N+1 real (~16 statements/profissional) só apareceu no pré-check da Entrega, 2-3h e 2 waves depois, com retry num ponto do ciclo mais caro. Mesma classe da 4.92: checagem que existe em prosa mas não no checklist do ponto de fechamento que já audita os gates irmãos.
+
+**Decisão**: o item 1(b) da Etapa 3.6 enumera os **três** gates por-wave (reviewer sempre; security e performance quando devidos) e, para o gate 10, exige confronto **ativo** do diff da wave contra a lista canônica de gatilhos — por **referência** à `description` do `performance-engineer` (dono único, 4.20/4.155), nunca por segunda cópia da lista. Gatilho presente sem veredito (`aprovado` ou `n/a` com motivo) reabre a wave. A correção é prosa; **gatilho registrado**: a 4.92 já declarou que reincidência no inventário o torna mecânico (run-state ou check do grafo, com fixture) — próxima wave fechada sem gate devido dispara essa promoção, não mais texto.
+
+**Aplicação**: `commands/implement.md` (Etapa 3.6, item 1b). Fila: linha LRN-058 de 2026-08-13 fechada como aplicada.
+
+### 4.198 — Cobertura de FR não é equivalência: FR de proibição exige AC que recuse o próprio evento
+
+**Problema**: postmortem de consumidor (LRN-057): FR [MUST] com modal de proibição ("resultado maior que o teto **não é selecionável**") coberto por AC que só provava a mitigação a jusante (bloquear a aplicação depois, avisar o teto). A implementação seguiu o AC à risca — e o oposto do FR sobreviveu a 2 waves de code-review e um gate 9 inteiro em navegador, porque reviewer e qa revisam contra o AC **por desenho**; só a convergência de fecho (4.143), comparando contra o texto literal do FR, achou. O grafo prova que o AC **existe** (`fr-sem-ac`); ninguém perguntava se o AC **prova** o FR.
+
+**Decisão**: check novo na Etapa 1 do `spec-validator` (o ponto mais cedo, antes de plan/tasks herdarem o AC fraco; corrigir em reviewer/qa replicaria a régua em 3 lugares): FR com modal de proibição/recusa cujos ACs pareados só provam mitigação a jusante — com exemplos literais do que **satisfaz** (recusa indireta: "retorna 403", "permanece inalterado", "nada é selecionado") para não punir SPEC legítima. Nasce **WARNING**, não ERROR: a régua das 4.52/4.64 (check semântico com amostra de um fica reservado; precedente literal na decisão da 0.44.0) prevalece sobre a severidade do caso — reincidência da classe escala a ERROR, e a escalada já está declarada no texto do check. Proposta alternativa (ERROR imediato, pela gravidade do caso de campo) fica à janela de veto do Diretor.
+
+**Aplicação**: `skills/spec-validator/SKILL.md` (Etapa 1, "EARS e redação"). Não entra no `lint-contract.md` (é semântico, não mecanizável por script — o consumidor mesmo o classificou assim). Fila: linha LRN-057 de 2026-08-13 fechada como aplicada.
+
+### 4.199 — Receber achado generalizável são dois atos: a correção de código e o roteamento da lição; a closure bloqueia pelo segundo também
+
+**Problema**: postmortem de consumidor (LRN-060): `licao_candidata` devolvida por um gate no retry teve a correção de código aplicada e a lição nunca roteada — a mesma classe ("retry muda contrato/custo e o artefato-fonte não acompanha") reapareceu horas depois como PLAN desatualizado, e o padrão só foi percebido ao compor o postmortem. Causa: o item 5 da closure (§3.4.2) competia por atenção com os itens 1–4 na mesma passada, mas a cláusula de bloqueio só cobria os itens 1–3 — "apliquei a correção e segui" passava sem nada acusar, inclusive pelo próprio autor.
+
+**Decisão**: o item 5 ganha a mesma força de bloqueio dos itens 1–3: closure falha se `licao_candidata` não-nula ficou **sem destino registrado** — o bloqueio é pelo **ato de rotear**, nunca pelo resultado externo (assimetria com o item 4/Jira preservada: `agile-coach` indisponível → registro inline + pendência declarada, o fallback que o item 4 já pratica). O item abre nomeando os dois atos como distintos e mandando enumerar as `licao_candidata` de **todos** os reports da task na wave, inclusive retry/convergência (onde o caso real nasceu). `commands/review.md` já delega a "mecânica" ao item 5 e já obriga o ato no próprio texto — herda sem edição.
+
+**Aplicação**: `commands/implement.md` (§3.4.2, item 5 + cláusula de bloqueio). Fila: linha LRN-060 de 2026-08-13 fechada como aplicada.
+
+### 4.200 — Timestamp de closure é medido onde nasce: a instrução de medição viaja com o campo, não com o campo irmão
+
+**Problema**: postmortem de consumidor (LRN-059, parente da classe 4.56/4.196 — "relógio medido, nunca estimativa"): `data_inicio`/`data_conclusao` do report consolidado de TASK pedem `<ISO 8601>` sem instruir como obtê-lo; a régua irmã existe duas seções acima no mesmo repo (`auto.md`, Largada/Cronologia) e não alcançou. Os campos foram preenchidos por estimativa; o `tracker-sync` achou os três relógios (TASK, commits, comentário Jira) mutuamente inconsistentes e recusou — corretamente — fabricar o worklog, ao custo da telemetria daquela wave. Nenhum gate 1–9 lê esses campos: a auditoria do sync não é garantida.
+
+**Decisão**: instrução de medição **inline nos dois pontos onde o valor nasce** — o YAML do §3.4.1 (main session consolida) e o report do `developer` (fonte upstream; corrigir só o consolidado deixaria a estimativa entrar por cópia): marca via `TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z`; sem marca capturada no momento, o timestamp do commit real (`git show -s --format=%cI <SHA>`) como evidência — nunca aproximado de memória. A doutrina continua com os donos (auto.md, index-contract.md); o inline é instrução operacional, não 5ª cópia da regra. **Débito registrado, sem mitigação no escopo**: o fuso `America/Sao_Paulo` é literal em todos os donos (ledger.sh, window-marker.sh, auto.md) e o consumidor pode estar noutro fuso — parametrizar exigiria campo na ficha (contrato novo → re-init), leva própria se o Diretor quiser.
+
+**Aplicação**: `commands/implement.md` (§3.4.1) · `agents/developer.md` (report). Fila: linha LRN-059 de 2026-08-13 fechada como aplicada.
+
 ---
 
 ## 5. Quality gates inegociáveis

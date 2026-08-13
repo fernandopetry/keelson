@@ -25,6 +25,39 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.97.0] — 2026-08-13
+
+Re-init: none
+
+Decisions 4.197–4.200 — consumer postmortem of a full autonomous `/keelson:auto` cycle
+(proposal queue 4.111): four gate-mechanics gaps, each one a rule that existed in prose
+but not at the checkpoint that could have enforced it.
+
+### Added
+
+- `spec-validator` gains a semantic check (WARNING, escalating to ERROR on class
+  recurrence): an FR with prohibition/refusal wording covered only by ACs that prove
+  downstream mitigation — blocking the *next* action instead of refusing the event
+  itself — proves a weaker version of the FR. Indirect refusal ("returns 403",
+  "remains unchanged") satisfies it (4.198).
+
+### Changed
+
+- The end-of-wave inventory (implement, step 3.6) now enumerates all three per-wave
+  gates — reviewer always; security *and performance* when due — and requires actively
+  matching the wave's diff against the performance-engineer's canonical trigger list; a
+  cost trigger with no recorded gate-10 verdict reopens the wave (4.197). Recurrence
+  promotes this to a mechanical check (standing trigger from 4.92).
+- Task closure now fails when a non-null `licao_candidata` from any gate report
+  (including retry/convergence rounds) is left without a registered destination —
+  applying the code fix and routing the lesson are two distinct acts; the block is on
+  the act of routing, with an inline fallback when the agile-coach is unavailable
+  (4.199).
+- `data_inicio`/`data_conclusao` in the consolidated task report and the developer
+  report now carry the measurement instruction inline (wall clock via `date`, or the
+  real commit timestamp as evidence) — never estimated from memory; inconsistent
+  estimates had cost a wave its telemetry (4.200).
+
 ## [0.96.1] — 2026-08-13
 
 Re-init: none

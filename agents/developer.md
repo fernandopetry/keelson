@@ -165,8 +165,8 @@ implementação já vive no código, nos testes e no commit, e a closure é da m
 ```yaml
 task_id: TASK-MMM-XXX
 status_proposto: Done | Blocked | Failed
-data_inicio: <ISO 8601>
-data_conclusao: <ISO 8601>
+data_inicio: <ISO 8601>    # medido (TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z) ao iniciar — nunca estimado (4.200)
+data_conclusao: <ISO 8601> # a mesma marca ao terminar; sem marca, o commit real (git show -s --format=%cI <SHA>)
 branch: <nome>
 commit_sha: <SHA curto>
 implementado_por: developer
