@@ -25,6 +25,31 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.96.1] — 2026-08-13
+
+Re-init: none
+
+Decisions 4.195–4.196 — first field round of 0.96.0 (consumer postmortem + Diretor
+report, proposal queue 4.111): scripts shipped without their executable bit, and active
+telemetry could skip the worklog in total silence.
+
+### Fixed
+
+- Executable bit committed for all 32 package scripts (`scripts/*.sh`, including test
+  suites) — the installed cache preserves the mode git has, so `100644` became a real
+  `permission denied` in the field; the pre-commit/CI check now covers `scripts/` and
+  `scripts/git-hooks/` alongside `hooks/` (second occurrence of the 4.180 class → the
+  check widens, 4.195).
+- `index-contract.md` ("Number allocation") now prescribes the `bash "…"` invocation
+  form for `next-id.sh` — the form the six real callers already used, and the only one
+  that doesn't depend on the executable bit (4.195).
+- Telemetry can no longer fail silently (4.196): every route that posts the closing
+  comment also posts the worklog (including on-demand mode and standalone briefs); the
+  standalone brief now carries a measured `**Largada**:` mark (the duration source that
+  route was missing); and the closing report gains a mandatory `Telemetria:` line when
+  `jira.telemetry` is on — published, failed with reason, or not publishable, never
+  omitted.
+
 ## [0.96.0] — 2026-08-12
 
 Re-init: required
