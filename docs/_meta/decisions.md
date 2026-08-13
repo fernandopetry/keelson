@@ -2072,6 +2072,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `.claude/agents/impact-scout.md` · `.claude/skills/field-intake/SKILL.md` · `CLAUDE.md` (seção *Ferramentas do mantenedor* + ponteiro na seção da 4.181). Sem bump, sem CHANGELOG e sem re-init — nada embarcado mudou.
 
+### 4.183 — `impact-scout` roda em opus: o mapa de impacto é avaliação, não execução
+
+**Problema**: o `impact-scout` nasceu na 4.182 com `model: sonnet`, no molde do `code-scout`. Mas o molde vale para a varredura (referências, dono único, guardas — mecânica que qualquer modelo faz), não para a dimensão 6 do mapa: gerar as **hipóteses de quebra** — o que hoje funciona e depende do comportamento atual, com a prova de cada uma — é o coração de julgamento da 4.181. O contraste ficou visível ao planejar a sessão do mantenedor em modelo mais econômico (Sonnet medium): a delegação existia, mas devolvia o parecer no mesmo nível de modelo que se queria economizar — a sessão principal viraria autora de um parecer fraco em vez de leitora de um parecer forte. Pela régua da 4.70, avaliadores rodam em opus e executores em sonnet; o scout era o único avaliador fora dela.
+
+**Decisão**: `impact-scout` passa a `model: opus`. A fronteira da 4.182 não muda: o scout continua mapeando sem decidir — a prova (rodar as guardas), a decisão e a escalação ao Diretor com proposta + default permanecem na sessão principal, que pode rodar em modelo mais econômico lendo um mapa forte. O `doctrine-reviewer` segue adiado com seu gatilho de reincidência — o bump do scout cobre o caso mais frequente.
+
+**Aplicação**: `.claude/agents/impact-scout.md` (frontmatter `model:`). Camada do mantenedor (4.182): sem bump, sem CHANGELOG e sem re-init.
+
 ---
 
 ## 5. Quality gates inegociáveis
