@@ -25,6 +25,49 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.96.0] — 2026-08-12
+
+Re-init: required
+
+Decisions 4.190–4.194 — branch policy becomes configuration, and the tracker sees the
+work from the first act:
+the demand's root issue is born at kickoff, branch names can carry its key, and an
+opt-in telemetry stream posts per-stage worklogs. Defaults preserve today's behavior —
+consumers who change nothing feel nothing; re-init is required only to receive the new
+ficha fields.
+
+### Added
+
+- `git` block in the ficha (`keelson.config.json`): `branchStrategy` (`"unica"` default ·
+  `"por-fatia"`) sets the default the epic decomposition proposes — the BRIEF stays the
+  single source read at runtime, and the Diretor can still override per epic (4.190).
+- `por-fatia` merge precondition: `/keelson:continue` no longer proposes a slice whose
+  declared dependency was delivered but not yet merged into main — it surfaces the merge
+  pending instead (merge remains a human act) and offers an independent slice (4.190).
+- Tracker root at kickoff (4.191): with `jira.enabled`, the formal-cycle kickoff creates
+  **only the root node** typed by triage (Epic for epics, spec issue as an honest stub for
+  regular demands, standalone for one-offs); the key is persisted in the BRIEF header and
+  copied to the SPEC by the specify hook, which enriches the stub instead of creating.
+  Connector down at kickoff → the command asks the Diretor for a manual key (link mode);
+  declined → best-effort as always. `epicPolicy: multi-feature` keeps creating at the
+  specify hook (declared exception).
+- `git.branchNaming` (`"slug"` default · `"tracker-key"`): opt-in branch names
+  `feat/<KEY>-<short-description>` using the root key from that kickoff; no key → declared
+  fallback to the classic `feat/<slug>-…`, and a pushed branch is never renamed (4.192).
+  Guarded mechanically: new `git-branch-config` item in `init-selfcheck.sh` (tracker-key
+  requires `jira.enabled`; enum values proven) with suite fixtures.
+- `jira.telemetry` (default `false`): each existing stage hook posts a **worklog** with the
+  measured stage duration plus a one-line comment with the stage's quality counters (gate
+  retries, escalations, red re-gates) on the main issue — aggregatable in Jira time
+  reports; per-operator attribution requires a per-user connector (4.193). Best-effort
+  inviolable; telemetry never moves cards. New §16/§17 in the Jira sync protocol.
+
+### Changed
+
+- `docs/_meta/conventions/` is shipped content: what commands read at runtime in the
+  consumer counts toward the version bump — the criterion is who reads, not where it
+  lives (4.194).
+
 ## [0.95.0] — 2026-08-12
 
 Re-init: none
