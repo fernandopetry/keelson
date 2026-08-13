@@ -21,10 +21,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Bit de execução dos hooks (4.180 — hooks.json invoca direto, 644 falha em silêncio)
+      - name: Bit de execução dos scripts do pacote (4.180/4.195 — 644 vira Permission denied no consumidor)
         run: |
-          bad="$(git ls-files -s -- 'hooks/*.sh' | grep -v '^100755' || true)"
-          if [ -n "$bad" ]; then echo "hook sem bit de execução:"; echo "$bad"; exit 1; fi
+          bad="$(git ls-files -s -- 'hooks/*.sh' 'scripts/*.sh' 'scripts/git-hooks/*' | grep -v '^100755' || true)"
+          if [ -n "$bad" ]; then echo "script sem bit de execução:"; echo "$bad"; exit 1; fi
 
       - name: Suíte do grafo (scripts/tests/graph/run.sh)
         run: bash scripts/tests/graph/run.sh

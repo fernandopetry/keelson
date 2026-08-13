@@ -76,14 +76,15 @@ for f in $staged; do
   esac
 done
 
-# Bit de execução dos hooks: hooks.json invoca hooks/*.sh DIRETAMENTE (sem prefixo bash),
-# então 644 no índice vira "Permission denied" silencioso a cada disparo no consumidor (4.180).
-# Confere o índice inteiro — um git ls-files, custo zero, e pega drift mesmo em commit alheio.
-hx_bad="$(git ls-files -s -- 'hooks/*.sh' 2>/dev/null | grep -v '^100755' || true)"
+# Bit de execução dos scripts do pacote: hooks.json invoca hooks/*.sh DIRETAMENTE (sem
+# prefixo bash) e 644 no índice vira "Permission denied" silencioso no consumidor (4.180);
+# a 2ª ocorrência da classe (scripts/next-id.sh 644 no pacote 0.96.0) estendeu o check a
+# todo script invocável do pacote (4.195). Confere o índice inteiro — custo zero.
+hx_bad="$(git ls-files -s -- 'hooks/*.sh' 'scripts/*.sh' 'scripts/git-hooks/*' 2>/dev/null | grep -v '^100755' || true)"
 if [ -n "$hx_bad" ]; then
-  echo "[keelson pre-commit] BLOQUEADO: hook sem bit de execução no índice — o harness o invoca direto e a falha é silenciosa (4.180):" >&2
+  echo "[keelson pre-commit] BLOQUEADO: script sem bit de execução no índice — no pacote instalado vira Permission denied (4.180/4.195):" >&2
   printf '%s\n' "$hx_bad" | sed 's/^/    /' >&2
-  echo "  Corrija: chmod +x hooks/*.sh && git add hooks/" >&2
+  echo "  Corrija: chmod +x <arquivos> && git add" >&2
   echo "  Escape consciente: KEELSON_SKIP_TESTS=1" >&2
   exit 1
 fi

@@ -2168,6 +2168,22 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `CLAUDE.md` (seção *Versionamento*, bullet novo). Esta leva já a aplica: as convenções tocadas (4.190–4.193) entram no bump 0.96.0.
 
+### 4.195 — Bit de execução é fato commitado para todo script do pacote; doutrina prescreve invocação via `bash`
+
+**Problema**: 2ª ocorrência da classe exec-bit (1ª: hooks 644, decisão 4.180). Postmortem de consumidor (fila 4.111, origem LRN-055 do ledger dele): seguindo ao pé da letra o "executor canônico" documentado no `index-contract.md` ("Alocação de número" — invocação direta do `next-id.sh`), a sessão levou `permission denied` no pacote instalado 0.96.0. Causa mecânica: 32 dos scripts de `scripts/` estavam `100644` no índice — o bit nunca foi commitado; o cache da CLI preserva o modo que o git tem. Os 6 comandos que invocam o script de verdade já usavam `bash "…"` (cada autor redescobriu o contorno) — só a "fonte única" prescrevia a forma que quebra. O check da 4.180 cobria apenas `hooks/*.sh`.
+
+**Decisão**: (a) **bit commitado para todo script invocável do pacote** — `scripts/*.sh` (inclui os `run.sh` das suítes) e `scripts/git-hooks/*`, além dos `hooks/*.sh` da 4.180; (b) o check do pre-commit e do CI **estende o pathspec** para essas três famílias (2ª reincidência da classe → check mecânico, escada 4.149); (c) a doutrina prescreve invocação de script do pacote **sempre na forma `bash "${CLAUDE_PLUGIN_ROOT}/scripts/<nome>.sh"`** — a única que não depende de bit — e o `index-contract.md` é corrigido para a forma que os invocadores reais já usam. As duas pontas juntas: o bit torna a forma direta inofensiva; a forma `bash` torna o bit irrelevante — defesa em profundidade contra a classe inteira.
+
+**Aplicação**: `chmod +x` + modo no índice (32 arquivos) · `scripts/git-hooks/pre-commit` (pathspec do check) · `.github/workflows/test.yml` (idem) · `docs/_meta/conventions/index-contract.md` ("Alocação de número"). Fila: 2 linhas de 2026-08-13 fechadas como aplicadas.
+
+### 4.196 — Telemetria ativa declara-se em todo fecho; toda rota com comentário de fecho publica worklog; brief avulso carrega a marca de largada
+
+**Problema**: 1ª rodada real da 4.193 (relato do Diretor, mesma sessão de consumidor do LRN-055): `jira.telemetry: true`, card criado na largada (§16 funcionou), e **nenhum worklog** — sem linha no report, sem evento no ledger: silêncio total, indistinguível de "nunca deveria ter rodado". Três furos da doutrina se somaram: o §17 nomeava só os 4 ganchos do ciclo formal (a rota avulsa/sob demanda, que só tem o fecho, ficava fora); o brief avulso não tinha marca `**Largada**:` (fonte de duração indefinida numa telemetria que é "medida, nunca estimada"); e nenhuma linha de report cobrava a publicação (a mutação e o diff inerte declaram até quando não rodam — a telemetria não declarava nem quando devia rodar).
+
+**Decisão**: (a) **cobertura por rota**: toda rota que publica o comentário de fecho (§11) — inclusive modo sob demanda e avulsa — publica também o worklog do trecho medido; (b) o **brief avulso ganha `**Largada**:`** medida (mesma régua 4.56 do BRIEF formal), fonte de duração da rota sem Cronologia; (c) **linha `Telemetria:` no esqueleto do report** (`report-contract.md`), condicional a `jira.telemetry: true`: `worklog <duração> publicado | falhou (<motivo>) | sem marca de largada — não publicável` — ativo sem linha é defeito do report; rota sem marca degrada **declarando**, nunca engolindo.
+
+**Aplicação**: `skills/_shared/jira-sync-protocol.md` §17 · `commands/auto.md` (item 6 do relógio) · `docs/_meta/conventions/index-contract.md` (variação avulsa) · `docs/_meta/conventions/report-contract.md` (linha nova) · wiki `Solucao-de-problemas.md` (sintoma reconhecível). Fila: linha de 2026-08-13 fechada como aplicada.
+
 ---
 
 ## 5. Quality gates inegociáveis

@@ -39,8 +39,9 @@ Nomes de arquivo de TASK por tipo: `-fix-` (bugfix), `-refactor-` (refactor), `-
 **Alocação de número (decisão 4.86)**: número novo de artefato numerado do slug — SPEC
 (com seu BRIEF pareado), PLAN ou brief avulso — sai de um **alocador único**:
 `max(todos os NNN e MMM já usados no slug) + 1`. O executor canônico é
-`${CLAUDE_PLUGIN_ROOT}/scripts/next-id.sh <dir-do-slug> alloc` (e `task <MMM>` para o
-próximo XXX de TASK — decisão 4.151); o `--check` confere o pareamento brief ↔ SPEC.
+`bash "${CLAUDE_PLUGIN_ROOT}/scripts/next-id.sh" <dir-do-slug> alloc` (e `task <MMM>` para o
+próximo XXX de TASK — decisão 4.151) — sempre via `bash`, a forma que não depende do bit
+de execução do pacote instalado (4.195); o `--check` confere o pareamento brief ↔ SPEC.
 Alocar de cabeça é o que colide. Consequências: nunca nascem dois
 artefatos novos com o mesmo número (a colisão de nome BRIEF-pareado × BRIEF-avulso é
 impossível por construção); pares NNN/MMM iguais pré-4.86 (ex.: SPEC-001 + PLAN-001)
@@ -147,6 +148,7 @@ da Story `standalone` no tracker (protocolo Jira §7). Esqueleto literal:
 **Tipo**: avulso
 **Status**: Aberto | Concluído
 **Data**: <YYYY-MM-DD>
+**Largada**: <YYYY-MM-DDTHH:MM:SS-0300 — medida com `TZ=America/Sao_Paulo date`, nunca estimada (4.196: é a fonte de duração do worklog da telemetria nesta rota)>
 **Origem**: <Diretor (pedido em sessão) | key do tracker (rota pull, ex.: PROJ-123)>
 **Jira**: <KEY — gravada pelo sync (§10 do protocolo); linha ausente = não sincronizado>
 
