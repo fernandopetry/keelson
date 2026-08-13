@@ -147,7 +147,9 @@ tudo (instalação com confirmação, config, smoke spec) e grava o campo após 
 
 `/keelson:continue <slug>`. Ele lê a fila viva do épico e os artefatos commitados,
 mostra o "você está aqui" e propõe o próximo passo com o comando já montado — retomar
-a wave interrompida, disparar a próxima fatia ou abrir o PR. Nada roda sem a sua
+a wave interrompida, disparar a próxima fatia ou abrir o PR. Com a estratégia
+`por-fatia`, ele também verifica se a fatia da qual a próxima depende já mergeou na
+main — se não, mostra a pendência de merge em vez de propor. Nada roda sem a sua
 confirmação, mas nada depende da sua memória. O passo a passo completo está em
 [Fluxo de épicos](Fluxo-de-epicos).
 

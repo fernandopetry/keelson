@@ -54,7 +54,8 @@ Ferramentas MCP usadas (todas do conector Atlassian): `atlassianUserInfo` (prova
 disponibilidade, §0), `getAccessibleAtlassianResources`, `getVisibleJiraProjects`,
 `getJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFields`,
 `searchJiraIssuesUsingJql`, `getTransitionsForJiraIssue`, `getJiraIssue`, `createJiraIssue`,
-`editJiraIssue`, `addCommentToJiraIssue`, `transitionJiraIssue`, `createIssueLink`.
+`editJiraIssue`, `addCommentToJiraIssue`, `addWorklogToJiraIssue` (telemetria, §17),
+`transitionJiraIssue`, `createIssueLink`.
 Nomes de servidor variam por instalação (`mcp__<servidor>__<ferramenta>`) — resolva pelo
 **sufixo** da ferramenta, nunca por um prefixo fixo.
 
@@ -75,8 +76,13 @@ variam por projeto.
 | `epicPolicy` | `always` (default — SPEC → Epic sempre) \| `multi-feature` (0–1 FEAT → projeção **compacta**, sem Epic — §7.0) |
 | `standaloneParent` | key **literal** de um Epic agrupador (criado uma vez pelo humano, sem SPEC por trás) que vira `parent` da Story avulsa (§7.1 — decisão 4.86); `null` (default) → Story avulsa nasce sem pai |
 | `transition` | `off` \| `comment` (default) \| `auto` — §9 |
+| `telemetry` | `false` (default) \| `true` — worklog por etapa + comentário de contadores (§17, decisão 4.193) |
 | `mapFile` | caminho do mapa `.md` do projeto (§3); `null` → só `summary`+`description`, sem mover card |
 | `boardId` | opcional, só para compor link "ver no board" em comentário |
+
+O bloco `git` da ficha (`branchStrategy`, `branchNaming` — decisões 4.190/4.192) não é
+deste protocolo — o dono é "Commit por marco" (`sdd-conventions.md`); ele só toca o Jira
+via §16 (a key da raiz é quem nomeia a branch no modo `tracker-key`).
 
 ## §3. Mapa do projeto (`mapFile`) — três seções
 
@@ -200,7 +206,10 @@ só quando a projeção degradada do §7 for possível; senão avisar e **não c
 órfã sem filhos possíveis é meio-estado ruim, não progresso). **Projeção compacta**
 (`epicPolicy: multi-feature` ∧ 0–1 FEAT — §7.0) → a issue da SPEC **não é criada**: a raiz
 da árvore é a Story única, e este § inteiro é no-op para a SPEC.
-1. Idempotência (§4). 2. `create` + sem key → `createJiraIssue` (projectKey, `issueType.spec`,
+1. Idempotência (§4) — e **antes de criar, olhe o BRIEF**: raiz criada na largada (§16,
+decisão 4.191) deixa a key no cabeçalho do BRIEF; presente → **copie-a** para a linha
+`**Jira**:` da SPEC e trate como issue existente (re-render §6.2 enriquece o stub — este §
+não cria). 2. `create` + sem key → `createJiraIssue` (projectKey, `issueType.spec`,
 `summary` = título da SPEC, `description` = template **Epic** da receita §6.2), aplicar campos `write` (§8),
 gravar a key na linha `**Jira**:` do cabeçalho (§10). 3. `link` → validar a key existente e
 aplicar campos `write`/`read` conforme o mapa. PLAN **não** vira issue (fica implícito na
@@ -578,6 +587,10 @@ declarada no mapa). A política `transition` continua valendo como em qualquer m
 - **Brief avulso** (decisão 4.86) → linha `**Jira**: <KEY>` no cabeçalho do
   `briefs/BRIEF-MMM-*-avulso.md` (ausente = ainda não sincronizado; na rota pull a linha
   já nasce preenchida com a key do card de origem — é ela que impede a duplicata).
+- **BRIEF (formal e épico) — raiz da largada (§16, decisão 4.191)** → linha `**Jira**: <KEY>`
+  no cabeçalho, gravada na largada que criou (ou recebeu do Diretor) a raiz. É a ponte
+  temporal entre a largada e a SPEC: o gancho do specify **copia** essa key para a SPEC (§6)
+  em vez de criar. Ausente = raiz ainda não criada — o §6 segue o fluxo normal.
 - **TASK** → campo `Jira: <KEY>` no bloco "Histórico de execução" da closure, ao lado de
   `Commit SHA`.
 - **INDEX** → apenas 1 linha no "Histórico recente" — **do sucesso**
@@ -758,3 +771,52 @@ closure, artefato ainda sem a linha — → **omita aquela e commite com as que 
 key resolvida → commit **sem key alguma**, idêntico ao de um projeto sem Jira, sem aviso e sem
 pergunta ao Diretor. **Nunca inventar key**: só entram as lidas literalmente dos artefatos. Um
 commit não espera o Jira.
+
+## §16. Raiz na largada (decisão 4.191)
+
+**Gatilho**: `jira.enabled` ∧ largada de ciclo formal (`/keelson:auto` Etapa 0.5) ou de épico
+(`/keelson:specify-epic` Etapa 3). **Cria apenas o nó-raiz** — a forma completa da árvore
+(fatias, FEATs, sub-tasks) ainda não existe, e crescer para baixo é barato (filho anexa ao pai
+na criação); os filhos continuam nascendo nos ganchos de sempre (§6.1, §7, `jira-sync-feat.md`).
+
+- **Tipo da raiz pela rota da triagem**: épico → Epic · demanda comum → `issueType.spec` ·
+  avulsa → `issueType.standalone` (§7.1). **Exceção declarada**: `epicPolicy: multi-feature`
+  decide a raiz olhando as FEATs da SPEC (§7.0), que não existem na largada → a criação
+  permanece no gancho do specify, como antes deste §.
+- **Stub honesto**: `summary` = título do pedido/brief; `description` mínima declarando que a
+  SPEC está em elaboração (nunca a receita §6.2 fingida — o re-render do gancho do specify
+  enriquece). Idempotência (§4) e sondagem anti-duplicata valem como em qualquer criação.
+- **Key no BRIEF** (§10): a key da raiz é gravada no cabeçalho do BRIEF na mesma largada —
+  é ela que o modo `git.branchNaming: tracker-key` usa para nomear a branch (4.192) e que o
+  gancho do specify copia para a SPEC.
+- **Conector caído na largada** → único ponto onde a degradação **pergunta** (o Diretor está
+  presente): ofereça informar uma key manual (a demanda vira modo `link`; a key entra no BRIEF
+  e o naming funciona igual). Recusou → siga sem key, best-effort §0 — a branch nasce no padrão
+  default e a linha declarada vai ao report. No meio do ciclo, a degradação continua silenciosa.
+- **Aborto com raiz criada**: demanda que morre depois da largada (escada, veto do Diretor) →
+  comentário de aborto no card no report da escalação — **nunca** deletar issue.
+- **Reclassificação pós-largada** (demanda que se revela épico): já é escalação (4.38); a
+  correção no tracker é criar o Epic e **linkar** a issue existente como primeira fatia —
+  epic link é update normal, distinto do re-parent de sub-task que o §4 proíbe.
+
+## §17. Telemetria de etapas — worklog por etapa (decisão 4.193)
+
+**Gatilho**: `jira.enabled` ∧ `jira.telemetry: true`. Desligado → nada muda. A telemetria é
+**medida, nunca estimada**: a fonte é o relógio do ciclo (4.56) — marcas da `## Cronologia`
+do BRIEF — e os eventos do ledger de sessão (4.76). Publicação em cada gancho de etapa que
+já existe (specify · tasks · implement · entrega), na **issue principal** do slug:
+
+- **Worklog** (`addWorklogToJiraIssue`): duração medida da etapa que fechou (`timeSpent`,
+  início = marca da etapa anterior). Worklog é o mecanismo agregável do Jira — relatórios de
+  tempo e API leem sem parsear prosa; comentário **não** substitui worklog.
+- **Comentário de contadores** (1 linha, estruturada): etapa · duração · retries de gate ·
+  escalações ao Diretor · re-gates vermelhos · waivers pedidos — lidos do ledger da etapa.
+  É o par duração+contadores que separa "demanda difícil" de "operação ruim"; duração
+  sozinha engana e não é publicada sem eles.
+- **Atribuição**: o autor do worklog é a conta autenticada no conector. Telemetria por
+  operador exige **conector por usuário** — conta de serviço compartilhada faz toda a
+  telemetria sair com o mesmo autor (pré-requisito de adoção; o plugin não tem como
+  prová-lo mecanicamente, então documente ao ativar).
+- **Best-effort §0 inviolável**: falha ao publicar → evento `tracker` no ledger; a
+  reconciliação da entrega (§12) publica o que ficou para trás. Telemetria **nunca** move
+  card (§9/4.65 intocados) e nunca trava etapa.

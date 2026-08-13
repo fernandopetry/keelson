@@ -115,7 +115,7 @@ A fonte primária de convenções é a **ficha/perfil** (o que o `/keelson:tasks
 - Padrão de commit declarado contradiz convenção **explícita** do perfil ou do CLAUDE.md (nenhuma declaração → vale o default do gerador, Conventional Commits, sem ERROR)
 
 ### WARNING se:
-- Branch sugerida foge do padrão declarado (perfil ou CLAUDE.md); sem padrão declarado, não avaliar
+- Branch sugerida foge do padrão declarado (perfil, CLAUDE.md ou ficha — `git.branchNaming`, decisão 4.192; o default do keelson é o de `sdd-conventions.md`, "Commit por marco"); sem padrão declarado, não avaliar
 
 ### Auto-fix se:
 - Convenções vazias mas ficha/perfil/CLAUDE.md têm dados: preencher

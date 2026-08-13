@@ -28,8 +28,13 @@
     "convention": "conventional",
     "releaseAutomation": null
   },
+  "git": {
+    "branchStrategy": "unica",
+    "branchNaming": "slug"
+  },
   "jira": {
     "enabled": false,
+    "telemetry": false,
     "site": null,
     "cloudId": null,
     "projectKey": null,

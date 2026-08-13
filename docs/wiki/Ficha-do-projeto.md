@@ -33,7 +33,8 @@ fixo nunca é assumido: se não está na ficha, o keelson pergunta ou reporta pe
   },
   "docsRoot": "docs",
   "commit": { "convention": "conventional", "releaseAutomation": null },
-  "jira": { "enabled": false }
+  "git": { "branchStrategy": "unica", "branchNaming": "slug" },
+  "jira": { "enabled": false, "telemetry": false }
 }
 ```
 
@@ -126,6 +127,23 @@ Raiz dos artefatos SDD. Default `docs`; os artefatos de cada demanda ficam em
 O keelson **alimenta** a automação de release; não a opera — publicar release é ato seu,
 como PR e deploy. Detalhes em [Convenção de commits](Convencao-de-commits).
 
+### `git`
+
+Política de branch do time (decisões 4.190/4.192). **Os defaults preservam o
+comportamento clássico** — bloco ausente = nada muda.
+
+```jsonc
+"git": {
+  "branchStrategy": "unica",   // "unica" | "por-fatia" — default proposto p/ épicos
+  "branchNaming": "slug"       // "slug" | "tracker-key" — nome da branch da largada
+}
+```
+
+| Campo | O que decide |
+|---|---|
+| `branchStrategy` | O default que o `/keelson:specify-epic` propõe na confirmação do épico: `unica` (todas as fatias na branch do épico, um PR ao final) ou `por-fatia` (cada história na sua branch — e o `/keelson:continue` só propõe uma fatia **dependente** depois que a anterior mergeou na main). Você pode sobrescrever épico a épico na confirmação; o que vale para leitura é sempre o que ficou gravado no BRIEF |
+| `branchNaming` | `slug` → `feat/<slug>-<descrição-curta>` (o padrão de sempre); `tracker-key` → `feat/<KEY>-<descrição-curta>` com a key do Jira criada na largada. Exige `jira.enabled: true` (o self-check do `init` prova); sem key na largada (conector caiu e você não informou uma), a branch nasce no padrão default e o report declara |
+
 ### `jira`
 
 Integração opcional, **desligada por padrão** e sempre *best-effort* — nunca bloqueia o
@@ -136,6 +154,7 @@ grava **IDs**.
 ```jsonc
 "jira": {
   "enabled": false,
+  "telemetry": false,                     // worklog + contadores por etapa (4.193)
   "site": null, "cloudId": null, "projectKey": null,
   "mode": "create",                       // "create" | "link"
   "issueType": { "spec": null, "feature": null, "task": null, "standalone": null },
@@ -146,8 +165,16 @@ grava **IDs**.
 }
 ```
 
+Com `jira.enabled`, a **issue-raiz da demanda nasce na largada** (Epic para épico, issue
+da SPEC para demanda comum, tarefa avulsa para o resto — decisão 4.191): o card existe
+desde o primeiro ato, a key entra no cabeçalho do BRIEF e pode nomear a branch
+(`git.branchNaming: "tracker-key"`). Se o conector estiver fora do ar na largada, o
+comando pergunta se você quer informar uma key manualmente; recusando, tudo segue sem
+Jira, como sempre (best-effort).
+
 | Campo | O que decide |
 |---|---|
+| `telemetry` | `true` publica, a cada etapa do ciclo (SPEC, PLAN, TASKs, entrega), um **worklog** com a duração medida da etapa e um comentário de 1 linha com os contadores de qualidade (retries de gate, escalações, re-gates) na issue principal. Worklog agrega nos relatórios de tempo do Jira. **Atenção**: o autor do worklog é a conta do conector — telemetria por pessoa exige que cada desenvolvedor use o próprio conector, nunca conta de serviço compartilhada |
 | `mode` | `create` — o keelson cria a issue da SPEC e as sub-tasks; `link` — pendura o trabalho numa issue que você já abriu |
 | `epicPolicy` | `multi-feature` não cria Epic para SPEC com 0–1 funcionalidade (a Story vira a raiz) |
 | `standaloneParent` | key de um Epic que **você** cria uma vez (ex.: "Manutenção") para as Stories de tarefa avulsa aninharem; `null` → a Story avulsa nasce sem pai — os dois são válidos |

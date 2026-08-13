@@ -34,7 +34,7 @@ A derivação chega como **fato** (4.154): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/
 | BRIEF do slug com `Status: aguardando-produto` | Retomada da forja: `/keelson:brief <slug>` (chegaram respostas?) |
 | Fatia `em ciclo` com closures **parciais** nas TASKs | Retomar a implementação na wave onde parou (o `/keelson:implement` lê as closures; artefatos pré-TASK incompletos → retomar o `/keelson:auto`, que reconhece o que já existe) |
 | Fatia `em ciclo` com **tudo entregue** nos artefatos (fila desatualizada) | Corrigir a fila declarando (princípio 2) e propor a próxima |
-| Fatia `entregue` · próxima `pendente` | `/keelson:auto "<título> (épico: <caminho do pai>)" --slug=<destino>` — com o sync de largada da 4.126 |
+| Fatia `entregue` · próxima `pendente` | `/keelson:auto "<título> (épico: <caminho do pai>)" --slug=<destino>` — com o sync de largada da 4.126. **Estratégia `por-fatia` (4.190)**: fatia cuja **dependência declarada** aponta fatia entregue mas **ainda não mergeada na main** (fato: `git merge-base --is-ancestor <branch-da-fatia> origin/main`, após `git fetch`) **não é proposta** — mostre a pendência de merge ao Diretor (merge é ato dele) e proponha fatia independente, se houver |
 | Próxima fatia `aguardando-produto (Q-NN)` | Mostrar a pendência (não propor a fatia); há fatia posterior **não bloqueada e sem dependência da bloqueada** → propô-la |
 | Fila toda `entregue` | Nada a continuar: apontar `/keelson:integrate` para o PR do épico (ato do Diretor) |
 | Modo demanda única | O mesmo raciocínio sem fila: brief → SPEC → PLAN → TASKs/closures dizem o ponto; propor a etapa que falta |

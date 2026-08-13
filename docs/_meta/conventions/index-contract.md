@@ -66,6 +66,7 @@ inline sem arquivo, e trivial não tem brief. Fora do ciclo, a mudança avulsa u
 **Largada**: <YYYY-MM-DDTHH:MM:SS-0300 — medida com `TZ=America/Sao_Paulo date`, nunca estimada>
 **SPEC**: SPEC-NNN
 **Epico**: <caminho do BRIEF épico pai — só quando a demanda veio de uma decomposição; omita a linha caso contrário>
+**Jira**: <KEY da raiz criada na largada (§16 do protocolo, decisão 4.191) — omita a linha sem tracker; o gancho do specify copia esta key para a SPEC>
 
 ## Pedido como dito
 <verbatim do Diretor — sem reescrita>
@@ -103,6 +104,7 @@ numeração NNN nem a linha `**SPEC**:`). Cabeçalho:
 **Origem**: <caminho do BRIEF forjado (4.128) | pedido em sessão>
 **Branch**: feat/<slug>-<descricao-curta>
 **Estratégia**: unica | por-fatia
+**Jira**: <KEY do Epic — opcional; raiz criada na largada, §16 do protocolo (4.191)>
 ```
 
 Conteúdo: pedido épico verbatim + **fila viva** (decisão 4.125) — a decomposição

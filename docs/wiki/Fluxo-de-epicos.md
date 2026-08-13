@@ -55,10 +55,16 @@ numa frase), o handoff da forja aponta a decomposição:
 O agente **PM** propõe as fatias; você confirma **duas coisas** numa parada só:
 
 1. **A decomposição** — as fatias, prioridades e slugs de destino;
-2. **A estratégia de branch** — o default é **branch única do épico**: todas as
-   fatias empilhadas em uma branch (`feat/<slug>-...`), cada fatia construindo sobre a
-   anterior, com a branch **sincronizada com a main a cada fronteira de fatia**. O PR
-   é um só, no final (e merge intermediário é permitido, se você quiser).
+2. **A estratégia de branch** — o default proposto vem da ficha (`git.branchStrategy`;
+   sem o campo, `unica`), e você pode trocar épico a épico na mesma confirmação:
+   - **`unica`** — todas as fatias empilhadas em uma branch (`feat/<slug>-...`), cada
+     fatia construindo sobre a anterior, com a branch **sincronizada com a main a cada
+     fronteira de fatia**. O PR é um só, no final (e merge intermediário é permitido,
+     se você quiser).
+   - **`por-fatia`** — cada história na sua própria branch, entregue e mergeada antes
+     da dependente seguinte: o `/keelson:continue` **não propõe** uma fatia que dependa
+     de outra ainda não mergeada na main — ele mostra a pendência de merge (o merge
+     continua ato seu) e oferece uma fatia independente, se houver.
 
 O resultado é o **BRIEF épico** com a **fila viva** — uma tabela com o estado de cada
 fatia (`pendente` · `em ciclo` · `aguardando-produto` · `entregue`) que os próprios
@@ -86,10 +92,12 @@ fatia 3.
 
 ## Perguntas que vão aparecer
 
-**Preciso mergear a cada fatia?** Não. Com a estratégia de branch única (default), o
+**Preciso mergear a cada fatia?** Depende da estratégia. Com branch única (default), o
 merge é um só, no final — e é sempre **ato seu**, nunca automático. A branch se mantém
 atualizada puxando a main a cada fronteira de fatia; se o merge da main quebrar a
-suíte, a entrega da fatia **para até resolver** (é gate, não aviso).
+suíte, a entrega da fatia **para até resolver** (é gate, não aviso). Com `por-fatia`,
+sim: cada história é entregue na sua branch e as fatias **dependentes** só largam
+depois que a anterior mergeou — o `continue` verifica isso por você.
 
 **Posso rodar a fatia 2 em outra máquina / outro dia / outra pessoa?** Sim — todo o
 estado vive nos artefatos commitados na branch do épico. Qualquer clone com a branch

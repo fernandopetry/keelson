@@ -11,7 +11,7 @@
 # Itens: hooks-executaveis · ficha-legivel · codepaths-existem · quality-existe ·
 #        sensitive-globs · perfil-resolve · perfil-reviewed · perfil-charter ·
 #        local-example · local-json-ignorado · local-placeholder ·
-#        artefatos-ignorados · playwright-flags · jira-campos
+#        artefatos-ignorados · playwright-flags · jira-campos · git-branch-config
 # Exit: 0 sem falha · 1 com falha · 2 uso incorreto.
 #
 # Bash 3.2-compatível; JSON via ficha.sh (irmão) e python3 (playwright/local.json;
@@ -268,6 +268,20 @@ if [ "$(fget jira.enabled)" = "true" ]; then
   [ -n "$(fget jira.issueType.task)" ] || j_bad="$j_bad issueType.task"
   if [ -n "$j_bad" ]; then emit falha jira-campos "jira.enabled com campo vazio:$j_bad"
   else emit ok jira-campos "campos mínimos do Jira preenchidos"; fi
+fi
+
+# ---- git: bloco de branch coerente (4.190/4.192) — só emite quando o bloco existe ----
+g_strat="$(fget git.branchStrategy)"
+g_name="$(fget git.branchNaming)"
+if [ -n "$g_strat" ] || [ -n "$g_name" ]; then
+  g_bad=""
+  case "${g_strat:-unica}" in unica|por-fatia) : ;; *) g_bad="$g_bad branchStrategy(${g_strat})" ;; esac
+  case "${g_name:-slug}" in slug|tracker-key) : ;; *) g_bad="$g_bad branchNaming(${g_name})" ;; esac
+  if [ "$g_name" = "tracker-key" ] && [ "$(fget jira.enabled)" != "true" ]; then
+    g_bad="$g_bad tracker-key-sem-jira(naming exige jira.enabled true — sem key a branch cai sempre no fallback)"
+  fi
+  if [ -n "$g_bad" ]; then emit falha git-branch-config "bloco git incoerente:$g_bad"
+  else emit ok git-branch-config "estratégia e naming de branch coerentes"; fi
 fi
 
 sort "$OUT"

@@ -138,6 +138,53 @@ case "$got" in
   *) echo "FAIL hook-sem-x:"; printf '%s\n' "$got" | sed -n 1,3p | sed 's/^/  /'; fail=$((fail + 1)) ;;
 esac
 
+# ---- bloco git incoerente: tracker-key sem jira + estratégia fora do enum (4.190/4.192) ----
+R4="$(mkrepo git-config)"
+mkdir -p "$R4/src"
+printf 'x\n' > "$R4/src/app.php"
+cat > "$R4/keelson.config.json" <<'EOF'
+{
+  "profile": { "backend": { "lang": "php", "version": "8.5", "file": "plugin:backend/php.md" } },
+  "codePaths": { "backend": ["src"] },
+  "sensitiveGlobs": [".env*"],
+  "quality": { "test": "true" },
+  "gates": { "security": true },
+  "docsRoot": "docs",
+  "git": { "branchStrategy": "por-historia", "branchNaming": "tracker-key" },
+  "jira": { "enabled": false }
+}
+EOF
+git -C "$R4" add -A >/dev/null 2>&1
+git -C "$R4" commit -qm base >/dev/null 2>&1
+total=$((total + 1))
+got="$(bash "$SC" "$R4" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
+case "$got" in
+  *"falha	git-branch-config	bloco git incoerente: branchStrategy(por-historia) tracker-key-sem-jira"*)
+    [ "$st" -eq 1 ] && echo "ok   git-config-incoerente" || { echo "FAIL git-config-incoerente: exit $st"; fail=$((fail + 1)); } ;;
+  *) echo "FAIL git-config-incoerente:"; printf '%s\n' "$got" | grep git-branch-config | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+
+# ---- bloco git coerente com jira ligado → ok ----
+cat > "$R4/keelson.config.json" <<'EOF'
+{
+  "profile": { "backend": { "lang": "php", "version": "8.5", "file": "plugin:backend/php.md" } },
+  "codePaths": { "backend": ["src"] },
+  "sensitiveGlobs": [".env*"],
+  "quality": { "test": "true" },
+  "gates": { "security": true },
+  "docsRoot": "docs",
+  "git": { "branchStrategy": "por-fatia", "branchNaming": "tracker-key" },
+  "jira": { "enabled": true, "projectKey": "PROJ", "issueType": { "spec": "10001", "task": "10003" } }
+}
+EOF
+total=$((total + 1))
+got="$(bash "$SC" "$R4" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
+case "$got" in
+  *"ok	git-branch-config	estratégia e naming de branch coerentes"*)
+    echo "ok   git-config-coerente" ;;
+  *) echo "FAIL git-config-coerente:"; printf '%s\n' "$got" | grep git-branch-config | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+
 # ---- ficha ausente → falha nomeada, exit 1 ----
 R3="$(mkrepo sem-ficha)"
 total=$((total + 1))
