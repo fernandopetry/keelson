@@ -2080,6 +2080,38 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `.claude/agents/impact-scout.md` (frontmatter `model:`). Camada do mantenedor (4.182): sem bump, sem CHANGELOG e sem re-init.
 
+### 4.184 — Ferramentaria descartável na árvore do consumidor nasce sob `thoughts/local/`
+
+**Problema**: prova mecânica que precisa rodar no runtime do projeto (tokenizer do próprio interpretador, via container que só monta o repo) não alcança o scratchpad da sessão — e não havia regra sobre onde esse instrumento vive. Numa sessão de campo, a varredura improvisou um diretório **untracked e não-ignorado** na árvore do consumidor (~4 MB de scripts e snapshots de base): sujeira permanente no `git status`, a um `git add -A` humano de distância do commit, e confusão do Diretor, que não sabia dizer se era defeito do plugin. A casa certa já existia com cobertura provada: `thoughts/local/` é per-clone, descartável por doutrina e garantido no `.gitignore` pelo `/keelson:init` (Etapa 5.5) — e, por estar na árvore, é visível dentro do mount do container.
+
+**Decisão** (diretriz do Diretor): instrumento descartável que precise viver na árvore do consumidor — script de prova, snapshot de base, lista de lote — nasce sob `thoughts/local/tools/<propósito>/`; cobertura conferida na criação com `git check-ignore` (se prova, não se infere — 4.51); remoção ou arquivamento **declarado no fecho**, no mesmo ciclo de vida do memo de exploração e do run-state. Nunca diretório novo na raiz nem pasta do projeto que "parece temporária".
+
+**Aplicação**: `docs/_meta/conventions/sdd-conventions.md`. Sem re-init — regra de conduta dos agents, nada na ficha muda.
+
+### 4.185 — Autocheck de narrativa cobre os dois eixos, vale em todo report; remover proveniência é cortar, nunca reescrever
+
+**Problema**: a classe "comentário narra o processo de review" reincidiu **~30× maior** depois de a 4.135 instalar o autocheck — 148+ ocorrências em 180 arquivos de uma branch de épico, exigindo brief dedicado e 9 rodadas de gate. Três furos no texto aplicado: (a) o autocheck valia só **no retry**, e a narrativa entra também na escrita original; (b) cobria só o eixo dos **substantivos** (rodada/achado/revisor) — a narrativa também se escreve por **comparação temporal** ("a versão anterior…", "agora faz", "historicamente", verbo no passado narrando o código), invisível a 6 rodadas de grep por substantivo; (c) ao **remover** proveniência de comentário existente, o developer reescreveu a frase em vez de cortá-la e re-afirmou fatos sem reler o código — dois fatos falsos plantados pela própria limpeza, capturados pelo re-gate (4.94) ao custo de uma rodada cada.
+
+**Decisão**: o autocheck do developer passa a valer **antes de todo report** (não só retry) e troca a lista de palavras pelo **teste por função** — *a frase narra de onde a mudança veio, ou compara o código com um estado que o leitor não alcança?* — com os dois eixos nomeados como exemplares (proveniência; comparação temporal). E ganha a regra de operação: ao remover proveniência, **cortar a frase, nunca reescrevê-la** — reescrever é a própria classe de erro. O instrumento mecânico de extração de comentários continua **por-linguagem** e nasce no consumidor sob `thoughts/local/tools/` (4.184) — o plugin fica com a régua; nova reincidência da classe após esta decisão promove o check mecânico a exigência do gate 7 para diff de comentários (escada da 4.149).
+
+**Aplicação**: `agents/developer.md` (item 5). Sem re-init.
+
+### 4.186 — Evidência mecânica de ausência carrega controle positivo
+
+**Problema**: um `code-reviewer` rodou 5 comandos de "prova de limpeza" que **nunca executaram** — a lista de arquivos numa variável de shell não sofreu word-splitting (zsh), o comando estourou `File name too long` e o `|| echo 0` do próprio script converteu o erro em "0 ocorrências". Teria sido reportado como prova de limpeza se o próprio revisor não tivesse desconfiado e se auto-auditado. A régua de falsificabilidade existente cobre o código sob revisão (4.52: "que estado faz este comando falhar?"; 4.93: não-vacuidade do lado gerador) — nenhuma cláusula cobria o **instrumento do avaliador**: gate que aceita "0 ocorrências" sem provar que o comando executou é o critério que passa vazio, do lado de quem avalia.
+
+**Decisão**: alegação de ausência por comando ("grep retornou 0") só é evidência acompanhada de **controle positivo** — no mesmo universo e na mesma execução, um padrão que **tem** de bater bateu; sem o controle, "limpo" é indistinguível de "o comando nunca executou". Vale para qualquer gate e para o comando re-executado da varredura (4.173).
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (bloco de convergência). Sem re-init.
+
+### 4.187 — Varredura por classe tem teto de rodadas declarado; eixo novo é decisão, não deriva
+
+**Problema**: a convergência (4.88/4.94) trava o retry do **mesmo** achado — e funcionou (nenhum lote da sessão de campo precisou de 3ª rodada). Mas varredura cujo aceite é "nenhuma instância da classe sobra" tem dinâmica própria: cada rodada **descobre escopo novo** (outro eixo do mesmo defeito — substantivos → comparação temporal → verbos no passado), cada descoberta é tecnicamente "achado novo" e nenhuma dispara a escalação. Resultado: 9 rodadas de gate para um brief estimado em "1 verificação mecânica", com as rodadas intermediárias sob autoridade exclusiva do Tech Lead, e dois sublotes tratando o mesmo padrão com réguas **opostas** porque o corte não tinha sido decidido antes do despacho.
+
+**Decisão**: (a) varredura por classe nasce com **teto de rodadas de gate declarado no despacho** (default 2); eixo genuinamente novo descoberto além do teto **não roda** — vira dívida declarada (brief/INDEX, com a régua registrada para quem pagar) ou decisão explícita do Diretor de estender (proposta + default, 4.85); (b) padrão de corte ambíguo se decide **antes** do despacho, uma vez para todos os lotes; (c) limite conhecido do fecho por busca, nomeado: rótulo removido pode deixar referência órfã **em outro arquivo** (ponteiro cruzado — A caracteriza um trecho de B; caracterização não é rótulo e nenhum grep de rótulo a alcança), então a varredura de remoção confere as referências ao trecho editado, não só o arquivo dele.
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (extensão do bloco da 4.173). Sem re-init.
+
 ---
 
 ## 5. Quality gates inegociáveis

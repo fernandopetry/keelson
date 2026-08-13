@@ -316,6 +316,29 @@ ela converge ou escala.
   comando não fecha o achado, porque não distingue "a classe fechou" de "os exemplos que
   o revisor viu fecharam". Caso real: 4 rodadas corrigindo os exemplos citados; na 3ª, o
   report declarou 3 arquivos e a mesma string sobrevivia em 8 outros dentro do range.
+- **Evidência mecânica de ausência carrega controle positivo (decisão 4.186).** "O
+  comando retornou 0 ocorrências" só é evidência se, no mesmo universo e na mesma
+  execução, um padrão que **tem** de bater bateu — sem o controle, "limpo" é
+  indistinguível de "o comando nunca executou". Caso real: 5 greps de prova falharam por
+  expansão de shell e um `|| echo 0` converteu o erro em "0 ocorrências"; só a
+  auto-auditoria do revisor evitou o falso "limpo". A falsificabilidade dos gates
+  (4.52/4.93) cobre o código sob revisão; esta cláusula cobre o **instrumento do
+  avaliador** — inclusive o comando re-executado da varredura (4.173).
+- **Varredura por classe tem teto declarado; eixo novo é decisão, não deriva (decisão
+  4.187).** A convergência (4.88/4.94) trava o retry do **mesmo** achado; numa varredura
+  cujo aceite é "nenhuma instância da classe sobra", cada rodada tende a descobrir
+  **escopo novo** — outro eixo do mesmo defeito — e nenhuma dispara a escalação, porque
+  cada descoberta parece legítima demais para não perseguir (caso real: 9 rodadas, cada
+  uma "achado novo"). Por isso a varredura nasce com **teto de rodadas de gate declarado
+  no despacho (default 2)**: eixo genuinamente novo além do teto não roda — vira dívida
+  declarada (brief/INDEX, com a régua registrada para quem pagar) ou decisão explícita
+  do Diretor de estender (proposta + default, 4.85). Padrão de corte ambíguo (manter ou
+  cortar `X`?) se decide **antes** do despacho, uma vez para todos os lotes — sublotes
+  com réguas opostas são retrabalho certo. Limite conhecido do fecho por busca: rótulo
+  removido pode deixar referência órfã **em outro arquivo** (A caracteriza um trecho de
+  B que o lote mudou — o ponteiro não é rótulo, é caracterização, e nenhum grep de
+  rótulo o alcança); a varredura de remoção confere as referências ao trecho editado,
+  não só o arquivo dele.
 - **O re-gate também pergunta "a prova ficou mais fraca?" (decisão 4.174).** Delta que
   muda a semântica de um caso já provado (inverter um default, trocar a condição de um
   ramo) **acrescenta** teste ao lado — o teste do ramo antigo permanece com o fixture
