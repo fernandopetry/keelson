@@ -803,8 +803,13 @@ na criação); os filhos continuam nascendo nos ganchos de sempre (§6.1, §7, `
 
 **Gatilho**: `jira.enabled` ∧ `jira.telemetry: true`. Desligado → nada muda. A telemetria é
 **medida, nunca estimada**: a fonte é o relógio do ciclo (4.56) — marcas da `## Cronologia`
-do BRIEF — e os eventos do ledger de sessão (4.76). Publicação em cada gancho de etapa que
-já existe (specify · tasks · implement · entrega), na **issue principal** do slug:
+do BRIEF no ciclo formal; a marca `**Largada**:` do brief avulso e a marca embutida na
+mensagem de largada nas demais rotas (4.196) — e os eventos do ledger de sessão (4.76).
+Publicação em cada gancho de etapa que já existe (specify · tasks · implement · entrega),
+na **issue principal** do slug. **Cobertura por rota (4.196)**: toda rota que publica o
+comentário de fecho (§11) — inclusive o modo sob demanda e a rota avulsa, que só têm o
+fecho — publica também o worklog do trecho medido; rota sem marca de largada → worklog
+**não publicável**, e isso é declarado (abaixo), nunca engolido:
 
 - **Worklog** (`addWorklogToJiraIssue`): duração medida da etapa que fechou (`timeSpent`,
   início = marca da etapa anterior). Worklog é o mecanismo agregável do Jira — relatórios de
@@ -820,3 +825,10 @@ já existe (specify · tasks · implement · entrega), na **issue principal** do
 - **Best-effort §0 inviolável**: falha ao publicar → evento `tracker` no ledger; a
   reconciliação da entrega (§12) publica o que ficou para trás. Telemetria **nunca** move
   card (§9/4.65 intocados) e nunca trava etapa.
+- **Telemetria ativa declara-se no fecho — nunca silêncio (4.196)**: com o gatilho ligado,
+  o report de fecho (contrato: `report-contract.md`) carrega a linha
+  `telemetria: worklog <duração> publicado em <KEY> | falhou (<motivo>) | sem marca de
+  largada — não publicável`. A 1ª rodada de campo produziu exatamente o caso que esta
+  linha impede: telemetria ativa, worklog ausente e nenhum rastro em lugar nenhum — o
+  mesmo padrão declarado da mutação e do diff inerte (opt-in ausente fala; ativo e não
+  executado fala mais alto).

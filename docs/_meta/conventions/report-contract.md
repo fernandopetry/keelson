@@ -46,6 +46,7 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 - **Decisões tomadas em seu nome**: <1 linha cada — decisão + porquê; inclui premissas [assumido], DECs, resoluções do PO, gates resolvidos com ajuste>
 - **Fora de escopo / pendente**: <achados estacionados, handoff aberto, parte recusada, lição pendente de merge>
 - **Tracker**: Jira: <KEY> (Épico) · Story: <KEY | —> em <coluna atual> (teto: <coluna>) · sub-tarefas: K/N · transições: <n aplicadas | nenhuma> (transition: <modo>)   # só com jira.enabled; sync pulado/falho aparece AQUI com o motivo, jamais some
+- **Telemetria**: <worklog <duração> publicado em <KEY> | falhou (<motivo>) | sem marca de largada — não publicável>   # só com jira.telemetry: true (§17 do protocolo, decisão 4.196); ativo sem linha é defeito do report, nunca omissão válida
 - **Fila do épico**: <fatia marcada `entregue` · próximo passo pronto: /keelson:continue <slug-âncora>>   # só demanda com **Epico**:
 - **Duração**: <total> (largada HH:MM → entrega HH:MM, horário de Brasília) · specify <n>min · plan <n>min · tasks <n>min · implement <n>min · janela pico ~<N>k tokens   # etapa que a rota não teve não aparece; marca ausente → o que foi medido + lacuna nomeada; janela só quando o log existe
 - **Pendente de você**: <revisão da branch · merge · resposta a pergunta estacionada · handoff · nada>

@@ -209,6 +209,24 @@ Isso é bug, não sucesso. O estado-alvo ao fim do ciclo é: sub-tasks concluíd
 coluna de "pronto para QA" esperando você, Epic intocado. Concluir a Story é **ato seu**
 (`/keelson:jira-sync <slug> --phase finish-dev`, ou na mão).
 
+### A telemetria está ativa e o worklog não apareceu no card
+
+Cheque nesta ordem:
+
+1. **A ficha tem os campos?** `jira.telemetry` só existe a partir da 0.96.0 e exige
+   re-rodar `/keelson:init` após o update; o default é `false` — ligar é decisão sua.
+2. **O report do fecho tem a linha `Telemetria:`?** Com telemetria ativa ela é
+   obrigatória (worklog publicado · falhou com motivo · sem marca de largada). A linha
+   diz exatamente o que aconteceu; a ausência dela é defeito do report — reporte ao
+   mantenedor.
+3. **`sem marca de largada`** significa que a rota não registrou a hora de início
+   (brief avulso antigo, anterior à marca `**Largada**:`) — o worklog é "medido, nunca
+   estimado", então sem marca ele não é publicável. Demandas novas registram a marca
+   sozinhas.
+4. **Permissão**: o autor do worklog é a conta do conector — ela precisa da permissão
+   "Work on issues" no projeto. E telemetria por pessoa exige conector por usuário;
+   conta de serviço compartilhada faz tudo sair com o mesmo autor.
+
 ### O `jira.<PROJECT>.md` está crescendo com listas de issues
 
 O mapa é **config, nunca ledger**: as três seções do protocolo (Campos, Etapas/Colunas,
