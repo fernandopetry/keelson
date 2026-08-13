@@ -86,6 +86,9 @@ jobs:
       - name: Suíte do e2e-coverage.sh (scripts/tests/e2e-coverage/run.sh)
         run: bash scripts/tests/e2e-coverage/run.sh
 
+      - name: Suíte da camada de release (scripts/tests/release/run.sh)
+        run: bash scripts/tests/release/run.sh
+
       - name: Sincronização de comandos/agents (scripts/check-sync.sh)
         run: bash scripts/check-sync.sh
 

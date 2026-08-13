@@ -6,6 +6,8 @@
 #     .claude-plugin/marketplace.json · seção Status do README.md
 #   - a versão atual tem entrada "## [X.Y.Z]" no CHANGELOG.md (§4.48: bump sem
 #     entrada é release incompleto)
+#   - a entrada da versão atual declara "Re-init: required|none" (§4.189: é o
+#     que o update.sh lê para avisar o consumidor sobre re-rodar o init)
 #   - todo espelho do MIRRORS (scripts/publish-wiki.sh) aponta para arquivo existente
 #   - bash -n em todos os scripts do repo (scripts/*.sh, git-hooks, testes)
 #
@@ -64,7 +66,17 @@ if [ -n "$VP" ]; then
   fi
 fi
 
-# --- 3. Espelhos do MIRRORS existem ---
+# --- 2b. Entrada da versão atual declara o marcador Re-init (§4.189) ---
+# Escopo restrito à versão corrente ($VP), nunca ao arquivo inteiro: um marcador
+# esquecido numa entrada histórica não pode bloquear commits que nada têm a ver.
+if [ -n "$VP" ] && grep -q "^## \[$VP\]" CHANGELOG.md 2>/dev/null; then
+  if sed -n "/^## \[$VP\]/,/^## \[/p" CHANGELOG.md \
+       | grep -qE '^Re-init: (required|none)$'; then
+    ok "entrada [$VP] declara o marcador Re-init"
+  else
+    fail "entrada [$VP] do CHANGELOG.md sem a linha \"Re-init: required\" ou \"Re-init: none\" (§4.189)"
+  fi
+fi
 if [ -f scripts/publish-wiki.sh ]; then
   miss=0
   for src in $(sed -n "/^MIRRORS='/,/'\$/p" scripts/publish-wiki.sh \

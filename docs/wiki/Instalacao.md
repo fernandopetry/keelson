@@ -64,9 +64,14 @@ refresh do marketplace falhar (seguir com cache velho reportaria "já atualizado
 
 ## Depois de atualizar: re-rodar o `init`
 
-Algumas versões mudam o bloco injetado no `CLAUDE.md` ou acrescentam campos na ficha. O
-CHANGELOG avisa quando é o caso, com a frase **"re-run `/keelson:init`"**. Rodar de novo é
-seguro e idempotente: o `init` preserva o que você já configurou e só completa o que falta.
+Algumas versões mudam o bloco injetado no `CLAUDE.md` ou acrescentam campos na ficha.
+**O próprio `/keelson:update` avisa quando é o caso**: cada entrada do CHANGELOG carrega
+um marcador `Re-init: required` ou `Re-init: none`, e o update varre as versões do salto
+que você acabou de dar e diz se precisa re-rodar `/keelson:init`. Se ele responder "não
+determinável" (não conseguiu ler o CHANGELOG instalado), confira as entradas do salto no
+[CHANGELOG](https://github.com/fernandopetry/keelson/blob/main/CHANGELOG.md) à mão. Rodar o
+`init` de novo é seguro e idempotente: ele preserva o que você já configurou e só completa
+o que falta.
 
 ## Desinstalar
 

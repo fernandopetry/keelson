@@ -316,7 +316,9 @@ Atualiza o keelson para a última versão do marketplace, **quando você decidir
 /keelson:update [--scope user|project|local]
 ```
 
-**O update não vale para a sessão corrente** — a CLI exige restart para aplicar; o report sempre termina lembrando de reiniciar a sessão. Falha é erro nomeado (CLI ausente, plugin não instalado via marketplace no scope, instalação de desenvolvimento), nunca contornada em silêncio. Governança: decisão 4.57 de `decisions.md`.
+Após atualizar, o script lê os marcadores `Re-init: required|none` das entradas do CHANGELOG recém-instalado e reporta se alguma versão do salto exige re-rodar `/keelson:init` (bloco do `CLAUDE.md` ou ficha mudaram); quando não há evidência (marcador ausente, árvore não localizada), ele degrada para "não determinável" — nunca afirma "não precisa" sem prova.
+
+**O update não vale para a sessão corrente** — a CLI exige restart para aplicar; o report sempre termina lembrando de reiniciar a sessão. Falha é erro nomeado (CLI ausente, plugin não instalado via marketplace no scope, instalação de desenvolvimento), nunca contornada em silêncio. Governança: decisões 4.57 e 4.189 de `decisions.md`.
 
 ### 3.17 `/keelson:postmortem` — postmortem de fim de sessão
 

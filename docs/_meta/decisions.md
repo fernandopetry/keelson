@@ -2112,6 +2112,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `guidelines/core/CODE-REVIEW.md` (extensão do bloco da 4.173). Sem re-init.
 
+### 4.189 — "Precisa de re-init?" é fato mecânico do CHANGELOG, lido pelo update
+
+**Problema**: "esta versão exige re-rodar `/keelson:init`" vivia como prosa livre por release ("re-run `/keelson:init`", com fraseado variando) e como registro paralelo do mantenedor — sem dono declarado e sem leitor mecânico. O consumidor que atualizava tinha de ler o CHANGELOG do salto inteiro e reconhecer a frase; na prática, a auditoria desta leva encontrou versões que exigiram re-init **sem** a frase na entrada (o registro do mantenedor sabia; o CHANGELOG não dizia). Re-init perdido é falha silenciosa: o bloco/ficha do consumidor fica defasado até algum sintoma aparecer.
+
+**Decisão**: (a) toda entrada versionada do CHANGELOG carrega a linha canônica `Re-init: required | none` logo abaixo do heading — `required` = a entrada mudou o bloco injetado no `CLAUDE.md` do consumidor ou o contrato da ficha; o dono do formato segue o `CLAUDE.md` do repo (§Versionamento); (b) `check-release.sh` exige a linha **na entrada da versão corrente** (escopo restrito: marcador esquecido em entrada histórica não bloqueia commits alheios); (c) `scripts/update.sh`, após o update, resolve a árvore instalada da versão nova (o cache da CLI é versionado — a árvore nova é irmã da antiga) e varre os marcadores do salto `(BEFORE, AFTER]`: alguma `required` → aviso nomeando as versões; marcador ausente, árvore não localizada ou intervalo indelimitável → **"não determinável"**, nunca "não precisa" sem evidência (régua da 4.156); (d) a camada nasce com suíte própria (`scripts/tests/release/run.sh` — primeira rede de `check-release.sh` e `update.sh` além do `bash -n`), registrada no pre-commit e no CI; (e) backfill das entradas históricas pela união prosa ∪ registro do mantenedor, com `required` vencendo em conflito — um init redundante é idempotente; um `none` errado é o defeito que a decisão existe para impedir.
+
+**Aplicação**: `CHANGELOG.md` (marcador em todas as entradas + nota no preâmbulo) · `scripts/update.sh` · `scripts/check-release.sh` · `scripts/tests/release/run.sh` · `scripts/git-hooks/pre-commit` e `.github/workflows/test.yml` (suíte) · `commands/update.md` · `method-guide.md` §3.16 · wiki `Instalacao.md` · `CLAUDE.md` (formato da entrada). A detecção só opera a partir do **próximo** update (quem sobe para a versão desta decisão ainda roda o `update.sh` antigo). Sem re-init — nem bloco nem ficha mudam.
+
 ---
 
 ## 5. Quality gates inegociáveis
