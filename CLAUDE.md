@@ -68,6 +68,11 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   leva revisa é o **conteúdo**, não o ato de subir.
 - **Charter é versionado à parte** (`guidelines/_meta/QUALITY-CHARTER.md`): só muda quando
   os artigos mudam; cada perfil referencia a versão no frontmatter `charter:`.
+- **O critério de pacote é quem lê, não onde mora** (decisão 4.194): arquivo que
+  comandos/agents/skills leem em runtime no consumidor — todo o `docs/_meta/conventions/`,
+  via `${CLAUDE_PLUGIN_ROOT}` — é conteúdo embarcado: mudança nele entra no `CHANGELOG.md`
+  e conta para o bump. `decisions.md`, `learning-log.md`, `proposal-inbox.md` e
+  `method-guide.md` continuam registro do mantenedor, sem bump.
 - **Sessões paralelas colidem em §4.x e versão** (caso real: duas "4.60" no mesmo dia —
   decisão 4.63): antes de numerar decisão ou bumpar, `git fetch` e confira o topo da main.
   O hook `scripts/git-hooks/pre-commit` bloqueia commit na `main` atrás do `origin/main`
