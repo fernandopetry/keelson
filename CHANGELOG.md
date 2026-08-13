@@ -17,6 +17,36 @@ commit messages and the matching decisions.
 
 ---
 
+## [0.94.0] — 2026-08-12
+
+Decisions 4.184–4.187 — a consumer postmortem (a "review-narrative sweep" that grew from
+an estimated single mechanical check into 9 gate rounds across 180 files) taught four
+rules: where disposable in-repo tooling lives, that the narrative class has two axes and
+recurs at the moment of writing, that an evaluator's "0 occurrences" claim proves nothing
+without a positive control, and that class sweeps need a declared round ceiling.
+
+### Added
+
+- Disposable tooling that must live inside the consumer's tree (e.g. proof scripts that
+  run in the project's container) is born under `thoughts/local/tools/<purpose>/`, with
+  ignore coverage proven at creation and removal declared at closure — never a new
+  untracked directory in the tree (4.184, `sdd-conventions.md`).
+- Mechanical absence claims by reviewers ("grep returned 0") now require a **positive
+  control** in the same run — a pattern that must match — otherwise "clean" is
+  indistinguishable from "the command never executed" (4.186, `CODE-REVIEW.md`).
+- Class sweeps ("no instance of pattern X remains") get a **declared round ceiling**
+  (default 2): a genuinely new axis found beyond it becomes declared debt or an explicit
+  Director decision — plus the named cross-file orphan-pointer limitation of grep-based
+  closure (4.187, `CODE-REVIEW.md`).
+
+### Changed
+
+- The developer's comment autocheck (4.135) now runs before **every** report (not only
+  retries), tests by function ("does the sentence narrate where the change came from, or
+  compare the code to a state the reader can't reach?") across both axes — provenance
+  and temporal comparison — and mandates **cut, never rewrite** when removing provenance
+  from an existing comment (4.185, `agents/developer.md`).
+
 ## [0.93.2] — 2026-08-12
 
 Decision 4.180 — an external diagnostic on a consumer project caught two plugin hooks
