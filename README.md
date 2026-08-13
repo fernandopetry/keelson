@@ -409,16 +409,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.94.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.95.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **hooks ship with the execute bit proven, not presumed**
-(decision 4.180). Two hooks had entered git as mode 644 and were failing silently on
-every trigger in a consumer project; the bit is now committed, pre-commit and CI block
-any non-executable `hooks/*.sh`, and `/keelson:init` detects a broken plugin cache
-(`hooks-executaveis` self-check item) with the repair indicated. No consumer re-init
-needed — the fix arrives with `/keelson:update`.
+New in this release: **`/keelson:update` now tells you whether the jump you just made
+requires re-running `/keelson:init`** (decision 4.189). Every CHANGELOG entry carries a
+machine-readable `Re-init: required | none` marker (backfilled across the whole history);
+after updating, the script scans the markers in the version interval and reports the
+verdict — degrading to "undeterminable" instead of guessing. No consumer re-init needed
+for this release; the detection itself starts working on the *next* update.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

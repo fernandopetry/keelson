@@ -13,11 +13,56 @@ This repository carries no release tags, so each entry is anchored by the commit
 `.claude-plugin/plugin.json`. Entries before `0.29.0` were reconstructed from those bumps, the
 commit messages and the matching decisions.
 
+Every versioned entry carries a machine-readable `Re-init: required | none` line right below
+its heading (§4.189): `required` means the release changed the injected CLAUDE block or the
+ficha (`keelson.config.json`) contract, so consumers must re-run `/keelson:init` after
+updating. `scripts/update.sh` reads these lines to tell the consumer whether the jump they
+just made needs a re-init. Markers up to `0.94.0` were backfilled on 2026-08-12 from entry
+prose and maintainer records; when the two conflicted, `required` won (a redundant init is
+merge-preserving and harmless — a wrong `none` is not).
+
 ## [Unreleased]
 
 ---
 
+## [0.95.0] — 2026-08-12
+
+Re-init: none
+
+Decision 4.189 — "does this version require re-running `/keelson:init`?" used to live as
+free prose per release (with varying wording) plus the maintainer's parallel records; this
+batch's audit found versions that required a re-init without the phrase in their entry.
+The answer is now a mechanical fact of the CHANGELOG, read by the updater.
+
+### Added
+
+- Every versioned CHANGELOG entry carries a canonical `Re-init: required | none` line
+  below its heading — `required` means the release changed the injected CLAUDE block or
+  the ficha contract. Backfilled across the whole history from entry prose ∪ maintainer
+  records (`required` wins on conflict: a redundant init is idempotent; a wrong `none`
+  is the silent failure this decision exists to prevent).
+- `scripts/update.sh` scans the markers of the jump `(BEFORE, AFTER]` after updating —
+  resolving the freshly installed tree in the CLI's versioned plugin cache — and reports
+  whether any version requires `/keelson:init`, naming them. No evidence (missing marker,
+  tree not found, unbounded interval) degrades to "undeterminable", never to "not needed".
+  Note: the detection only operates from the *next* update on — the jump onto this
+  version still runs the previous script.
+- `scripts/check-release.sh` requires the marker on the current version's entry (scoped
+  to the current entry only, so a forgotten historical marker cannot block unrelated
+  commits).
+- New regression suite `scripts/tests/release/run.sh` — the first safety net for
+  `check-release.sh` and `update.sh` beyond `bash -n` — wired into pre-commit and CI.
+
+### Changed
+
+- `/keelson:update`'s report gains the re-init verdict line; the wiki's "after updating"
+  section now points at the marker instead of the old free-prose convention.
+
+---
+
 ## [0.94.0] — 2026-08-12
+
+Re-init: none
 
 Decisions 4.184–4.187 — a consumer postmortem (a "review-narrative sweep" that grew from
 an estimated single mechanical check into 9 gate rounds across 180 files) taught four
@@ -49,6 +94,8 @@ without a positive control, and that class sweeps need a declared round ceiling.
 
 ## [0.93.2] — 2026-08-12
 
+Re-init: none
+
 Decision 4.180 — an external diagnostic on a consumer project caught two plugin hooks
 shipping without the execute bit: `window-marker.sh` failed silently on every `Stop`
 (269 failures in 3 days) and `compact-anchor.sh` never ran on compaction. Both were
@@ -74,6 +121,8 @@ born via Write (mode 644) in the 4.146–4.149 batch; nothing mechanical checked
 
 ## [0.93.1] — 2026-08-11
 
+Re-init: none
+
 Human re-review of the `backend/php.md` §10 lock-trap block added by 4.177, with every
 claim checked against the official InnoDB documentation (8.4).
 
@@ -89,6 +138,8 @@ claim checked against the official InnoDB documentation (8.4).
   deadlock) were confirmed verbatim and stand unchanged.
 
 ## [0.93.0] — 2026-08-11
+
+Re-init: none
 
 Decisions 4.170–4.179. A 15-hour field session re-running the quality gates on an
 advanced slice (4 gate-8 rounds on one concurrency bug, 8 escalations — all inside the
@@ -151,6 +202,8 @@ defect and two open postmortem proposals (M1/M4).
 
 ## [0.92.2] — 2026-08-11
 
+Re-init: none
+
 Decision 4.169 — first gate 8 run over the `/keelson:e2e-setup` scaffold (same field
 session as 4.167/4.168): three medium findings, all one family — the credential typed
 by the auth setup project leaked into run artifacts.
@@ -177,6 +230,8 @@ mode) or apply the three adjustments by hand.
 
 ## [0.92.1] — 2026-08-11
 
+Re-init: none
+
 Decision 4.168 — field feedback from the first real `/keelson:e2e-setup` run: the setup
 scattered three gitignored runtime directories (`test-results/`, `playwright-report/`,
 `e2e/.auth/`) across the app root, each needing its own `.gitignore` line.
@@ -199,6 +254,8 @@ Consumers that already ran the setup with the defaults: re-run `/keelson:e2e-set
 ---
 
 ## [0.92.0] — 2026-08-11
+
+Re-init: none
 
 Decision 4.167 — first real `/keelson:init` run after 4.166 exposed the adoption gap:
 a project without an E2E runner got `e2e: null` and nothing else. An opt-in gate with
@@ -225,6 +282,8 @@ produced `/keelson:mutation-setup`, 4.123).
 ---
 
 ## [0.91.0] — 2026-08-11
+
+Re-init: required
 
 Decision 4.166 — screen verification gains a durable, re-runnable layer: verified UI
 behavior is codified into versioned E2E specs, so regression stops re-paying the cost
@@ -266,6 +325,8 @@ lines); projects without an E2E runner are untouched (`e2e: null`).
 ---
 
 ## [0.90.0] — 2026-08-11
+
+Re-init: none
 
 Decisions 4.161–4.165 — a real consumer cycle (26 tasks, 8 waves, ~60 commits) lands its
 four proposals plus one maintainer finding from the same session's transcript: text-anchored
@@ -316,6 +377,8 @@ middle layer gets an owner, and the wave guard stops taxing every turn.
 
 ## [0.89.0] — 2026-08-11
 
+Re-init: none
+
 Decisions 4.159–4.160 — the full sweep of the mattpocock/skills benchmark lands its two
 remaining borrowings: bugfix proof starts red, and doctrine pruning gets a method.
 
@@ -340,6 +403,8 @@ remaining borrowings: bugfix proof starts red, and doctrine pruning gets a metho
 
 ## [0.88.1] — 2026-08-11
 
+Re-init: none
+
 Decision 4.158 — the audit that followed 4.157 (same gap class: a principle declared
 without a falsifiable test) found one recurrence of the shape, in `/keelson:specify`.
 
@@ -356,6 +421,8 @@ without a falsifiable test) found one recurrence of the shape, in `/keelson:spec
 ---
 
 ## [0.88.0] — 2026-08-10
+
+Re-init: none
 
 Decision 4.157 — vertical slicing stops being a decorative principle: it gains a
 falsifiable test, and the structure around it (granularity by file count, single-component
@@ -387,6 +454,8 @@ expand–contract).
 ---
 
 ## [0.87.1] — 2026-08-09
+
+Re-init: none
 
 Decision 4.156 — first real consumer round of the mechanical-fact scripts (4.151/4.154):
 the parsers now match the format the plugin actually produces in the field, and degrade
@@ -424,6 +493,8 @@ with a declared warning instead of inventing a fact where they cannot parse.
 
 ## [0.87.0] — 2026-08-07
 
+Re-init: required
+
 Decision 4.155 — performance becomes a dedicated quality gate (gate 10), mirroring the
 proven gate-8 design: a specialist reviewer, a canonical trigger list, the checklist
 owner read at runtime, and a verdict that is always declared — never silence.
@@ -453,6 +524,8 @@ owner read at runtime, and a verdict that is always declared — never silence.
   trigger) — re-run `/keelson:init` in consumer projects to refresh the block.
 
 ## [0.86.0] — 2026-08-06
+
+Re-init: none
 
 Decision 4.154 — the deferred list from 4.151 closes: the remaining seven pieces of
 deterministic work move from prose to scripts, under the same contract (frozen
@@ -489,6 +562,8 @@ regression suites on pre-commit and CI, named degradation, doctrine citing facts
 ---
 
 ## [0.85.0] — 2026-08-06
+
+Re-init: none
 
 Decisions 4.151–4.153 — deterministic work that the model used to re-derive in prose
 on every cycle now runs as scripts with contracts and frozen regression suites; the
@@ -534,6 +609,8 @@ doctrine cites their output as fact and never duplicates the rule.
 
 ## [0.84.0] — 2026-08-06
 
+Re-init: none
+
 Decision 4.150 — the Jira map file is configuration, never a ledger. Motivated by a
 real consumer whose map had accumulated one issue-tree section per synced SPEC —
 redundant with the SDD artifacts and Jira itself, and growing without bound.
@@ -558,6 +635,8 @@ redundant with the SDD artifacts and Jira itself, and growing without bound.
 ---
 
 ## [0.83.0] — 2026-08-06
+
+Re-init: none
 
 Decisions 4.146–4.149 — facts survive outside the model's context: re-anchoring
 after compaction, a measured context window, mechanically proved synchronization,
@@ -599,6 +678,8 @@ of affaan-m/ECC (2026-08-06).
   the pre-commit quality guard and the CI workflow run the new check and suite.
 
 ## [0.82.0] — 2026-08-06
+
+Re-init: none
 
 Decisions 4.142–4.145 — the cycle closes both ways: a delivery convergence pass,
 a budget for pending uncertainty, and escalation questions readable on their own.
@@ -643,6 +724,8 @@ Distilled from a benchmark of github/spec-kit (2026-08-06).
 
 ## [0.81.1] — 2026-08-06
 
+Re-init: none
+
 Decision 4.141 — fixes the 4.42 anti-renudge valve under parallel dispatch.
 
 ### Fixed
@@ -659,6 +742,8 @@ Decision 4.141 — fixes the 4.42 anti-renudge valve under parallel dispatch.
 ---
 
 ## [0.81.0] — 2026-08-06
+
+Re-init: none
 
 Decisions 4.138–4.140
 
@@ -695,6 +780,8 @@ Decisions 4.138–4.140
 
 ## [0.80.0] — 2026-08-06
 
+Re-init: none
+
 Decisions 4.136–4.137
 
 ### Changed
@@ -720,6 +807,8 @@ Decisions 4.136–4.137
 ---
 
 ## [0.79.0] — 2026-08-06
+
+Re-init: none
 
 Decisions 4.130–4.135
 
@@ -762,6 +851,8 @@ Decisions 4.130–4.135
 
 ## [0.78.1] — 2026-08-06
 
+Re-init: required
+
 Decision 4.129
 
 ### Fixed
@@ -778,6 +869,8 @@ Decision 4.129
 ---
 
 ## [0.78.0] — 2026-08-05
+
+Re-init: required
 
 Decisions 4.125–4.128 — the epic becomes operable without human memory. Motivated by a
 direct field report: a team being onboarded kept getting lost right after
@@ -826,6 +919,8 @@ the injected block.
 
 ## [0.77.0] — 2026-08-05
 
+Re-init: none
+
 Decision 4.124
 
 ### Changed
@@ -845,6 +940,8 @@ Decision 4.124
 ---
 
 ## [0.76.0] — 2026-08-05
+
+Re-init: required
 
 Decision 4.123
 
@@ -869,6 +966,8 @@ Decision 4.123
 
 ## [0.75.1] — 2026-08-05
 
+Re-init: none
+
 Decision 4.122 — same-day amendment of 4.121.
 
 ### Changed
@@ -886,6 +985,8 @@ Decision 4.122 — same-day amendment of 4.121.
 ---
 
 ## [0.75.0] — 2026-08-05
+
+Re-init: none
 
 Decision 4.121
 
@@ -913,6 +1014,8 @@ Decision 4.121
 
 ## [0.74.1] — 2026-08-05
 
+Re-init: none
+
 Decision 4.120 — corollary of 4.119, observed live in the same measured session.
 
 ### Fixed
@@ -930,6 +1033,8 @@ Decision 4.120 — corollary of 4.119, observed live in the same measured sessio
 ---
 
 ## [0.74.0] — 2026-08-04
+
+Re-init: none
 
 Decision 4.119
 
@@ -953,6 +1058,8 @@ Decision 4.119
 
 ## [0.73.1] — 2026-08-04
 
+Re-init: none
+
 Decisions 4.117–4.118 — field corollaries of the forge batch, both observed live in the
 same measured session.
 
@@ -974,6 +1081,8 @@ same measured session.
 
 ## [0.73.0] — 2026-08-04
 
+Re-init: none
+
 Decision 4.116
 
 ### Changed
@@ -991,6 +1100,8 @@ Decision 4.116
 ---
 
 ## [0.72.0] — 2026-08-04
+
+Re-init: none
 
 Decisions 4.112–4.115
 
@@ -1022,6 +1133,8 @@ Decisions 4.112–4.115
 ---
 
 ## [0.71.0] — 2026-08-04
+
+Re-init: none
 
 Decisions 4.105–4.111
 
@@ -1086,6 +1199,8 @@ Decisions 4.105–4.111
 
 ## [0.70.1] — 2026-08-04
 
+Re-init: required
+
 Decision 4.103 (description-cap correction)
 
 ### Fixed
@@ -1097,6 +1212,8 @@ Decision 4.103 (description-cap correction)
 ---
 
 ## [0.70.0] — 2026-08-04
+
+Re-init: required
 
 Decisions 4.103, 4.104
 
@@ -1141,6 +1258,8 @@ Decisions 4.103, 4.104
 
 ## [0.69.1] — 2026-08-04
 
+Re-init: none
+
 Decision 4.102 (folder-name correction)
 
 ### Changed
@@ -1154,6 +1273,8 @@ Decision 4.102 (folder-name correction)
 ---
 
 ## [0.69.0] — 2026-08-04
+
+Re-init: required
 
 Decision 4.102
 
@@ -1185,6 +1306,8 @@ Decision 4.102
 
 ## [0.68.0] — 2026-08-04
 
+Re-init: none
+
 Decisions 4.100–4.101
 
 ### Added
@@ -1210,6 +1333,8 @@ Decisions 4.100–4.101
 ---
 
 ## [0.67.0] — 2026-08-04
+
+Re-init: none
 
 Decisions 4.96–4.99
 
@@ -1250,6 +1375,8 @@ Decisions 4.96–4.99
 ---
 
 ## [0.66.0] — 2026-08-03
+
+Re-init: none
 
 Decisions 4.92–4.95
 
@@ -1294,6 +1421,8 @@ re-run still applies if pending).
 
 ## [0.65.1] — 2026-08-03
 
+Re-init: required
+
 Decision 4.91
 
 ### Fixed
@@ -1313,6 +1442,8 @@ Decision 4.91
 ---
 
 ## [0.65.0] — 2026-08-03
+
+Re-init: none
 
 Decision 4.90
 
@@ -1351,6 +1482,8 @@ Decision 4.90
 
 ## [0.64.0] — 2026-08-03
 
+Re-init: required
+
 Decision 4.89
 
 ### Added
@@ -1379,6 +1512,8 @@ Decision 4.89
 ---
 
 ## [0.63.0] — 2026-08-03
+
+Re-init: none
 
 Decision 4.88
 
@@ -1414,6 +1549,8 @@ Decision 4.88
 
 ## [0.62.0] — 2026-08-02
 
+Re-init: required
+
 Decision 4.87
 
 ### Added
@@ -1443,6 +1580,8 @@ Decision 4.87
 ---
 
 ## [0.61.0] — 2026-08-02
+
+Re-init: required
 
 Decision 4.86
 
@@ -1481,6 +1620,8 @@ Decision 4.86
 
 ## [0.60.0] — 2026-08-02
 
+Re-init: required
+
 Decision 4.85
 
 ### Changed
@@ -1505,6 +1646,8 @@ Decision 4.85
 
 ## [0.59.0] — 2026-08-02
 
+Re-init: none
+
 Decision 4.84
 
 ### Added
@@ -1522,6 +1665,8 @@ Decision 4.84
 ---
 
 ## [0.58.0] — 2026-08-02
+
+Re-init: none
 
 Decision 4.83
 
@@ -1547,6 +1692,8 @@ Decision 4.83
 ---
 
 ## [0.57.0] — 2026-08-02
+
+Re-init: none
 
 Decision 4.82
 
@@ -1587,6 +1734,8 @@ Decision 4.82
 
 ## [0.56.0] — 2026-07-31
 
+Re-init: none
+
 Decision 4.81
 
 ### Added
@@ -1613,6 +1762,8 @@ Decision 4.81
 ---
 
 ## [0.55.0] — 2026-07-31
+
+Re-init: required
 
 Decision 4.80
 
@@ -1648,6 +1799,8 @@ Decision 4.80
 
 ## [0.54.1] — 2026-07-31
 
+Re-init: none
+
 Decision 4.79 (revised)
 
 ### Changed
@@ -1664,6 +1817,8 @@ Decision 4.79 (revised)
 ---
 
 ## [0.54.0] — 2026-07-31
+
+Re-init: none
 
 Decision 4.79
 
@@ -1688,6 +1843,8 @@ Decision 4.79
 ---
 
 ## [0.53.0] — 2026-07-31
+
+Re-init: none
 
 Decision 4.78
 
@@ -1720,6 +1877,8 @@ Decision 4.78
 
 ## [0.52.0] — 2026-07-31
 
+Re-init: none
+
 Decision 4.77
 
 ### Added
@@ -1749,6 +1908,8 @@ Decision 4.77
 ---
 
 ## [0.51.0] — 2026-07-31
+
+Re-init: none
 
 Decision 4.76
 
@@ -1788,6 +1949,8 @@ Decision 4.76
 
 ## [0.50.0] — 2026-07-31
 
+Re-init: required
+
 Decision 4.75
 
 ### Added
@@ -1820,6 +1983,8 @@ Re-run `/keelson:init` on consumer projects to receive the updated CLAUDE block.
 
 ## [0.49.1] — 2026-07-31
 
+Re-init: none
+
 Decision 4.74
 
 ### Changed
@@ -1836,6 +2001,8 @@ Decision 4.74
 ---
 
 ## [0.49.0] — 2026-07-31
+
+Re-init: none
 
 Decision 4.73
 
@@ -1857,6 +2024,8 @@ Decision 4.73
 
 ## [0.48.1] — 2026-07-31
 
+Re-init: none
+
 Decision 4.72
 
 ### Fixed
@@ -1871,6 +2040,8 @@ Decision 4.72
 ---
 
 ## [0.48.0] — 2026-07-31
+
+Re-init: required
 
 Decision 4.71
 
@@ -1916,6 +2087,8 @@ needs false-positive design that doesn't fit this batch.
 
 ## [0.47.0] — 2026-07-30
 
+Re-init: none
+
 Decision 4.70
 
 ### Changed
@@ -1935,6 +2108,8 @@ Decision 4.70
 ---
 
 ## [0.46.0] — 2026-07-30
+
+Re-init: none
 
 Decision 4.69
 
@@ -1964,6 +2139,8 @@ Decision 4.69
 ---
 
 ## [0.45.0] — 2026-07-30
+
+Re-init: none
 
 Decision 4.68
 
@@ -2011,6 +2188,8 @@ Decision 4.68
 
 ## [0.44.0] — 2026-07-30
 
+Re-init: none
+
 Decision 4.67
 
 ### Added
@@ -2034,6 +2213,8 @@ Decision 4.67
 ---
 
 ## [0.43.0] — 2026-07-30
+
+Re-init: none
 
 Decision 4.66
 
@@ -2069,6 +2250,8 @@ Decision 4.66
 
 ## [0.42.0] — 2026-07-30
 
+Re-init: required
+
 Decision 4.65
 
 ### Fixed
@@ -2100,6 +2283,8 @@ Decision 4.65
 
 ## [0.41.1] — 2026-07-30
 
+Re-init: none
+
 Decision 4.64
 
 ### Changed
@@ -2123,6 +2308,8 @@ Decision 4.64
 ---
 
 ## [0.41.0] — 2026-07-30
+
+Re-init: none
 
 Decision 4.62
 
@@ -2166,6 +2353,8 @@ Decision 4.62
 
 ## [0.40.0] — 2026-07-29
 
+Re-init: none
+
 Decision 4.61
 
 ### Added
@@ -2196,6 +2385,8 @@ Decision 4.61
 ---
 
 ## [0.39.0] — 2026-07-29
+
+Re-init: none
 
 Decision 4.60
 
@@ -2233,6 +2424,8 @@ Decision 4.60
 ---
 
 ## [0.38.0] — 2026-07-29
+
+Re-init: none
 
 Decision 4.59
 
@@ -2275,6 +2468,8 @@ Decision 4.59
 
 ## [0.37.0] — 2026-07-28
 
+Re-init: none
+
 Decision 4.58
 
 ### Changed
@@ -2299,6 +2494,8 @@ Decision 4.58
 
 ## [0.36.0] — 2026-07-28
 
+Re-init: none
+
 Decision 4.57
 
 ### Added
@@ -2320,6 +2517,8 @@ Decision 4.57
 ---
 
 ## [0.35.0] — 2026-07-28
+
+Re-init: none
 
 Decision 4.56
 
@@ -2343,6 +2542,8 @@ Decision 4.56
 
 ## [0.34.0] — 2026-07-28
 
+Re-init: none
+
 Decision 4.55
 
 ### Added
@@ -2359,6 +2560,8 @@ Decision 4.55
 ---
 
 ## [0.33.0] — 2026-07-28
+
+Re-init: none
 
 Decision 4.54
 
@@ -2388,6 +2591,8 @@ Decision 4.54
 ---
 
 ## [0.32.0] — 2026-07-28
+
+Re-init: none
 
 Decision 4.53
 
@@ -2420,6 +2625,8 @@ Decision 4.53
 ---
 
 ## [0.31.0] — 2026-07-28
+
+Re-init: none
 
 Decision 4.52
 
@@ -2456,6 +2663,8 @@ Decision 4.52
 
 ## [0.30.2] — 2026-07-28
 
+Re-init: none
+
 Decision 4.51
 
 ### Fixed
@@ -2487,6 +2696,8 @@ Decision 4.51
 
 ## [0.30.1] — 2026-07-28
 
+Re-init: none
+
 Decision 4.50
 
 ### Added
@@ -2509,6 +2720,8 @@ Decision 4.50
 ---
 
 ## [0.30.0] — 2026-07-27
+
+Re-init: required
 
 Decision 4.49
 
@@ -2546,6 +2759,8 @@ Decision 4.49
 
 ## [0.29.0] — 2026-07-27
 
+Re-init: none
+
 Charter `0.5.1` · decision 4.48
 
 ### Added
@@ -2562,6 +2777,8 @@ Charter `0.5.1` · decision 4.48
 ---
 
 ## [0.28.0] — 2026-07-26
+
+Re-init: none
 
 Decision 4.47 · `146d4f2`
 
@@ -2584,6 +2801,8 @@ Decision 4.47 · `146d4f2`
 
 ## [0.27.0] — 2026-07-26
 
+Re-init: none
+
 Decision 4.46 · `787e753`
 
 ### Changed
@@ -2605,6 +2824,8 @@ got a key, with no record of why — best-effort worked as designed and degraded
 
 ## [0.26.0] — 2026-07-26
 
+Re-init: none
+
 Decision 4.45 · `d0eed7d`
 
 ### Added
@@ -2624,6 +2845,8 @@ Decision 4.45 · `d0eed7d`
 ---
 
 ## [0.25.0] — 2026-07-26
+
+Re-init: none
 
 Decision 4.44 · `b0e0395`
 
@@ -2646,6 +2869,8 @@ Decision 4.44 · `b0e0395`
 ---
 
 ## [0.24.0] — 2026-07-26
+
+Re-init: none
 
 Decision 4.43 · `9d1d2ab`
 
@@ -2676,6 +2901,8 @@ Decision 4.43 · `9d1d2ab`
 
 ## [0.23.0] — 2026-07-26
 
+Re-init: none
+
 Decision 4.42 · `4192a0f`
 
 ### Added
@@ -2694,6 +2921,8 @@ Decision 4.42 · `4192a0f`
 
 ## [0.22.1] — 2026-07-26
 
+Re-init: none
+
 `3ab34f0`
 
 ### Fixed
@@ -2702,6 +2931,8 @@ Decision 4.42 · `4192a0f`
 ---
 
 ## [0.22.0] — 2026-07-26
+
+Re-init: required
 
 Decision 4.41 · `a37adcb`
 
@@ -2721,6 +2952,8 @@ Decision 4.41 · `a37adcb`
 
 ## [0.21.1] — 2026-07-26
 
+Re-init: none
+
 `f639fec`
 
 ### Fixed
@@ -2732,6 +2965,8 @@ Decision 4.41 · `a37adcb`
 ---
 
 ## [0.21.0] — 2026-07-26
+
+Re-init: none
 
 Decision 4.40 · `cb0d0f1`, `85a6e4a`
 
@@ -2749,6 +2984,8 @@ Decision 4.40 · `cb0d0f1`, `85a6e4a`
 
 ## [0.20.0] — 2026-07-26
 
+Re-init: none
+
 Decision 4.39 · `d0868df`, `f7f1329`, `4f2b5b5`
 
 ### Added
@@ -2765,6 +3002,8 @@ Decision 4.39 · `d0868df`, `f7f1329`, `4f2b5b5`
 ---
 
 ## [0.19.0] — 2026-07-26
+
+Re-init: none
 
 Decision 4.38 · `b7854e7`, `3b9dea1`, `80a0337`, `575950e`, `ba2c5c8`
 
@@ -2784,6 +3023,8 @@ Decision 4.38 · `b7854e7`, `3b9dea1`, `80a0337`, `575950e`, `ba2c5c8`
 
 ## [0.18.0] — 2026-07-25
 
+Re-init: none
+
 Decision 4.36 · `9f54f84`
 
 ### Added
@@ -2795,6 +3036,8 @@ Decision 4.36 · `9f54f84`
 ---
 
 ## [0.17.0] — 2026-07-25
+
+Re-init: required
 
 Decision 4.35 · `8877f39`
 
@@ -2817,6 +3060,8 @@ Decision 4.35 · `8877f39`
 
 ## [0.16.0] — 2026-07-24
 
+Re-init: none
+
 Decision 4.34 · `d469990`
 
 ### Added
@@ -2832,6 +3077,8 @@ Both gaps came from an adversarial coverage review of an external letter on inst
 ---
 
 ## [0.15.0] — 2026-07-24
+
+Re-init: none
 
 Decisions 4.31, 4.32, 4.33 · Charter `0.3.0` → `0.5.0` · `f573e48`
 
@@ -2859,6 +3106,8 @@ Decisions 4.31, 4.32, 4.33 · Charter `0.3.0` → `0.5.0` · `f573e48`
 
 ## [0.13.0] — 2026-07-24
 
+Re-init: none
+
 Decision 4.30 · `8cf7864`
 
 Lessons from the first real `/keelson:auto` run (a 2FA feature — the maximally sensitive case),
@@ -2885,6 +3134,8 @@ where the security gate ran only *after* delivery and caught a real critical byp
 
 ## [0.12.0] — 2026-07-24
 
+Re-init: none
+
 Decision 4.29 · `5f6494f`
 
 ### Fixed
@@ -2898,6 +3149,8 @@ Decision 4.29 · `5f6494f`
 ---
 
 ## [0.11.0] — 2026-07-23
+
+Re-init: none
 
 Decision 4.28 · `12a7167`
 
@@ -2913,6 +3166,8 @@ Decision 4.28 · `12a7167`
 
 ## [0.10.0] — 2026-07-23
 
+Re-init: none
+
 Decision 4.27 · `6add21c`
 
 ### Added
@@ -2924,6 +3179,8 @@ Decision 4.27 · `6add21c`
 ---
 
 ## [0.9.0] — 2026-07-23
+
+Re-init: none
 
 Decisions 4.25, 4.26 · `10c611e`
 
@@ -2938,6 +3195,8 @@ Decisions 4.25, 4.26 · `10c611e`
 
 ## [0.8.0] — 2026-07-23
 
+Re-init: none
+
 Decisions 4.23, 4.24 · `e98e46c`
 
 ### Changed
@@ -2949,6 +3208,8 @@ Decisions 4.23, 4.24 · `e98e46c`
 ---
 
 ## [0.7.0] — 2026-07-22
+
+Re-init: none
 
 Decision 4.22 · `b1bb97a`
 
@@ -2963,6 +3224,8 @@ Decision 4.22 · `b1bb97a`
 
 ## [0.6.0] — 2026-07-22
 
+Re-init: none
+
 Decision 4.21 · `c49e122`
 
 ### Changed
@@ -2972,6 +3235,8 @@ Decision 4.21 · `c49e122`
 ---
 
 ## [0.5.1] — 2026-07-22
+
+Re-init: none
 
 Decision 4.20 · `498dcdf`
 
@@ -2984,6 +3249,8 @@ Decision 4.20 · `498dcdf`
 
 ## [0.5.0] — 2026-07-22
 
+Re-init: none
+
 Decision 4.19 · `eaec382`
 
 ### Added
@@ -2994,6 +3261,8 @@ Decision 4.19 · `eaec382`
 ---
 
 ## [0.4.0] — 2026-07-22
+
+Re-init: none
 
 Decisions 4.16, 4.17, 4.18 · `871bcf9`, `33ab90a`, `657cd45`
 
@@ -3013,6 +3282,8 @@ Decisions 4.16, 4.17, 4.18 · `871bcf9`, `33ab90a`, `657cd45`
 
 ## [0.3.1] — 2026-07-22
 
+Re-init: none
+
 Decision 4.15 · `3521e88`
 
 ### Added
@@ -3022,6 +3293,8 @@ Decision 4.15 · `3521e88`
 ---
 
 ## [0.3.0] — 2026-07-22
+
+Re-init: none
 
 Charter `0.2.0` → `0.3.0` · `6ead08a`, `9d54075`
 
@@ -3034,6 +3307,8 @@ Charter `0.2.0` → `0.3.0` · `6ead08a`, `9d54075`
 
 ## [0.2.5] — 2026-07-20
 
+Re-init: none
+
 `1bf6538` (LRN-015/016/017)
 
 ### Fixed
@@ -3044,6 +3319,8 @@ Charter `0.2.0` → `0.3.0` · `6ead08a`, `9d54075`
 
 ## [0.2.4] — 2026-07-18
 
+Re-init: none
+
 `a155bb3` (LRN-014)
 
 ### Fixed
@@ -3052,6 +3329,8 @@ Charter `0.2.0` → `0.3.0` · `6ead08a`, `9d54075`
 ---
 
 ## [0.2.3] — 2026-07-18
+
+Re-init: none
 
 Decision 4.14 · `b6f1062`
 
@@ -3062,6 +3341,8 @@ Decision 4.14 · `b6f1062`
 
 ## [0.2.2] — 2026-07-18
 
+Re-init: none
+
 Decision 4.13 · `de9e6ea`
 
 ### Added
@@ -3071,6 +3352,8 @@ Decision 4.13 · `de9e6ea`
 
 ## [0.2.1] — 2026-07-17
 
+Re-init: none
+
 `fc54360`
 
 ### Changed
@@ -3079,6 +3362,8 @@ Decision 4.13 · `de9e6ea`
 ---
 
 ## [0.2.0] — 2026-07-17
+
+Re-init: none
 
 `806a9c5`
 
@@ -3090,6 +3375,8 @@ Decision 4.13 · `de9e6ea`
 
 ## [0.1.3] — 2026-07-17
 
+Re-init: none
+
 `3eb088b`
 
 ### Added
@@ -3098,6 +3385,8 @@ Decision 4.13 · `de9e6ea`
 ---
 
 ## [0.1.2] — 2026-07-17
+
+Re-init: none
 
 `9541b71`
 
@@ -3108,6 +3397,8 @@ Decision 4.13 · `de9e6ea`
 
 ## [0.1.1] — 2026-07-17
 
+Re-init: none
+
 `1d8469c`
 
 ### Fixed
@@ -3116,6 +3407,8 @@ Decision 4.13 · `de9e6ea`
 ---
 
 ## [0.1.0] — 2026-07-16
+
+Re-init: none
 
 `079b973`
 
