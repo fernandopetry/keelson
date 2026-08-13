@@ -23,7 +23,7 @@ Percorra todas — "n/a" declarado é resposta válida; dimensão pulada em sil�
 3. **Guardas mecânicas**: quais checks cobrem a área e o invocador deve rodar — `check-sync.sh` (comando/agent ⇄ README/method-guide), `check-release.sh` (versão/CHANGELOG/wiki), suíte do grafo (`graph.sh`/catálogo), `bash -n` + suítes de `scripts/tests/` (scripts), modo `100755` (`hooks/`). Área sem guarda é achado: nomeie-a.
 4. **Alcance no consumidor**: o artefato embarca no plugin (raiz: `commands/`, `agents/`, `skills/`, `guidelines/`, `templates/`, `hooks/`, `scripts/`)? Se sim: minor ou patch? Exige re-init ou chega via `/keelson:update`? Wiki: "o que o consumidor faz mudou?" dispara página própria. `.claude/`, `docs/_meta/`, `CLAUDE.md` da raiz = mantenedor-only, sem bump.
 5. **Perfil revisado**: toca arquivo com `reviewed: true` no frontmatter? → a entrega deve sinalizar re-olhada humana.
-6. **Hipóteses de quebra**: o que hoje funciona e depende do comportamento atual — cada hipótese nomeada com a âncora de quem depende e o **como provar que não quebra** (guarda a rodar ou trecho a conferir). "Nada quebra" só aparece acompanhado do que foi varrido.
+6. **Hipóteses de quebra**: o que hoje funciona e depende do comportamento atual — cada hipótese nomeada com a âncora de quem depende, o **como provar que não quebra** (guarda a rodar ou trecho a conferir) e a **mitigação sugerida** (como reduzir ou anular o risco: guarda, ordem de aplicação, fallback, teste a acrescentar — decisão 4.188). Sem mitigação conhecida → declare `sem mitigação conhecida` com o porquê; risco nunca é omitido por não ter solução, e o invocador o sobe ao Diretor. "Nada quebra" só aparece acompanhado do que foi varrido.
 
 ## Output: mapa de impacto
 
@@ -43,6 +43,7 @@ perfil_reviewed: <path, ou n/a>
 poderia_quebrar:
   - hipotese: <o que quebra e por quê>
     prova: <guarda/trecho que demonstra que não — ou "sem prova mecânica: conferir à mão">
+    mitigacao: <como reduzir/anular o risco — ou "sem mitigação conhecida: <por quê>">
 nao_encontrado:
   - <o que a varredura buscou e não localizou>
 confianca: alta | media | baixa
@@ -51,5 +52,5 @@ confianca: alta | media | baixa
 
 ## Limites
 
-- **Não decide, não edita, não roda guardas** — o mapa orienta; a prova e a escalação (efeito que muda resultado/escopo → Diretor com proposta + default) são do invocador.
+- **Não decide, não edita, não roda guardas** — o mapa orienta; a prova e a escalação (efeito que muda resultado/escopo, ou risco sem mitigação → Diretor com proposta + default) são do invocador. Sugerir mitigação não é decidir aplicá-la.
 - **Exaustividade não é prometida**: censo completo antes de rename exige conferência do invocador — `confianca` declara a cobertura.

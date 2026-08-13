@@ -2112,6 +2112,14 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `guidelines/core/CODE-REVIEW.md` (extensão do bloco da 4.173). Sem re-init.
 
+### 4.188 — Risco identificado viaja com mitigação sugerida; ausência de mitigação é declarada, nunca omitida
+
+**Problema**: a 4.181 exige nomear o que poderia quebrar e provar por que não quebra — mas o contrato parava no diagnóstico: o risco chegava ao Diretor sem caminho de redução, e risco **sem solução conhecida** tende a sumir do relato, porque apontar problema sem proposta é desconfortável. É o mesmo viés que o contrato de escalação do PO já corrige com proposta + default (4.85) — a análise de impacto não tinha o equivalente. Diretriz explícita do Diretor.
+
+**Decisão**: (a) todo risco do mapa de impacto carrega **mitigação sugerida** — como reduzir ou anular: guarda a rodar, ordem de aplicação, fallback, teste a acrescentar; na escalação, a mitigação **é** a proposta; (b) "sem mitigação conhecida" é resposta válida e **obrigatória**, com o porquê — omitir o risco por não ter solução é o defeito, não tê-la; (c) risco sem mitigação conhecida **sobe sempre ao Diretor** antes de aplicar, mude escopo ou não; (d) o schema do `impact-scout` ganha o campo `mitigacao` por hipótese de quebra.
+
+**Aplicação**: `CLAUDE.md` (seção *Antes de qualquer alteração*, bullets novos) · `.claude/agents/impact-scout.md` (dimensão 6, schema, Limites). Sem bump e sem re-init — camada do mantenedor (4.182).
+
 ### 4.189 — "Precisa de re-init?" é fato mecânico do CHANGELOG, lido pelo update
 
 **Problema**: "esta versão exige re-rodar `/keelson:init`" vivia como prosa livre por release ("re-run `/keelson:init`", com fraseado variando) e como registro paralelo do mantenedor — sem dono declarado e sem leitor mecânico. O consumidor que atualizava tinha de ler o CHANGELOG do salto inteiro e reconhecer a frase; na prática, a auditoria desta leva encontrou versões que exigiram re-init **sem** a frase na entrada (o registro do mantenedor sabia; o CHANGELOG não dizia). Re-init perdido é falha silenciosa: o bloco/ficha do consumidor fica defasado até algum sintoma aparecer.

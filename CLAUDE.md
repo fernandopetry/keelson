@@ -17,10 +17,16 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   "nada quebra" sem verificação não é resposta. Prova preferida é mecânica: rode a
   guarda que cobre a área tocada (`check-sync.sh`, `check-release.sh`, suíte do grafo,
   `bash -n`, suítes de `scripts/tests/`) em vez de argumentar.
+- **Risco identificado viaja com mitigação sugerida** (decisão 4.188): como reduzir ou
+  anular — guarda a rodar, ordem de aplicação, fallback, teste a acrescentar. "Sem
+  mitigação conhecida" é resposta válida e obrigatória, com o porquê — omitir o risco
+  por não ter solução é o defeito, não tê-la.
 - Efeito colateral que muda resultado ou escopo do pedido → sinalize ao Diretor
-  **antes** de aplicar, com proposta + default (mesmo contrato de escalação do PO).
-  Os demais entram na entrega: efeitos considerados e por que foram descartados —
-  descartar em silêncio é o mesmo defeito de contornar furo de plano em silêncio.
+  **antes** de aplicar, com proposta + default (mesmo contrato de escalação do PO) —
+  a mitigação sugerida é a proposta. **Risco sem mitigação conhecida sobe sempre ao
+  Diretor**, mude escopo ou não. Os demais entram na entrega: efeitos considerados,
+  mitigação e por que foram descartados — descartar em silêncio é o mesmo defeito de
+  contornar furo de plano em silêncio.
 
 ## Ferramentas do mantenedor (`.claude/` do repo — decisão 4.182)
 
