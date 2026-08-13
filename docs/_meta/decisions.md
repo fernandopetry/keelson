@@ -2056,6 +2056,22 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `hooks/window-marker.sh` e `hooks/compact-anchor.sh` (chmod +x commitado) · `scripts/git-hooks/pre-commit` · `.github/workflows/test.yml` · `scripts/init-selfcheck.sh` + suíte · `commands/init.md` (Etapa 6) · wiki `Solucao-de-problemas.md`. Sem re-init — o consumidor recebe a correção no próximo `/keelson:update`.
 
+### 4.181 — Alteração no keelson passa por análise de efeito colateral antes da edição
+
+**Problema**: alterações solicitadas vinham sendo aplicadas direto no artefato pedido, sem mapear quem mais depende do comportamento atual. O repo é uma malha de donos únicos, espelhos e guardas (4.20, 4.81, 4.82, 4.147): um ajuste local pode quebrar o que funciona em outro ponto — e a classe mais cara é a falha silenciosa, que nada acusa na hora e aparece dias depois em campo (caso 4.180: 269 falhas de hook no consumidor, 6 dias após o release). Diretriz explícita do Diretor: o objetivo é não estragar o que está funcionando.
+
+**Decisão**: análise de efeito colateral é etapa obrigatória **antes de editar**: (a) mapear o raio de impacto — quem referencia/consome o artefato (dono único, comandos/agents, scripts/CI, consumidores via update) e qual comportamento atual depende do que muda; (b) teste falsificável — nomear o que poderia quebrar e provar por que não quebra, com preferência por prova mecânica (guardas e suítes existentes) sobre argumento; (c) efeito que muda resultado ou escopo escala ao Diretor com proposta + default antes de aplicar; os demais entram na entrega como efeitos considerados e descartados — descartar em silêncio é violação, análoga a contornar furo de plano em silêncio.
+
+**Aplicação**: `CLAUDE.md` (seção *Antes de qualquer alteração*). Sem bump e sem re-init — o `CLAUDE.md` da raiz é doutrina do repo de desenvolvimento, não artefato entregue ao consumidor.
+
+### 4.182 — Ferramentas do mantenedor vivem em `.claude/` versionado, fora do pacote
+
+**Problema**: a 4.181 tornou a análise de efeito colateral obrigatória, mas ela depende de disciplina da sessão principal — exatamente quem tende a pular o grep quando a mudança "parece de uma linha". E o fluxo mais recorrente do mantenedor (absorver postmortem/ledger/proposta de consumidor) tem regras de ordem fáceis de violar, espalhadas em três donos (registrar antes do parecer, 4.111; abstrair identificadores, 4.72; escada de reincidência, 4.149) — as duas violações já aconteceram em campo. O repo não tinha lugar para tooling de desenvolvimento: `agents/` e `skills/` da raiz embarcam no plugin, e ferramenta do mantenedor não pode virar superfície do consumidor.
+
+**Decisão**: `.claude/agents/` e `.claude/skills/` **versionados** são a camada de ferramentas do mantenedor, fora do pacote — o loader do plugin e o `check-sync.sh` leem só a raiz (verificado: padrões do pre-commit ancorados em `^agents/`/`^commands/`), e mudança nessa camada não bumpa versão nem entra no CHANGELOG. Nascem duas peças: **`impact-scout`** (agent read-only no molde do `code-scout` — devolve o mapa de impacto da 4.181 em seis dimensões com âncoras, sem decidir nem editar) e **`field-intake`** (skill sequenciadora com ponteiros — impõe a ordem 4.111 → 4.72 → 4.149 → leva → fecho de estado, sem duplicar o texto dos donos). Adiados com gatilho explícito, pela escada da 4.149: `doctrine-reviewer` (gatilho: reincidência de defeito de conteúdo de doutrina que os checks de sincronia não pegam) e `check-refs.sh` para ponteiros internos entre docs (gatilho: primeiro ponteiro quebrado manifestado em campo).
+
+**Aplicação**: `.claude/agents/impact-scout.md` · `.claude/skills/field-intake/SKILL.md` · `CLAUDE.md` (seção *Ferramentas do mantenedor* + ponteiro na seção da 4.181). Sem bump, sem CHANGELOG e sem re-init — nada embarcado mudou.
+
 ---
 
 ## 5. Quality gates inegociáveis

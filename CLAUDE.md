@@ -4,6 +4,41 @@ Este repositório **é** o plugin (a raiz é o pacote). Não é um projeto consu
 o keelson; a doutrina que os consumidores recebem vive em `guidelines/` e o bloco
 injetado neles em `templates/CLAUDE.keelson-block.md`.
 
+## Antes de qualquer alteração — análise de efeito colateral (decisão 4.181)
+
+- Toda alteração solicitada — código, doutrina, comando, agent, skill, script, hook ou
+  doc — começa **mapeando o raio de impacto antes de editar**: quem referencia ou
+  consome o artefato (dono único da regra, comandos/agents que o citam, scripts e CI
+  que o leem, consumidores via `/keelson:update`) e qual comportamento atual funciona
+  e depende do que vai mudar. `grep` pelo nome/heading do artefato é o mínimo; mudança
+  que toca mais de um artefato → delegue o mapa ao `impact-scout` (seção *Ferramentas
+  do mantenedor*).
+- O teste é falsificável: **nomeie o que poderia quebrar e prove por que não quebra** —
+  "nada quebra" sem verificação não é resposta. Prova preferida é mecânica: rode a
+  guarda que cobre a área tocada (`check-sync.sh`, `check-release.sh`, suíte do grafo,
+  `bash -n`, suítes de `scripts/tests/`) em vez de argumentar.
+- Efeito colateral que muda resultado ou escopo do pedido → sinalize ao Diretor
+  **antes** de aplicar, com proposta + default (mesmo contrato de escalação do PO).
+  Os demais entram na entrega: efeitos considerados e por que foram descartados —
+  descartar em silêncio é o mesmo defeito de contornar furo de plano em silêncio.
+
+## Ferramentas do mantenedor (`.claude/` do repo — decisão 4.182)
+
+- `.claude/agents/` e `.claude/skills/` **versionados** são tooling do desenvolvimento
+  do keelson, fora do pacote: o loader do plugin e o `check-sync.sh` leem só a raiz
+  (`agents/`, `commands/`, `skills/`). Mudança aqui não bumpa versão nem entra no
+  `CHANGELOG.md` — mas ganha decisão §4.x quando muda o processo.
+- **`impact-scout`** (agent, read-only): devolve o mapa de impacto da 4.181 com âncoras
+  `arquivo:linha` — referências, dono único, guardas a rodar, alcance no consumidor,
+  hipóteses nomeadas de quebra. Delegue quando a mudança tocar mais de um artefato ou
+  o raio de impacto não for óbvio; lookup de um grep fica inline.
+- **`/field-intake`** (skill): sequencia a absorção de insumo de campo — registrar na
+  `proposal-inbox.md` **antes** do parecer (4.111), abstrair identificadores (4.72),
+  checar reincidência (4.149) e fechar o estado na mesma leva.
+- Adiados com gatilho (4.182): `doctrine-reviewer` (reincidência de defeito de conteúdo
+  de doutrina que os checks de sincronia não pegam) · `check-refs.sh` (primeiro ponteiro
+  interno quebrado em campo).
+
 ## Versionamento
 
 - **Versão do plugin** vive em **3 lugares, sempre sincronizados**:
