@@ -45,6 +45,7 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 - **Convergência (SPEC ↔ código)**: <convergiu em <SHA> | N gaps: <tipo — source-ref, 1 por linha>>   # só ciclo formal com SPEC (decisão 4.143) — OMITIR nas demais rotas
 - **Decisões tomadas em seu nome**: <1 linha cada — decisão + porquê; inclui premissas [assumido], DECs, resoluções do PO, gates resolvidos com ajuste>
 - **Fora de escopo / pendente**: <achados estacionados, handoff aberto, parte recusada, lição pendente de merge>
+- **Lições da rodada**: <toda `licao_candidata` devolvida por gate — inclusive retry/convergência — com destino registrado: `alvo: projeto` → lessons.md · `alvo: processo` → `agile-coach` | nenhuma>   # aplicar a correção de código não é rotear a lição — dois atos (4.199/4.204); lição sem destino → o fecho se declara parcial
 - **Tracker**: Jira: <KEY> (Épico) · Story: <KEY | —> em <coluna atual> (teto: <coluna>) · sub-tarefas: K/N · transições: <n aplicadas | nenhuma> (transition: <modo>)   # só com jira.enabled; sync pulado/falho aparece AQUI com o motivo, jamais some
 - **Telemetria**: <worklog <duração> publicado em <KEY> | falhou (<motivo>) | sem marca de largada — não publicável>   # só com jira.telemetry: true (§17 do protocolo, decisão 4.196); ativo sem linha é defeito do report, nunca omissão válida
 - **Fila do épico**: <fatia marcada `entregue` · próximo passo pronto: /keelson:continue <slug-âncora>>   # só demanda com **Epico**:
@@ -84,5 +85,5 @@ o pico da próxima rodada herda o da anterior.
 | Invocador | Fonte das linhas | Específico dele |
 |---|---|---|
 | `/keelson:auto` (Entrega) | composição e aceitação do item 2.5 · tracker da reconciliação do item 4 · marcas da Etapa 0.5 | métrica de sucesso (item 6.4) · perguntas estacionadas em lote (item 9) · fecho do ledger (item 10) |
-| Modo sob demanda (4.75) | ledger + diff da mudança | versão mínima do bloco do consumidor; gate aplicável sem veredito → "não rodado" |
+| Modo sob demanda (4.75) | ledger + diff da mudança | versão mínima do bloco do consumidor; gate aplicável sem veredito → "não rodado"; linha "Lições da rodada" obrigatória (4.204) |
 | `/keelson:report` | **só** ledger + repositório (nunca impressão residual da conversa) | seção "Cobertura deste relatório" sempre presente; não commita nem faz push |

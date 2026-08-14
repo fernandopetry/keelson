@@ -60,7 +60,12 @@
   Tech Lead, e — **regra deste modo, nunca do ciclo** — commit só a pedido do Diretor
   (no ciclo o commit por TASK é do time: o `developer` commita a implementação e a
   closure commita o fecho da task; decisão 4.91). Só o trivial não-comportamental (typo de
-  comentário/doc) pode ser inline, declarado — **sem brief e sem card**. No **primeiro
+  comentário/doc) pode ser inline, declarado — **sem brief e sem card** — e trivial tem
+  **teste, antes de despachar** (decisão 4.205): o diff **introduz ou propaga
+  campo/contrato através de uma fronteira de camada** (consulta/coluna nova, campo novo
+  atravessando um serviço, tipo novo na outra ponta)? Então **não é trivial, por menor
+  que pareça** — o brief nasce antes do código, nunca depois que o review aponta a
+  ausência. No **primeiro
   turno** da mudança, declare **quem escreve o código** (qual agent — ou por que será
   inline) **e sob qual card** (decisão 4.86): o Diretor citou uma key do tracker → ela
   vai na linha `**Jira**:` do brief e **nenhum card novo é criado**; sem key, com
@@ -83,7 +88,12 @@
   `n/a (<motivo>)` · **"não rodado — <motivo>", nunca omitido** (mesma régua do
   `/keelson:report`; fecho com gate pendente se declara **parcial** e não convida ao
   commit — decisão 4.85) · decisões tomadas em seu nome · o que ficou fora de
-  escopo ou pendente · estado do tracker (com `jira.enabled`) · e o que depende de você
+  escopo ou pendente · **toda `licao_candidata` devolvida por qualquer gate da rodada
+  — inclusive retry — com destino registrado** (`alvo: projeto` →
+  `guidelines/project/lessons.md` · `alvo: processo` → `agile-coach`): aplicar a
+  correção de código que o achado pede **não é** rotear a lição que ele carrega — são
+  dois atos, e lição sem destino também declara o fecho **parcial** (decisão 4.204) ·
+  estado do tracker (com `jira.enabled`) · e o que depende de você
   — **por modo** (decisão 4.91): no sob demanda, o commit é seu; no ciclo, a branch já
   chega commitada TASK a TASK (e pushada pelo `/keelson:auto`) — seus atos são revisão,
   PR e merge (decisão 4.41). O relatório é montado a partir do **ledger de sessão**

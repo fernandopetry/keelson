@@ -179,7 +179,11 @@ um diff → sem TASK; repartível em pedaços independentes → TASKs, cada uma 
 verifica a referência e a forma: `task-brief` e `brief-sem-criterio` no
 `graph-contract.md`). Avulso que acumular decisão técnica ou tocar contrato no meio do
 caminho **para e promove** (vira SPEC/ciclo), declarando. O trivial inline (4.75)
-continua sem brief. Slug com avulsos ganha no INDEX a seção `## Avulsas`
+continua sem brief — com **teste operacional pré-despacho** (decisão 4.205): o diff
+**introduz ou propaga campo/contrato através de uma fronteira de camada ou componente**
+(coluna/consulta nova, campo novo atravessando um serviço ou caso de uso, tipo/prop novo
+no consumidor da outra ponta)? → **não é trivial, por menor que pareça** — o brief nasce
+**antes** do código, nunca regularizado depois que o review aponta a ausência. Slug com avulsos ganha no INDEX a seção `## Avulsas`
 (tabela `| ID | Título | Status | Jira | Data |`), mantida por quem fecha o avulso.
 
 **Morada multi-slug (decisão 4.87)**: mudança avulsa que toca vários slugs continua com

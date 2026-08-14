@@ -129,7 +129,10 @@ chegarem. Documento pequeno ou pedido claro não precisa da forja — vá direto
 3. **Trivial pula o ciclo — mas trivial é raio de dano, não tamanho.** Typo, texto,
    cor: mudança direta, sem SPEC. Já uma linha que muda o que o sistema promete (shape
    de id, chave de payload, default de API) entra no ciclo por menor que pareça: todo
-   consumidor quebra junto. Na dúvida, `/keelson:triage` decide.
+   consumidor quebra junto. Teste rápido antes de despachar: o diff **introduz ou
+   propaga campo/contrato através de uma fronteira de camada** (consulta nova, campo
+   novo atravessando um serviço, tipo novo na outra ponta)? Então não é trivial — e o
+   brief nasce antes do código. Na dúvida, `/keelson:triage` decide.
 
 Continue por [Conceitos](Conceitos) para entender o modelo, ou pelo
 [Guia do método](Guia-do-metodo) para a referência completa dos comandos.

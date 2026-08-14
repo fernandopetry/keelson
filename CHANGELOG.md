@@ -25,6 +25,39 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.100.0] — 2026-08-13
+
+Re-init: required
+
+Decisions 4.204–4.205 — consumer postmortem from the post-merge window of the same
+field cycle as 0.97.0–0.99.0: the Tech Lead repeated, minutes after diagnosing it,
+the very mechanism it had just proposed a fix for (apply the code fix a gate finding
+asks for, never route the lesson it carries) — this time in on-demand mode, a surface
+the formal cycle's closure (4.199) never reaches. Both fixes land in the injected
+CLAUDE block, the only text that governs closings in both modes.
+
+### Changed
+
+- Closing report contract (`conventions/report-contract.md`, the declared owner of the
+  full closing form) gains the mandatory line "Lições da rodada" (4.204): every
+  `licao_candidata` returned by any gate of the round — including retry/convergence —
+  leaves the closing with a recorded destination (`alvo: projeto` → the project's
+  lessons file; `alvo: processo` → `agile-coach`). Applying the code fix a finding asks
+  for is not routing the lesson it carries — two distinct acts; a closing with an
+  unrouted lesson declares itself partial, same rule as a pending gate. The injected
+  block's closing bullet carries the minimal version of the same rule, so on-demand
+  mode — where the recurrence happened — is covered too. If the class recurs, the next
+  patch must ship a mechanical autocheck (4.149 ladder), not a third prose rewording.
+- The "trivial, no brief" exception of on-demand mode gains an operational pre-dispatch
+  test (4.205), owned by `conventions/index-contract.md` next to the existing
+  falsifiable rulers and mirrored in the injected block: does the diff introduce or
+  propagate a field/contract across a layer or component boundary (new query/column,
+  field crossing a service, new type on the consuming end)? Then it is not trivial,
+  however small it looks: the standalone brief is written before the code, never
+  retrofitted after review flags its absence.
+- Wiki Primeiros-passos: the "trivial is blast radius, not size" rule now names the
+  same layer-boundary test (4.205).
+
 ## [0.99.0] — 2026-08-13
 
 Re-init: none
