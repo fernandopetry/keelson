@@ -17,8 +17,12 @@
 # positivo é um round-trip; o de um falso negativo é horas de CPU e a impressão de que havia
 # trabalho acontecendo quando não havia.
 #
-# Agnóstico de projeto: não lê a ficha nem depende de stack — observa apenas os processos de
-# segundo plano que o próprio agente lançou (marca do Bash tool do Claude Code).
+# Agnóstico de projeto: não lê a ficha nem depende de stack. O alvo é filtrado em dois
+# estágios: (1) a marca do Bash tool do Claude Code no comando — separa processo de agente
+# de qualquer outra coisa da máquina do humano — e (2) atribuição de dono por ancestralidade
+# de PPIDs (decisão 4.206): só é ignorado o processo cuja cadeia leva PROVADAMENTE ao
+# processo `claude` de OUTRA sessão viva; cadeia órfã ou indeterminada continua acusando
+# (fail-closed — indeterminado nunca vira "de outra sessão").
 # stop_hook_active evita loop: cutuca uma vez por encerramento.
 
 set -euo pipefail
@@ -42,9 +46,18 @@ import sys
 # poucos minutos). Dev servers de longa duracao normalmente nao sao lancados via Bash tool.
 THRESHOLD_MIN = 10
 
-# Marca do shell que o Bash tool do Claude Code cria. E o que separa "processo que ESTE
-# agente lancou" de qualquer outra coisa da maquina do humano.
+# Marca do shell que o Bash tool do Claude Code cria. E o que separa "processo de agente"
+# de qualquer outra coisa da maquina do humano. A marca sozinha e GLOBAL da maquina — com
+# sessoes paralelas ela casa processo de todas; o dono e decidido pela ancestralidade abaixo.
 CLAUDE_SHELL_MARK = "shell-snapshots/snapshot-"
+
+# Reconhece o processo de uma sessao claude na tabela: argv0 (ou caminho) terminando no
+# binario `claude` seguido de espaco/fim. Nao casa `claude-code/`, `.claude/` nem os
+# binarios do app desktop (`.../MacOS/Claude`, capitalizado).
+CLAUDE_PROC_RE = re.compile(r"(^|/)claude(\s|$)")
+
+# Teto de saltos ao subir a cadeia de PPIDs — protege contra tabela corrompida/ciclica.
+MAX_SALTOS = 64
 
 
 def bloqueia(reason: str) -> None:
@@ -78,7 +91,7 @@ def etime_para_segundos(etime: str) -> int | None:
 
 try:
     saida = subprocess.run(
-        ["ps", "-eo", "pid,etime,command"],
+        ["ps", "-eo", "pid,ppid,etime,command"],
         capture_output=True, text=True, timeout=10, check=True,
     ).stdout
 except Exception as e:
@@ -88,20 +101,58 @@ except Exception as e:
         f"({type(e).__name__}: {e}).\n\n"
         "Isto nao significa que esta tudo certo — significa que a verificacao nao rodou. "
         "Confira a mao se ha processo de segundo plano seu ainda vivo (ex.: "
-        "`ps -eo pid,etime,command | grep shell-snapshots`) e mate o que nao estiver "
+        "`ps -eo pid,ppid,etime,command | grep shell-snapshots`) e mate o que nao estiver "
         "trabalhando de verdade, antes de encerrar."
     )
 
-meu_pid = os.getpid()
-suspeitos = []
+# Uma passada monta a tabela inteira em memoria: as cadeias de PPID sao resolvidas sem
+# nenhuma chamada adicional de `ps`.
+ppid_de: dict[int, int] = {}
+cmd_de: dict[int, str] = {}
+linhas_ps = []
 
 for linha in saida.splitlines()[1:]:
-    m = re.match(r"\s*(\d+)\s+(\S+)\s+(.*)", linha)
+    m = re.match(r"\s*(\d+)\s+(\d+)\s+(\S+)\s+(.*)", linha)
     if not m:
         continue
+    pid, ppid, etime, cmd = int(m.group(1)), int(m.group(2)), m.group(3), m.group(4)
+    ppid_de[pid] = ppid
+    cmd_de[pid] = cmd
+    linhas_ps.append((pid, etime, cmd))
 
-    pid, etime, cmd = int(m.group(1)), m.group(2), m.group(3)
+if not linhas_ps:
+    # Parser que nao casa NENHUMA linha e falha de inspecao (ex.: colunas reordenadas
+    # numa plataforma nova), nunca "esta tudo limpo".
+    bloqueia(
+        "Guarda de segundo plano: a saida do `ps` nao casou o formato esperado "
+        "(pid,ppid,etime,command) — a verificacao NAO rodou.\n\n"
+        "Confira a mao: `ps -eo pid,ppid,etime,command | grep shell-snapshots`."
+    )
 
+
+def ancestrais(pid: int) -> list[int]:
+    cadeia, visto = [], set()
+    atual = ppid_de.get(pid)
+    while atual is not None and atual > 1 and atual not in visto and len(cadeia) < MAX_SALTOS:
+        cadeia.append(atual)
+        visto.add(atual)
+        atual = ppid_de.get(atual)
+    return cadeia
+
+
+# Raiz da MINHA sessao: o primeiro ancestral do proprio hook que e um processo claude.
+# O hook roda como filho do claude que o disparou, entao a cadeia passa por ele.
+# (Env var: costura de teste da suite scripts/tests/stale-bg/ — nunca setada em uso real.)
+meu_pid = int(os.environ.get("KEELSON_STALE_GUARD_SELF_PID", os.getpid()))
+raiz_da_sessao = next(
+    (a for a in ancestrais(meu_pid) if CLAUDE_PROC_RE.search(cmd_de.get(a, ""))),
+    None,
+)
+
+suspeitos = []
+ignorados_outra_sessao = 0
+
+for pid, etime, cmd in linhas_ps:
     if pid == meu_pid or CLAUDE_SHELL_MARK not in cmd:
         continue
     # O proprio hook e seus filhos casam a marca, mas vivem segundos — o limiar os exclui.
@@ -109,6 +160,22 @@ for linha in saida.splitlines()[1:]:
     segundos = etime_para_segundos(etime)
     if segundos is None or segundos < THRESHOLD_MIN * 60:
         continue
+
+    # Dono por ancestralidade. So ha prova de "outra sessao" quando (a) a raiz da minha
+    # foi identificada e (b) a cadeia do candidato passa por ALGUM claude que nao e ela.
+    # Sem raiz identificada, ou com cadeia orfa (reparentada ao init quando o shell pai
+    # morre — o caso classico do proprio incidente), o dono e indeterminado e o processo
+    # CONTINUA no laudo: indeterminado nunca vira "de outra sessao".
+    anc = ancestrais(pid)
+    if raiz_da_sessao is not None and raiz_da_sessao not in anc:
+        if any(CLAUDE_PROC_RE.search(cmd_de.get(a, "")) for a in anc):
+            ignorados_outra_sessao += 1
+            continue
+        dono = "indeterminado"
+    elif raiz_da_sessao is None:
+        dono = "indeterminado"
+    else:
+        dono = "meu"
 
     # `sleep` no comando = cheiro de loop de sondagem. E a forma exata do incidente que
     # originou este guard, e a doc do Bash tool desaconselha explicitamente.
@@ -119,6 +186,7 @@ for linha in saida.splitlines()[1:]:
         "etime": etime,
         "minutos": segundos // 60,
         "sondagem": sondagem,
+        "dono": dono,
         "cmd": re.sub(r"\s+", " ", cmd)[:160],
     })
 
@@ -130,13 +198,19 @@ suspeitos.sort(key=lambda s: -s["minutos"])
 linhas = []
 for s in suspeitos:
     marca = " ⟵ CHEIRO DE LOOP DE SONDAGEM" if s["sondagem"] else ""
-    linhas.append(f"  PID {s['pid']} · vivo há {s['etime']}{marca}\n    {s['cmd']}")
+    dono = " · dono INDETERMINADO (cadeia orfa — pode ser seu)" if s["dono"] == "indeterminado" else ""
+    linhas.append(f"  PID {s['pid']} · vivo há {s['etime']}{dono}{marca}\n    {s['cmd']}")
 
 tem_sondagem = any(s["sondagem"] for s in suspeitos)
 
+nota_outras = (
+    f" (outros {ignorados_outra_sessao} pertencem a outra(s) sessao(oes) claude viva(s) "
+    "e foram ignorados)" if ignorados_outra_sessao else ""
+)
+
 reason = (
-    f"Guarda de segundo plano: {len(suspeitos)} processo(s) que VOCE lancou estao vivos "
-    f"ha mais de {THRESHOLD_MIN} minutos.\n\n"
+    f"Guarda de segundo plano: {len(suspeitos)} processo(s) atribuivel(is) a ESTA sessao "
+    f"estao vivos ha mais de {THRESHOLD_MIN} minutos{nota_outras}.\n\n"
     + "\n".join(linhas)
     + "\n\nAntes de encerrar, decida por cada um — nao presuma que trabalho longo e "
     "trabalho acontecendo:\n"

@@ -25,6 +25,36 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.100.1] — 2026-08-14
+
+Re-init: none
+
+Decision 4.206 — maintainer field report: with parallel claude sessions on the same
+machine, the stale-background guard of session B nagged about session A's background
+processes — its only filter was the Bash-tool shell mark in the command line, which
+is machine-global, and the nudge's text tells the agent to kill what it flags, so one
+session could take down another's legitimate work.
+
+### Fixed
+
+- `stale-background-guard` now attributes ownership by walking the PPID chain in the
+  same `ps` table it already captures (4.206): a process is silenced **only** on
+  positive proof it belongs to another live claude session (own session root
+  identified AND the candidate's chain passes through a different claude process).
+  Everything else keeps nagging — orphaned chains (reparented to init, the classic
+  shape of the very incident that motivated the guard, now labeled
+  `dono INDETERMINADO`), an unidentifiable own root, and a `ps` table that yields
+  zero parsed rows (fail-closed nudge, never "clean"). The rule in one line:
+  indeterminate never counts as "another session's" — the change can only shrink the
+  flagged set, never create the expensive false negative. Skipped processes are
+  counted in the report.
+
+### Added
+
+- Regression suite `scripts/tests/stale-bg/run.sh` (fake `ps` injected via PATH,
+  self-PID test seam): first mechanical coverage of a hook's Python body — wired
+  into CI and into the pre-commit gate when the hook or the suite changes.
+
 ## [0.100.0] — 2026-08-13
 
 Re-init: required

@@ -1,0 +1,9 @@
+  PID  PPID     ELAPSED COMMAND
+    1     0    01:00:00 /sbin/launchd
+  300     1    01:00:00 /Users/x/Library/Application Support/Claude/claude-code/2.1.0/claude.app/Contents/MacOS/claude --outra-sessao
+  310   300    00:40:00 /bin/zsh -c source /Users/x/.claude/shell-snapshots/snapshot-zsh-111-aaa.sh && sleep 999
+  400     1    01:00:00 /usr/local/bin/claude --minha-sessao
+  500   400    00:00:03 python3
+  410   400    00:35:00 /bin/zsh -c source /Users/x/.claude/shell-snapshots/snapshot-zsh-222-bbb.sh && until false; do sleep 30; done
+  420   400    00:02:00 /bin/zsh -c source /Users/x/.claude/shell-snapshots/snapshot-zsh-222-bbb.sh && npm test
+  600     1    00:50:00 /bin/zsh -c source /Users/x/.claude/shell-snapshots/snapshot-zsh-333-ccc.sh && sleep 9

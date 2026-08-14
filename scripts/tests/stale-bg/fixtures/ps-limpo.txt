@@ -1,0 +1,5 @@
+  PID  PPID     ELAPSED COMMAND
+    1     0    01:00:00 /sbin/launchd
+  400     1    01:00:00 /usr/local/bin/claude --minha-sessao
+  500   400    00:00:03 python3
+  420   400    00:02:00 /bin/zsh -c source /Users/x/.claude/shell-snapshots/snapshot-zsh-222-bbb.sh && npm test

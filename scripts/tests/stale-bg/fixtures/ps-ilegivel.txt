@@ -1,0 +1,2 @@
+COMMAND ELAPSED
+isto nao e uma tabela de ps
