@@ -25,6 +25,30 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.100.2] — 2026-08-14
+
+Re-init: none
+
+Decision 4.207 — consumer field report: in a large feature, three near-identical
+functions that could have been one survived the whole cycle. The Art. 3 rule already
+forbade reimplementing what exists, but its search instruction pointed only at the
+documented canon: an equivalent born two waves earlier was in nobody's diff and in
+nobody's docs, and the closing convergence pass deliberately does not re-run gates 1–7.
+
+### Changed
+
+- Gate 7's Reuse/DRY bullet now names the three search surfaces explicitly: the round's
+  own diff, the accumulated branch diff (equivalents born in earlier waves of the same
+  PLAN; searched by name/signature over files created in the branch, `n/a` declared when
+  no base branch is resolvable), and the documented canon. The finding always targets
+  the current round's diff — the earlier equivalent is the canon to reuse, never
+  retroactively reproved (`guidelines/core/CODE-REVIEW.md`).
+- The developer looks for an existing equivalent — including one born in an earlier wave
+  of the same PLAN — before creating a new helper/validation/conversion, as a pointer to
+  the gate-7 rule (`agents/developer.md`).
+
+---
+
 ## [0.100.1] — 2026-08-14
 
 Re-init: none

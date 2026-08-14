@@ -80,12 +80,12 @@ Antes de codar, atualizar o arquivo da TASK:
 
 ### 4. Implementar
 
-1. Criar/modificar arquivos no working tree (ou worktree em Agent Teams).
+1. Criar/modificar arquivos no working tree (ou worktree em Agent Teams). Helper/validação/
+   conversão nova só depois de procurar o equivalente existente — inclusive de **wave anterior
+   do mesmo PLAN**, no acumulado da branch: reimplementar reprova no gate 7 (`CODE-REVIEW.md` Art. 3, 4.207).
 2. Respeitar:
-   - Stack e versão do perfil de linguagem ativo
+   - Stack/versão, naming e anti-padrões do perfil de linguagem ativo
    - Padrão arquitetural (`${CLAUDE_PLUGIN_ROOT}/guidelines/core/ARCHITECTURE.md` + perfil)
-   - Naming declarado
-   - Anti-padrões proibidos
 3. **Só toque arquivos em "Escopo > Inclui"** e auxiliares necessários (testes, types, fixtures) — dentro dos `codePaths` da ficha.
 4. **Regra do escoteiro** (Charter Art. 6): o trecho que você já edita fica melhor do que encontrou, dentro das três condições do Art. 6, declarado item a item no campo `escoteiro` do report. Melhoria maior → não faça: registre no campo `fora_de_escopo` do report (sinal ao Tech Lead, que estaciona sem inflar a task).
 5. **Ao corrigir achado de gate** (retry pós-review): a explicação de o que foi corrigido e por quê vai no **report** e no histórico do artefato — **nunca em comentário no código** (decisão 4.88): esse texto fala com o revisor de hoje, não com o leitor de amanhã, e será reprovado na rodada seguinte. Comentário continua regido pelo piso/teto do Art. 7 — se a correção criou um porquê durável (ex.: uma guarda contra-intuitiva), esse comentário curto é devido; a narrativa da rodada, não. **Autocheck antes de todo report** (decisões 4.135 e 4.185 — vale em qualquer entrega, não só no retry): releia os comentários que **você** introduziu/alterou e aplique o teste por função — *a frase narra de onde a mudança veio, ou compara o código com um estado que o leitor não alcança?* A narrativa tem **dois eixos**: **proveniência** (cita rodada, achado, revisor, wave, gate — ex.: "F1", "achado do review") e **comparação temporal** ("a versão anterior…", "agora faz", "historicamente", verbo no passado narrando o que o código fazia — nenhuma palavra de processo necessária). Ambos falham o teste de apagar por definição; remova antes de reportar Done, não deixe para o gate 7 achar. **Ao remover proveniência de um comentário existente, corte a frase — nunca a reescreva**: reescrever é re-afirmar um fato sobre o código sem tê-lo relido, e é assim que a limpeza planta fato falso (caso real: dois, capturados pelo re-gate ao custo de uma rodada cada).

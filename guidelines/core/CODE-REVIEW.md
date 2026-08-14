@@ -144,11 +144,21 @@ ofício do revisor — aplique-o sem checklist. Os pontos com régua keelson pr�
 - **Abstração especulativa** (Art. 4): indireção ou padrão sem dor demonstrável no diff e
   sem DEC que o justifique — sinalizar (bloqueia quando óbvio).
 - **Reúso / DRY** (Art. 3): o código **não reimplementa** utilitário, validação, helper,
-  conversão ou abstração que **já existe** no projeto. Não basta checar duplicação entre
-  os arquivos novos — procure o equivalente canônico já existente que deveria ter sido
-  usado (seção de reúso do perfil ativo · `./ARCHITECTURE.md`). Reimplementação de
-  canônico existente = FALHA mesmo com o código correto, **inclusive nos testes**
-  (fixtures/helpers — `./TESTING.md`).
+  conversão ou abstração que **já existe** no projeto — e "já existe" tem **três
+  superfícies de busca**, nenhuma dispensando as outras (decisão 4.207): **(a)** o
+  próprio diff da rodada — funções quase equivalentes entre TASKs da mesma wave;
+  **(b)** o acumulado da branch da demanda — equivalente nascido em **wave anterior do
+  mesmo PLAN** ainda não é canônico documentado nem aparece no diff da rodada; procure-o
+  entre os arquivos/símbolos **criados** na branch, por nome/assinatura (ex.: `git diff
+  --name-status --diff-filter=A <base>...HEAD`), nunca relendo o acumulado inteiro —
+  base pela mesma resolução do `/keelson:review`; sem base determinável (working tree
+  na própria base, diff avulso sem branch), superfície `(b): n/a`, **declarado**;
+  **(c)** o canônico documentado (seção de reúso do perfil ativo · `./ARCHITECTURE.md`).
+  O **alvo do achado é sempre o diff da rodada** — o equivalente anterior é o canônico a
+  reusar/estender, nunca reprovado retroativamente (4.88: aprovado permanece aprovado;
+  consolidar o antigo → `fora_de_escopo`). Reimplementação de equivalente existente =
+  FALHA mesmo com o código correto, **inclusive nos testes** (fixtures/helpers —
+  `./TESTING.md`).
 - **Comentários** (Art. 7): todo comentário passa no teste de apagar (Perde/Não-perde).
 - **Rastro de processo em copy** (decisão 4.201): identificador de artefato SDD (`FR-`/`AC-`/`TASK-`/`DEC-`… — catálogo no `index-contract.md`) **visível ao usuário** — label, mensagem, texto de template — é rastro vazado, não copy, **salvo quando um AC exige a exibição** (tela de rastreabilidade/admin legítima): o discriminante é o pai declarado da pergunta inversa (gate 4), não proibição mecânica. Os endereços legítimos do ID seguem os de sempre — comentário-âncora (Art. 7) e tag `@AC-NNN-XXX` de spec E2E; a fronteira é a superfície do usuário, não o código.
 - **Erros já cometidos no projeto**: as lições de `guidelines/project/` valem como regra.
