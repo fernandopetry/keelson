@@ -2216,6 +2216,22 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `commands/implement.md` (§3.4.1) · `agents/developer.md` (report). Fila: linha LRN-059 de 2026-08-13 fechada como aplicada.
 
+### 4.201 — ID de artefato SDD visível ao usuário é rastro de processo, salvo AC que exija a exibição
+
+**Problema**: relato do Diretor (screenshot da mesma sessão do PM PLAN-007): um ID de FR literal apareceu na copy de um formulário de produção — e sobreviveu a 2 waves de code-review e a um gate 9 inteiro em navegador que **leu exatamente essa tela**. Não é cegueira de gate, é régua ausente: nenhuma linha da doutrina dizia que identificador SDD em superfície de usuário é defeito — e a doutrina até incentiva citar IDs (comentário-âncora do Art. 7, `@AC` em spec E2E, keys em commit), sem fronteira que impedisse o hábito de vazar para a copy. Nenhuma regra de copy/microcopy existia em lugar nenhum do repo.
+
+**Decisão**: bullet novo no gate 7 (`CODE-REVIEW.md`, irmão de "Comentários" e da família "Narrativa de correção não entra no código"): ID de artefato SDD **visível ao usuário** é rastro vazado, não copy — **gatilho de pergunta, não proibição mecânica**: o discriminante é o pai declarado da pergunta inversa (gate 4) — AC que exige a exibição (tela de rastreabilidade/admin) legitima; sem AC pai, achado. As fronteiras legítimas (comentário do Art. 7, `@AC` de spec E2E) são **citadas por referência**, nunca redefinidas — o Charter permanece intocado. O `qa` ganha o **olhar** (uma linha apontando para a régua), não uma segunda cópia. **Check mecânico não nasce agora**, com motivo nomeado: distinguir comentário de string literal é dependente de linguagem e nenhum script do pacote lê conteúdo de código de produção; escada da 4.149 registrada — 2ª ocorrência em campo → check WARNING-only sobre o bucket `producao` do `diff-facts.sh` (princípio do lint-contract: check por padrão nunca é ERROR).
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (gate 7) · `agents/qa.md` (olhar, item 3) · wiki `Conceitos.md` (linha do gate 9). Fila: linha de 2026-08-13 fechada como aplicada.
+
+### 4.202 — Consistência estrutural entre campos irmãos é critério do gate 9: o grupo é o exemplar, o teto é sugestão
+
+**Problema**: mesmo screenshot: um campo do grupo com estrutura divergente das irmãs (default como texto estático acima do controle onde as demais usam placeholder), desalinhando a linha — capturado em screenshot pelo gate 9 e não acusado, porque o gate prova comportamento contra ACs e consistência visual não era critério de ninguém. O risco simétrico é conhecido: critério visual mal amarrado vira régua de gosto e produz achado inarbitrável que quebra a convergência (teto de 1 retry).
+
+**Decisão**: critério novo no item 3 do fluxo do `qa` (ao lado de "Saída renderizável", o precedente de inspeção estrutural), com **três amarras**: (a) **o grupo de irmãos é o exemplar** — transposição da calibração por exemplares do gate 7: compara-se irmão com irmão do mesmo formulário/fieldset, nunca com ideal de design; divergência de um contra N é achado, padrão consistente não é; (b) **medido, não olhado** — a diferença estrutural é citada pelo snapshot de acessibilidade (instrumento do screen-verify), nomeando a divergência (label→controle vs. label→texto→controle), nunca a impressão; (c) **teto de severidade = sugestão** — roteado via `atencao:`/`fora_de_escopo`, não reprova o gate nem consome retry, salvo quando contradiz um AC — o que anula por construção o risco de convergência. Fora do roteiro por-AC do `commands/tasks.md` (item sem AC pai viraria aresta órfã para o grafo — hipótese nomeada do mapa).
+
+**Aplicação**: `agents/qa.md` (item 3 do fluxo) · wiki `Conceitos.md` (linha do gate 9). Fila: linha de 2026-08-13 fechada como aplicada.
+
 ---
 
 ## 5. Quality gates inegociáveis

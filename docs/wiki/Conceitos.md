@@ -117,7 +117,7 @@ aplicada com o mesmo peso a tudo.
 |---|---|---|
 | **1–7** | `code-reviewer` | Implementação completa · testes cobrindo os ACs, passando · lint limpo · escopo respeitado · DECs respeitadas · aderência ao Charter e ao perfil ativo · code review |
 | **8** | `security-engineer` | Só em mudança sensível (auth, autorização, injeção, upload, dados pessoais, cripto, sessão, endpoints, redirect, exec, dependências) |
-| **9** | `qa` | Comportamento **provado executando**, não deduzido do relatório do developer |
+| **9** | `qa` | Comportamento **provado executando**, não deduzido do relatório do developer — inclui higiene da superfície (ID de artefato SDD visível sem AC que o exija é achado) e consistência estrutural entre campos irmãos do mesmo grupo (achado-sugestão, nunca reprova sozinho) |
 | **10** | `performance-engineer` | Só quando o diff toca superfície de custo (consultas/ORM, laços sobre volume variável, cache, rede, jobs, render pesado, migração de dados). Padrão de custo patológico — como consulta dentro de laço — **bloqueia**; otimização além disso só com medição, nunca por palpite. Não é teste de stress: é revisão de padrões |
 
 Cada gate roda no recorte do que ele prova: os testes acompanham **cada tarefa**; a

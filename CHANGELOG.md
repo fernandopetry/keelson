@@ -25,6 +25,31 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.98.0] — 2026-08-13
+
+Re-init: none
+
+Decisions 4.201–4.202 — Diretor report with a screenshot from the same field cycle as
+0.97.0: two visible UI defects survived every gate that actually looked at the screen,
+because no rule made them defects.
+
+### Added
+
+- Gate 7 gains a copy-hygiene rule (4.201): an SDD artifact ID (`FR-`/`AC-`/`TASK-`/
+  `DEC-`…) visible to the end user — in a label, message or template text — is leaked
+  process residue, not copy, unless an AC explicitly requires displaying it (the gate-4
+  declared-parent test is the discriminant, so traceability/admin screens stay
+  legitimate). Comment anchors and E2E `@AC` tags remain the legitimate homes for IDs.
+  A mechanical check is deliberately deferred (no package script reads consumer
+  production code; second field occurrence triggers a WARNING-only check per the 4.149
+  ladder).
+- Gate 9 gains a structural-consistency criterion (4.202): sibling fields of the same
+  visual group with divergent structure (label→control vs. label→text→control; default
+  as placeholder vs. static text) are a finding — measured against the accessibility
+  snapshot, comparing siblings within their own group (the group is the exemplar, never
+  a design ideal), and capped at suggestion severity: it never fails the gate or
+  consumes a retry on its own, unless it contradicts an AC.
+
 ## [0.97.0] — 2026-08-13
 
 Re-init: none

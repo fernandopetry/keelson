@@ -38,6 +38,7 @@ Invocado pelo `/keelson:auto` (Etapa 3.5) **antes** de existir código, sobre as
      e invisível no checklist. **Salve o artefato** gerado no exercício e cite o caminho
      na evidência — ele segue no report para a Entrega, onde a revisão humana o vê de
      uma olhada.
+   - **Higiene e consistência da superfície** (decisões 4.201/4.202) — na tela ou artefato exercitado: (a) identificador de artefato SDD visível ao usuário sem AC que exija a exibição é achado (régua e discriminante: gate 7 de `guidelines/core/CODE-REVIEW.md`); (b) campos/elementos irmãos do mesmo grupo com **estrutura divergente** (label→controle numa irmã, label→texto→controle noutra; default como placeholder vs. texto estático) são achado **medido, não olhado** — cite a diferença pelo snapshot de acessibilidade, comparando irmão com irmão do próprio grupo (o grupo é o exemplar, nunca um ideal de design). Teto de severidade de (b): **sugestão** — rote via `atencao:` ou `fora_de_escopo`, sem reprovar o gate nem consumir retry, salvo quando contradiz um AC.
    - **Camada de persistência alterada**: quando o teste usa um substituto (ex.: banco em memória), rode um **smoke contra o serviço real** chamando cada método público tocado — o substituto pode não capturar construções específicas do motor real (ver a seção de testes/gotchas do perfil ativo).
 4. **Cruzar com ACs**: para cada AC observável, registrar evidência (o que rodou, o que saiu, esperado vs obtido).
 5. Decisão: comportamento bate com os ACs → VERIFICADO; diverge → FALHOU.
