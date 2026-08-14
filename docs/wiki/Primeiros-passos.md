@@ -114,7 +114,9 @@ Ele classifica a demanda e diz qual comando usar — **não executa nada sem con
 A **forja do BRIEF** é o estágio profundo antes do ciclo: inventaria o documento contra
 o que a SPEC vai exigir, responde pelo **código** o que o código responde, pergunta a
 você **uma coisa por vez** só o que faltou — e o que só produto sabe vira pergunta
-formal com Q-ID, sem travar nada. No fim, ou o BRIEF sai `pronto` (com o comando de
+formal com Q-ID, sem travar nada. Em demanda com tela, a forja oferece registrar uma
+**referência visual** concreta (uma tela específica que a entrega deve alcançar — o QA a
+usará como padrão de comparação). No fim, ou o BRIEF sai `pronto` (com o comando de
 handoff para rodar `/keelson:auto` numa sessão limpa), ou fica `aguardando-produto` e
 você retoma **em qualquer sessão nova** com `/keelson:brief <slug>` quando as respostas
 chegarem. Documento pequeno ou pedido claro não precisa da forja — vá direto ao `auto`.

@@ -81,7 +81,7 @@ O keelson simula um time real, e os IDs dos agents **são** os nomes dos papéis
 | `code-reviewer` | Code Reviewer | Quality gates 1–7 |
 | `security-engineer` | Security Engineer | Gate 8, quando a mudança é sensível |
 | `performance-engineer` | Performance Engineer | Gate 10, quando o diff toca superfície de custo |
-| `qa` | QA | Gate 9 — prova, executando, que funciona |
+| `qa` | QA | Gate 9 — prova, executando, que funciona; com referência visual no BRIEF, compara a tela entregue contra ela (alcança/não alcança) |
 | `product-analyst` | Product Analyst | Crítica de mérito da SPEC |
 | `agile-coach` | Agile Coach | Aprendizado do processo |
 | `staff-engineer` | Staff Engineer | Gera perfis de linguagem novos |

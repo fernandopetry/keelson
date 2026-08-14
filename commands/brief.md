@@ -63,6 +63,7 @@ Formule as perguntas de negócio que o **código responde** e despache-as ao `co
 - Métrica sem **fonte de medição** → pergunta obrigatória (instrumentação ou externa+dono — 4.99); anti-persona quando disciplinar o escopo (4.98).
 - Lacuna que o Diretor **não** responde → classifique: **pergunta a produto** (Q-ID) ou **assumida com risco declarado** (com selo). Pergunta a produto sobre premissa de **valor no núcleo** usa o conteúdo do protocolo do menor teste (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/value-test-protocol.md`, 4.100 — leia só nesse disparo): proposta de teste falsificador + default anexos à pergunta.
 - Marque `[bloqueia-núcleo]` na pergunta cuja resposta muda o resultado da demanda (mesmo vocabulário da 4.100); as demais seguem ao ciclo como riscos declarados.
+- Demanda com tela → ofereça ao Diretor registrar uma **referência visual** concreta (seção aditiva `## Referência visual`; os três testes que a qualificam — nomeada, fetchável, comparável — estão no contrato do BRIEF, `index-contract.md`, 4.203). Sem referência é resposta válida; não insista.
 
 ## Etapa 4: gravar o BRIEF e sair por uma das 3 saídas
 

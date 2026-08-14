@@ -226,8 +226,20 @@ pré-ciclo). Tudo aqui é aditivo — BRIEFs existentes continuam válidos sem a
 
   ## Riscos declarados
   - <o que foi assumido conscientemente, com o selo de evidência (4.96)>
+
+  ## Referência visual
+  - <a referência concreta que a entrega deve alcançar> · onde: <URL | path | tela do próprio produto> · captura: <path do screenshot salvo | —>
   ```
 
+- **Referência visual** (decisão 4.203): em demanda com tela, o Diretor pode ancorar a
+  qualidade visual numa referência concreta. Ela só entra no BRIEF se passar **três
+  testes**: **nomeada** (uma coisa específica — "a tela de listagem do próprio produto",
+  "o formulário do concorrente que o Diretor apontou" —, nunca uma categoria como "design
+  limpo"), **fetchável** (dá para abrir, executar ou screenshotar) e **comparável** (a
+  tela entregue e a referência lado a lado permitem julgamento). Quem a consome é o gate 9
+  (`agents/qa.md` — veredito comparativo binário, nunca nota); o portador até lá é o
+  briefing destilado dos gates (`commands/implement.md`). Campo ausente → o exemplar do
+  gate 9 continua sendo o grupo de irmãos (4.202).
 - **Pendência viva**: BRIEF `aguardando-produto` → 1 linha em **Riscos ativos** do INDEX
   (`| BRF-NNN | BRIEF-NNN aguardando produto: <Q-IDs> pendente(s) desde <data> | retomar via /keelson:brief <slug> | BRIEF-NNN |`),
   retirada quando o BRIEF fica `pronto` (+1 linha no Histórico recente).

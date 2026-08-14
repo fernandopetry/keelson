@@ -25,6 +25,36 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.99.0] — 2026-08-13
+
+Re-init: none
+
+Decision 4.203 — absorption of an external benchmark (the public "gauntlet-loop"
+pattern) at the Diretor's request: most of it already existed in keelson
+(generator ≠ evaluator, clean-context critics, wave fan-out) and the uncapped
+loop-until-win was rejected (it conflicts with the deliberate retry ceiling of
+4.88/4.187); what remained was a real gap — UI demands had no place to anchor
+"what it should look like".
+
+### Added
+
+- The BRIEF contract gains an optional additive section `## Referência visual`
+  (4.203): for demands with a screen, the Diretor may anchor visual quality in a
+  concrete reference that must pass three falsifiable tests — **named** (a specific
+  thing, not a category), **fetchable** (can be opened, run or screenshotted) and
+  **comparable** (side by side with the delivered screen allows judgement). The
+  forge (`/keelson:brief`) offers to record it; no validator requires it.
+- Gate 9 consumes the reference when present (4.203): the distilled gate briefing
+  carries the literal reference line, and the QA compares the delivered screen
+  against it with a **binary comparative verdict** (reaches / does not reach, each
+  difference named from the snapshot — measured, not eyeballed), never a score.
+  The reference replaces the sibling group as the exemplar of 4.202; severity stays
+  capped at suggestion (binary is the form of the judgement, not its severity),
+  unless an AC cites the reference. The reference is captured **outside the
+  authenticated session** (reading material, never a login target — realm isolation
+  of `screen-verify` preserved). Without a reference, 4.202 applies unchanged;
+  without a screen gate, the comparison is declared `n/a`.
+
 ## [0.98.0] — 2026-08-13
 
 Re-init: none

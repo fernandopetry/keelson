@@ -409,15 +409,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.98.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.99.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the review gates learn to see the screen as a user does**
-(decisions 4.201–4.202). An SDD artifact ID visible in end-user copy is now a gate-7
-finding unless an AC requires displaying it, and gate 9 flags sibling form fields with
-divergent structure — measured against the group's own pattern, capped at suggestion
-severity. No re-init needed.
+New in this release: **visual quality gets a concrete anchor** (decision 4.203,
+absorbed from the public gauntlet-loop pattern). The BRIEF may name a visual
+reference — named, fetchable, comparable — and gate 9 judges the delivered screen
+against it with a binary verdict (reaches / does not reach), never a score, capped
+at suggestion severity. No re-init needed.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
