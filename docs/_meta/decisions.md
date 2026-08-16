@@ -2316,6 +2316,16 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.213 — O gatilho da skill-standards sobe de instrução para cutucada mecânica: hook de nudge no repo do mantenedor
+
+**Problema**: o gatilho da 4.212 ("skill/comando/agent criado ou editado → `/skill-standards`") vive só no roteamento do CLAUDE.md — aderência do modelo à doutrina, não garantia: uma sessão que ignore a instrução commita artefato de instrução sem a revisão. O Diretor pediu a promoção sem esperar reincidência (mesma classe da ativação antecipada do check-refs na 4.209 — divergência da escada 4.149, declarada).
+
+**Decisão**: hook **PostToolUse** (`Write|Edit`) no repo de desenvolvimento — `.claude/hooks/skill-standards-nudge.sh`, registrado em `.claude/settings.json` (versionado; primeiro uso do arquivo). Escopo: `.md` sob `commands/`, `agents/`, `skills/`, `.claude/skills/` (worktrees excluídos). Efeito: **cutucada, nunca gate** — injeta `additionalContext` lembrando de rodar `/skill-standards` antes do commit; o juízo de conteúdo é trabalho de LLM, não de script, então bloquear seria prometer prova que o script não tem. Anti-renudge por fingerprint sessão+arquivo em janela append-only com teto de 200 entradas (4.141); padrão da casa: bash 3.2, fallback gracioso (sem jq/input lixo → exit 0), validado com `bash -n` + teste sintético de 7 casos (dispara / segura a 2ª / ignora docs, não-md, worktree / lixo / `.claude/skills/`).
+
+**Aplicação**: `.claude/hooks/skill-standards-nudge.sh` (+x) · `.claude/settings.json` · bullet de roteamento do CLAUDE.md anotado com o hook. Tooling do mantenedor (4.182): sem bump, sem CHANGELOG.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

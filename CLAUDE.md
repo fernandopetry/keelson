@@ -41,7 +41,9 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   **`/harness-audit`** (skill, 4.209) → Diretor pediu auditoria/poda da doutrina
   (fato mecânico: `scripts/check-refs.sh`; report-only, aplicar é leva própria com 4.181) ·
   **`/skill-standards`** (skill, 4.212) → skill/comando/agent criado ou editado, ou pedido
-  de verificação de boas práticas de autoria (régua = digest re-buscável da doc Anthropic).
+  de verificação de boas práticas de autoria (régua = digest re-buscável da doc Anthropic);
+  o gatilho tem cutucada mecânica: hook `.claude/hooks/skill-standards-nudge.sh` via
+  `.claude/settings.json` (4.213 — lembrete 1×/arquivo/sessão, nunca gate).
 - Adiado com gatilho (4.182): `doctrine-reviewer` (reincidência de defeito de conteúdo
   de doutrina que os checks de sincronia não pegam). `check-refs.sh` foi ativado antes
   do gatilho por decisão do Diretor (4.209, divergência declarada).
