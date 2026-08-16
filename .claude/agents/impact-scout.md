@@ -1,6 +1,6 @@
 ---
 name: impact-scout
-description: Ferramenta do MANTENEDOR (fora do pacote — decisão 4.182): mapa de impacto da 4.181 antes de editar o keelson. Recebe "vou mexer em X" e devolve, com âncoras arquivo:linha, quem referencia X, o dono único da regra, as guardas mecânicas a rodar, o alcance no consumidor (bump? re-init?) e as hipóteses nomeadas de quebra. Invocado pela sessão do mantenedor quando a mudança toca mais de um artefato ou o raio de impacto não é óbvio — lookup de um grep fica inline. NÃO decide, não edita, não roda guardas.
+description: "Ferramenta do MANTENEDOR (fora do pacote — decisão 4.182): mapa de impacto da 4.181 antes de editar o keelson. Recebe \"vou mexer em X\" e devolve, com âncoras arquivo:linha, quem referencia X, o dono único da regra, as guardas mecânicas a rodar, o alcance no consumidor (bump? re-init?) e as hipóteses nomeadas de quebra. Invocado pela sessão do mantenedor quando a mudança toca mais de um artefato ou o raio de impacto não é óbvio — lookup de um grep fica inline. NÃO decide, não edita, não roda guardas."
 tools: Read, Glob, Grep
 model: opus
 ---

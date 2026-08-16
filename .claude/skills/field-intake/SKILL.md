@@ -1,6 +1,6 @@
 ---
 name: field-intake
-description: Ferramenta do MANTENEDOR (fora do pacote — decisão 4.182): sequencia a absorção de insumo de campo de consumidor — postmortem, ledger, PROPOSTA_PLUGIN, relato do Diretor sobre sessão de consumidor. Garante a ordem que costuma ser violada: registrar na proposal-inbox ANTES do parecer (4.111), abstrair identificadores (4.72), checar reincidência (4.149) e fechar o estado na mesma leva. Ativar quando chegar material de campo para virar (ou não) doutrina.
+description: "Ferramenta do MANTENEDOR (fora do pacote — decisão 4.182): sequencia a absorção de insumo de campo de consumidor — postmortem, ledger, PROPOSTA_PLUGIN, relato do Diretor sobre sessão de consumidor. Garante a ordem que costuma ser violada: registrar na proposal-inbox ANTES do parecer (4.111), abstrair identificadores (4.72), checar reincidência (4.149) e fechar o estado na mesma leva. Ativar quando chegar material de campo para virar (ou não) doutrina."
 ---
 
 # Skill: field-intake
