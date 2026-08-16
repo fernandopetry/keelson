@@ -23,7 +23,8 @@ fixo nunca é assumido: se não está na ficha, o keelson pergunta ou reporta pe
     "typecheck": null,
     "build": null,
     "boot": null,
-    "mutation": null
+    "mutation": null,
+    "e2e": null
   },
   "gates": {
     "security": true,
@@ -106,11 +107,17 @@ Use `null` no que não existe. Campo com comando errado é pior que campo vazio.
 
 | Campo | Efeito |
 |---|---|
-| `security` | Liga o `security-engineer` (gate 8) quando a mudança é sensível |
-| `review` | Liga o `code-reviewer` (gates 1–7) |
-| `reviewThreshold` | Tamanho mínimo do diff (arquivos/linhas) para acionar o review |
-| `screenVerify.enabled` | Liga o gate de verificação de tela via Playwright MCP |
-| `screenVerify.artifactsDir` | Onde caem screenshots e dumps (default `thoughts/screen-verify`, fora do git) |
+| `security` | `true`/`false` — liga o `security-engineer` (gate 8) quando a mudança é sensível |
+| `review` | `true`/`false` — liga o `code-reviewer` (gates 1–7) |
+| `reviewThreshold` | Tamanho mínimo do diff (`files`/`lines`) para acionar o review |
+| `screenVerify.enabled` | `true`/`false` — liga o gate de verificação de tela |
+| `screenVerify.method` | Como a tela é verificada: `"skill:screen-verify"` (default — a skill embarcada dirige o browser via Playwright MCP, lendo credenciais do `keelson.local.json`) ou o identificador de um método próprio do projeto (aí a Etapa 4.4 do init é pulada e o projeto responde pelo motor) |
+| `screenVerify.artifactsDir` | Onde caem screenshots e dumps (default `thoughts/screen-verify`, fora do git — o init prova a cobertura com `git check-ignore`) |
+
+Atalho aceito: `screenVerify` booleano (`true`/`false`) equivale a `{ "enabled": <valor>, "method": null }` —
+o `/keelson:init` migra fichas antigas para o formato objeto preservando o valor. O modo do
+browser (headless ou não) **não** vive na ficha: é flag do servidor Playwright MCP, que é quem
+de fato controla — duas fontes de verdade divergiriam em silêncio.
 
 ### `docsRoot`
 
@@ -174,19 +181,30 @@ Jira, como sempre (best-effort).
 
 | Campo | O que decide |
 |---|---|
+| `enabled` | `true`/`false` — liga a integração. Desligada, nenhum outro campo do bloco tem efeito |
+| `site` / `cloudId` | O hostname Atlassian que você informa e o ID que o `init` resolve por descoberta (`getAccessibleAtlassianResources`) — em runtime tudo opera por **ID**, nunca por nome |
+| `projectKey` | A key do projeto Jira onde os cards nascem |
+| `issueType.spec` | ID do tipo que representa a demanda (Epic, na hierarquia de 3 níveis) |
+| `issueType.feature` | ID do tipo standard (Story) para o 3º nível Epic ▸ Story ▸ sub-task. `null` → sem 3º nível, nada muda |
+| `issueType.task` | ID do tipo de **sub-task** (o `init` confirma `subtask: true`; senão, avisa o fallback para issue linkada) |
+| `issueType.standalone` | ID de um tipo nível 0 (Tarefa/Bug) para a tarefa avulsa fora do aninhamento; `null` → avulsos não sincronizam |
 | `telemetry` | `true` publica, a cada etapa do ciclo (SPEC, PLAN, TASKs, entrega), um **worklog** com a duração medida da etapa e um comentário de 1 linha com os contadores de qualidade (retries de gate, escalações, re-gates) na issue principal. Worklog agrega nos relatórios de tempo do Jira. **Atenção**: o autor do worklog é a conta do conector — telemetria por pessoa exige que cada desenvolvedor use o próprio conector, nunca conta de serviço compartilhada |
 | `mode` | `create` — o keelson cria a issue da SPEC e as sub-tasks; `link` — pendura o trabalho numa issue que você já abriu |
 | `epicPolicy` | `multi-feature` não cria Epic para SPEC com 0–1 funcionalidade (a Story vira a raiz) |
 | `standaloneParent` | key de um Epic que **você** cria uma vez (ex.: "Manutenção") para as Stories de tarefa avulsa aninharem; `null` → a Story avulsa nasce sem pai — os dois são válidos |
 | `transition` | `comment` (default) só comenta; `auto` move cards; `off` não toca no quadro |
-| `mapFile` | Tabela Markdown com campos customizados e colunas do board, criada pelo `init` e preenchida por você |
+| `mapFile` | Caminho da tabela Markdown (`{docsRoot}/_meta/jira.<PROJECT>.md`) com campos customizados, colunas do board e trilho de status, criada pelo `init` e preenchida por você. É **config, nunca ledger**: registro de execução (árvore de issues, keys criadas) não pertence a ela |
+| `boardId` | ID do board, quando o `init` o identifica; `null` é válido |
 
 Referência completa dos comandos: `/keelson:jira-sync` no [Guia do método](Guia-do-metodo).
 
 ## `keelson.local.json` — o que **não** vai para o git
 
 Arquivo separado, local e **não versionado** (confira o `.gitignore`), com as credenciais
-de **desenvolvimento** que a verificação de tela usa para logar no app local.
+de **desenvolvimento** que a verificação de tela usa para logar no app local. Ele anda em
+par com o **`keelson.local.example.json`**, este sim **versionado**: o template do projeto,
+com os realms e usernames reais de dev e cada `password` como placeholder
+(`<PREENCHER: ...>`) — o mesmo padrão de `.env` / `.env.example`.
 
 ```jsonc
 {
@@ -196,18 +214,37 @@ de **desenvolvimento** que a verificação de tela usa para logar no app local.
         "description": "Área administrativa — usuários internos",
         "baseUrl": "http://localhost:5173/",
         "login": { "path": "/auth/login", "username": "<usuário de dev>", "password": "<senha de dev>" }
+      },
+      "portal": {
+        "description": "Portal do usuário final — conta distinta da admin",
+        "baseUrl": "http://localhost:5173/portal/",
+        "login": { "path": "/portal/login", "username": "<usuário de dev do portal>", "password": "<senha de dev>" }
       }
     },
-    "defaultRealm": "admin"
+    "defaultRealm": "admin",
+    "notes": "Opcional: dicas de setup local (como subir o serviço, seed/fixture de dev…)"
   }
 }
 ```
 
-Um **realm** por área logada da aplicação (admin, portal do usuário final…). Projeto com
-uma área só: mantenha um realm.
+| Campo | O que decide |
+|---|---|
+| `realms.<nome>` | Um **realm por área logada** da aplicação (admin, portal do usuário final…). Projeto com uma área só: mantenha um realm. O nome é livre — nomeie pelo que o acesso é |
+| `realms.<nome>.description` | Do que se trata o acesso — é o que permite escolher o realm certo na verificação |
+| `realms.<nome>.baseUrl` | URL base **local** daquela área (cada realm pode ter URL própria) |
+| `realms.<nome>.login` | `path` (rota de login relativa à `baseUrl`), `username` e `password` — sempre conta de dev |
+| `defaultRealm` | Qual realm a verificação usa quando o roteiro não especifica |
+| `notes` | Opcional: instruções de setup local específicas do projeto |
+
+- **Formato flat legado** (`baseUrl` + `login` direto sob `screenVerify`, sem `realms`)
+  segue aceito em runtime e equivale a um realm único; o `/keelson:init` migra o
+  `.example` para `realms` preservando os valores.
+- O self-check do `init` prova que o `keelson.local.json` está no `.gitignore` (não pode
+  aparecer em `git status`/`git ls-files`) e que o `.example` não tem senha real.
 
 > **Somente credenciais de desenvolvimento, descartáveis.** Nunca URL, login ou senha de
-> produção, nunca conta real de usuário.
+> produção, nunca conta real de usuário. Nenhum segredo vai para a **ficha** — inclusive
+> o bloco `jira`, que funciona pelo conector MCP sem token.
 
 ## Mudou alguma coisa no projeto?
 

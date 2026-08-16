@@ -25,6 +25,29 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.100.6] — 2026-08-16
+
+Re-init: none
+
+Decision 4.81 (wiki doctrine) — documentation-only batch: the project-sheet wiki page
+becomes the exhaustive reference for `keelson.config.json` and `keelson.local.json`.
+
+### Changed
+
+- Wiki `Ficha-do-projeto`: the full-sheet snippet now includes `quality.e2e`;
+  `gates.screenVerify.method` is documented (embedded `skill:screen-verify` default vs.
+  project-owned method, plus the accepted boolean shorthand and its migration);
+  every `jira` key present in the snippet now has an explanation row (`enabled`,
+  `site`/`cloudId`, `projectKey`, the four `issueType.*` legs, `boardId`) and
+  `mapFile` carries the config-never-ledger rule (4.150).
+- Wiki `Ficha-do-projeto`: the `keelson.local.json` section becomes a field-by-field
+  reference — realms catalogue (`description`, `baseUrl`, `login`, `defaultRealm`,
+  `notes`), the versioned `keelson.local.example.json` pairing, the accepted legacy
+  flat format, and the init self-check proofs (`.gitignore` coverage, no real password
+  in the example). All examples are generic placeholders — no consumer data.
+
+---
+
 ## [0.100.5] — 2026-08-16
 
 Re-init: none
