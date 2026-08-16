@@ -34,17 +34,12 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   do keelson, fora do pacote: o loader do plugin e o `check-sync.sh` leem só a raiz
   (`agents/`, `commands/`, `skills/`). Mudança aqui não bumpa versão nem entra no
   `CHANGELOG.md` — mas ganha decisão §4.x quando muda o processo.
-- **`impact-scout`** (agent, read-only): devolve o mapa de impacto da 4.181 com âncoras
-  `arquivo:linha` — referências, dono único, guardas a rodar, alcance no consumidor,
-  hipóteses nomeadas de quebra. Delegue quando a mudança tocar mais de um artefato ou
-  o raio de impacto não for óbvio; lookup de um grep fica inline.
-- **`/field-intake`** (skill): sequencia a absorção de insumo de campo — registrar na
-  `proposal-inbox.md` **antes** do parecer (4.111), abstrair identificadores (4.72),
-  checar reincidência (4.149) e fechar o estado na mesma leva.
-- **`/harness-audit`** (skill, 4.209): auditoria recorrente da doutrina em duas camadas —
-  fato mecânico via `scripts/check-refs.sh` (ponteiros internos; report-only, rodada
-  manual + suíte `scripts/tests/refs/`) e juízes duplos cegos de poda com a régua 4.160
-  e plants de controle (4.186). Report-only; aplicar corte é leva própria com 4.181.
+- Roteamento (o quê/como de cada ferramenta vive no frontmatter dela — não duplique aqui):
+  **`impact-scout`** (agent) → mapa de impacto da 4.181; delegue quando a mudança tocar
+  mais de um artefato ou o raio não for óbvio, lookup de um grep fica inline ·
+  **`/field-intake`** (skill) → chegou insumo de campo de consumidor ·
+  **`/harness-audit`** (skill, 4.209) → Diretor pediu auditoria/poda da doutrina
+  (fato mecânico: `scripts/check-refs.sh`; report-only, aplicar é leva própria com 4.181).
 - Adiado com gatilho (4.182): `doctrine-reviewer` (reincidência de defeito de conteúdo
   de doutrina que os checks de sincronia não pegam). `check-refs.sh` foi ativado antes
   do gatilho por decisão do Diretor (4.209, divergência declarada).

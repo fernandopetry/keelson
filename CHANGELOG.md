@@ -25,6 +25,35 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.100.4] — 2026-08-16
+
+Re-init: required
+
+Decision 4.210 — first real run of the internal harness audit (12 blind dual judges over
+77 doctrine surfaces) applied: every dual-agreed finding was the same defect class —
+restating a rule that already has a declared owner, or motivational no-op prose.
+
+### Changed
+
+- `agents/developer.md`, `agents/qa.md`, `commands/jira-sync.md`, `commands/implement.md`:
+  inline restatements of commit-convention, Jira-protocol §9/§7.0/§15 and
+  handoff-protocol §8.1 rules replaced by pointers to their owners — behavior contracts
+  unchanged, one address per rule.
+- `guidelines/core/ARCHITECTURE.md`: "Isolamento de efeito colateral" section removed
+  (second copy of Quality Charter Art. 4). `guidelines/core/WORKFLOW.md`: "Exija
+  elegância" section and persona phrasing removed (no-op under the 4.160 pruning tests).
+- **Injected CLAUDE block** (`templates/CLAUDE.keelson-block.md`): round orchestration
+  re-declaration replaced by a pointer to its single owner (CODE-REVIEW.md §Orquestração),
+  and the gate-10 cost-surface list — which had drifted from the canonical
+  `performance-engineer` list — now points at the canonical source. This changes the
+  injected block: **re-run `/keelson:init` after updating**.
+- `docs/_meta/method-guide.md`: per-command §3.x bodies reduced to a short summary plus a
+  pointer to the canonical `commands/*.md` (frozen KEEP/CUT plan from the audit pilot);
+  quickstart, §5 agents table and pointer headings untouched. The wiki mirror follows
+  automatically.
+
+---
+
 ## [0.100.3] — 2026-08-16
 
 Re-init: none

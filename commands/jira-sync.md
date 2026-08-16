@@ -64,9 +64,8 @@ TASKs dos PLANs que a cobrem.
    que ficou para trás e por quê.
 4. **Viabilidade da projeção** (protocolo §7.0) — resolver **antes** de montar o plano, não
    descobrir na criação: cruzar os `hierarchyLevel` dos `issueType` configurados com o fato de
-   as SPECs do slug declararem ou não FEATs (`grep -n '^### FEAT-'`) — e com a `epicPolicy`
-   da ficha (§7.0: `multi-feature` ∧ 0–1 FEAT → projeção **compacta**, sem Epic; a projeção
-   já registrada pelas keys persistidas prevalece sobre o recálculo). Classifique em uma linha:
+   as SPECs do slug declararem ou não FEATs (`grep -n '^### FEAT-'`) e com a `epicPolicy`
+   da ficha — a escada e a precedência da projeção registrada são do §7.0. Classifique em uma linha:
    **3 níveis pleno** · **compacta (Story raiz + sub-tasks)** · **2 níveis válido** ·
    **2 níveis via Story implícita** (degrau (0)) ·
    **2 níveis via `standalone`** (degrau (i)) · **inviável** (com a perna que não aninha e o
@@ -106,8 +105,7 @@ Aplicar o protocolo de sync Jira sobre o alvo (slug inteiro ou a árvore da SPEC
    status-alvo correspondente ao estado real da TASK (In Progress → alvo de "TASK iniciada";
    Done → alvo de "TASK concluída") e a Story ao teto (`Trabalho iniciado (Story)`) quando
    alguma TASK dela já começou — sempre validando a transição em runtime e sob o **teto e a
-   não-regressão** do §9 (nunca puxar de volta card movido pelo humano; unidade de QA nunca
-   passa da coluna de desenvolvimento) — e aplicar o gatilho "Funcionalidade pronta p/ QA"
+   não-regressão** do §9 — e aplicar o gatilho "Funcionalidade pronta p/ QA"
    (`jira-sync-feat.md` §6.1 item 5) às FEATs já completas (pelo teto, tipicamente
    comentário).
 6. **Persistência** (§10): keys gravadas; 1 linha no "Histórico recente" do INDEX.

@@ -58,15 +58,6 @@ isolável (ver abaixo).
 
 ---
 
-## Isolamento de efeito colateral
-
-Todo efeito colateral (I/O, rede, banco, relógio, aleatoriedade, estado global)
-**DEVE** ser explícito e isolável atrás de uma porta. Regra de negócio pura não faz I/O;
-ela **recebe** o resultado do I/O ou **pede** por meio de uma abstração. É isso que torna
-o domínio testável sem infraestrutura (Charter Art. 1 e Art. 4).
-
----
-
 ## Padrões de projeto: vocabulário, não objetivo
 
 Um padrão nomeia uma **solução para uma dor** — nunca se aplica um padrão para "seguir boas

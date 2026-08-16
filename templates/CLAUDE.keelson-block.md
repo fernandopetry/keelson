@@ -44,18 +44,14 @@
   no slug dominante — onde viveria a SPEC — com 1 linha de rastro no INDEX dos demais,
   decisão 4.87) —, delega ao `developer` e passa o diff
   pelo `code-reviewer` (régua avulsa); `security-engineer` em mudança sensível,
-  `performance-engineer` quando o diff toca superfície de custo (consulta/ORM, laço
-  sobre volume variável, cache, rede, render pesado — gate 10) e `qa`
-  quando há comportamento observável — mesmos gatilhos do ciclo. Os gates aplicáveis
-  da rodada rodam **em paralelo, no mesmo turno**, sobre um **pacote de contexto
-  único** montado por você — diff + SHA, critérios literais da âncora, fatias da
-  ficha, seção do perfil — **factual, nunca avaliativo** (sua opinião sobre o diff
-  não entra; decisão 4.89). Correção pós-gate
-  **converge, não recomeça** (decisão 4.88): re-review sobre o **delta**; gate que
-  reprova de novo após 1 retry → **escala ao Diretor** (estado + proposta + default),
-  nunca 3ª rodada por conta própria; delta só de comentário/doc re-checa com o próprio
-  revisor sem reabrir os gates de comportamento; e a explicação da correção vai no
-  report — **nunca em comentário no código**. Invocar um agent
+  `performance-engineer` quando o diff toca superfície de custo (lista canônica na
+  description do agent — gate 10) e `qa`
+  quando há comportamento observável — mesmos gatilhos do ciclo. A orquestração da
+  rodada — gates em paralelo sobre pacote de contexto único factual (4.89), correção
+  que converge com teto de 1 retry e escalação ao Diretor (4.88) — tem **dono único**
+  na seção *Orquestração da rodada* de
+  `${CLAUDE_PLUGIN_ROOT}/guidelines/core/CODE-REVIEW.md`: siga-a no sob demanda como
+  no ciclo. Invocar um agent
   **não puxa o ciclo**: cada um devolve a sua tarefa e para; a orquestração é sempre do
   Tech Lead, e — **regra deste modo, nunca do ciclo** — commit só a pedido do Diretor
   (no ciclo o commit por TASK é do time: o `developer` commita a implementação e a

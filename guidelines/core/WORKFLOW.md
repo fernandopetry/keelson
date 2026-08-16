@@ -11,8 +11,7 @@
 
 - **Simplicidade primeiro:** faça cada mudança o mais simples possível; impacte o mínimo
   de código.
-- **Sem preguiça:** encontre a causa raiz. Sem correção temporária, sem gambiarra —
-  padrão de desenvolvedor sênior.
+- **Sem preguiça:** encontre a causa raiz. Sem correção temporária, sem gambiarra.
 - **Impacto mínimo:** a mudança toca só o necessário (Charter Art. 6).
 - **Esforço proporcional** a **complexidade × risco** (Charter, régua geral) — cortar
   redundância (provar a mesma coisa 2×, re-explorar o mesmo domínio, planejar em dobro)
@@ -56,24 +55,15 @@ o caso específico).
 - **Forte e única, não redundante** — regra completa no dono: `./TESTING.md`
   ("Verificação forte e única").
 - Compare o comportamento entre a versão base e a sua mudança quando relevante.
-- Pergunte-se: *"um engenheiro sênior aprovaria isto?"*
 
-### 4. Exija elegância (equilibrada)
-
-- Mudança não trivial: pergunte-se *"existe uma forma mais elegante?"*.
-- Se uma correção parecer gambiarra: *"sabendo tudo que sei agora, implemente a solução
-  elegante"*.
-- **Pule** isso em correções simples e óbvias — não superengenharia.
-- Desafie o próprio trabalho antes de apresentá-lo.
-
-### 5. Correção autônoma de bug
+### 4. Correção autônoma de bug
 
 - Recebeu um relatório de bug: **apenas corrija**. Aponte para o log, o erro, o teste
   falhando — e resolva. Zero troca de contexto necessária do usuário.
 - **Limite:** se após 3 tentativas o bug persistir, documente as hipóteses testadas e
   escale para o humano.
 
-### 6. Quando escalar para o humano
+### 5. Quando escalar para o humano
 
 A régua é a **reversibilidade** (Charter Art. 6): ação destrutiva ou de difícil reversão
 (excluir dados/arquivos, `DROP`/`ALTER` destrutivo, config de produção, contrato público)

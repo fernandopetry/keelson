@@ -136,11 +136,9 @@ feat(<slug>): <descrição curta>
 Implementa TASK-MMM-XXX, cobre FR-NNN-XXX, AC-NNN-XXX.
 ```
 
-**Tipo fora da lista fechada é defeito** — some do changelog de quem gera release pelos commits.
-Com `commit.releaseAutomation` preenchido na ficha, o tipo tem **efeito de publicação** (`feat` →
-minor, `fix` → patch) e **quebra de compatibilidade se declara** (`tipo(escopo)!:` ou rodapé
-`BREAKING CHANGE:`) — omiti-la faz a automação publicar minor onde era major. Na dúvida entre
-`feat` e `fix`, é o sinal **furo no plano**: reporte ao Tech Lead em vez de escolher no escuro.
+Tipo, escopo, marca de quebra e os efeitos de `commit.releaseAutomation` seguem o dono
+acima — não os re-derive. Na dúvida entre `feat` e `fix`, é o sinal **furo no plano**:
+reporte ao Tech Lead em vez de escolher no escuro.
 
 **Com `jira.enabled` na ficha**, a descrição abre com as **keys** do mais amplo ao mais
 específico — Epic, Story, sub-task —, **depois** do `tipo(escopo):` (decisão 4.79):
@@ -149,11 +147,8 @@ específico — Epic, Story, sub-task —, **depois** do `tipo(escopo):` (decis�
 feat(<slug>): PROJ-12 PROJ-34 PROJ-56 <descrição curta>
 ```
 
-As três já estão nos artefatos que você recebeu: `**Jira**:` no cabeçalho da SPEC (Epic) ·
-`**Jira**:` sob o heading da FEAT da sua TASK, ou `**Jira Story**:` no cabeçalho (Story) ·
-campo `Jira:` da closure da sua TASK (sub-task). **Key ausente → omita aquela e commite**;
-nenhuma resolvida → commit sem key. Nunca invente key, nunca espere o Jira para commitar.
-Régua completa (teto de Stories, projeção compacta): §15 do
+De onde tirar cada key, o fallback de ausência (nunca invente key, nunca espere o Jira
+para commitar) e a régua completa: §15 do
 `${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`.
 
 ### 8. Retornar report estruturado

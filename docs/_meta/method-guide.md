@@ -69,103 +69,39 @@ Conteúdo canônico: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventio
 
 ### 3.1 `/keelson:specify` — criar SPEC
 
-Transforma uma demanda em especificação funcional (FRs em EARS, ACs em Given-When-Then, glossário, escopo). **Agnóstica de tecnologia** — stack e arquitetura são proibidos na SPEC.
+Transforma uma demanda em especificação funcional (FRs em EARS, ACs em Given-When-Then, glossário, escopo), **agnóstica de tecnologia** — stack e arquitetura são proibidos na SPEC. O `spec-validator` roda automaticamente ao final; próximo passo: `/keelson:plan SPEC-NNN`.
 
-```
-/keelson:specify <descrição em linguagem natural ou @arquivo> [--slug=<nome>]
-```
-
-| Aspecto | Detalhe |
-|---|---|
-| Gera | `<docsRoot>/<slug>/specs/SPEC-NNN-<titulo>.md` |
-| Atualiza | `INDEX.md` do slug (cria se não existir) |
-| Gate | `spec-validator` roda automaticamente ao final |
-| Próximo passo | `/keelson:plan SPEC-NNN` |
-
-Pode fazer até 4 perguntas se houver ambiguidade crítica (contrato externo, falha, segurança, decisão irreversível); em fluxo autônomo pós-largada, não pausa (escada de reação do `/keelson:auto`). Ambiguidade menor vira premissa `[assumido]` — revise-as no output.
-
-SPEC com **2+ fluxos entregáveis** (unidades de teste do QA) agrupa os FRs da §5 sob headings `### FEAT-NNN-XXX: <nome>` — cada FR pertence a exatamente uma FEAT; os ACs derivam a filiação do FR que cobrem. Um fluxo só → **não** declare a camada (a funcionalidade colapsa na própria SPEC). Decisão 4.27.
+Detalhe completo (flags, fluxo, regras): `commands/specify.md`.
 
 ### 3.2 `/keelson:plan` — criar PLAN
 
-Transforma uma SPEC em plano técnico: componentes (COMP), decisões arquiteturais (DEC) com alternativas, mapeamento FR → componente, riscos técnicos (TRISK). Herda stack e padrões da **ficha** (`keelson.config.json`) e do **perfil ativo** — não reescolhe.
+Transforma uma SPEC aprovada em plano técnico — componentes (COMP), decisões (DEC) com alternativas, mapeamento FR → componente, riscos (TRISK) — herdando stack e padrões da ficha e do perfil ativo, sem reescolher. Uma SPEC pode ter vários PLANs (cobertura incremental via `--covers`/`--slice`). Gate: `plan-validator`; próximo passo: `/keelson:tasks PLAN-MMM`.
 
-```
-/keelson:plan <SPEC-NNN ou caminho> [--covers=FR-NNN-001,FR-NNN-002] [--slice="descrição"]
-```
-
-| Flag | Uso |
-|---|---|
-| (nenhuma) | Cobre todos os FRs/NFRs ainda não cobertos por PLANs anteriores |
-| `--covers=...` | Cobre apenas os FRs/NFRs listados (entrega incremental) |
-| `--slice="..."` | Descreve em linguagem natural o recorte desejado; o comando interpreta contra os FRs e confirma |
-
-| Aspecto | Detalhe |
-|---|---|
-| Gera | `<docsRoot>/<slug>/plans/PLAN-MMM-<titulo>.md` |
-| Gate | `plan-validator` |
-| Próximo passo | `/keelson:tasks PLAN-MMM` |
-
-Uma SPEC pode ter vários PLANs (cobertura incremental). DECs marcadas `Irreversível: sim` são propagadas ao INDEX e passam a restringir PLANs futuros.
+Detalhe completo (flags, fluxo, regras): `commands/plan.md`.
 
 ### 3.3 `/keelson:tasks` — decompor PLAN em TASKs
 
-Quebra o PLAN em tarefas atômicas (small: 30min–2h, medium: 2–4h), ordenadas em **waves** por dependência topológica. Tasks da mesma wave são paralelizáveis.
+Quebra o PLAN em tarefas atômicas ordenadas em **waves** por dependência topológica (tasks da mesma wave são paralelizáveis), com campos de closure preparados que o `/keelson:implement` preenche — não os preencha manualmente. Gate: `task-validator` (modo batch); próximo passo: `/keelson:implement PLAN-MMM` (ou `--dry-run` primeiro).
 
-```
-/keelson:tasks <PLAN-MMM ou caminho> [--max-size=<tamanho>] [--only=COMP-MMM-XXX]
-```
-
-| Aspecto | Detalhe |
-|---|---|
-| Gera | `<docsRoot>/<slug>/tasks/TASK-MMM-XXX-<titulo>.md` (um arquivo por task) + `TASK-MMM-INDEX.md` |
-| Gate | `task-validator` (modo batch) |
-| Próximo passo | `/keelson:implement PLAN-MMM` (ou `--dry-run` primeiro) |
-
-Cada TASK contém campos de closure vazios ("Histórico de execução") que o `/keelson:implement` preenche. Não preencha manualmente.
-
-Quando a SPEC declara FEATs, cada TASK ganha o campo `**Funcionalidade**:` (FEATs dos FRs realizados, uma marcada `(primária)`; task transversal lista todas) e o `TASK-MMM-INDEX.md` ganha a seção "Cobertura por funcionalidade" (FEAT → TASKs → Done).
+Detalhe completo (flags, fluxo, regras): `commands/tasks.md`.
 
 ### 3.4 `/keelson:implement` — executar PLAN
 
-Orquestra a implementação wave por wave, usando subagents (`developer` + `code-reviewer`) ou Agent Teams. Cada task passa pelos quality gates e closure obrigatória antes de Done.
+Orquestra a implementação wave por wave via subagents (`developer` + `code-reviewer` e gates dedicados): cada task passa pelos quality gates e closure obrigatória antes de Done; falha = 1 retry, depois escala para humano. Não promove Status do PLAN (apenas sugere), não faz deploy, não cria PR nem modifica SPEC/PLAN durante a implementação.
 
-```
-/keelson:implement <PLAN-MMM ou caminho> [--max-parallel=<N>] [--dry-run] [--only-wave=<N>] [--force-mode=<teams|subagents>]
-```
-
-| Flag | Uso |
-|---|---|
-| `--dry-run` | Imprime o plano de execução (modo, waves, paralelismo) sem executar |
-| `--only-wave=N` | Executa apenas a wave N |
-| `--max-parallel=N` | Limita paralelismo |
-| `--force-mode=...` | Força `teams` ou `subagents` (default: `subagents`) |
-
-**Quality gates** (obrigatórios): implementação completa, testes cobrindo ACs passando, lint limpo, escopo respeitado, DECs respeitadas, aderência ao Charter + perfil ativo, code review pelo reviewer agent. Recorte por natureza (decisão 4.90, dono: `core/CODE-REVIEW.md` §Orquestração): testes por task; revisão + segurança **1× por wave** sobre o diff acumulado, achado roteado à task de origem; comportamento (`qa`) **por FEAT/história** na wave em que ela completa (sem FEATs → contra o DoD, no fim), com a verificação gravada na SPEC e cobrada pelo grafo (`feat-sem-verificacao`). Falha = 1 retry, depois escala para humano.
-
-**O que ele NÃO faz**: promover Status do PLAN para Done (apenas sugere), deploy, criar PR, resolver conflito de merge, modificar SPEC/PLAN durante a implementação.
+Detalhe completo (flags, fluxo, regras): `commands/implement.md`.
 
 ### 3.5 `/keelson:triage` — triagem de demanda nova
 
-Quando você não sabe se uma demanda vira SPEC, PLAN ou TASK, este comando classifica e roteia. **Não executa nada sem confirmação.**
-
-```
-/keelson:triage <descrição em linguagem natural> [--slug=<nome>] [--from=<KEY>]
-```
-
-Roteamento em resumo: contrato novo → SPEC; contrato igual com estratégia nova → PLAN `--slice`; bug/refactor → TASK pré-preenchida — **sem PLAN aplicável, brief avulso** (`briefs/BRIEF-MMM-*-avulso.md`, contrato no `index-contract.md`; decisão 4.86); trivial → direto no código; slug legado sem INDEX → `/keelson:migrate-legacy` antes. `--from=<KEY>` (rota pull, 4.86): a demanda já é um card do tracker — a descrição do card vira o insumo, e a key acompanha o destino (nunca cria card duplicado). A tabela e os critérios canônicos são do próprio comando: `${CLAUDE_PLUGIN_ROOT}/commands/triage.md`.
+Classifica uma demanda e roteia para SPEC, PLAN, TASK, brief avulso ou ação direta — **não executa nada sem confirmação**. Use quando não sabe qual comando aplicar; a tabela e os critérios canônicos de roteamento são do próprio comando.
 
 **Quando NÃO usar**: se você já sabe o que fazer (vá direto ao comando), para triviais óbvios, ou em emergências.
 
+Detalhe completo (flags, fluxo, regras): `commands/triage.md`.
+
 ### 3.6 `/keelson:migrate-legacy` — migrar slug legado
 
-Equaliza um slug pré-keelson (tem README mas não tem INDEX.md): move os `.md` da raiz para `legacy/`, gera INDEX mínimo a partir do README, cria pastas `specs/`, `plans/`, `tasks/` vazias.
-
-```
-/keelson:migrate-legacy <slug> [--dry-run] [--keep-in-place]
-```
-
-**Não cria** SPECs/PLANs/TASKs retroativas — o histórico keelson do slug começa a partir da migração. Preserva tudo (usa `git mv`). Revise o INDEX gerado: a extração do README é melhor esforço. Política: migrar **on-demand**, quando for mexer no slug pela primeira vez.
+Equaliza um slug pré-keelson (tem README mas não tem INDEX.md): move os `.md` para `legacy/`, grava o TRIAGE durável e gera INDEX mínimo — **não cria** SPECs/PLANs/TASKs retroativas. Política: migrar **on-demand**, quando for mexer no slug pela primeira vez; revise o INDEX gerado (extração é melhor esforço).
 
 **Para onde foi cada coisa do antigo `README.md` por feature** (modelo descontinuado — decisão 4.6 de `decisions.md`):
 
@@ -175,204 +111,103 @@ Equaliza um slug pré-keelson (tem README mas não tem INDEX.md): move os `.md` 
 | Mapa técnico: arquivos por camada, endpoints, códigos de erro | **PLAN** (`<docsRoot>/<slug>/plans/PLAN-MMM-*.md`) — componentes, interface pública, fluxos, modelo de dados |
 | Estado / o que existe / progresso | **INDEX.md** (`<docsRoot>/<slug>/INDEX.md`) — gerado pelos comandos `/keelson:*` |
 
+Detalhe completo (flags, fluxo, regras): `commands/migrate-legacy.md`.
+
 ### 3.7 `/keelson:rebuild-index` — reconstruir INDEX
 
-Regenera o `INDEX.md` de um slug a partir dos arquivos individuais (SPECs, PLANs, TASKs). Faz backup do INDEX atual antes.
+Regenera o `INDEX.md` de um slug a partir dos artefatos (SPECs, PLANs, TASKs e o TRIAGE legado, que é reespelhado), com backup do atual. Use quando o INDEX foi deletado, corrompido ou divergiu dos arquivos — não para mudança incremental (operação destrutiva; use os comandos próprios).
 
-```
-/keelson:rebuild-index <slug> [--dry-run]
-```
-
-**Quando usar**: INDEX deletado, corrompido, ou divergente dos arquivos. **Quando NÃO usar**: INDEX consistente (operação destrutiva) ou mudança incremental (use os comandos próprios). Também detecta inconsistências (FRs órfãos, PLANs sem SPEC, status incoerente) e pergunta antes de prosseguir nas críticas.
-
-> ⚠️ Achados de migração vivem em `legacy/TRIAGE-*.md` (fonte durável); o `/keelson:rebuild-index` deriva o INDEX de specs/plans/tasks **e reespelha as seções legadas a partir do TRIAGE** — o que não estiver no TRIAGE se perde no rebuild (ver `/keelson:migrate-legacy` e a decisão 4.5 / LRN-012).
+Detalhe completo (flags, fluxo, regras): `commands/rebuild-index.md`.
 
 ### 3.8 `/keelson:integrate` — preparar entrega (suíte + PR)
 
-Após a implementação de um PLAN concluída (TASKs Done, DoD satisfeita), valida a DoD, roda a suíte completa (comando `quality.test` da ficha) — e, quando a ficha declara `quality.mutation`, a **mutação da suíte** logo depois dela (opt-in, exit code é o veredito — decisão 4.121); rodada verde registrada pelo fecho do `/keelson:auto` no mesmo estado de código é **reaproveitada**, com dispensa declarada (4.122) —, gera a descrição e **abre o Pull Request**.
+Após a implementação de um PLAN concluída (TASKs Done, DoD satisfeita): valida a DoD, roda a suíte completa — e a mutação opt-in da ficha, reaproveitando rodada verde registrada no mesmo estado de código —, gera a descrição e **abre o Pull Request**. Não faz merge nem deploy (decisão humana) e não promove o Status do PLAN.
 
-```
-/keelson:integrate <PLAN-MMM ou caminho> [--base=<branch>] [--draft] [--dry-run]
-```
-
-**Não faz merge nem deploy** — isso permanece decisão humana. Não promove o Status do PLAN (apenas sugere).
+Detalhe completo (flags, fluxo, regras): `commands/integrate.md`.
 
 ### 3.9 `/keelson:auto` — ciclo completo autônomo (modo padrão)
 
-Conduz `specify → plan → tasks → implement → entrega` de ponta a ponta **sem aprovação de etapa**, sob o **contrato Diretor–PO** (decisões 4.37/4.38): você é o **Diretor**. Abre com a **última chamada**: escalação pré-largada só pelos 4 critérios do contrato (pedido claro → nenhuma pergunta) + **brief** — o pedido como dito + a interpretação do PO, persistidos em `briefs/BRIEF-NNN.md`; a interpretação é apresentada e o fluxo **segue sem esperar** (janela de veto: silêncio = seguir; correção sua → brief re-emitido). O brief **vira a fonte da demanda**: a SPEC nasce dele e o PO valida SPEC e entrega contra ele. Depois da largada, não deixa pergunta pendurada: dificuldade vira decisão em nome do Diretor ou parte estacionada perguntada em lote na entrega; interrupção no meio só em **último caso** (errar custaria o ciclo inteiro). A entrega fecha com o **relatório de aceitação do PO** e o estado de pendência do Diretor. É o **default**: basta pedir a tarefa em linguagem natural, sem digitar o comando. Governança: decisões 4.10, 4.11, 4.13, 4.14, 4.37 e 4.38 de `decisions.md`.
+O **default**: conduz `specify → plan → tasks → implement → entrega` de ponta a ponta sem aprovação de etapa, sob o contrato Diretor–PO — brief com janela de veto na largada, decisões em nome do Diretor no meio (interrupção só em último caso), e entrega com relatório de aceitação do PO no esqueleto canônico do `report-contract.md`. Entrega = branch + commit + push, **sem PR** — merge e deploy continuam humanos. Basta pedir a tarefa em linguagem natural, sem digitar o comando; ambiente sem tela gera handoff de verificação (§8).
 
-```
-/keelson:auto <descrição ou @arquivo> [--slug=<nome>]
-```
-
-Rigor proporcional preservado (trivial → direto; bug/refactor → inline; feature → ciclo completo). **Entrega**: branch + commit + push, **sem PR** — com `quality.mutation` na ficha, o fecho roda a **mutação da suíte** antes da aceitação do PO e registra a rodada verde no INDEX com o SHA (o `/keelson:integrate` reaproveita — decisões 4.121/4.122). No ciclo com SPEC, o fecho roda também a **convergência** (decisão 4.143): o `code-reviewer` relê a SPEC inteira contra o código final e classifica cada lacuna em 4 tipos (`ausente` · `parcial` · `contradiz` · `não solicitado` — código que ninguém pediu), com registro em SHA no INDEX reaproveitado pelo `/keelson:integrate`; gap se corrige antes do push ou vira pergunta estacionada — nunca push silencioso. Merge e deploy continuam humanos. Com Jira ativo, o fecho roda a **reconciliação** do protocolo de sync (idempotente — rede para ganchos que não rodaram) e o report traz a **linha de estado do tracker** (Epic · Story **com a coluna atual e o teto** · sub-tarefas K/N · transições) — best-effort não bloqueia, mas sempre conta. O fecho deixa a unidade de QA **na coluna de desenvolvimento**, esperando você: concluí-la é ato seu (`--phase finish-dev` ou na mão) — Story em "concluído" ao fim do ciclo é bug, não sucesso (decisão 4.65). Ciclo que gerou `PROPOSTA_PLUGIN` (lição de processo cujo dono é o plugin) → o report traz também a **mensagem ao mantenedor** composta pelo `agile-coach`, em bloco copy-paste para você encaminhar. O report fecha ainda com a **linha de duração da sessão** — total e quebra por etapa (specify · plan · tasks · implement), em horário de Brasília — medida por `date` nas marcas de `Largada`/`Cronologia` do BRIEF, nunca estimada; é relógio de parede (inclui esperas) e jamais vira gatilho de parada. A forma do report inteiro tem dono único: o **esqueleto canônico** de `docs/_meta/conventions/report-contract.md` (decisão 4.130) — linha obrigatória é lacuna a preencher, seção condicional carrega bloco copy-paste, nunca resumo. Governança: decisões 4.10, 4.53, 4.54 e 4.56 de `decisions.md`.
-
-**Ambiente sem tela** (worktree/nuvem, ou `gates.screenVerify` sem app disponível): o gate 9 não exercitável gera **handoff de verificação** — doc com roteiro + prompt copy-paste no report para um agente com tela fechar a verificação (ver §8). A entrega é declarada parcial até lá. A verificação em si roda pela skill `screen-verify` (Playwright MCP, headless por padrão — decisão 4.49), e a indisponibilidade que gera o handoff é **provada e nomeada** por causa; a régua é do §8.
+Detalhe completo (flags, fluxo, regras): `commands/auto.md`.
 
 ### 3.10 `/keelson:guided` — ciclo com checkpoints (opt-in pausado)
 
-O oposto opt-in do `/keelson:auto`: roda o ciclo **pausando em 2 marcos** (SPEC pronta, PLAN pronto) para o seu OK, e com a **régua estrita** de perguntar na hora em qualquer exceção (você está acompanhando — a escada de estacionamento do auto não se aplica). O brief é gravado igual, mas **confirmado na hora** (sem janela de veto); no CHECKPOINT 1 o **PO recomenda e você bate o martelo**. Use quando quer revisar o contrato e o desenho antes do desenvolvimento.
+O oposto opt-in do `/keelson:auto`: roda o ciclo pausando em **2 marcos** (SPEC pronta, PLAN pronto) para o seu OK — o PO recomenda, você bate o martelo — e pergunta na hora em qualquer exceção. Use quando quer revisar o contrato e o desenho antes do desenvolvimento.
 
-```
-/keelson:guided <descrição ou @arquivo> [--slug=<nome>]
-```
+Detalhe completo (flags, fluxo, regras): `commands/guided.md`.
 
 ### 3.11 `/keelson:refine` — lapidar uma ideia crua (opt-in, pré-ciclo)
 
-Refina um pedido vago **antes** de virar demanda: ancoragem barata no domínio, no máximo uma rodada de 2–4 perguntas (só as que mudam o caminho), e devolve um **prompt refinado** (contexto, pedido, premissas decididas, fora de escopo) com oferta de disparar o `/keelson:auto`. Não cria artefato keelson nem inicia o ciclo sozinho. Use quando **você** sente que a ideia está crua; pedido claro não precisa dele — o `/keelson:auto` absorve ambiguidade não-crítica via premissas `[assumido]`.
+Refina um pedido vago **antes** de virar demanda: no máximo uma rodada de 2–4 perguntas decisivas e devolve um **prompt refinado** com oferta de disparar o `/keelson:auto`. Não cria artefato keelson nem inicia o ciclo sozinho; pedido claro não precisa dele — o auto absorve ambiguidade não-crítica via premissas `[assumido]`.
 
-```
-/keelson:refine <ideia em linguagem natural ou @arquivo>
-```
+Detalhe completo (flags, fluxo, regras): `commands/refine.md`.
 
 ### 3.12 `/keelson:audit` — auditoria manual de dependências (CVE/NVD)
 
-Roda a auditoria de vulnerabilidade conhecida sobre as dependências, **em momento oportuno escolhido por você** (começo de ciclo, antes de entrega grande, projeto parado). Cobre o cenário que os gates por diff não cobrem: CVE publicado **depois** de a dependência entrar. Resolve a ferramenta pela §8 do perfil ativo (fallback: detecção de lockfile), cita o CVE ID da saída da ferramenta (nunca de memória) e reporta ecossistema sem ferramenta como `INDISPONÍVEL` — nunca em silêncio. Achado vira **oferta de demanda** de upgrade pelo ciclo normal; o comando não atualiza nada.
+Roda a auditoria de vulnerabilidade conhecida sobre as dependências, **em momento oportuno escolhido por você** — cobre o cenário que os gates por diff não cobrem: CVE publicado depois de a dependência entrar. Achado vira **oferta de demanda** de upgrade pelo ciclo normal; o comando não atualiza nada. `full` inclui higiene (desatualizados, abandonados, licenças).
 
-```
-/keelson:audit [full]
-```
-
-`full` inclui higiene (desatualizados, abandonados, licenças). É manual (pull) — para cobertura contínua, Dependabot/Renovate ou CI agendada. Governança: decisão 4.17 de `decisions.md`.
+Detalhe completo (flags, fluxo, regras): `commands/audit.md`.
 
 ### 3.13 `/keelson:jira-sync` — reconciliar um slug com o Jira (opcional)
 
-Rede de segurança da integração opcional com Jira (via **conector MCP Atlassian**, ligada em `jira.enabled` na ficha). Os comandos do ciclo já sincronizam **best-effort**, e o fecho do `/keelson:auto` roda a mesma reconciliação automaticamente (decisão 4.53); este comando avulso cobre o resto — backfill de slug antigo, ciclo interrompido antes da entrega, conector que só ficou disponível depois — reprocessando o slug e criando/vinculando/comentando/transicionando o que ficou para trás, de forma **idempotente**.
+Rede de segurança da integração opcional com Jira (conector MCP Atlassian, `jira.enabled` na ficha): reprocessa um slug — ou só a árvore de uma SPEC — criando/vinculando/comentando/transicionando de forma **idempotente** o que os ganchos best-effort do ciclo deixaram para trás; com `--phase` move a árvore no quadro. Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. A lógica vive no `skills/_shared/jira-sync-protocol.md` — o comando só orquestra.
 
-```
-/keelson:jira-sync <slug | PLAN-MMM | SPEC-NNN ou caminho da SPEC> [--dry-run] [--phase start-dev|finish-dev]
-```
-
-Com slug ou `PLAN-MMM` reconcilia o slug inteiro; apontando uma **SPEC** (`SPEC-NNN` ou o
-caminho do arquivo), a reconciliação fica **escopada à árvore dela** — Epic, Stories e
-sub-tasks das TASKs dos PLANs que a cobrem (coluna "Cobre" do INDEX) — o fallback manual
-para o ciclo que terminou com o tracker vazio (decisão 4.55).
-
-Com `--phase` (decisão 4.60), depois de reconciliar o comando **move a árvore no quadro** —
-o ato imperativo seu, fora dos marcos automáticos: `start-dev` leva Epic/Story/sub-tasks às
-colunas de desenvolvimento; `finish-dev` conclui as sub-tasks e leva a Story à coluna de
-revisão (o passo seguinte do fluxo). Os alvos vêm das linhas `--phase` da tabela
-Etapas/Colunas do mapa, **por nível** (`epic`/`story`/`subtask` — workflows diferem por
-tipo; nível sem linha não se move, e o Epic só se move com a linha `epic` declarada). Sem
-transição direta, o walker percorre o **Trilho do board** do mapa status a status, validando
-cada salto em runtime — nunca regride, e salto bloqueado para-e-comenta. Por ser ordem
-explícita sua, o verbo move mesmo com `transition: comment` (só `off` bloqueia); os ganchos
-automáticos continuam regidos pela política da ficha.
-
-A quantidade de Epics é política declarada (decisão 4.61): com `jira.epicPolicy:
-"multi-feature"`, SPEC com **0–1 FEAT** (funcionalidade única) projeta **sem Epic** — a
-Story única é a raiz, com as sub-tasks embaixo; Epic só nasce com 2+ FEATs (há o que
-agrupar). O sinal é a contagem de headings `### FEAT-` da SPEC — declaração de produto,
-mecânica, nunca "a IA achou pequeno". A projeção é avaliada na primeira criação e
-registrada pelas próprias keys; SPEC compacta que ganhar FEATs depois não é re-parentada
-(a Story nova nasce irmã + link, e o estado misto é reportado — reorganizar é ato seu no
-Jira). Default `"always"` mantém o comportamento clássico: toda SPEC vira Epic.
-
-| Aspecto | Detalhe |
-|---|---|
-| Gera | Issues, Stories de FEAT (quando a SPEC declara FEATs e `issueType.feature` está preenchido), sub-tasks e tarefas isoladas (`issueType.standalone` — brief avulso, decisão 4.86, ou transversal sem primária) no Jira (via conector); grava a linha `**Jira**:` no cabeçalho da SPEC, sob os headings FEAT, no cabeçalho do brief avulso e na closure das TASKs |
-| Atualiza | 1 linha no "Histórico recente" do `INDEX.md` (contrato da tabela "PLANs" intocado) |
-| Gate | — (best-effort; `jira.enabled:false` ou conector ausente → não faz nada) |
-| Pré-condição | Rodar **de dentro do repo consumidor** (ficha no cwd). A Etapa 0 resolve a **viabilidade da projeção** antes de planejar — 3 níveis · 2 níveis · 2 níveis via Story implícita · 2 níveis via `standalone` · inviável (com a perna que não aninha) — e sinaliza **backfill** quando o slug já está concluído e `transition` não move card |
-| Lógica | Toda no `skills/_shared/jira-sync-protocol.md` (régua de hierarquia: §7.0; 3º nível: `jira-sync-feat.md`) — o comando só orquestra |
-
-As descrições dos cards seguem a **receita para humanos** (protocolo §6.2, decisão 4.59):
-todo tipo de issue nasce com narrativa em português — a unidade de QA (Story ou tarefa
-isolada) traz "o que faz", roteiro "como testar" derivado dos ACs (incluindo os de NFR da
-funcionalidade; AC sem caminho manual vira a linha "verificações automatizadas") e a lista
-formal deles. Toda descrição abre com o aviso "não edite — registre um comentário" e fecha
-no rodapé-marcador com o caminho relativo do artefato-fonte. A reconciliação re-renderiza
-descrição vazia ou com marcador; descrição editada por humano nunca é sobrescrita —
-`--refresh-descriptions` força o re-render sem marcador (backfill de cards da receita
-antiga, decisão explícita sua).
-
-Nunca bloqueia o ciclo, não cria PR nem faz merge/deploy. Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53, 4.55, 4.59, 4.60 e 4.61 de `decisions.md`.
+Detalhe completo (flags, fluxo, regras): `commands/jira-sync.md`.
 
 ### 3.14 `/keelson:review` — code review de um diff avulso (sem artefato SDD)
 
-Porta de entrada da doutrina para o código que **entrou fora do ciclo**: hotfix, código herdado, contribuição externa, mudança feita à mão. Você aponta um diff — working tree, `staged`, `last`, `-N` commits, um `<sha>`, um range `<a>..<b>` ou `branch` — e a main session assume seu papel de **Tech Lead**: despacha `code-reviewer` (gates 1–7) e, pelos gatilhos, `security-engineer` (gate 8, área sensível) e `performance-engineer` (gate 10, superfície de custo — 4.155) **em paralelo**; consolida e classifica cada achado; pede **um** OK; e então despacha a correção ao `developer`, com **re-revisão obrigatória** do que foi corrigido (mais `qa` quando a correção tem efeito observável).
+Porta de entrada da doutrina para código que **entrou fora do ciclo** (hotfix, herdado, contribuição externa): a main session despacha os gates aplicáveis **em paralelo** sobre o diff apontado, consolida os achados, pede **um** OK e despacha a correção com re-revisão obrigatória. Sem artefato SDD os gates degradam de forma **declarada**; achado estrutural vira demanda, nunca edição no ato — nada é commitado.
 
-```
-/keelson:review [alvo] [--fix] [--no-security] [--paths=<a,b>]
-```
-
-Sem TASK não há AC, escopo declarado nem DEC: os gates 1, 4 e 5 **degradam** (prova exigida para toda lógica nova; coerência do diff no lugar do escopo; decisões irreversíveis do INDEX quando o slug é inferível) e todo gate degradado ou `n/a` é **declarado** — a régua da degradação tem dono único em `guidelines/core/CODE-REVIEW.md`. Achado **estrutural** vira demanda (`/keelson:triage` ou TASK de bugfix), nunca edição no ato; nada é commitado e nenhum artefato durável é criado. Governança: decisão 4.36 de `decisions.md`.
+Detalhe completo (flags, fluxo, regras): `commands/review.md`.
 
 ### 3.15 `/keelson:specify-epic` — decompor um pedido grande (épico)
 
-Quando o pedido é grande demais para uma demanda (2+ capacidades independentes, 2+ slugs prováveis, um roadmap numa frase), o **PM** do time decompõe em demandas independentes e priorizadas — cada uma segue depois o ciclo normal (`/keelson:auto`) com o seu PO. Você (Diretor) **confirma a decomposição e a estratégia de branch** (o default proposto vem de `git.branchStrategy` da ficha — 4.190; ausente, branch **única** do épico, com sync da main a cada fronteira de fatia — 4.126; `por-fatia` faz o `/keelson:continue` exigir merge da fatia da qual a próxima depende) — é a única parada, e é intencional: decomposição errada contamina N ciclos. O comando grava o **BRIEF épico** no slug-âncora com a **fila viva** (estado por fatia, atualizado pelos ciclos filhos — 4.125) e devolve a fila com o comando da demanda 1 **e a porta de retomada**: `/keelson:continue <slug>` (§3.21) é tudo que alguém precisa decorar para seguir depois. **Disparar cada ciclo é decisão sua** (nada roda sozinho).
+Quando o pedido é grande demais para uma demanda (2+ capacidades independentes), o **PM** decompõe em demandas independentes e priorizadas — cada uma segue depois o ciclo normal com o seu PO. Você confirma a decomposição e a estratégia de branch (a única parada, intencional); o comando grava o **BRIEF épico** com a fila viva e devolve a porta de retomada: `/keelson:continue <slug>` (§3.21). **Disparar cada ciclo é decisão sua.**
 
-```
-/keelson:specify-epic <pedido épico ou @arquivo> [--slug=<âncora>]
-```
-
-Rotas de chegada: direto, pela categoria 7 do `/keelson:triage`, proposto pelo `/keelson:auto` na triagem de rigor (pré-largada; pós-largada, expansão de escopo é escalação do PO, nunca re-decomposição) — ou pelo handoff da forja (`/keelson:brief`), cujo BRIEF é **entrada de primeira classe**: fatos do código, premissas com selo e perguntas pendentes a produto viajam para as fatias (4.128). Governança: decisões 4.37, 4.39, 4.125–4.128 de `decisions.md`.
+Detalhe completo (flags, fluxo, regras): `commands/specify-epic.md`.
 
 ### 3.16 `/keelson:update` — atualizar o plugin instalado
 
-Atualiza o keelson para a última versão do marketplace, **quando você decidir** (é humano-only). O motor é o script embarcado (`scripts/update.sh`), que roda a CLI do Claude Code na ordem que importa: `claude plugin marketplace update keelson` **e depois** `claude plugin update keelson` — refresh do marketplace sozinho não atualiza o plugin instalado, e refresh falho aborta (seguir com cache velho reportaria "já atualizado" sem estar). A versão antes/depois vem da ficha de plugins da CLI (com fallback no `claude plugin list`; nunca se inventa número); versão que não se moveu → "nada a fazer".
+Atualiza o keelson para a última versão do marketplace, **quando você decidir** (humano-only), via `scripts/update.sh` + CLI do Claude Code. Reporta versão antes/depois, o veredito de re-init (marcadores `Re-init:` do CHANGELOG — exige · não exige · não determinável) e termina lembrando de **reiniciar a sessão**: o update não vale para a sessão corrente.
 
-```
-/keelson:update [--scope user|project|local]
-```
-
-Após atualizar, o script lê os marcadores `Re-init: required|none` das entradas do CHANGELOG recém-instalado e reporta se alguma versão do salto exige re-rodar `/keelson:init` (bloco do `CLAUDE.md` ou ficha mudaram); quando não há evidência (marcador ausente, árvore não localizada), ele degrada para "não determinável" — nunca afirma "não precisa" sem prova.
-
-**O update não vale para a sessão corrente** — a CLI exige restart para aplicar; o report sempre termina lembrando de reiniciar a sessão. Falha é erro nomeado (CLI ausente, plugin não instalado via marketplace no scope, instalação de desenvolvimento), nunca contornada em silêncio. Governança: decisões 4.57 e 4.189 de `decisions.md`.
+Detalhe completo (flags, fluxo, regras): `commands/update.md`.
 
 ### 3.17 `/keelson:postmortem` — postmortem de fim de sessão
 
-Rodado pelo Diretor no **fim da sessão** (é humano-only), ou apontando um episódio passado. Relê as interações da sessão inteira — cada correção pedida, retry, gate reprovado, "esqueci de falar" — como fonte primária de evidência, cruza com git e artefatos do ciclo, e monta: a **tabela dos fatos** (com a distinção inegociável entre defeito e requisito novo), os **mecanismos por causa-raiz** (qual gate viu e aprovou, não rodou ou não tinha como ver — com evidência literal, ex.: a asserção tautológica citada) e o **ponto de intervenção mais barato** de cada um, inclusive quando era um ato do Diretor.
+Rodado pelo Diretor no **fim da sessão** (humano-only), ou apontando um episódio passado: relê as interações como fonte primária de evidência, cruza com git e artefatos do ciclo, e monta a tabela dos fatos, os mecanismos por causa-raiz e o ponto de intervenção mais barato de cada um. Saídas: o doc durável em `<docsRoot>/_meta/postmortems/` e o **bloco copy-paste ao mantenedor**. Não corrige nada (defeito aberto → `/keelson:triage`).
 
-```
-/keelson:postmortem [slug | branch | descrição — sem argumento: a sessão corrente]
-```
-
-O endereçamento tem um dono por achado: lição de **projeto** é aplicada na hora (`lessons.md`/perfil); achado de **processo** vai ao `agile-coach` (uma invocação por causa-raiz), que deduplica no ledger e devolve `PROPOSTA_PLUGIN` + `mensagem_mantenedor` com diff literal (4.54/4.64); falha de raciocínio ou caso pontual é **descartado declaradamente** — regra só para falha de verificação. Saídas: o doc durável `<docsRoot>/_meta/postmortems/PM-<data>-<alvo>.md` e o **bloco copy-paste ao mantenedor** que fecha o output — é ele que alimenta a evolução do plugin. Não corrige nada (defeito aberto → `/keelson:triage`). Governança: decisão 4.69 de `decisions.md`.
+Detalhe completo (flags, fluxo, regras): `commands/postmortem.md`.
 
 ### 3.18 `/keelson:report` — refazer o relatório de fecho
 
-Rede de segurança, não caminho normal (é humano-only): **toda mudança já fecha com relatório automático** — a Entrega do `/keelson:auto`, o output do `/keelson:implement` e o fecho do modo sob demanda (4.75/4.76). Este comando existe para quando o fecho **não existe ou não serve mais**: sessão retomada no dia seguinte, contexto comprimido, report perdido no scroll, sessão livre que acumulou várias mudanças sem consolidação.
+Rede de segurança, não caminho normal (humano-only): refaz o relatório de fecho a partir do **ledger de sessão** + diff da branch + INDEX, para quando o fecho automático não existe ou não serve mais (sessão retomada, contexto comprimido, report perdido no scroll). Gate sem evento registrado vira lacuna nomeada, nunca "aprovado". Não commita, não corrige, não move card.
 
-```
-/keelson:report [slug]
-```
-
-A matéria-prima é o **ledger de sessão** (`thoughts/local/session-ledger/` — §3.0/`sdd-conventions.md`), onde cada evento foi escrito **quando aconteceu**, somado ao diff da branch e ao INDEX; a sessão **não** é relida (esse é o trabalho — e o custo — do `/keelson:postmortem`, que investiga *por que* o processo deixou passar, não *o que* aconteceu). Gate sem evento registrado nunca vira "aprovado": vira lacuna nomeada, e o gate que o diff exigir é declarado como pendente de rodar. Não commita, não corrige, não move card. Governança: decisão 4.76 de `decisions.md`.
+Detalhe completo (flags, fluxo, regras): `commands/report.md`.
 
 ### 3.19 `/keelson:brief` — forjar documento de produto em BRIEF (opt-in, pré-ciclo)
 
-O estágio profundo pré-ciclo (humano-only — é uma conversa com você): recebe o **documento da área de produto** (PRD, doc de demanda, e-mail — path ou colado), inventaria o conteúdo contra as seções que a SPEC vai exigir (problema, outcome, métrica **com fonte**, personas, escopo, premissas **com selo**), responde pelo **código** o que o código responde (`code-scout`), pergunta a você **uma coisa por vez** só o que documento+código não cobriram, e formaliza como **Q-ID** o que só produto pode responder. Sai sempre por uma de 3 portas: BRIEF `pronto` (+ handoff copy-paste para o `/keelson:auto` em sessão limpa) · continuar a conversa · `aguardando-produto` (pendência plantada no INDEX; a retomada é em **sessão nova**, lendo o BRIEF — nunca a conversa antiga). Fronteira com o `/keelson:refine`: ideia crua e leve é lá; documento de produto e profundidade é aqui. Governança: decisão 4.102.
+O estágio profundo pré-ciclo (humano-only — é uma conversa com você): recebe o documento da área de produto, inventaria contra as seções que a SPEC vai exigir, responde pelo código o que o código responde (`code-scout`), pergunta uma coisa por vez só o que faltou e formaliza como **Q-ID** o que só produto responde. Sai por 3 portas: BRIEF `pronto` (+ handoff para o `/keelson:auto`) · continuar a conversa · `aguardando-produto`. Ideia crua e leve é o `/keelson:refine`; documento de produto e profundidade é aqui.
 
-```
-/keelson:brief <documento (path ou colado) | slug | path de BRIEF>
-```
+Detalhe completo (flags, fluxo, regras): `commands/brief.md`.
 
 ### 3.20 `/keelson:mutation-setup` — configurar o gate de mutação (humano-only)
 
-Setup guiado do gate de mutação (decisões 4.121–4.123) para quem não conhece a ferramenta: detecta a stack pela ficha, propõe a ferramenta canônica (Infection · Stryker · mutmut · PIT · cargo-mutants) e **instala com a sua confirmação**, gera a config a partir de `codePaths`/`quality.test`, **prova o pipeline com uma rodada-amostra** (escopo de um arquivo — nunca a base toda) e só então grava `quality.mutation` na ficha. O comando nasce com escopo de diff e **sem threshold** (gate informativo): o report termina com a instrução de calibrar o score mínimo após 1–2 entregas observadas — travar o threshold é ato seu. Não roda a mutação completa (isso é da entrega), não commita o setup.
+Setup guiado do gate de mutação para quem não conhece a ferramenta: detecta a stack pela ficha, instala a ferramenta canônica **com a sua confirmação**, prova o pipeline com rodada-amostra e só então grava `quality.mutation` — sem threshold na primeira adoção (gate informativo; calibrar o score mínimo após 1–2 entregas é ato seu). Não roda a mutação completa nem commita o setup.
 
-```
-/keelson:mutation-setup [--base=<branch>] [--dry-run]
-```
+Detalhe completo (flags, fluxo, regras): `commands/mutation-setup.md`.
 
 ### 3.21 `/keelson:continue` — retomar um slug de onde parou (humano-only)
 
-A porta única de retomada (decisão 4.127): você — ou qualquer pessoa do seu time — aponta um slug e o comando descobre onde o trabalho parou, mostra o "você está aqui" (a fila do épico com estados, ou o ponto do ciclo avulso) e propõe **um** próximo passo com default: retomar a forja `aguardando-produto`, retomar a implementação na wave interrompida, disparar a próxima fatia (com o sync da main na largada), ou apontar o `/keelson:integrate` quando a fila acabou. Confirmou → executa na própria sessão. Ele **deriva tudo dos artefatos commitados** (a fila viva do BRIEF épico, closures de TASK, status dos briefs — nunca guarda estado próprio, nunca lê `thoughts/local/`), e divergência entre fila e artefatos resolve pelos artefatos (4.58). Depois de um fim de semana, ninguém precisa lembrar de nada: `continue` + o slug.
+A porta única de retomada: você aponta um slug e o comando deriva **dos artefatos commitados** onde o trabalho parou, mostra o "você está aqui" e propõe **um** próximo passo com default — executa só após a sua confirmação. Depois de um fim de semana, ninguém precisa lembrar de nada: `continue` + o slug.
 
-```
-/keelson:continue <slug | caminho de BRIEF épico>
-```
-
-Não dispara nada sem a sua confirmação — apontar o slug é o seu ato (4.41); não re-decompõe épico, não faz merge nem PR. Governança: decisões 4.125–4.127 de `decisions.md`.
+Detalhe completo (flags, fluxo, regras): `commands/continue.md`.
 
 ### 3.22 `/keelson:e2e-setup` — configurar a suíte E2E (humano-only)
 
-Setup guiado da suíte E2E (decisões 4.166–4.167) para quem não conhece a ferramenta: detecta runner existente (outro motor consolidado não é trocado — vira o comando da ficha, com a ressalva do recorte por tag), **instala o Playwright com a sua confirmação** (inclusive o binário do navegador, em cache do usuário; o manifesto Node pode viver em subdiretório do app — 4.172), gera `playwright.config` a partir da ficha (`testDir: e2e/`, saídas gitignored, `baseURL` por env — URL e credencial nunca hardcoded), o esqueleto de auth por realm lendo o `keelson.local.json` em runtime, e um smoke spec de exemplo com a convenção de tags. **Prova com `npx playwright test --list`** (rodada real só com a app de pé), roda o **gate 8** sobre o diff quando `gates.security` está ativo (o setup instala dependência e gera código de credencial — sensível por desenho, 4.171) e só então grava `quality.e2e`. Os specs de AC não nascem aqui — são entregáveis do developer, task a task. Não roda a regressão completa (isso é da entrega), não commita o setup.
+Setup guiado da suíte E2E para quem não conhece a ferramenta: instala o Playwright **com a sua confirmação**, gera config, esqueleto de auth por realm e smoke spec a partir da ficha, prova com `--list`, roda o gate 8 sobre o diff quando ativo e só então grava `quality.e2e`. Os specs de AC não nascem aqui — são entregáveis do developer, task a task; não roda a regressão completa nem commita o setup.
 
-```
-/keelson:e2e-setup [--dry-run]
-```
+Detalhe completo (flags, fluxo, regras): `commands/e2e-setup.md`.
 
 ---
 
