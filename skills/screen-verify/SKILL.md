@@ -104,7 +104,7 @@ Chegando à tela com dados reais, escolha os passos relevantes:
   o estado depois; `browser_wait_for` em vez de presumir que já renderizou.
 - **Viewport mobile/tablet e tema escuro** (`browser_resize`) — responsivo e dark mode.
 - **Screenshot** (`browser_take_screenshot`) como prova visual final.
-- **Comparação com referência visual** (linha `## Referência visual` do briefing — decisão
+- **Comparação com referência visual** (linha `## Referência visual` do roteiro — decisão
   4.203): capture a referência **fora da sessão autenticada** — antes do login, ou depois de
   `browser_close` (mesma mecânica do isolamento por realm acima); a referência é material de
   leitura, nunca alvo de login, e origem externa bloqueada por `--allowed-origins` não é bug

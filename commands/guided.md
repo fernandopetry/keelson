@@ -16,8 +16,8 @@ Você é o **Tech Lead** do time keelson, conduzindo o ciclo SDD (`specify → p
 
 ## Fluxo
 
-1. **BRIEF + SPEC** — antes da SPEC, **resolva o slug e o próximo NNN** (regra da Etapa 0.2 do `/keelson:specify`, que os reutiliza — nunca renumera), grave o **BRIEF** (contrato canônico em `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`: pedido como dito + interpretação do PO) e **confirme a interpretação com o Diretor na hora** — humano presente, sem a janela de veto do `/keelson:auto` (cláusula de modo, 4.33). Depois execute `/keelson:specify` (com a resolução de slug da Etapa 0.2: reusar/migrar slug de domínio existente antes de criar novo). Rode o `spec-validator`.
-   - ⏸ **CHECKPOINT 1**: apresente a SPEC pronta **com a recomendação do PO** (veredito do modo aprovação, vindo do specify com brief) e pergunte se pode promover para `Approved` e seguir para o PLAN. A recomendação é do PO; **o martelo é do Diretor**. Aplique ajustes que o humano pedir antes de seguir.
+1. **BRIEF + SPEC** — antes da SPEC, **resolva o slug e o próximo NNN** (regra da Etapa 0.2 do `/keelson:specify`, que os reutiliza — nunca renumera), grave o **BRIEF** (contrato canônico em `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`: pedido como dito + interpretação do PO) e **confirme a interpretação com o Diretor na hora** — Diretor presente, sem a janela de veto do `/keelson:auto` (cláusula de modo, 4.33). Depois execute `/keelson:specify` (com a resolução de slug da Etapa 0.2: reusar/migrar slug de domínio existente antes de criar novo). Rode o `spec-validator`.
+   - ⏸ **CHECKPOINT 1**: apresente a SPEC pronta **com a recomendação do PO** (veredito do modo aprovação, vindo do specify com brief) e pergunte se pode promover para `Approved` e seguir para o PLAN. A recomendação é do PO; **o martelo é do Diretor**. Aplique ajustes que o Diretor pedir antes de seguir.
 
 2. **PLAN** — execute `/keelson:plan`. Rode o `plan-validator`.
    - ⏸ **CHECKPOINT 2**: apresente o PLAN pronto (componentes, DECs, cobertura) e pergunte se pode seguir para TASKs + desenvolvimento.
@@ -28,6 +28,6 @@ Você é o **Tech Lead** do time keelson, conduzindo o ciclo SDD (`specify → p
 
 Os **commits de marco** (decisão 4.119 — regra: `sdd-conventions.md`, "Commit por marco") valem como no `/keelson:auto`: a branch da demanda nasce **antes da SPEC** (nova por demanda) e cada etapa fecha com o commit dos seus artefatos — no guided, **após o OK do checkpoint** correspondente.
 
-## Paradas por exceção (régua estrita — humano presente)
+## Paradas por exceção (régua estrita — Diretor presente)
 
-Mesmo entre os checkpoints, **pare e pergunte na hora** em: ambiguidade crítica na SPEC; DEC irreversível; mudança de risco (auth, schema, exclusão de dados, config de produção) antes de aplicar; `ERROR` de validator que não se auto-corrige; quality gate que falha após 1 retry; achado de segurança (gate 8). O modo guiado existe para o humano decidir junto — a escada de reação do `/keelson:auto` não se aplica.
+Mesmo entre os checkpoints, **pare e pergunte na hora** em: ambiguidade crítica na SPEC; DEC irreversível; mudança de risco (auth, schema, exclusão de dados, config de produção) antes de aplicar; `ERROR` de validator que não se auto-corrige; quality gate que falha após 1 retry; achado de segurança (gate 8). O modo guiado existe para o Diretor decidir junto — a escada de reação do `/keelson:auto` não se aplica.

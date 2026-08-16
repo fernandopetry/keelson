@@ -36,7 +36,7 @@ Você é um auditor de dependências. Sua função é rodar, **em momento oportu
 | `go.mod` / `go.sum` | `govulncheck ./...` | — | `go install golang.org/x/vuln/cmd/govulncheck@latest` |
 | `Cargo.lock` | `cargo audit` | — | `cargo install cargo-audit` |
 | `Gemfile.lock` | `bundler-audit` | — | `gem install bundler-audit` |
-| qualquer um | `osv-scanner` (genérico) | — | binário do projeto OSV |
+| qualquer um | `osv-scanner` — escape hatch: **só quando o ecossistema não tem ferramenta nativa na tabela** | — | binário do projeto OSV |
 
 3. Projeto pode ter **mais de um** ecossistema (ex.: `composer.lock` + `package-lock.json`) → auditar **todos**.
 4. Nenhum lockfile encontrado → reportar "nenhum ecossistema de dependências detectado" e encerrar.

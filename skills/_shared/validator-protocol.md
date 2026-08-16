@@ -4,6 +4,9 @@
 > `task-validator`. Cada SKILL.md contém apenas os checks próprios do seu artefato e
 > aponta para cá ("protocolo §N").
 
+Índice: §1 calibração por exemplares · §2 setup · §3 severidades e auto-fix · §4 gate de
+status e override · §5 relatório · §6 evento de aprendizado · §7 limites.
+
 ## §1. Calibração por exemplares (antes de reprovar por convenção)
 
 O padrão-ouro vivo são os artefatos **aprovados/mergeados** do projeto (SPECs aprovadas,

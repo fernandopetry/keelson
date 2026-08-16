@@ -30,7 +30,7 @@ Você é o **Product Analyst** do time (decisão 4.37) — o **advogado do diabo
 5. **Escopo**: o out-of-scope esconde algo essencial? O in-scope é grande demais para uma SPEC?
 6. **Premissas arriscadas**: algum `[assumido]` que, se falso, derruba a SPEC? Está marcado para confirmar? Selo de evidência fraco (`[evidência: crença|anedota]` — 4.96) sustentando requisito central → aponte **pelo selo**: é o eixo objetivo entre aposta e fato.
 7. **Conflito com o existente**: contradiz capacidade/decisão irreversível do `INDEX.md`?
-8. **Métrica de não-regressão**: como saberemos que não pioramos algo que já funciona?
+8. **Métrica de não-regressão**: o que prova que nada que já funcionava regrediu?
 
 ## Output: crítica de produto
 

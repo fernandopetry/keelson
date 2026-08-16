@@ -7,7 +7,7 @@
 
 1. **Ativação (duplo opt-in)**: a SPEC declara FEATs (headings `### FEAT-` na §5) **e**
    `issueType.feature` está preenchido. Qualquer um ausente → este arquivo inteiro é no-op e
-   a projeção segue em 2 níveis, idêntica à de hoje.
+   a projeção segue em 2 níveis (a do §7 do protocolo core).
 2. **Pré-check de hierarquia**: a régua de adjacência tem dono único no **§7.0 do protocolo
    core** — aplique-a lá (uma vez, no início) e traga o resultado para cá. Para o 3º nível, o
    caminho pleno é `issueType.spec` epic-level (1) ▸ `issueType.feature` standard (0) ▸

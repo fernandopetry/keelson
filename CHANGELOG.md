@@ -25,6 +25,35 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.100.7] — 2026-08-16
+
+Re-init: none
+
+Decision 4.212 — Anthropic's Agent Skills authoring best practices become a verifiable
+ruler: new maintainer skill `skill-standards` (`.claude/skills/`, outside the package)
+checks any created/edited skill/command/agent against a cached digest of the official
+docs, re-fetched when older than 30 days. First adherence round ran over the whole
+package this batch: 45 artifacts reviewed, 34 already adherent, 13 deviations fixed.
+
+### Changed
+
+- `skills/_shared/jira-sync-protocol.md` and `validator-protocol.md`: table of contents
+  added at the top (files >100 lines); availability probe names `atlassianUserInfo` as
+  the default with `getAccessibleAtlassianResources` as explicit fallback; time-anchored
+  prose ("idêntico ao de hoje", "como hoje") replaced with behavior-anchored wording
+  (also in `jira-sync-feat.md`).
+- `skills/screen-verify`: "briefing" unified to "roteiro" (single term per concept).
+- `agents/code-reviewer`: modified-files source gets a named default (developer report;
+  fallback `git diff --name-only`). `agents/performance-engineer`: "categoria do
+  catálogo" unified. `agents/product-analyst`: first-person phrasing removed.
+- `commands/init.md`: embedded-profile enumeration replaced by runtime discovery of
+  `guidelines/` (the hard-coded version list aged with every new profile).
+  `commands/implement.md`: historical changelog clause cut from live closure-commit
+  instruction. `commands/audit.md`: `osv-scanner` row marked as explicit escape hatch.
+  `commands/guided.md`: "humano"/"Diretor" unified to "Diretor" for the acting role.
+
+---
+
 ## [0.100.6] — 2026-08-16
 
 Re-init: none

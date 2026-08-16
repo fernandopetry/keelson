@@ -4,10 +4,17 @@
 > duplicam a lógica. Ativado só quando a ficha declara `jira.enabled: true`. 3º nível
 > (FEAT/Stories): `jira-sync-feat.md`, mesma pasta.
 
+Índice: §0 gatilho/degradação · §1 ferramentas/cloudId · §2 config da ficha · §3 mapa do
+projeto · §4 idempotência · §5 modos create/link · §6 issue da SPEC (§6.1 Stories FEAT ·
+§6.2 descrição para humanos) · §7 sub-tasks · §8 campos personalizados · §9 progresso
+(comentar × transicionar) · §10 persistência das keys · §11 link do PR · §12 reconciliação ·
+§13 verbos de fase · §14 saída degradada · §15 keys no commit · §16 raiz na largada ·
+§17 telemetria de etapas.
+
 ## §0. Quando roda + degradação graciosa (best-effort inviolável)
 
 - **Gatilho**: `jira.enabled == true` na ficha (`keelson.config.json`). Bloco ausente ou
-  `enabled: false` → o protocolo **não faz nada** e o comando segue idêntico ao de hoje.
+  `enabled: false` → o protocolo **não faz nada** e o comando segue como se ele não existisse.
 - **Nunca bloqueia**: ferramentas do conector Atlassian indisponíveis (não autorizado,
   ambiente headless) **ou** qualquer chamada MCP que falhe (permissão, campo obrigatório,
   transição inexistente) → **avisa e segue** (com o rastro abaixo). O ciclo SDD nunca trava
@@ -16,7 +23,8 @@
   decisão 4.26). Antes de concluir que o conector não está disponível: **carregue as
   ferramentas** — num harness que as entrega *deferred*, elas não aparecem na lista até serem
   buscadas, e "não vi as ferramentas" **não é evidência** — e faça **uma** chamada barata de
-  prova (`atlassianUserInfo`, ou `getAccessibleAtlassianResources`). Só o retorno dessa
+  prova: `atlassianUserInfo` (default; se o servidor não a expõe,
+  `getAccessibleAtlassianResources`). Só o retorno dessa
   tentativa autoriza a conclusão; o resultado vale para a execução inteira (não repita a
   prova a cada gancho).
 - **A prova vale para a execução — a queda também** (decisão 4.76). O resultado da prova acima
@@ -393,7 +401,7 @@ conjunto de keys persistidas (§10: `**Jira**:` presente = plena; key de Story *
 recalcula; SPEC compacta que ganha a 2ª FEAT depois **não re-parenta** (§4) — a Story nova
 nasce irmã sem pai + link "relates to" com a raiz, estado misto reportado (criar Epic e
 reorganizar é ato do Diretor no Jira); `issueType.feature: null` → compacta inviável,
-degradar para a projeção plena/de hoje com aviso (§0). `epicPolicy` ausente/`always` → tudo
+degradar para a projeção plena com aviso (§0). `epicPolicy` ausente/`always` → tudo
 abaixo vale inalterado.
 
 **Antes de criar qualquer coisa** (vale para 2 e 3 níveis; o `jira-sync-feat.md` referencia
@@ -505,7 +513,7 @@ seguro); antes → avançar **um status por vez** na ordem do trilho, revalidand
 cada salto (mesmas regras de `isAvailable`/`hasScreen`/`isConditional` acima). Salto sem
 transição segura, ou status atual **fora do trilho** → **parar onde está**, comentar e reportar
 a posição alcançada — nunca forçar. Sem seção de trilho no mapa → só o salto direto (sem
-caminho → comenta, como hoje).
+caminho → comenta, o default do §9).
 
 **Marcos automáticos do ciclo e onde atuam** (gatilhos canônicos do §3; cada um segue a
 política de `transition`):

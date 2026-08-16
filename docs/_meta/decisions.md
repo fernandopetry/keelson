@@ -2306,6 +2306,16 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.212 — Boas práticas de autoria da Anthropic viram régua verificável: skill `skill-standards` com digest re-buscável
+
+**Problema**: os artefatos de instrução do keelson (skills, comandos, agents) nunca foram verificados contra a doc oficial de autoria de Agent Skills da Anthropic — e essa doc **muda**: uma verificação feita hoje contra régua decorada envelhece em silêncio. O harness-audit (4.209) audita poda/redundância pela régua interna 4.160, mas não cobre os critérios upstream (descrição o-quê+quando em 3ª pessoa, teto de 500 linhas, progressive disclosure de 1 camada, default+escape hatch, info datada fora do fluxo).
+
+**Decisão**: nasce a skill de mantenedor **`skill-standards`** (`.claude/skills/`, fora do pacote — 4.182): protocolo de verificação em duas etapas — fato mecânico primeiro (frontmatter via motor 4.211, limites de name/description, `wc -l`, paths, profundidade de referência), depois juízo de conteúdo pela régua do **digest cacheado** (`references/anthropic-best-practices.md`, linha `fetched:`). O digest é **espelho re-buscável**: com mais de 30 dias, a rodada re-busca as fontes via WebFetch antes de julgar, reescreve o digest inteiro (nunca acumula versões) e destaca no relatório item de régua que mudou upstream; fetch falhou → segue com o digest velho **declarando a idade**, nunca trava. Adaptações do keelson prevalecem e são declaradas na própria skill: português é doutrina, nome estabelecido não renomeia por estética (rename é quebra, 4.21), dono único vence autocontenção (4.20), avaliação é fixture/suíte + campo, não harness de eval paralelo. Gatilho de uso: skill/comando/agent criado ou editado, ou pedido explícito do Diretor. Report-only na fronteira do pacote: aplicar correção em artefato embarcado é leva própria com 4.181.
+
+**Aplicação**: `.claude/skills/skill-standards/SKILL.md` + `references/anthropic-best-practices.md` (digest `fetched: 2026-08-16`) · roteamento no CLAUDE.md (§Ferramentas do mantenedor) · 1ª rodada executada na mesma leva sobre `skills/`, `commands/`, `agents/` (resultado na entrada do CHANGELOG que a leva bumpar). Sem bump pela skill em si (4.182).
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

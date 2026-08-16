@@ -39,7 +39,9 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   mais de um artefato ou o raio não for óbvio, lookup de um grep fica inline ·
   **`/field-intake`** (skill) → chegou insumo de campo de consumidor ·
   **`/harness-audit`** (skill, 4.209) → Diretor pediu auditoria/poda da doutrina
-  (fato mecânico: `scripts/check-refs.sh`; report-only, aplicar é leva própria com 4.181).
+  (fato mecânico: `scripts/check-refs.sh`; report-only, aplicar é leva própria com 4.181) ·
+  **`/skill-standards`** (skill, 4.212) → skill/comando/agent criado ou editado, ou pedido
+  de verificação de boas práticas de autoria (régua = digest re-buscável da doc Anthropic).
 - Adiado com gatilho (4.182): `doctrine-reviewer` (reincidência de defeito de conteúdo
   de doutrina que os checks de sincronia não pegam). `check-refs.sh` foi ativado antes
   do gatilho por decisão do Diretor (4.209, divergência declarada).

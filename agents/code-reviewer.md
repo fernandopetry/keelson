@@ -53,7 +53,7 @@ Gates 8 (segurança) e 9 (comportamento) não são seus: `security-engineer` e `
 
 1. Ler report do developer.
 2. Ler a régua (`guidelines/core/CODE-REVIEW.md`), TASK, PLAN, SPEC, a ficha e o perfil ativo. **Do perfil, leia sempre as seções §§1–5, 7, 9 e 11.** Inclua **§6** quando a task toca área sensível (lista canônica: description do `security-engineer`); **§8** quando toca manifesto/lockfile; **§10** quando envolve query/dataset pesado; **§12** quando os `quality.*` da ficha não bastarem. Perfil sem a espinha numerada 0–12 → leia o arquivo inteiro.
-3. Listar arquivos modificados (do report ou via `git diff`).
+3. Listar arquivos modificados do report do developer; report ausente ou incompleto → `git diff --name-only`.
 
 ### 2. Aplicar os gates 1–7 em ordem
 
