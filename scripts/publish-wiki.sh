@@ -182,6 +182,8 @@ AWK
 PAGES_NOW="$TMP/pages-now.txt"
 : > "$PAGES_NOW"
 
+# $MAP é lido duas vezes (redirect do loop + insumo do awk), nunca escrito aqui
+# shellcheck disable=SC2094
 while read -r src page; do
   [ -n "${src:-}" ] || continue
   srcdir="$(dirname "$src")"

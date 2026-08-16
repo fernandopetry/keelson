@@ -116,6 +116,8 @@ sg_bad=""
 while IFS= read -r cand; do
   [ -n "$cand" ] || continue
   hit=0
+  # $gpat sem aspas no case é o ponto: o candidato é casado contra o GLOB da ficha
+  # shellcheck disable=SC2254
   while IFS= read -r g; do
     [ -n "$g" ] || continue
     gpat="$g"

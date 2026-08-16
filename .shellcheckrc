@@ -1,0 +1,8 @@
+# Supressões repo-wide do shellcheck (decisão 4.208) — só código idiomático deliberado
+# do repo entra aqui; falso positivo pontual usa diretiva local, e achado real se corrige.
+#
+# SC2013: for sobre $(cmd) palavra a palavra — deliberado; nomes de arquivo do repo não
+#         têm espaço (convenção kebab dos templates, já documentada no pre-commit).
+# SC2015: A && B || C — idioma das suítes de teste (ok/falha); o B é echo, que não falha.
+# SC2016: '$' em aspas simples — formatos de printf/sed/awk onde a não-expansão é o ponto.
+disable=SC2013,SC2015,SC2016

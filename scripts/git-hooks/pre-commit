@@ -76,6 +76,33 @@ for f in $staged; do
   esac
 done
 
+# Análise estática (shellcheck) nos scripts staged (4.208), além da sintaxe do bash -n.
+# Fallback gracioso: binário ausente → aviso e segue (o CI roda em todos os arquivos e
+# é a prova real, como na portabilidade Linux). Falso positivo consciente → diretiva
+# "# shellcheck disable=SCxxxx" no local, nunca desligar o passo.
+sc_files=""
+for f in $staged; do
+  case "$f" in
+    *.sh|scripts/git-hooks/*)
+      [ -f "$f" ] && sc_files="$sc_files $f" ;;
+  esac
+done
+if [ -n "$sc_files" ]; then
+  if command -v shellcheck >/dev/null 2>&1; then
+    # sc_files é lista separada por espaço (nomes do repo não têm espaço) — expansão intencional
+    # shellcheck disable=SC2086
+    if ! out="$(shellcheck $sc_files 2>&1)"; then
+      printf '%s\n' "$out" | sed 's/^/    /' >&2
+      echo "[keelson pre-commit] BLOQUEADO: shellcheck acusou nos scripts staged (4.208)." >&2
+      echo "  Corrija — ou, para falso positivo consciente, suprima com diretiva no local." >&2
+      echo "  Escape consciente: KEELSON_SKIP_TESTS=1" >&2
+      exit 1
+    fi
+  else
+    echo "[keelson pre-commit] aviso: shellcheck ausente — análise estática fica para o CI (4.208)." >&2
+  fi
+fi
+
 # Bit de execução dos scripts do pacote: hooks.json invoca hooks/*.sh DIRETAMENTE (sem
 # prefixo bash) e 644 no índice vira "Permission denied" silencioso no consumidor (4.180);
 # a 2ª ocorrência da classe (scripts/next-id.sh 644 no pacote 0.96.0) estendeu o check a

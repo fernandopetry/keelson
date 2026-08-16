@@ -26,6 +26,9 @@ jobs:
           bad="$(git ls-files -s -- 'hooks/*.sh' 'scripts/*.sh' 'scripts/git-hooks/*' | grep -v '^100755' || true)"
           if [ -n "$bad" ]; then echo "script sem bit de execução:"; echo "$bad"; exit 1; fi
 
+      - name: shellcheck em todos os scripts (4.208 — análise estática além do bash -n)
+        run: shellcheck scripts/*.sh hooks/*.sh scripts/git-hooks/* scripts/tests/*/run.sh
+
       - name: Suíte do grafo (scripts/tests/graph/run.sh)
         run: bash scripts/tests/graph/run.sh
 

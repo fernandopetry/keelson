@@ -10,5 +10,9 @@
 *.log
 .tmp/
 
+# Credenciais de ambiente — nunca versionar (agentes operam neste repo)
+.env
+.env.*
+
 # Clone de trabalho do GitHub Wiki (destino de scripts/publish-wiki.sh)
 .wiki/
