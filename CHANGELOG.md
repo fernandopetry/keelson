@@ -25,6 +25,26 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.100.5] — 2026-08-16
+
+Re-init: none
+
+Decision 4.211 — invalid YAML frontmatter (unquoted value containing ": ") broke GitHub's
+rendering of a skill file, and not for the first time; per the recurrence ladder the class
+is now mechanically proven, not manually swept.
+
+### Added
+
+- `scripts/check-frontmatter.sh`: every `.md` opening with `---` must carry a parseable
+  YAML block. Strict proof via python3+PyYAML; graceful heuristic fallback (with warning)
+  when the parser is missing, mirroring the shellcheck pattern — CI always runs strict.
+  Wired into three layers: pre-commit (any staged `.md` triggers a full sweep, blocking),
+  CI (full sweep + regression suite `scripts/tests/frontmatter/`), and `check-release.sh`
+  (a release cannot ship a `.md` GitHub will not render). Suite fixtures are excluded
+  from the sweep — planted defects belong to the suite, not the repo.
+
+---
+
 ## [0.100.4] — 2026-08-16
 
 Re-init: required

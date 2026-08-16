@@ -1,0 +1,3 @@
+check-frontmatter: aviso — python3/PyYAML ausentes; só a heurística roda (o CI é a prova real).
+ERRO: COLON.md: valor sem aspas contém ": " (linha 3: description: Ferramenta (fora do pacote): quebra o YAML sem aspas.)
+check-frontmatter: 1 frontmatter(s) inválido(s) em 2 arquivo(s) com frontmatter.

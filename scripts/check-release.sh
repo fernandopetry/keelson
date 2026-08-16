@@ -10,6 +10,8 @@
 #     que o update.sh lê para avisar o consumidor sobre re-rodar o init)
 #   - todo espelho do MIRRORS (scripts/publish-wiki.sh) aponta para arquivo existente
 #   - bash -n em todos os scripts do repo (scripts/*.sh, git-hooks, testes)
+#   - frontmatter de todo .md é YAML válido (§4.211 — via check-frontmatter.sh;
+#     GitHub não renderiza frontmatter inválido)
 #
 # Uso: check-release.sh [--root <dir>]   (default: raiz do repo via git)
 # Exit: 0 tudo certo · 1 violações (todas listadas de uma vez) · 2 uso incorreto.
@@ -100,6 +102,19 @@ for f in scripts/*.sh scripts/git-hooks/* scripts/tests/*/run.sh; do
   fi
 done
 [ "$bad" -eq 0 ] && ok "bash -n limpo em todos os scripts"
+
+# --- 5. Frontmatter YAML válido em todo .md (4.211 — reincidência em campo) ---
+FM="$(cd "$(dirname "$0")" && pwd)/check-frontmatter.sh"
+if [ -f "$FM" ]; then
+  if fm_out="$(bash "$FM" 2>&1)"; then
+    ok "frontmatter YAML válido em todo .md"
+  else
+    fail "frontmatter inválido (4.211) — release não sai com .md que o GitHub não renderiza:"
+    printf '%s\n' "$fm_out" | grep '^ERRO:' | sed 's/^/      /'
+  fi
+else
+  ok "check-frontmatter.sh ausente — passo pulado"
+fi
 
 echo ""
 if [ "$fails" -gt 0 ]; then
