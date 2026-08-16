@@ -41,9 +41,13 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 - **`/field-intake`** (skill): sequencia a absorção de insumo de campo — registrar na
   `proposal-inbox.md` **antes** do parecer (4.111), abstrair identificadores (4.72),
   checar reincidência (4.149) e fechar o estado na mesma leva.
-- Adiados com gatilho (4.182): `doctrine-reviewer` (reincidência de defeito de conteúdo
-  de doutrina que os checks de sincronia não pegam) · `check-refs.sh` (primeiro ponteiro
-  interno quebrado em campo).
+- **`/harness-audit`** (skill, 4.209): auditoria recorrente da doutrina em duas camadas —
+  fato mecânico via `scripts/check-refs.sh` (ponteiros internos; report-only, rodada
+  manual + suíte `scripts/tests/refs/`) e juízes duplos cegos de poda com a régua 4.160
+  e plants de controle (4.186). Report-only; aplicar corte é leva própria com 4.181.
+- Adiado com gatilho (4.182): `doctrine-reviewer` (reincidência de defeito de conteúdo
+  de doutrina que os checks de sincronia não pegam). `check-refs.sh` foi ativado antes
+  do gatilho por decisão do Diretor (4.209, divergência declarada).
 
 ## Versionamento
 

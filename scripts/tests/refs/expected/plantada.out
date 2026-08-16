@@ -1,0 +1,4 @@
+ERRO: CLAUDE.md:3: ponteiro quebrado: commands/fantasma.md
+ERRO: CLAUDE.md:4: ponteiro quebrado: skills/orfao/
+ERRO: CLAUDE.md:7: ponteiro quebrado: ${CLAUDE_PLUGIN_ROOT}/guidelines/core/nada.md
+check-refs: 3 ponteiro(s) quebrado(s) em 4 citação(ões) verificada(s).

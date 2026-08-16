@@ -25,6 +25,27 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.100.3] — 2026-08-16
+
+Re-init: none
+
+Decision 4.209 — internal harness audit. A pilot with an external dual-judge audit
+tool validated the mechanics but could not see `commands/`, `agents/` or the packaged
+skills as surfaces; the repo now carries its own deterministic pointer check, activated
+by maintainer decision ahead of its original field trigger (declared divergence).
+
+### Added
+
+- `scripts/check-refs.sh`: every package path cited in doctrine prose (backtick spans,
+  plus `${CLAUDE_PLUGIN_ROOT}/` reads inside fences) must resolve to an existing file
+  or directory. Precision-first: only known package roots are tested, consumer-side
+  paths (`guidelines/project/**`, `docs/<slug>/…`) and placeholders never fire, and
+  surfaces are enumerated via `git ls-files`. Report-only for now — manual run, not a
+  routine commit gate; its regression suite (`scripts/tests/refs/`, planted-defect
+  fixtures with frozen output) joins the pre-commit motor loop and CI like every suite.
+
+---
+
 ## [0.100.2] — 2026-08-14
 
 Re-init: none

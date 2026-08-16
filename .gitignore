@@ -16,3 +16,9 @@
 
 # Clone de trabalho do GitHub Wiki (destino de scripts/publish-wiki.sh)
 .wiki/
+
+# Saídas de auditoria do harness (relatórios derivados, nunca fonte)
+.harness-eval/
+
+# Worktrees de sessão (cópia integral do repo — nunca versionar nem auditar)
+.claude/worktrees/

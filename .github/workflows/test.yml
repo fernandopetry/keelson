@@ -95,6 +95,9 @@ jobs:
       - name: Suíte do stale-background-guard (scripts/tests/stale-bg/run.sh)
         run: bash scripts/tests/stale-bg/run.sh
 
+      - name: Suíte do check-refs.sh (scripts/tests/refs/run.sh)
+        run: bash scripts/tests/refs/run.sh
+
       - name: Sincronização de comandos/agents (scripts/check-sync.sh)
         run: bash scripts/check-sync.sh
 
