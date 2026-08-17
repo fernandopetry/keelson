@@ -168,7 +168,11 @@ ofício do revisor — aplique-o sem checklist. Os pontos com régua keelson pr�
   `./TESTING.md`).
 - **Comentários** (Art. 7): todo comentário passa no teste de apagar (Perde/Não-perde).
 - **Rastro de processo em copy** (decisão 4.201): identificador de artefato SDD (`FR-`/`AC-`/`TASK-`/`DEC-`… — catálogo no `index-contract.md`) **visível ao usuário** — label, mensagem, texto de template — é rastro vazado, não copy, **salvo quando um AC exige a exibição** (tela de rastreabilidade/admin legítima): o discriminante é o pai declarado da pergunta inversa (gate 4), não proibição mecânica. Os endereços legítimos do ID seguem os de sempre — comentário-âncora (Art. 7) e tag `@AC-NNN-XXX` de spec E2E; a fronteira é a superfície do usuário, não o código.
-- **Erros já cometidos no projeto**: as lições de `guidelines/project/` valem como regra.
+- **Erros já cometidos no projeto**: as lições de `guidelines/project/` com `Estado: ativa`
+  valem como regra (`em-observacao` é contexto, nunca reprova; `revogada` não vale — ciclo
+  de vida: `core/WORKFLOW.md`, decisão 4.221). Lição ativa que bloquearia caso legítimo
+  não é licença para reprovar em silêncio: o contorno fundamentado vira `licao_contestada`
+  no report do developer.
 - **Calibração por exemplares**: antes de reprovar por estilo/padrão, compare com código
   análogo já **mergeado** (mesma camada/domínio). Padrão consistente com o repo aprovado
   não é smell — reprove o desvio real, não a divergência com um ideal abstrato.

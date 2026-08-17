@@ -231,7 +231,7 @@ Você não gerencia o MAP: o time o semeia, atualiza e consome sozinho. Se quise
 | Configuração do projeto | `keelson.config.json` (versionado) |
 | Credenciais de ambiente local | `keelson.local.json` (**fora** do git) |
 | Rascunho de sessão, evidência efêmera | `thoughts/` (fora do git) |
-| Lições do projeto | `guidelines/project/` |
+| Lições do projeto | `guidelines/project/` — cada lição com ciclo de vida (`ativa` · `em-observacao` · `revogada`); só a ativa vira critério/regra, e `/keelson:lessons-audit` audita o acervo |
 
 Próximo: [A ficha do projeto](Ficha-do-projeto) ou o
 [Guia do método](Guia-do-metodo).

@@ -109,6 +109,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:status` | Executive summary of a slug's current state — what's done, in flight, planned |
 | `/keelson:migrate-legacy` | Migrate a legacy slug (docs without `INDEX.md`) to the SDD layout |
 | `/keelson:rebuild-index` | Rebuild a slug's `INDEX.md` from scratch out of its artifacts |
+| `/keelson:lessons-audit` | Audit the project lessons ledger — retrofit the lifecycle format, measure provenance via git, flag expired or obsolete lessons; judgment cuts apply only with your OK |
 | `/keelson:verify-handoff` † | Close a pending screen-verification `HANDOFF` — consolidates the branch, exercises each item in the real environment; no merge (points to `/keelson:integrate`) |
 | `/keelson:postmortem` † | End-of-session postmortem — re-reads the whole session's interactions (corrections, retries, failed gates), separates defects from new scope, traces each gap to the mechanism that let it through, and produces the copy-paste maintainer message (with literal diffs via the agile-coach) that evolves the plugin |
 | `/keelson:mutation-setup` † | Guided setup of the mutation gate — detects the stack from the ficha, installs the canonical tool with confirmation, generates its config, proves the pipeline with a sample run and writes `quality.mutation` (diff-scoped, no threshold at first) |
@@ -409,15 +410,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.102.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.103.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the on-demand mode's gate 8 trigger now names the same canonical
-topic list its gate 10 sibling already pointed to, closing a false-positive gap found
-in the field (decision 4.219); gate 6 gained a reverse check — a diff that closes a
-pitfall a profile documents as still-live now must update that paragraph in the same
-commit (decision 4.220). Re-init required.
+New in this release: lessons learned gained a lifecycle — state now gates their force
+(only an active lesson becomes a TASK criterion or a gate-7 rule), a grounded contest
+demotes them (first reformulates, second revokes into a one-line tombstone), and
+`/keelson:lessons-audit` retrofits and audits an existing ledger with git as the fact
+source (decision 4.221). No re-init needed.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

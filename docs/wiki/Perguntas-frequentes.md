@@ -184,6 +184,17 @@ Pelo relatório de fecho, que é montado a partir de um **ledger** escrito enqua
 eventos acontecem — não de memória no fim. Gate sem evento registrado **não** vira
 "aprovado": vira lacuna nomeada. Perdeu o relatório? `/keelson:report [slug]`.
 
+### Uma lição aprendida antiga está atrapalhando mais do que ajudando. E agora?
+
+As lições de `guidelines/project/lessons.md` têm ciclo de vida (`Estado: ativa |
+em-observacao | revogada`) — só a `ativa` vira critério de TASK ou regra de gate. Quando
+uma lição ativa bloqueia um caso legítimo, o developer a contorna **com razão declarada**
+(`licao_contestada` no report) e o fecho aplica a escada: 1ª contestação reformula a
+lição, 2ª revoga (o bloco vira uma linha na seção Revogadas; o conteúdo integral fica no
+histórico do git). Para limpar um acervo antigo ou fazer higiene periódica, rode
+`/keelson:lessons-audit` — ele mede o que expirou (fato) e propõe o que sedimentou
+(juízo, só com o seu OK); na dúvida, mantém.
+
 ### E se ele errar?
 
 Rode `/keelson:postmortem` no fim da sessão. Ele relê as interações, separa **defeito** de

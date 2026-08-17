@@ -209,6 +209,12 @@ Setup guiado da suíte E2E para quem não conhece a ferramenta: instala o Playwr
 
 Detalhe completo (flags, fluxo, regras): `commands/e2e-setup.md`.
 
+### 3.23 `/keelson:lessons-audit` — auditar o acervo de lições do projeto
+
+Audita `guidelines/project/lessons.md` sob o ciclo de vida da 4.221: retrofita o formato (Validade/Estado/Contadores) em acervo pré-existente (conservador: lição antiga entra `ativa`), mede a origem por git (pickaxe por bloco; imensurável degrada para `indeterminada`, nunca inventa), aplica direto os vereditos de **fato** (Validade testável e falsa) e propõe os de **juízo** (sedimento, no-op, duplicata — régua 4.160) só com a sua confirmação; na dúvida, mantém. Revogada vira tombstone de 1 linha na seção `## Revogadas` (conteúdo integral no histórico do git). Não cria lição, não aplica a escada de contestação (papel do fecho/closure) e não commita.
+
+Detalhe completo (flags, fluxo, regras): `commands/lessons-audit.md`.
+
 ---
 
 ## 4. Skills

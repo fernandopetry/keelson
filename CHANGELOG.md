@@ -25,6 +25,55 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.103.0] — 2026-08-17
+
+Re-init: none
+
+Lessons learned gained a lifecycle (decision 4.221). Field pain reported by the
+Diretor: with several people working the same codebase, a bad lesson propagates as an
+obligation to every reader, an opinion-born lesson enters with the same force as a
+defect-born one, and a true lesson goes stale when the world changes — and with no
+demotion channel, the ledger only grows.
+
+### Added
+
+- Lifecycle fields in the canonical lesson format (single owner:
+  `guidelines/core/WORKFLOW.md`): **Validade** (a verifiable condition that keeps the
+  lesson valid, or `indeterminada`), **Estado** (`ativa | em-observacao | revogada`)
+  and **Contadores** (`confirmada · contestada`). Defect-born lessons are born active
+  (the defect is the evidence — preserves the 4.138 mechanism); opinion-born ones start
+  under observation and promote on first confirmation; a dedupe-update now counts as a
+  confirmation event.
+- The symmetric demotion ladder: a grounded contest — an active lesson blocked
+  legitimate work and was worked around with a declared reason (`licao_contestada` in
+  the developer's report; a silent workaround remains a 4.38 violation) — increments
+  the counter: first contest reformulates the lesson (never duplicates), second revokes
+  it into a one-line tombstone under `## Revogadas` (full content stays in git
+  history, so the active section stays clean and recurrence stays detectable).
+- `/keelson:lessons-audit` — audits an existing ledger: retrofits the lifecycle format
+  (conservative: pre-ladder lessons enter active), measures provenance via git pickaxe
+  per block (degrades to "indeterminada", never invents a date), applies fact-backed
+  verdicts directly (a testable-and-false Validade) and judgment verdicts (sediment,
+  no-op, duplicates — the 4.160 ruler) only with explicit confirmation; in doubt, the
+  verdict is keep.
+
+### Changed
+
+- State now gates the force of a lesson: only `Estado: ativa` becomes a TASK criterion
+  (`/keelson:tasks` cross-check, 4.138) or a gate-7 rule (`core/CODE-REVIEW.md`);
+  under-observation is reading context, revoked has no force — previously every lesson
+  bound every reader forever.
+- The closing-report line "Lições da rodada" (`report-contract.md`) and the
+  `/keelson:implement` closure also route `licao_contestada` with the ladder applied; a
+  contested lesson left without its ladder registered declares the closure partial,
+  same as an unrouted `licao_candidata`.
+
+The injected CLAUDE block is untouched — the on-demand minimal close keeps routing
+only `licao_candidata`; taking the contest channel into the block would cost a re-init
+for every consumer and is deferred with a named trigger (decision 4.221).
+
+---
+
 ## [0.102.1] — 2026-08-17
 
 Re-init: required

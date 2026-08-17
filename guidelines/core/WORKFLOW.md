@@ -200,7 +200,8 @@ Após **qualquer** correção do usuário, registre o padrão aprendido no arqui
 do projeto (`guidelines/project/lessons.md`), para que o mesmo erro não se repita.
 
 **Formato canônico** — uma lição por bloco, deduplicada (se já existe equivalente,
-**atualize** em vez de duplicar):
+**atualize** em vez de duplicar — e atualizar **é** o evento de confirmação: incremente
+`confirmada`):
 
 ```markdown
 ## [Área] Descrição curta
@@ -208,7 +209,34 @@ do projeto (`guidelines/project/lessons.md`), para que o mesmo erro não se repi
 **Erro:** o que aconteceu
 **Causa:** por que aconteceu
 **Solução:** como resolver (citar arquivo/padrão de referência)
+**Validade:** <condição verificável que a mantém válida — ex.: "enquanto <lib> < 3.0"> | indeterminada
+**Estado:** ativa | em-observacao | revogada
+**Contadores:** confirmada N · contestada N
 ```
+
+**Ciclo de vida** (decisão 4.221) — o estado governa a força da lição:
+
+- **Nascimento**: lição de **defeito real** (achado de gate, correção do usuário) nasce
+  `ativa` — o defeito é a evidência. Lição de origem **opinativa** (sugestão sem defeito
+  observado, importada de outro projeto) nasce `em-observacao`.
+- **Força por estado**: só `ativa` vale como regra (critério de TASK, gate 7);
+  `em-observacao` é contexto de leitura, nunca obrigação; `revogada` não vale.
+- **Promoção**: `confirmada ≥ 1` (a lição pegou/evitou o mesmo erro de novo, ou o
+  dedupe a atualizou) promove `em-observacao` → `ativa`.
+- **Contestação** (a escada simétrica): lição que bloqueou caso legítimo, contornada
+  com razão declarada, incrementa `contestada` — 1ª → **reformule** a lição (nunca
+  duplique nem crie exceção ao lado); 2ª → **revogue**. O sinal chega pelo report do
+  developer (`licao_contestada`) e é roteado no fecho, como `licao_candidata`.
+- **Revogação**: mova o bloco para a seção `## Revogadas` no fim do arquivo, reduzido a
+  1 linha — `- [Área] título — <motivo> (revogada em <data>; histórico no git)`. O
+  conteúdo integral vive no histórico de commits; a seção ativa fica limpa e a
+  reincidência de lição revogada continua detectável.
+- **Eixos ortogonais**: `Estado` é a vida da lição; "em vigor | pendente de merge"
+  (decisão 4.71) é o vigor da *escrita* — lição `ativa` numa branch não mergeada segue
+  pendente de merge.
+
+Auditoria periódica do acervo (retrofit de formato, origem via git, validade expirada,
+sedimento): `/keelson:lessons-audit`.
 
 Quando a regra for de uma área com guideline de referência (perfil de linguagem, `core/`),
 adicione também uma linha curta de anti-padrão lá.
