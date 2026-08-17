@@ -63,6 +63,7 @@ WARNING	spec-rfc-forma	FR-001-002: marcador RFC 2119 fora da forma canonica [MUS
 WARNING	spec-sem-risco	nenhum risco listado na secao 9 (SPEC-001-login-defeituosa.md)
 WARNING	spec-sem-should-may	nenhum FR SHOULD ou MAY (SPEC-002-lote.md)
 WARNING	spec-tecnologia	"PostgreSQL" citado na secao 6 (dominio, nao tecnologia — pode ser falso positivo) (SPEC-001-login-defeituosa.md)
+WARNING	task-comando-contradiz-criterio	comando de verificacao usa --group skip-migration e outra linha da mesma TASK proibe a tag skip-migration (4.215) (TASK-001-007-contradiz-grupo.md)
 WARNING	task-criterio-grep-nao-ancorado	1 criterio(s) com grep/rg de padrao textual sem ancora de simbolo/fronteira — condicao estrutural verificada por texto casa prosa/comentario (4.161) (TASK-001-002-corrige-login.md)
 WARNING	task-done-gate-aberto	1 item(ns) de Quality gates desmarcado(s) sem consolidacao declarada (4.90) (TASK-001-006-done-aberta.md)
 WARNING	task-nome-tipo	Tipo bugfix sem marcador -fix- no nome do arquivo (TASK-001-002-corrige-login.md)

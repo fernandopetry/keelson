@@ -23,7 +23,8 @@
 
 ## Contexto
 
-Primeiro componente do fluxo de login.
+Primeiro componente do fluxo de login. Lição do projeto: prova de segurança
+nunca leva `@group integration` fora da suíte dedicada.
 
 ## Escopo
 
@@ -45,6 +46,7 @@ Seguir o contrato do COMP-001-001.
 - [ ] AC-001-001 coberto por teste de integração
 - [ ] Registro de tentativa coberto por teste
 - [ ] Caminho legado ausente — verificação executável: `grep -c 'Autenticador::legado' src/` → 0
+- [ ] Suíte unitária verde — verificação executável: `vendor/bin/phpunit --group unit` → `OK`
 
 ## Roteiro do gate 9 (fixado ANTES do código)
 

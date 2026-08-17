@@ -409,15 +409,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.100.7` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.101.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the reuse check reaches across waves** (decision 4.207, from a
-consumer field report). Gate 7's Reuse/DRY rule now names its three search surfaces —
-the round's own diff, the accumulated branch diff (equivalents born in earlier waves
-of the same feature), and the documented canon — and the developer checks for an
-existing equivalent before creating a new helper. No re-init needed.
+New in this release: **the closing report checks itself and TASK contradictions become
+lint** (decisions 4.214–4.217, from a consumer field report). The report skeleton gains
+a countable self-check (no more deliveries missing the Duration line), a new lint check
+catches a verification command using a test-group tag the same TASK forbids, INDEX
+history timestamps must be measured, and the line ceiling for commands/agents/skills
+rises to Anthropic's documented 500. No re-init needed.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

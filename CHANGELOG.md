@@ -25,6 +25,47 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.101.0] — 2026-08-17
+
+Re-init: none
+
+Decisions 4.214–4.217 — field intake from a full `/keelson:auto` consumer cycle (~4h36):
+the closing report was delivered as prose without the canonical skeleton's mechanical
+lines (no `Duração`, no diff composition — the class that founded 4.130, recurring), a
+TASK was again born with a verification command contradicting its own criteria (3rd
+occurrence of the class), and INDEX history timestamps were reconstructed from memory.
+Line ceiling for commands/agents/skills raised by Director's directive.
+
+### Added
+
+- `artifact-lint.sh`: new TASK check `task-comando-contradiz-criterio` (WARNING, 4.215) —
+  a verification command using `--group <tag>` while another line of the same TASK
+  forbids that same tag; tag equality required on both sides. Fixture pair (planted
+  defect + non-false-positive) frozen in the regression suite (10 cases green);
+  `task-validator` escalates to ERROR when the forbidden tag is a project lesson the
+  command actually violates.
+- `report-contract.md` §1: countable self-check before emitting (4.214) — on routes that
+  emit the literal skeleton (`/keelson:auto`, `/keelson:report`), the composed report is
+  checked against §2 filtered by route: N mandatory lines / N present by literal
+  `**<Name>**:` marker; missing line → fill it (or name the gap) before sending.
+  `commands/auto.md` carries the trigger.
+
+### Changed
+
+- `commands/tasks.md`: the lessons cross-check (4.138) now also covers lessons that
+  classify a **type/class** of test or command without naming a file, and verifies the
+  **literal command** of each criterion against the lesson — not just the prose citing
+  it (4.215, the dammed LRN-056 patch).
+- `index-contract.md` (INDEX update recipe, item 3): history entries are timestamped
+  with a **measured** mark at event time (or reuse an already-measured mark from this
+  run's Cronologia/ledger); an entry reconstructed from memory ships date-only, never an
+  invented hour (4.216).
+- Line ceiling for `commands/`, `agents/` and `skills/` raised from 300 to 500 lines,
+  anchored on Anthropic's authoring guideline (<500 lines; 4.217, Director's directive) —
+  the 4.160 pruning rules still apply to every edit.
+
+---
+
 ## [0.100.7] — 2026-08-16
 
 Re-init: none

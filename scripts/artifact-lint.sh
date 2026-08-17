@@ -534,6 +534,30 @@ sect == "crit" && line ~ /(^|[ `|(])(grep|egrep|rg) / {
       line !~ /['"]\^/)
     nGrepSolto++
 }
+(sect == "crit" || sect == "gate9") && line ~ /--group[ \t]+[A-Za-z0-9_-]/ {
+  # 4.215: lado comando — tag de grupo usada por comando de verificacao (linha sem negacao)
+  lline = tolower(line)
+  if (lline !~ /nunca|jamais|proib/ && index(lline, "não") == 0 && index(lline, " nao ") == 0) {
+    s = line
+    while (match(s, /--group[ \t]+[A-Za-z0-9_-]+/)) {
+      t = substr(s, RSTART, RLENGTH); sub(/^--group[ \t]+/, "", t)
+      cmdGroup[t] = 1
+      s = substr(s, RSTART + RLENGTH)
+    }
+  }
+}
+line ~ /(@group|--group)[ \t]+[A-Za-z0-9_-]/ {
+  # 4.215: lado proibicao — linha com negacao citando a mesma tag, em qualquer secao
+  lline = tolower(line)
+  if (lline ~ /nunca|jamais|proib/ || index(lline, "não") > 0 || index(lline, " nao ") > 0) {
+    s = line
+    while (match(s, /(@group|--group)[ \t]+[A-Za-z0-9_-]+/)) {
+      t = substr(s, RSTART, RLENGTH); sub(/^(@group|--group)[ \t]+/, "", t)
+      prohGroup[t] = 1
+      s = substr(s, RSTART + RLENGTH)
+    }
+  }
+}
 sect == "crit" && line ~ /^- \[[ xX]\]/ {
   ncrit++
   crit = crit " " line
@@ -616,6 +640,9 @@ END {
   # criterio com grep de texto sem ancora
   if (nGrepSolto > 0)
     emit("WARNING", "task-criterio-grep-nao-ancorado", nGrepSolto " criterio(s) com grep/rg de padrao textual sem ancora de simbolo/fronteira — condicao estrutural verificada por texto casa prosa/comentario (4.161)")
+  # comando de verificacao contradiz proibicao de tag da mesma TASK
+  for (t in cmdGroup) if (t in prohGroup)
+    emit("WARNING", "task-comando-contradiz-criterio", "comando de verificacao usa --group " t " e outra linha da mesma TASK proibe a tag " t " (4.215)")
 }
 AWK
 

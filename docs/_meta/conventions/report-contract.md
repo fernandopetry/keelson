@@ -29,6 +29,14 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 - **Narrado em linguagem de time** (PO, Tech Lead, Developer, QA, Security — 4.41);
   IDs técnicos ficam nos artefatos. Narrativa é bem-vinda **ao redor** do esqueleto,
   nunca no lugar dele.
+- **Autocheck contável antes de emitir** (decisão 4.214 — reincidência da classe que
+  fundou a 4.130): nas rotas que emitem o esqueleto literal do §2 (`/keelson:auto`,
+  `/keelson:report`), componha o relatório e **confronte-o com o §2 filtrado pela rota**
+  (linhas cujo condicional `# OMITIR…` não alcança, conforme o §3): conte
+  `N obrigatórias / N presentes` pelo marcador literal `**<Nome>**:` — divergência →
+  preencher a linha (ou a lacuna nomeada) **antes** de enviar. Prosa ao redor não conta
+  como linha; o fecho sob demanda (versão mínima do bloco do consumidor) fica fora da
+  contagem. A lista é sempre o §2 lido **nesta etapa**, nunca de memória.
 
 ## §2. Esqueleto
 

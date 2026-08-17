@@ -2324,6 +2324,38 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 **Aplicação**: `.claude/hooks/skill-standards-nudge.sh` (+x) · `.claude/settings.json` · bullet de roteamento do CLAUDE.md anotado com o hook. Tooling do mantenedor (4.182): sem bump, sem CHANGELOG.
 
+### 4.214 — Esqueleto do report ganha autocheck contável: existir como arquivo não impediu a paráfrase
+
+**Problema**: análise de sessão de consumidor (ciclo `/keelson:auto` completo, ~4h36) mostrou a Entrega emitida em prosa própria — tabela de gates + seções narrativas — sem as linhas mecânicas do esqueleto canônico: sem `**Duração**:` (a Cronologia do BRIEF estava medida e completa; o número era trivialmente computável e o Diretor sentiu falta dele), sem `**Composição do diff**:`, sem `**Telemetria**:`. É a reincidência exata da classe que fundou a 4.130 (o "caso real" do preâmbulo do contrato: entrega de 20 TASKs sem a linha de duração): no fim de sessão longa, com contexto comprimido, a narrativa sobrevive e as linhas mecânicas evaporam — o esqueleto literal existir em arquivo não bastou, porque nada obrigava a conferir o texto composto contra ele.
+
+**Decisão**: o `report-contract.md` §1 ganha o **autocheck contável** (escada 4.149 — 2ª ocorrência da classe → check, nunca 2ª prosa): nas rotas que emitem o esqueleto literal do §2 (`/keelson:auto` e `/keelson:report`), o emissor compõe o relatório e o confronta com o §2 **lido nesta etapa** filtrado pela rota (§3): `N obrigatórias / N presentes` pelo marcador literal `**<Nome>**:`; divergência → preencher (ou lacuna nomeada) antes de enviar. Prosa ao redor não conta como linha; o fecho sob demanda (versão mínima do bloco) fica fora da contagem — o bloco injetado não muda (sem re-init). `commands/auto.md` (Etapa 5, item 6) carrega só o gatilho, não a cópia da regra.
+
+**Aplicação**: `docs/_meta/conventions/report-contract.md` §1 (dono) · `commands/auto.md` Etapa 5 item 6. Origem: relato do Diretor + transcript da sessão (fila da 4.111). Sem guarda mecânica de script nesta camada — o check é do emissor; reincidir com o autocheck em vigor promove a classe a verificação fora do modelo (hook/script), nunca 3ª formulação.
+
+### 4.215 — Contradição comando×critério sobre tag de grupo vira fato de lint: 3ª ocorrência da classe
+
+**Problema**: 3ª ocorrência contável da mesma causa-raiz (LRN-025 → LRN-048/4.162 → LRN-056 do ledger de consumidor, agora reincidente em novo ciclo): TASK nasce com comando de verificação `--group <tag>` no critério enquanto a prosa/critério irmão da mesma TASK proíbe exatamente essa tag — o developer executa o comando literal (a instrução mais concreta), a tag entra no arquivo e o gate reprova em retry o que o artefato já contradiz desde a geração. A 4.162 (prosa: "dois critérios nunca se contradizem") foi cumprida nominalmente e não preveniu; a escada 4.149 exige check mecânico a partir daqui — e a 4.93 já tinha reservado o check desta família para reincidência.
+
+**Decisão**: (a) check novo `task-comando-contradiz-criterio` no `artifact-lint.sh` (grupo TASK): WARNING quando um comando de Critérios de pronto/Roteiro do gate 9 usa `--group <tag>` (linha sem negação) e **qualquer** linha da mesma TASK proíbe a mesma tag (negação + `@group`/`--group <tag>`); igualdade de tag exigida nos dois lados — `--group unit` com proibição de `integration` não dispara (fixture do não-falso-positivo escrita antes do expected de defeito, ordem da 4.161). Nasce WARNING (§1 do lint-contract: padrão, nunca ERROR mecânico); o `task-validator` escala para ERROR quando a proibição é lição/convenção que o comando viola de fato. (b) O patch de prosa represado da LRN-056 entra no gerador (`commands/tasks.md`, parágrafo do cruzamento 4.138): o cruzamento com `lessons.md` alcança lição por **tipo/classe** de teste (não só arquivo nomeado) e confere o **comando literal**, não só a prosa que cita a lição.
+
+**Aplicação**: `scripts/artifact-lint.sh` · fixtures + `expected/` da suíte (`scripts/tests/artifact-lint/`, 10 casos verdes) · `docs/_meta/conventions/lint-contract.md` §3 · `skills/task-validator/SKILL.md` Etapa 3 · `commands/tasks.md`. Fila: LRN-056/mensagem ao mantenedor → aplicada. Generalização além de `--group` (ex.: `pytest -m`) fica adiada com gatilho: primeira ocorrência de campo noutro ecossistema estende o padrão do check, não cria check novo.
+
+### 4.216 — Histórico do INDEX com marca medida: a hora reconstruída de memória sai errada e fora de ordem
+
+**Problema**: na mesma sessão analisada, o `Histórico recente` do INDEX saiu com entradas fora de ordem cronológica (a conclusão da wave 1 registrada com hora **anterior** à criação das TASKs) e com marcas divergindo ~15–30min da `Cronologia` medida do mesmo ciclo — timestamps reconstruídos de memória na hora de escrever a entrada, não medidos no evento. Classe "medido, nunca estimado" (4.56/4.196/4.200); a 4.200 cobriu a closure de TASK, mas a receita do INDEX pedia "timestamp e ação" sem dizer de onde vem o timestamp.
+
+**Decisão**: a receita de atualização do INDEX (`index-contract.md`, item 3) carrega a instrução de medição **inline no ponto que preenche o campo** (mesma régua da 4.200): marca medida ao escrever (`TZ=America/Sao_Paulo date`) ou reaproveitada da `Cronologia`/ledger desta execução; entrada reconstruída de memória sai **sem hora** (só a data) — hora inventada é o defeito, não a lacuna. Sem validação mecânica de formato no `index-check.sh` nesta leva (mudança de catálogo é decisão à parte; reincidir promove).
+
+**Aplicação**: `docs/_meta/conventions/index-contract.md` (receita, item 3). Origem: observação do mantenedor na análise da sessão (fila da 4.111).
+
+### 4.217 — Teto de linhas de comando/agent/skill sobe de 300 para 500, ancorado na doc da Anthropic
+
+**Problema**: o teto de 300 linhas (herança da 4.35) vinha exigindo "compressão equivalente" a cada patch em arquivos no limite — `commands/tasks.md` acumulou 5 propostas represadas (LRN-031/034/048/050/056) esperando corte compensatório, e o custo de destilar a cada leva passou a competir com a absorção de lição de campo. A doc oficial de autoria de Agent Skills da Anthropic (digest da `skill-standards`, 4.212) fixa **corpo < 500 linhas** como o limite de qualidade.
+
+**Decisão**: diretriz do Diretor — o teto sobe para **500 linhas** (o limite da doc Anthropic, não um número da casa), válido para `commands/`, `agents/` e `skills/`. O teto novo não é convite a prosa: a régua de poda 4.160 (no-op/sedimento/leading word) e a `skill-standards` continuam valendo em toda edição — o que muda é que patch com mérito não fica mais represado por aritmética de linhas; perto de 500, a saída é dividir em arquivo auxiliar (progressive disclosure), como a própria doc manda.
+
+**Aplicação**: esta entrada é o dono da régua (as menções a "teto de 300" em decisões anteriores são históricas). Primeira aplicação: o patch da LRN-056 entrou em `commands/tasks.md` (322 linhas) sem corte compensatório na 4.215.
+
 ---
 
 ## 5. Quality gates inegociáveis

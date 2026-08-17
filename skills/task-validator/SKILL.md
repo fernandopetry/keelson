@@ -90,6 +90,7 @@ aberta (`plan-status-vs-tasks` — 4.153) e closure preenchida com Status ≠ Do
 - AC vinculado ao FR realizado não aparece em nenhum critério
 - Critério de teste (gate 1) sem verificação executável anexada — comando + saída/efeito esperado (só TASK em `Todo`/`In Progress`; `Done` legada não reprova por isso)
 - Fato `task-criterio-grep-nao-ancorado` (4.161) **e** a condição do critério é estrutural — assinatura, campo, projeção, predicado, chave de payload: escale para ERROR quando o padrão de texto não resiste a prosa/comentário ou nomeia símbolo de **outra camada** (ex.: campo do VO em camelCase onde o payload usa snake_case — cumprir à risca ensina o bug de volta); condição legitimamente textual (docstring exigida, mensagem literal) → o WARNING fica como está
+- Fato `task-comando-contradiz-criterio` (4.215) **e** a proibição é regra de lição/convenção do projeto que o comando viola de verdade (o developer executa o comando, nunca a prosa — o comando vence em silêncio): escale para ERROR; menção legítima da tag (ex.: proibição sobre outro contexto que o comando não alcança) → o WARNING fica como está
 
 ### WARNING se:
 - Critério não-verificável ("usuário fica feliz")

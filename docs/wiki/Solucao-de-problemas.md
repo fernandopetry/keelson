@@ -61,6 +61,17 @@ dos testes apontados, ou recalibrar o threshold no comando da ficha (decisão su
 keelson não define score mínimo). Remover o campo desliga o gate por completo: ele é
 opt-in.
 
+### O validator acusou "comando contradiz critério" numa TASK
+
+O lint achou, na mesma TASK, um comando de verificação usando `--group <tag>` e outra
+linha proibindo exatamente essa tag (ex.: a lição do projeto diz "prova de segurança
+nunca leva `@group skip-migration`" e o comando do critério prescreve
+`--group skip-migration`). O developer executa o comando literal, então o comando vence
+a prosa em silêncio — corrija o lado errado antes de implementar: ou o comando (caso
+típico), ou a proibição, se ela não se aplica a este contexto. Nasce como WARNING; o
+`task-validator` escala para ERROR quando a proibição é uma lição real do projeto que o
+comando viola (decisão 4.215).
+
 ### O gate de comportamento (9) ficou pendente
 
 O keelson **não finge** que verificou. A pendência vem com a causa nomeada:
