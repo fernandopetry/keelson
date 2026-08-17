@@ -2366,6 +2366,24 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.219 — Gatilho do gate 8 no modo avulso ganha a mesma âncora textual do gate 10: PATH não é TÓPICO
+
+**Problema**: postmortem de consumidor (`aav-backoffice`, LRN-063) relatou o `security-engineer` (gate 8) despachado sobre um diff de acessibilidade pura (`id`/`aria-*`/foco, nenhum tópico de auth/injeção/upload/crypto/sessão/exec/deps) e aprovado com veredito explícito de falso-positivo — custo de uma rodada sem retorno. O Tech Lead tratou o match de `sensitiveGlobs` da ficha (sinal de PATH) como suficiente para o gatilho, quando só o tópico do diff é o critério real (o que `agents/security-engineer.md` já declara na própria description e `commands/implement.md` §3.3 item 8 já usa explicitamente). A causa é um texto ambíguo local: `templates/CLAUDE.keelson-block.md`, bullet "Mudança pontual", dizia apenas "`security-engineer` em mudança sensível" — sem apontar a lista canônica —, enquanto o bullet irmão, poucas palavras depois na mesma frase, já ancora o `performance-engineer` na description do agent (gate 10). A assimetria era literal: mesma frase, mesmo padrão de gatilho, só um dos dois agentes ganhou a âncora explícita.
+
+**Decisão**: estender a mesma frase do bullet "Mudança pontual" — `security-engineer` dispara quando o diff toca a **superfície sensível** (lista canônica na description do agent — gate 8), com `sensitiveGlobs` da ficha declarado como sinal de PATH complementar, que **não substitui** o match por TÓPICO. Mesma fórmula já usada para o `performance-engineer` na frase seguinte, aplicada ao par irmão.
+
+**Aplicação**: `templates/CLAUDE.keelson-block.md` (linha 46, bullet "Mudança pontual" — re-rodar init nos consumidores). Sem bump de capacidade nova: ajuste fino de texto (patch).
+
+### 4.220 — Gate 6 ganha via inversa: diff que fecha "armadilha viva" documentada no perfil atualiza o próprio perfil
+
+**Problema**: postmortem de consumidor (`aav-backoffice`, LRN-064) relatou dois defeitos de acessibilidade corrigidos no mesmo brief avulso que o perfil de frontend do projeto (`guidelines/project/frontend/vue.md` §12.5) documentava como "armadilha verificada e viva". A atualização do parágrafo só aconteceu porque o Tech Lead, ao receber o achado qualitativo do `code-reviewer`, a executou por iniciativa própria — nenhum item do Gate 6 ("aderência ao Charter + perfil ativo") audita a via inversa: o gate confere diff-contra-perfil (stack, naming, anti-padrões), mas nada confere se o diff **fecha** exatamente um defeito que o perfil descreve como ainda vivo. Sem essa leitura atenta (revisor apressado, achado de menor prioridade, rodada sob pressão), a doutrina ativa seguiria ensinando o próximo developer a remendar na tela o que a primitiva já resolve.
+
+**Decisão**: bullet novo no Gate 6, após "Anti-padrões": **Doc-trap fechada pelo próprio diff** — quando a correção elimina exatamente um defeito que o perfil/guideline do projeto documenta como armadilha ainda viva (linguagem tipo "não conte com", "ainda não faz", "armadilha verificada e viva"), o mesmo commit atualiza esse parágrafo.
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (Gate 6, bullet novo). Conteúdo embarcado lido em runtime pelo `code-reviewer` — entra no `CHANGELOG.md` e conta para o bump (critério 4.194), mas não é o bloco injetado nem a ficha: sem re-init.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

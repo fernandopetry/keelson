@@ -25,6 +25,28 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.102.1] — 2026-08-17
+
+Re-init: required
+
+Two field-reported doctrine fixes from a consumer postmortem (`aav-backoffice`,
+LRN-063/LRN-064), both patch-scoped (no new capability).
+
+### Fixed
+
+- On-demand mode's `security-engineer` trigger (gate 8) now points at the same
+  canonical topic list its `performance-engineer` sibling already anchored to (gate
+  10) — "sensitive change" alone let a Tech Lead treat a `sensitiveGlobs` path match
+  as sufficient to dispatch the gate, when only a diff that actually touches a listed
+  topic (auth, injection, upload, personal data, crypto, session, endpoints, redirect,
+  exec, deps) should. Field case: an accessibility-only diff (id/aria-*/focus) got
+  dispatched to gate 8 purely on path, and the reviewer returned an approved, explicit
+  false-positive (decision 4.219).
+- Gate 6 ("Charter + active profile adherence") gained a reverse check: when a diff
+  closes exactly the defect a project's profile documents as a still-live pitfall, the
+  same commit now updates that paragraph — previously nothing forced this, and it only
+  happened once because a reviewer read the section closely (decision 4.220).
+
 ## [0.102.0] — 2026-08-17
 
 Re-init: required

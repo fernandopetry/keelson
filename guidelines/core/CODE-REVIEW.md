@@ -129,6 +129,12 @@ reabertura declarada.
 - **Padrão de teste**: runner e estrutura do perfil / `./TESTING.md`.
 - **Anti-padrões** proibidos pelo perfil: nenhum presente.
 - **Decisões irreversíveis**: nenhuma quebrada.
+- **Doc-trap fechada pelo próprio diff**: quando a correção elimina exatamente um
+  defeito que o perfil/guideline do projeto documenta como armadilha ainda viva
+  (linguagem tipo "não conte com", "ainda não faz", "armadilha verificada e viva"), o
+  mesmo commit atualiza esse parágrafo — perfil que segue descrevendo como presente um
+  defeito que o diff acabou de fechar ensina o próximo developer a remendar na tela o
+  que a primitiva já resolve.
 
 **Falha**: violação de qualquer item — citar exatamente qual.
 

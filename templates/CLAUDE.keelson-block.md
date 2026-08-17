@@ -43,7 +43,9 @@
   `index-contract.md` do plugin; decisão 4.86; mudança que cruza slugs → **um brief só**,
   no slug dominante — onde viveria a SPEC — com 1 linha de rastro no INDEX dos demais,
   decisão 4.87) —, delega ao `developer` e passa o diff
-  pelo `code-reviewer` (régua avulsa); `security-engineer` em mudança sensível,
+  pelo `code-reviewer` (régua avulsa); `security-engineer` quando o diff toca a
+  superfície sensível (lista canônica na description do agent — gate 8; `sensitiveGlobs`
+  da ficha é sinal de PATH, complementar — não substitui o match por TÓPICO),
   `performance-engineer` quando o diff toca superfície de custo (lista canônica na
   description do agent — gate 10), `product-designer` quando o diff toca superfície
   de interface (lista canônica na description do agent — gate 11) e `qa`

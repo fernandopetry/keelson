@@ -409,16 +409,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.102.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.102.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **design/UX becomes a dedicated quality gate — gate 11** (decision
-4.218, from the Director's observation that delivered screens didn't match backend
-rigor). New Charter Art. 10, a senior `product-designer` reviewer with a closed catalog
-of amateur-pattern blockers (`core/DESIGN.md`), anti-taste calibration (findings beyond
-the catalog need an anchor in the product's own patterns), and full cycle wiring.
-Re-init required.
+New in this release: the on-demand mode's gate 8 trigger now names the same canonical
+topic list its gate 10 sibling already pointed to, closing a false-positive gap found
+in the field (decision 4.219); gate 6 gained a reverse check — a diff that closes a
+pitfall a profile documents as still-live now must update that paragraph in the same
+commit (decision 4.220). Re-init required.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.
