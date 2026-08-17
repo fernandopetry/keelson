@@ -27,7 +27,7 @@ Same engine everywhere; only the ~15-line adapter changes.
 
 | Piece | What it is |
 |-------|------------|
-| **Quality Charter** | Nine language-agnostic articles that define "good". Each carries a *falsifiable rule* — how you prove it was met. Proof is external (a test), never a self-checklist. |
+| **Quality Charter** | Ten language-agnostic articles that define "good". Each carries a *falsifiable rule* — how you prove it was met. Proof is external (a test), never a self-checklist. |
 | **Profile Outline** | The mandatory table of contents every language profile fills in — so a Node profile covers the same ground as the PHP one (parity). |
 | **Language profiles** | The Charter *instantiated* for a language/version (`backend/php.md`, `frontend/*`). Ships with PHP — the 8.5 exemplar plus a curated legacy ladder (5.6 · 7.0 · 7.4 · 8.0); other stacks are **generated on install** from your standard, then reviewed by you. |
 | **The ficha** (`keelson.config.json`) | The per-project adapter: paths, quality commands, active profile, gates. |
@@ -387,7 +387,7 @@ Owner of the rule: `docs/_meta/conventions/commit-convention.md`. Governance: de
 ```
 keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
-├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer, performance-engineer… + tools (not roles): code-scout, scribe, tracker-sync
+├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer, performance-engineer, product-designer… + tools (not roles): code-scout, scribe, tracker-sync
 ├── skills/            # spec / plan / task validators + status + screen-verify
 ├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard, jira-guard
 ├── guidelines/
@@ -409,16 +409,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.101.0` (Quality Charter `0.5.1`) — early. The engine and the PHP reference profile
+`0.102.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: **the closing report checks itself and TASK contradictions become
-lint** (decisions 4.214–4.217, from a consumer field report). The report skeleton gains
-a countable self-check (no more deliveries missing the Duration line), a new lint check
-catches a verification command using a test-group tag the same TASK forbids, INDEX
-history timestamps must be measured, and the line ceiling for commands/agents/skills
-rises to Anthropic's documented 500. No re-init needed.
+New in this release: **design/UX becomes a dedicated quality gate — gate 11** (decision
+4.218, from the Director's observation that delivered screens didn't match backend
+rigor). New Charter Art. 10, a senior `product-designer` reviewer with a closed catalog
+of amateur-pattern blockers (`core/DESIGN.md`), anti-taste calibration (findings beyond
+the catalog need an anchor in the product's own patterns), and full cycle wiring.
+Re-init required.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

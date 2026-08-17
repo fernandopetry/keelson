@@ -81,6 +81,7 @@ O keelson simula um time real, e os IDs dos agents **são** os nomes dos papéis
 | `code-reviewer` | Code Reviewer | Quality gates 1–7 |
 | `security-engineer` | Security Engineer | Gate 8, quando a mudança é sensível |
 | `performance-engineer` | Performance Engineer | Gate 10, quando o diff toca superfície de custo |
+| `product-designer` | Product Designer | Gate 11, quando o diff toca superfície de interface — a entrega visual no padrão do resto do sistema |
 | `qa` | QA | Gate 9 — prova, executando, que funciona; com referência visual no BRIEF, compara a tela entregue contra ela (alcança/não alcança) |
 | `product-analyst` | Product Analyst | Crítica de mérito da SPEC |
 | `agile-coach` | Agile Coach | Aprendizado do processo |
@@ -117,11 +118,12 @@ aplicada com o mesmo peso a tudo.
 |---|---|---|
 | **1–7** | `code-reviewer` | Implementação completa · testes cobrindo os ACs, passando · lint limpo · escopo respeitado · DECs respeitadas · aderência ao Charter e ao perfil ativo · code review |
 | **8** | `security-engineer` | Só em mudança sensível (auth, autorização, injeção, upload, dados pessoais, cripto, sessão, endpoints, redirect, exec, dependências) |
-| **9** | `qa` | Comportamento **provado executando**, não deduzido do relatório do developer — inclui higiene da superfície (ID de artefato SDD visível sem AC que o exija é achado) e consistência estrutural entre campos irmãos do mesmo grupo (achado-sugestão, nunca reprova sozinho) |
+| **9** | `qa` | Comportamento **provado executando**, não deduzido do relatório do developer — inclui higiene da superfície (ID de artefato SDD visível sem AC que o exija é achado) e a medição de consistência entre campos irmãos, que segue como insumo do gate 11 (achado-sugestão, nunca reprova sozinho) |
 | **10** | `performance-engineer` | Só quando o diff toca superfície de custo (consultas/ORM, laços sobre volume variável, cache, rede, jobs, render pesado, migração de dados). Padrão de custo patológico — como consulta dentro de laço — **bloqueia**; otimização além disso só com medição, nunca por palpite. Não é teste de stress: é revisão de padrões |
+| **11** | `product-designer` | Só quando o diff toca superfície de interface (tela/componente, markup, estilos/tokens, copy, formulário, navegação, estados de UI, e-mail renderizado). Padrão descuidado do catálogo de design — tela sem estados vazio/carregando/erro, componente que reinventa padrão que o produto já tem, ação sem resposta, piso de acessibilidade furado — **bloqueia**; refinamento além disso só ancorado num padrão existente do produto, nunca por gosto do revisor. Não é direção de arte: é revisão contra o padrão do produto |
 
 Cada gate roda no recorte do que ele prova: os testes acompanham **cada tarefa**; a
-revisão, a segurança e a performance rodam **uma vez por wave**, sobre o conjunto integrado (é onde a
+revisão, a segurança, a performance e o design rodam **uma vez por wave**, sobre o conjunto integrado (é onde a
 interação entre tarefas aparece); e o QA prova a **história completa** quando ela passa
 a existir de ponta a ponta — como um QA de time real, que testa a funcionalidade, não o
 commit. Nada disso é gate pulado: cada consolidação fica declarada na tarefa, e a

@@ -1,11 +1,15 @@
 ---
 lang: php
 version: "5.6"
-charter: 0.5.1
+charter: 0.6.0
 generated-by: profile-writer
 reviewed: false
 reviewer: null
 ---
+
+> **Art. 10 (design/UX — Charter 0.6.0)**: n/a neste perfil — role backend sem
+> superfície de interface própria. O gabarito do gate 11 é `core/DESIGN.md`; a
+> instância de stack cabe ao perfil de frontend do projeto.
 
 # PHP 5.6 — Perfil de linguagem (legado)
 

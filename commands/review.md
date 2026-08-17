@@ -56,8 +56,9 @@ Você é o **Tech Lead** do time nesta revisão. Não revisa e não corrige com 
 2. **Inferir o slug** pelos arquivos tocados (domínio, `codePaths`, termos nos `INDEX.md`). Inferiu → ler o `INDEX.md` para as **decisões irreversíveis** e riscos ativos (é o que salva o gate 5). Não inferiu → gate 5 `n/a`, declarado.
 3. Classificar **área sensível** para decidir o gate 8: lista canônica na `description` do `security-engineer`.
 4. Classificar **superfície de custo** para decidir o gate 10: lista canônica na `description` do `performance-engineer` (decisão 4.155).
-5. Classificar **efeito observável** (endpoint, UI, regra exercitável) — decide o gate 9 na Etapa 7.
-6. Entender um fluxo **além do diff** (de onde vem um dado, quem consome o que mudou) é varredura ampla → delegue ao `code-scout` (conclusão ancorada, decisão 4.75); não varra a codebase inline.
+5. Classificar **superfície de interface** para decidir o gate 11: lista canônica na `description` do `product-designer` (decisão 4.218).
+6. Classificar **efeito observável** (endpoint, UI, regra exercitável) — decide o gate 9 na Etapa 7.
+7. Entender um fluxo **além do diff** (de onde vem um dado, quem consome o que mudou) é varredura ampla → delegue ao `code-scout` (conclusão ancorada, decisão 4.75); não varra a codebase inline.
 
 Não leia a régua nem o perfil integralmente: quem os lê são os revisores (modelo de carga — decisão 4.35).
 
@@ -74,6 +75,7 @@ E o que é específico deste comando — **declare explicitamente**:
 - **`code-reviewer`** — sempre. Gates 1–7 sobre o diff, na régua degradada.
 - **`security-engineer`** — quando a área é sensível e `gates.security` está ativo (`--no-security` desliga; a decisão de desligar entra no output).
 - **`performance-engineer`** — quando o diff toca superfície de custo (gate 10, decisão 4.155; gabarito lido em runtime: `core/PERFORMANCE.md` + seção de performance do perfil).
+- **`product-designer`** — quando o diff toca superfície de interface (gate 11, decisão 4.218; gabarito lido em runtime: `core/DESIGN.md` + seção de UI do perfil quando existir).
 
 Todos os aplicáveis no mesmo turno, em paralelo (como a Etapa 3.3 do `/keelson:implement`). Espere os reports; não antecipe conclusão.
 
@@ -115,8 +117,9 @@ TASK em disco, sem commit) com um briefing efêmero:
 1. Despache o **`code-reviewer` de novo** sobre o diff da correção. Report anterior não vale como aprovação do código novo — o que foi corrigido é código não revisado.
 2. Houve achado de segurança corrigido → o **`security-engineer`** também roda de novo.
 3. Houve achado de performance corrigido → o **`performance-engineer`** também roda de novo, sobre o delta (convergência 4.88).
-4. Correção com **efeito observável** → **`qa`** (gate 9): prova o comportamento rodando os testes e exercitando a app quando o ambiente permite. Ambiente sem tela com `gates.screenVerify` ativo → o `qa` reporta `PARCIAL` com `handoff_seed` e evidência de sondagem (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`); aqui isso vira **pendência declarada no output**, não handoff em disco (revisão avulsa não tem PLAN para ancorar o doc).
-5. REPROVADO: 1 retry com instruções precisas, depois escala ao humano com o diagnóstico.
+4. Houve achado de design corrigido → o **`product-designer`** também roda de novo, sobre o delta (convergência 4.88).
+5. Correção com **efeito observável** → **`qa`** (gate 9): prova o comportamento rodando os testes e exercitando a app quando o ambiente permite. Ambiente sem tela com `gates.screenVerify` ativo → o `qa` reporta `PARCIAL` com `handoff_seed` e evidência de sondagem (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`); aqui isso vira **pendência declarada no output**, não handoff em disco (revisão avulsa não tem PLAN para ancorar o doc).
+6. REPROVADO: 1 retry com instruções precisas, depois escala ao humano com o diagnóstico.
 
 ## Etapa 8: achados estruturais viram demanda
 
@@ -134,7 +137,7 @@ Para cada estrutural, proponha o roteamento — **sem executar** (a régua é a 
 ## Escopo
 - Diff: <comando usado> — N arquivo(s), ~M linha(s) adicionada(s)
 - Slug inferido: <slug ou "não inferível">
-- Revisores: code-reviewer <id> | security-engineer <id ou n/a> | performance-engineer <id ou n/a> | qa <id ou n/a>
+- Revisores: code-reviewer <id> | security-engineer <id ou n/a> | performance-engineer <id ou n/a> | product-designer <id ou n/a> | qa <id ou n/a>
 
 ## Gates
 | Gate | Resultado | Nota |
@@ -149,6 +152,7 @@ Para cada estrutural, proponha o roteamento — **sem executar** (a régua é a 
 | 8 Segurança | aprovado \| reprovado \| n/a | n/a = área não sensível ou --no-security |
 | 9 Comportamento | verificado \| pendente \| n/a | só quando houve correção com efeito observável |
 | 10 Performance | aprovado \| reprovado \| n/a | n/a = superfície de custo não tocada |
+| 11 Design/UX | aprovado \| reprovado \| n/a | n/a = superfície de interface não tocada |
 
 ## Corrigido nesta rodada
 - `arquivo:linha` — <achado> → <correção> (re-revisado por <id>)

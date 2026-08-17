@@ -6,7 +6,7 @@
 >
 > Palavras-chave conforme RFC 2119: **DEVE / NÃO DEVE / DEVERIA / PODE**.
 >
-> **Versão: 0.5.1** — é esta versão que o campo `charter:` do cabeçalho de
+> **Versão: 0.6.0** — é esta versão que o campo `charter:` do cabeçalho de
 > proveniência de cada perfil referencia.
 
 ---
@@ -155,6 +155,19 @@ a mudança está **documentada** onde o próximo vai procurar.
 
 - **Régua:** existe a definição de pronto (os gates) e ela foi satisfeita de forma
   verificável; a documentação canônica reflete a mudança.
+
+## Art. 10 — A interface tem o mesmo padrão do código que a serve
+
+O que o usuário vê e opera **DEVE** refletir o rigor aplicado ao restante do sistema.
+Padrões de interface descuidada conhecidos (estado não tratado, componente que
+reinventa padrão existente do produto, ação sem resposta perceptível, piso de
+acessibilidade furado) **NÃO DEVEM** ser introduzidos. Refinamento além disso **DEVE**
+ser ancorado na consistência com o produto, não no gosto de quem revisa.
+
+- **Por quê:** o usuário julga o sistema inteiro pela superfície que toca; backend
+  impecável atrás de uma tela descuidada é percebido como sistema descuidado.
+- **Régua:** toda vista de dados nova trata vazio/carregando/erro; nenhum componente
+  reinventa padrão que o produto já tem; toda ação do usuário tem resposta perceptível.
 
 ---
 

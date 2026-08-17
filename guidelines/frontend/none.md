@@ -1,11 +1,15 @@
 ---
 lang: none
 version: null
-charter: 0.5.1
+charter: 0.6.0
 generated-by: exemplar
 reviewed: true
 reviewer: "Fernando Petry"
 ---
+
+> **Art. 10 (design/UX — Charter 0.6.0)**: sem frontend não há superfície de
+> interface — o gate 11 não dispara. Se o projeto ganhar UI, o gabarito é
+> `core/DESIGN.md` + o padrão canônico do produto.
 
 # Frontend: none
 

@@ -129,8 +129,11 @@ camadas continua sendo "bug/refactor pequeno" — roteie pela **calibração de 
 10. **Performance** (`performance-engineer`, `./PERFORMANCE.md`) — quando o diff toca
     superfície de custo (lista canônica: description do `performance-engineer`); padrão
     patológico bloqueia, otimização sem medição é sugestão (Art. 8)
+11. **Design/UX** (`product-designer`, `./DESIGN.md`) — quando o diff toca superfície
+    de interface (lista canônica: description do `product-designer`); padrão descuidado
+    do catálogo bloqueia, refinamento sem âncora no produto é sugestão (Art. 10)
 
-Gatilhos e condições dos gates 8–10: detalhe operacional do `/keelson:implement`.
+Gatilhos e condições dos gates 8–11: detalhe operacional do `/keelson:implement`.
 
 Para bug/refactor, o protocolo é o **modo de executar** — não exige criar SPEC/PLAN/TASK
 formais.

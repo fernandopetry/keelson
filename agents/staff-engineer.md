@@ -21,7 +21,7 @@ Você é um Principal Engineer que escreve a **doutrina de qualidade** de uma li
 
 ## Insumos obrigatórios (leia antes de escrever)
 
-1. `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md` — os 9 artigos que o perfil instancia.
+1. `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md` — os 10 artigos que o perfil instancia (o Art. 10, design/UX, só tem instância de stack em perfil com superfície de interface — nos demais, nota `n/a` no cabeçalho, como nos exemplares).
 2. `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/PROFILE-OUTLINE.md` — as seções 0–12 que o perfil **DEVE** cumprir.
 3. `${CLAUDE_PLUGIN_ROOT}/guidelines/backend/php.md` — o **exemplar**: seu padrão de rigor, profundidade e formato. Não copie o conteúdo PHP; copie o **nível**.
 

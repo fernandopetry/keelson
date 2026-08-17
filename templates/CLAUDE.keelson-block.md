@@ -29,7 +29,7 @@
 - **Modo padrão = autônomo** (`/keelson:auto` — não precisa digitar o comando): pedido
   não-trivial em linguagem natural entra no ciclo `specify → plan → tasks → implement`
   conduzido pelo **time** keelson (po, developer, code-reviewer, qa, security-engineer,
-  performance-engineer),
+  performance-engineer, product-designer),
   sob o contrato Diretor–PO: o brief é emitido na largada (janela de veto — o fluxo
   segue sem esperar), o PO valida SPEC e entrega **contra o brief**, e a entrega fecha
   com o **relatório de aceitação do PO**. Você é o **Diretor**: veto, PR, merge e
@@ -45,7 +45,8 @@
   decisão 4.87) —, delega ao `developer` e passa o diff
   pelo `code-reviewer` (régua avulsa); `security-engineer` em mudança sensível,
   `performance-engineer` quando o diff toca superfície de custo (lista canônica na
-  description do agent — gate 10) e `qa`
+  description do agent — gate 10), `product-designer` quando o diff toca superfície
+  de interface (lista canônica na description do agent — gate 11) e `qa`
   quando há comportamento observável — mesmos gatilhos do ciclo. A orquestração da
   rodada — gates em paralelo sobre pacote de contexto único factual (4.89), correção
   que converge com teto de 1 retry e escalação ao Diretor (4.88) — tem **dono único**
@@ -107,7 +108,9 @@
 - **Definição de pronto (gates):** ACs cobertos por prova · testes passando · lint
   limpo · escopo respeitado · decisões respeitadas · aderência ao Charter + perfil ·
   code review · **segurança** e **comportamento verificado** (condicionais aos gates
-  da ficha) · **aceitação do PO** contra o brief (rotas com brief/espelho).
+  da ficha) · **performance** e **design/UX** (condicionais à superfície tocada —
+  listas canônicas nas descriptions dos agents) · **aceitação do PO** contra o brief
+  (rotas com brief/espelho).
 - A prova de pronto é **externa e falsificável** (um teste que cobre o comportamento),
   nunca um autochecklist — **gerador ≠ avaliador**.
 

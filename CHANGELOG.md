@@ -25,6 +25,59 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.102.0] — 2026-08-17
+
+Re-init: required
+
+Decision 4.218 — design/UX becomes a dedicated quality gate (gate 11), from the
+Director's field observation that delivered screens didn't match backend rigor ("the
+backend is high standard, the visual is so-so"). Quality Charter 0.5.1 → 0.6.0: new
+Art. 10 ("the interface meets the same standard as the code that serves it") — the
+constitution had articles for correctness, security and cost, and silence for the
+surface users actually touch.
+
+### Added
+
+- `agents/product-designer.md`: a senior Product Designer runs gate 11 mirroring the
+  gate 10 pattern (4.155) — ruler read at runtime, fired by a canonical
+  interface-surface list in its description (screen/component, markup, styles/tokens,
+  copy, form, navigation, UI states, rendered email), one run per wave in parallel with
+  the review round, also in `/keelson:review` and on-demand mode. Verdict always
+  declared (`n/a` outside the surface); `design_gate11` closure field and report
+  column; deterministic delivery pre-check line (same ruler as gates 8/10). No ficha
+  flag: the canonical trigger list is the proportionality lever (4.155 principle). The
+  gate reviews by diff inspection; an existing screen capture (qa/screen-verify)
+  arrives via the briefing — the evaluator stays read-only.
+- `guidelines/core/DESIGN.md`: the gate 11 ruler — a closed catalog of amateur-pattern
+  blockers (data views without empty/loading/error states, components reinventing
+  patterns the product already has, actions without perceptible feedback, AA
+  accessibility floor, spacing/typography off the project scale, raw values duplicating
+  tokens, placeholder-as-label forms) with anti-taste calibration: findings beyond the
+  catalog only count when anchored to an existing product pattern (canonical component,
+  token, reference screen); speculative redesign is never a gate requirement.
+- Quality Charter **Art. 10** (Charter 0.5.1 → 0.6.0).
+
+### Changed
+
+- Gate 9 (`qa`) demarcation — a declared, Director-approved revision of 4.202: the
+  sibling-consistency measurement keeps its `suggestion` cap and now travels as input
+  to gate 11's briefing, where pattern judgment happens against the closed catalog.
+- All 7 embedded profiles: `charter: 0.6.0` plus an Art. 10 `n/a` header note (role
+  without its own interface surface). The PROFILE-OUTLINE gains no UI section yet —
+  deferred until the first real frontend profile (named trigger in 4.218).
+- Gate wiring across the cycle: `implement.md` (§3.3 item 11, gate briefing, closure
+  YAML, wave inventory, output table), `review.md` (classification, dispatch,
+  re-review, output), `auto.md` (Step 4 and the delivery pre-check), `core/WORKFLOW.md`
+  (gate catalog), `core/CODE-REVIEW.md` (boundary note and per-wave round), the
+  injected CLAUDE block (cast, on-demand triggers, definition of done — hence the
+  re-init), `sdd-conventions.md` (load map; read-only evaluator roster), method guide
+  §5 and wiki `Conceitos.md`.
+- `hooks/agent-guard.sh`: nudge regex extended to gates 10/11 and the deny-roster
+  completed with `performance-engineer`/`product-designer` — closes a pre-existing
+  gate 10 gap (lateral finding applied with the Director's approval).
+
+---
+
 ## [0.101.0] — 2026-08-17
 
 Re-init: none

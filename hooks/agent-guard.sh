@@ -52,7 +52,7 @@ if printf '%s' "$texto" | grep -Eiq 'spec-validator|plan-validator|task-validato
 else
   # --- trabalho de papel do elenco: exige verbo de papel, não só menção a artefato ---
   printf '%s' "$texto" | grep -Eiq \
-    'crítica de mérito|quality gates|gates 1.7|gate [89]([^0-9]|$)|modo aprovação|modo aceitação|modo resolução|modo pré-código|contra o brief|relatório de aceitação|impleme?nt(e|ar) a TASK|corrija os achados|revis(e|ão) (o diff|de segurança)|decomp(onha|osição).*(épico|epico)' \
+    'crítica de mérito|quality gates|gates 1.7|gate ([89]|1[01])([^0-9]|$)|modo aprovação|modo aceitação|modo resolução|modo pré-código|contra o brief|relatório de aceitação|impleme?nt(e|ar) a TASK|corrija os achados|revis(e|ão) (o diff|de segurança|de performance|de design)|decomp(onha|osição).*(épico|epico)' \
     || exit 0
   motivo_extra="Este spawn parece executar trabalho de um PAPEL do time keelson com um agent genérico — o agent do elenco carrega a doutrina do papel (input, gates, formato de report), e o genérico não."
 fi
@@ -76,7 +76,7 @@ agent-guard (keelson, decisão 4.42): subagent_type "${stype:-ausente}" para tra
 
 ${motivo_extra}
 
-Refaça a chamada com o agent correto do elenco: keelson:developer (implementar TASK) · keelson:code-reviewer (gates 1–7) · keelson:qa (gate 9 / modo pré-código) · keelson:security-engineer (gate 8) · keelson:product-analyst (crítica de mérito) · keelson:po (modos aprovação/aceitação/resolução) · keelson:pm (decomposição de épico). Validators (spec/plan/task-validator) são skills: o spawn genérico é aceito quando o briefing cita o SKILL.md canônico.
+Refaça a chamada com o agent correto do elenco: keelson:developer (implementar TASK) · keelson:code-reviewer (gates 1–7) · keelson:qa (gate 9 / modo pré-código) · keelson:security-engineer (gate 8) · keelson:performance-engineer (gate 10) · keelson:product-designer (gate 11) · keelson:product-analyst (crítica de mérito) · keelson:po (modos aprovação/aceitação/resolução) · keelson:pm (decomposição de épico). Validators (spec/plan/task-validator) são skills: o spawn genérico é aceito quando o briefing cita o SKILL.md canônico.
 
 Se o uso genérico for INTENCIONAL (exploração, pesquisa, tarefa fora do ciclo), repita a chamada — este aviso não se repete para esta mesma chamada.
 EOF
