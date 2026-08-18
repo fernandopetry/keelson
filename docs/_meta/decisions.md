@@ -2392,6 +2392,16 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.222 — Ideia de melhoria do keelson ganha forja própria: skill `idea-forge` refina antes de virar leva
+
+**Problema**: ideia do Diretor para melhorar o keelson entra hoje direto na conversa de desenvolvimento, sem etapa que a esclareça e a conecte com o que já existe. Três modos de falha: (a) ideia vira leva sem teste falsificável — implementa-se a solução proposta em vez do problema por trás dela; (b) colisão descoberta tarde — a ideia duplica mecanismo existente, contradiz decisão vigente ou repete proposta já recusada, e o custo de descobrir isso é pago dentro da leva, não antes; (c) o análogo existe dos dois lados vizinhos e falta no meio: o consumidor tem `/keelson:brief` (forja de intenção de produto) e o insumo de campo tem `/field-intake` (sequenciador de absorção), mas a ideia nativa do Diretor não tem porta.
+
+**Decisão**: skill de mantenedor **`idea-forge`** (`.claude/skills/`, fora do pacote — 4.182), report-only, com sequência fixa: capturar e devolver a ideia reformulada (problema separado da solução) → conectar com o existente (decisions.md, proposal-inbox, learning-log, doutrina/tooling; `impact-scout` quando o raio não for óbvio) → esclarecer por perguntas dirigidas (dor observável, gatilho, teste falsificável, fronteira) → julgar com catálogo fechado de vereditos (`avançar | absorver | já-coberta | adiar-com-gatilho | recusar`), aplicando à ideia as réguas que a doutrina aplicaria depois (4.160, dono único, escada 4.149) → entregar mini-brief que a leva de desenvolvimento consome (problema, proposta, teste, conexões com âncora, classificação bump/re-init, donos tocados, riscos com mitigação — 4.188). Forma **skill**, não agent: o refino é diálogo com o Diretor, e agent isolado não pergunta. Insumo de consumidor continua indo ao `/field-intake` (registro antes de parecer, 4.111).
+
+**Aplicação**: `.claude/skills/idea-forge/SKILL.md` (novo) · linha de roteamento em `CLAUDE.md` §Ferramentas do mantenedor. Tooling de mantenedor: sem bump, sem CHANGELOG (4.182). Observar: veredito `já-coberta` recorrente numa mesma área sinaliza problema de descoberta da doutrina, não de falta de mecanismo.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
