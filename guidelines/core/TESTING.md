@@ -79,6 +79,17 @@ bloqueante no gate 1 — `./CODE-REVIEW.md`):
   fixture: duas linhas, uma satisfazendo e outra não). Fixture de um agregado deixa o
   mutante de maior raio invisível por construção — caso real: apagar a correlação
   sobreviveu a 51/51 testes, e em produção recusaria toda submissão de todo usuário.
+- **Guard textual nasce como inventário, nunca como parser (decisão 4.227)**: teste ou
+  guard que prova propriedade do código-fonte por varredura de texto nasce com
+  **universo declarado e fechamento contável** — uma lista fechada (allowlist de
+  arquivos/símbolos, inventário "N no escopo, N provados") confrontada com o universo
+  real, controle positivo incluso (a régua do avaliador é a 4.186) e degradação para
+  aviso quando não parseia. Tentar **reconhecer todas as formas da linguagem** por
+  regex é fail-open por construção: cada idioma não previsto passa em silêncio (caso
+  real: 3 rodadas de gate acrescentando formas de escrita SQL até trocar o oráculo por
+  allowlist). O caso irmão no **critério de TASK** já tem dono — `commands/tasks.md`,
+  item (b) da 4.161 (grep ancorado em estrutura); este bullet cobre o guard entregue
+  como teste.
   Corolário para invariante **fotografado** (valor congelado no filho × config vigente
   no pai): os defaults do builder compartilhado nascem **divergentes** — pai e filho com
   o mesmo valor tornam ler um ou outro indistinguível, e a guarda vira decoração.

@@ -109,6 +109,12 @@ Agent indisponível → executar as Etapas 2–3 inline é o fallback, declarado
    disparado) **não é feedback** — feedback é o que a tela mostra ao usuário. FR de ação
    sem os três estados está incompleta; cada estado vira AC verificável (e os gates 1 e 9
    herdam a prova de graça).
+10. **Par de leitura do que se persiste** (decisão 4.225): FR que introduz campo ou
+    estado persistível novo **sem par de leitura está incompleto** — algum FR ou AC da
+    mesma SPEC nomeia onde o valor salvo **reaparece** (recarga da tela, payload de
+    consulta, exibição). AC de leitura no próprio FR satisfaz; não é preciso FR novo.
+    Caso real: percentual especificado só na escrita nasceu sumindo ao recarregar e
+    ausente do payload — 4 correções encadeadas que a SPEC teria evitado numa linha.
 
 ## Etapa 3: estrutura obrigatória do arquivo SPEC (contrato de forma — executado pelo `scribe`)
 

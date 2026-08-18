@@ -2422,6 +2422,32 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.225 — SPEC exige o par de leitura do que se persiste: princípio 10 do specify + WARNING do spec-validator
+
+**Problema**: análise de transcript de sessão de consumidor (ciclo `/auto` de ~7h30, ~22 commits `fix`) localizou a maior fonte de furo de plano num padrão de forma detectável: a SPEC especificou **salvar** um valor e nenhum FR/AC cobria onde ele **reaparece** — o campo nasceu sumindo ao recarregar e ausente do payload de leitura, e 4–5 correções encadeadas (read on load, payload, sincronização entre cartões irmãos, refetch) derivaram desse único furo. O mesmo padrão em escala menor apareceu no contrato de repositório da primeira wave (linhas sem agrupamento e nome do agrupador ausentes, descobertos por task consumidora bloqueada). Nenhum princípio do `specify.md` nem check do `spec-validator` pergunta pela volta do dado.
+
+**Decisão**: dois lados, gerador e avaliador. No `commands/specify.md`, princípio 10 da Etapa 2 (irmão do 9/4.67, mesmo formato de teste): FR que introduz campo/estado persistível novo **sem par de leitura está incompleto** — algum FR ou AC da mesma SPEC nomeia onde o valor salvo reaparece; AC de leitura satisfaz, FR novo não é exigido (evita inflar a contagem que dispara `spec-porte-epico`). No `skills/spec-validator/SKILL.md`, WARNING semântico na seção "EARS e redação", ao lado da 4.198 e com a mesma fronteira declarada contra o grafo: pressupõe AC existente (`fr-sem-ac` já acusa FR sem AC nenhum; este check pergunta se algum AC prova a **volta** do dado). Não entra no artifact-lint: semântico, mesma calibração da 4.198.
+
+**Aplicação**: `commands/specify.md` (Etapa 2, princípio 10) · `skills/spec-validator/SKILL.md` (Etapa 1, "EARS e redação"). Conteúdo embarcado (4.194): bump minor + CHANGELOG; bloco injetado e ficha intocados — sem re-init.
+
+### 4.226 — Prova de gate não vive em grupo excluído da suíte: check no gate 1 + autocheck do developer
+
+**Problema**: mesma sessão de consumidor — classes de teste-prova de segurança de **2 waves** carregavam um grupo de teste que a configuração default da suíte exclui: as provas existiam, passavam isoladas e **nunca rodavam** na rodada padrão; o gate 8 do consumidor registrou "4ª ocorrência do padrão no projeto". A classe é vizinha das 4.162/4.215 (que cobrem o **critério da TASK**: alcance do filtro, contradição comando×tag), mas o eixo aqui é outro — a config da suíte × o marcador do teste entregue — e nenhum gate confrontava os dois. Pela escada 4.149 (2ª+ reincidência), a proposta chega com o check contável desenhado. Risco mapeado pelo `impact-scout` e mitigado no desenho: escrever "rode a suíte default" contradiria o gate 2 ("não rode a suíte completa", rodada escopada) e criaria 5ª cópia da regra de grupo/tag — a régua é reformulada como **propriedade do teste**, não amplitude da rodada.
+
+**Decisão**: dois momentos. No **gate 1** (`CODE-REVIEW.md`, bloco "Checks mecânicos de falsificabilidade" — é o irmão natural: teste excluído "existe e passa, mas não roda onde o time olha"): bullet novo — confrontar o grupo/tag/marcador de cada teste novo com as exclusões da config default do runner; achado bloqueante, vocabulário agnóstico ("marcador que a configuração default não seleciona" — nomes concretos ficam no perfil, mesma divisão do TESTING.md). No **developer** (`agents/developer.md`, etapa 5): autocheck antes do report — a evidência é contável e reusa `verificacao.final` (campo existente; nenhum campo novo no report, preservando os 3 consumidores do contrato): o comando da rodada default listando o teste novo executado, nunca só a rodada filtrada. O dono da régua na **geração** segue `commands/tasks.md` (4.161/4.215) — os bullets novos citam o dono, não a replicam.
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (gate 1) · `agents/developer.md` (etapa 5). Conteúdo embarcado (4.194): bump minor + CHANGELOG; sem re-init (precedente 4.219/4.220 — régua lida em runtime, bloco injetado aponta e não copia).
+
+### 4.227 — Guard textual nasce como inventário contável, nunca como parser da linguagem
+
+**Problema**: mesma sessão de consumidor — o único loop real de gate (3 rodadas do gate 8 sobre o mesmo artefato) foi um guard meta-teste que provava concessões de uma DEC parseando SQL com regex: fail-open no idioma dominante na 1ª rodada, mais 2 formas de escrita escapando na 2ª, até a 3ª trocar o oráculo por allowlist de arquivos. Parser textual de linguagem é fail-open **por construção** — cada idioma não previsto passa em silêncio — e a doutrina não nomeava o anti-padrão: a 4.161 cobre o caso irmão (grep não-ancorado no **critério de TASK**), nada cobria o guard entregue **como teste**.
+
+**Decisão**: bullet novo em `guidelines/core/TESTING.md`, "Asserções que provam" (6º, ao lado do 4.175), escrito como alvo positivo (régua 4.160): guard que prova propriedade do código-fonte por varredura textual nasce com **universo declarado e fechamento contável** — lista fechada (allowlist/inventário "N no escopo, N provados") confrontada com o universo real, controle positivo (4.186) e degradação para aviso quando não parseia — nunca tentando reconhecer todas as formas da linguagem. O próprio repo é o exemplar do padrão (check-refs.sh, graph.sh: allowlist + degradação WARNING). Fronteira com a 4.161 declarada no bullet (sujeitos distintos: critério de TASK lá, guard-teste aqui). Sujeito restrito a teste/guard-de-teste — guard de código de produção, se reincidir, ganha ponteiro no gate 7 em leva própria.
+
+**Aplicação**: `guidelines/core/TESTING.md` ("Asserções que provam", bullet 6). Conteúdo embarcado (4.194): bump minor + CHANGELOG; sem re-init.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

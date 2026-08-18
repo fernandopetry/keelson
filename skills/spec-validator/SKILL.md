@@ -50,6 +50,7 @@ degradação; a calibração final é sua (protocolo §1/§3).
 - ERROR: sujeito implícito ou vago no FR ("o sistema" genérico quando a SPEC nomeia atores distintos).
 - WARNING: FR com múltiplos verbos coordenados (FR composto).
 - WARNING: FR com modal de **proibição/recusa** ("não deve permitir", "nunca ocorre", "não é X") cujos ACs pareados só provam **mitigação a jusante** (bloquear/avisar a ação seguinte) em vez da negação/recusa do próprio evento — o AC prova uma versão mais fraca do FR (`fr-sem-ac` confere que o AC existe; este check pergunta se ele **prova** o FR). Recusa em forma indireta satisfaz ("Então retorna 403", "Então o registro permanece inalterado", "Então nada é selecionado"); só aviso/bloqueio de etapa posterior, não. Reincidência da classe escala a ERROR (régua 4.52 — decisão 4.198).
+- WARNING: FR que **persiste** campo/estado novo (salvar, gravar, registrar, atualizar valor) sem **par de leitura** na mesma SPEC — nenhum FR ou AC nomeia onde o valor salvo reaparece (recarga, payload de consulta, exibição). Pressupõe AC existente: FR sem AC nenhum já é `fr-sem-ac` do grafo, e este check não re-acusa; ele pergunta se algum AC prova a **volta** do dado (decisão 4.225 — mesma família da 4.198: "o AC existe" ≠ "o AC prova").
 - Escalar `spec-ears-nao-casa`/`spec-tecnologia` (fatos WARNING) para ERROR quando o padrão é claro: verbo imperativo sobre tecnologia ("usar", "implementar com", "armazenar no", "deploy em") ou menção a estrutura de arquivo, pasta, namespace, classe.
 
 ### Auto-fix (protocolo §3)

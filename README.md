@@ -411,16 +411,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.105.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.106.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the `/keelson:auto` kickoff now sizes every demand automatically —
-the `estimator` agent writes a `## Estimativa` section into the BRIEF (best-effort,
-never a gate), the closing report confronts estimated vs. actual, and every closed
-cycle feeds the project's calibration history (decision 4.224, building on 4.223's
-`/keelson:estimate`). Estimates never touch measured fields and never decide routing.
-No re-init needed for this jump (0.104.0 required one: new ficha key `jira.estimate`).
+New in this release: a field batch from a consumer transcript analysis (decisions
+4.225–4.227) — SPECs now require a read counterpart for every newly persisted
+field/state (specify principle 10 + spec-validator WARNING), gate 1 confronts new
+tests' group/tag markers with the default suite's exclusions (a proof that never runs
+where the team looks is a blocking finding), and textual guards over source code are
+born as countable allowlists/inventories, never language parsers. No re-init needed.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

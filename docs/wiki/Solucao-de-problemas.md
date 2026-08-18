@@ -72,6 +72,17 @@ típico), ou a proibição, se ela não se aplica a este contexto. Nasce como WA
 `task-validator` escala para ERROR quando a proibição é uma lição real do projeto que o
 comando viola (decisão 4.215).
 
+### O gate 1 reprovou um teste que passa: "grupo excluído da suíte default"
+
+O teste existe e passa quando rodado isolado, mas carrega um grupo/tag/marcador que a
+configuração default do runner exclui (ex.: `@group` listado nas exclusões do
+`phpunit.xml`) — ou seja, ele nunca executa na rodada que o time olha. O gate 1
+confronta o marcador de cada teste novo com as exclusões da config e trata o caso como
+achado bloqueante (decisão 4.226; caso de campo: provas de segurança de 2 waves
+inertes). Correção típica: remover o grupo do teste-prova ou movê-lo para um grupo que
+a suíte default seleciona; a evidência pedida é a rodada default listando o teste
+executado.
+
 ### O gate de comportamento (9) ficou pendente
 
 O keelson **não finge** que verificou. A pendência vem com a causa nomeada:

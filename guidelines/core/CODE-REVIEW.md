@@ -31,7 +31,13 @@ Cada AC dos critérios de pronto tem ≥ 1 teste que o verifica, e o teste é **
 - valor esperado **calculado chamando o código de produção** (tautologia);
 - requisito de unicidade provado com "contém" em vez de **contagem**;
 - cadeia de fallback sem **um caso por ramo** (fixture sempre-preenchido);
-- AC quantificado ("todos os X") coberto só pelo caso default.
+- AC quantificado ("todos os X") coberto só pelo caso default;
+- teste-prova em **grupo/tag/marcador que a configuração default da suíte não
+  seleciona** (decisão 4.226): confronte o marcador de cada teste novo com as exclusões
+  da config do runner — teste excluído da rodada default existe e passa isolado, mas
+  **nunca roda** onde o time olha (caso real: provas de segurança de 2 waves inertes,
+  4ª ocorrência no mesmo projeto). O dono da régua na geração é `commands/tasks.md`
+  (4.161/4.215 — fixação com conjunto não-vazio); aqui é o momento do gate.
 
 Cada um é **achado bloqueante**: o teste existe e passa, mas não é capaz de falhar junto
 com o comportamento — o AC conta como **sem teste**.

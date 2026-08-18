@@ -25,6 +25,39 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.106.0] — 2026-08-18
+
+Re-init: none
+
+Decisions 4.225–4.227 — field batch from a consumer transcript analysis (a ~7h30 `/auto`
+cycle with ~22 fix commits): the three actionable causes become doctrine. None of them
+touches the injected block or the ficha contract.
+
+### Added
+
+- **SPEC symmetry: what is written must be read back** (4.225). `specify.md` gains
+  principle 10: an FR that introduces a new persistable field/state is incomplete
+  without a read counterpart — some FR/AC in the same SPEC names where the saved value
+  reappears (reload, query payload, display); a read AC on the same FR satisfies. The
+  `spec-validator` gains the matching semantic WARNING (sibling of 4.198, same declared
+  boundary against the graph's `fr-sem-ac`). Field case: a value specced only on the
+  write side produced 4–5 chained fixes.
+- **Gate proof must live in the default suite selection** (4.226). Gate 1 gains a
+  falsifiability check: the group/tag/marker of every new test is confronted with the
+  default runner configuration's exclusions — an excluded proof exists and passes in
+  isolation but never runs where the team looks (4th occurrence of the class in the
+  same consumer project; 4.149 ladder). The `developer` gains the mirrored autocheck
+  before reporting, with countable evidence in the existing `verificacao.final` field.
+  Written as a property of the test, not of the run — the gate 2 scoped-run rule and
+  the TASK-criterion owners (4.161/4.215) stay untouched and are pointed to, not copied.
+- **Textual guards are born as countable inventories, never language parsers** (4.227).
+  `TESTING.md` "Asserções que provam" gains a 6th bullet: a guard proving a property of
+  source code by text scanning declares its universe (allowlist/inventory with countable
+  closure), carries a positive control (4.186) and degrades to a warning when it cannot
+  parse — trying to recognize every form of the language is fail-open by construction
+  (field case: 3 gate rounds teaching SQL idioms to a regex until the oracle became an
+  allowlist).
+
 ## [0.105.0] — 2026-08-17
 
 Re-init: none

@@ -107,6 +107,12 @@ esperado independente do código sob teste (nunca calculado chamando produção)
 para requisito de unicidade, um caso por ramo de fallback, tabela para requisito
 quantificado ("todos os X"). Teste que não é capaz de falhar reprova no gate 1.
 
+**Teste novo roda onde o time olha** (decisão 4.226): antes de reportar, confronte o
+grupo/tag/marcador de cada teste que você criou com as exclusões da config default do
+runner — teste em grupo excluído passa isolado e **nunca roda** na rodada padrão. A
+evidência é contável e vai em `verificacao.final`: o comando da rodada default listando
+o teste novo executado (`OK (N tests)` que o inclui), nunca só a rodada filtrada.
+
 **Spec E2E como entregável** (`quality.e2e` na ficha — decisão 4.166): AC com efeito
 observável em tela → o spec E2E que o prova faz parte da task, tagueado `@<slug>` no
 arquivo e `@AC-NNN-XXX` por teste; asserção de DOM/texto/estado/rede, nunca comparação
