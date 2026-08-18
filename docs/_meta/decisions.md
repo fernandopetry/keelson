@@ -2448,6 +2448,56 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.228 — Declarar wave paralela exige checagem por arquivo, não lembrança da regra
+
+**Problema**: LRN-066 de consumidor — a condição SEQUENTIAL_FORCED de arquivos de registro compartilhados (lista que já vive na Etapa 1 do `implement.md`) foi violada 3× na mesma sessão: o Tech Lead paralelizou por disjunção de território (squads/features) e a generalizou aos arquivos de registro, **mesmo tendo escrito a lição no ledger 2× entre as ocorrências**. O commit por pathspec (4.163) evitou perda, mas custou 2–3 commits de conserto por incidente. Texto lido a cada wave, escrito pelo próprio autor do erro, não previne sob a pressão de despachar — falta um ponto de checagem, não mais regra.
+
+**Decisão**: parágrafo novo na própria Etapa 1 (dono da lista — nunca 2ª cópia na 3.1): antes de declarar wave paralela, cruzar os `Escopo > Inclui` das TASKs candidatas (já lidos na Etapa 0.5) contra a lista de arquivos de registro — 2+ TASKs citando o mesmo arquivo de registro força sequencial; território é heurística por consumidor, não substitui a checagem por arquivo. A exceção literal ("mesmo diretório com arquivos distintos não força sequencial") permanece.
+
+**Aplicação**: `commands/implement.md` (Etapa 1, SEQUENTIAL_FORCED). Embarcado (4.194): bump minor; sem re-init.
+
+### 4.229 — Nome de arquivo novo se verifica contra a convenção do perfil, como caminho e schema
+
+**Problema**: LRN-067 de consumidor — TASK prescreveu o caminho literal de 2 componentes novos com prefixo que o perfil de frontend do projeto reserva ao design system; o developer seguiu à risca (comportamento correto) e os componentes nasceram únicos no repo violando a convenção, achados só no gate 7. O gerador já verifica caminho (4.106) e schema (4.108); o **nome** nunca.
+
+**Decisão**: sub-bullet no princípio 6 do `tasks.md`: nome/prefixo de arquivo **novo** citado no Inclui conferido contra a convenção de nomenclatura do perfil ativo antes de escrito — prefixo idiomático não dispensa; perfil sem seção de nomenclatura → declara e segue (degradação no molde do product-designer). A convenção é do perfil — o comando cita, nunca enumera prefixos.
+
+**Aplicação**: `commands/tasks.md` (princípio 6). Embarcado: bump minor; sem re-init.
+
+### 4.230 — Correção de alinhamento do gate 11 se soma antes de se escrever
+
+**Problema**: LRN-068 de consumidor — o gate 11 reprovou 2× o mesmo alinhamento, a 2ª pela própria prescrição da 1ª: "pr-5" era canônico e plausível, mas alinha o container — o valor do pai terminava antes (trilhas 124px vs 20px), e ninguém somou a aritmética antes de escrever o achado. Classe LRN-029 (achado redigido sem verificar contra o caso real) no campo design/CSS.
+
+**Decisão**: extensão do item 4 do `product-designer.md`: correção que prescreve técnica de medida para igualar coordenadas é verificada por **aritmética** (somar as trilhas dos dois lados) antes de virar texto do achado; sem os valores legíveis, o achado degrada a `sugestao` com a medida faltante nomeada. É verificação do achado, não direção de arte (o limite do agent permanece).
+
+**Aplicação**: `agents/product-designer.md` (item 4). Embarcado: bump minor; sem re-init.
+
+### 4.231 — Inventário de fim de wave ganha o eixo tracker: despacho do sync auditado como os gates
+
+**Problema**: LRN-069 de consumidor — com `jira.enabled`, o tracker-sync não foi despachado em **nenhuma** das 6 waves (ganchos despacho/closure que o 3.2/3.4.2 mandam), a árvore inteira ficou em "A fazer" o ciclo todo, e só a reconciliação do fecho corrigiu — por iniciativa do agent, não por contrato. Mesma classe estrutural de LRN-028/LRN-058 (4.197): obrigação em prosa sem confronto mecânico no inventário que já audita os irmãos.
+
+**Decisão**: eixo (c) no item 1 do §3.6: com `jira.enabled`, o ledger tem evento `tracker` **desta wave** para os dois ganchos; o bloqueio é pelo **ato de despachar**, nunca pelo resultado externo (desenho da 4.199; `falhou com motivo` cumpre — 4.196; ledger sem evento com retorno do agent em mãos é degradação declarada, nunca reabertura cega). Ausência do despacho reabre a wave agora.
+
+**Aplicação**: `commands/implement.md` (§3.6, item 1c). Embarcado: bump minor; sem re-init.
+
+### 4.232 — Denominador do fechamento contável de escopo: quem toca a tabela, nunca quem já tem predicado
+
+**Problema**: LRN-034 reincidência 3 (4ª ocorrência cumulativa da família — a escada 4.149 não aceita mais reformulação textual sozinha): o item (c) da 4.139 ancorava o denominador em "todo método cujo WHERE **carrega** esse escopo" — e upsert/delete **sem predicado nenhum** saíram da contagem por construção ("2 de 2 com escopo", faltando os 2 que tocavam a tabela sem escopo). IDOR de escrita real chegou ao gate 8, não ao gate 1.
+
+**Decisão**: denominador reformulado in loco no item (c): "todo método que **toca** a tabela/recurso escopado — leitura ou escrita, com ou sem predicado hoje"; método sem predicado é prova **faltando**. Mecanização dentro do limite do lint (o check pedido — contar queries no código — exigiria ler código-fonte: fora do contrato e anti-padrão 4.227; **decisão em nome do Diretor**, default do impact-scout): fato novo `task-mutacao-sem-contagem` (WARNING) cobra a **forma** do par contável ("N métodos … N provas") quando o critério menciona mutação de predicado de escopo; o confronto número×código é do gate 8. Escalada a ERROR declarada no task-validator (TASK de persistência com escopo). Check contra o código: adiado com gatilho (nova reincidência da família com o lint ativo).
+
+**Aplicação**: `commands/tasks.md` (item (c)) · `scripts/artifact-lint.sh` + fixture `TASK-001-009` + expected regenerado · `docs/_meta/conventions/lint-contract.md` (catálogo) · `skills/task-validator/SKILL.md` (escalação). Embarcado: bump minor; sem re-init.
+
+### 4.233 — Ausência de citação não absolve: teste de segurança com grupo de suíte vira fato de lint por nome
+
+**Problema**: LRN-056 reincidência 1 — o lint da 4.215 só pega **contradição** textual; nesta sessão as 12 TASKs herdaram `--group` excluído como boilerplate **sem** nenhuma frase a contradizer (3 ocorrências, sempre achadas no gate 8, nunca no gate 1). A 4.226 cobriu o momento do **gate**; faltava o gerador+lint. Limite estrutural: a lista de grupos excluídos vive na config da suíte do consumidor, fora do universo do lint — inferi-la seria inventar ERROR.
+
+**Decisão**: fato novo `task-prova-seguranca-com-grupo` (WARNING — **decisão em nome do Diretor**, default: o contrato §1 limita check-por-padrão a WARNING; escalada a ERROR declarada no task-validator quando lição/ficha/perfil do projeto confirma a tag como excluída): arquivo de teste de segurança no Inclui — reconhecido por padrão de **nome** (`*Permission*Test`/`*Security*Test`/`*Guard*Test`), best-effort declarado no catálogo (ausência de achado ≠ ausência de defeito) — com comando usando `--group <tag>`; suprimido quando a tag já dispara o 4.215 (sem duplo achado). Prosa no cruzamento do `tasks.md`: boilerplate herdado é a mesma classe sem contradição, e rota nova que estende guard pré-existente soma a obrigação de destravar a rede. Generalização do padrão de nome a outros ecossistemas: mesmo gatilho da 4.215 (1ª ocorrência de campo).
+
+**Aplicação**: `commands/tasks.md` (cruzamento 4.138/4.215) · `scripts/artifact-lint.sh` + fixture `TASK-001-008` + expected · `lint-contract.md` · `skills/task-validator/SKILL.md`. Embarcado: bump minor; sem re-init.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

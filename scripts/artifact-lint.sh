@@ -546,6 +546,13 @@ sect == "crit" && line ~ /(^|[ `|(])(grep|egrep|rg) / {
     }
   }
 }
+subq == "inc" && line ~ /(Permission|Security|Guard)[A-Za-z0-9_]*Test/ {
+  # 4.233: arquivo de teste de seguranca citado no Inclui (padrao de NOME, best-effort
+  # declarado no lint-contract — ausencia de achado nao prova ausencia de defeito)
+  nSecTest++
+  if (secName == "") { s = line; if (match(s, /[A-Za-z0-9_\/.-]*(Permission|Security|Guard)[A-Za-z0-9_]*Test[A-Za-z0-9_.]*/)) secName = substr(s, RSTART, RLENGTH) }
+}
+sect == "crit" { critAll = critAll " " line }
 line ~ /(@group|--group)[ \t]+[A-Za-z0-9_-]/ {
   # 4.215: lado proibicao — linha com negacao citando a mesma tag, em qualquer secao
   lline = tolower(line)
@@ -643,6 +650,16 @@ END {
   # comando de verificacao contradiz proibicao de tag da mesma TASK
   for (t in cmdGroup) if (t in prohGroup)
     emit("WARNING", "task-comando-contradiz-criterio", "comando de verificacao usa --group " t " e outra linha da mesma TASK proibe a tag " t " (4.215)")
+  # teste de seguranca no Inclui + comando com tag de grupo, sem proibicao que o 4.215 pegue
+  if (nSecTest > 0)
+    for (t in cmdGroup) if (!(t in prohGroup))
+      emit("WARNING", "task-prova-seguranca-com-grupo", "teste de seguranca no Inclui (" secName ") e comando de verificacao com --group " t " — confirme que a config default da suite nao exclui a tag (4.233)")
+  # criterio de mutacao de escopo sem o par contavel N metodos / N provas
+  lcAll = tolower(critAll)
+  if ((lcAll ~ /tenant|predicado de escopo|escopo de (dono|tenant|agregado)/) && lcAll ~ /muta/) {
+    if (!(lcAll ~ /[0-9]+[ \t]*m[eé]+todos?/ && lcAll ~ /[0-9]+[ \t]*provas?/))
+      emit("WARNING", "task-mutacao-sem-contagem", "criterio menciona mutacao de predicado de escopo sem o par contavel \"N metodos ... N provas\" (4.232)")
+  }
 }
 AWK
 

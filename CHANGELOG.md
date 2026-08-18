@@ -25,6 +25,46 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.107.0] — 2026-08-18
+
+Re-init: none
+
+Decisions 4.228–4.233 — second field batch from the same consumer cycle: the six
+`PROPOSTA_PLUGIN` findings recorded in the consumer's learning-log (LRN-066..069 plus
+the LRN-034/LRN-056 recurrences) become doctrine and lint. Injected block and ficha
+contract untouched.
+
+### Added
+
+- **Parallel-wave declaration is checked, not remembered** (4.228). Before declaring a
+  wave parallel, the implement step 1 crosses the candidate TASKs' `Escopo > Inclui`
+  against the shared-registry file list (DI container, route files, manifests) — 2+
+  TASKs citing the same registry file force sequential, even when territory disjunction
+  suggests otherwise (field case: 3 violations in one session with the lesson written
+  twice by its own author).
+- **New-file names are verified like paths and schemas** (4.229). The tasks generator
+  confronts a new file's name/prefix with the active profile's naming convention before
+  writing it (field case: 2 components born with the design-system-reserved prefix).
+- **Gate 11 alignment prescriptions are summed before written** (4.230). A correction
+  prescribing padding/margin/width to equalize coordinates is verified by arithmetic
+  (both tracks summed); without readable track values it degrades to `sugestao`.
+- **Wave-end inventory gains the tracker axis** (4.231). With `jira.enabled`, the
+  ledger must hold this wave's `tracker` events for the dispatch and closure hooks;
+  blocking is on the act of dispatching, never the external result (field case: 6 waves
+  with zero dispatches, the whole tree stuck in "To do" until delivery reconciliation).
+- **Scope-mutation accounting gets the right denominator plus a lint fact** (4.232).
+  The countable closure now counts every method that touches the scoped table (with or
+  without a predicate today) — a write method with no predicate is a missing proof, not
+  out of scope (field case: real write-IDOR reached gate 8 unseen). New WARNING
+  `task-mutacao-sem-contagem` enforces the countable form; number-vs-code stays with
+  gate 8.
+- **Security tests carrying a suite group become a lint fact by name** (4.233). New
+  WARNING `task-prova-seguranca-com-grupo`: a security-test file in `Inclui`
+  (`*Permission*Test`/`*Security*Test`/`*Guard*Test`, declared best-effort) whose
+  verification command uses `--group <tag>` with no prohibition in the TASK — the
+  inherited-boilerplate case 4.215 cannot see; suppressed when 4.215 already fires.
+  Both new checks ship with fixtures and validator escalation rules.
+
 ## [0.106.0] — 2026-08-18
 
 Re-init: none

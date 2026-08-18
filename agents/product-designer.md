@@ -69,7 +69,15 @@ ou notificação renderizada.
    por inspeção do diff e **declare** a base do achado.
 4. Cada achado: categoria do catálogo de `core/DESIGN.md`, `arquivo:linha`, severidade,
    correção objetiva citando o padrão canônico do produto (componente/token/tela de
-   referência) ou o item do gabarito.
+   referência) ou o item do gabarito. **Correção de alinhamento se soma antes de se
+   escrever (decisão 4.230)**: quando a correção prescreve técnica de medida (padding,
+   margin, largura) para igualar a coordenada de dois elementos, verifique por
+   **aritmética** — some as trilhas dos dois lados (padding + conteúdo + gap até o
+   valor) e confirme que batem; prescrição plausível mas não somada alinha o container,
+   não o caso, e o achado seguinte reabre pelo próprio remendo (caso real: "pr-5"
+   canônico, e a trilha real era 124px vs 20px — 2ª reprovação pela mesma causa). Isto
+   é verificação do achado, não direção de arte; sem os valores das duas trilhas
+   legíveis no diff/tokens, o achado sai como `sugestao` com a medida faltante nomeada.
 5. Decisão: **qualquer** padrão descuidado do catálogo em superfície que o usuário vê
    ou opera → REPROVADO.
 
