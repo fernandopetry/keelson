@@ -162,6 +162,7 @@ grava **IDs**.
 "jira": {
   "enabled": false,
   "telemetry": false,                     // worklog + contadores por etapa (4.193)
+  "estimate": false,                      // espelho da estimativa da demanda (4.223)
   "site": null, "cloudId": null, "projectKey": null,
   "mode": "create",                       // "create" | "link"
   "issueType": { "spec": null, "feature": null, "task": null, "standalone": null },
@@ -189,6 +190,7 @@ Jira, como sempre (best-effort).
 | `issueType.task` | ID do tipo de **sub-task** (o `init` confirma `subtask: true`; senão, avisa o fallback para issue linkada) |
 | `issueType.standalone` | ID de um tipo nível 0 (Tarefa/Bug) para a tarefa avulsa fora do aninhamento; `null` → avulsos não sincronizam |
 | `telemetry` | `true` publica, a cada etapa do ciclo (SPEC, PLAN, TASKs, entrega), um **worklog** com a duração medida da etapa e um comentário de 1 linha com os contadores de qualidade (retries de gate, escalações, re-gates) na issue principal. Worklog agrega nos relatórios de tempo do Jira. **Atenção**: o autor do worklog é a conta do conector — telemetria por pessoa exige que cada desenvolvedor use o próprio conector, nunca conta de serviço compartilhada |
+| `estimate` | `true` espelha a **estimativa** da demanda (`/keelson:estimate`) na issue principal — comentário estruturado de 1 linha (waves/tasks previstos, faixa total, confiança); se o `mapFile` definir um campo `estimate`, grava também o campo. **Nunca vira worklog**: worklog é tempo medido; estimativa e medição não compartilham campo (decisão 4.223) |
 | `mode` | `create` — o keelson cria a issue da SPEC e as sub-tasks; `link` — pendura o trabalho numa issue que você já abriu |
 | `epicPolicy` | `multi-feature` não cria Epic para SPEC com 0–1 funcionalidade (a Story vira a raiz) |
 | `standaloneParent` | key de um Epic que **você** cria uma vez (ex.: "Manutenção") para as Stories de tarefa avulsa aninharem; `null` → a Story avulsa nasce sem pai — os dois são válidos |

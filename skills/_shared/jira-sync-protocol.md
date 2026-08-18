@@ -840,3 +840,26 @@ fecho — publica também o worklog do trecho medido; rota sem marca de largada 
   linha impede: telemetria ativa, worklog ausente e nenhum rastro em lugar nenhum — o
   mesmo padrão declarado da mutação e do diff inerte (opt-in ausente fala; ativo e não
   executado fala mais alto).
+
+## §18. Espelho da estimativa (decisão 4.223)
+
+**Gatilho**: `jira.enabled` ∧ `jira.estimate: true` ∧ a demanda tem estimativa (bloco do
+`estimate-contract.md` §3) ∧ a issue principal existe. Desligado ou sem estimativa →
+nada muda. Publicação no gancho em que a estimativa nasce ou entra no ciclo
+(`/keelson:estimate` Etapa 3, largada do ciclo com seção `## Estimativa` no BRIEF):
+
+- **Comentário estruturado** (1 linha) na issue principal:
+  `estimativa: ~N waves · ~N tasks (~X small · ~Y medium) · total <min–max>h · confiança <alta|média|baixa>`.
+  Quando o mapa de campos do projeto (§8, decisão 4.65) define um campo `estimate`,
+  gravar também o campo (`editJiraIssue`) com o teto da faixa — o comentário continua
+  (é o rastro legível da composição).
+- **Nunca worklog**: worklog é relógio **medido** (§17, 4.193) — estimativa em worklog
+  contamina a agregação que motivou a telemetria. A separação estimado/medido é a regra
+  §1.2 do `estimate-contract.md`.
+- **Best-effort §0 inviolável**: falha ao publicar → evento `tracker` no ledger; a
+  reconciliação (§12) publica o atrasado. O espelho nunca move card e nunca trava o
+  comando.
+- **Declaração no report**: a linha `Estimativa × realizado` do fecho
+  (`report-contract.md`) carrega o resultado do espelho
+  (`publicada | falhou (motivo) | n/a`) — ativo sem declaração é defeito do report
+  (forma da 4.196).

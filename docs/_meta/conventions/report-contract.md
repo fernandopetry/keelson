@@ -57,6 +57,7 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 - **Tracker**: Jira: <KEY> (Épico) · Story: <KEY | —> em <coluna atual> (teto: <coluna>) · sub-tarefas: K/N · transições: <n aplicadas | nenhuma> (transition: <modo>)   # só com jira.enabled; sync pulado/falho aparece AQUI com o motivo, jamais some
 - **Telemetria**: <worklog <duração> publicado em <KEY> | falhou (<motivo>) | sem marca de largada — não publicável>   # só com jira.telemetry: true (§17 do protocolo, decisão 4.196); ativo sem linha é defeito do report, nunca omissão válida
 - **Fila do épico**: <fatia marcada `entregue` · próximo passo pronto: /keelson:continue <slug-âncora>>   # só demanda com **Epico**:
+- **Estimativa × realizado**: <~N waves/~N tasks previstos vs N/N reais · <min–max>h vs <duração medida> · desvio em meia linha · linha anexada em guidelines/project/estimates.md · espelho: <publicada | falhou (motivo) | n/a>>   # só quando o BRIEF da demanda tem seção ## Estimativa (estimate-contract.md §4, decisão 4.223); o realizado vem do TASK-MMM-INDEX e da duração MEDIDA — nunca o contrário
 - **Duração**: <total> (largada HH:MM → entrega HH:MM, horário de Brasília) · specify <n>min · plan <n>min · tasks <n>min · implement <n>min · janela pico ~<N>k tokens   # etapa que a rota não teve não aparece; marca ausente → o que foi medido + lacuna nomeada; janela só quando o log existe
 - **Pendente de você**: <revisão da branch · merge · resposta a pergunta estacionada · handoff · nada>
 

@@ -83,6 +83,14 @@ inline sem arquivo, e trivial não tem brief. Fora do ciclo, a mudança avulsa u
 <anexada pelo condutor do ciclo — uma linha `- <etapa>: <timestamp>` ao concluir cada etapa>
 ```
 
+**Seção opcional `## Estimativa` (decisão 4.223)**: quando a demanda foi dimensionada
+(`/keelson:estimate` ou `estimator` sob demanda) e entra no ciclo, o condutor grava o
+bloco canônico da estimativa (esqueleto no `estimate-contract.md` §3) como seção do
+BRIEF — formal ou avulso. É ela que liga a linha `Estimativa × realizado` do report de
+fecho (`report-contract.md`) e a linha de calibração em `guidelines/project/estimates.md`.
+Sem a seção, nada disso existe. A estimativa jamais preenche `Largada`/`Cronologia` —
+esses campos seguem medidos.
+
 Ciclo de vida: `Emitido` na largada (antes da SPEC) → `Aceito` na Entrega, junto do
 relatório de aceitação do PO. As marcas de `Largada` e `Cronologia` são **medidas**
 (`TZ=America/Sao_Paulo date`) e alimentam a linha de duração do report da Entrega —

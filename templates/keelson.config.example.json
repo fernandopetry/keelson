@@ -35,6 +35,7 @@
   "jira": {
     "enabled": false,
     "telemetry": false,
+    "estimate": false,
     "site": null,
     "cloudId": null,
     "projectKey": null,

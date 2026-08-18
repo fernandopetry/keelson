@@ -94,6 +94,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:brief` † | Forge a product document into a lapidated BRIEF before the cycle — inventory mirrored on the SPEC sections, code anchoring, one-question-at-a-time interview, formal pendings to product; reentrant by state on disk |
 | `/keelson:refine` † | Polish a raw idea into a refined prompt before it becomes a demand |
 | `/keelson:triage` | Triage a new demand — routes to SPEC, PLAN, TASK, standalone brief or direct action; `--from=<KEY>` pulls an existing tracker card as the input (classifies, doesn't execute) |
+| `/keelson:estimate` | Size a demand before the cycle — predicted waves/tasks and a time range per phase (interview, artifacts, implementation, gates) via the estimator agent, calibrated by the project's estimated-vs-actual history; refuses to guess ("not estimable" with the named gaps) and never decides routing |
 | `/keelson:specify-epic` | Decompose an epic-sized request into prioritized independent demands via the PM agent — you confirm the split and the branch strategy (default: one epic branch, synced with main at every slice boundary), the living queue tracks per-slice state, each demand then runs its own cycle |
 | `/keelson:continue` † | Resume a slug from wherever it stopped — derives the state from committed artifacts (epic queue, TASK closures, brief statuses), shows "you are here" and proposes the single next step with a default; after a weekend nobody needs to remember anything |
 
@@ -388,7 +389,7 @@ Owner of the rule: `docs/_meta/conventions/commit-convention.md`. Governance: de
 ```
 keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
-├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer, performance-engineer, product-designer… + tools (not roles): code-scout, scribe, tracker-sync
+├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer, performance-engineer, product-designer… + tools (not roles): code-scout, scribe, tracker-sync, estimator
 ├── skills/            # spec / plan / task validators + status + screen-verify
 ├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard, jira-guard
 ├── guidelines/
@@ -410,15 +411,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.103.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.104.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: lessons learned gained a lifecycle — state now gates their force
-(only an active lesson becomes a TASK criterion or a gate-7 rule), a grounded contest
-demotes them (first reformulates, second revokes into a one-line tombstone), and
-`/keelson:lessons-audit` retrofits and audits an existing ledger with git as the fact
-source (decision 4.221). No re-init needed.
+New in this release: demands can be sized before the cycle — `/keelson:estimate` and
+the `estimator` agent predict waves/tasks and a time range per phase (interview,
+artifacts, implementation, gates), the closing report confronts estimated vs. actual,
+and the project accumulates a calibration history; estimates never touch measured
+fields and never decide routing (decision 4.223). Re-init required (new ficha key
+`jira.estimate`).
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

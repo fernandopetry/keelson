@@ -25,6 +25,55 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.104.0] — 2026-08-17
+
+Re-init: required
+
+Decision 4.223 — demands can now be sized before the cycle. Director's pain: with
+several demands queued, there was no way to compare their sizes to decide order and
+allocation — the real dimension only appeared after specify→plan→tasks, too late to
+prioritize. The cycle already produced the measure a posteriori (waves, task count and
+dominant size in `TASK-MMM-INDEX`; measured duration per phase); this release
+anticipates it.
+
+### Added
+
+- `/keelson:estimate` — sizes a demand without running anything: predicted
+  `~N waves · ~N tasks` (small/medium mix, same semantics `tasks.md` already defines)
+  plus a time range per phase — interview, artifact writing (specify+plan+tasks),
+  implementation, and gates (including expected re-gates). Read-only: creates no SDD
+  artifact and never routes.
+- `estimator` agent — new single owner of the sizing competence, a team tool outside
+  the role cast (like `code-scout`): it sizes, it never decides. The existing "does
+  not estimate effort" limits of `pm`/`po`/`product-analyst` stay untouched.
+- `docs/_meta/conventions/estimate-contract.md` — single owner of the scale, the
+  output skeleton, the three inviolable rules (honest refusal: a vague request gets
+  "not estimable" with the named gaps, never an invented number; estimates never
+  occupy measured fields; dimension informs, never routes — 4.137 intact) and the
+  calibration history.
+- Estimated-vs-actual loop: when an estimated demand enters the cycle, the BRIEF
+  carries an optional `## Estimativa` section (`index-contract.md`); the closing
+  report confronts it with the real waves/tasks and the **measured** duration
+  (conditional line in `report-contract.md`), and appends one calibration line to
+  `guidelines/project/estimates.md` — which the estimator reads before every new
+  estimate (fewer than 3 closed demands → it declares "no historical base").
+- `jira.estimate` ficha key (default `false`) + sync protocol §18 — mirrors the
+  estimate to the main issue as a structured comment (custom field when the project's
+  field map defines `estimate`); never a worklog, best-effort, result declared in the
+  closing report.
+
+### Changed
+
+- Wiki: new *Dimensionamento de demanda* concept, the `jira.estimate` row in the
+  ficha reference, and a FAQ entry on why a small estimate never skips the cycle.
+
+Re-init is required because the ficha contract gained the `jira.estimate` key.
+Deferred with named triggers (4.182): a dimension column in the epic living queue
+(trigger: 3+ estimated demands in one epic) and automatic consumption of the estimate
+by `/keelson:auto` (trigger: a calibration file with a real historical base).
+
+---
+
 ## [0.103.0] — 2026-08-17
 
 Re-init: none

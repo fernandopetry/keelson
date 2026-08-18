@@ -63,6 +63,14 @@ slug, o comando para e lista os candidatos em vez de escolher um.
 Nunca o validator (ele só bloqueia errors). No ciclo com brief, quem promove é o PO pelo
 veredito registrado; no fluxo avulso e no `/keelson:guided`, é você.
 
+### A estimativa disse que é pequena. Posso pular o ciclo?
+
+Não — e essa separação é proposital. `/keelson:estimate` dimensiona (waves, tasks,
+faixa de tempo) para você **priorizar e comparar** demandas; quem decide a rota é o
+`/keelson:triage`, pelo custo de estar plausivelmente errado, nunca pelo tamanho: uma
+mudança de uma linha que altera o que o sistema promete roteia para o ciclo por menor
+que pareça. Estimativa pequena + rota pesada podem coexistir — e estão ambas certas.
+
 ## Sobre autonomia e controle
 
 ### O keelson faz merge ou deploy sozinho?

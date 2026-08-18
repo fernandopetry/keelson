@@ -215,6 +215,12 @@ Audita `guidelines/project/lessons.md` sob o ciclo de vida da 4.221: retrofita o
 
 Detalhe completo (flags, fluxo, regras): `commands/lessons-audit.md`.
 
+### 3.24 `/keelson:estimate` — dimensionar uma demanda antes do ciclo
+
+Devolve a dimensão prevista de uma demanda — `~N waves · ~N tasks` (mix small/medium) + faixa de tempo por fase (entrevista, artefatos, implementação, gates) — via agent `estimator`, calibrado pelo histórico estimado × realizado do projeto (`guidelines/project/estimates.md`). Read-only: não cria artefato SDD e não roteia. Pedido vago → `não estimável` com as lacunas nomeadas, nunca número inventado. A dimensão informa a priorização do Diretor; **a rota continua do `/keelson:triage`** (4.137: tamanho nunca decide rota) e a estimativa nunca entra em campo medido (worklog/Duração — 4.56). Dono da régua: `docs/_meta/conventions/estimate-contract.md` (decisão 4.223).
+
+Detalhe completo (flags, fluxo, regras): `commands/estimate.md`.
+
 ---
 
 ## 4. Skills
@@ -273,6 +279,7 @@ Os agents formam o **time** do keelson (modelo de time e contrato Diretor–PO �
 | `code-scout` | *(ferramenta, fora do elenco)* — reconhecimento de codebase, devolve conclusão ancorada em `arquivo:linha` | Tech Lead (main session), fases exploratórias e sessão livre |
 | `scribe` | *(ferramenta, fora do elenco)* — redige SPEC/PLAN/TASKs pelo contrato do comando; devolve sumário, não o conteúdo (4.103) | `/keelson:specify`, `/keelson:plan`, `/keelson:tasks` |
 | `tracker-sync` | *(ferramenta, fora do elenco)* — executa os ganchos do protocolo Jira; devolve o resumo canônico do tracker (4.103) | ganchos de `/keelson:specify`, `/keelson:tasks`, `/keelson:implement`, `/keelson:auto`; `/keelson:jira-sync` |
+| `estimator` | *(ferramenta, fora do elenco)* — dimensiona demanda antes do ciclo: waves/tasks previstos + faixa por fase, com calibração histórica; recusa estimar sem base (4.223) | `/keelson:estimate`, Tech Lead sob demanda |
 
 Os validators (`spec-validator`, `plan-validator`, `task-validator`) e o `code-scout` ficam **fora do elenco de propósito**: são ferramentas do time, não papéis (decisões 4.37/4.73).
 

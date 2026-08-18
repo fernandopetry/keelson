@@ -88,9 +88,10 @@ O keelson simula um time real, e os IDs dos agents **são** os nomes dos papéis
 | `staff-engineer` | Staff Engineer | Gera perfis de linguagem novos |
 
 Os validators, o `code-scout`, o `scribe` (redige SPEC/PLAN/TASKs pelo contrato do
-comando, para os insumos não ocuparem a janela da sessão principal) e o `tracker-sync`
-(executa os ganchos do Jira e devolve só o resumo) ficam **fora da metáfora**: são
-ferramentas do time, não pessoas.
+comando, para os insumos não ocuparem a janela da sessão principal), o `tracker-sync`
+(executa os ganchos do Jira e devolve só o resumo) e o `estimator` (dimensiona uma
+demanda antes do ciclo — ver *Dimensionamento de demanda*, abaixo) ficam **fora da
+metáfora**: são ferramentas do time, não pessoas.
 
 ### O contrato Diretor–PO
 
@@ -108,6 +109,22 @@ ferramentas do time, não pessoas.
   QA (funciona?).
 
 **A autonomia termina nos commits.** PR, merge e deploy são seus.
+
+## Dimensionamento de demanda
+
+Antes de a demanda entrar no ciclo, `/keelson:estimate` devolve a **dimensão prevista**:
+`~N waves · ~N tasks` (mix small/medium) e uma faixa de tempo por fase — entrevista,
+escrita dos artefatos, implementação e gates. A unidade é a mesma que o ciclo mede no
+fim (waves e tasks reais, duração medida por etapa), então cada demanda fechada vira
+uma linha de **calibração** (`guidelines/project/estimates.md`): o par estimado ×
+realizado aparece no relatório de fecho e ensina as próximas estimativas. Com menos de
+3 demandas fechadas, a estimativa declara "sem base histórica" — e pedido vago recebe
+**"não estimável"** com as lacunas nomeadas, nunca um número inventado.
+
+Duas fronteiras propositais: a estimativa **não decide a rota** (isso é do
+`/keelson:triage` — uma mudança de uma linha pode exigir o ciclo inteiro se quebra o
+que o sistema promete) e **não toca campo medido** (worklog e duração seguem sendo
+relógio real; estimativa vive em campo próprio, comparada só na leitura).
 
 ## Quality gates
 
