@@ -70,10 +70,14 @@ disciplina de proposta + default da escalação — cada lacuna vem com a pergun
 
 ## §4. Persistência e confronto
 
-- **Registro**: quando a demanda entra no ciclo e tem BRIEF (formal ou avulso), o
-  condutor grava o bloco do §3 como seção `## Estimativa` do BRIEF
-  (`index-contract.md`). Demanda estimada que nunca entra no ciclo não persiste nada —
-  a estimativa avulsa é resposta ao Diretor, não artefato.
+- **Registro, por rota**: a **largada do `/keelson:auto`** estima sempre (item 6.6 da
+  Etapa 0.5, decisão 4.224) — nas rotas com BRIEF em arquivo, grava o bloco do §3 como
+  seção `## Estimativa` sem confirmação (registro, não decisão; best-effort: falha ou
+  `não estimável` → o ciclo segue sem a seção, declarado no report). O
+  **`/keelson:estimate`** avulso grava no BRIEF existente só com confirmação do
+  Diretor; estimativa avulsa sem BRIEF não persiste (é resposta, não artefato) — mas se
+  a demanda largar o ciclo **na mesma sessão**, a largada reutiliza o bloco em vez de
+  re-estimar.
 - **Confronto no fecho**: rota com `## Estimativa` no BRIEF → o report emite a linha
   `Estimativa × realizado` (`report-contract.md` §2): estrutura prevista vs. waves/tasks
   reais do `TASK-MMM-INDEX` · faixa total vs. duração **medida** · desvio em meia linha.

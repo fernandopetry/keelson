@@ -112,14 +112,17 @@ metáfora**: são ferramentas do time, não pessoas.
 
 ## Dimensionamento de demanda
 
-Antes de a demanda entrar no ciclo, `/keelson:estimate` devolve a **dimensão prevista**:
+Toda demanda que entra pelo `/keelson:auto` ganha uma **dimensão prevista** na largada:
 `~N waves · ~N tasks` (mix small/medium) e uma faixa de tempo por fase — entrevista,
-escrita dos artefatos, implementação e gates. A unidade é a mesma que o ciclo mede no
-fim (waves e tasks reais, duração medida por etapa), então cada demanda fechada vira
-uma linha de **calibração** (`guidelines/project/estimates.md`): o par estimado ×
-realizado aparece no relatório de fecho e ensina as próximas estimativas. Com menos de
-3 demandas fechadas, a estimativa declara "sem base histórica" — e pedido vago recebe
-**"não estimável"** com as lacunas nomeadas, nunca um número inventado.
+escrita dos artefatos, implementação e gates — gravada como seção `## Estimativa` do
+BRIEF. Quer o número **antes** de decidir rodar? `/keelson:estimate` devolve a mesma
+estimativa sem disparar nada. A unidade é a mesma que o ciclo mede no fim (waves e
+tasks reais, duração medida por etapa), então cada demanda fechada vira uma linha de
+**calibração** (`guidelines/project/estimates.md`): o par estimado × realizado aparece
+no relatório de fecho e ensina as próximas estimativas. Com menos de 3 demandas
+fechadas, a estimativa declara "sem base histórica" — e pedido vago recebe
+**"não estimável"** com as lacunas nomeadas, nunca um número inventado (no auto, o
+ciclo segue normalmente sem a seção; a estimativa jamais trava a largada).
 
 Duas fronteiras propositais: a estimativa **não decide a rota** (isso é do
 `/keelson:triage` — uma mudança de uma linha pode exigir o ciclo inteiro se quebra o

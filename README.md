@@ -411,16 +411,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.104.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.105.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: demands can be sized before the cycle — `/keelson:estimate` and
-the `estimator` agent predict waves/tasks and a time range per phase (interview,
-artifacts, implementation, gates), the closing report confronts estimated vs. actual,
-and the project accumulates a calibration history; estimates never touch measured
-fields and never decide routing (decision 4.223). Re-init required (new ficha key
-`jira.estimate`).
+New in this release: the `/keelson:auto` kickoff now sizes every demand automatically —
+the `estimator` agent writes a `## Estimativa` section into the BRIEF (best-effort,
+never a gate), the closing report confronts estimated vs. actual, and every closed
+cycle feeds the project's calibration history (decision 4.224, building on 4.223's
+`/keelson:estimate`). Estimates never touch measured fields and never decide routing.
+No re-init needed for this jump (0.104.0 required one: new ficha key `jira.estimate`).
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

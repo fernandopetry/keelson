@@ -127,7 +127,7 @@ Detalhe completo (flags, fluxo, regras): `commands/integrate.md`.
 
 ### 3.9 `/keelson:auto` — ciclo completo autônomo (modo padrão)
 
-O **default**: conduz `specify → plan → tasks → implement → entrega` de ponta a ponta sem aprovação de etapa, sob o contrato Diretor–PO — brief com janela de veto na largada, decisões em nome do Diretor no meio (interrupção só em último caso), e entrega com relatório de aceitação do PO no esqueleto canônico do `report-contract.md`. Entrega = branch + commit + push, **sem PR** — merge e deploy continuam humanos. Basta pedir a tarefa em linguagem natural, sem digitar o comando; ambiente sem tela gera handoff de verificação (§8).
+O **default**: conduz `specify → plan → tasks → implement → entrega` de ponta a ponta sem aprovação de etapa, sob o contrato Diretor–PO — brief com janela de veto na largada, decisões em nome do Diretor no meio (interrupção só em último caso), e entrega com relatório de aceitação do PO no esqueleto canônico do `report-contract.md`. A largada também **estima a demanda** (agent `estimator`, seção `## Estimativa` no BRIEF — 4.224, best-effort) e a entrega confronta estimado × realizado, alimentando a calibração do projeto. Entrega = branch + commit + push, **sem PR** — merge e deploy continuam humanos. Basta pedir a tarefa em linguagem natural, sem digitar o comando; ambiente sem tela gera handoff de verificação (§8).
 
 Detalhe completo (flags, fluxo, regras): `commands/auto.md`.
 

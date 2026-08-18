@@ -25,6 +25,36 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.105.0] — 2026-08-17
+
+Re-init: none
+
+Decision 4.224 — the `/keelson:auto` kickoff now estimates every demand. The 4.223
+deferral ("auto consumes estimates once the calibration has a real base") was circular,
+as the Director pointed out the same day: the base only forms if the cycle estimates,
+and standalone `/keelson:estimate` calls are too rare to feed it.
+
+### Changed
+
+- The auto kickoff (step 0.5, new item 6.6, between tracker root and branch) invokes
+  the `estimator` agent and writes the `## Estimativa` section into the BRIEF on every
+  file-backed route — no confirmation asked (it is a record, not a decision).
+  Best-effort and never a gate: "not estimable" or an agent failure lets the cycle
+  proceed without the section, declared in one half-line in the report. A demand
+  already sized in the same session via `/keelson:estimate` has its block reused, never
+  re-estimated.
+- With this, every closed cycle automatically produces one estimated-vs-actual
+  calibration line in `guidelines/project/estimates.md` — the "no historical base"
+  cold-start resolves itself. No new ficha key: the behavior is built into auto
+  (an opt-out is only born if the cost hurts in the field, with real data).
+
+No re-init: the ficha and the injected block are untouched. Watch with 4.223: if
+kickoff estimates (made before the SPEC) err systematically more than interviewed
+`/keelson:estimate` ones, that data decides whether kickoff should estimate after
+specify — a future decision made with measurement, never before it.
+
+---
+
 ## [0.104.0] — 2026-08-17
 
 Re-init: required
