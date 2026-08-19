@@ -2498,6 +2498,16 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.234 — Worklog de telemetria é sempre delta entre marcas; o total do ciclo nunca vira worklog na rota com Cronologia
+
+**Problema**: 1ª rodada real completa da telemetria por etapa (4.193/4.196) — relato do Diretor com o worklog do tracker em mãos: os ganchos por etapa publicaram trechos corretos (specify, tasks, closures por wave), e o gancho de **entrega** publicou um worklog largada→fim, que é a soma de todas as etapas — qualquer agregação de tempo do tracker (relatórios, API) conta ~2× o real. A ambiguidade nasceu da própria 4.196: "toda rota que publica o comentário de fecho publica também o worklog do **trecho medido**" — no fecho da rota formal, "trecho" foi lido como o ciclo inteiro, leitura reforçada pela linha de duração total do report (item 6.3 do `/keelson:auto`) e pela linha `Telemetria:` do report-contract, que não distinguiam janela. Risco espelho mapeado antes de editar (4.181): delta puro reabriria o furo da 4.196 — a janela larga cobria *por acidente* trechos de ganchos que degradaram no meio do ciclo.
+
+**Decisão**: o worklog de telemetria é **sempre o delta do trecho que fechou** — início = o mais recente entre a última marca do relógio do ciclo e o fim do último worklog de telemetria publicado na issue (cobre também closures por wave, que não têm marca própria na Cronologia). Na rota com marcas intermediárias, **largada→fim nunca vira worklog**: o total do ciclo já tem morada no comentário de contadores do fecho e na linha `Duração` do report (o consumidor confirmou que o comentário já sai com o total — nada novo a criar), e fica só lá. Largada→fim como worklog permanece correto **apenas** na rota sem marcas intermediárias (brief avulso, sob demanda — 4.196 intacta), onde é o único trecho. Trecho cujo gancho degradou (evento `tracker` pendente) é republicado como worklog **próprio** na reconciliação da entrega — recuperar cobertura nunca é alargar a janela do fecho (decisão em nome do Diretor, default da escalação 4.181).
+
+**Aplicação**: `skills/_shared/jira-sync-protocol.md` §17 (dono único da janela) · `commands/auto.md` gancho `entrega`, alínea (c) (ponteiro) · `docs/_meta/conventions/report-contract.md` (comentário da linha `Telemetria:`) · wiki `Solucao-de-problemas.md` (sintoma reconhecível). Embarcado: bump patch; sem re-init.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

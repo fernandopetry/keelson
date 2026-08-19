@@ -819,8 +819,18 @@ comentário de fecho (§11) — inclusive o modo sob demanda e a rota avulsa, qu
 fecho — publica também o worklog do trecho medido; rota sem marca de largada → worklog
 **não publicável**, e isso é declarado (abaixo), nunca engolido:
 
-- **Worklog** (`addWorklogToJiraIssue`): duração medida da etapa que fechou (`timeSpent`,
-  início = marca da etapa anterior). Worklog é o mecanismo agregável do Jira — relatórios de
+- **Worklog** (`addWorklogToJiraIssue`): duração medida do **trecho que fechou**
+  (`timeSpent`). Início do trecho = o mais recente entre a última marca do relógio do
+  ciclo (Cronologia/largada) e o fim do último worklog de telemetria já publicado na
+  issue — vale igual para as closures por wave do gancho `implement`. **Rota com marcas
+  intermediárias → largada→fim nunca vira worklog (4.234)**: essa janela é a soma dos
+  trechos já publicados, e publicá-la no fecho duplica a agregação de tempo do tracker;
+  o total do ciclo já tem morada — o comentário de contadores do fecho e a linha
+  `Duração` do report — e fica só lá. Rota **sem** marcas intermediárias (brief avulso,
+  modo sob demanda — 4.196): largada→fim **é** o único trecho, e é o que se publica.
+  Gancho anterior que degradou (evento `tracker` pendente) → a reconciliação da entrega
+  publica o trecho perdido como worklog **próprio**, nunca alargando a janela do worklog
+  do fecho. Worklog é o mecanismo agregável do Jira — relatórios de
   tempo e API leem sem parsear prosa; comentário **não** substitui worklog.
 - **Comentário de contadores** (1 linha, estruturada): etapa · duração · retries de gate ·
   escalações ao Diretor · re-gates vermelhos · waivers pedidos — lidos do ledger da etapa.

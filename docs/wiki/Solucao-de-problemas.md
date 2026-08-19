@@ -249,6 +249,14 @@ Cheque nesta ordem:
    "Work on issues" no projeto. E telemetria por pessoa exige conector por usuário;
    conta de serviço compartilhada faz tudo sair com o mesmo autor.
 
+### Apareceu um worklog somando o ciclo inteiro além dos worklogs por etapa
+
+Versões anteriores à 0.107.1 podiam publicar, no fecho, um worklog largada→fim — que é
+a soma das etapas já lançadas, duplicando a agregação de tempo. Desde a 4.234 o worklog
+do fecho cobre só o trecho da entrega; o total do ciclo vive no comentário de contadores
+e na linha `Duração` do report, nunca em worklog. Se aconteceu: exclua (ou edite) o
+lançamento do ciclo completo no card — os worklogs por etapa já contêm o tempo real.
+
 ### O `jira.<PROJECT>.md` está crescendo com listas de issues
 
 O mapa é **config, nunca ledger**: as três seções do protocolo (Campos, Etapas/Colunas,

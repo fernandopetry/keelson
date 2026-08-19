@@ -411,18 +411,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.107.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.107.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the second field batch from the same consumer cycle (decisions
-4.228–4.233) — parallel-wave declaration now checks candidate TASKs against the
-shared-registry file list, new-file names are verified against the profile's naming
-convention, gate 11 alignment prescriptions are summed before written, the wave-end
-inventory audits tracker-sync dispatch, and two new lint facts land with fixtures:
-`task-mutacao-sem-contagem` (countable scope-mutation closure) and
-`task-prova-seguranca-com-grupo` (security test carrying a suite group). No re-init
-needed (this follows 0.106.0's write⇄read SPEC symmetry batch, also re-init-free).
+New in this release: telemetry worklogs no longer double-count (decision 4.234) — the
+delivery hook logs only the delta since the last mark, never the whole-cycle window
+(whose sum already lives in the closing comment and the report's `Duração` line); the
+full-cycle worklog stays valid only on routes without intermediate marks. No re-init
+needed.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

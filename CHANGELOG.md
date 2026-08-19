@@ -25,6 +25,33 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.107.1] — 2026-08-19
+
+Re-init: none
+
+Decision 4.234 — telemetry worklogs stop double-counting. Field case (Director's
+report with the real tracker worklog in hand): per-stage hooks logged correct slices,
+then the delivery hook logged a kickoff→end worklog — the sum of every stage — so any
+Jira time aggregation counted ~2× the real time. The ambiguity came from 4.196's
+"measured slice" wording at the closing hook.
+
+### Fixed
+
+- **Worklog window is always the delta between marks** (§17 of the jira-sync
+  protocol): slice start = the most recent of the last cycle-clock mark and the end of
+  the last published telemetry worklog (this also covers per-wave closures, which have
+  no mark of their own). On routes with intermediate marks the kickoff→end window is
+  never a worklog — the cycle total already lives in the closing counters comment and
+  in the report's `Duração` line, and stays only there. Kickoff→end as a worklog
+  remains correct solely on routes without intermediate marks (standalone brief,
+  on-demand mode — 4.196 untouched).
+- **Degraded hooks keep their coverage**: a slice whose hook failed mid-cycle (pending
+  `tracker` ledger event) is re-published as its **own** worklog by the delivery
+  reconciliation — recovering coverage never widens the closing worklog's window.
+- Pointer clarifiers on the delivery hook of `/keelson:auto` (item c) and on the
+  `Telemetria:` line of the report contract; the troubleshooting wiki gains the
+  recognizable symptom ("a worklog summing the whole cycle") with the manual fix.
+
 ## [0.107.0] — 2026-08-18
 
 Re-init: none
