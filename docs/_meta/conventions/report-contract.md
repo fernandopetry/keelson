@@ -25,7 +25,10 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 - **Medido, nunca estimado**: composição via `git diff --stat` contra a base · tracker
   pela reconciliação desta execução (nunca memória dos ganchos) · duração pelas marcas
   de relógio (`TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z`) — sem marca medida,
-  não há número (decisão 4.56).
+  não há número (decisão 4.56). Item de **pendência reapresentado** (`Fora de escopo /
+  pendente`, `Pendente de você`) segue a régua "lista reapresentada é lista medida"
+  (dono: `sdd-conventions.md`, decisão 4.237): conferido na fonte durável nesta rodada,
+  ou marcado `não medido`.
 - **Narrado em linguagem de time** (PO, Tech Lead, Developer, QA, Security — 4.41);
   IDs técnicos ficam nos artefatos. Narrativa é bem-vinda **ao redor** do esqueleto,
   nunca no lugar dele.

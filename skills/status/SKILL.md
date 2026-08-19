@@ -40,10 +40,13 @@ Produza um **resumo executivo** do estado de um slug, respondendo à pergunta es
    O script é read-only (compatível com o princípio inviolável); régua e contrato:
    `docs/_meta/conventions/graph-contract.md`. Indisponível/falhou → siga pelo INDEX,
    nomeando a causa.
+5. **Fato mecânico antes da síntese** (decisão 4.237): rode já o `index-check.sh` da
+   Etapa 3 — a síntese nasce sabendo o que do INDEX envelheceu, em vez de descobrir
+   depois de escrita.
 
 ## Etapa 2: síntese
 
-Componha você mesmo o resumo executivo em markdown, calibrado ao foco — sem template rígido; o que cada foco cobre:
+Componha você mesmo o resumo executivo em markdown, calibrado ao foco — sem template rígido. Pendência ou risco **reapresentado** segue a régua "lista reapresentada é lista medida" (dono: `docs/_meta/conventions/sdd-conventions.md`, decisão 4.237): item cuja fonte não foi conferida nesta rodada (INDEX estale acusado pelo `index-check.sh`, handoff não relido) sai marcado **`não medido`**, nunca como corrente. O que cada foco cobre:
 
 - **Visão geral**: resumo de 2–3 linhas do que a área faz hoje; capacidades por estágio (✅ implementadas · 🟡 em desenvolvimento, com PLAN-MMM e X/Y tasks Done · ⏸ especificadas, aguardando plan); próximo movimento sugerido; riscos ativos que merecem atenção (máx. 3); saúde do slug (contagens de SPECs/PLANs por status, decisões irreversíveis, termos do glossário, última atividade).
 - **`--focus=risks`**: riscos abertos do INDEX com mitigação + `Q-*` agregados das SPECs Approved + `TRISK-*` dos PLANs em desenvolvimento.
@@ -53,10 +56,11 @@ Componha você mesmo o resumo executivo em markdown, calibrado ao foco — sem t
 
 ## Etapa 3: detecção de inconsistências (fato mecânico)
 
-Execute `bash "${CLAUDE_PLUGIN_ROOT}/scripts/index-check.sh" {docsRoot}/<slug>` —
-tabelas × arquivos, célula Tasks × TASKs reais, capacidade adiantada, seções e teto do
-histórico chegam como fato (catálogo: index-contract.md). Read-only; indisponível →
-confira por leitura e nomeie a causa.
+O comando é `bash "${CLAUDE_PLUGIN_ROOT}/scripts/index-check.sh" {docsRoot}/<slug>` —
+já executado na Etapa 1 (item 5); aqui trata-se o resultado. Tabelas × arquivos, célula
+Tasks × TASKs reais, capacidade adiantada, seções e teto do histórico chegam como fato
+(catálogo: index-contract.md). Read-only; indisponível → confira por leitura e nomeie a
+causa.
 
 Se inconsistência:
 - Não bloquear resposta.

@@ -20,7 +20,7 @@ Escale ao Diretor **apenas** quando a questão bate em um destes 4 critérios:
 1. **Ambiguidade que muda o resultado** (não detalhe de execução);
 2. Descoberta que **expande ou conflita com o escopo** do brief;
 3. Ação **irreversível ou externa** (merge, deploy, dado destruído, contrato com terceiro);
-4. Conflito com **diretriz anterior** do Diretor.
+4. Conflito com **diretriz anterior** do Diretor — e o claim de conflito é **verificado, nunca deduzido** (decisão 4.238): a escalação cita a âncora da diretriz (BRIEF · "Decisões irreversíveis" do INDEX · report anterior · evento `decisao` do ledger) com a frase citada em ≤1 linha na cauda do bloco — afirmar de memória que uma opção "revoga" ou "conflita com" decisão anterior infla o custo da opção que o Diretor tem de escolher (caso real: retificação registrada). Diretriz lembrada sem âncora localizável → **escala assim mesmo**, declarando `âncora não localizada` — suprimir a escalação por falta de âncora é o defeito pior.
 
 Toda escalação carrega **proposta + default** ("sigo com A a menos que o Diretor diga o contrário") **e o custo concreto do ramo não escolhido** — uma cláusula dizendo o que se perde ou quebra se o Diretor recusar a proposta; esse fato entra na escalação, nunca depois dela como justificativa (decisão 4.136). Escalação sem default trava o fluxo e é defeito; either/or equilibrado sem recomendação é o mesmo defeito — opinião retida. Recomendação que genuinamente não pode ser formada: declare isso e diga o que a destravaria. Fora dos 4 critérios, você decide e registra.
 
@@ -60,6 +60,7 @@ escalacoes:
     questao: <curta e objetiva>
     proposta: <caminho recomendado>
     default: <o que será feito sem resposta>
+    ancora: <só com criterio: diretriz — caminho + frase citada ≤1 linha, ou "não localizada" (4.238)>
 ```
 
 ## Modo aceitação (Entrega)

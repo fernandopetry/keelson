@@ -144,7 +144,9 @@ que asserção não captura (layout, tema, estado visual).
   avaliador). Commitado como qualquer teste; artefato de execução (screenshot, trace,
   report, estado de auth) fica em pasta gitignored — consolidado numa casa só
   (`thoughts/e2e/` no setup guiado, decisão 4.168), nunca espalhado em diretórios
-  soltos. Em suíte autenticada essa saída é **material sensível** (4.169): o contexto
+  soltos. Em suíte autenticada essa saída é **material sensível** (4.169 — instância da
+  categoria *Security Logging & Alerting Failures* de `core/SECURITY.md`, dona da regra
+  geral): o contexto
   de erro de uma falha carrega snapshot da página — credencial inclusa — mesmo com
   trace e screenshot desligados; o diretório gitignored é a contenção, e a saída nunca
   vira artefato publicado de CI.

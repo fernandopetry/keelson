@@ -26,7 +26,7 @@ categoria muda de nome/posição. Texto integral de cada edição: <https://gith
 | **Software Supply Chain Failures** (amplia Vulnerable Components) | Lockfile commitado; auditar dependências contra o advisory database do ecossistema (ver seção *Dependências & CVE* abaixo); conferir a procedência do pacote (typosquatting) |
 | **Authentication Failures** | Rate limiting; MFA; sessões seguras |
 | **Software/Data Integrity Failures** (inclui deserialização insegura) | Verificar integridade de uploads e artefatos; CSP; nunca deserializar entrada não confiável |
-| **Security Logging & Alerting Failures** | Logar tentativas de acesso; **nunca** logar senhas/tokens/PII |
+| **Security Logging & Alerting Failures** | Logar tentativas de acesso; **nunca** logar senhas/tokens/PII — e saída de agente/ferramenta que tocou credencial (retorno de subagent, evento de ledger, closure, report) **é log** para esta regra: material sensível, mesma classe da saída E2E autenticada (`core/TESTING.md`) |
 | **SSRF** | Validar/allowlist de URLs externas; recusar IPs internos |
 | **Mishandling of Exceptional Conditions** | Erro trata **fail-closed** — exceção nunca deixa recurso em estado permissivo; detalhe interno não chega à resposta |
 | **CSRF** | Token anti-CSRF em mutações autenticadas por cookie; `samesite` no cookie de sessão |
@@ -47,6 +47,7 @@ categoria muda de nome/posição. Texto integral de cada edição: <https://gith
 | **Clickjacking** | Sem proteção de enquadramento | Negar enquadramento (frame-ancestors/`X-Frame-Options`) |
 | **File Upload** | Aceitar qualquer arquivo | Allowlist de tipo/extensão; validar o conteúdo real |
 | **Open Redirect** | Redirecionar para destino vindo da entrada | Allowlist de destinos permitidos |
+| **Credencial via shell** (decisão 4.236) | Carregar arquivo de ambiente com `source`/`export` — o arquivo vira script: substituição de comando executa e a falha de parse **ecoa o segredo** na mensagem de erro (caso real: senha em texto plano no transcript) | Parser de chave=valor que não interpreta o conteúdo (dotenv/equivalente); a mensagem de erro do parser nunca é repassada |
 
 ---
 
@@ -130,6 +131,7 @@ o CVE/NVD:
 - [ ] Segredos vêm de configuração/secret store — nunca hardcoded, em log ou em URL
 - [ ] Token de autenticação fora de armazenamento acessível a script do cliente; transporte seguro (ex.: cookie `httpOnly`/`secure`/`samesite`)
 - [ ] Sem dado sensível/PII em logs nem em telemetria
+- [ ] Arquivo de ambiente/credencial lido por parser que não interpreta shell — nunca `source`/`export`; erro do parser não ecoa o conteúdo
 - [ ] Redirecionamentos e uploads restritos por allowlist
 - [ ] Mutação autenticada por cookie exige token anti-CSRF
 - [ ] Erro/exceção trata fail-closed; sem stack trace/detalhe interno na resposta

@@ -99,6 +99,12 @@ suíte, a entrega da fatia **para até resolver** (é gate, não aviso). Com `po
 sim: cada história é entregue na sua branch e as fatias **dependentes** só largam
 depois que a anterior mergeou — o `continue` verifica isso por você.
 
+E em qualquer estratégia, quando duas linhas de trabalho se reencontram, **merge limpo
+não é merge correto**: o time lista as constantes/sentinelas que mudaram de valor
+entre os dois lados e varre os consumidores novos do outro lado antes de confiar no
+resultado — conflito textual prova texto, não significado, e o merge é tratado como
+diff novo que passa pela suíte e pelos gates.
+
 **Posso rodar a fatia 2 em outra máquina / outro dia / outra pessoa?** Sim — todo o
 estado vive nos artefatos commitados na branch do épico. Qualquer clone com a branch
 enxerga o mesmo estado; `/keelson:continue <slug>` funciona igual para qualquer pessoa

@@ -2508,6 +2508,46 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.235 — Merge limpo não é merge correto: reconciliação semântica quando linhas de trabalho se reencontram
+
+**Problema**: relato do Diretor (campo, registrado na proposal-inbox em 2026-08-19) — ao encadear fatias irmãs entregues, **4 defeitos que só existiam no merge** foram achados: sentinela que mudou de valor entre os pais (um lado escrevia contra o valor antigo), bind removido de um lado e exigido do outro, asserção cuja premissa uma decisão posterior revogou, testes apontando id antigo de elemento. Cada fatia era verde sozinha e o git não acusou conflito — merge de 3 vias resolve por **linha**, nunca por significado. A 4.74 (dry-run `git merge-tree`) prova conflito textual; nenhuma frase da doutrina cobria o merge limpo semanticamente divergente. Risco espelho mapeado (4.181): (a) "passa pelos gates" lido como autorização a mergear — mitigado fechando com "merge para a base segue humano"; (b) varredura sem teto em épico grande (precedente de custo da 4.207) — mitigada recortando pelo diff dos símbolos listados; (c) no-op em `branchStrategy: unica` — mitigado condicionando ao gatilho real.
+
+**Decisão**: regra nova com gatilho "duas linhas de trabalho que se reencontram" (fronteira de fatia × main, fatias irmãs de `por-fatia`, worktrees integradas — **decisão em nome do Diretor**, default do mapa de impacto: sem reencontro, n/a): antes de confiar no merge, (1) listar constantes/sentinelas/contratos cujo valor difere entre os pais, recorte pelo diff dos símbolos tocados; (2) varrer os consumidores **novos** do outro lado — o perigo está no que se combina sem conflitar; (3) tratar o resultado como diff novo, que passa pela suíte e pelos gates da fronteira. Dono único ao lado da 4.126/4.163; `agent-teams.md` cita, nunca repete. Sem guarda mecânica hoje (nenhum script compara sentinelas entre pais) — mecanização segue a escada 4.149 na reincidência.
+
+**Aplicação**: `docs/_meta/conventions/sdd-conventions.md` (bullet novo antes de "Merge, PR e deploy são humanos") · wiki `Fluxo-de-epicos.md` (página própria, pergunta do merge). Embarcado: bump minor; sem re-init.
+
+---
+
+### 4.236 — Credencial de arquivo de ambiente lê-se por parser, nunca por shell; saída de agente que tocou credencial é log
+
+**Problema**: incidente real em consumidor (proposal-inbox 2026-08-19) — `source .env` fez o bash interpretar a senha como sintaxe e **ecoá-la em texto plano** no transcript do subagente (log em disco). A contenção foi correta e a régua ficou registrada só no consumidor; `guidelines/core/SECURITY.md` não mencionava a classe (zero ocorrências de `.env`/dotenv/`source`). Risco de no-op mapeado (4.181): "transcript é material sensível" sem sink acionável — mitigado ancorando nos sinks que o keelson controla (retorno de subagent, ledger, closure, report).
+
+**Decisão**: (a) linha nova na tabela *Outras vulnerabilidades* — carregar arquivo de ambiente com `source`/`export` é o ❌ (o arquivo vira script; a falha de parse ecoa o segredo), parser de chave=valor que não interpreta o conteúdo é o ✅, e a mensagem de erro do parser nunca é repassada; item espelho no checklist final. (b) A categoria *Security Logging & Alerting Failures* passa a declarar que saída de agente/ferramenta que tocou credencial **é log** para a regra "nunca logar segredo" — e `TESTING.md` (material sensível E2E, 4.169) vira **instância** apontando a categoria, preservando dono único. Mecanização no hook `security-guard.sh` (padrão `source .env`) **adiada com gatilho** (escada 4.149: 1ª ocorrência, texto basta; reincidência → padrão no `P_SECRET` com teste sintético).
+
+**Aplicação**: `guidelines/core/SECURITY.md` (tabela + categoria + checklist) · `guidelines/core/TESTING.md` (instância aponta a categoria). Embarcado: bump minor; sem re-init. Perfis `reviewed: true` não tocados de propósito (o "como" por linguagem fica para quando o perfil for reeditado).
+
+---
+
+### 4.237 — Lista reapresentada é lista medida: pendência não conferida sai marcada, nunca como corrente
+
+**Problema**: revisão de lista consolidada de pendências em consumidor (proposal-inbox 2026-08-19) cobrava **3 itens já resolvidos** ao longo do caminho — a própria revisão registrou a lição "lista de pendência não medida envelhece para cima" e o custo: a confiança na lista inteira. A régua-mãe "medido, nunca estimado" (report-contract §1, 4.56/4.130) não alcançava item de pendência **reapresentado**; a skill `status` tratava o INDEX como verdade sem medição e só rodava o `index-check.sh` **depois** da síntese.
+
+**Decisão**: régua genérica com dono único em `sdd-conventions.md` (**decisão em nome do Diretor** — opção (B) do mapa de impacto: é o arquivo de convenções comuns a todo comando; escrever no report-contract exigiria alargar o escopo declarado dele, e a skill `status` não é invocadora dele): resumo de estado/pendências reapresentado ao Diretor confere cada item contra a fonte durável antes de reapresentar; item não conferido sai marcado **`não medido`** — marcação, não bloqueio (preserva o read-only e o "não bloquear resposta" da skill). `report-contract.md` §1 e `skills/status/SKILL.md` citam; a skill promove o `index-check.sh` para **antes** da síntese (o custo é o fato mecânico barato, nunca releitura integral por item — preserva a leitura sob demanda).
+
+**Aplicação**: `docs/_meta/conventions/sdd-conventions.md` (dono) · `docs/_meta/conventions/report-contract.md` §1 (cauda do "Medido, nunca estimado") · `skills/status/SKILL.md` (Etapa 1 item 5, Etapa 2, Etapa 3) · wiki `Conceitos.md` (meia linha no bullet do status). Embarcado: bump minor; sem re-init (bloco injetado intocado).
+
+---
+
+### 4.238 — Claim de conflito com diretriz anterior é verificado, nunca deduzido — e nunca suprime a escalação
+
+**Problema**: retificação registrada em consumidor (proposal-inbox 2026-08-19) — a redação de uma pendência afirmava que a opção em decisão "revogava" uma DEC anterior; **falso**, medido depois: a decisão citada recaía sobre outro assunto. A imprecisão **inflava o custo da opção que o Diretor tinha de escolher** — o critério 4 do contrato de escalação (`agents/po.md`) aceitava o claim de memória. Família 4.58 (verificado, não deduzido) e 4.136 (custo do ramo). Risco mapeado (4.181): não existe registro canônico único de "diretriz anterior do Diretor" no consumidor — exigir âncora sem saída degradada suprimiria escalação legítima, o defeito pior.
+
+**Decisão**: o critério 4 exige a âncora verificada — fontes aceitas enumeradas (BRIEF · "Decisões irreversíveis" do INDEX · report anterior · evento `decisao` do ledger), citação literal em ≤1 linha na **cauda** do bloco (preserva o teste da 4.145: o Diretor decide lendo só o bloco; 4.124: caminho, nunca ID nu). **Cláusula de degradação obrigatória** (decisão em nome do Diretor, default do mapa de impacto): diretriz lembrada sem âncora localizável → escala assim mesmo, declarando `âncora não localizada`. Campo `ancora:` **opcional** no schema `escalacoes[]` (só com `criterio: diretriz`), preservando a forma para os demais critérios e os 3 invocadores.
+
+**Aplicação**: `agents/po.md` (critério 4 + schema) · wiki `Conceitos.md` (bullet dos critérios de escalação). Embarcado: bump minor; sem re-init. Sem suíte que valide o bloco de escalação — consumido por LLM, mecanização não proposta (imecanizável barato de declarar: o alvo é a citação, não a forma).
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

@@ -103,7 +103,8 @@ metáfora**: são ferramentas do time, não pessoas.
   veto); correção sua reemite o brief.
 - Ele escala **por exceção**, sempre com proposta e default: ambiguidade que muda o
   resultado, expansão ou conflito de escopo, ação irreversível ou externa, conflito com
-  diretriz anterior.
+  diretriz anterior — este último sempre com a diretriz **citada na fonte** (ou a
+  declaração de que a âncora não foi localizada), nunca de memória.
 - Decisões tomadas em seu nome ficam registradas.
 - A entrega fecha com **relatório de aceitação** (bate com o brief?) — que é diferente do
   QA (funciona?).
@@ -206,7 +207,8 @@ a cada rodada. Três coisas úteis de saber:
   wave/cobertura sobre artefato já `Done` é rebaixado a aviso `[legacy]`.
 - **Dá para ver o desenho.** Pergunte ao `/keelson:status` sobre dependências ou ordem
   das tasks e ele devolve o diagrama (Mermaid) — tasks por wave, com status, ou o mapa
-  FR→componente.
+  FR→componente. Pendência reapresentada vem conferida na fonte — ou marcada
+  `não medido`, nunca apresentada como corrente.
 - A régua completa (sintaxe dos campos, catálogo de checks) está no
   [Contrato do grafo](Contrato-do-grafo).
 

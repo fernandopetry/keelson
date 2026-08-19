@@ -25,6 +25,49 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.108.0] — 2026-08-19
+
+Re-init: none
+
+Decisions 4.235–4.238 — field batch from a consumer handoff review requested by the
+Director: four lessons abstracted from real incidents (semantic merge defects, a
+credential echoed by `source .env`, a stale pending list, an unverified conflict
+claim) become doctrine. Injected block and ficha contract untouched.
+
+### Added
+
+- **A clean merge is not a correct merge** (4.235). Whenever two lines of work
+  reconverge (slice boundary syncing with main, sibling slice branches chaining,
+  integrated worktrees), the doctrine now requires listing the constants/sentinels
+  whose values differ between the parents and sweeping the other side's new consumers
+  before trusting the result — 3-way merge resolves by line, never by meaning (field
+  case: 4 defects that only existed in the merge of individually green slices). The
+  merge result is a new diff that runs the suite and the boundary gates. Owner:
+  `sdd-conventions.md`; the epics wiki page explains it to consumers.
+- **Env-file credentials are read by a parser, never by the shell** (4.236).
+  `guidelines/core/SECURITY.md` gains the vulnerability row (`source`/`export` of an
+  env file turns it into a script and parse failures echo the secret — real incident:
+  password in plain text in a subagent transcript) and the matching checklist item;
+  the logging category now states that agent/tool output that touched a credential
+  (subagent return, ledger event, closure, report) **is a log** for the "never log
+  secrets" rule. `TESTING.md`'s E2E sensitive-output rule (4.169) becomes an instance
+  pointing at that category.
+- **A re-presented list is a measured list** (4.237). Any state/pending summary shown
+  to the Director checks each pending item against its durable source before
+  re-presenting it; unchecked items are marked `não medido`, never shown as current
+  (field case: 3 already-resolved items billed by the same review). Owner:
+  `sdd-conventions.md`; the report contract's "Medido, nunca estimado" rule and the
+  `status` skill cite it, and `status` now runs `index-check.sh` **before** composing
+  the summary.
+- **A conflict claim against a prior directive is verified, never deduced** (4.238).
+  The PO's escalation criterion 4 now requires the directive's anchor (BRIEF, INDEX
+  irreversible decisions, prior report, ledger `decisao` event) quoted in ≤1 line at
+  the tail of the block — with the mandatory degradation "escalate anyway, declaring
+  `âncora não localizada`" so the rule can never suppress a legitimate escalation.
+  Optional `ancora:` field in the escalation schema (only for `criterio: diretriz`).
+
+---
+
 ## [0.107.1] — 2026-08-19
 
 Re-init: none
