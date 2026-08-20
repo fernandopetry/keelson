@@ -62,6 +62,7 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 - **Fila do épico**: <fatia marcada `entregue` · próximo passo pronto: /keelson:continue <slug-âncora>>   # só demanda com **Epico**:
 - **Estimativa × realizado**: <~N waves/~N tasks previstos vs N/N reais · <min–max>h vs <duração medida> · desvio em meia linha · linha anexada em guidelines/project/estimates.md · espelho: <publicada | falhou (motivo) | n/a>>   # só quando o BRIEF da demanda tem seção ## Estimativa (estimate-contract.md §4, decisão 4.223); o realizado vem do TASK-MMM-INDEX e da duração MEDIDA — nunca o contrário
 - **Duração**: <total> (largada HH:MM → entrega HH:MM, horário de Brasília) · specify <n>min · plan <n>min · tasks <n>min · implement <n>min · janela pico ~<N>k tokens   # etapa que a rota não teve não aparece; marca ausente → o que foi medido + lacuna nomeada; janela só quando o log existe
+- **Custo por papel**: <papel ~<N>k tokens (<M> spawns) · …, maiores primeiro — saída literal de `context-cost.sh --compose`>   # OMITIR quando o log não tem linha de agente — telemetria da dieta (4.239), medida ou omitida, nunca estimada; custo jamais vira gatilho de parada (4.23)
 - **Pendente de você**: <revisão da branch · merge · resposta a pergunta estacionada · handoff · nada>
 
 ## Relatório de aceitação (PO)                    # rotas com brief/espelho
@@ -83,14 +84,22 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 A **linha de duração** é relógio de parede — inclui esperas — e jamais vira gatilho de
 parada ("fôlego não é gatilho", 4.23/4.24). Fontes das marcas: `Cronologia` do BRIEF na
 rota formal; eventos `marco` do ledger nas rotas sem arquivo (`sdd-conventions.md`).
-A cauda **`janela pico`** (decisão 4.148) segue a mesma régua da duração — **medida ou
-omitida, nunca estimada**: a fonte é `thoughts/local/session-window.log` (uma linha
-`<ts> janela=<tokens>` por Stop, escrita pelo hook `window-marker` fora do contexto do
-modelo); o pico é o maior valor do log (`sort` numérico da coluna). Sem log (hook
-indisponível, projeto sem ficha) → a cauda é omitida, sem lacuna declarada — ela é
-telemetria da dieta de contexto (meta da 4.103: ≤600k), não obrigação do report. O
-fecho que move o ledger para `reported-*/` move o log junto — mesma razão: sem o corte,
-o pico da próxima rodada herda o da anterior.
+A cauda **`janela pico`** (decisão 4.148) e a linha **`Custo por papel`** (decisão
+4.239, extensão da 4.148) seguem a mesma régua da duração — **medidas ou omitidas,
+nunca estimadas**: a fonte única é `thoughts/local/session-window.log`, escrito pelo
+hook `window-marker` fora do contexto do modelo — uma linha `<ts> janela=<tokens>`
+por Stop e uma linha `<ts> agente=<tipo> tokens=<N>` por subagent concluído. Quem
+compõe as duas é `bash "${CLAUDE_PLUGIN_ROOT}/scripts/context-cost.sh" <raiz>
+--compose` (pico = maior janela; ranking = soma por papel, decrescente) — a saída é
+citada literal, jamais recalculada de memória. Sem log ou sem linhas de agente (hook
+indisponível, projeto sem ficha, rota sem subagents) → cauda/linha omitidas, sem
+lacuna declarada — são telemetria da dieta de contexto (meta da 4.103: ≤600k), não
+obrigação do report; e **custo nunca é gatilho** de parada ou de mudança de
+comportamento (4.23/4.24). O fecho que move o ledger para `reported-*/` move o log
+junto — mesma razão: sem o corte, o pico e o ranking da próxima rodada herdam os da
+anterior. O arquivo de offset (`thoughts/local/.window-offset.*`) **permanece**: é
+ponteiro de leitura do transcript, não medição — apagá-lo faria o hook reprocessar e
+repovoar o log novo com agentes já reportados.
 
 ## §3. O que cada invocador acrescenta
 

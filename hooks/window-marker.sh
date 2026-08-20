@@ -10,6 +10,15 @@
 # pico quando o arquivo existe (dono da linha: report-contract.md), e a lacuna é
 # nomeada quando não existe. Medido ou omitido — nunca estimado.
 #
+# Custo por papel (decisão 4.239, extensão da 4.148): o mesmo log ganha uma linha
+# `<ts> agente=<tipo> tokens=<N>` por subagent concluído — extraída dos registros
+# de resultado do Task no transcript (campos agentType/totalTokens), processando
+# só o DELTA desde o último Stop (offset por transcript em
+# thoughts/local/.window-offset.<cksum>; o fecho move o log, nunca o offset — sem
+# ele o próximo report herdaria os agentes já reportados). O formato do transcript
+# é interno ao harness e pode mudar entre versões: linha que não parseia é
+# ignorada em silêncio — telemetria degrada, nunca inventa.
+#
 # Escopo: só age em projeto keelson (keelson.config.json na raiz ou thoughts/local/
 # já existente) — fora disso, exit 0 sem tocar o filesystem.
 #
@@ -62,10 +71,68 @@ for line in sys.stdin:
 print(best if best is not None else "")
 ' 2>/dev/null || echo "")"
 
-[ -n "$janela" ] || exit 0
-
 mkdir -p "$cwd/thoughts/local" 2>/dev/null || exit 0
 ts="$(TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z 2>/dev/null || date +%Y-%m-%dT%H:%M:%S)"
-echo "${ts} janela=${janela}" >> "$cwd/thoughts/local/session-window.log" 2>/dev/null || true
+log="$cwd/thoughts/local/session-window.log"
+
+if [ -n "$janela" ]; then
+  echo "${ts} janela=${janela}" >> "$log" 2>/dev/null || true
+fi
+
+# custo por papel (4.239): processa só o delta do transcript desde o último Stop.
+key="$(printf '%s' "$transcript" | cksum 2>/dev/null | awk '{print $1}')"
+[ -n "$key" ] || exit 0
+off_file="$cwd/thoughts/local/.window-offset.$key"
+offset=0
+if [ -f "$off_file" ]; then
+  offset="$(cat "$off_file" 2>/dev/null || echo 0)"
+fi
+case "$offset" in
+  ''|*[!0-9]*) offset=0 ;;
+esac
+size="$(wc -c < "$transcript" 2>/dev/null | tr -d '[:space:]' || echo 0)"
+case "$size" in
+  ''|*[!0-9]*) exit 0 ;;
+esac
+# transcript menor que o offset conhecido = arquivo trocado/reescrito → recomeça
+[ "$size" -lt "$offset" ] && offset=0
+[ "$size" -gt "$offset" ] || exit 0
+
+# só linhas completas do delta contam; CONSUMED devolve até onde é seguro avançar
+# o offset (linha parcial no fim de um write fica para o próximo Stop).
+delta_out="$(tail -c +"$((offset + 1))" "$transcript" 2>/dev/null | python3 -c '
+import sys
+data = sys.stdin.buffer.read()
+consumed = data.rfind(b"\n") + 1
+import json
+for raw in data[:consumed].split(b"\n"):
+    raw = raw.strip()
+    if not raw:
+        continue
+    try:
+        obj = json.loads(raw)
+    except Exception:
+        continue
+    tur = obj.get("toolUseResult")
+    if not isinstance(tur, dict):
+        continue
+    tokens = tur.get("totalTokens")
+    agent = tur.get("agentType")
+    if isinstance(tokens, (int, float)) and tokens > 0 and isinstance(agent, str) and agent:
+        print("AGENTE %s %d" % (agent.replace(" ", "_"), int(tokens)))
+print("CONSUMED %d" % consumed)
+' 2>/dev/null || echo "")"
+[ -n "$delta_out" ] || exit 0
+
+consumed=""
+printf '%s\n' "$delta_out" | while IFS=' ' read -r tag a b; do
+  [ "$tag" = "AGENTE" ] || continue
+  echo "${ts} agente=${a} tokens=${b}" >> "$log" 2>/dev/null || true
+done
+consumed="$(printf '%s\n' "$delta_out" | awk '$1=="CONSUMED"{print $2; exit}')"
+case "$consumed" in
+  ''|*[!0-9]*) exit 0 ;;
+esac
+printf '%s' "$((offset + consumed))" > "$off_file" 2>/dev/null || true
 
 exit 0

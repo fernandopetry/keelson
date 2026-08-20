@@ -411,15 +411,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.108.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.109.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: four field lessons become doctrine (decisions 4.235–4.238) —
-semantic reconciliation when work lines reconverge ("a clean merge is not a correct
-merge"), env-file credentials read by a parser and never by the shell, pending lists
-measured against their source before being re-presented, and conflict claims against
-prior directives anchored to a quoted source. No re-init needed.
+New in this release: the closure report now measures context cost per role
+(decision 4.239) — the `window-marker` hook attributes subagent tokens from the
+transcript delta and the new `context-cost.sh` composes peak window + a per-role
+ranking, measured or omitted, never estimated; cost is never a stop trigger. An
+external lossy-compression proxy was evaluated and refused (gate evidence must stay
+literal). No re-init needed.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

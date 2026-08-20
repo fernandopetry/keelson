@@ -63,6 +63,7 @@ O relatório final traz, em ordem de importância:
 | Gates | O que passou, o que degradou e **o que ficou pendente** — pendência nomeada nunca vira "Done" |
 | Pendências do Diretor | Decisões que sobraram para você, em lote |
 | Duração | Relógio de parede por etapa |
+| Custo por papel | Tokens aproximados por membro do time (quando medidos) — observação para a dieta de contexto, nunca motivo de parada |
 
 Consulte o estado a qualquer momento:
 

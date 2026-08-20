@@ -25,6 +25,41 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.109.0] — 2026-08-20
+
+Re-init: none
+
+Decision 4.239 — context-cost observability requested by the Director (high token
+consumption reported by consumers, with quality explicitly non-negotiable). The
+closure report gains a measured per-role token ranking; an external lossy-compression
+proxy was evaluated and refused (compressed diffs/logs corrupt the literal evidence
+the gates consume). Injected block and ficha contract untouched.
+
+### Added
+
+- **Context cost per role in the closure report** (4.239, extending 4.148). The
+  `window-marker` Stop hook now also extracts one `agente=<type> tokens=<N>` line per
+  completed subagent from the transcript **delta** since the last Stop (offset file
+  `thoughts/local/.window-offset.<cksum>`; unparseable lines are silently skipped —
+  telemetry degrades, never invents). The new read-only `scripts/context-cost.sh`
+  composes the log into peak window + a descending per-role ranking (regression suite
+  `scripts/tests/context-cost/`, registered in pre-commit and CI). The report
+  contract gains the **Custo por papel** line — measured or omitted, never estimated —
+  and `/keelson:auto`'s Delivery fills it from the script's literal output (item 6.5).
+  Cost is never a stop trigger (4.23/4.24): the number exists to aim future
+  context-diet work, not to change cycle behavior.
+- **OTEL note in `/keelson:init`'s report** (4.239). The init report now mentions the
+  Claude Code OTEL export (`CLAUDE_CODE_ENABLE_TELEMETRY=1` + OTLP endpoint) for
+  consumers who want exact per-model token/cost numbers. Informational only — keelson
+  never writes harness config; enabling it is the Director's act.
+
+### Changed
+
+- The ledger-closing step of `/keelson:auto` (item 10) still moves
+  `session-window.log` to `reported-*/`, and now explicitly **keeps** the
+  `.window-offset.*` file — it is a read pointer, not a measurement; deleting it
+  would repopulate the fresh log with already-reported agents.
+
 ## [0.108.0] — 2026-08-19
 
 Re-init: none

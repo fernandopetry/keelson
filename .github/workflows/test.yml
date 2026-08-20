@@ -101,6 +101,9 @@ jobs:
       - name: Suíte do check-frontmatter.sh (scripts/tests/frontmatter/run.sh)
         run: bash scripts/tests/frontmatter/run.sh
 
+      - name: Suíte do context-cost.sh (scripts/tests/context-cost/run.sh)
+        run: bash scripts/tests/context-cost/run.sh
+
       - name: Frontmatter YAML de todo .md (scripts/check-frontmatter.sh)
         run: |
           python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet pyyaml

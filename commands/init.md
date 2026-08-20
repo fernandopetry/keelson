@@ -221,6 +221,8 @@ Reporte cada item como ✓/✗. `✗` vira ação no relatório, não é silenci
 
 Resuma: o que foi **detectado**, o que foi **perguntado**, o perfil de cada camada (exemplar ou gerado), a contagem de pendências `⚠️ não confirmado` por perfil gerado (coletadas do companheiro `_review/<lang>-<versão>.md`), e o resultado do self-check. Se houver perfil `reviewed: false`, instrua: **revise-o antes do primeiro `/keelson:specify`**.
 
+Feche com uma nota informativa de observabilidade (decisão 4.239 — **só informa, nunca grava config**): o report de fecho do ciclo já mede janela de contexto e custo por papel em tokens aproximados (hook `window-marker` + `scripts/context-cost.sh`); quem quiser número exato de tokens/custo por modelo tem a **exportação OTEL do Claude Code** — opt-in do harness via `CLAUDE_CODE_ENABLE_TELEMETRY=1` + endpoint OTLP próprio (métrica `claude_code.token.usage`). Configurar é ato do Diretor, fora do keelson: env de telemetria exporta dados de uso para o coletor que ele escolher (a régua "sem dado sensível em telemetria" de `core/SECURITY.md` vale para o destino).
+
 ## Config incremental (durante o uso)
 
 Se, mais tarde, outro comando `/keelson:*` encontrar a ficha **incompleta ou ambígua** para o que precisa (ex.: `quality.build` ausente numa tarefa que builda), ele **pergunta na hora e oferece gravar a resposta na ficha** — em vez de perguntar sempre. A ficha se completa pelo uso.

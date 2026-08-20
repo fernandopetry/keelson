@@ -257,6 +257,19 @@ do fecho cobre só o trecho da entrega; o total do ciclo vive no comentário de 
 e na linha `Duração` do report, nunca em worklog. Se aconteceu: exclua (ou edite) o
 lançamento do ciclo completo no card — os worklogs por etapa já contêm o tempo real.
 
+### O report não trouxe a linha `Custo por papel` (ou veio sem algum agente)
+
+A linha existe desde a 0.109.0 (decisão 4.239) e é **telemetria**: medida ou omitida,
+nunca estimada — a ausência dela **não** é defeito quando não há o que medir. Fonte:
+o hook `window-marker` grava tokens por subagent em `thoughts/local/session-window.log`
+a cada Stop, e `scripts/context-cost.sh` compõe o ranking no fecho. Se subagents
+rodaram e a linha saiu vazia mesmo assim, as causas prováveis: plugin anterior à
+0.109.0 durante parte do ciclo (rode `/keelson:update`); hook sem `python3` no PATH
+(ele degrada em silêncio, por desenho); ou o formato interno do transcript do harness
+mudou — nesse caso o parser ignora as linhas em vez de inventar número: reporte ao
+mantenedor com a versão do Claude Code. O número é observação para a dieta de
+contexto — o ciclo nunca para nem encolhe por causa dele.
+
 ### O `jira.<PROJECT>.md` está crescendo com listas de issues
 
 O mapa é **config, nunca ledger**: as três seções do protocolo (Campos, Etapas/Colunas,
