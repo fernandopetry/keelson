@@ -25,6 +25,30 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.110.0] — 2026-08-20
+
+Re-init: none
+
+Decision 4.240 — field report from a consumer session: a new page built "from the
+legacy queries" shipped a user-facing domain term chosen between competing synonyms
+with no DEC, no question to the Director and no artifact line — the agent's own root
+cause: an incomplete legacy reading that became a promise. First occurrence of the
+class at the terminology surface (family 4.58/4.238, "verified, not deduced").
+Injected block and ficha contract untouched.
+
+### Added
+
+- **Inherited domain terms carry provenance** (4.240). When a demand is based on a
+  legacy artifact (code, queries, screens), `/keelson:specify`'s Ubiquitous Language
+  principle now requires each user-facing domain term to enter the glossary with the
+  anchor of the source that uses it (`file:line` or query identifier); a term the
+  source does not decide — competing synonyms, partial reading — is a product choice
+  and becomes a §8 premise (`[confirmar]` within the 4.144 budget, or `[assumido]`
+  with the chosen default declared), never a silent model default. Falsifiable test:
+  "who chose this word?" is answered by an anchor or a premise — "nobody" is the
+  defect. Mechanical check deferred with the 4.149 ladder (recurrence promotes it to
+  the spec-validator).
+
 ## [0.109.0] — 2026-08-20
 
 Re-init: none

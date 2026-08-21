@@ -85,7 +85,7 @@ Agent indisponível → executar as Etapas 2–3 inline é o fallback, declarado
 ## Etapa 2: princípios obrigatórios (contrato de forma — executado pelo `scribe`)
 
 1. **Outcome-first**: comece pelo resultado esperado.
-2. **Ubiquitous Language**: defina termos no glossário, reutilize do glossário consolidado do INDEX.md (canônico — Etapa 0.4).
+2. **Ubiquitous Language**: defina termos no glossário, reutilize do glossário consolidado do INDEX.md (canônico — Etapa 0.4). **Termo herdado de fonte legada tem proveniência (decisão 4.240)**: quando a demanda se baseia em artefato legado (código, queries, telas), termo de domínio voltado ao usuário entra no glossário com a âncora da fonte que o usa (`arquivo:linha` ou identificador da consulta); termo que a fonte não decide — sinônimos concorrentes, leitura parcial — é escolha de produto: vira premissa da §8 (`[confirmar]` ou `[assumido]` com default declarado), nunca escolha silenciosa. Teste: "quem escolheu esta palavra?" responde-se com uma âncora ou uma premissa — "ninguém" é o defeito.
 3. **EARS para FRs**:
    - Ubiquitous: `O <sistema> deve <resposta>.`
    - Event-driven: `Quando <gatilho>, o <sistema> deve <resposta>.`
