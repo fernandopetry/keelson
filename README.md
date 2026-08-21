@@ -411,16 +411,17 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.110.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.111.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the closure report now measures context cost per role
-(decision 4.239) — the `window-marker` hook attributes subagent tokens from the
-transcript delta and the new `context-cost.sh` composes peak window + a per-role
-ranking, measured or omitted, never estimated; cost is never a stop trigger. An
-external lossy-compression proxy was evaluated and refused (gate evidence must stay
-literal). No re-init needed.
+New in this release: four AI-native-SDLC gaps closed (decisions 4.241–4.244) — plans
+now consult other slugs' irreversible decisions (conflicts are cited and justified,
+never discovered in code); an opt-in `guidelines/project/invariants.md` gives "what
+must never change" a home read by planning and review gate 6; the `/keelson:init`
+report gains a maturity snapshot stating what each absent assurance layer means for
+agent autonomy; and human interventions become a counted closure-report line backed
+by a new `intervencao` ledger event. No re-init needed.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

@@ -25,6 +25,43 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.111.0] — 2026-08-21
+
+Re-init: none
+
+Decisions 4.241–4.244 — batch motivated by the Director's analysis of the AI-native
+SDLC landscape: the four gaps between what the article describes and what keelson
+already does, applied within keelson's scope (up to the PR). Injected block and ficha
+contract untouched.
+
+### Added
+
+- **Plans now consult other slugs' irreversible decisions** (4.241). `/keelson:plan`'s
+  context step sweeps the `## Decisões irreversíveis` block of every other slug's
+  INDEX (heading-only extraction; absence declared per slug, never silence). A foreign
+  irreversible DEC never halts the flow: a conflict becomes a citation + justification
+  in the PLAN's new §Aderência field, cited by path and in prose only — never as a
+  graph edge. The scribe package carries the extracted list inline.
+- **Project invariants file** (4.242). New opt-in consumer artifact
+  `guidelines/project/invariants.md` — product/architecture restrictions that must
+  hold in any demand and were never born from a PLAN. Rule owner:
+  `guidelines/core/ARCHITECTURE.md` (falsifiable one-bullet format; the Director
+  writes it, keelson reads it). Read conditionally by `/keelson:plan` (a design that
+  violates one halts and reports) and by review gate 6 (absent file → declared `n/a`,
+  never silent approval).
+- **Maturity snapshot in the `/keelson:init` report** (4.243). A literal skeleton
+  block states, per assurance layer (test, lint, boot, screen, e2e, mutation,
+  invariants), what its absence means for the autonomy the Director grants. Every
+  line is anchored in a read ficha field or self-check line (`não medido` otherwise);
+  informational only — opt-ins stay opt-ins, nothing blocks.
+- **Human interventions are now a counted report line** (4.244). The session ledger's
+  closed catalog gains the `intervencao` event type (an effective Director response
+  mid-cycle: a veto, an answered escalation, a returned handoff — `decisao` events,
+  autonomy exercised on the Director's behalf, never count). `ledger.sh` validates the
+  type (regression suite extended, 12 green cases) and the closure report skeleton
+  gains a mandatory `**Intervenções humanas**` line composed from `ledger.sh count`
+  before archiving, with its degradation prescribed inline.
+
 ## [0.110.0] — 2026-08-20
 
 Re-init: none

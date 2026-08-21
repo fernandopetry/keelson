@@ -88,6 +88,25 @@ de `guidelines/project/` e de DECs.
 
 ---
 
+## Invariantes do projeto — `guidelines/project/invariants.md` (opt-in, decisão 4.242)
+
+Restrições de produto ou arquitetura que **devem permanecer verdadeiras em qualquer
+demanda** e que **não nascem de um PLAN** — vêm do negócio, de compliance ou de operação
+(ex.: "saldo de carteira nunca fica negativo", "a tabela de auditoria é append-only",
+"resposta pública nunca expõe id interno"). O que nasce de um PLAN continua **DEC
+irreversível no INDEX do slug** — este arquivo não a duplica. Na dúvida, a fronteira é um
+teste: *a restrição existiria mesmo que aquele PLAN nunca tivesse sido escrito?*
+
+- **Formato**: um invariante por bullet, enunciado **falsificável** — dá para apontar um
+  diff que o viola. Regra vaga ("o código deve ser seguro") não entra.
+- **Quem escreve**: o Diretor (ou o time, com o Diretor de acordo). O keelson **lê, não
+  gera** — arquivo ausente significa que o projeto ainda não declarou invariantes.
+- **Quem lê** (sempre condicional — só quando o arquivo existe): a Etapa 3 do
+  `/keelson:plan` e o gate 6 do code review. Ausente → `n/a (sem invariants.md)`
+  **declarado**, nunca aprovação silenciosa.
+
+---
+
 ## Nomear seguindo o vizinho
 
 Antes de nomear um tipo, arquivo, tabela ou coluna, **leia 2–3 vizinhos do mesmo

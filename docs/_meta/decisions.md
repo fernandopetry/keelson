@@ -2564,6 +2564,46 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.241 — PLAN consulta as decisões irreversíveis dos outros slugs: conflito se cita e se justifica, nunca se descobre no código
+
+**Problema**: leva motivada por análise externa do Diretor (SDLC AI-native — memória arquitetural como camada de contexto do projeto). A Etapa 0.3 do `/keelson:plan` extraía decisões irreversíveis **só do próprio slug**: DEC irreversível gravada no INDEX do slug A era invisível ao planner do slug B, que podia contradizê-la sem saber — e nenhum gate acusaria (gates 5/6 são escopados ao slug). A infraestrutura já existia: DEC `Irreversível: sim` é propagada ao bloco "Decisões irreversíveis" do INDEX desde sempre (index-contract.md); faltava só o leitor cross-slug.
+
+**Decisão**: a Etapa 0.3 ganha o item 5 — varrer `{docsRoot}/*/INDEX.md` (exceto o slug corrente) extraindo **só a seção `## Decisões irreversíveis`** por heading (dieta de contexto, 4.103); slug sem a seção ou não-parseável → `sem bloco de decisões` **declarado**, nunca silêncio lido como "nenhum conflito" (4.58). **DEC alheia nunca para o fluxo** (Etapa 3): conflito vira citação + justificativa no campo novo da §Aderência ("Decisões irreversíveis de outros slugs em conflito"), citando o INDEX alheio **pelo caminho** (4.124) e **só em prosa** — nunca campo de aresta (âncora cross-slug reprova no grafo por design). O pacote do scribe recebe a lista inline (sem ela a justificativa não chegaria ao arquivo). Dono da regra é o **gerador** (precedente 4.108); o plan-validator continua estrutural.
+
+**Aplicação**: `commands/plan.md` (item 0.3.5, Etapa 3, campo da §Aderência no template, pacote da Etapa 3.5, alerta do output). Embarcado: bump minor (0.111.0); **Re-init: none**. Observar: custo de janela em repo com muitos slugs (mitigação aplicada: extração por heading; persistindo, teto de slugs é decisão futura) e falso conflito tratado como parada (a redação reserva o parar-e-reportar ao próprio slug).
+
+---
+
+### 4.242 — Invariantes do projeto: `guidelines/project/invariants.md` opt-in, lido pelo plan e pelo gate 6
+
+**Problema**: "o que nunca pode mudar" no consumidor não tinha morada. DEC irreversível cobre o que **nasce de um PLAN**; restrição de produto/compliance/operação que existe antes de qualquer PLAN ("saldo nunca negativo", "tabela de auditoria append-only") ficava implícita — e implementação aparentemente correta podia violá-la sem que gate algum a lesse (a classe de defeito que a execução agêntica mais amplifica).
+
+**Decisão**: artefato **opt-in** `guidelines/project/invariants.md` (mesma morada de `lessons.md`/`estimates.md`, precedência já declarada no bloco injetado). Dono único da régua: seção nova de `guidelines/core/ARCHITECTURE.md` — formato (um invariante por bullet, enunciado **falsificável**), fronteira com DEC irreversível pelo teste *"a restrição existiria mesmo sem aquele PLAN?"*, e quem escreve: o **Diretor** (o keelson lê, não gera). Leitores, sempre condicionais: Etapa 3 do `/keelson:plan` (violação pelo desenho → parar e reportar) e **gate 6** (nenhum violado; ausente → `n/a (sem invariants.md)` declarado, nunca aprovação silenciosa). Fora do bloco injetado, dos perfis e do `security-engineer` — incluir qualquer um deles é decisão própria futura, não efeito colateral.
+
+**Aplicação**: `guidelines/core/ARCHITECTURE.md` (dono), `guidelines/core/CODE-REVIEW.md` (gate 6), `commands/plan.md` (Etapa 3), `agents/code-reviewer.md` (carga condicional), wiki `Conceitos.md`. **Re-init: none**; perfis intocados (sem re-olhada humana). Observar: sobreposição com lessons/DEC na prática (o teste de fronteira decide; reincidência de confusão → refinar a régua) e invariante vago entrando (o formato falsificável é a guarda).
+
+---
+
+### 4.243 — Retrato de maturidade no relatório do `/keelson:init`: o efeito de cada camada de assurance ausente, enunciado
+
+**Problema**: o init detecta e prova as camadas de assurance (suíte, lint, boot, tela, E2E, mutação), mas não **enuncia o que a ausência de cada uma significa** para a autonomia concedida — autonomia igual sobre base fraca produz evidência mais fraca sem que o Diretor veja isso no momento da adoção. Human-on-the-loop: quem define o espaço de autonomia precisa saber o que o sustenta.
+
+**Decisão**: a Etapa 7 ganha o **Retrato de maturidade** — esqueleto **literal** (a prosa parafraseável é a classe que fundou 4.130/4.214), uma linha por camada (test, lint, boot, tela, e2e, mutation e invariantes da 4.242), cada linha nascida do **campo lido da ficha ou da linha do self-check** — campo não conferido sai `não medido`, nunca composto de memória (4.237). É informação, nunca gate: opt-in segue opt-in, nada bloqueia. Redação curta no init; a referência longa continua na coluna "Sem isso" da wiki (`Ficha-do-projeto.md`) — duas redações **declaradas**, com a wiki dona do porquê.
+
+**Aplicação**: `commands/init.md` (Etapa 7), wiki `Primeiros-passos.md`. **Re-init: none** (o retrato aparece ao re-rodar o init; bloco e ficha intocados). Observar: drift entre o retrato e a tabela da wiki (a poda 4.160 acusa sedimento) e retrato tratado como checklist de bloqueio por sessão de consumidor.
+
+---
+
+### 4.244 — Intervenção humana vira evento de ledger (`intervencao`) e linha contável do report
+
+**Problema**: o report de fecho mede duração (4.56), custo por papel (4.239) e estimado×realizado (4.223), mas não conta **quantas vezes o humano precisou intervir** — a métrica que diz onde a autonomia realmente termina (e a linha que faltava para comparar fluxo atual × fluxo agêntico numa demanda real). O catálogo fechado do ledger (4.76) não tinha tipo para isso; `decisao` é o **inverso** (autonomia exercida em nome do Diretor) e contá-la como intervenção inverteria o sentido da métrica.
+
+**Decisão**: o catálogo ganha `intervencao` — resposta **efetiva** do Diretor no meio do ciclo (veto na janela, resposta a escalação ou pergunta, handoff devolvido), anotada pelo Tech Lead no instante em que a resposta chega, natureza em meia linha no corpo; `decisao` **nunca** conta. `ledger.sh` valida o tipo no enum (com fixture na suíte — mudança de catálogo nunca é efeito colateral silencioso). O esqueleto do report (§2) ganha a linha obrigatória `**Intervenções humanas**`, composta de `ledger.sh count` **antes** do archive, com degradação prescrita na própria linha (`0 registradas — ausência de evento ≠ ausência de intervenção` | `sem ledger — não medido`); por ter marcador literal sem `# OMITIR`, entra sozinha no autocheck contável da 4.214.
+
+**Aplicação**: `docs/_meta/conventions/sdd-conventions.md` (catálogo), `scripts/ledger.sh` + `scripts/tests/ledger/run.sh` (12 casos verdes), `docs/_meta/conventions/report-contract.md` (§2), `commands/auto.md` (catálogo inline + lista de registro). Embarcado (4.194): bump minor (0.111.0); **Re-init: none** — o fecho mínimo do bloco injetado fica fora da contagem por design (report-contract §1). Observar: linha cronicamente `0 registradas` com intervenções visíveis na conversa (emissor não anotando o evento) — reincidência promove cutucada mecânica pela escada 4.149.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

@@ -221,6 +221,19 @@ Reporte cada item como ✓/✗. `✗` vira ação no relatório, não é silenci
 
 Resuma: o que foi **detectado**, o que foi **perguntado**, o perfil de cada camada (exemplar ou gerado), a contagem de pendências `⚠️ não confirmado` por perfil gerado (coletadas do companheiro `_review/<lang>-<versão>.md`), e o resultado do self-check. Se houver perfil `reviewed: false`, instrua: **revise-o antes do primeiro `/keelson:specify`**.
 
+Inclua o **Retrato de maturidade** (decisão 4.243): esqueleto literal abaixo, uma linha por camada de assurance. Cada linha nasce do **campo lido da ficha ou da linha do self-check** — campo não conferido sai `não medido`, nunca composto de memória (4.237). É informação para o Diretor calibrar a autonomia que concede aos agentes; **nada aqui bloqueia** (opt-in segue opt-in).
+
+```
+Retrato de maturidade — o que sustenta a autonomia dos agentes neste projeto
+- **Suíte de testes**: <quality.test provado | ausente → gate 1 sem prova mecânica; a evidência fica só no review>
+- **Lint**: <quality.lint provado | ausente → erro estático depende do olho do reviewer>
+- **Boot local**: <quality.boot provado | null escolhido → "app fora do ar" não é verificável (4.71)>
+- **Verificação de tela**: <screenVerify + método | desabilitada → comportamento visual fica com o Diretor>
+- **E2E**: <quality.e2e provado | ausente → gate 9 prova executando, mas sem regressão re-executável (opt-in: /keelson:e2e-setup)>
+- **Mutação**: <quality.mutation provado | ausente → suíte verde é evidência mais fraca (opt-in: /keelson:mutation-setup)>
+- **Invariantes do projeto**: <guidelines/project/invariants.md presente | ausente → gate 6 declara n/a (opt-in — 4.242)>
+```
+
 Feche com uma nota informativa de observabilidade (decisão 4.239 — **só informa, nunca grava config**): o report de fecho do ciclo já mede janela de contexto e custo por papel em tokens aproximados (hook `window-marker` + `scripts/context-cost.sh`); quem quiser número exato de tokens/custo por modelo tem a **exportação OTEL do Claude Code** — opt-in do harness via `CLAUDE_CODE_ENABLE_TELEMETRY=1` + endpoint OTLP próprio (métrica `claude_code.token.usage`). Configurar é ato do Diretor, fora do keelson: env de telemetria exporta dados de uso para o coletor que ele escolher (a régua "sem dado sensível em telemetria" de `core/SECURITY.md` vale para o destino).
 
 ## Config incremental (durante o uso)

@@ -254,6 +254,7 @@ Você não gerencia o MAP: o time o semeia, atualiza e consome sozinho. Se quise
 | Credenciais de ambiente local | `keelson.local.json` (**fora** do git) |
 | Rascunho de sessão, evidência efêmera | `thoughts/` (fora do git) |
 | Lições do projeto | `guidelines/project/` — cada lição com ciclo de vida (`ativa` · `em-observacao` · `revogada`); só a ativa vira critério/regra, e `/keelson:lessons-audit` audita o acervo |
+| Invariantes do projeto | `guidelines/project/invariants.md` (opcional) — o que **nunca pode mudar** neste projeto, um invariante falsificável por bullet, escrito por você. Quando existe, o planejamento e o gate de review checam contra ele; ausente, o gate declara `n/a` |
 
 Próximo: [A ficha do projeto](Ficha-do-projeto) ou o
 [Guia do método](Guia-do-metodo).

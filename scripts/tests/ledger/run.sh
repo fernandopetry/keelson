@@ -61,9 +61,10 @@ total=$((total + 1))
 printf 'x\n' | bash "$LG" "$R" append relatorio qa meu-slug --ts "$TS1" >/dev/null 2>&1
 [ $? -eq 2 ] && ok tipo-invalido-exit-2 || falha tipo-invalido-exit-2
 
-# mais eventos para list/count/archive
+# mais eventos para list/count/archive (inclui intervencao — catálogo 4.244)
 printf 'largada da demanda\n' | bash "$LG" "$R" append marco tech-lead meu-slug --ts "2026-08-06T09:00:00-0300" >/dev/null 2>&1
 printf 'handoff de tela pendente\n' | bash "$LG" "$R" append pendencia qa meu-slug --ts "2026-08-06T15:00:00-0300" >/dev/null 2>&1
+printf 'veto do Diretor na janela do brief\n' | bash "$LG" "$R" append intervencao tech-lead meu-slug --ts "2026-08-06T16:00:00-0300" >/dev/null 2>&1
 
 # list ativo, ordenado
 total=$((total + 1))
@@ -71,13 +72,15 @@ got="$(bash "$LG" "$R" list 2>/dev/null | sed "s|$LD/||")"
 want="20260806-090000-marco-tech-lead.md
 20260806-142310-gate-code-reviewer-2.md
 20260806-142310-gate-code-reviewer.md
-20260806-150000-pendencia-qa.md"
+20260806-150000-pendencia-qa.md
+20260806-160000-intervencao-tech-lead.md"
 if [ "$got" = "$want" ]; then ok list-ordenado; else falha "list-ordenado: [$got]"; fi
 
 # count por tipo
 total=$((total + 1))
 got="$(bash "$LG" "$R" count 2>/dev/null)"
 want="gate	2
+intervencao	1
 marco	1
 pendencia	1"
 if [ "$got" = "$want" ]; then ok count-por-tipo; else falha "count-por-tipo: [$got]"; fi
@@ -86,7 +89,7 @@ if [ "$got" = "$want" ]; then ok count-por-tipo; else falha "count-por-tipo: [$g
 total=$((total + 1))
 msg="$(bash "$LG" "$R" archive --keep 20260806-150000-pendencia-qa.md --ts "2026-08-06T18:00:00-0300" 2>/dev/null)"
 case "$msg" in
-  "ledger: 3 evento(s) arquivado(s) em $LD/reported-20260806-180000 · 1 pendente(s) preservado(s)") ok archive-keep ;;
+  "ledger: 4 evento(s) arquivado(s) em $LD/reported-20260806-180000 · 1 pendente(s) preservado(s)") ok archive-keep ;;
   *) falha "archive-keep: [$msg]" ;;
 esac
 total=$((total + 1))
@@ -94,7 +97,7 @@ ativos="$(bash "$LG" "$R" list 2>/dev/null | sed "s|$LD/||")"
 if [ "$ativos" = "20260806-150000-pendencia-qa.md" ]; then ok archive-pendente-fica; else falha "archive-pendente-fica: [$ativos]"; fi
 total=$((total + 1))
 arq="$(bash "$LG" "$R" list --archived 2>/dev/null | grep -c '')"
-if [ "$arq" = "3" ]; then ok archive-movidos; else falha "archive-movidos: [$arq]"; fi
+if [ "$arq" = "4" ]; then ok archive-movidos; else falha "archive-movidos: [$arq]"; fi
 
 # archive sem nada a mover
 bash "$LG" "$R" archive --keep 20260806-150000-pendencia-qa.md --ts "2026-08-06T19:00:00-0300" >/dev/null 2>&1

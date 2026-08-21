@@ -135,6 +135,10 @@ reabertura declarada.
 - **Padrão de teste**: runner e estrutura do perfil / `./TESTING.md`.
 - **Anti-padrões** proibidos pelo perfil: nenhum presente.
 - **Decisões irreversíveis**: nenhuma quebrada.
+- **Invariantes do projeto** (`guidelines/project/invariants.md`, quando existe — 4.242):
+  nenhum violado pelo diff. Arquivo ausente → `n/a (sem invariants.md)` declarado no
+  veredito do gate, nunca omitido. A régua do artefato mora em `./ARCHITECTURE.md`
+  (seção "Invariantes do projeto").
 - **Doc-trap fechada pelo próprio diff**: quando a correção elimina exatamente um
   defeito que o perfil/guideline do projeto documenta como armadilha ainda viva
   (linguagem tipo "não conte com", "ainda não faz", "armadilha verificada e viva"), o

@@ -31,6 +31,7 @@ Ler `{docsRoot}/<slug>/INDEX.md`:
 2. Extrair **decisões irreversíveis do slug** (DEC marcadas como irreversíveis em PLANs anteriores).
 3. Extrair glossário consolidado.
 4. Identificar capacidades já implementadas, em desenvolvimento e especificadas-mas-não-planejadas.
+5. **Decisões irreversíveis dos outros slugs** (4.241): varra `{docsRoot}/*/INDEX.md` (exceto o do slug corrente) e extraia **só a seção `## Decisões irreversíveis`** de cada um, por heading — nunca o INDEX inteiro (dieta de contexto, 4.103). Slug sem a seção ou com INDEX não-parseável → declare `<slug>: sem bloco de decisões` na saída da etapa — ausência declarada, nunca silêncio lido como "nenhum conflito" (4.58).
 
 Se INDEX não existe, parar e reportar: "INDEX.md do slug não encontrado. /keelson:specify deveria ter criado. Verifique."
 
@@ -66,7 +67,9 @@ registrada no PLAN.
 
 ## Etapa 3: validação contra guidelines
 
-Antes de gerar o PLAN: **stack proposto autorizado** pela ficha e pelo perfil de linguagem ativo; **decisões irreversíveis** (perfil/`guidelines/core/` ou INDEX.md) tocadas → parar e reportar. Conflito irresolvível: parar antes de escrever.
+Antes de gerar o PLAN: **stack proposto autorizado** pela ficha e pelo perfil de linguagem ativo; **decisões irreversíveis** (perfil/`guidelines/core/` ou INDEX.md) tocadas → parar e reportar; **invariantes do projeto** (`guidelines/project/invariants.md`, quando existe — régua em `guidelines/core/ARCHITECTURE.md`, decisão 4.242) violados pelo desenho → parar e reportar. Conflito irresolvível: parar antes de escrever.
+
+**Decisão irreversível de outro slug** (colhida na 0.3.5 — decisão 4.241) **nunca para o fluxo**: conflito ou vizinhança com o desenho proposto vira **citação + justificativa** no campo próprio da §Aderência (Etapa 5), citando o INDEX alheio **pelo caminho** (`{docsRoot}/<outro-slug>/INDEX.md` — 4.124) e **só em prosa** — DEC de outro slug não entra em campo de aresta do grafo (âncora cross-slug reprova como ref quebrada por design, index-contract.md). O parar-e-reportar fica reservado às decisões do próprio slug e dos guidelines.
 
 ## Etapa 3.5: redação delegada ao `scribe` (decisão 4.103)
 
@@ -76,7 +79,9 @@ A redação do PLAN **não acontece nesta janela**. Despache o agent `scribe` co
 - **Alvo resolvido**: slug, MMM e caminho (Etapa 0.4).
 - **Insumos** (caminhos): SPEC alvo, INDEX.md, perfil de linguagem (as **seções** da carga
   da 0.1 — o scribe lê por seção, não o arquivo inteiro), memo de exploração e/ou `MAP.md`
-  do slug, e a **conclusão ancorada do `code-scout`** da Etapa 2 (inline no prompt — é curta).
+  do slug, a **conclusão ancorada do `code-scout`** da Etapa 2 (inline no prompt — é curta)
+  e as **decisões irreversíveis de outros slugs** da 0.3.5 (inline — a lista extraída é
+  curta; sem elas a justificativa da §Aderência não chega ao arquivo).
 - **Decisões desta execução**: cobertura alvo da Etapa 1 (caso A–D), respostas da triagem
   técnica (Etapa 2) e restrições da Etapa 3.
 
@@ -120,6 +125,7 @@ indisponível → executar as Etapas 4–5 inline é o fallback, declarado no ou
 **Stack vigente herdado**: <lista>
 **Padrão arquitetural seguido**: <padrão>
 **Decisões irreversíveis do slug tocadas**: nenhuma | listar
+**Decisões irreversíveis de outros slugs em conflito**: nenhuma | `{docsRoot}/<outro-slug>/INDEX.md` DEC-MMM-XXX — <justificativa: por que este PLAN não a quebra, ou por que a divergência é legítima>
 **Exceções aos guidelines**: nenhuma | listar com justificativa
 
 ## Cobertura
@@ -219,6 +225,6 @@ Aplicar a **receita de atualização do INDEX** (`${CLAUDE_PLUGIN_ROOT}/docs/_me
 3. Resumo de cobertura agregada (antes vs depois).
 4. DEC novas marcadas como irreversíveis.
 5. Resultado da validação: errors, warnings.
-6. Alertas: overlap, gap, conflito de guideline.
+6. Alertas: overlap, gap, conflito de guideline, DEC de outro slug citada em conflito (4.241).
 7. Estado do INDEX.
 8. Próximo comando, com o **caminho** do PLAN criado (4.124): `/keelson:tasks {docsRoot}/<slug>/plans/PLAN-MMM-<nome>.md`.

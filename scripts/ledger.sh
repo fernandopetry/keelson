@@ -61,8 +61,8 @@ case "$ACTION" in
     [ -n "$TIPO" ] && [ -n "$ORIGEM" ] && [ -n "$SLUG" ] || die2 "append exige <tipo> <origem> <slug>."
     shift 3
     case "$TIPO" in
-      gate|decisao|fora_de_escopo|pendencia|tracker|marco) ;;
-      *) die2 "tipo fora do catálogo fechado (4.76): $TIPO — use gate, decisao, fora_de_escopo, pendencia, tracker ou marco" ;;
+      gate|decisao|intervencao|fora_de_escopo|pendencia|tracker|marco) ;;
+      *) die2 "tipo fora do catálogo fechado (4.76/4.244): $TIPO — use gate, decisao, intervencao, fora_de_escopo, pendencia, tracker ou marco" ;;
     esac
     case "$ORIGEM" in */*|*" "*) die2 "origem inválida (sem espaço/barra): $ORIGEM" ;; esac
     REF=""; TS=""

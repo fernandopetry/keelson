@@ -20,6 +20,12 @@ Responda o que ele perguntar (o resto ele detecta). Ao final, confira dois arqui
 Faça o commit desses dois arquivos antes de começar — eles são configuração do time, não
 rascunho de sessão.
 
+O relatório do `init` termina com um **Retrato de maturidade**: uma linha por camada de
+verificação (testes, lint, boot, tela, E2E, mutação, invariantes) dizendo o que a
+ausência de cada uma significa para a autonomia dos agentes. Nada ali bloqueia — é o
+mapa do que sustenta a confiança que você delega; a referência completa de cada campo
+está na [ficha](Ficha-do-projeto).
+
 ## 2. Pedir a primeira demanda
 
 O modo padrão é **autônomo**. Você não precisa digitar comando nenhum: peça em linguagem
@@ -62,6 +68,7 @@ O relatório final traz, em ordem de importância:
 | Aceitação do PO | A entrega corresponde ao que você pediu no brief |
 | Gates | O que passou, o que degradou e **o que ficou pendente** — pendência nomeada nunca vira "Done" |
 | Pendências do Diretor | Decisões que sobraram para você, em lote |
+| Intervenções humanas | Quantas vezes o ciclo precisou de uma resposta sua (veto, escalação respondida, handoff devolvido) — decisões tomadas **em seu nome** não contam |
 | Duração | Relógio de parede por etapa |
 | Custo por papel | Tokens aproximados por membro do time (quando medidos) — observação para a dieta de contexto, nunca motivo de parada |
 
