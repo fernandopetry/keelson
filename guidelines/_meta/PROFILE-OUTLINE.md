@@ -55,7 +55,9 @@ Responde: *como se nomeia, e em que idioma?*
 - convenção por tipo de símbolo (classe, função, constante, arquivo);
 - idioma do código vs idioma do comentário;
 - qual comentário **carrega** o que a sintaxe não tem (→ obrigatório, Art. 7) e qual é
-  **ritual** nesta linguagem (o que o tipo/atributo já diz);
+  **ritual** nesta linguagem (o que o tipo/atributo já diz) — exemplo-âncora: docstring/
+  JSDoc/docblock que repete a assinatura já tipada é ritual; shape de coleção, generics
+  para o analisador estático e exceções que o chamador trata são carga (4.245);
 - padrões de nome que sinalizam papel (interface, teste, DTO…).
 
 ## 4. Estrutura & arquitetura `[obrigatória]`  → Charter Art. 4, 7

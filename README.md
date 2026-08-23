@@ -411,17 +411,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.111.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.112.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: four AI-native-SDLC gaps closed (decisions 4.241–4.244) — plans
-now consult other slugs' irreversible decisions (conflicts are cited and justified,
-never discovered in code); an opt-in `guidelines/project/invariants.md` gives "what
-must never change" a home read by planning and review gate 6; the `/keelson:init`
-report gains a maturity snapshot stating what each absent assurance layer means for
-agent autonomy; and human interventions become a counted closure-report line backed
-by a new `intervencao` ledger event. No re-init needed.
+New in this release: comment volume in generated code is trimmed where it is
+cheapest (decision 4.245) — the developer's pre-report self-check now runs the full
+Art. 7 delete test on every comment it wrote (not only the narrative check), and a
+gate-7 "suggested removal" never opens a review round of its own: it rides along a
+retry another finding already opened, or stays a suggestion. Generated profiles get
+a concrete anchor for what a ritual docstring/JSDoc is. No re-init needed.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

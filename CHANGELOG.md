@@ -25,6 +25,45 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.112.0] — 2026-08-22
+
+Re-init: none
+
+Decision 4.245 — the Director asked how to cut comment volume in generated code
+without losing effectiveness. The rule (Charter Art. 7 delete test, floor and
+ceiling) was already right; what leaked was *where* it ran — the developer's
+pre-report self-check covered only narrative comments, and a gate-7 "suggested
+removal" had no consumer in the implement loop, so it died in the review report.
+Constraint honoured: no new step, no new round, no loop. Injected block and ficha
+contract untouched.
+
+### Changed
+
+- **Developer self-check now runs the full Art. 7 delete test** (4.245). Before every
+  report, the developer re-reads each comment it introduced and asks whether deleting
+  it loses information the code does not give back: no → delete it (paraphrase,
+  signature repeated in prose, ritual file header, docblock restating a native type);
+  yes → it stays (DEC/FR anchor, workaround with its removal condition, invariant,
+  path already tried). The floor travels in the same sentence as the ceiling, so the
+  check cannot over-delete. Previously the self-check caught only narrative comments
+  (provenance, temporal comparison — 4.135/4.185).
+- **Gate-7 "suggested removal" rides along, never opens a round** (4.245). A comment
+  the reviewer flags as redundant is still a suggestion, never a failure — and now it
+  has a destination: when the originating TASK goes to retry because of *another*
+  finding, the suggested removals join the retry dispatch and the developer applies
+  them with the fix (inert delta, same-reviewer re-check, 4.88). Without a retry it
+  stays a suggestion in the report. Rule owner: `core/CODE-REVIEW.md` severity
+  calibration; `/keelson:implement` references it; the `code-reviewer` report
+  template says so in a one-line comment on `acoes_sugeridas`.
+- **Profile outline §3 gains a concrete anchor for ritual comments** (4.245). Generated
+  profiles are told what "ritual" means in a typed language — a docstring/JSDoc/docblock
+  that repeats an already-typed signature — and what still carries information
+  (collection shape, generics for the static analyser, exceptions the caller handles).
+  Applies to profiles the `staff-engineer` generates; embedded PHP profiles already
+  state it.
+
+---
+
 ## [0.111.0] — 2026-08-21
 
 Re-init: none

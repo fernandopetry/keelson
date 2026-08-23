@@ -112,7 +112,7 @@ gates:
     status: OK | FAIL
     detalhe: <descrição>
 
-acoes_sugeridas:
+acoes_sugeridas:      # inclui remoção de comentário sugerida (Art. 7) com arquivo:linha — carona no retry da TASK, nunca rodada própria (4.245)
   - <ação para corrigir falha>
 
 fora_de_escopo:       # problema real visto no entorno, fora desta task — sinal ao Tech Lead; null se não houve

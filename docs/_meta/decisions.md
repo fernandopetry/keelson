@@ -2604,6 +2604,22 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.245 — Comentário se apaga onde custa zero: autocheck do developer cobre o teste inteiro do Art. 7; remoção sugerida pelo gate 7 pega carona, nunca abre rodada
+
+**Problema**: o Diretor perguntou como diminuir os comentários do código gerado sem perder efetividade. A régua já é a certa (Art. 7: teste único de apagar, piso e teto, 4.31/4.32) — o vazamento está em **onde o teste roda**: (a) o autocheck pré-report do developer (4.135/4.185) aplica só os dois eixos de narrativa (proveniência, comparação temporal); paráfrase e assinatura repetida — o grosso do volume — passam sem releitura no ponto de escrita; (b) o gate 7 aponta o comentário redundante como `acoes_sugeridas` (remoção sugerida, não bloqueio — 4.31) e **esse campo não tinha consumidor** no `/keelson:implement`: a sugestão nascia no report do reviewer e morria lá, e como correção só-texto não reabre o ciclo (4.88), o comentário sobrevivia por construção; (c) os perfis gerados recebem do PROFILE-OUTLINE §3 a obrigação de distinguir comentário que carrega de comentário ritual, mas sem exemplo-âncora — e docstring/JSDoc repetindo assinatura tipada é o ritual mais comum fora do PHP. Restrição do Diretor: otimizar sem deixar o fluxo mais rebuscado, e sem risco de loop.
+
+**Decisão**:
+- **O autocheck do developer aplica o teste inteiro do Art. 7**, não só o de narrativa: para cada comentário introduzido, apagar mentalmente — o leitor perde algo que o código não devolve? Não → apagar de verdade; perde → fica. O piso (âncora DEC/FR, armadilha com condição de remoção, invariante, caminho tentado) viaja na mesma frase, como guarda contra sobrecorreção. Mesmo padrão da 4.135: reincidência de regra existente vira autocheck no ponto de escrita, nunca segunda redação.
+- **Remoção sugerida pelo gate 7 pega carona, nunca abre rodada**: quando a TASK de origem vai a retry por **outro** achado, as remoções sugeridas entram no despacho e o developer aplica junto (delta inerte — re-verifica com o mesmo revisor, 4.88); sem retry, fica como sugestão no report. Nunca conta como falha, nunca rodada própria — é o que impede o loop (sugestão → retry → re-review → nova sugestão) que o Diretor vetou. O dono da régua é a calibração do `core/CODE-REVIEW.md`; `implement.md` referencia; o template do `code-reviewer` ganha um comentário de uma linha dizendo onde a sugestão vai parar.
+- **PROFILE-OUTLINE §3 ganha exemplo-âncora**: docstring/JSDoc/docblock que repete assinatura já tipada é ritual; shape de coleção, generics para o analisador estático e exceções que o chamador trata são carga. Os perfis `none.md` ficaram fora: são pseudo-perfis de ausência de papel, não perfis genéricos — o dono para perfil gerado é o Outline.
+- **Recusado nesta leva**: (i) developer aplicar as remoções sugeridas numa passada própria após review aprovado — adiciona um passo a toda task com sugestão, contra a restrição de não rebuscar; (ii) medição mecânica de densidade (`diff-facts.sh`) — fica na escada 4.149: a 4.31 é a 1ª ocorrência documentada, reincidência após esta leva promove o check com fixture; (iii) tocar o Charter (alvo positivo "invariante que cabe num teste vai no teste") — exige bump do Charter e re-olhada do `php.md`, fora do pedido.
+
+**Custo assumido**: o autocheck fica um pouco mais longo (uma frase com o teste duplo); a carona exige que o Tech Lead copie as remoções sugeridas para o despacho do retry quando ele existir — custo só em retry que já ia acontecer. Risco nomeado: sobrecorreção (developer apagando âncora de DEC ou condição de remoção) — mitigado pelo piso repetido na mesma frase e pelo gate 7, que já bloqueia DEC sem âncora e workaround sem condição de remoção (sentido inverso coberto).
+
+**Aplicação**: `agents/developer.md` (item 5 — autocheck), `guidelines/core/CODE-REVIEW.md` (§Calibração de severidade — dono da carona), `commands/implement.md` (parágrafo do retry, Etapa 3.3), `agents/code-reviewer.md` (comentário no template `acoes_sugeridas`), `guidelines/_meta/PROFILE-OUTLINE.md` (§3). Embarcado: bump minor (0.112.0); **Re-init: none** (bloco injetado e ficha intocados). Wiki: nada a mudar — `Conceitos.md` e a FAQ já descrevem a régua; o que mudou é onde o teste roda. Observar: comentário redundante ainda chegando ao gate 7 em volume (autocheck não lido) → escada 4.149, check mecânico de densidade no `diff-facts.sh`.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

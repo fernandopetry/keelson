@@ -226,7 +226,10 @@ que também envia e-mail) é o mesmo smell, mais grave — viola a régua do Art
 **Não bloqueia** (vira sugestão): espaçamento e ordem de imports; nome estranho mas
 legível; nome genérico com alternativa de domínio disponível (só bloqueia se esconder
 intenção ou efeito colateral); comentário que reprova no teste do Art. 7 — entra como
-**remoção sugerida**, com os trechos apontados.
+**remoção sugerida**, com os trechos apontados. A sugestão **nunca abre rodada nem conta
+como falha**: pega carona no retry da mesma TASK quando outro achado o abriu (delta
+inerte — re-verifica com o mesmo revisor, §Convergência); sem retry, fica no report como
+sugestão. A remoção barata é a do developer no autocheck, antes do gate (decisão 4.245).
 
 **Bloqueia**: violação de regra explícita do Charter ou do perfil; lógica de negócio sem
 teste; escopo violado; reimplementação de canônico existente. Do Art. 7 bloqueiam: bloco
