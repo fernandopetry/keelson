@@ -50,7 +50,9 @@ cruza várias áreas continua com **um brief só**: ele mora no slug dominante �
 sairia a SPEC se o trabalho crescesse — e os demais ganham uma linha de referência no
 INDEX. Regra de corte:
 mudou o que o sistema **promete**, ou há decisão técnica entre alternativas → é ciclo,
-não avulso.
+não avulso. A porta de entrada você escolhe declarando a intenção junto do pedido
+(*"ajuste pontual"*, *"sem ciclo"*); a promoção pela regra de corte, quando acontece,
+vem sempre declarada com motivo.
 
 **A SPEC também declara o que sustenta e como se prova** (decisões 4.96–4.101). Cada
 premissa carrega um **selo de evidência** (`crença · anedota · entrevistas · medido`) —

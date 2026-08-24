@@ -25,6 +25,37 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.113.0] — 2026-08-24
+
+Re-init: required
+
+Decision 4.246 — field feedback from a consumer: "I ask for a simple adjustment
+mid-development and the system spins up SPEC, plan and tasks; I just wanted a free
+mode to ask for something direct." The capability already existed (on-demand mode,
+4.75/4.86; direct-action routing; the trivial test, 4.205) — what was missing was a
+lever the Director could pull and discover: routing was the model's silent judgment.
+Re-init required: the injected block changed.
+
+### Added
+
+- **Declared punctual intent picks the door** (4.246). When the Director states the
+  intent alongside the request in natural language ("quick fix", "no cycle", "direct
+  change" — examples, not rigid keywords), the session enters on-demand mode by
+  default instead of re-judging the route. The declaration picks the *door*, never
+  waives the *promotion*: the existing falsifiable rule (changed promise, technical
+  decision between alternatives, the layer-boundary test) still promotes to the full
+  cycle — and the promotion is always announced with its reason before proceeding,
+  never decided silently. Scope: free sessions — invoking a `/keelson:*` command
+  remains the explicit request for that command's contract (4.129), so `/keelson:auto`
+  still runs the cycle. Rule owner: the injected block's on-demand bullet; the
+  method guide §5 mirror was updated in the same batch.
+- **Wiki teaches the lever**: a new FAQ entry ("I asked for a simple adjustment and
+  keelson opened a SPEC — how do I avoid that?") separates the two axes (size never
+  decides the route; declared intent picks the default door), and Getting-started /
+  Concepts carry the phrases.
+
+---
+
 ## [0.112.0] — 2026-08-22
 
 Re-init: none

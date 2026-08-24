@@ -140,7 +140,10 @@ chegarem. Documento pequeno ou pedido claro não precisa da forja — vá direto
    consumidor quebra junto. Teste rápido antes de despachar: o diff **introduz ou
    propaga campo/contrato através de uma fronteira de camada** (consulta nova, campo
    novo atravessando um serviço, tipo novo na outra ponta)? Então não é trivial — e o
-   brief nasce antes do código. Na dúvida, `/keelson:triage` decide.
+   brief nasce antes do código. Na dúvida, `/keelson:triage` decide. E quando você
+   **sabe** que é pontual, diga junto do pedido — *"ajuste pontual: …"*, *"sem ciclo"*:
+   isso escolhe a porta do modo sob demanda; se a régua acima disparar mesmo assim, a
+   promoção ao ciclo vem declarada com motivo, nunca em silêncio.
 
 Continue por [Conceitos](Conceitos) para entender o modelo, ou pelo
 [Guia do método](Guia-do-metodo) para a referência completa dos comandos.

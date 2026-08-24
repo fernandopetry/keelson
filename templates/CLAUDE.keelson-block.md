@@ -27,7 +27,8 @@
 ### Como trabalhar
 
 - **Modo padrão = autônomo** (`/keelson:auto` — não precisa digitar o comando): pedido
-  não-trivial em linguagem natural entra no ciclo `specify → plan → tasks → implement`
+  não-trivial em linguagem natural **sem declaração de intenção pontual** (bullet
+  seguinte) entra no ciclo `specify → plan → tasks → implement`
   conduzido pelo **time** keelson (po, developer, code-reviewer, qa, security-engineer,
   performance-engineer, product-designer),
   sob o contrato Diretor–PO: o brief é emitido na largada (janela de veto — o fluxo
@@ -36,8 +37,14 @@
   deploy são seus — a autonomia termina no push da branch. Aprovação etapa a etapa é
   opt-in (`/keelson:guided`). Rigor **proporcional a complexidade × risco** (ver Charter).
 - **Mudança pontual = modo sob demanda** (decisão 4.75): ajuste localizado de código,
-  sem decisão de produto, não precisa do ciclo — mas **a main session (Tech Lead) não
-  escreve o código**: destila um briefing curto (o quê, onde, critério de aceite) —
+  sem decisão de produto, não precisa do ciclo. **Declaração de intenção pontual do
+  Diretor** ("ajuste pontual", "sem ciclo", "mudança direta") **escolhe este modo como
+  default de porta, sem re-julgar** (decisão 4.246; vale na sessão livre — comando
+  `/keelson:*` invocado segue o contrato do comando, 4.129): a promoção ao ciclo
+  continua existindo só pela régua falsificável deste bullet (mudança de promessa ·
+  decisão entre alternativas · o teste 4.205 abaixo) e é **declarada com motivo antes
+  de seguir, nunca arbitrada em silêncio** (família 4.85). Neste modo, **a main
+  session (Tech Lead) não escreve o código**: destila um briefing curto (o quê, onde, critério de aceite) —
   que **nasce em arquivo**, como **brief avulso** em
   `{docsRoot}/<slug>/briefs/BRIEF-MMM-<descricao>-avulso.md` (esqueleto no
   `index-contract.md` do plugin; decisão 4.86; mudança que cruza slugs → **um brief só**,

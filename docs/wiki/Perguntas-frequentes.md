@@ -70,6 +70,18 @@ faixa de tempo) para você **priorizar e comparar** demandas; quem decide a rota
 `/keelson:triage`, pelo custo de estar plausivelmente errado, nunca pelo tamanho: uma
 mudança de uma linha que altera o que o sistema promete roteia para o ciclo por menor
 que pareça. Estimativa pequena + rota pesada podem coexistir — e estão ambas certas.
+Já a sua **intenção declarada** tem peso na porta de entrada — veja a pergunta seguinte.
+
+### Pedi um ajuste simples e o keelson abriu SPEC e plano. Como evito?
+
+Declare a intenção junto do pedido: *"ajuste pontual: …"*, *"sem ciclo — só corrige
+X"*, *"mudança direta: …"*. A declaração escolhe a **porta**: a mudança entra no
+[modo sob demanda](Conceitos) — brief avulso, developer e review, sem SPEC/plano/tarefas.
+O que a declaração **não** dispensa é a **promoção**: se o ajuste muda o que o sistema
+promete ou exige decisão técnica entre alternativas, o keelson promove ao ciclo — mas
+dizendo o motivo antes de seguir, nunca em silêncio. As duas respostas convivem: a
+pergunta acima é sobre tamanho (que nunca decide rota); esta é sobre intenção (que
+decide o default da porta).
 
 ## Sobre autonomia e controle
 
