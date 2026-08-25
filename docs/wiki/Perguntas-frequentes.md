@@ -212,6 +212,53 @@ classe do merge e do deploy.
 
 ## Sobre custo e confiança
 
+### O keelson não deixa o desenvolvimento mais lento?
+
+Ele deixa a **primeira parte** mais lenta e o **todo** mais rápido — e a diferença está
+no que cada um conta como "pronto".
+
+Toda mudança séria tem dois blocos de trabalho: escrever o código e **garantir que ele
+está certo** — entender o pedido, revisar, testar, provar que funciona. O segundo bloco
+existe sempre; a única escolha é *quando* pagá-lo. Sem processo, o código sai rápido e a
+conta chega depois, com juros: o requisito mal-entendido vira retrabalho, o bug escapa
+para produção, a próxima sessão recomeça sem contexto. O keelson paga essa conta
+**antes**, à vista — SPEC, gates, QA. Por isso a primeira volta parece demorada: você
+está vendo um custo que sempre existiu, mas que ficava invisível (e maior) no fim.
+
+```mermaid
+flowchart TD
+    A["Toda mudança tem dois blocos"] --> B["Escrever o código"]
+    A --> C["Garantir que está certo:<br/>entender, revisar, testar, provar"]
+    C --> D{"Quando pagar esse segundo bloco?"}
+    D -- "Depois (sem processo)" --> E["Parece rápido no começo —<br/>a conta volta como bug e retrabalho"]
+    D -- "Antes (keelson)" --> F["Parece lento no começo —<br/>a entrega sai pronta de verdade"]
+```
+
+E esse custo não é fixo — o keelson calibra o peso pelo tamanho do risco:
+
+- **Ajuste pequeno não paga ciclo.** Diga *"ajuste pontual: …"* junto do pedido e a
+  mudança entra pelo [modo sob demanda](Conceitos): developer e review, sem SPEC nem
+  plano — veja
+  [a pergunta sobre a porta](#pedi-um-ajuste-simples-e-o-keelson-abriu-spec-e-plano-como-evito).
+- **Os gates rodam por camada, não a cada passo.** Testes rodam por tarefa; revisão,
+  segurança, performance e design rodam **uma vez por wave**, sobre o conjunto; o QA
+  prova a funcionalidade inteira uma vez. E tarefas da mesma wave rodam em paralelo.
+- **Gate que não se aplica não roda.** Segurança só em mudança sensível, performance só
+  quando o diff toca superfície de custo, design só quando há tela. Mudança que não
+  exercita código dispensa a suíte — sempre declarando isso, nunca em silêncio.
+- **O custo é previsível.** `/keelson:estimate` diz antes quantas waves e tarefas a
+  demanda deve ter, e o relatório de fecho confronta o estimado com o realizado.
+
+Quer comparar de verdade? Não compare sensação com sensação. O relatório de fecho mede
+duração e estimado × realizado; some, do outro lado, o tempo de entender o requisito,
+revisar e testar à mão — mais o retrabalho quando algo escapa. É essa soma que o keelson
+está disputando, não o tempo de digitar código.
+
+A exceção honesta: para protótipo descartável ou experimento que ninguém vai manter, o
+ciclo não compensa mesmo — e o próprio keelson concorda, roteando o trivial para fora
+dele. O keelson é para código que **fica**: quanto mais tempo o código vive, mais barata
+essa conta paga à vista se torna.
+
 ### Por que ele escreve tão poucos comentários?
 
 Porque o teste é único: *apagar essa linha perde informação que o código não devolve?*
