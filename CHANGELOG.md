@@ -25,6 +25,36 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.113.1] — 2026-08-24
+
+Re-init: required
+
+Decision 4.247 — wording fix on the day-old 4.246 lever, before any field round:
+"applies in a free session" could be read by a session that just ran `/keelson:auto`
+as "this session is not free", silently disabling the lever in its most common
+scenario — final adjustments right after a cycle delivers. That misreading risk was
+hypothesis 2 of the 4.246 impact map; it materialized as a Director question the
+same day. Re-init required: the injected block changed.
+
+### Changed
+
+- **The lever's scope now names the post-cycle case** (4.247). The injected block and
+  the method-guide mirror say the declaration applies *outside a running command —
+  including right after a cycle delivers in the same session, when the session is
+  free again*. While a command runs, nothing changes (its contract still governs,
+  4.129).
+- **FAQ explains the post-`auto` scenario in plain language** (4.247): a new entry
+  ("I finished a `/keelson:auto` and just want some final tweaks — will I fall into
+  the cycle again?") aimed at readers new to keelson, with a mermaid flow diagram
+  (rendered by the GitHub wiki) showing when a request goes through the running
+  cycle, the on-demand door, or promotion with a stated reason.
+- **Own wiki pages now have an authoring rule** (4.247, maintainer-side): the target
+  reader is someone who started using keelson recently — simple language, no internal
+  vocabulary, and a mermaid diagram alongside the text when a flow or branching
+  decision benefits from one. Mirrors keep their owners' text untouched.
+
+---
+
 ## [0.113.0] — 2026-08-24
 
 Re-init: required

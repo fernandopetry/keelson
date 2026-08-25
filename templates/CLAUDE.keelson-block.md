@@ -39,8 +39,10 @@
 - **Mudança pontual = modo sob demanda** (decisão 4.75): ajuste localizado de código,
   sem decisão de produto, não precisa do ciclo. **Declaração de intenção pontual do
   Diretor** ("ajuste pontual", "sem ciclo", "mudança direta") **escolhe este modo como
-  default de porta, sem re-julgar** (decisão 4.246; vale na sessão livre — comando
-  `/keelson:*` invocado segue o contrato do comando, 4.129): a promoção ao ciclo
+  default de porta, sem re-julgar** (decisão 4.246; vale **fora de comando em
+  execução** — inclusive logo após a entrega de um ciclo na mesma sessão, quando a
+  sessão volta a ser livre; comando `/keelson:*` invocado segue o contrato do
+  comando, 4.129): a promoção ao ciclo
   continua existindo só pela régua falsificável deste bullet (mudança de promessa ·
   decisão entre alternativas · o teste 4.205 abaixo) e é **declarada com motivo antes
   de seguir, nunca arbitrada em silêncio** (família 4.85). Neste modo, **a main

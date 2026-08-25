@@ -411,7 +411,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.113.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.113.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
@@ -420,7 +420,10 @@ New in this release: the Director gets a natural-language lever for quick change
 cycle") makes on-demand mode the default door instead of relying on the model's
 routing judgment; promotion to the full cycle still happens by the existing
 falsifiable rule, and is always announced with a reason, never decided silently.
-Re-init required (the injected block changed).
+0.113.1 (decision 4.247) makes explicit that the lever also works right after a
+`/keelson:auto` cycle finishes in the same session, and the FAQ explains that
+scenario in plain language with a flow diagram. Re-init required (the injected
+block changed).
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

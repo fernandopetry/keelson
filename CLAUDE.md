@@ -155,6 +155,12 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   **texto que já tem dono é espelhado, nunca reescrito** — página própria só para o que
   não existe em lugar nenhum. A wiki **não** é um 4º lugar a sincronizar: comando novo
   continua em `commands/*.md` + `README.md` + `method-guide.md`, e a página é derivada.
+- **Página própria fala com quem chegou agora** (decisão 4.247): o leitor-alvo é quem
+  começou a usar o keelson recentemente — linguagem simples, sem pressupor vocabulário
+  interno (número de decisão §4.x fica fora do texto; conceito citado linka a página
+  que o explica). Fluxo ou decisão com ramificação ganha diagrama ` ```mermaid ` junto
+  do texto quando facilitar o entendimento — o GitHub renderiza mermaid na wiki.
+  A régua vale para página própria; espelho segue o texto do dono, intocado.
 - **Espelho anda sozinho; página própria tem gatilho.** Mexeu em `method-guide`, Charter
   ou convenção → a wiki acompanha no push, sem ação nenhuma. O que exige olhar é a página
   própria, e o teste é um só: **o que o consumidor faz mudou?** — campo novo na ficha →

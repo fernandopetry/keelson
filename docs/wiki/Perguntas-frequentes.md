@@ -83,6 +83,36 @@ dizendo o motivo antes de seguir, nunca em silêncio. As duas respostas convivem
 pergunta acima é sobre tamanho (que nunca decide rota); esta é sobre intenção (que
 decide o default da porta).
 
+### Terminei um `/keelson:auto` e só quero uns ajustes finais. Vou cair no ciclo de novo?
+
+Não precisa. Quando o `auto` termina e entrega, a sessão volta ao normal — cada pedido
+novo começa do zero, mesmo que a conversa ainda esteja cheia do contexto do ciclo.
+Então vale a mesma dica da pergunta anterior: diga que é pontual junto do pedido
+(*"ajuste pontual: aumenta a fonte do título"*) e o keelson faz o ajuste direto, sem
+abrir SPEC nem plano de novo.
+
+Dois detalhes para entender o que acontece por trás:
+
+- **Enquanto o `auto` ainda está rodando**, o pedido entra pelos mecanismos do próprio
+  ciclo (seu veto, escalações) — a dica vale para depois da entrega.
+- **Depois da entrega**, mesmo que o ajuste toque exatamente o que acabou de ser
+  entregue, a rota é leve: uma tarefa avulsa ligada ao plano que já existe — nada de
+  SPEC ou plano novos. E se o seu "ajuste simples" na verdade mudar uma promessa do
+  sistema (um formato de dado, um contrato entre partes), o keelson avisa por que vai
+  promover ao ciclo **antes** de seguir — nunca decide isso em silêncio.
+
+```mermaid
+flowchart TD
+    A["Você faz um pedido"] --> B{"O /keelson:auto ainda<br/>está rodando?"}
+    B -- "Sim" --> C["O pedido entra pelos mecanismos<br/>do próprio ciclo (veto, escalação)"]
+    B -- "Não — já entregou" --> D{"Você disse que é pontual?<br/>(&quot;ajuste pontual: …&quot;, &quot;sem ciclo&quot;)"}
+    D -- "Sim" --> E["Modo sob demanda:<br/>ajuste direto, sem SPEC/plano novos"]
+    D -- "Não" --> F["O keelson julga a rota<br/>(triagem normal)"]
+    E --> G{"O ajuste muda uma<br/>promessa do sistema?"}
+    G -- "Não" --> H["Entrega rápida ✅"]
+    G -- "Sim" --> I["Promove ao ciclo,<br/>dizendo o motivo antes"]
+```
+
 ## Sobre autonomia e controle
 
 ### O keelson faz merge ou deploy sozinho?
