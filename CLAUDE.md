@@ -160,6 +160,9 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   interno (número de decisão §4.x fica fora do texto; conceito citado linka a página
   que o explica). Fluxo ou decisão com ramificação ganha diagrama ` ```mermaid ` junto
   do texto quando facilitar o entendimento — o GitHub renderiza mermaid na wiki.
+  Aspas dentro de rótulo mermaid → aspas simples (`'…'`) — entidade `&quot;` quebra o
+  parser do GitHub (caso real, 784ba51); bloco mermaid novo/editado se valida antes do
+  push (ex.: mermaid.ink), porque **nenhuma guarda mecânica cobre `docs/wiki/`**.
   A régua vale para página própria; espelho segue o texto do dono, intocado.
 - **Espelho anda sozinho; página própria tem gatilho.** Mexeu em `method-guide`, Charter
   ou convenção → a wiki acompanha no push, sem ação nenhuma. O que exige olhar é a página
