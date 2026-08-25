@@ -105,7 +105,7 @@ Dois detalhes para entender o que acontece por trás:
 flowchart TD
     A["Você faz um pedido"] --> B{"O /keelson:auto ainda<br/>está rodando?"}
     B -- "Sim" --> C["O pedido entra pelos mecanismos<br/>do próprio ciclo (veto, escalação)"]
-    B -- "Não — já entregou" --> D{"Você disse que é pontual?<br/>(&quot;ajuste pontual: …&quot;, &quot;sem ciclo&quot;)"}
+    B -- "Não — já entregou" --> D{"Você disse que é pontual?<br/>('ajuste pontual: …', 'sem ciclo')"}
     D -- "Sim" --> E["Modo sob demanda:<br/>ajuste direto, sem SPEC/plano novos"]
     D -- "Não" --> F["O keelson julga a rota<br/>(triagem normal)"]
     E --> G{"O ajuste muda uma<br/>promessa do sistema?"}
