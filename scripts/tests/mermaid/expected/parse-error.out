@@ -1,0 +1,2 @@
+ERRO: docs/wiki/Pagina.md: bloco mermaid (linha 3): parse falhou no renderizador (HTTP 400): Parse error on line 2
+check-mermaid: 1 bloco(s) mermaid inválido(s).

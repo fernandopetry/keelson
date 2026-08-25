@@ -104,6 +104,12 @@ jobs:
       - name: Suíte do context-cost.sh (scripts/tests/context-cost/run.sh)
         run: bash scripts/tests/context-cost/run.sh
 
+      - name: Suíte do check-mermaid.sh (scripts/tests/mermaid/run.sh)
+        run: bash scripts/tests/mermaid/run.sh
+
+      - name: Blocos mermaid da superfície da wiki (scripts/check-mermaid.sh)
+        run: bash scripts/check-mermaid.sh
+
       - name: Frontmatter YAML de todo .md (scripts/check-frontmatter.sh)
         run: |
           python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet pyyaml

@@ -1,0 +1,2 @@
+ERRO: docs/wiki/Pagina.md: bloco mermaid (linha 3): entidade &quot; no bloco — o GitHub decodifica antes de parsear e as aspas aninhadas quebram (784ba51); use aspas simples no rótulo
+check-mermaid: 1 bloco(s) mermaid inválido(s).
