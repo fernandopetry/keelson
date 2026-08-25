@@ -25,9 +25,33 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
-## [0.114.0] — 2026-08-24
+## [0.115.0] — 2026-08-25
 
 Re-init: none
+
+Decision 4.251
+
+### Added
+- **`/keelson:merge` — merge one or more branches into the current branch, one commit
+  per branch.** New human-only command that processes branches in sequence: for each
+  one, runs the textual-conflict dry-run (`git merge-tree --write-tree`, reusing the
+  4.74 mechanism) and mandatory semantic reconciliation (reusing the 4.235 rule —
+  diverging symbols between parents + new consumers, even without a textual conflict). A
+  clean branch (no conflict, no reconciliation finding, green suite) closes its commit
+  directly, with no agent dispatched; a conflict, reconciliation finding or broken test
+  dispatches the `developer` agent scoped to just the touched files (standalone-review
+  mode, no commit) and the `code-reviewer` audits only that resolution's diff (gates
+  1–7, plus gate 8 via `security-engineer` on sensitive area) — never the whole branch
+  diff. Only then does that branch's own merge commit close before moving to the next. A
+  failing suite or gate after one retry aborts that branch's merge and stops the queue
+  there — already-merged branches keep their commits, the rest are never attempted, and
+  the human is handed the diagnosis. This is a declared exception to "no command merges"
+  (`docs/_meta/conventions/sdd-conventions.md`): push, merge into the remote main branch,
+  PR and deploy remain exclusively human.
+
+### Changed
+- `developer`, `code-reviewer` and `security-engineer` agent descriptions now list
+  `/keelson:merge` as an invoker.
 
 Decisions 4.249/4.250 — field case: a consumer proposed "anchor-only comments" and the
 three real examples behind the proposal turned out to violate the current rule (process

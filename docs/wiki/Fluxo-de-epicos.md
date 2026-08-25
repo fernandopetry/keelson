@@ -103,7 +103,10 @@ E em qualquer estratégia, quando duas linhas de trabalho se reencontram, **merg
 não é merge correto**: o time lista as constantes/sentinelas que mudaram de valor
 entre os dois lados e varre os consumidores novos do outro lado antes de confiar no
 resultado — conflito textual prova texto, não significado, e o merge é tratado como
-diff novo que passa pela suíte e pelos gates.
+diff novo que passa pela suíte e pelos gates. Para trazer uma ou mais branches de fatia
+para dentro da sua branch de trabalho atual com essa checagem automatizada, use
+`/keelson:merge` — ele resolve conflito e teste quebrado e fecha um commit por branch,
+mas nunca mergeia para a principal nem dá push por conta própria.
 
 **Posso rodar a fatia 2 em outra máquina / outro dia / outra pessoa?** Sim — todo o
 estado vive nos artefatos commitados na branch do épico. Qualquer clone com a branch

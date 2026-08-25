@@ -132,6 +132,8 @@ Humanos-only (não aparecem na listagem): `/keelson:guided` (ciclo com checkpoin
 `/keelson:brief` (forjar documento de produto em BRIEF, pré-ciclo) ·
 `/keelson:refine` (lapidar ideia) · `/keelson:audit` (auditoria de dependências) ·
 `/keelson:review` (code review de um diff avulso, sem artefato SDD) ·
+`/keelson:merge` (mesclar uma ou mais branches na corrente, uma de cada vez, com commit
+de merge próprio por branch — push, merge remoto, PR e deploy continuam humanos) ·
 `/keelson:verify-handoff` (fechar gate de tela remoto) ·
 `/keelson:continue` (retomar um slug de onde parou — fila do épico, wave interrompida
 ou próxima fatia, derivado dos artefatos commitados) ·

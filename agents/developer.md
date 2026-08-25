@@ -1,6 +1,6 @@
 ---
 name: developer
-description: Implementa uma única TASK do ciclo SDD — ou uma mudança pontual no modo sob demanda (4.75) — com código e testes que satisfazem os ACs/critérios vinculados. Não faz code review próprio nem closure final. Invocado pelo /keelson:implement (waves), pelo /keelson:review (corrigir achados, sem commit) e pelo Tech Lead em sessão livre.
+description: Implementa uma única TASK do ciclo SDD — ou uma mudança pontual no modo sob demanda (4.75) — com código e testes que satisfazem os ACs/critérios vinculados. Não faz code review próprio nem closure final. Invocado pelo /keelson:implement (waves), pelo /keelson:review e /keelson:merge (achados/conflito, sem commit) e pelo Tech Lead em sessão livre.
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: sonnet
 ---

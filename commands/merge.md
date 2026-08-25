@@ -1,0 +1,202 @@
+---
+description: Mescla uma ou mais branches na branch de trabalho corrente, uma de cada vez — sem conflito nem teste quebrado, commita direto; havendo um dos dois, developer resolve e code-reviewer audita só o ponto tocado antes do commit de merge
+argument-hint: "<branch> [<branch2> ...] [--into=<branch>] [--dry-run] [--no-tests]"
+disable-model-invocation: true
+---
+
+# /keelson:merge
+
+Você é o **Tech Lead** nesta integração. Não resolve conflito nem conserta teste com as
+próprias mãos: despacha o `developer`, valida com o `code-reviewer` e fecha o commit de
+merge — nunca o push. Existe para trazer branches de tarefa (feature, fix, branch de
+outra sessão) para dentro da branch de trabalho corrente, com a reconciliação e a prova
+de gate que um `git merge` cru não dá. Uso típico: uma **branch de release/integração**
+onde várias tarefas se encontram e são testadas juntas antes do PR — `<branch>` é a
+tarefa, `--into=<branch-de-release>` (ou já estar nela) é o destino; o conflito que
+normalmente só aparece na hora de abrir o PR é resolvido e provado aqui antes.
+
+**Princípio inviolável 1**: este comando fecha o **commit de merge local** de cada
+branch — nunca dá push, nunca mergeia para a branch principal remota, nunca abre PR,
+nunca faz deploy (exceção declarada em
+`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`, decisão 4.251). Push,
+merge remoto, PR e deploy continuam do Diretor.
+
+**Princípio inviolável 2**: **N branches, N commits.** Cada branch aprovada nas Etapas
+1–5 fecha com **seu próprio** commit de merge antes da próxima começar — nunca um squash
+de várias branches num commit só. Uma branch que falha (Etapa 4 esgotou o retry, Etapa 5
+reprovou no retry) **para a fila**: as branches já mescladas ficam commitadas, as
+restantes não são tentadas — reporte o corte exato.
+
+**Princípio inviolável 3**: merge limpo não é merge correto — reconciliação semântica
+(`sdd-conventions.md`, decisão 4.235) é obrigatória mesmo sem conflito textual. O
+perigo não está no que conflita, está no que se combina sem conflitar.
+
+**Princípio inviolável 4**: `developer` e `code-reviewer` só entram em cena **onde houve
+conflito** — textual, achado de reconciliação semântica, ou teste quebrado. Merge limpo
+com suíte verde vai direto ao commit, sem despachar ninguém. Quando entram, o escopo dos
+dois é **o ponto tocado**, nunca a branch inteira: o `developer` resolve só os arquivos
+em conflito/achado, o `code-reviewer` audita só o diff dessa resolução (gerador ≠
+avaliador, decisão 4.30 — quem resolve não é quem aprova).
+
+**Princípio inviolável 5**: falha de teste ou reprovação do `code-reviewer` (quando
+despachado) é **1 retry, depois escala** — nunca force o fechamento driblando a régua.
+
+## Input
+
+```
+/keelson:merge <branch> [<branch2> ...] [--into=<branch>] [--dry-run] [--no-tests]
+```
+
+| Arg/Flag | Uso |
+|---|---|
+| `<branch> [<branch2> ...]` | Uma ou mais branches a mesclar, processadas **em sequência**, na ordem dada |
+| `--into=<branch>` | Branch de destino, comum a todas. Default: a branch corrente do working tree |
+| `--dry-run` | Só o dry-run de conflito textual (decisão 4.74) de cada branch — não altera a working tree |
+| `--no-tests` | Pula a Etapa 4 (suíte) em todas as branches. Use só quando já passaram na suíte em verificação recente — declare o motivo no output |
+
+Exemplo — trazer duas tarefas para a branch de release antes do PR:
+
+```
+git checkout release
+/keelson:merge feat/slug-tarefa-1 feat/slug-tarefa-2
+```
+
+## Etapa 0: pré-checks (falhou um → parar e reportar, nada é executado)
+
+1. **Working tree limpo**: `git status --porcelain` sob os `codePaths` da ficha. Sujeira
+   de código → parar, pedir commit/stash (laboratório único, mesma régua do
+   `/keelson:verify-handoff` Etapa 0.2).
+2. **Merge em curso já existente** (`MERGE_HEAD` presente) → parar: reportar o estado e
+   apontar `git merge --abort` ou `git commit` como saídas humanas — nunca empilhar um
+   merge novo sobre um pendente.
+3. **Branch de destino** (`--into` ou a corrente) e **cada branch de origem** existem
+   (`git rev-parse --verify`, local ou `origin/<branch>` após `git fetch origin`). Alguma
+   não existe → parar, listar todas antes de tentar qualquer merge (falha tardia no meio
+   da fila é pior que falha cedo).
+4. Se `--into` foi passado, `git checkout <into>` antes de seguir (destino sujo cai no
+   passo 1).
+
+`--dry-run` roda só a Etapa 1 para cada branch, na ordem, e para — sem tocar a working tree.
+
+## Loop por branch (Etapas 1–6, uma branch de cada vez, na ordem do input)
+
+Para a branch corrente da fila:
+
+### Etapa 1: dry-run de conflito textual (decisão 4.74)
+
+```bash
+git merge-tree --write-tree <into> <branch>          # git ≥ 2.38
+# fallback (git < 2.38):
+git merge --no-commit --no-ff <branch> && git merge --abort
+```
+
+Limpo → registrar e seguir. Conflitado → listar os arquivos em conflito no output desta
+etapa; a resolução acontece de verdade na Etapa 3, este passo só prova o que vem pela frente.
+
+### Etapa 2: reconciliação semântica (decisão 4.235) — antes de confiar em qualquer merge
+
+1. **Base comum**: `git merge-base <into> <branch>`.
+2. **Símbolos que divergem entre os pais**: `git diff <base-comum>...<branch>` recortado
+   aos símbolos tocados (constantes, sentinelas, contratos, assinaturas) — nunca o repo
+   inteiro.
+3. **Consumidores novos do outro lado**: para cada símbolo divergente, varrer quem passou
+   a depender dele desde a base comum. Achado real → vira item a resolver na Etapa 3,
+   mesmo que o merge textual não conflite nele.
+
+Este passo não muda a working tree — é insumo para o briefing do `developer`.
+
+### Etapa 3: merge real
+
+`git merge --no-commit --no-ff <branch>`. Sem conflito textual **e** sem achado da
+Etapa 2 → marcar esta branch como **limpa até aqui** e seguir para a Etapa 4 sem
+despachar ninguém.
+
+### Etapa 4: resolução dos pontos tocados (delegada ao `developer` — só se houve gatilho)
+
+Gatilho: conflito textual (Etapa 3) **ou** achado de reconciliação semântica (Etapa 2)
+**ou** suíte vermelha (abaixo). Nenhum gatilho nesta branch → pule para a Etapa 6.
+
+1. Rodar `quality.test` da ficha sobre o merge staged — mesmo numa branch "limpa até
+   aqui", porque teste quebrado é gatilho por si só.
+2. Algum gatilho disparou → despachar o `developer` em **modo revisão avulsa** (sem TASK
+   em disco, sem commit — mesmo modo do `/keelson:review` Etapa 6) com um briefing
+   efêmero **escopado só ao que disparou**:
+   - Conflito → lista de arquivos com marcadores `<<<<<<<`.
+   - Achado de reconciliação → o(s) símbolo(s) divergente(s) e o(s) consumidor(es) novo(s)
+     da Etapa 2.
+   - Suíte vermelha → o teste/arquivo que falhou.
+   - Critério de pronto: conflito resolvido preservando o comportamento pretendido dos
+     dois lados (não "o lado que compilar primeiro"); achado de reconciliação endereçado
+     ou declarado não aplicável com o porquê; suíte verde sem mudança de comportamento
+     além do necessário.
+   - `git add` nos arquivos tocados — **nunca commitar** (o commit desta branch é a
+     Etapa 6). Reforce o limite: só os arquivos do gatilho; não refatorar além disso —
+     é este escopo restrito que a Etapa 5 audita.
+3. Suíte ainda vermelha após o turno do `developer` → **1 retry**; persistindo,
+   `git merge --abort`, **esta branch não fecha commit**, parar a fila (princípio 2) e
+   escalar ao humano com o diagnóstico.
+
+### Etapa 5: `code-reviewer` sobre o diff da resolução (só se a Etapa 4 despachou o `developer`)
+
+1. Diff = **só o que o `developer` tocou na Etapa 4** (arquivos de conflito/achado/teste
+   resolvidos) — nunca a branch inteira; o `code-reviewer` recebe o comando de diff
+   restrito a esses arquivos, não uma cópia (mesmo contrato do `/keelson:review` Etapa 0,
+   aplicado ao delta como a Etapa 7 dele faz na re-revisão).
+2. Régua degradada de "sem artefato SDD" (`guidelines/core/CODE-REVIEW.md`) — slug
+   inferível pelos arquivos tocados → ler o `INDEX.md` para decisões irreversíveis (gate 5);
+   não inferível → gate 5 `n/a`, declarado.
+3. Área sensível entre os arquivos resolvidos (lista canônica na `description` do
+   `security-engineer`) → despachar também, gate 8, mesmo escopo restrito.
+4. REPROVADO → **1 retry** com instruções precisas (novo turno do `developer`, escopo
+   restrito ao achado); ainda reprovado → `git merge --abort`, **esta branch não fecha
+   commit**, parar a fila (princípio 2) e escalar ao humano.
+
+### Etapa 6: fechar o commit de merge desta branch
+
+Commit de merge (dois pais) não segue a Conventional Commits do
+`docs/_meta/conventions/commit-convention.md` — essa régua é para commits normais do
+consumidor; aqui usa-se o formato padrão do git, que o GitHub reconhece como merge.
+
+1. **Branch limpa** (nenhum gatilho na Etapa 4) → `git commit` com a mensagem default:
+   ```
+   Merge branch '<branch>' into <into>
+   ```
+2. **Branch com gatilho, aprovada na Etapa 5** → mesmo título, mais um corpo que resume
+   o que foi resolvido (para quem olhar `git log` sem reabrir o comando):
+   ```
+   Merge branch '<branch>' into <into>
+
+   Resolved via /keelson:merge:
+   - conflito: <arquivo1>, <arquivo2>            (omitido se não houve)
+   - reconciliação: <símbolo> — <consumidor novo endereçado>   (omitido se n/a)
+   - suíte: vermelha → consertada                 (omitido se n/a)
+
+   Reviewed-by: code-reviewer (gates 1-7<, 8 se rodou>)
+   ```
+3. Registrar o SHA do commit de merge e seguir para a próxima branch da fila (volta à
+   Etapa 1 sobre o novo HEAD). Fila vazia → Etapa 7.
+
+## Etapa 7: output final
+
+```markdown
+# Merge: <into>
+
+## Branches processadas (em ordem)
+- <branch1>: ✅ commit <sha> — limpa, sem despacho (dry-run limpo · sem achado de reconciliação · suíte verde)
+- <branch2>: ✅ commit <sha> — developer + code-reviewer no escopo: <arquivos> (motivo: conflito | achado de reconciliação | suíte vermelha)
+- <branch3>: ❌ não commitada — <motivo: suíte vermelha após retry | gate reprovado após retry> — fila interrompida aqui
+
+## Reconciliação semântica (decisão 4.235, por branch)
+- <branch1>: símbolos divergentes <lista ou nenhum> · consumidores novos endereçados <lista ou n/a>
+
+## Estado da working tree
+- HEAD em <into>, N commit(s) de merge novos (<sha1>, <sha2>, ...).
+- Push, merge para a branch principal remota, PR e deploy continuam com você.
+```
+
+## Limites
+
+Nunca dá push, nunca mergeia para a branch principal remota, nunca abre PR, nunca faz
+deploy, não promove Status, não cria SPEC/PLAN. Achado estrutural encontrado na
+reconciliação semântica (decisão de arquitetura, não conflito local) não é resolvido no
+ato — reporte como pendência, mesma régua do `/keelson:review` Etapa 8.

@@ -104,6 +104,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 |---------|--------------|
 | `/keelson:init` | Interactive setup — detects the stack, writes the ficha and the `CLAUDE.md` block |
 | `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
+| `/keelson:merge` † | Merge one or more branches into the current branch, one at a time — conflict and broken-test fixes dispatched to the developer agent, gates 1–7 via code-reviewer, one merge commit per branch (push, remote merge, PR and deploy stay human) |
 | `/keelson:jira-sync` | Reconcile a slug — or a single SPEC subtree — with Jira via the Atlassian MCP connector; `--phase start-dev\|finish-dev` walks the tree across the board — idempotent, best-effort (optional) |
 | `/keelson:review` † | Review an arbitrary diff (working tree, last commit, N commits, range, branch) against the keelson doctrine via independent reviewers; on your OK, dispatches the fix to the developer agent and re-reviews — for code that arrived without an SDD artifact |
 | `/keelson:audit` † | On-demand dependency audit against known vulnerabilities (CVE/NVD); `full` adds hygiene (outdated, abandoned, licenses) |
@@ -411,12 +412,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.114.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.115.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: two enforcement fixes for the comment rule, from a real field
-case (decisions 4.249/4.250) — a suggested comment removal from review is now always
+New in this release: `/keelson:merge` (decision 4.251) — merges one or more branches
+into the current branch, one at a time, with conflict and broken-test resolution
+dispatched to the developer agent and gates 1–7 via code-reviewer; each branch closes
+its own merge commit before the next starts. Push, remote merge, PR and deploy stay
+human. See the full CHANGELOG for details.
 applied before delivery (it still never opens a review round: at wave end in the
 cycle, in the correction batch of a standalone review), and the Art. 7 comment test
 closes countably at both points where it runs (a comment inventory in the gate-7
