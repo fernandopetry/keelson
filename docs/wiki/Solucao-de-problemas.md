@@ -155,6 +155,19 @@ Há um ciclo em andamento. O hook de wave lê o arquivo de estado da execução
 encerramento enquanto o status for `em_andamento`. Ou deixe o ciclo terminar, ou peça
 explicitamente para parar — aí o estado é encerrado com o motivo registrado.
 
+### O bloqueio cita um ciclo que não é desta sessão
+
+Acontece quando várias sessões keelson trabalham em paralelo no mesmo projeto: o
+arquivo de estado que bloqueou o encerramento foi escrito por **outra** sessão, que
+ainda está viva. Cada arquivo carrega o campo `sessao:` com o id de quem o escreveu;
+quando ele aponta outra sessão, a mensagem do bloqueio muda — em vez de "continue ou
+encerre", ela instrui a **não tocar** no ciclo alheio (continuar entraria no trabalho
+da outra sessão; encerrar apagaria o checkpoint dela no meio de uma tarefa), fazer um
+inventário rápido e relatar o achado a você. É o comportamento esperado: nenhuma
+sessão continua nem encerra o ciclo de outra. Se a sessão dona realmente morreu e o
+arquivo ficou órfão, peça na sessão atual para assumir ou limpar o estado — a
+assunção é sempre um ato deliberado, nunca automático.
+
 ## Ciclo e comportamento do time
 
 ### Digitei um comando no meio de um ciclo e ele não rodou

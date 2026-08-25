@@ -34,7 +34,7 @@ for f in "$cwd"/thoughts/local/run-state-*.md; do
   [ -f "$f" ] || continue
   grep -q '^status: em_andamento' "$f" 2>/dev/null || continue
   n=$((n + 1))
-  campos="$(grep -E '^(slug|plan|waves_concluidas|waves_total|retomada):' "$f" 2>/dev/null | sed 's/^/    /' || true)"
+  campos="$(grep -E '^(slug|plan|waves_concluidas|waves_total|retomada|sessao):' "$f" 2>/dev/null | sed 's/^/    /' || true)"
   runs="${runs}
 — ${f#"$cwd"/}:
 ${campos}"
@@ -57,7 +57,7 @@ fi
 echo "[keelson compact-anchor] Contexto recém-compactado — fatos do disco (imunes à sumarização, decisão 4.146):"
 if [ "$n" -gt 0 ]; then
   printf '%s\n' "Run keelson EM ANDAMENTO:${runs}"
-  echo "Antes do próximo despacho, releia os artefatos apontados em 'retomada' (INDEX do slug + TASK-INDEX) — estado de wave, gates pendentes e pendências do Diretor se re-derivam do disco, nunca do resumo comprimido."
+  echo "Antes do próximo despacho, releia os artefatos apontados em 'retomada' (INDEX do slug + TASK-INDEX) — estado de wave, gates pendentes e pendências do Diretor se re-derivam do disco, nunca do resumo comprimido. Posse (decisão 4.251): run cujo campo 'sessao' aponte OUTRA sessão não é desta — não o retome nem o encerre; inventarie e escale ao humano."
 fi
 [ -n "$ledger_line" ] && echo "$ledger_line"
 

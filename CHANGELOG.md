@@ -23,6 +23,45 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.115.0] — 2026-08-25
+
+Re-init: none
+
+Decision 4.251 — field case, 4th manifestation of the same class in the consumer's ledger:
+with several keelson sessions running in parallel on the same checkout, the wave guard
+blocked one session's turn citing **another live session's** run state, and both offered
+exits (continue / mark closed) were destructive — enter a third party's worktree, or erase
+a live session's checkpoint mid-TASK. Run-state ownership is now modeled end to end.
+
+### Added
+
+- **`sessao:` field in the run-state canonical format** (owner: `sdd-conventions.md`,
+  "Estado de run"). Written by `run-state.sh` from `RUN_STATE_SESSAO`, else
+  `CLAUDE_CODE_SESSION_ID` (the same UUID hooks receive as `session_id` in their payload
+  — one id space on both ends), else the honest `desconhecida`.
+- **Third exit in the wave guard**: when a run's `sessao:` points at another session, the
+  block message stops offering continue/close and instructs instead — do not touch the
+  file, inventory (run-state mtime, `git status` of the worktree in `retomada:`, live peer
+  sessions) and escalate to the human. The "no stamina-based stops" rule gains the
+  ownership caveat in its owner (`commands/auto.md`) and in the degraded message path.
+- **Writer-side refusal**: `run-state.sh init`/`wave-done`/`close`/`remove` exit 2 on an
+  in-progress run owned by a different session when both ids are known; any unknown side
+  degrades to the previous warning behavior (never a blind block); `FORCE=1` takes
+  ownership deliberately. Suite grown to 23 cases with a session-controlled environment.
+
+### Changed
+
+- **`compact-anchor` mirrors `sessao:`** and conditions its resume instruction: a run
+  owned by another session is inventoried and escalated, never resumed — closing the
+  post-compaction side door to the same destructive exit.
+- **Wave-guard nudge window is now per reading session** (fingerprint composed with the
+  reader's `session_id`): session A's nudge no longer swallows the one owed to session B
+  over the same run. Known one-time effect: each active run re-nudges once right after
+  this update.
+- **Wiki (Solução de problemas)**: new section — the block cites a cycle that is not this
+  session's — explaining the third exit and that taking over an orphaned run is always a
+  deliberate act.
+
 ---
 
 ## [0.114.0] — 2026-08-24
