@@ -111,8 +111,9 @@ gates:
   code_review_qualitativo:
     status: OK | FAIL
     detalhe: <descrição>
+    comentarios_diff: "<N introduzidos/alterados · M reprovados, eixo por item em acoes_sugeridas>"  # inventário contável (4.250) — fato julgado; nunca muda o status sozinho
 
-acoes_sugeridas:      # inclui remoção de comentário sugerida (Art. 7) com arquivo:linha — carona no retry da TASK, nunca rodada própria (4.245)
+acoes_sugeridas:      # inclui remoção de comentário sugerida (Art. 7) com arquivo:linha — carona no retry, ou aplicada no fecho do modo (fim de wave no ciclo); nunca rodada própria (4.245/4.249)
   - <ação para corrigir falha>
 
 fora_de_escopo:       # problema real visto no entorno, fora desta task — sinal ao Tech Lead; null se não houve

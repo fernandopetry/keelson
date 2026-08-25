@@ -411,19 +411,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.113.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.114.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the Director gets a natural-language lever for quick changes
-(decision 4.246) — stating punctual intent alongside the request ("quick fix", "no
-cycle") makes on-demand mode the default door instead of relying on the model's
-routing judgment; promotion to the full cycle still happens by the existing
-falsifiable rule, and is always announced with a reason, never decided silently.
-0.113.1 (decision 4.247) makes explicit that the lever also works right after a
-`/keelson:auto` cycle finishes in the same session, and the FAQ explains that
-scenario in plain language with a flow diagram. Re-init required (the injected
-block changed).
+New in this release: two enforcement fixes for the comment rule, from a real field
+case (decisions 4.249/4.250) — a suggested comment removal from review is now always
+applied before delivery (it still never opens a review round: at wave end in the
+cycle, in the correction batch of a standalone review), and the Art. 7 comment test
+closes countably at both points where it runs (a comment inventory in the gate-7
+report, an autocheck count in the developer report). Re-init: none.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

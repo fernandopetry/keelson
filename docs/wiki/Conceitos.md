@@ -229,6 +229,10 @@ devolve?*
 As âncoras de uma linha são deliberadas: elas formam o **grafo de navegação** que leva do
 código à decisão que o moldou.
 
+E o teste tem rede dupla: quem escreve o código aplica o teste antes de entregar, e o
+review confere de novo. Comentário reprovado no review é removido antes da entrega —
+sem abrir rodada extra de revisão: a remoção entra no fechamento normal do trabalho.
+
 ## O MAP do slug — memória de território entre demandas
 
 Num domínio com várias demandas (um épico fatiado, manutenção recorrente), o

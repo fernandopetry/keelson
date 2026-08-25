@@ -177,6 +177,14 @@ ofício do revisor — aplique-o sem checklist. Os pontos com régua keelson pr�
   FALHA mesmo com o código correto, **inclusive nos testes** (fixtures/helpers —
   `./TESTING.md`).
 - **Comentários** (Art. 7): todo comentário passa no teste de apagar (Perde/Não-perde).
+  O report traz o **inventário contável** dos comentários que o diff introduz/altera
+  (decisão 4.250, escada 4.149): N introduzidos/alterados, e para cada reprovado o eixo —
+  narrativa de **proveniência** ou de **comparação temporal** (definição operacional no
+  autocheck do `developer`, 4.185), paráfrase/ritual, ou bloco maior que o código que
+  explica. O inventário é fato **julgado pelo revisor**, nunca oráculo mecânico sobre o
+  texto do código (anti-padrão do parser textual — `./TESTING.md`, 4.227); reprovado que
+  não cai nas violações bloqueantes do Art. 7 vai para a remoção sugerida da §Calibração
+  — não bloqueia, não abre rodada.
 - **Rastro de processo em copy** (decisão 4.201): identificador de artefato SDD (`FR-`/`AC-`/`TASK-`/`DEC-`… — catálogo no `index-contract.md`) **visível ao usuário** — label, mensagem, texto de template — é rastro vazado, não copy, **salvo quando um AC exige a exibição** (tela de rastreabilidade/admin legítima): o discriminante é o pai declarado da pergunta inversa (gate 4), não proibição mecânica. Os endereços legítimos do ID seguem os de sempre — comentário-âncora (Art. 7) e tag `@AC-NNN-XXX` de spec E2E; a fronteira é a superfície do usuário, não o código.
 - **Erros já cometidos no projeto**: as lições de `guidelines/project/` com `Estado: ativa`
   valem como regra (`em-observacao` é contexto, nunca reprova; `revogada` não vale — ciclo
@@ -226,10 +234,18 @@ que também envia e-mail) é o mesmo smell, mais grave — viola a régua do Art
 **Não bloqueia** (vira sugestão): espaçamento e ordem de imports; nome estranho mas
 legível; nome genérico com alternativa de domínio disponível (só bloqueia se esconder
 intenção ou efeito colateral); comentário que reprova no teste do Art. 7 — entra como
-**remoção sugerida**, com os trechos apontados. A sugestão **nunca abre rodada nem conta
-como falha**: pega carona no retry da mesma TASK quando outro achado o abriu (delta
-inerte — re-verifica com o mesmo revisor, §Convergência); sem retry, fica no report como
-sugestão. A remoção barata é a do developer no autocheck, antes do gate (decisão 4.245).
+**remoção sugerida**, com os trechos apontados (`arquivo:linha`). A sugestão **nunca abre
+rodada nem conta como falha — e nunca morre no report** (decisão 4.249; caso real de
+campo: rodada sem retry shippava o comentário reprovado): com retry aberto por outro
+achado, pega carona no despacho (delta inerte — re-verifica com o mesmo revisor,
+§Convergência); sem retry, a rota de fecho do invocador a aplica antes da entrega — no
+ciclo, 1 aplicação por wave no fim dela (`/keelson:implement` §3.6); no diff avulso, a
+leva de correções do `/keelson:review`; no sob demanda, a própria rodada. A aplicação
+**corta exatamente a lista apontada** — nunca varredura própria, nunca reescrita (4.185)
+— declara a contagem (`N sugeridas → N aplicadas / N contestadas`) e aceita contestação
+de uma linha: comentário que carrega semântica (anotação, diretiva de ferramenta) ou que
+o developer julga carga fica, com o motivo no report. A remoção barata continua a do
+developer no autocheck, antes do gate (decisão 4.245).
 
 **Bloqueia**: violação de regra explícita do Charter ou do perfil; lógica de negócio sem
 teste; escopo violado; reimplementação de canônico existente. Do Art. 7 bloqueiam: bloco

@@ -25,6 +25,38 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ---
 
+## [0.114.0] — 2026-08-24
+
+Re-init: none
+
+Decisions 4.249/4.250 — field case: a consumer proposed "anchor-only comments" and the
+three real examples behind the proposal turned out to violate the current rule (process
+narrative shipped in comments, one docblock larger than the code it explained). The
+proposal was declined — the defect was enforcement, not the rule — and the batch closes
+the two enforcement leaks it exposed.
+
+### Changed
+
+- **A suggested comment removal never dies in the report** (4.249). It still never opens
+  a review round and never counts as a failure — but now it is always applied before
+  delivery: with a retry open for another finding it rides along (unchanged); without
+  one, the closing route of each mode applies it (cycle: one dispatch per wave at wave
+  end; standalone review: the existing correction batch; on-demand: the same round).
+  Application cuts exactly the listed `file:line` items — never a self-directed sweep,
+  never a rewrite — with a one-line contestation as a legitimate outcome and the count
+  (`N suggested → N applied / N contested`) declared in the wave bulletin.
+- **The Art. 7 comment test now closes countably at both points where it runs** (4.250).
+  The gate-7 report carries an inventory of comments the diff introduces/alters
+  (`comentarios_diff`: N, and the axis of each rejected one — provenance narrative,
+  temporal comparison, paraphrase/ritual, block larger than the code), always a
+  reviewer-judged fact that never flips the gate status by itself; the developer report
+  declares `autocheck_comentarios` (introduced · removed by the autocheck). No textual
+  parser of code is involved — the anti-pattern stays banned.
+- **Wiki (Conceitos)**: one plain-language sentence — a comment that fails review is
+  removed before delivery, without an extra review round.
+
+---
+
 ## [0.113.1] — 2026-08-24
 
 Re-init: required

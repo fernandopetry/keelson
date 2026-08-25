@@ -111,6 +111,7 @@ TASK em disco, sem commit) com um briefing efêmero:
 - Passe: `arquivo:linha`, o problema, a correção proposta pelo revisor, os comandos `quality.*`, o perfil ativo e a seção a ler.
 - Reforce o limite do escopo: só os arquivos dos achados; não refatorar além do apontado; mudar comportamento observável é achado **estrutural**, não correção.
 - Achado de teste faltando: o teste é **falsificável** (`guidelines/core/TESTING.md`).
+- Inclua na leva as **remoções de comentário sugeridas** (`acoes_sugeridas`, Art. 7 — decisão 4.249): corte da lista literal `arquivo:linha`, nunca varredura própria nem reescrita; contestação de uma linha é saída legítima.
 
 ## Etapa 7: re-revisão (gate, não formalidade)
 
