@@ -23,6 +23,23 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.115.1] — 2026-08-25
+
+Re-init: none
+
+Decision 4.252 — closes the deferred item (i) of 4.251, triggered by the Director in the
+same batch.
+
+### Fixed
+
+- **A third party's cycle no longer silences the free session's safety net**. The
+  `review-guard` and `security-guard` stop hooks used to short-circuit on ANY in-progress
+  run state; with parallel sessions on one checkout, session A's cycle muted session B's
+  review/security nudges. The short-circuit now applies only when the run belongs to the
+  reading session (`sessao:` equals the payload's `session_id`); unknown owner, legacy
+  format or missing `session_id` keep the previous silence — a nudge is never reactivated
+  on doubt. Proven by 8 synthetic scenarios with a positive control (no run → both nudge).
+
 ## [0.115.0] — 2026-08-25
 
 Re-init: none

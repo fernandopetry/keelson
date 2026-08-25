@@ -55,12 +55,19 @@ active="$(printf '%s' "$input" | jq -r '.stop_hook_active // false' 2>/dev/null 
 
 # Ciclo formal em andamento → o gate 8 tem dono (rodada da wave no /keelson:implement,
 # 3.3/4.92); este hook é a rede da SESSÃO LIVRE, não um segundo cobrador
-# (decisão 4.103). run-state ativo → silêncio.
+# (decisão 4.103). run-state ativo DESTA sessão → silêncio. Posse (4.252): run de
+# OUTRA sessão (campo `sessao:` ≠ session_id do payload) não silencia a rede desta;
+# dono desconhecido/formato antigo/sem session_id → silêncio como antes (nunca
+# reativar nudge por dúvida).
+session_id="$(printf '%s' "$input" | jq -r '.session_id // ""' 2>/dev/null || echo "")"
 for rs in "$proj"/thoughts/local/run-state-*.md; do
   [ -f "$rs" ] || continue
-  if grep -q "^status: em_andamento" "$rs" 2>/dev/null; then
-    exit 0
+  grep -q "^status: em_andamento" "$rs" 2>/dev/null || continue
+  dono="$(sed -n 's/^sessao:[ 	]*//p' "$rs" 2>/dev/null | sed -n 1p)"
+  if [ -n "$session_id" ] && [ -n "$dono" ] && [ "$dono" != "desconhecida" ] && [ "$dono" != "$session_id" ]; then
+    continue
   fi
+  exit 0
 done
 
 # gates.security desligado na ficha → não cutuca (default: ligado quando ausente).
