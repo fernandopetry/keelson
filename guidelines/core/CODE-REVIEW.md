@@ -429,14 +429,26 @@ nenhum gate por parte responde — o código realiza o que o texto pede, e só o
   requisito por inteiro · `contradiz` — o código conflita com um FR ou uma DEC ·
   `não solicitado` — capacidade sem pai declarado (a régua do gate 4/4.142 aplicada ao
   acumulado da branch).
+- **Passada de dedup da entrega** (decisão 4.253 — revisão declarada do recorte da
+  4.207): a rodada aplica a superfície (b) do bullet Reúso/DRY do gate 7 (dono da
+  mecânica de busca, da base e da degradação declarada) ao acumulado da **entrega
+  inteira** — quase-equivalentes entre os símbolos/arquivos **criados** na branch, e
+  deles contra o canônico documentado. Muda o momento e o efeito, nunca a régua: achado
+  de duplicação **não é gap e nunca bloqueia o fecho** — vira pendência de consolidação
+  com as âncoras dos dois lados, roteada como `fora_de_escopo` (consolidar é diff novo
+  para frente — 4.88: aprovado permanece aprovado). Achado que uma wave já roteou não
+  reaparece: a passada existe para o que nenhuma wave viu. O outcome declara a
+  componente sempre: `dedup: aplicada — N achados | n/a — sem base determinável`.
 - **Outcome declarado, nunca implícito**: `convergiu` ou a lista de gaps. Gap segue o
   fluxo normal — correção antes do push (régua de re-gate acima, 1 retry) ou parte
   estacionada com a pergunta pronta na Entrega; push silencioso com gap aberto é a
   falha que o passo existe para impedir.
 - **Registro reaproveitável** (padrão da 4.122): rodada `convergiu` entra no "Histórico
-  recente" do INDEX como `<data>: convergência de fecho verde em <SHA>`; o
-  `/keelson:integrate` a reaproveita quando `git diff <SHA>...HEAD` é inerte (régua em
-  `./TESTING.md`, "Diff inerte") — sem registro válido, a rodada corre lá.
+  recente" do INDEX como `<data>: convergência de fecho verde em <SHA> (dedup: aplicada |
+  n/a — sem base)`; o `/keelson:integrate` a reaproveita quando `git diff <SHA>...HEAD` é
+  inerte (régua em `./TESTING.md`, "Diff inerte") — sem registro válido, a rodada corre
+  lá. Selo sem o marcador de dedup (legado) cobre só a componente SPEC: no
+  reaproveitamento, a passada de dedup roda mesmo assim.
 
 Sem SPEC (rotas inline, TASK avulsa) o passo não existe — o espelho do brief e a
 aceitação do PO são o fecho proporcional dessas rotas.

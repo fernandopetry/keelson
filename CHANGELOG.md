@@ -23,6 +23,32 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.116.0] — 2026-08-25
+
+Re-init: none
+
+Decision 4.253 — field report from the Director (consumer sessions): duplicated logic
+surviving multi-commit deliveries (a whole story). Same class as 4.207, which
+operationalized the reuse search per wave but deliberately left the closing convergence
+untouched; consumer version not yet confirmed, so the recurrence ladder does not advance —
+the batch ships as a structural safety net by explicit Director decision.
+
+### Added
+
+- **Delivery-wide dedup pass in the closing convergence**. The `code-reviewer` in
+  convergence mode now also applies gate 7's reuse surface (b) to the whole delivery:
+  near-equivalent symbols/files **created** on the branch, compared against each other and
+  against the documented canon. A duplication finding is never a gap and never blocks the
+  close — it becomes a consolidation pendency with anchors on both sides, routed like
+  `fora_de_escopo` (consolidation is new diff going forward; approved stays approved), and
+  findings already routed by a wave do not reappear. The INDEX seal now carries the
+  component (`dedup: aplicada | n/a — sem base`); a legacy seal without the marker only
+  covers the SPEC component, so `/keelson:integrate` still runs the dedup pass when
+  reusing it. Formal cycle with SPEC only; outside it, `/keelson:review` over the branch
+  diff remains the manual lever. (`guidelines/core/CODE-REVIEW.md` ·
+  `agents/code-reviewer.md` · `commands/auto.md` · `commands/integrate.md` · wiki
+  `Conceitos`)
+
 ## [0.115.1] — 2026-08-25
 
 Re-init: none

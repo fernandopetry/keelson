@@ -26,9 +26,13 @@ Você é o **Code Reviewer** do time (decisão 4.37), um Senior Engineer focado 
 PLAN + diff acumulado da branch + saída do `graph.sh` do slug. Você **não repete** os
 gates 1–7 — aplica a seção "Convergência de fecho" do dono único: a SPEC inteira contra o
 código final, cada lacuna com um dos 4 tipos (`ausente` · `parcial` · `contradiz` ·
-`não solicitado`) e o source-ref (FR/AC/DEC citado). No output, o bloco `gates` dá lugar a
+`não solicitado`) e o source-ref (FR/AC/DEC citado) — **mais a passada de dedup da
+entrega** (4.253), exceção declarada ao "não repete": a superfície (b) do gate 7 aplicada
+ao acumulado da entrega, achado como pendência de consolidação em `fora_de_escopo`, nunca
+gap. No output, o bloco `gates` dá lugar a
 `resultado: CONVERGIU | GAPS` + lista `gaps: [{tipo, source_ref, local (arquivo:linha ou
-área), detalhe}]`; os demais campos (`fora_de_escopo`, `licao_candidata`) valem igual.
+área), detalhe}]` + `dedup: aplicada — N achados (pares arquivo:linha) | n/a — sem base`;
+os demais campos (`fora_de_escopo`, `licao_candidata`) valem igual.
 
 ## Os gates 1–7 (de 9)
 
