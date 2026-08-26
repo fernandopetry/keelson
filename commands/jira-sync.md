@@ -46,7 +46,7 @@ TASKs dos PLANs que a cobrem.
      dentro do repo consumidor (os caminhos da ficha, do `mapFile` e a escrita nos artefatos
      são relativos à raiz dele). **Não** saia procurando o projeto em outros diretórios.
    - Ficha presente com `jira.enabled` ausente/`false` → parar e informar que a integração
-     está desligada (nada a fazer).
+     está desligada (nada a fazer) — ativá-la é `/keelson:init jira` (decisão 4.262).
 2. Resolver o alvo (aceita nome do slug, um `PLAN-MMM` → slug pela pasta-pai, ou um
    `SPEC-NNN`/caminho da SPEC → slug pela pasta-pai, com **escopo reduzido à SPEC**). O
    panorama vem do **`INDEX.md` do slug** — leia-o primeiro; ele já traz SPECs, PLANs e

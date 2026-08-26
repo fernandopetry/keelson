@@ -102,7 +102,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 
 | Command | What it does |
 |---------|--------------|
-| `/keelson:init` | Interactive setup — detects the stack, writes the ficha and the `CLAUDE.md` block |
+| `/keelson:init` | Interactive setup — detects the stack, writes the ficha and the `CLAUDE.md` block; `init jira` scopes the run to the Jira integration (enable it late, re-measure a changed board) |
 | `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
 | `/keelson:jira-sync` | Reconcile a slug — or a single SPEC subtree — with Jira via the Atlassian MCP connector; `--phase start-dev\|finish-dev` walks the tree across the board — idempotent, best-effort (optional) |
 | `/keelson:review` † | Review an arbitrary diff (working tree, last commit, N commits, range, branch) against the keelson doctrine via independent reviewers; on your OK, dispatches the fix to the developer agent and re-reviews — for code that arrived without an SDD artifact |
@@ -262,7 +262,10 @@ transitions). It's **off by default** and **best-effort**: it never blocks the c
   an answer in the repository weeks later, not just in a lost session log.
 - **Discovered, never hardcoded.** `/keelson:init` learns your project's issue types, statuses
   and custom fields at runtime (Jira metadata) and stores **IDs** in the ficha's `jira` block.
-  No Atlassian site, project key or field ID ever ships in the plugin.
+  No Atlassian site, project key or field ID ever ships in the plugin. Adopted keelson with
+  Jira off? `/keelson:init jira` runs just that discovery later — and on a project already
+  configured it **re-measures**: types or workflow that changed on the board surface as
+  warnings and commented suggestions in the map, never as silent overwrites.
 - **Two modes.** `create` (keelson creates the SPEC issue + sub-tasks — ideal for a clean,
   team-managed project) or `link` (it hangs work under an issue you already opened — ideal for
   a governed, company-managed project).
@@ -411,17 +414,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.117.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.118.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a regression corpus for the mechanical engines (decision 4.260)
-— a realistic synthetic slug with the output of every read-only engine frozen, run on
-pre-commit and CI, so shape regressions like the 4.254 parser bugs turn red before
-release instead of in the field — plus the written rule that a fixed engine bug ships
-with a fixture reproducing it and a positive control. Follows 0.117.0 (same day):
-three parser fixes and five doctrine gaps from a consumer field message, decisions
-4.254–4.259. Re-init: none.
+New in this release: `/keelson:init jira` (decision 4.262) — a scoped run that
+configures or **re-measures** just the Jira integration of an existing adoption:
+enable Jira late without re-running the full init, and when the board's types or
+workflow changed, discovered divergences surface as warnings and commented map
+suggestions, never silent overwrites. Re-init: none. See the
+[CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

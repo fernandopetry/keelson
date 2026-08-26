@@ -1,5 +1,6 @@
 ---
-description: Configura ou repara a adoção do keelson num projeto — detecta a stack, escreve a ficha (keelson.config.json), resolve o perfil de linguagem e injeta o bloco no CLAUDE.md
+description: Configura ou repara a adoção do keelson num projeto — detecta a stack, escreve a ficha (keelson.config.json), resolve o perfil de linguagem e injeta o bloco no CLAUDE.md; com o escopo `jira`, configura ou re-mede só a integração Jira
+argument-hint: "[jira]"
 ---
 
 # /keelson:init
@@ -28,6 +29,15 @@ Este comando **nunca apaga nem sobrescreve** o que o humano personalizou. Ao rod
 - **Arquivos personalizados nunca são regenerados por cima**: `keelson.local.json` (credenciais), perfis `guidelines/project/*` já `reviewed: true`. Se precisam de um campo novo, **complete o campo** — não reescreva o arquivo.
 
 Reset é explícito: se o humano quer recomeçar um artefato do zero, ele pede (`--reset`); o default é sempre **preservar**.
+
+## Escopo `jira` — configurar ou re-medir só a integração Jira (decisão 4.262)
+
+`/keelson:init jira` executa **somente** a Etapa 4.6 e a fatia Jira do self-check (Etapa 6) — a porta para ligar o Jira depois de uma adoção que começou com `jira.enabled: false`, ou para atualizar a config quando o quadro do projeto mudou, sem repassar detecção de stack, perfis e o resto do fluxo. Sem argumento, nada muda: o comando segue as Etapas 1–7 como sempre.
+
+- **Pré-condição**: a ficha (`keelson.config.json`) existe na raiz. Ausente → **pare sem escrever nada** e instrua rodar `/keelson:init` completo — o escopo configura uma adoção existente, não cria uma.
+- **Execução**: Etapa 4.6 na íntegra (perguntas de produto, descoberta por ID, mapa, gravação do bloco `jira`), com a Regra de merge valendo como em qualquer rodada. Depois, a fatia Jira do self-check: os itens `jira-*` do `init-selfcheck.sh` (filtre a saída do script — ele não tem, nem precisa de, flag de recorte) e as provas que exigem MCP vivo do bloco `se jira.enabled` da Etapa 6. O relatório se reduz ao que foi tocado.
+- **Re-medição (bloco já configurado)**: com o bloco `jira` preenchido, o merge-preserving sozinho deixaria IDs mortos intactos — um quadro que mudou de workflow ou de tipos de card não se corrige preservando. No escopo, re-execute a **descoberta** dos passos 2–3 da Etapa 4.6 e **compare com o que está gravado**: ID de tipo/status que não existe mais, status novo ausente do Trilho, ordem do workflow que mudou → cada divergência vira **aviso no relatório e sugestão comentada no mapa**, pela mesma fórmula da Regra de merge da Etapa 4.6 ("estrutura adicionada como sugestão comentada, nunca sobrescrevendo a tabela do humano"); ficha e mapa só mudam com a confirmação do humano. Divergência entre a prosa do mapa e a ficha segue a régua da Etapa 6: **a ficha vale**.
+- **Porta humana**: o escopo existe para o Diretor ativar/atualizar o Jira quando decidir. Comando que encontra a ficha incompleta no meio de um ciclo continua na rota **Config incremental** (fim deste comando) — pergunta o campo que falta e oferece gravar — nunca invoca o init.
 
 ## Etapa 1 — Detecção (não pergunte o que dá para inferir)
 

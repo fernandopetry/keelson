@@ -238,6 +238,20 @@ reconciliar depois:
   `/keelson:init` valida o seu mapeamento de tipos e avisa qual perna não fecha, com o tipo
   correto.
 
+### O quadro mudou e o sync usa IDs velhos
+
+Workflow reordenado, coluna nova, tipo de card renomeado ou removido: a configuração
+gravada na ficha e no mapa não se atualiza sozinha (o init preserva o que existe). Rode:
+
+```
+/keelson:init jira
+```
+
+O escopo re-descobre tipos e workflow no Jira real e **compara com o que está gravado** —
+cada divergência (ID que não existe mais, status novo fora do trilho) vira aviso e
+sugestão comentada no mapa. Nada é sobrescrito: você confirma o que muda. O mesmo comando
+serve para ligar o Jira num projeto que adotou o keelson sem ele.
+
 ### A Story ficou concluída no fim do ciclo
 
 Isso é bug, não sucesso. O estado-alvo ao fim do ciclo é: sub-tasks concluídas, Story na

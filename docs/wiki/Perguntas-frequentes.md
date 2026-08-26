@@ -164,7 +164,8 @@ não tudo de uma vez.
 ### Sou obrigado a usar Jira?
 
 Não. A integração vem **desligada** e é *best-effort* — nunca bloqueia o ciclo. Sem Jira,
-nada muda no funcionamento.
+nada muda no funcionamento. E dá para ligar depois, sem refazer a adoção: `/keelson:init jira`
+configura só a integração (descobre tipos, workflow e monta o mapa do projeto).
 
 ### Trabalho fora do ciclo aparece no Jira?
 

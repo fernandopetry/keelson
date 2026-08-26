@@ -23,6 +23,38 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.118.0] — 2026-08-26
+
+Re-init: none
+
+Decision 4.262 — Director's raw idea refined via idea-forge: real adoptions start with
+`jira.enabled: false`, and turning Jira on later had no discoverable door short of
+re-running the whole init; a board whose types or workflow changed kept dead IDs,
+because merge-preserving preserves instead of re-measuring.
+
+### Added
+
+- **`/keelson:init jira` — scoped run for the Jira integration**: with an existing
+  ficha, runs only the Jira step (guided discovery of types, workflow and map
+  scaffolding, all by ID) plus the Jira slice of the self-check — no stack detection,
+  no profile resolution. Without the argument nothing changes; without a ficha it
+  stops cleanly and points to the full init. The scope is a human door: commands that
+  find an incomplete ficha mid-cycle keep using incremental config, never the init.
+- **Re-measure mode**: when the `jira` block is already configured, the scoped run
+  re-discovers types and workflow on the live board and compares them with what is
+  stored — dead type/status IDs, new statuses missing from the board rail, reordered
+  workflows surface as report warnings and commented map suggestions. Nothing is
+  overwritten: the ficha stays authoritative and the human confirms every change.
+
+### Changed
+
+- `/keelson:jira-sync` with the integration disabled now points to `/keelson:init
+  jira` as the way to enable it.
+- The method guide gained the init's own section (§3.25) — it was the only command
+  without one — so the mirrored wiki now documents the command and its new scope.
+- README (Commands table and Jira section) and the wiki's FAQ, troubleshooting
+  ("the board changed") and ficha reference document the new door.
+
 ## [0.117.1] — 2026-08-26
 
 Re-init: none

@@ -221,6 +221,12 @@ Devolve a dimensão prevista de uma demanda — `~N waves · ~N tasks` (mix smal
 
 Detalhe completo (flags, fluxo, regras): `commands/estimate.md`.
 
+### 3.25 `/keelson:init` — configurar ou reparar a adoção
+
+A porta de entrada do keelson num projeto: detecta a stack, escreve a ficha (`keelson.config.json`), resolve o perfil de linguagem (embarcado ou gerado via `staff-engineer`) e injeta o bloco gerenciado no `CLAUDE.md`. Idempotente e preservador (Regra de merge): rodar de novo completa e repara, nunca destrói — re-rodar após atualizar o plugin é o caminho de migração de versão. Fecha com um self-check falsificável e o Retrato de maturidade (4.243). Com o escopo `jira` (`/keelson:init jira`, decisão 4.262), executa só a etapa de integração Jira + a fatia Jira do self-check: liga o Jira depois de uma adoção que começou sem ele, ou **re-mede** tipos/workflow quando o quadro mudou — divergência vira aviso e sugestão comentada, nunca sobrescrita. O escopo exige ficha existente (sem ela, a saída aponta o init completo) e é porta de invocação humana.
+
+Detalhe completo (etapas, regras, self-check): `commands/init.md`.
+
 ---
 
 ## 4. Skills

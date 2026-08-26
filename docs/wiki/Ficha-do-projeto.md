@@ -156,7 +156,9 @@ comportamento clássico** — bloco ausente = nada muda.
 Integração opcional, **desligada por padrão** e sempre *best-effort* — nunca bloqueia o
 ciclo. Funciona pelo **conector MCP Atlassian**: sem token, sem SDK, sem segredo na ficha.
 O `/keelson:init` descobre em runtime os tipos de issue, status e campos do seu projeto e
-grava **IDs**.
+grava **IDs**. Para configurar (ou atualizar) só este bloco depois da adoção, rode
+`/keelson:init jira`: liga a integração num projeto que começou sem ela e, se o bloco já
+está preenchido, re-mede o quadro e aponta divergências sem sobrescrever nada.
 
 ```jsonc
 "jira": {
