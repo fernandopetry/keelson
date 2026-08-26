@@ -52,6 +52,11 @@ couber; `chore` é o que sobra, nunca o default preguiçoso.
 **`fix` × `refactor`**: se o comportamento estava errado e agora está certo, é `fix` — ainda que
 a correção tenha sido uma reescrita grande. `refactor` é comportamento idêntico antes e depois.
 
+**Commit de merge é a exceção declarada** (decisão 4.263): commit de **dois pais** — o que o
+`/keelson:merge` fecha — usa o formato padrão do git (`Merge branch '<a>' into <b>`), que
+ferramentas e o GitHub reconhecem como merge; não recebe `<tipo>(<escopo>)`. A régua desta
+página vale para commits normais de um pai.
+
 ## Quebra de compatibilidade
 
 Mudança que **força o consumidor a alterar código, config ou chamada** é declarada — nunca

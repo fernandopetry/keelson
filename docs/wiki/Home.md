@@ -25,8 +25,8 @@ por linguagem.
 Você descreve a demanda em linguagem natural. O keelson conduz o ciclo
 `specify → plan → tasks → implement` com um time de agents (PO, developer, code
 reviewer, QA, security engineer), aplica os quality gates a cada tarefa e entrega uma
-branch commitada com relatório de aceitação. **Abrir PR, mergear e publicar continuam
-sendo seus atos.**
+branch commitada com relatório de aceitação. **Abrir PR, mergear para a branch
+principal e publicar continuam sendo seus atos.**
 
 ```
 /keelson:auto "Exportação de relatórios em CSV com filtro de período"

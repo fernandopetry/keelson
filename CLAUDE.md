@@ -139,8 +139,10 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   ação irreversível/externa · conflito com diretriz anterior), sempre com proposta +
   default; registra **decisões tomadas em nome do Diretor**; entrega **relatório de
   aceitação** (alinhamento ao brief ≠ QA, que prova que funciona).
-- **A autonomia termina nos commits**: PR, merge e deploy são atos do Diretor (pode haver
-  outras sessões na mesma base).
+- **A autonomia termina nos commits**: PR, merge para a branch principal e deploy são
+  atos do Diretor (pode haver outras sessões na mesma base). Exceção declarada (4.263):
+  `/keelson:merge`, humano-only, mescla branches para dentro da branch de trabalho
+  corrente — o dono da regra é o `sdd-conventions.md`.
 - **Sinais laterais com contrato** (gatilho + rota + registro): furo no plano
   (Developer → Tech Lead; contornar em silêncio é violação de gate) · cenário ambíguo
   pré-código (QA → PO) · achado fora de escopo (Reviewer/QA → Tech Lead) · escalação e

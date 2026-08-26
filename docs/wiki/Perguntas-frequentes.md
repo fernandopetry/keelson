@@ -118,8 +118,16 @@ flowchart TD
 ### O keelson faz merge ou deploy sozinho?
 
 Não, e isso é regra dura: **a autonomia termina nos commits**. Ele cria branch, commita e
-faz push. Abrir PR (`/keelson:integrate`), mergear e publicar são atos seus — inclusive
-porque pode haver outra sessão trabalhando na mesma base.
+faz push. Abrir PR (`/keelson:integrate`), mergear para a branch principal e publicar são
+atos seus — inclusive porque pode haver outra sessão trabalhando na mesma base.
+
+Há uma exceção pontual, que você mesmo invoca: `/keelson:merge` traz uma ou mais
+branches **para dentro da sua branch de trabalho atual** (nunca para a principal),
+resolvendo conflito e teste quebrado no processo, e fecha um commit de merge próprio
+por branch trazida. Uso comum: uma branch de release/integração onde várias tarefas
+são testadas juntas antes do PR — em vez de o conflito só aparecer na hora de abrir o
+PR, ele é resolvido e provado ali. O comando nunca dá push nem mergeia para a branch
+principal; isso continua com você.
 
 ### Ele commita sem me perguntar?
 

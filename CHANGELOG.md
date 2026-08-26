@@ -23,6 +23,56 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.119.0] — 2026-08-26
+
+Re-init: required
+
+Decision 4.263 — first external contribution by pull request (PR #1, by Tiego
+Torelli): the command was proposed against 0.114.0 and could not be merged (decision/
+version/section collisions with the current main, plus execution defects), so this
+batch re-implements the approved design from the current main with corrections,
+crediting the proposal. It closes the gap decision 4.235 left open: the
+semantic-reconciliation rule existed, but had no executor.
+
+### Added
+
+- **`/keelson:merge` — merge one or more branches into the current working branch,
+  one merge commit per branch.** New human-only command that processes branches in
+  sequence: for each one, runs the textual-conflict dry-run (`git merge-tree
+  --write-tree`, reusing the 4.74 mechanism; the git < 2.38 fallback always aborts the
+  trial merge, including on conflict), the mandatory semantic reconciliation (reusing
+  the 4.235 rule — symbols diverging between the parents plus new consumers on the
+  other side, even without a textual conflict) and the project suite over the staged
+  merge. A clean branch (no conflict, no reconciliation finding, green suite) closes
+  its merge commit directly, with no agent dispatched; a conflict, reconciliation
+  finding or broken test dispatches the `developer` scoped to just the triggered
+  files (standalone mode, no commit) and the `code-reviewer` audits only that
+  resolution's diff (gates 1–7, plus gate 8 via `security-engineer` on sensitive
+  areas) — never the whole branch diff. Only then does that branch's own merge commit
+  close before the next branch starts. A failing suite or gate after one retry aborts
+  that branch's merge and stops the queue there — already-merged branches keep their
+  commits, the rest are never attempted, and the final output always declares the
+  exact working-tree state (including `MERGE_HEAD`). This is a declared exception to
+  "no command merges" in `docs/_meta/conventions/sdd-conventions.md`: push, merging
+  into the remote main branch, PR and deploy remain exclusively human.
+
+### Changed
+
+- `docs/_meta/conventions/commit-convention.md` now declares the two-parent merge
+  commit exception (standard git format, no `type(scope)` prefix) — the rule owner,
+  not the new command, carries it; the pathspec-commit rule (4.163) in
+  `sdd-conventions.md` gained the matching exception (git refuses a partial commit
+  during a merge).
+- `developer`, `code-reviewer` and `security-engineer` agent descriptions list
+  `/keelson:merge` as an invoker; the injected CLAUDE block gained the human-only
+  command's note (hence `Re-init: required`).
+- Every remaining statement of the human-merge boundary was aligned with the declared
+  exception: `guidelines/core/WORKFLOW.md` (the rule's embedded second owner, read at
+  runtime), the injected block's cycle bullet, the method guide's §5 intro and the
+  wiki's own pages (FAQ, epic flow, concepts, first steps, home) now scope the human
+  act to "merge into the main branch" — a stale copy of the old absolute rule could
+  make an agent refuse the new command.
+
 ## [0.118.0] — 2026-08-26
 
 Re-init: none

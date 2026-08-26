@@ -104,6 +104,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 |---------|--------------|
 | `/keelson:init` | Interactive setup — detects the stack, writes the ficha and the `CLAUDE.md` block; `init jira` scopes the run to the Jira integration (enable it late, re-measure a changed board) |
 | `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
+| `/keelson:merge` † | Merge one or more branches into the current working branch, one at a time — one merge commit per branch; a clean branch (no conflict, no semantic-reconciliation finding, green suite) commits directly with no agent dispatched, otherwise the developer resolves only the triggered files and the code-reviewer audits only that resolution's diff (push, remote merge, PR and deploy stay human) |
 | `/keelson:jira-sync` | Reconcile a slug — or a single SPEC subtree — with Jira via the Atlassian MCP connector; `--phase start-dev\|finish-dev` walks the tree across the board — idempotent, best-effort (optional) |
 | `/keelson:review` † | Review an arbitrary diff (working tree, last commit, N commits, range, branch) against the keelson doctrine via independent reviewers; on your OK, dispatches the fix to the developer agent and re-reviews — for code that arrived without an SDD artifact |
 | `/keelson:audit` † | On-demand dependency audit against known vulnerabilities (CVE/NVD); `full` adds hygiene (outdated, abandoned, licenses) |
@@ -414,15 +415,17 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.118.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.119.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: `/keelson:init jira` (decision 4.262) — a scoped run that
-configures or **re-measures** just the Jira integration of an existing adoption:
-enable Jira late without re-running the full init, and when the board's types or
-workflow changed, discovered divergences surface as warnings and commented map
-suggestions, never silent overwrites. Re-init: none. See the
+New in this release: `/keelson:merge` (decision 4.263, proposed by an external
+contributor in PR #1) — a human-only command that merges one or more branches into
+the current working branch, one merge commit per branch: a clean branch commits
+directly with no agent dispatched; a conflict, semantic-reconciliation finding or
+broken test dispatches the developer scoped to the triggered files and the
+code-reviewer audits only that resolution's diff. Push, remote merge, PR and deploy
+stay human. Re-init: required (the injected block gained the command's note). See the
 [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in

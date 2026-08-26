@@ -75,7 +75,7 @@ O keelson simula um time real, e os IDs dos agents **são** os nomes dos papéis
 
 | Papel | Quem é | O que faz |
 |---|---|---|
-| **Diretor** | **Você** | Emite a intenção (o brief), mantém o veto, decide PR/merge/deploy |
+| **Diretor** | **Você** | Emite a intenção (o brief), mantém o veto, decide PR, merge para a principal e deploy |
 | **Tech Lead** | A sessão principal | Orquestra: despacha os agents, consolida, decide o caminho técnico |
 | `po` | Product Owner | Dono da demanda; valida SPEC e entrega **contra o brief**, nunca contra a própria opinião |
 | `pm` | Product Manager | Decompõe um pedido épico em demandas independentes |
@@ -111,7 +111,9 @@ metáfora**: são ferramentas do time, não pessoas.
 - A entrega fecha com **relatório de aceitação** (bate com o brief?) — que é diferente do
   QA (funciona?).
 
-**A autonomia termina nos commits.** PR, merge e deploy são seus.
+**A autonomia termina nos commits.** PR, merge para a branch principal e deploy são
+seus. A única exceção é o comando `/keelson:merge`, que você mesmo invoca: ele traz
+branches para dentro da sua branch de trabalho atual — nunca para a principal.
 
 ## Dimensionamento de demanda
 

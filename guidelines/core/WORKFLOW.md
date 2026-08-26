@@ -155,7 +155,10 @@ revisa código ≠ quem revisa segurança ≠ quem verifica ≠ quem aprova prod
 integra/deploya. **Aprovação de produto**: no ciclo com BRIEF, é do `po` — contra o
 brief, nunca contra a própria opinião; sem brief (fluxo avulso) ou no `/keelson:guided`,
 é humana. As fronteiras **sempre humanas**: veto e escalação (o Diretor), abrir PR,
-mergear e deployar — a autonomia termina no push da branch de trabalho.
+mergear para a branch principal e deployar — a autonomia termina no push da branch de
+trabalho. Exceção declarada no dono da regra (`sdd-conventions.md`, item "Merge, PR e
+deploy são humanos"): o `/keelson:merge`, invocado pelo Diretor, mescla branches para
+dentro da branch de trabalho corrente — nunca para a principal.
 
 ### Regras do modelo de tarefas
 

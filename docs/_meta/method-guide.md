@@ -227,6 +227,23 @@ A porta de entrada do keelson num projeto: detecta a stack, escreve a ficha (`ke
 
 Detalhe completo (etapas, regras, self-check): `commands/init.md`.
 
+### 3.26 `/keelson:merge` — mesclar branches na corrente (humano-only)
+
+Mescla uma ou mais branches na branch de trabalho corrente, **uma de cada vez**: para
+cada branch, roda o dry-run de conflito textual (4.74), a reconciliação semântica
+(4.235) e a suíte sobre o merge. Branch limpa (sem conflito, sem achado, suíte verde)
+fecha o commit direto, sem despachar ninguém; havendo conflito, achado de
+reconciliação ou teste quebrado, o `developer` resolve **só os pontos do gatilho** e o
+`code-reviewer` audita **só esse diff** (gates 1–7, + gate 8 em área sensível) — e
+então fecha **um commit de merge próprio** para aquela branch, antes de seguir para a
+próxima. Falha de suíte ou de gate após 1 retry interrompe a fila naquele ponto
+(branches anteriores ficam commitadas, as seguintes não são tentadas) e escala ao
+Diretor. Exceção declarada à regra "nenhum comando faz merge"
+(`docs/_meta/conventions/sdd-conventions.md`, decisão 4.263): nunca dá push, nunca
+mergeia para a branch principal remota, nunca abre PR, nunca faz deploy.
+
+Detalhe completo (flags, fluxo, regras): `commands/merge.md`.
+
 ---
 
 ## 4. Skills
@@ -267,15 +284,15 @@ Nunca modifica arquivos. Se detectar divergência entre INDEX e arquivos, sugere
 
 ## 5. Agents (o time — uso interno dos comandos)
 
-Os agents formam o **time** do keelson (modelo de time e contrato Diretor–PO — decisões 4.37/4.38): a main session atua como **Tech Lead** e o humano é o **Diretor** (emite o brief, mantém o veto; PR, merge e deploy são dele). Você normalmente não invoca estes diretamente — os comandos os orquestram. O papel completo de cada um é a `description` do frontmatter do próprio agent (fonte única):
+Os agents formam o **time** do keelson (modelo de time e contrato Diretor–PO — decisões 4.37/4.38): a main session atua como **Tech Lead** e o humano é o **Diretor** (emite o brief, mantém o veto; PR, merge para a branch principal e deploy são dele). Você normalmente não invoca estes diretamente — os comandos os orquestram. O papel completo de cada um é a `description` do frontmatter do próprio agent (fonte única):
 
 | Agent | Papel no time | Invocado por |
 |---|---|---|
 | `po` | **PO** — dono da demanda; valida SPEC e entrega contra o brief | `/keelson:specify`, `/keelson:auto`, `/keelson:implement` |
 | `pm` | **PM** — decompõe brief épico em demandas priorizadas | `/keelson:specify-epic` |
-| `developer` | **Developer** — implementa uma única TASK | `/keelson:implement`, `/keelson:review` |
-| `code-reviewer` | **Code Reviewer** — quality gates 1–7 antes da closure; convergência de fecho (4.143) | `/keelson:implement`, `/keelson:review`, fecho do ciclo (`/keelson:auto` · `/keelson:integrate`) |
-| `security-engineer` | **Security Engineer** — gate 8, em mudança sensível | `/keelson:implement`, `/keelson:review` |
+| `developer` | **Developer** — implementa uma única TASK | `/keelson:implement`, `/keelson:review`, `/keelson:merge` |
+| `code-reviewer` | **Code Reviewer** — quality gates 1–7 antes da closure; convergência de fecho (4.143) | `/keelson:implement`, `/keelson:review`, `/keelson:merge`, fecho do ciclo (`/keelson:auto` · `/keelson:integrate`) |
+| `security-engineer` | **Security Engineer** — gate 8, em mudança sensível | `/keelson:implement`, `/keelson:review`, `/keelson:merge` |
 | `performance-engineer` | **Performance Engineer** — gate 10, quando o diff toca superfície de custo (4.155) | `/keelson:implement`, `/keelson:review` |
 | `product-designer` | **Product Designer** — gate 11, quando o diff toca superfície de interface (4.218) | `/keelson:implement`, `/keelson:review` |
 | `qa` | **QA** — gate 9 + verificabilidade pré-código | `/keelson:implement`, `/keelson:auto`, `/keelson:review` |

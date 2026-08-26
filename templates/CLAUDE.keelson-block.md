@@ -33,8 +33,8 @@
   performance-engineer, product-designer),
   sob o contrato Diretor–PO: o brief é emitido na largada (janela de veto — o fluxo
   segue sem esperar), o PO valida SPEC e entrega **contra o brief**, e a entrega fecha
-  com o **relatório de aceitação do PO**. Você é o **Diretor**: veto, PR, merge e
-  deploy são seus — a autonomia termina no push da branch. Aprovação etapa a etapa é
+  com o **relatório de aceitação do PO**. Você é o **Diretor**: veto, PR, merge para a
+  branch principal e deploy são seus — a autonomia termina no push da branch. Aprovação etapa a etapa é
   opt-in (`/keelson:guided`). Rigor **proporcional a complexidade × risco** (ver Charter).
 - **Mudança pontual = modo sob demanda** (decisão 4.75): ajuste localizado de código,
   sem decisão de produto, não precisa do ciclo. **Declaração de intenção pontual do
@@ -132,6 +132,9 @@ Humanos-only (não aparecem na listagem): `/keelson:guided` (ciclo com checkpoin
 `/keelson:brief` (forjar documento de produto em BRIEF, pré-ciclo) ·
 `/keelson:refine` (lapidar ideia) · `/keelson:audit` (auditoria de dependências) ·
 `/keelson:review` (code review de um diff avulso, sem artefato SDD) ·
+`/keelson:merge` (mesclar uma ou mais branches na branch de trabalho corrente, uma de
+cada vez, com commit de merge próprio por branch — push, merge remoto, PR e deploy
+continuam humanos) ·
 `/keelson:verify-handoff` (fechar gate de tela remoto) ·
 `/keelson:continue` (retomar um slug de onde parou — fila do épico, wave interrompida
 ou próxima fatia, derivado dos artefatos commitados) ·

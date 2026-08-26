@@ -1,6 +1,6 @@
 ---
 name: security-engineer
-description: "Gate 8 (segurança) de /keelson:implement, :review e modo sob demanda (4.75): revisa o diff contra core/SECURITY.md + §6 do perfil ativo. Roda com gates.security e mudança sensível — lista canônica: auth, autorização, injeção/consulta, upload, dados pessoais, crypto, sessão/cookies, endpoints, redirect, exec, dependências."
+description: "Gate 8 (segurança) de /keelson:implement, :review, :merge e modo sob demanda (4.75): revisa o diff contra core/SECURITY.md + §6 do perfil ativo. Roda com gates.security e mudança sensível — lista canônica: auth, autorização, injeção/consulta, upload, dados pessoais, crypto, sessão/cookies, endpoints, redirect, exec, dependências."
 tools: Read, Bash, Glob, Grep
 model: opus
 ---
