@@ -23,6 +23,66 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.117.0] — 2026-08-26
+
+Re-init: none
+
+Decisions 4.254–4.259 — maintainer message from a consumer running 0.115.1 (ledger
+LRN-070–075; classes LRN-031 and LRN-048 at recurrence 2): three parser bugs confirmed
+by direct reading in this repo, plus five doctrine gaps from the same cycle. All eight
+were registered in the proposal inbox before the verdict (4.111) and closed in this
+batch.
+
+### Fixed
+
+- **AC cited on a continuation line now counts as coverage** (4.254). The TASK parser
+  in `scripts/graph.sh` only extracted ACs from `- [ ]` lines in "Critérios de pronto",
+  while the gate-9 section already scanned every line — an AC cited on the second line
+  of a multi-line item produced a false `ac-sem-task` and a wrong owner in the INDEX.
+  Both sections now scan every line; `artifact-lint.sh` (via the full-section
+  accumulator) and `edge-diff.sh` mirror the same anchor, so the three parsers read the
+  same universe. `graph-contract.md` and the canonical edge syntax in
+  `commands/tasks.md` were rewritten accordingly.
+- **`task-criterio-sem-ac` requires a well-formed AC ID** (4.254). The check used a
+  loose `AC-` substring, so a criterion containing that literal inside a regex (e.g. a
+  ban on SDD IDs) satisfied it without citing any AC. New fixture proves the false
+  negative.
+- **`NFR-…` no longer counts as `FR-…` in coverage cross-checks** (4.254). The FR
+  extraction behind `plan-overlap-fr`/`task-overlap-fr` had no left boundary, so an NFR
+  in `Realiza (FRs)` or in the covered list produced spurious overlaps (6 in the field
+  case). Left boundary added at all three extraction points, proven by planted fixtures
+  plus a positive control with the old code.
+
+### Changed
+
+- **Grep anchors must exclude comments to absolve** (4.255, recurrence 2 of the 4.161
+  class). `\b`/`::`/`->`/`class `/`function ` bound the symbol but still match it inside
+  a docblock, leaving the warning inert exactly where it mattered; now only
+  `Reflection`, explicit exclusion (`-v`) and start-of-line-anchored patterns absolve
+  `task-criterio-grep-nao-ancorado`. The doctrine in `commands/tasks.md` item (b) —
+  which used to prescribe those anchors — and the suite's valid fixture moved to the
+  new canonical form. Severity unchanged (WARNING; the task-validator still escalates).
+- **Absence criteria run against the parent commit at fixation** (4.256). A criterion
+  whose expected output is empty/0 must also run against the parent: non-empty output
+  there means the ban is broader than the TASK's scope — a broken criterion, never
+  inherited code to delete (field case: a "no SDD IDs" criterion born red against 10
+  legitimate anchors per file later cost a legitimate new anchor).
+- **Criterion×PLAN contradiction is now a validator ERROR** (4.257, recurrence 2 of the
+  contradiction family 4.162/4.215/4.233 — 4th form). A criterion banning what the
+  parent PLAN prescribes is checked by the `task-validator` (which holds the PLAN in
+  context); an awk lint fact was declared unmechanizable (no canonical literal pair;
+  textual semantic parsing is the 4.227 anti-pattern).
+- **Requirements added to an in-flight TASK are born with criteria** (4.258). The
+  generation rule "an Inclui item without a criterion is an item without proof" now
+  explicitly reaches scope mutations during execution: the same Edit that adds the
+  requirement adds its executable criterion (`commands/implement.md` §3.2).
+- **Closure edits are anchored and must preserve committed headings** (4.259). §3.4.2
+  item 1 now prescribes template-anchored Edits (never wide block replacement) plus an
+  immediate `git diff` check: a removed heading line is a defect of the edit, to revert
+  and redo (field case: a block substitution ate Escopo/Critérios/gate-9 sections of 7
+  TASKs, 255→45 lines, unnoticed for 4 waves). The inline closure in
+  `commands/auto.md` points at the same rule.
+
 ## [0.116.0] — 2026-08-25
 
 Re-init: none

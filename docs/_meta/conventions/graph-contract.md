@@ -45,7 +45,7 @@ separados por vírgula** ou a palavra **`nenhuma`**:
 | `violates` | TASK → AC | `**AC violado**:` (só bugfix) |
 | `task-dep` | TASK → TASK | `- **Depende de**:` |
 | `blocks` | TASK → TASK | `- **Bloqueia**:` |
-| `covers-ac` | TASK → AC | itens `- [ ]` de "Critérios de pronto" ∪ linhas do "Roteiro do gate 9" |
+| `covers-ac` | TASK → AC | toda linha de "Critérios de pronto" ∪ "Roteiro do gate 9" — continuação de item multi-linha incluída (4.254) |
 | `ac-covers` | AC → FR\|NFR | `(cobre …)` do AC |
 | `feat-of` | FR → FEAT | posicional: FR sob heading `### FEAT-` na §5 da SPEC |
 | `task-brief` | TASK → BRIEF | `**Brief**:` — âncora da TASK avulsa (decisão 4.86); exclusiva com `belongs-to` |
@@ -56,8 +56,11 @@ atributos `wave`, `status`, `tipo`; BRIEF carrega `status` e `crit` — 1 quando
 `tasks/TASK-*.md` **e `briefs/BRIEF-*-avulso.md`** (só o sabor avulso — decisão 4.86) —
 `TASK-*-INDEX.md`, `INDEX.md`, os demais sabores de `briefs/` (pareado, épico),
 `handoffs/` e `legacy/` são derivados ou prosa livre, **nunca fonte de nó/aresta**.
-`covers-ac` ignora menção a AC em prosa fora de item `- [ ]` (menção de realocação não
-é cobertura).
+`covers-ac` alcança **qualquer linha** das seções "Critérios de pronto" e "Roteiro do
+gate 9" — item multi-linha cita o AC na continuação, que não tem bullet (4.254; a
+restrição anterior a itens `- [ ]` deixava o AC da 2ª linha sem dono e o índice
+mentindo). Menção a AC **fora** dessas duas seções continua não sendo cobertura
+(menção de realocação em Contexto/Escopo não é cobertura).
 Cross-PLAN: aresta para nó de outro PLAN/SPEC do **mesmo slug** é válida — a
 existência resolve no slug inteiro.
 

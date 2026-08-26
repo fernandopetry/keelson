@@ -411,16 +411,18 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.116.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.117.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: two enforcement fixes for the comment rule, from a real field
-case (decisions 4.249/4.250) — a suggested comment removal from review is now always
-applied before delivery (it still never opens a review round: at wave end in the
-cycle, in the correction batch of a standalone review), and the Art. 7 comment test
-closes countably at both points where it runs (a comment inventory in the gate-7
-report, an autocheck count in the developer report). Re-init: none.
+New in this release: three confirmed parser bugs fixed in the mechanical layer (AC
+cited on a continuation line now counts as coverage; "mentions AC" requires a
+well-formed ID; `NFR-…` no longer counts as `FR-…` in coverage cross-checks) and five
+doctrine gaps closed from the same consumer cycle (decisions 4.254–4.259): grep
+anchors must exclude comments to absolve, absence criteria run against the parent
+commit at fixation, criterion×PLAN contradictions are now a validator ERROR,
+requirements added to an in-flight TASK are born with criteria, and closure edits are
+anchored and must preserve every committed heading. Re-init: none.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

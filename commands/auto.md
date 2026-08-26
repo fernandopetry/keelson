@@ -104,7 +104,7 @@ Execute `/keelson:implement` (ou o protocolo inline, para bug/refactor). Aplique
 - Gate falha → **1 retry**. Persistiu: parte **isolável** → estacione-a, siga com o que independe dela e traga a pendência no relatório da Entrega; **bloqueia todo o restante** → degrau 3 da escada (interrompa com diagnóstico — não force).
 - Achado de segurança (gate 8, rejeição imediata) → corrigir via retry é o caminho normal. Vulnerabilidade que persistir **nunca entra na branch**: estacione a parte e destaque-a como **primeiro item** do report da Entrega; se nada é entregável sem ela → degrau 3.
 - Gate 9 impossibilitado por **ambiente sem tela** (só quando `gates.screenVerify` está ativo) → **não é falha** (não consome retry, não bloqueia): vira `pendente_handoff` e é tratado na Etapa 4.6.
-- Tudo verde → faça a closure (INDEX + campos da TASK) e siga para a Entrega.
+- Tudo verde → faça a closure (INDEX + campos da TASK) e siga para a Entrega — a edição da TASK segue a régua do §3.4.2 do implement (Edit ancorado; `git diff` do arquivo sem cabeçalho removido, decisão 4.259).
 - **Registro no ledger** (item 5 da Etapa 0.5) conforme os eventos acontecem, **não** ao final: cada veredito de gate (com `implementado_por`/`revisado_por`), cada decisão tomada em autonomia, cada **resposta efetiva do Diretor** (veto na janela, resposta a escalação, handoff devolvido — evento `intervencao`, 4.244), cada achado fora de escopo, cada parte estacionada e cada degradação de tracker. Na rota **formal**, o `/keelson:implement` já escreve os eventos das waves — não duplique; você acrescenta os seus (decisões da escada, gates rodados fora das waves). É esse registro que sustenta os itens 6.1, 7.4 e 8 do report sem depender de memória.
 
 ## Etapa 4.5: Auto-aprendizado do processo

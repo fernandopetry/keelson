@@ -2694,6 +2694,66 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.254 — Três defeitos dos motores mecânicos: AC em linha de continuação, "menciona AC" por substring, FR sem fronteira à esquerda
+
+**Problema**: mensagem ao mantenedor de consumidor (2026-08-26, versão instalada 0.115.1, ledger LRN-070–075 — registrada na proposal-inbox antes do parecer, 4.111), três bugs confirmados por leitura no mantenedor: (1) no parser de TASK do `graph.sh`, a regra da seção "Critérios de pronto" só extraía AC de linha `- [ ]`, enquanto a seção irmã do Roteiro do gate 9 extraía de toda linha — AC citado na 2ª linha de um item multi-linha ficava sem aresta `covers-ac`, produzindo `ac-sem-task` falso e índice mentindo sobre o dono (caso real: o único de 31 ACs "sem dono" era o citado em continuação); (2) o check `task-criterio-sem-ac` usava `index(…, "AC-")` — substring solta: critério contendo o literal `AC-` dentro de um regex (ex. proibição de IDs SDD) satisfazia o check sem citar AC nenhum (falso negativo real); (3) a extração de FR nos cruzamentos de cobertura (`plan-overlap-fr`/`task-overlap-fr`) usava `match(/FR-[0-9]+-[0-9]+/)` sem fronteira — `NFR-006-001` casava como `FR-006-001` e gerou 6 overlaps espúrios.
+
+**Decisão**: (1) toda linha das seções crit/gate9 passa pelo extrator de AC (simetria com a gate9; `SEENAC` já dedupa) — a regra do `graph-contract` "covers-ac ignora prosa fora de item `- [ ]`" era a codificação do bug e foi reescrita: cobertura alcança qualquer linha das duas seções, menção fora delas segue não contando; o `artifact-lint` acompanhou (o check usa `critAll`, que acumula a seção inteira) e o `edge-diff.sh` espelhou a âncora — os três parsers leem o mesmo universo (sem isso, o grafo consideraria coberta uma TASK que o lint reprova); (2) "menciona AC" exige ID bem-formado `AC-N-N` — forma abreviada (`AC-001`) não conta: não resolve no grafo; (3) fronteira à esquerda `(^|[^A-Za-z0-9])` nos 3 pontos do `lint_dir_cross` (awk POSIX sem `\b`). Provas por controle positivo (4.186): fixtures plantadas (AC só em continuação na suíte do graph; substring `AC-` em regex; `NFR` em `Realiza (FRs)` e na lista `FRs cobertos`) — os motores antigos, rodados sobre elas, reproduzem os 3 defeitos; os novos saem limpos com expected congelado. Efeito declarado de (1): AC citado em prosa solta dentro da seção de critérios passa a contar como cobertura no INDEX (mesma semântica da gate9 desde sempre). Efeito considerado e adiado com gatilho: o contador de overlap conta ocorrências, não arquivos distintos (FR repetido no mesmo PLAN produz "coberto por 2 PLANs (X, X)") — defeito irmão não relatado em campo; mitigação conhecida (dedup por FR+arquivo com fixture), aplica-se na 1ª ocorrência real.
+
+**Aplicação**: `scripts/graph.sh` (regra crit) · `scripts/artifact-lint.sh` (check 633 via `critAll`; fronteira nos 3 pontos) · `scripts/edge-diff.sh` (espelho da âncora + cabeçalho) · `docs/_meta/conventions/graph-contract.md` (tabela `covers-ac` + parágrafo reescrito) · `docs/_meta/conventions/lint-contract.md` (linhas TASK e cross-arquivo) · `commands/tasks.md` (espelho da sintaxe canônica) · fixtures+expected das suítes graph/artifact-lint (incl. fixture nova `TASK-001-010-ac-substring`) · inbox linhas 2026-08-26 (bugs 1–3) → `aplicada (4.254)`. Guardas rodadas: suítes graph (30), artifact-lint (10), edge-diff (4), shellcheck, `bash -n`.
+
+---
+
+### 4.255 — Âncora que absolve o grep é só a que exclui comentário: `\b`/`::`/`->` deixam de contar (2ª reincidência LRN-031)
+
+**Problema**: mesma mensagem (2026-08-26) — 2ª reincidência da classe LRN-031 (4.107 → 4.161): as âncoras aceitas pelo lint (`\b`, `::`, `->`, `class `/`function `) provam **limite de símbolo**, não **exclusão de comentário** — `\bSímbolo\b` segue casando o símbolo citado em docblock, e o WARNING da 4.161 ficava inerte exatamente nos critérios estruturais que mais precisavam dele. Escada 4.149 satisfeita: a proposta chegou com o refinamento do check desenhado.
+
+**Decisão**: absolvem o `task-criterio-grep-nao-ancorado` apenas as formas que não leem comentário — `Reflection`, exclusão explícita (`-v`) e padrão ancorado em início de linha (`'^`/`"^`). Fronteira de símbolo deixou de absolver; a mensagem do WARNING explica o porquê. A doutrina acompanhou no dono (item (b) da régua de contorno do `/keelson:tasks`, que **prescrevia** `\b`/`::` como ancoragem correta — mantê-la ensinaria a escrever o que o lint acusa) e a fixture válida da suíte migrou para a forma canônica nova (revisita declarada da fixture-prova da 4.161); o caso `::` virou plant positivo na fixture de defeito. Calibração preservada: o check segue WARNING — quem escala para ERROR é o task-validator quando a condição é estrutural (desenho da 4.161 intacto). **Observar**: volume de WARNINGs em TASKs legítimas com grep `::` (a absolvição sumiu para todas) — se o validator passar a rebaixar em massa, a régua fina é dele, não do lint.
+
+**Aplicação**: `scripts/artifact-lint.sh` (condição + mensagem) · `docs/_meta/conventions/lint-contract.md` (linha do check) · `commands/tasks.md` (item (b)) · fixtures/expected da suíte · inbox linha LRN-031 (2026-08-26) → `aplicada (4.255)`.
+
+---
+
+### 4.256 — Critério de ausência roda contra o commit-pai na fixação: não-vazio no pai é critério quebrado, nunca código a apagar
+
+**Problema**: mesma mensagem (2026-08-26) — a régua da verificação executável exige o comando executado na fixação com evidência de conjunto **não-vazio** (4.52/4.93), mas nada exigia o simétrico para critério de **ausência** (saída esperada vazia/0): um critério de "nenhum ID SDD" nasceu vermelho contra o estado herdado (10 âncoras legítimas por arquivo) e, duas waves depois, induziu o developer a apagar a única âncora nova de um bloco com cinco vivas — cumprimento à risca de um critério mais largo que o escopo da TASK.
+
+**Decisão**: critério de ausência executa **também contra o commit-pai** na fixação; saída não-vazia ali é critério quebrado (a proibição nasceu mais larga que o escopo), nunca código herdado a apagar. Frase única no dono (bloco da verificação executável do `/keelson:tasks`), como simétrico declarado da 4.93. Check mecânico não desenhado (1ª ocorrência da forma; o lint não executa comandos) — escada 4.149 aberta para reincidência.
+
+**Aplicação**: `commands/tasks.md` (Etapa 3, após o corolário da 4.93) · inbox linha proposta 5 (2026-08-26) → `aplicada (4.256)`.
+
+---
+
+### 4.257 — Contradição de critério sobe um nível: critério×PLAN é a 4ª forma da família, e o task-validator a acusa (2ª reincidência LRN-048)
+
+**Problema**: mesma mensagem (2026-08-26) — 2ª reincidência da classe LRN-048, 4ª forma cumulativa da família da contradição (4.162 critério×critério · 4.215 comando×critério · 4.233 ausência de cruzamento): um critério proibiu chamadas que o próprio PLAN mandava escrever, e a checagem de não-contradição só olhava dentro da TASK. A linha de 2026-08-17 da inbox já previa que a 4ª forma exigiria check mecânico (escada 4.149).
+
+**Decisão**: critério com proibição (chamada, símbolo, padrão vetado) é confrontado com o que o **PLAN-pai prescreve** antes de fixado (item (e) da régua de contorno), e o **task-validator** ganha o check de ERROR na Etapa 3 — o autocheck da escada: ele já lê o PLAN em contexto, e o confronto é julgamento dirigido. Fato de lint awk declarado **imecanizável**: contradição critério×PLAN não tem par literal canônico dos dois lados (a da 4.215 tinha a tag `--group X`) — detectá-la textualmente exigiria parser semântico de prescrição, o anti-padrão fail-open da 4.227; além disso o lint cross-arquivo só roda em modo diretório e o validator valida por arquivo (o check morreria na rota principal). Ressalva de calibração no próprio check: proibição sobre contexto que o PLAN não alcança não é contradição.
+
+**Aplicação**: `commands/tasks.md` (item (e)) · `skills/task-validator/SKILL.md` (Etapa 3, ERROR) · inbox linha LRN-048 (2026-08-26) → `aplicada (4.257)`.
+
+---
+
+### 4.258 — Requisito que entra numa TASK depois de gerada nasce com critério: a régua da geração alcança a mutação
+
+**Problema**: mesma mensagem (2026-08-26) — "item do Inclui sem critério é item sem prova" vale na geração (cobertura reversa, ERROR do validator) e a pendência herdada entra como critério no despacho (4.140), mas nada cobria o Escopo que **muda durante a execução**: requisito acrescentado a TASK em andamento (ajuste de furo, expansão sancionada) nasceu sem critério, e o de maior risco da wave fechou com prova por autoatestação num caminho sem runner.
+
+**Decisão**: qualquer requisito que entre numa TASK depois de gerada carrega critério verificável **no mesmo Edit**, sob a régua de geração inteira (verificação executável, executada na fixação) — extensão declarada do parágrafo da 4.140 no §3.2 do implement, que já é o dono do "editar a TASK antes do despacho". O validator não precisa de check novo: a cobertura reversa já reprova item do Inclui sem critério quando a TASK for revalidada — o furo era o momento (a mutação não passa por validação), e a régua no ponto de edição o fecha.
+
+**Aplicação**: `commands/implement.md` (§3.2, parágrafo da 4.140) · inbox linha proposta 7 (2026-08-26) → `aplicada (4.258)`.
+
+---
+
+### 4.259 — Closure edita artefato por Edit ancorado e prova que nenhum cabeçalho sumiu: encolhimento estrutural silencioso tem guarda
+
+**Problema**: mesma mensagem (2026-08-26, prioridade alta, erro declarado do executor no consumidor) — a rotina de closure substituiu o intervalo entre dois marcadores distantes e comeu Escopo, Critérios e Roteiro de gate 9 de 7 TASKs (255→45 linhas), 4 waves despercebido. Furo duplo: o §3.4.2 só manda conferir o INDEX (`index-check.sh`) — nada audita o arquivo de TASK editado; e a guarda que existiria (`task-secao-ausente`, ERROR do lint) é rebaixada a `WARNING [legacy]` exatamente no estado que a closure cria (`Status: Done`).
+
+**Decisão**: o item 1 do §3.4.2 prescreve **Edit ancorado nos marcadores literais do template** (nunca substituição de intervalo amplo) e a conferência mecânica imediata: `git diff` do arquivo editado sem linha removida começando com `#` — cabeçalho da versão commitada que some é defeito da edição, a reverter e reeditar; na closure, remoção de heading nunca é legítima (a closure só preenche histórico/status), então o check não tem falso-positivo estrutural. Universal (qualquer heading, custo zero, sem script novo — `git diff` é a fonte); a closure inline do `/keelson:auto` ganhou o ponteiro de uma linha (dono único no §3.4.2). Extensão do `edge-diff.sh` com eixo de cabeçalhos considerada e dispensada: o `git diff` inline cobre o caso com menos máquina; se a classe reincidir por rota que não passa por `git diff`, o eixo no edge-diff é a mitigação seguinte (gatilho declarado).
+
+**Aplicação**: `commands/implement.md` (§3.4.2, item 1) · `commands/auto.md` (Etapa 4, linha da closure) · inbox linha proposta 8 (2026-08-26) → `aplicada (4.259)`.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify

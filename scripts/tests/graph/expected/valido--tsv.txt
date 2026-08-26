@@ -15,7 +15,7 @@ edge	comp-realiza	COMP-001-001	FR-001-001	plans/PLAN-001-demo-auth.md:26
 edge	comp-realiza	COMP-001-001	FR-001-002	plans/PLAN-001-demo-auth.md:26
 edge	comp-realiza	COMP-001-002	FR-001-003	plans/PLAN-001-demo-auth.md:32
 edge	covers-ac	TASK-001-001	AC-001-001	tasks/TASK-001-001-setup-auth.md:32
-edge	covers-ac	TASK-001-002	AC-001-002	tasks/TASK-001-002-login-invalido.md:32
+edge	covers-ac	TASK-001-002	AC-001-002	tasks/TASK-001-002-login-invalido.md:33
 edge	covers-ac	TASK-001-003	AC-001-003	tasks/TASK-001-003-relatorio.md:37
 edge	covers-ac	TASK-001-004	AC-001-001	tasks/TASK-001-004-fix-sessao.md:25
 edge	covers-ac	TASK-001-005	AC-001-002	tasks/TASK-001-005-transversal.md:24

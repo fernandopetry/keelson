@@ -29,7 +29,8 @@ Fixture válida.
 
 ## Critérios de pronto
 
-- [ ] Testes cobrem AC-001-002 — verificação executável: `make test` → verde
+- [ ] Testes cobrem o caminho de recusa — verificação executável: `make test` → verde
+  (prova AC-001-002 — citado só nesta linha de continuação; plant da 4.254)
 - [ ] Sem warnings novos
 
 ## Histórico de execução (preenchido pelo /keelson:implement)

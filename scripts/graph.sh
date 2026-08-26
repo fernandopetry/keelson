@@ -426,7 +426,9 @@ ftype == "T" && cur_task != "" && line ~ /^- \*\*Depende de\*\*[ \t]*:/ {
 ftype == "T" && cur_task != "" && line ~ /^- \*\*Bloqueia\*\*[ \t]*:/ {
   listedges("blocks", cur_task, fieldrest(line), "^TASK-[0-9]+-[0-9]+$", "Bloqueia"); next
 }
-ftype == "T" && cur_task != "" && sect == "crit" && line ~ /^- \[[ xX]\]/ { allac(line, cur_task); next }
+# toda linha das secoes crit/gate9 passa pelo extrator — item multi-linha cita AC
+# na continuacao, que nao casa "^- [" (4.254)
+ftype == "T" && cur_task != "" && sect == "crit" { allac(line, cur_task); next }
 ftype == "T" && cur_task != "" && sect == "gate9" { allac(line, cur_task); next }
 
 # ---------- TASK-MMM-INDEX (só p/ index-desatualizado) ----------

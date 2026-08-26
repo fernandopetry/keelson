@@ -525,13 +525,12 @@ sect == "dep" && line ~ /^- \*\*Depende de\*\*[ \t]*:/ {
   v = line; sub(/^[^:]*:/, "", v); DEP = trim(v); next
 }
 sect == "crit" && line ~ /(^|[ `|(])(grep|egrep|rg) / {
-  # 4.161: grep de padrao textual sem ancora de simbolo/fronteira em criterio de
-  # verificacao — casa prosa/docblock quando a condicao e estrutural. Contam como
-  # ancora: \b, ::, ->, "class ", "function ", Reflection, exclusao (-v) ou
-  # padrao ancorado em inicio de linha ('^ / "^).
-  if (line !~ /\\b/ && line !~ /::/ && line !~ /->/ && line !~ /class / && \
-      line !~ /function / && line !~ /Reflection/ && line !~ / -[a-zA-Z]*v/ && \
-      line !~ /['"]\^/)
+  # 4.161/4.255: grep de padrao textual em criterio de verificacao casa prosa/docblock
+  # mesmo com fronteira de simbolo — \b/::/-> limitam a palavra, nao excluem comentario
+  # (2a reincidencia LRN-031: \bSimbolo\b seguia casando docblock e o WARNING ficava
+  # inerte onde mais importava). Absolvem so as formas que nao leem comentario:
+  # Reflection, exclusao explicita (-v) ou padrao ancorado em inicio de linha ('^ / "^).
+  if (line !~ /Reflection/ && line !~ / -[a-zA-Z]*v/ && line !~ /['"]\^/)
     nGrepSolto++
 }
 (sect == "crit" || sect == "gate9") && line ~ /--group[ \t]+[A-Za-z0-9_-]/ {
@@ -630,7 +629,7 @@ END {
   }
   # criterios de pronto
   if (sCrit && ncrit == 0) emit("ERROR", "task-criterios-vazios", "secao \"Criterios de pronto\" sem itens de checklist")
-  else if (sCrit && REALIZA != "" && tolower(REALIZA) !~ /^(nenhuma|nenhum|n\/a|-)$/ && index(crit g9, "AC-") == 0)
+  else if (sCrit && REALIZA != "" && tolower(REALIZA) !~ /^(nenhuma|nenhum|n\/a|-)$/ && (critAll g9) !~ /AC-[0-9]+-[0-9]+/)
     emit("ERROR", "task-criterio-sem-ac", "nenhum criterio de pronto ou roteiro do gate 9 menciona AC")
   # tipo especifico
   if (TIPO == "bugfix" && !temACV) {
@@ -646,7 +645,7 @@ END {
     emit("WARNING", "task-done-gate-aberto", nGateAberto " item(ns) de Quality gates desmarcado(s) sem consolidacao declarada (4.90)")
   # criterio com grep de texto sem ancora
   if (nGrepSolto > 0)
-    emit("WARNING", "task-criterio-grep-nao-ancorado", nGrepSolto " criterio(s) com grep/rg de padrao textual sem ancora de simbolo/fronteira — condicao estrutural verificada por texto casa prosa/comentario (4.161)")
+    emit("WARNING", "task-criterio-grep-nao-ancorado", nGrepSolto " criterio(s) com grep/rg de padrao textual sem exclusao de comentario nem ancora executavel — fronteira de simbolo (\\b/::/->) limita a palavra mas segue casando docblock/prosa (4.161, 4.255)")
   # comando de verificacao contradiz proibicao de tag da mesma TASK
   for (t in cmdGroup) if (t in prohGroup)
     emit("WARNING", "task-comando-contradiz-criterio", "comando de verificacao usa --group " t " e outra linha da mesma TASK proibe a tag " t " (4.215)")
@@ -694,13 +693,20 @@ lint_dir_cross() { # $1 = dir do slug
       /^## / { on = ($0 ~ /^## Cobertura/) ? 1 : 0; frmode = 0 }
       on && /^\*\*FRs cobertos\*\*/ {
         v = $0; sub(/^[^:]*:/, "", v)
-        while (match(v, /FR-[0-9]+-[0-9]+/)) { print substr(v, RSTART, RLENGTH) "\t" FILE; v = substr(v, RSTART + RLENGTH) }
+        # fronteira a esquerda: NFR-x-y nunca conta como FR-x-y (awk POSIX sem \b — 4.254)
+        while (match(v, /(^|[^A-Za-z0-9])FR-[0-9]+-[0-9]+/)) {
+          m = substr(v, RSTART, RLENGTH); sub(/^[^F]/, "", m)
+          print m "\t" FILE; v = substr(v, RSTART + RLENGTH)
+        }
         frmode = 1; next
       }
       on && /^\*\*/ { frmode = 0 }
       on && frmode && /^- / {
         v = $0
-        if (match(v, /FR-[0-9]+-[0-9]+/)) print substr(v, RSTART, RLENGTH) "\t" FILE
+        if (match(v, /(^|[^A-Za-z0-9])FR-[0-9]+-[0-9]+/)) {
+          m = substr(v, RSTART, RLENGTH); sub(/^[^F]/, "", m)
+          print m "\t" FILE
+        }
       }
     ' "$f"
   done > "$TMP/plancov.tsv"
@@ -719,7 +725,11 @@ lint_dir_cross() { # $1 = dir do slug
     awk -v FILE="$b" -v M="$m" '
       /^\*\*Realiza \(FRs\)\*\*[ \t]*:/ {
         v = $0; sub(/^[^:]*:/, "", v)
-        while (match(v, /FR-[0-9]+-[0-9]+/)) { print M "\t" substr(v, RSTART, RLENGTH) "\t" FILE; v = substr(v, RSTART + RLENGTH) }
+        # mesma fronteira a esquerda do plancov (4.254)
+        while (match(v, /(^|[^A-Za-z0-9])FR-[0-9]+-[0-9]+/)) {
+          m = substr(v, RSTART, RLENGTH); sub(/^[^F]/, "", m)
+          print M "\t" m "\t" FILE; v = substr(v, RSTART + RLENGTH)
+        }
       }
     ' "$f"
   done > "$TMP/taskcov.tsv"

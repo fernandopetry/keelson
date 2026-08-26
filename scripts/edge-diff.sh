@@ -17,7 +17,8 @@
 # Campos: os de aresta do graph-contract §2 (Pertence a, Brief, Realiza (FRs),
 # AC violado, Componente, Funcionalidade, Depende de, Bloqueia, SPEC referenciada,
 # FRs/NFRs cobertos, Realiza/Dependências por COMP, cobre por AC) + `criterio`
-# (ACs citados em itens `- [ ]`/roteiro do gate 9).
+# (IDs citados nas seções Critérios de pronto/Roteiro do gate 9 — qualquer linha,
+# continuação de item incluída, mesma âncora do graph.sh, 4.254).
 # Exit: 0 nada perdido · 1 aresta perdida · 2 uso incorreto.
 # Read-only; bash 3.2 + awk POSIX.
 
@@ -102,7 +103,9 @@ extract() { # $1 = arquivo → linhas "campo<TAB>ID" ordenadas e únicas
       if (ci > 0) ids("cobre(" ac ")", substr(line, ci))
       next
     }
-    sect == "crit" && (/^- \[[ xX]\]/ || /^- /) { ids("criterio", line); next }
+    # toda linha das secoes de criterio/gate 9 — mesma ancora do graph.sh (4.254):
+    # item multi-linha cita AC na continuacao, que nao tem bullet
+    sect == "crit" { ids("criterio", line); next }
   ' "$1" | sort -u
 }
 

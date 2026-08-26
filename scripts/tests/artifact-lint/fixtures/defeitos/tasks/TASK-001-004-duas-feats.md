@@ -2,7 +2,7 @@
 
 **Slug**: defeitos
 **Pertence a**: PLAN-001
-**Realiza (FRs)**: FR-001-003
+**Realiza (FRs)**: FR-001-003, NFR-001-001
 **Funcionalidade**: FEAT-001-001, FEAT-001-002
 **Componente**: COMP-001-001
 **Wave**: 1

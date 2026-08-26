@@ -21,6 +21,7 @@
 
 **FRs cobertos**:
 - FR-002-001
+- NFR-002-001
 
 **Cobertura agregada do slug**: 1/31 FRs da SPEC-002 cobertos.
 
