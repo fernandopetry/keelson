@@ -296,6 +296,28 @@ if printf '%s\n' "$staged" | grep -qE '^scripts/(graph\.sh$|artifact-lint\.sh$|i
   run_suite corpus
 fi
 
+# Dono de formato de artefato no commit (4.261): linha ESTRUTURAL (heading ou campo
+# **X**:) no diff staged dos comandos que carregam o template inline → o corpus pode
+# ter ficado para trás; suíte verde com motores velhos não prova conformidade nova.
+# Heading do corpo do comando também casa (falso-positivo aceito: custo = 1 suíte + 1 aviso).
+if printf '%s\n' "$staged" | grep -qE '^commands/(specify|plan|tasks)\.md$'; then
+  if git diff --cached -U0 -- commands/specify.md commands/plan.md commands/tasks.md 2>/dev/null \
+     | grep -qE '^[+-](#{1,3} |\*\*[A-Za-z][^*]*\*\*[ \t]*:)'; then
+    run_suite corpus
+    echo "[keelson pre-commit] AVISO: linha estrutural mudou em dono de formato de artefato (4.261) — se o formato/template mudou, lint e corpus acompanham na MESMA leva; corpus verde aqui não prova conformidade com o formato novo." >&2
+  fi
+fi
+
+# Frequência de recongelamento do corpus (4.261): o sinal vive no git — 3+ expected
+# recongelados em 30 dias sugere congelamento além do necessário. Nunca bloqueia.
+if printf '%s\n' "$staged" | grep -q '^scripts/tests/corpus/expected/'; then
+  refreezes="$(git log --oneline --since='30 days ago' -- scripts/tests/corpus/expected/ 2>/dev/null | wc -l | tr -d ' ')"
+  case "$refreezes" in ''|*[!0-9]*) refreezes=0 ;; esac
+  if [ "$((refreezes + 1))" -ge 3 ]; then
+    echo "[keelson pre-commit] AVISO: $((refreezes + 1))o recongelamento do corpus em 30 dias (4.261) — frequência alta sugere que congelamos além do necessário; leve a revisão da régua 4.260 ao Diretor." >&2
+  fi
+fi
+
 # Checks de release: obrigatórios quando os arquivos de release mudam
 if printf '%s\n' "$staged" | grep -qE '^(\.claude-plugin/|CHANGELOG\.md$|README\.md$|scripts/publish-wiki\.sh$)'; then
   if [ -f scripts/check-release.sh ]; then

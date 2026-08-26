@@ -2764,6 +2764,16 @@ A proibição concreta de `??`/`?.` no consumidor ficou no **perfil do projeto d
 
 ---
 
+### 4.261 — Os observáveis do corpus viram guardas no pre-commit: sinal que vive no git não depende de memória
+
+**Problema**: pergunta do Diretor (2026-08-26, na sequência da 4.260): os dois itens "a observar" da decisão — custo de manutenção do corpus quando o formato dos artefatos mudar, e frequência de recongelamento dos expected — viviam em memória de sessão e no texto da decisão, dependendo de a leva certa lembrar na hora certa. Diagnóstico: metade já se auto-resolvia pela cadeia da 4.260 (formato muda → lint acompanha, pela régua → pre-commit roda o corpus quando o lint muda → corpus quebra e força atualização); os dois furos residuais têm sinal mecânico disponível no próprio git no momento exato do ato.
+
+**Decisão**: dois gatilhos novos no `pre-commit` (tooling do mantenedor, sem bump): (1) **dono de formato no commit** — diff staged de `commands/specify.md`/`plan.md`/`tasks.md` tocando linha **estrutural** (heading `#{1,3}` ou campo `**X**:` — heurística validada com 11 casos de controle positivo/negativo; prosa e bullets de doutrina não casam) → roda a suíte do corpus e avisa que verde com motores velhos não prova conformidade com formato novo — cobre o furo "formato muda sem o lint acompanhar"; falso-positivo declarado e aceito: heading do corpo do próprio comando também casa (custo: 1 suíte + 1 aviso). (2) **Contador de recongelamento** — `expected/` do corpus staged → `git log --since='30 days ago'` conta os recongelamentos e, do 3º no mês em diante, avisa que a frequência sugere congelamento além do necessário, com rota ao Diretor. Nenhum dos dois bloqueia — são o "observar" executado pelo hook no ato que o motiva, nunca gate. Limite declarado: só mecaniza observável cujo sinal vive no git; observável de campo (falso-positivo em consumidor) continua chegando pelo `/field-intake`.
+
+**Aplicação**: `scripts/git-hooks/pre-commit` (2 blocos após o do corpus) · memória do mantenedor atualizada (os "observar" da 4.260 apontam para as guardas). Sem bump, sem CHANGELOG (4.182 — hooks de git do repo, fora do pacote); guardas rodadas: controles positivo/negativo dos predicados, `bash -n`, shellcheck.
+
+---
+
 ## 5. Quality gates inegociáveis
 
 ### 5.1 SPEC: gate ao final do /keelson:specify
