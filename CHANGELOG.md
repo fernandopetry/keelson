@@ -23,6 +23,40 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.120.0] — 2026-08-26
+
+Re-init: none
+
+Decisions 4.264–4.266 — correctness batch from a consumer's instrumented three-arm
+benchmark over the same work item (field report absorbed via the maintainer inbox):
+gate 8 approved the same code one arm rejected, a headless init returned with the
+profile agent still running, and `gates.review: false` did not do what the docs said.
+
+### Added
+
+- **Gate 8 approvals now carry a countable inventory.** An APROVADO with no findings
+  must enumerate, in the new `conferido` field of the security report, each checklist
+  category applicable to the round's diff with the surface actually checked
+  (`file:line` or a count) — scoped to the diff, never the whole repository. A blanket
+  "no vulnerabilities" report is invalid and the cycle rejects it. The rule lives in
+  `guidelines/core/SECURITY.md` (which the `security-engineer` already reads at
+  runtime); the inventory is a fact that accompanies the verdict, never a number that
+  decides it (4.264).
+
+### Fixed
+
+- **`/keelson:init` can no longer finish with a ghost profile.** The `staff-engineer`
+  invocation is blocking by contract: the profile path only enters the ficha after the
+  file provably exists on disk (`test -f`), and the report now opens with an adoption
+  verdict — `Adoção: completa` only when the self-check has no failure; otherwise
+  `incompleta` with the exact pending action. A declined profile generation is a
+  declared state, not a failure (4.265).
+- **Docs no longer claim `gates.review` disables the cycle's code review.** The key
+  (and `gates.reviewThreshold`) only parametrize the out-of-cycle Stop-hook nudge
+  (`review-guard`); gates 1–7 always run in the cycle. The ficha wiki page, the init's
+  gate list and the troubleshooting page now say so; behavior is unchanged and the
+  ficha template was deliberately left untouched (4.266).
+
 ## [0.119.0] — 2026-08-26
 
 Re-init: required

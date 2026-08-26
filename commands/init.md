@@ -72,12 +72,15 @@ Para backend e (se houver) frontend:
 
 Em todos os casos, **grave o caminho resolvido no campo `profile.<role>.file` da ficha**: prefixo `plugin:` para exemplar embarcado (ex.: `plugin:backend/php.md`, resolvido em `${CLAUDE_PLUGIN_ROOT}/guidelines/`); caminho relativo à raiz do projeto para perfil gerado (ex.: `guidelines/project/backend/node-20.md`). É esse campo que os demais comandos usam para carregar o perfil.
 
+**A invocação do `staff-engineer` é bloqueante** (decisão 4.265 — regra geral: artefato de subagent que etapa seguinte consome ⇒ o retorno é pré-condição): espere o agent retornar e **prove que o arquivo existe no disco** (`test -f`) antes de gravar o caminho na ficha e de seguir adiante — o caminho nunca entra na ficha pela promessa do spawn. Caso real: rodada não-interativa retornou com o agent ainda rodando e a ficha apontando arquivo nunca escrito.
+
 Perfis gerados nascem **pendentes de revisão**: afirmações não confirmadas levam a tag inline `⚠️ não confirmado` e a logística de revisão humana vive no arquivo companheiro `_review/<lang>-<versão>.md` ao lado do perfil (embarcados: `${CLAUDE_PLUGIN_ROOT}/guidelines/backend/_review/php-<versão>.md`) — colete os itens do companheiro para o relatório.
 
 ## Etapa 4 — Escrever a ficha `keelson.config.json`
 
 Parta de `${CLAUDE_PLUGIN_ROOT}/templates/keelson.config.example.json` e preencha com os valores resolvidos: `profile` (backend/frontend com `lang`+`version`+`file` da Etapa 3), `codePaths`, `sensitiveGlobs`, `quality`, `docsRoot`, `git` (estratégia e naming de branch — decisões 4.190/4.192; os defaults do template preservam o comportamento clássico: `branchStrategy: "unica"`, `branchNaming: "slug"` — pergunte só se o humano mencionar política de branch; `"tracker-key"` exige `jira.enabled: true`, provado pelo self-check), e `gates`:
 - `security` (bool);
+- `review`/`reviewThreshold` parametrizam a **cutucada de encerramento** do hook `review-guard` (mudança de código fora do ciclo — decisões 4.15/4.266); **não** desligam o `code-reviewer` do ciclo, que roda sempre;
 - `screenVerify` = objeto `{ "enabled": <há frontend?>, "method": <o da Etapa 2, ex. "skill:screen-verify">, "artifactsDir": <default "thoughts/screen-verify"> }`. (Aceita também o atalho booleano `true`/`false` = `{enabled, method:null}`.) **O modo do browser NÃO vive aqui** — headless é flag do servidor MCP (Etapa 4.4), que é quem de fato controla; duas fontes de verdade divergiriam em silêncio.
 
 Grave na raiz do projeto. **Se a ficha já existe** → Regra de merge; específico deste passo: migrar um `screenVerify` booleano antigo para o objeto `{enabled, method, artifactsDir}` mantendo o valor; ficha sem `artifactsDir` → acrescentar o default.
@@ -217,7 +220,7 @@ chamada de prova). Prove o restante:
 - `quality.boot` declarado → o que ele invoca **existe no disco** (binário no PATH, compose file, script) — não suba a app aqui, prove só que o comando não é fantasia; campo ausente numa ficha antiga → complete com a pergunta da Etapa 2 (Regra de merge);
 - os `codePaths` existem no disco;
 - `sensitiveGlobs` **cobre os arquivos de segredo que existem no projeto** (decisão 4.71): enumere os candidatos em disco (`.env*` em **qualquer** nível — raiz inclusive —, `*.pem`/`*.key`, arquivos de credencial do projeto) e prove **por matching real** que cada um casa com algum glob — mesma régua da 4.51: inferir da leitura dos globs não vale (caso medido: ficha cobrindo os `.env*` de subdiretórios, `.env` da raiz descoberto). Candidato sem cobertura → acrescente o glob do caminho exato;
-- os guidelines do perfil ativo resolvem: cada `profile.<role>.file` da ficha aponta para um arquivo existente (regra de resolução da Etapa 3); perfil com `reviewed: false` no front-matter vira instrução de revisão no relatório; perfil cujo `charter:` no front-matter é **menor** que a versão atual do `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md` vira aviso de re-derivação/revisão no relatório;
+- os guidelines do perfil ativo resolvem: cada `profile.<role>.file` da ficha está **preenchido** e aponta para um arquivo existente (regra de resolução da Etapa 3; campo ausente é `✗` deste item — o `perfil-resolve` mecânico degrada em silêncio nesse caso, decisão 4.265); perfil com `reviewed: false` no front-matter vira instrução de revisão no relatório; perfil cujo `charter:` no front-matter é **menor** que a versão atual do `${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md` vira aviso de re-derivação/revisão no relatório;
 - se `screenVerify.enabled`: `keelson.local.example.json` existe e está **versionado** (sem senha real); `keelson.local.json` existe **e** está no `.gitignore` (confirme que **não** aparece em `git status`/`git ls-files`); campos ainda em placeholder (`<...>`) viram instrução de preenchimento no relatório (com o aviso dev-only); `artifactsDir` e `.playwright-mcp/` **provados** cobertos por `git check-ignore` (Etapa 5.5) — inferir da linha `thoughts/` não vale.
 - se `method: skill:screen-verify`: o **runtime de browser responde** — ferramentas `mcp__playwright__*` carregadas (deferred não aparecem até serem buscadas) e uma navegação de prova barata (`browser_navigate` para `about:blank`, ou a `baseUrl` do realm default quando a app está de pé). Falhou → **não** é `✓` silencioso nem `✗` genérico: o relatório nomeia a causa (servidor não configurado · pacote não baixado · binário do navegador ausente · Node < 18) **e o comando exato** que resolve.
 - se `method: skill:screen-verify`: as **flags efetivas** conferem (Etapa 4.4, passos 2–3). Responder não basta:
@@ -228,6 +231,8 @@ chamada de prova). Prove o restante:
 Reporte cada item como ✓/✗. `✗` vira ação no relatório, não é silenciado.
 
 ## Etapa 7 — Relatório
+
+Abra com o **veredito da adoção** (decisão 4.265): `Adoção: completa` somente quando o self-check da rodada não tem linha `falha` e nenhum `✗` dos itens LLM ficou sem reparo; senão `Adoção: incompleta — <item>: <ação exata>`. O veredito segura a declaração de pronto, nunca a emissão do relatório — recusa explícita do humano (ex.: optou por não gerar perfil) é estado declarado, não falha. No escopo `jira`, o veredito cobre só a fatia executada.
 
 Resuma: o que foi **detectado**, o que foi **perguntado**, o perfil de cada camada (exemplar ou gerado), a contagem de pendências `⚠️ não confirmado` por perfil gerado (coletadas do companheiro `_review/<lang>-<versão>.md`), e o resultado do self-check. Se houver perfil `reviewed: false`, instrua: **revise-o antes do primeiro `/keelson:specify`**.
 

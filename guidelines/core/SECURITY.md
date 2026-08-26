@@ -136,3 +136,17 @@ o CVE/NVD:
 - [ ] Mutação autenticada por cookie exige token anti-CSRF
 - [ ] Erro/exceção trata fail-closed; sem stack trace/detalhe interno na resposta
 - [ ] Dependências auditadas contra o advisory database (CVE), com lockfile commitado
+
+---
+
+## Veredito de aprovação (gate 8) — decisão 4.264
+
+**APROVADO sem achado viaja com inventário contável.** "Nenhuma vulnerabilidade" sem
+denominador é indistinguível de "não olhei": o report de aprovação enumera cada categoria
+do checklist **aplicável ao diff da rodada** com a superfície conferida — `arquivo:linha`
+ou contagem — escopado ao diff e ao escopo sensível declarado, nunca ao repositório
+inteiro. O inventário é **fato que acompanha o veredito, nunca o decide sozinho** (o
+julgamento segue do revisor — número não vira oráculo); enumeração produzida por comando
+carrega controle positivo no mesmo universo (mesma régua da evidência mecânica de
+ausência do avaliador — `core/CODE-REVIEW.md`, 4.186). Aprovação sem inventário é
+**report inválido** para quem o aceita.

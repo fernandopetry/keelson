@@ -31,7 +31,7 @@ Você é um Application Security Engineer focado em **revisar segurança** do c�
 2. Rodar o checklist do gabarito contra o diff.
 3. Mudança tocando dependências/manifesto/lockfile → rodar a ferramenta de auditoria que o gabarito nomeia para o ecossistema e aplicar a política *Dependências & CVE* do `SECURITY.md`; ferramenta indisponível → achado `severidade: media` "auditoria de dependências indisponível para <ecossistema>" (**fail-visible** — não bloqueia sozinho).
 4. Cada achado: categoria OWASP, `arquivo:linha`, severidade, correção objetiva (e `cve` quando vindo da auditoria).
-5. Decisão: **qualquer** vulnerabilidade real → REPROVADO.
+5. Decisão: **qualquer** vulnerabilidade real → REPROVADO. APROVADO exige o campo `conferido` preenchido — a régua é a seção *Veredito de aprovação (gate 8)* do `SECURITY.md`; aprovação sem inventário é report inválido.
 
 ## Output: report de revisão de segurança
 
@@ -44,6 +44,12 @@ resultado: APROVADO | REPROVADO
 revisado_por: security-engineer
 data_revisao: <ISO 8601>
 escopo_sensivel: [auth | injecao | upload | dados_pessoais | crypto | endpoint | deps | ...]
+
+# Obrigatório quando resultado: APROVADO — régua: SECURITY.md, "Veredito de aprovação (gate 8)" (4.264).
+# Escopado ao diff da rodada; fato que acompanha o veredito, nunca o decide sozinho.
+conferido:
+  - categoria: "<categoria do checklist aplicável ao diff>"
+    superficie: "<arquivo:linha ou contagem no diff>"
 
 achados:
   - categoria: "Injection"          # nome canônico do superset de core/SECURITY.md

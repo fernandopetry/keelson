@@ -260,7 +260,7 @@ E sugira `/keelson:integrate {docsRoot}/<slug>/plans/PLAN-MMM-<nome>.md` — com
   | Task | implementado_por | revisado_por | gate 8 | gate 9 | gate 10 | gate 11 |
   |---|---|---|---|---|---|---|
   | TASK-MMM-XXX | <id> | <id> | aprovado \| n/a | verificado \| pendente_handoff \| n/a | aprovado \| n/a | aprovado \| n/a |
-- Linha com `revisado_por` = `implementado_por`, gate 8 `n/a` em task que tocou área sensível, gate 10 `n/a` em task que tocou superfície de custo, ou gate 11 `n/a` em task que tocou superfície de interface → report **inválido**: rode o gate que falta antes de concluir.
+- Linha com `revisado_por` = `implementado_por`, gate 8 `n/a` em task que tocou área sensível (ou `aprovado` cujo report veio sem o inventário `conferido` — decisão 4.264), gate 10 `n/a` em task que tocou superfície de custo, ou gate 11 `n/a` em task que tocou superfície de interface → report **inválido**: rode o gate que falta antes de concluir.
 
 ## Closure
 - Tasks com closure completa: N/N

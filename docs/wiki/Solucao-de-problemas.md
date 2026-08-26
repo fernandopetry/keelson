@@ -41,6 +41,24 @@ Esse reparo **evapora no próximo update** do plugin. A correção durável viaj
 próprio pacote (versões ≥ 0.93.2 provam o bit no CI); rode `/keelson:update` — e o
 `/keelson:init` também detecta o caso (item `hooks-executaveis` do self-check).
 
+### O init disse que terminou, mas o perfil de linguagem não existe
+
+Sintoma: a ficha aponta `profile.<role>.file` para um arquivo que não está no disco —
+típico de rodada não-interativa que retornou enquanto o agente que gera o perfil ainda
+rodava. A partir da versão `0.120.0` o init espera o agente terminar, prova que o
+arquivo existe antes de gravar o caminho, e o relatório abre com
+`Adoção: incompleta` quando algo ficou pendente. Reparo: atualize o plugin
+(`/keelson:update`) e rode `/keelson:init` de novo — a Regra de merge preserva o que
+você já configurou; confira no relatório o item de perfil do self-check.
+
+### Desliguei `gates.review` na ficha e o reviewer continuou rodando
+
+Não é defeito. `gates.review` (e `gates.reviewThreshold`) governam a **cutucada de
+encerramento**: o lembrete que bloqueia o fim da sessão quando há mudança de código
+sem revisão **fora do ciclo**. A revisão do ciclo (gates 1–7 do `/keelson:implement`)
+não é configurável — é parte do método. O efeito de cada campo está na
+[Ficha do projeto](Ficha-do-projeto).
+
 ## Gates que reprovam
 
 ### O gate de testes reprova, mas os testes passam na minha mão
