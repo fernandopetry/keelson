@@ -411,18 +411,17 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.117.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.117.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: three confirmed parser bugs fixed in the mechanical layer (AC
-cited on a continuation line now counts as coverage; "mentions AC" requires a
-well-formed ID; `NFR-…` no longer counts as `FR-…` in coverage cross-checks) and five
-doctrine gaps closed from the same consumer cycle (decisions 4.254–4.259): grep
-anchors must exclude comments to absolve, absence criteria run against the parent
-commit at fixation, criterion×PLAN contradictions are now a validator ERROR,
-requirements added to an in-flight TASK are born with criteria, and closure edits are
-anchored and must preserve every committed heading. Re-init: none.
+New in this release: a regression corpus for the mechanical engines (decision 4.260)
+— a realistic synthetic slug with the output of every read-only engine frozen, run on
+pre-commit and CI, so shape regressions like the 4.254 parser bugs turn red before
+release instead of in the field — plus the written rule that a fixed engine bug ships
+with a fixture reproducing it and a positive control. Follows 0.117.0 (same day):
+three parser fixes and five doctrine gaps from a consumer field message, decisions
+4.254–4.259. Re-init: none.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and profile contributions welcome.

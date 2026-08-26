@@ -182,3 +182,7 @@ plantados ≥ 1 por check, stage) + saídas esperadas versionadas + `run.sh` que
 `graph.sh` caso a caso e compara com `diff` (sai ≠ 0 na divergência). Mudou o parser?
 A suíte re-prova a métrica da leva (zero falso-positivo no válido, todo defeito
 acusado). Fixture nova acompanha check novo — check sem fixture não entra no catálogo.
+Bug corrigido nasce com fixture do caso + controle positivo — régua da camada mecânica
+inteira, texto no `lint-contract.md` (4.260); a variedade de forma realista tem cinto
+no corpus (`scripts/tests/corpus/`), que congela as saídas de todos os motores
+read-only sobre um slug sintético-realista.

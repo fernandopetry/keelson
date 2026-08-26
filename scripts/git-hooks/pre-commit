@@ -289,6 +289,13 @@ for par in "ficha:ficha diff-facts" "next-id:next-id" "index-check:index" \
   fi
 done
 
+# Corpus de regressão dos motores read-only (4.260): slug sintético-realista com as
+# saídas de graph/artifact-lint/index-check congeladas — roda quando qualquer motor
+# coberto ou o próprio corpus muda (run_suite dedupa se já rodou)
+if printf '%s\n' "$staged" | grep -qE '^scripts/(graph\.sh$|artifact-lint\.sh$|index-check\.sh$|tests/corpus/)'; then
+  run_suite corpus
+fi
+
 # Checks de release: obrigatórios quando os arquivos de release mudam
 if printf '%s\n' "$staged" | grep -qE '^(\.claude-plugin/|CHANGELOG\.md$|README\.md$|scripts/publish-wiki\.sh$)'; then
   if [ -f scripts/check-release.sh ]; then

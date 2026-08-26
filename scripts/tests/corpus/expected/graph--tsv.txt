@@ -1,0 +1,120 @@
+edge	ac-covers	AC-001-001	FR-001-001	specs/SPEC-001-exportacao-pedidos.md:82
+edge	ac-covers	AC-001-002	FR-001-002	specs/SPEC-001-exportacao-pedidos.md:86
+edge	ac-covers	AC-001-003	FR-001-004	specs/SPEC-001-exportacao-pedidos.md:90
+edge	ac-covers	AC-001-004	FR-001-006	specs/SPEC-001-exportacao-pedidos.md:91
+edge	ac-covers	AC-001-005	FR-001-005	specs/SPEC-001-exportacao-pedidos.md:95
+edge	ac-covers	AC-001-006	FR-001-003	specs/SPEC-001-exportacao-pedidos.md:96
+edge	belongs-to	TASK-001-001	PLAN-001	tasks/TASK-001-001-registrador-solicitacoes.md:4
+edge	belongs-to	TASK-001-002	PLAN-001	tasks/TASK-001-002-dedupe-solicitacao.md:4
+edge	belongs-to	TASK-001-003	PLAN-001	tasks/TASK-001-003-fix-expiracao-retirada.md:4
+edge	belongs-to	TASK-001-004	PLAN-001	tasks/TASK-001-004-refactor-consulta-pedidos.md:4
+edge	belongs-to	TASK-001-005	PLAN-001	tasks/TASK-001-005-limite-e-aviso.md:4
+edge	belongs-to	TASK-001-006	PLAN-001	tasks/TASK-001-006-chore-limpeza-temporarios.md:4
+edge	belongs-to	TASK-001-007	PLAN-001	tasks/TASK-001-007-reenvio-aviso.md:4
+edge	blocks	TASK-001-001	TASK-001-004	tasks/TASK-001-001-registrador-solicitacoes.md:22
+edge	blocks	TASK-001-001	TASK-001-005	tasks/TASK-001-001-registrador-solicitacoes.md:22
+edge	blocks	TASK-001-002	TASK-001-003	tasks/TASK-001-002-dedupe-solicitacao.md:22
+edge	blocks	TASK-001-002	TASK-001-005	tasks/TASK-001-002-dedupe-solicitacao.md:22
+edge	blocks	TASK-001-004	TASK-001-006	tasks/TASK-001-004-refactor-consulta-pedidos.md:21
+edge	blocks	TASK-001-005	TASK-001-007	tasks/TASK-001-005-limite-e-aviso.md:22
+edge	comp-dep	COMP-001-002	COMP-001-001	plans/PLAN-001-exportacao-pedidos.md:59
+edge	comp-dep	COMP-001-003	COMP-001-002	plans/PLAN-001-exportacao-pedidos.md:66
+edge	comp-realiza	COMP-001-001	FR-001-001	plans/PLAN-001-exportacao-pedidos.md:50
+edge	comp-realiza	COMP-001-001	FR-001-002	plans/PLAN-001-exportacao-pedidos.md:50
+edge	comp-realiza	COMP-001-002	FR-001-003	plans/PLAN-001-exportacao-pedidos.md:57
+edge	comp-realiza	COMP-001-003	FR-001-004	plans/PLAN-001-exportacao-pedidos.md:64
+edge	comp-realiza	COMP-001-003	FR-001-005	plans/PLAN-001-exportacao-pedidos.md:64
+edge	comp-realiza	COMP-001-003	FR-001-006	plans/PLAN-001-exportacao-pedidos.md:64
+edge	covers-ac	TASK-001-001	AC-001-001	tasks/TASK-001-001-registrador-solicitacoes.md:47
+edge	covers-ac	TASK-001-002	AC-001-002	tasks/TASK-001-002-dedupe-solicitacao.md:46
+edge	covers-ac	TASK-001-003	AC-001-004	tasks/TASK-001-003-fix-expiracao-retirada.md:47
+edge	covers-ac	TASK-001-005	AC-001-003	tasks/TASK-001-005-limite-e-aviso.md:62
+edge	covers-ac	TASK-001-005	AC-001-006	tasks/TASK-001-005-limite-e-aviso.md:48
+edge	covers-ac	TASK-001-007	AC-001-005	tasks/TASK-001-007-reenvio-aviso.md:41
+edge	declares-feat	TASK-001-001	FEAT-001-001	tasks/TASK-001-001-registrador-solicitacoes.md:6
+edge	declares-feat	TASK-001-002	FEAT-001-001	tasks/TASK-001-002-dedupe-solicitacao.md:6
+edge	declares-feat	TASK-001-003	FEAT-001-002	tasks/TASK-001-003-fix-expiracao-retirada.md:6
+edge	declares-feat	TASK-001-005	FEAT-001-001	tasks/TASK-001-005-limite-e-aviso.md:6
+edge	declares-feat	TASK-001-005	FEAT-001-002	tasks/TASK-001-005-limite-e-aviso.md:6
+edge	declares-feat	TASK-001-007	FEAT-001-002	tasks/TASK-001-007-reenvio-aviso.md:6
+edge	feat-of	FR-001-001	FEAT-001-001	specs/SPEC-001-exportacao-pedidos.md:60
+edge	feat-of	FR-001-002	FEAT-001-001	specs/SPEC-001-exportacao-pedidos.md:61
+edge	feat-of	FR-001-003	FEAT-001-001	specs/SPEC-001-exportacao-pedidos.md:62
+edge	feat-of	FR-001-004	FEAT-001-002	specs/SPEC-001-exportacao-pedidos.md:69
+edge	feat-of	FR-001-005	FEAT-001-002	specs/SPEC-001-exportacao-pedidos.md:72
+edge	feat-of	FR-001-006	FEAT-001-002	specs/SPEC-001-exportacao-pedidos.md:73
+edge	feat-primaria	TASK-001-001	FEAT-001-001	tasks/TASK-001-001-registrador-solicitacoes.md:6
+edge	feat-primaria	TASK-001-002	FEAT-001-001	tasks/TASK-001-002-dedupe-solicitacao.md:6
+edge	feat-primaria	TASK-001-003	FEAT-001-002	tasks/TASK-001-003-fix-expiracao-retirada.md:6
+edge	feat-primaria	TASK-001-007	FEAT-001-002	tasks/TASK-001-007-reenvio-aviso.md:6
+edge	implements	TASK-001-001	COMP-001-001	tasks/TASK-001-001-registrador-solicitacoes.md:7
+edge	implements	TASK-001-002	COMP-001-001	tasks/TASK-001-002-dedupe-solicitacao.md:7
+edge	implements	TASK-001-003	COMP-001-003	tasks/TASK-001-003-fix-expiracao-retirada.md:7
+edge	implements	TASK-001-004	COMP-001-002	tasks/TASK-001-004-refactor-consulta-pedidos.md:6
+edge	implements	TASK-001-005	COMP-001-002	tasks/TASK-001-005-limite-e-aviso.md:7
+edge	implements	TASK-001-005	COMP-001-003	tasks/TASK-001-005-limite-e-aviso.md:7
+edge	implements	TASK-001-006	COMP-001-002	tasks/TASK-001-006-chore-limpeza-temporarios.md:5
+edge	implements	TASK-001-007	COMP-001-003	tasks/TASK-001-007-reenvio-aviso.md:7
+edge	maps	FR-001-001	COMP-001-001	plans/PLAN-001-exportacao-pedidos.md:108
+edge	maps	FR-001-002	COMP-001-001	plans/PLAN-001-exportacao-pedidos.md:109
+edge	maps	FR-001-003	COMP-001-002	plans/PLAN-001-exportacao-pedidos.md:110
+edge	maps	FR-001-004	COMP-001-003	plans/PLAN-001-exportacao-pedidos.md:111
+edge	maps	FR-001-005	COMP-001-003	plans/PLAN-001-exportacao-pedidos.md:112
+edge	maps	FR-001-006	COMP-001-003	plans/PLAN-001-exportacao-pedidos.md:113
+edge	maps-ac	FR-001-001	AC-001-001	plans/PLAN-001-exportacao-pedidos.md:108
+edge	maps-ac	FR-001-002	AC-001-002	plans/PLAN-001-exportacao-pedidos.md:109
+edge	maps-ac	FR-001-004	AC-001-003	plans/PLAN-001-exportacao-pedidos.md:111
+edge	maps-ac	FR-001-005	AC-001-005	plans/PLAN-001-exportacao-pedidos.md:112
+edge	maps-ac	FR-001-006	AC-001-004	plans/PLAN-001-exportacao-pedidos.md:113
+edge	plan-covers	PLAN-001	FR-001-001	plans/PLAN-001-exportacao-pedidos.md:23
+edge	plan-covers	PLAN-001	FR-001-002	plans/PLAN-001-exportacao-pedidos.md:24
+edge	plan-covers	PLAN-001	FR-001-003	plans/PLAN-001-exportacao-pedidos.md:25
+edge	plan-covers	PLAN-001	FR-001-004	plans/PLAN-001-exportacao-pedidos.md:26
+edge	plan-covers	PLAN-001	FR-001-005	plans/PLAN-001-exportacao-pedidos.md:27
+edge	plan-covers	PLAN-001	FR-001-006	plans/PLAN-001-exportacao-pedidos.md:28
+edge	plan-covers	PLAN-001	NFR-001-001	plans/PLAN-001-exportacao-pedidos.md:31
+edge	plan-covers	PLAN-001	NFR-001-002	plans/PLAN-001-exportacao-pedidos.md:32
+edge	realiza	TASK-001-001	FR-001-001	tasks/TASK-001-001-registrador-solicitacoes.md:5
+edge	realiza	TASK-001-002	FR-001-002	tasks/TASK-001-002-dedupe-solicitacao.md:5
+edge	realiza	TASK-001-003	FR-001-006	tasks/TASK-001-003-fix-expiracao-retirada.md:5
+edge	realiza	TASK-001-005	FR-001-003	tasks/TASK-001-005-limite-e-aviso.md:5
+edge	realiza	TASK-001-005	FR-001-004	tasks/TASK-001-005-limite-e-aviso.md:5
+edge	realiza	TASK-001-007	FR-001-005	tasks/TASK-001-007-reenvio-aviso.md:5
+edge	spec-ref	PLAN-001	SPEC-001	plans/PLAN-001-exportacao-pedidos.md:19
+edge	task-dep	TASK-001-003	TASK-001-002	tasks/TASK-001-003-fix-expiracao-retirada.md:22
+edge	task-dep	TASK-001-004	TASK-001-001	tasks/TASK-001-004-refactor-consulta-pedidos.md:20
+edge	task-dep	TASK-001-005	TASK-001-001	tasks/TASK-001-005-limite-e-aviso.md:21
+edge	task-dep	TASK-001-005	TASK-001-002	tasks/TASK-001-005-limite-e-aviso.md:21
+edge	task-dep	TASK-001-006	TASK-001-004	tasks/TASK-001-006-chore-limpeza-temporarios.md:19
+edge	task-dep	TASK-001-007	TASK-001-005	tasks/TASK-001-007-reenvio-aviso.md:21
+edge	violates	TASK-001-003	AC-001-004	tasks/TASK-001-003-fix-expiracao-retirada.md:11
+node	AC	AC-001-001	specs/SPEC-001-exportacao-pedidos.md	
+node	AC	AC-001-002	specs/SPEC-001-exportacao-pedidos.md	
+node	AC	AC-001-003	specs/SPEC-001-exportacao-pedidos.md	
+node	AC	AC-001-004	specs/SPEC-001-exportacao-pedidos.md	
+node	AC	AC-001-005	specs/SPEC-001-exportacao-pedidos.md	
+node	AC	AC-001-006	specs/SPEC-001-exportacao-pedidos.md	
+node	COMP	COMP-001-001	plans/PLAN-001-exportacao-pedidos.md	
+node	COMP	COMP-001-002	plans/PLAN-001-exportacao-pedidos.md	
+node	COMP	COMP-001-003	plans/PLAN-001-exportacao-pedidos.md	
+node	DEC	DEC-001-001	plans/PLAN-001-exportacao-pedidos.md	
+node	DEC	DEC-001-002	plans/PLAN-001-exportacao-pedidos.md	
+node	FEAT	FEAT-001-001	specs/SPEC-001-exportacao-pedidos.md	
+node	FEAT	FEAT-001-002	specs/SPEC-001-exportacao-pedidos.md	
+node	FR	FR-001-001	specs/SPEC-001-exportacao-pedidos.md	
+node	FR	FR-001-002	specs/SPEC-001-exportacao-pedidos.md	
+node	FR	FR-001-003	specs/SPEC-001-exportacao-pedidos.md	
+node	FR	FR-001-004	specs/SPEC-001-exportacao-pedidos.md	
+node	FR	FR-001-005	specs/SPEC-001-exportacao-pedidos.md	
+node	FR	FR-001-006	specs/SPEC-001-exportacao-pedidos.md	
+node	NFR	NFR-001-001	specs/SPEC-001-exportacao-pedidos.md	
+node	NFR	NFR-001-002	specs/SPEC-001-exportacao-pedidos.md	
+node	PLAN	PLAN-001	plans/PLAN-001-exportacao-pedidos.md	status=Approved
+node	SPEC	SPEC-001	specs/SPEC-001-exportacao-pedidos.md	status=Approved metrica=1
+node	TASK	TASK-001-001	tasks/TASK-001-001-registrador-solicitacoes.md	wave=1 closure=1 status=Done tipo=feature
+node	TASK	TASK-001-002	tasks/TASK-001-002-dedupe-solicitacao.md	wave=1 closure=1 status=Done tipo=feature
+node	TASK	TASK-001-003	tasks/TASK-001-003-fix-expiracao-retirada.md	wave=2 status=In Progress tipo=bugfix
+node	TASK	TASK-001-004	tasks/TASK-001-004-refactor-consulta-pedidos.md	wave=2 status=Todo tipo=refactor
+node	TASK	TASK-001-005	tasks/TASK-001-005-limite-e-aviso.md	wave=2 status=Todo tipo=feature
+node	TASK	TASK-001-006	tasks/TASK-001-006-chore-limpeza-temporarios.md	wave=3 status=Todo tipo=chore
+node	TASK	TASK-001-007	tasks/TASK-001-007-reenvio-aviso.md	wave=3 status=Todo tipo=feature

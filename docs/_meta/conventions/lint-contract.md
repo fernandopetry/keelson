@@ -58,6 +58,13 @@ inventário fechado do que o script computa. Prefixos: `spec-` (spec-validator),
 
 (`(W)` = nasce WARNING por ser padrão/heurística — §1.)
 
+**Bug corrigido nasce com fixture que o reproduz** (4.260, irmã do "check novo → fixture
+nova"): correção de defeito no motor entra com fixture do caso **e controle positivo** —
+o motor anterior à correção, rodado sobre ela, tem de falhar (4.186); a suíte congelada
+passa a segurar a reintrodução. A variedade de forma realista tem cinto próprio no corpus
+(`scripts/tests/corpus/` — saídas de todos os motores read-only congeladas; diff de
+expected em leva exige justificativa na decisão, nunca aceite cego).
+
 ## §4. O fato no validator
 
 Idêntico ao §5 do `graph-contract.md`, que é o dono da régua: cada achado entra no

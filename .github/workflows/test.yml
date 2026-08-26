@@ -59,6 +59,9 @@ jobs:
       - name: Suíte do artifact-lint.sh (scripts/tests/artifact-lint/run.sh)
         run: bash scripts/tests/artifact-lint/run.sh
 
+      - name: Corpus de regressão dos motores (scripts/tests/corpus/run.sh)
+        run: bash scripts/tests/corpus/run.sh
+
       - name: Suíte do run-state.sh (scripts/tests/run-state/run.sh)
         run: bash scripts/tests/run-state/run.sh
 

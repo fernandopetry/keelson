@@ -23,6 +23,30 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.117.1] — 2026-08-26
+
+Re-init: none
+
+Decision 4.260 — Director's concern after the 4.254 batch, refined via idea-forge: the
+existing per-engine suites are synthetic-minimal by design, so regressions in
+real-world artifact *shapes* passed green and only surfaced in the field.
+
+### Added
+
+- **Regression corpus for the mechanical engines** (`scripts/tests/corpus/`,
+  maintainer tooling): a single realistic synthetic slug (SPEC with FEATs/NFRs and
+  multi-line ACs, PLAN with DECs, 7 TASKs covering feature/bugfix/refactor/chore/
+  transversal, an AC cited only on a continuation line, legacy parenthetical
+  annotations, filled closures, a gate-9 script, coherent INDEXes) with the output of
+  every read-only engine frozen (`graph.sh --check`/`--tsv`, `artifact-lint.sh`,
+  `index-check.sh`). Runs on pre-commit whenever a covered engine or the corpus
+  changes, and always in CI. Origin proof: the pre-4.254 engines fail this suite.
+- **Written rule: a fixed engine bug is born with a fixture reproducing it plus a
+  positive control** (the pre-fix engine must fail on it) — sibling of "a new check
+  ships with a fixture", owned by `lint-contract.md` with a pointer in
+  `graph-contract.md` §6. An expected-output diff in a batch requires justification in
+  the decision — blind re-freezing is the named anti-pattern.
+
 ## [0.117.0] — 2026-08-26
 
 Re-init: none
