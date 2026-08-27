@@ -208,8 +208,9 @@ A parte que o disco e o git provam sozinhos chega como **fato** (4.154): rode
 hooks do plugin instalado, codePaths, binários
 dos `quality.*`, matching real dos `sensitiveGlobs`, resolução/`reviewed`/`charter`
 do perfil, `keelson.local.*` (versionamento, gitignore provado, placeholders),
-`check-ignore` dos diretórios de artefato, flags efetivas do Playwright por escopo e
-campos mínimos do Jira. Cada linha `falha`/`aviso` vira item do relatório. Exceção com
+`check-ignore` dos diretórios de artefato, flags efetivas do Playwright por escopo,
+campos mínimos do Jira e validade do bloco `models` (chave existe no elenco de agents
+do pacote, alias conhecido). Cada linha `falha`/`aviso` vira item do relatório. Exceção com
 reparo imediato: `falha` em `hooks-executaveis` (hook sem `+x` falha em **silêncio** a
 cada disparo — decisão 4.180) → aplique o `chmod +x` que a linha indica no cache do
 plugin, declare no relatório que o reparo local **evapora no próximo update** e

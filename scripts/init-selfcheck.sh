@@ -11,7 +11,8 @@
 # Itens: hooks-executaveis · ficha-legivel · codepaths-existem · quality-existe ·
 #        sensitive-globs · perfil-resolve · perfil-reviewed · perfil-charter ·
 #        local-example · local-json-ignorado · local-placeholder ·
-#        artefatos-ignorados · playwright-flags · jira-campos · git-branch-config
+#        artefatos-ignorados · playwright-flags · jira-campos · git-branch-config ·
+#        models-validos
 # Exit: 0 sem falha · 1 com falha · 2 uso incorreto.
 #
 # Bash 3.2-compatível; JSON via ficha.sh (irmão) e python3 (playwright/local.json;
@@ -284,6 +285,36 @@ if [ -n "$g_strat" ] || [ -n "$g_name" ]; then
   fi
   if [ -n "$g_bad" ]; then emit falha git-branch-config "bloco git incoerente:$g_bad"
   else emit ok git-branch-config "estratégia e naming de branch coerentes"; fi
+fi
+
+# ---- models: chave aponta agent real do pacote, alias conhecido (4.272) — só emite quando o bloco existe ----
+m_obj="$(fget models)"
+if [ -n "$m_obj" ] && [ "$m_obj" != "{}" ]; then
+  if command -v python3 >/dev/null 2>&1; then
+    m_pairs="$(python3 - "$ROOT/keelson.config.json" <<'PY' 2>/dev/null
+import json, sys
+try:
+    with open(sys.argv[1]) as f:
+        m = json.load(f).get("models") or {}
+except Exception:
+    sys.exit(0)
+for k, v in m.items():
+    print("%s=%s" % (k, v))
+PY
+)"
+    m_bad=""; m_warn=""; m_n=0
+    for m_pair in $m_pairs; do
+      m_k="${m_pair%%=*}"; m_v="${m_pair#*=}"
+      m_n=$((m_n + 1))
+      [ -f "$PLUGROOT/agents/$m_k.md" ] || m_bad="$m_bad $m_k"
+      case "$m_v" in opus|sonnet|haiku) : ;; *) m_warn="$m_warn $m_pair" ;; esac
+    done
+    if [ -n "$m_bad" ]; then emit falha models-validos "agent desconhecido no elenco do plugin:$m_bad"
+    elif [ -n "$m_warn" ]; then emit aviso models-validos "alias fora do conjunto conhecido (opus/sonnet/haiku):$m_warn — confira no harness"
+    else emit ok models-validos "desvios de modelo apontam agents do pacote: $m_n"; fi
+  else
+    emit aviso models-validos "sem python3 para validar o bloco models — confira à mão"
+  fi
 fi
 
 sort "$OUT"

@@ -4,7 +4,8 @@
 # Monta repos git sintéticos + um plugin-root falso (Charter 0.5.1 e perfil php) e
 # compara a saída inteira com a esperada. Regras provadas: matching real dos
 # sensitiveGlobs, check-ignore provado, local.json versionado é falha, flags efetivas
-# do Playwright por escopo, charter antigo vira aviso, jira com campo vazio é falha.
+# do Playwright por escopo, charter antigo vira aviso, jira com campo vazio é falha,
+# bloco models validado contra o elenco de agents do plugin (4.272).
 #
 # Uso: scripts/tests/init-selfcheck/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível; exige git.
@@ -183,6 +184,75 @@ case "$got" in
   *"ok	git-branch-config	estratégia e naming de branch coerentes"*)
     echo "ok   git-config-coerente" ;;
   *) echo "FAIL git-config-coerente:"; printf '%s\n' "$got" | grep git-branch-config | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+
+# ---- bloco models: agent do pacote com alias conhecido → ok (4.272) ----
+mkdir -p "$PR/agents"
+printf -- '---\nname: developer\nmodel: sonnet\n---\n# Subagent: developer\n' > "$PR/agents/developer.md"
+R5="$(mkrepo models)"
+mkdir -p "$R5/src"
+printf 'x\n' > "$R5/src/app.php"
+cat > "$R5/keelson.config.json" <<'EOF'
+{
+  "profile": { "backend": { "lang": "php", "version": "8.5", "file": "plugin:backend/php.md" } },
+  "codePaths": { "backend": ["src"] },
+  "sensitiveGlobs": [".env*"],
+  "quality": { "test": "true" },
+  "models": { "developer": "opus" },
+  "gates": { "security": true },
+  "docsRoot": "docs",
+  "jira": { "enabled": false }
+}
+EOF
+git -C "$R5" add -A >/dev/null 2>&1
+git -C "$R5" commit -qm base >/dev/null 2>&1
+total=$((total + 1))
+got="$(bash "$SC" "$R5" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"
+case "$got" in
+  *"ok	models-validos	desvios de modelo apontam agents do pacote: 1"*) echo "ok   models-valido" ;;
+  *) echo "FAIL models-valido:"; printf '%s\n' "$got" | grep models-validos | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+
+# ---- bloco models: chave que não é agent do pacote → falha, exit 1 ----
+cat > "$R5/keelson.config.json" <<'EOF'
+{
+  "profile": { "backend": { "lang": "php", "version": "8.5", "file": "plugin:backend/php.md" } },
+  "codePaths": { "backend": ["src"] },
+  "sensitiveGlobs": [".env*"],
+  "quality": { "test": "true" },
+  "models": { "reviewer": "opus" },
+  "gates": { "security": true },
+  "docsRoot": "docs",
+  "jira": { "enabled": false }
+}
+EOF
+total=$((total + 1))
+got="$(bash "$SC" "$R5" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
+case "$got" in
+  *"falha	models-validos	agent desconhecido no elenco do plugin: reviewer"*)
+    [ "$st" -eq 1 ] && echo "ok   models-desconhecido" || { echo "FAIL models-desconhecido: exit $st"; fail=$((fail + 1)); } ;;
+  *) echo "FAIL models-desconhecido:"; printf '%s\n' "$got" | grep models-validos | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+
+# ---- bloco models: alias fora do conjunto conhecido → aviso ----
+cat > "$R5/keelson.config.json" <<'EOF'
+{
+  "profile": { "backend": { "lang": "php", "version": "8.5", "file": "plugin:backend/php.md" } },
+  "codePaths": { "backend": ["src"] },
+  "sensitiveGlobs": [".env*"],
+  "quality": { "test": "true" },
+  "models": { "developer": "turbo" },
+  "gates": { "security": true },
+  "docsRoot": "docs",
+  "jira": { "enabled": false }
+}
+EOF
+total=$((total + 1))
+got="$(bash "$SC" "$R5" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"
+case "$got" in
+  *"aviso	models-validos	alias fora do conjunto conhecido (opus/sonnet/haiku): developer=turbo — confira no harness"*)
+    echo "ok   models-alias-estranho" ;;
+  *) echo "FAIL models-alias-estranho:"; printf '%s\n' "$got" | grep models-validos | sed 's/^/  /'; fail=$((fail + 1)) ;;
 esac
 
 # ---- ficha ausente → falha nomeada, exit 1 ----
