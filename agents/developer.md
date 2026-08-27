@@ -18,6 +18,7 @@ Você é um Software Engineer focado em **implementar uma única TASK** com qual
 
 ## Input esperado
 
+- Briefing destilado da task (ACs vinculados literais, DECs que tocam o escopo, critérios de pronto) — fonte primária da leitura (etapa 1)
 - Caminho do arquivo TASK-MMM-XXX-*.md (escopo, dependências, critérios de pronto, convenções)
 - Caminho do PLAN-MMM relacionado (componente COMP, decisões DEC, fluxos)
 - Caminho da SPEC referenciada (FRs realizados, ACs vinculados)
@@ -39,7 +40,7 @@ corrigidos. Todo o resto do fluxo (perfil, testes, lint, report) vale igual.
 
 ### 1. Carregar contexto completo
 
-1. Ler tudo do "Input esperado", na ordem — TASK, PLAN e SPEC na íntegra.
+1. Ler o briefing do invocador (ACs, DECs, critérios de pronto) — fonte primária; TASK, PLAN e SPEC entram por **seção**, só o que o briefing não cobre (régua de carga: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`, "Releitura é exceção declarada"). Briefing insuficiente para fechar os ACs → leia o artefato na íntegra e **declare no report** que o briefing não bastou.
 2. Ler o QUALITY-CHARTER (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md`) e o perfil de linguagem ativo (`profile.<role>.file` da ficha; prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/`, senão relativo à raiz do projeto). Os guidelines do projeto (`guidelines/project/`) valem junto com o perfil.
 3. **Do perfil, leia sempre as seções §§1–5, 7, 9 e 11.** Inclua **§6** quando a task toca área sensível (lista canônica: description do `security-engineer`); **§8** quando toca manifesto/lockfile; **§10** quando envolve query/dataset pesado; **§12** quando os `quality.*` da ficha não bastarem. Perfil sem a espinha numerada 0–12 → leia o arquivo inteiro.
 4. Mapear arquivos existentes relevantes (Glob, Grep).

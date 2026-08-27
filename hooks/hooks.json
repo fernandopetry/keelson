@@ -6,7 +6,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/worktree-guard.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/worktree-guard.sh",
+            "timeout": 30
           }
         ]
       },
@@ -15,7 +16,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/agent-guard.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/agent-guard.sh",
+            "timeout": 30
           }
         ]
       },
@@ -24,7 +26,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/noverify-guard.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/noverify-guard.sh",
+            "timeout": 30
           }
         ]
       }
@@ -34,35 +37,43 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/doc-guard.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/doc-guard.sh",
+            "timeout": 30
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/security-guard.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/security-guard.sh",
+            "timeout": 30
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/review-guard.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/review-guard.sh",
+            "timeout": 30
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/stale-background-guard.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/stale-background-guard.sh",
+            "timeout": 30
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/wave-guard.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/wave-guard.sh",
+            "timeout": 30
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/desc-guard.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/desc-guard.sh",
+            "timeout": 30
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/jira-guard.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/jira-guard.sh",
+            "timeout": 30
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/window-marker.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/window-marker.sh",
+            "timeout": 30
           }
         ]
       }
@@ -73,7 +84,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/compact-anchor.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/compact-anchor.sh",
+            "timeout": 30
           }
         ]
       }
