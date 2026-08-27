@@ -5,29 +5,38 @@ there is no separate source tree — so every change here ships to every consume
 That is why the review bar for contributions is the same bar the plugin itself
 enforces on the projects that adopt it.
 
-## How contributions are absorbed (read this first)
+## How contributions are reviewed and land (read this first)
 
-External PRs are **reviewed, but not merged directly**. This is deliberate, not
-distrust. The repository maintains append-only registries — decision numbers,
-the plugin version, the `CHANGELOG.md` — that collide silently between forks:
-a branch based on an older `main` claims numbers that are already taken, and git
-merges the duplicate entries **without any textual conflict**. Merging a stale
-base would corrupt those registries invisibly.
+External PRs are **reviewed as proposals**. This is deliberate, not distrust.
+The repository maintains append-only registries — decision numbers, the plugin
+version, the `CHANGELOG.md` — that collide silently between forks: a branch
+based on an older `main` claims numbers that are already taken, and git merges
+the duplicate entries **without any textual conflict**. Merging a stale base
+would corrupt those registries invisibly.
 
-So the flow for an accepted contribution is:
+The flow for a contribution is:
 
 1. Your PR is reviewed as a **proposal** and registered in the maintainer queue
    ([docs/_meta/proposal-inbox.md](docs/_meta/proposal-inbox.md)) before any verdict.
-2. The review produces a written verdict: **absorb**, **absorb partially**, or
-   **decline** — always with reasons anchored in the repository's quality rules.
-3. Absorbed work is **re-implemented on top of the current `main`, with credit
-   to you** in the `CHANGELOG.md` entry and in the decision log
-   ([docs/_meta/decisions.md](docs/_meta/decisions.md)). The first external PR
-   to this repo (`/keelson:merge`) landed exactly this way, credited to its author.
+2. The review produces a written verdict: **merge directly**, **absorb**,
+   **absorb partially**, or **decline** — always with reasons anchored in the
+   repository's quality rules.
+3. **Direct merge** happens when the full ladder holds — all of it, no
+   near-misses: your branch sits on the current `main` tip; no registry file is
+   touched (`CHANGELOG.md`, `docs/_meta/decisions.md`, version files, the README
+   *Status* section); the review finds **zero corrections**; and CI is green on
+   the PR. Your commits then land **with your authorship** (rebase-and-merge),
+   and the maintainer adds the release commit (version, changelog, decision
+   entry) on top in the same batch.
+4. Otherwise — the default — accepted work is **re-implemented on top of the
+   current `main`, with credit to you** in the `CHANGELOG.md` entry and in the
+   decision log ([docs/_meta/decisions.md](docs/_meta/decisions.md)). The first
+   external PR to this repo (`/keelson:merge`) landed exactly this way,
+   credited to its author.
 
-Your ideas and your design are what get absorbed; the commit that lands them is
-rebuilt against the live registries. A clear problem statement plus a focused
-diff is the highest-leverage PR you can open.
+Either way the credit is yours; the difference is whether your commits land
+verbatim. A clear problem statement plus a focused diff is the highest-leverage
+PR you can open — and meeting the ladder above makes it mergeable as-is.
 
 ## Before you open a PR
 

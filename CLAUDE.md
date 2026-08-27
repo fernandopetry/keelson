@@ -48,9 +48,10 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   o gatilho tem cutucada mecânica: hook `.claude/hooks/skill-standards-nudge.sh` via
   `.claude/settings.json` (4.213 — lembrete 1×/arquivo/sessão, nunca gate) ·
   **`/pr-review`** (skill, 4.267) → chegou PR no repositório; parecer com a régua de leva
-  interna e veredito absorver/parcial/recusar — nunca merge direto (rota 4.263). O registro
-  da chegada continua com o `/field-intake` (PR é insumo de campo com código junto); a face
-  pública da rota para o contribuidor é o `CONTRIBUTING.md`.
+  interna e veredito mergear direto (escada 4.268 completa) / absorver / parcial / recusar —
+  default é absorção com crédito (4.263). O registro da chegada continua com o
+  `/field-intake` (PR é insumo de campo com código junto); a face pública da rota para o
+  contribuidor é o `CONTRIBUTING.md`.
 - Adiado com gatilho (4.182): `doctrine-reviewer` (reincidência de defeito de conteúdo
   de doutrina que os checks de sincronia não pegam). `check-refs.sh` foi ativado antes
   do gatilho por decisão do Diretor (4.209, divergência declarada).
