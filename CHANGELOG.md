@@ -23,6 +23,41 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.121.0] — 2026-08-27
+
+Re-init: required
+
+Decision 4.272 — the top-priority gap from a consumer's three-arm benchmark: changing
+an agent's model tier required forking the plugin, since `model:` lives only in agent
+frontmatter that `/keelson:update` overwrites. Proposed and implemented by an external
+contributor in PR #3, merged preserving authorship, with maintainer fixes on top in
+the same batch.
+
+### Added
+
+- **Optional `models` block in the ficha: per-agent model tier, born with its reader.**
+  `keelson.config.json` gains `"models": {}`, mapping an agent's `name:` (no `keelson:`
+  prefix) to a harness model alias (e.g. `opus`, `sonnet`, `haiku` — the valid set
+  belongs to the harness). Dispatch rule with a single owner in `sdd-conventions.md`,
+  cited by the injected block and the implement/review/merge/auto commands: every spawn
+  reads `bash "…/scripts/ficha.sh" <root> --get models.<agent>` and passes a non-empty
+  result as the spawn's `model:`; an empty result — or an absent/unreadable ficha —
+  dispatches without `model:` and the agent's frontmatter holds (4.70: downgrading an
+  evaluator is a declared project decision, never a dispatcher's guess). `/keelson:init`
+  lists the block in Etapa 4 and leaves it `{}` unless the human asks for a deviation.
+- **The init self-check proves the block.** New conditional `models-validos` item: a key
+  that names no agent of the installed package is a failure; an alias outside the known
+  set degrades to a warning (a newer harness tier may exist). Three new self-check suite
+  cases prove ok/failure/warning; the ficha suite proves the read, the hyphenated key
+  and the absent-key path.
+
+### Fixed
+
+- **The wiki no longer misstates the model defaults.** The new `models` section claimed
+  "generators on sonnet, evaluators on opus" — `qa` is an evaluator on sonnet. The
+  default is each agent's own frontmatter; the false classification is gone and the
+  section moved to match its position in the example JSON.
+
 ## [0.120.1] — 2026-08-27
 
 Re-init: none
