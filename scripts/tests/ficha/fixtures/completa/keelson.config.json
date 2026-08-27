@@ -16,6 +16,7 @@
     "boot": "docker compose up -d",
     "mutation": null
   },
+  "models": { "developer": "opus", "code-reviewer": "opus" },
   "gates": {
     "security": true,
     "review": true,

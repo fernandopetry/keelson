@@ -17,6 +17,7 @@
     "mutation": null,
     "e2e": null
   },
+  "models": {},
   "gates": {
     "security": true,
     "review": true,

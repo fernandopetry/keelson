@@ -8,7 +8,9 @@
 ### Fonte da verdade
 
 - **Ficha do projeto:** `keelson.config.json` na raiz — paths de código, comandos de
-  qualidade, perfil de linguagem e gates ativos. **Antes de qualquer tarefa, leia a
+  qualidade, perfil de linguagem e gates ativos — e, opcional, o tier de modelo por papel: a cada
+  despacho de agent, `ficha.sh --get models.<agent>` vai em `model:` do spawn, vazio →
+  frontmatter do agent (régua em `sdd-conventions.md`). **Antes de qualquer tarefa, leia a
   ficha** e use os valores dela; nunca assuma caminhos ou comandos fixos.
 - **Constituição de qualidade:** o `QUALITY-CHARTER` do plugin — artigos agnósticos
   de linguagem.

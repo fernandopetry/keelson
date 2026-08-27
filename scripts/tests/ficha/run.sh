@@ -64,6 +64,9 @@ check get-bool-false      0 "false"           -- "$C" --get jira.enabled
 check get-array           0 "src
 app"                                          -- "$C" --get codePaths.backend
 check get-aninhado        0 "2"               -- "$C" --get gates.reviewThreshold.files
+check get-models-agent    0 "opus"            -- "$C" --get models.developer
+check get-models-hifen    0 "opus"            -- "$C" --get models.code-reviewer
+check get-models-ausente  0 ""                -- "$C" --get models.qa
 check get-ausente-legada  0 ""                -- "$L" --get docsRoot
 check get-default-legada  0 "docs"            -- "$L" --get docsRoot --default docs
 
