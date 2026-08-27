@@ -2,7 +2,7 @@
 
 > Memória institucional das decisões sobre como o keelson (spec-driven development) é praticado. Diferente da doutrina de código (QUALITY-CHARTER + perfil ativo, que regem o **código**), este arquivo rege o **processo de desenvolvimento**.
 
-**Última revisão**: 2026-08-06
+**Última revisão**: 2026-08-27
 **Status do documento**: vivo, atualizado conforme decisões evoluem
 
 > **Nota de rename (decisão 4.40, 2026-07-26)**: entradas anteriores à 0.21.0 citam agents pelos IDs antigos (`task-implementer`, `task-reviewer`, `task-verifier`, `security-reviewer`, `product-critic`, `process-tuner`, `profile-writer`). Histórico não se reescreve — o de-para completo está na decisão 4.40.
@@ -2891,6 +2891,14 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 **Decisão**: merge direto passa a ser **veredito possível** do parecer (`/pr-review`), condicionado à escada — **todas** as condições, sem cláusula de quase: (1) base = topo atual da `origin/main`; (2) **zero** toque em registro append-only — `CHANGELOG.md`, `decisions.md`, versão nos 3 lugares, *Status* do README; (3) parecer com **zero correções** (qualquer "parcial" ou correção pendente permanece na rota de absorção da 4.263, que segue sendo o default); (4) CI verde na PR — workflow do fork aprovado pelo Diretor **por rodada**, nunca `pull_request_target` com checkout do código da PR; (5) execução: **rebase-and-merge preservando a autoria do contribuidor** + **commit de fecho do mantenedor na mesma leva** (decisão §4.x, CHANGELOG, bump, Re-init, olhada da wiki) — PR que segue o CONTRIBUTING é incompleta por definição, a camada de release continua exclusiva do mantenedor. Merge segue ato do Diretor (a autonomia termina nos commits). Risco avaliado como ~zero pelo Diretor e registrado: a escada só abre exatamente onde as três ameaças originais não existem. Esta entrada **supersede o fraseado absoluto** da 4.263 ("nunca merge direto"), que permanece histórico e intacto como precedente da rota de absorção.
 
 **Aplicação**: `.claude/skills/pr-review/SKILL.md` (premissa + veredito de 4 opções com a escada) · `CONTRIBUTING.md` (a seção da rota ganha a escada e o merge com autoria preservada) · `CLAUDE.md` (linha de roteamento) · sem bump/CHANGELOG (4.182/4.194, mesmo enquadramento da 4.267) · wiki: nada (contribuidor ≠ consumidor) · mapa de impacto: reuso declarado do mapa da 4.267 (mesmos artefatos e guardas, README intocado desta vez — `check-sync`/`check-release` não disparam).
+
+### 4.269 — Intake de campo checa precedente: parecer nomeia decisão/CHANGELOG/recusa anterior ou declara ausência
+
+**Problema**: o passo 4 do `/field-intake` buscava **reincidência do defeito** (inbox + `learning-log.md`), mas não **precedente de decisão**: proposta que contradiz uma §4.x vigente, reverte algo que o CHANGELOG registrou de propósito, ou reapresenta recusa anterior sob outra origem só era pega se o mantenedor lembrasse — ou se o grep de referências do `impact-scout` esbarrasse nela por citar o mesmo artefato, o que não cobre contradição **semântica** (mesma regra dita com outras palavras; decisão antiga que estabeleceu o contrário sem citar o arquivo tocado). As guardas mecânicas (`check-sync`/`check-release`/`check-refs`/grafo) provam consistência estrutural, nunca semântica; esse elo dependia de memória humana.
+
+**Decisão**: o passo 4 passa a ser **reincidência e precedente**. Precedente: busca pelos termos-chave do padrão abstraído em `docs/_meta/decisions.md`, no `CHANGELOG.md` e nas linhas já fechadas da inbox (recusas incluídas); o parecer de cada linha **nomeia o precedente encontrado** (`§4.x`, entrada do CHANGELOG ou linha da inbox) **ou declara `sem precedente encontrado`** — verificado, não deduzido (4.58) — e o observável vira item contável da Entrega da skill. Proposta que contradiz decisão vigente nunca é aplicada em silêncio por cima do precedente: sobe ao Diretor com proposta + default (mesmo contrato de escalação); revogar decisão continua ato explícito (`[REVOGADA…]`, §9), nunca efeito colateral de parecer.
+
+**Aplicação**: `.claude/skills/field-intake/SKILL.md` (description + passo 4 + Entrega) · a rota de PR herda de graça — o `/pr-review` delega os passos 1–4 ao `/field-intake` (4.267) · tooling do mantenedor: sem bump/CHANGELOG (4.182) · wiki: nada (ferramenta interna, consumidor não vê).
 
 ---
 
