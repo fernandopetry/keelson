@@ -42,7 +42,6 @@ fixo nunca é assumido: se não está na ficha, o keelson pergunta ou reporta pe
 
 > Referência viva: [`templates/keelson.config.example.json`](https://github.com/fernandopetry/keelson/blob/main/templates/keelson.config.example.json) no repositório.
 
-
 ## Campo a campo
 
 ### `profile`
@@ -105,6 +104,22 @@ Use `null` no que não existe. Campo com comando errado é pior que campo vazio.
 > rodada-amostra e grava o campo para você — sem threshold no início, para você
 > calibrar depois de observar uma ou duas entregas.
 
+### `models`
+
+Opcional. Mapeia nome de agent (o `name:` do frontmatter, sem prefixo) para um alias de
+modelo do harness (ex.: `opus`, `sonnet`, `haiku`). Agent fora do bloco usa o modelo do
+próprio frontmatter — o default do plugin para aquele papel.
+
+```json
+"models": {
+  "developer": "opus",
+  "qa": "opus"
+}
+```
+
+Bloco vazio (`{}`) ou ausente = default em tudo. Rebaixar um avaliador é decisão do projeto e
+fica registrada aqui; o `/keelson:init` anota no relatório o desvio que o humano pedir na rodada.
+
 ### `gates`
 
 | Campo | Efeito |
@@ -121,22 +136,6 @@ o `/keelson:init` migra fichas antigas para o formato objeto preservando o valor
 browser (headless ou não) **não** vive na ficha: é flag do servidor Playwright MCP, que é quem
 de fato controla — duas fontes de verdade divergiriam em silêncio.
 
-
-### `models`
-
-Opcional. Mapeia nome de agent (o `name:` do frontmatter, sem prefixo) para o alias de modelo
-do harness — `opus`, `sonnet` ou `haiku`. Agent fora do bloco usa o modelo do próprio
-frontmatter, que é o default do plugin: gerador em `sonnet`, avaliador em `opus`.
-
-```json
-"models": {
-  "developer": "opus",
-  "qa": "opus"
-}
-```
-
-Bloco vazio (`{}`) ou ausente = default em tudo. Rebaixar um avaliador é decisão do projeto e
-fica registrada aqui; o `/keelson:init` anota no relatório o desvio que o humano pedir na rodada.
 ### `docsRoot`
 
 Raiz dos artefatos SDD. Default `docs`; os artefatos de cada demanda ficam em

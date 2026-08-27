@@ -64,6 +64,8 @@ Com a triagem e a exploração em mãos, feche o entendimento **enquanto o Diret
 
 7. **Branch da demanda nasce na largada** (decisão 4.119 — regra com dono: `sdd-conventions.md`, "Commit por marco"): rota que produz artefato SDD (feature/risco) cria e usa `feat/<slug>-<descrição-curta>` **antes da Etapa 1** — com `git.branchNaming: "tracker-key"` na ficha, `feat/<KEY>-<descrição-curta>` usando a key do item 6.5 (sem key → fallback ao default, **declarado no report**; regra completa no dono) — **nova por demanda**, nunca a de outra demanda por inércia. **Fatia de épico (decisões 4.125/4.126)**: demanda com `**Epico**:` cujo pai declara `**Estratégia**: unica` entra na **branch do épico** (`**Branch**:` do pai — crie-a na 1ª fatia) e faz o **sync de largada**: `git fetch` + merge da main na branch (**merge, nunca rebase**; conflito que exija decisão → resolva com o Diretor, que ainda está presente). Na mesma largada, marque a fatia como `em ciclo (<caminho do BRIEF filho>)` na fila do pai — e o épico como `em execução`, se for a 1ª. A partir daqui, cada etapa fecha com o commit do seu marco: Etapa 1 → `docs(<slug>): SPEC-NNN …` (inclui BRIEF e INDEX); Etapa 2 → `docs(<slug>): PLAN-MMM …`; Etapa 3.5 (após a revalidação limpa) → `docs(<slug>): decompose PLAN-MMM into N tasks`. Trivial/bug/refactor inline: sem branch aqui — a Entrega (Etapa 5, item 1) cobre.
 
+Em todo despacho de agent deste ciclo (`estimator`, `po`, `qa`, `code-reviewer`, `tracker-sync` — e os das etapas delegadas): modelo de cada spawn: `ficha.sh --get models.<agent>` → `model:`; vazio → frontmatter do agent (régua em `sdd-conventions.md`).
+
 ## Etapa 1: SPEC (feature)
 
 Execute `/keelson:specify` (incluindo a Etapa 0.2 dele).
