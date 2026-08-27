@@ -2934,6 +2934,16 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 ---
 
+### 4.274 — Relatório de fecho sugere `/keelson:postmortem` quando a sessão teve dificuldades
+
+**Problema**: a 4.69 resolveu a **produção** da análise de postmortem, mas o gatilho continuou 100% pull e humano-only — nada no fluxo sugere rodá-lo. O mantenedor roda quando precisa; utilizadores de consumidores não rodam, e a análise deixa de existir — inclusive o `PM-*.md` durável, que o mantenedor poderia colher no repositório do consumidor mesmo sem envio. Sugerir sempre seria ruído: a dor é só a sessão com dificuldades. As formas de hook foram descartadas no mapa de impacto: no evento Stop o repertório do pacote só tem bloqueio-1× ou marcador mudo — "nudge, nunca gate" não é implementável ali —, o ledger é arquivado antes do fim da Entrega (o hook contaria zero na pior sessão), e a régua de custo da 4.273 recusou hook dedicado no consumidor sem 2ª ocorrência de campo (aqui a reincidência de campo é zero — o insumo é o Diretor).
+
+**Decisão**: o esqueleto do relatório de fecho ganha a linha condicional `**Sugestão de postmortem**` (padrão `# OMITIR`): quando a sessão teve retry, gate reprovado ou correção/intervenção do Diretor, o fecho sugere ao Diretor **digitar** `/keelson:postmortem`, nomeando os sinais — a linha jamais invoca o comando (humano-only). O gatilho é **juízo do Tech Lead sobre a sessão vivida**, nunca parser do ledger: "retry" e "gate reprovado" não são tipos do catálogo e inferi-los por grep no corpo livre é o parser de linguagem que a 4.227 veda. Cobertura declarada como parcial (reduz o furo, não o fecha — padrão 4.270); o gatilho de observação da 4.244 (linha de intervenções cronicamente zerada com intervenção visível) segue de pé para mecanizar se a subnotificação reincidir. A redação harmoniza com a seção "Mensagem ao mantenedor": ela cobre o erro pontual do ciclo; o postmortem cobre o episódio inteiro.
+
+**Aplicação**: `docs/_meta/conventions/report-contract.md` §2 (linha nova — conteúdo embarcado, 4.194; alcança `/keelson:auto`, modo sob demanda e `/keelson:report`) · rotas descobertas declaradas: o `/keelson:implement` avulso mantém template próprio e o fecho mínimo do bloco fica fora da contagem por design (padrão da 4.244) · lateral na mesma leva: o header de uso do `scripts/ledger.sh` volta a listar `intervencao` no catálogo (drift desde a 4.244 — o enum de execução sempre esteve certo) · CHANGELOG 0.122.0, `Re-init: none` (bloco injetado e contrato da ficha intactos) · wiki: FAQ ("E se ele errar?") passa a dizer que o fecho lembra o comando em sessão com dificuldades.
+
+---
+
 ## 7. Roteamento de mudanças
 
 Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir manualmente:

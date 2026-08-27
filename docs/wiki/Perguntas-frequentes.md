@@ -306,7 +306,10 @@ histórico do git). Para limpar um acervo antigo ou fazer higiene periódica, ro
 Rode `/keelson:postmortem` no fim da sessão. Ele relê as interações, separa **defeito** de
 **escopo novo**, rastreia cada falha até o mecanismo que deixou passar (qual gate viu e
 aprovou, ou não rodou, ou não tinha como ver) e produz a mensagem pronta para o mantenedor
-do plugin. Corrigir o bug em si é outra demanda — `/keelson:triage`.
+do plugin. Corrigir o bug em si é outra demanda — `/keelson:triage`. E você não precisa
+lembrar sozinho: quando a sessão teve dificuldades (retry, gate reprovado, correção sua no
+meio do caminho), o próprio relatório de fecho sugere rodar o comando — sessão tranquila
+não vê a sugestão.
 
 ---
 

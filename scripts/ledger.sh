@@ -11,7 +11,7 @@
 #
 #   append   cria thoughts/local/session-ledger/<yyyymmdd-hhmmss>-<tipo>-<origem>.md
 #            com o cabeçalho canônico; o corpo (2–3 linhas) entra pelo stdin.
-#            Tipos (catálogo FECHADO): gate decisao fora_de_escopo pendencia tracker marco.
+#            Tipos (catálogo FECHADO): gate decisao intervencao fora_de_escopo pendencia tracker marco.
 #            Timestamp medido (TZ=America/Sao_Paulo); --ts <iso> só para testes.
 #            A linha `ts:` do cabeçalho é DESTE script — linha `ts:` no início do
 #            stdin é descartada (4.156: ts estimado de memória não entra no evento).

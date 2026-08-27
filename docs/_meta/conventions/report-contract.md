@@ -65,6 +65,7 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 - **Duração**: <total> (largada HH:MM → entrega HH:MM, horário de Brasília) · specify <n>min · plan <n>min · tasks <n>min · implement <n>min · janela pico ~<N>k tokens   # etapa que a rota não teve não aparece; marca ausente → o que foi medido + lacuna nomeada; janela só quando o log existe
 - **Custo por papel**: <papel ~<N>k tokens (<M> spawns) · …, maiores primeiro — saída literal de `context-cost.sh --compose`>   # OMITIR quando o log não tem linha de agente — telemetria da dieta (4.239), medida ou omitida, nunca estimada; custo jamais vira gatilho de parada (4.23)
 - **Pendente de você**: <revisão da branch · merge · resposta a pergunta estacionada · handoff · nada>
+- **Sugestão de postmortem**: <a sessão teve dificuldades — <sinais em meia linha: retry, gate reprovado, correção/intervenção do Diretor> → vale rodar `/keelson:postmortem` para cobrir o episódio (o `PM-*.md` durável fica no repositório mesmo sem envio ao mantenedor)>   # OMITIR quando a sessão não teve retry, gate reprovado nem correção do Diretor (decisão 4.274) — juízo de quem viveu a sessão, nunca parser do ledger (4.227); a linha SUGERE que o Diretor digite o comando (humano-only), jamais o invoca; complementa a seção "Mensagem ao mantenedor": ela cobre o erro pontual, o postmortem cobre o episódio inteiro
 
 ## Relatório de aceitação (PO)                    # rotas com brief/espelho
 <pedido vs entregue · evidência de alinhamento · o que ficou de fora>

@@ -415,17 +415,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.121.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.122.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: per-agent model tiers in the ficha (decision 4.272, proposed and
-implemented by an external contributor in PR #3, merged preserving authorship) — an
-optional `models` block maps an agent name to a harness model alias; every spawn reads
-it and falls back to the agent's own frontmatter when unset, so downgrading an
-evaluator is always a declared project decision. The init self-check validates the
-block against the package's agent roster. Re-init: required (the injected block and
-the ficha contract changed). See the [CHANGELOG](CHANGELOG.md) for history.
+New in this release: the closing report now suggests `/keelson:postmortem` when the
+session had difficulties (decision 4.274) — a conditional line names the signals
+(retries, failed gates, human corrections) and asks the human to type the command;
+healthy sessions never see it. The suggestion is the Tech Lead's judgment of the
+session it lived, never a parser over the ledger. Re-init: none. See the
+[CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

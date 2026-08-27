@@ -23,6 +23,34 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.122.0] — 2026-08-27
+
+Re-init: none
+
+Decision 4.274 — the postmortem command produced valuable analysis but its trigger was
+100% pull and human-only: nothing in the flow ever suggested running it, so users who
+don't know or forget the command simply lose the analysis (and the durable `PM-*.md`
+file the maintainer could harvest from the consumer repo even without a hand-off).
+
+### Added
+
+- **The closing report suggests `/keelson:postmortem` when the session had
+  difficulties.** A new conditional line in the canonical closing-report skeleton
+  (`report-contract.md` §2) appears only when the session saw retries, failed gates or
+  human corrections, names those signals, and asks the human to type the command —
+  healthy sessions never see the line, and it never invokes the command itself (it is
+  human-only). The trigger is the Tech Lead's judgment of the session it lived, never a
+  parser over the ledger; coverage is declared partial by design. Reaches
+  `/keelson:auto`, the on-demand mode and `/keelson:report`; the standalone
+  `/keelson:implement` report template and the consumer block's minimal close stay out,
+  declared.
+
+### Fixed
+
+- **The `ledger.sh` usage header lists `intervencao` again** — the header's type
+  catalogue had drifted from the enforced enum since the type was added; the runtime
+  check was always correct.
+
 ## [0.121.1] — 2026-08-27
 
 Re-init: none
