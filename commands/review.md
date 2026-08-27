@@ -77,7 +77,7 @@ E o que é específico deste comando — **declare explicitamente**:
 - **`performance-engineer`** — quando o diff toca superfície de custo (gate 10, decisão 4.155; gabarito lido em runtime: `core/PERFORMANCE.md` + seção de performance do perfil).
 - **`product-designer`** — quando o diff toca superfície de interface (gate 11, decisão 4.218; gabarito lido em runtime: `core/DESIGN.md` + seção de UI do perfil quando existir).
 
-Todos os aplicáveis no mesmo turno, em paralelo (como a Etapa 3.3 do `/keelson:implement`). Espere os reports; não antecipe conclusão.
+Todos os aplicáveis no mesmo turno, em paralelo (como a Etapa 3.3 do `/keelson:implement`). Espere os reports; não antecipe conclusão. Modelo de cada spawn: `ficha.sh --get models.<agent>` → `model:`; vazio → frontmatter do agent (régua em `sdd-conventions.md`).
 
 ## Etapa 4: consolidar — o ofício de tech lead
 

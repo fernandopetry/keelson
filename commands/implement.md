@@ -94,6 +94,7 @@ Se `--dry-run`, parar.
 **Subagents reutilizáveis do keelson** (pasta `agents/` do plugin):
 - `developer`: executor da task
 - `code-reviewer`: revisor com quality gates
+- Modelo de cada spawn: `ficha.sh --get models.<agent>` → `model:`; vazio → frontmatter do agent (régua em `sdd-conventions.md`)
 
 Se esses subagents não existirem, usar subagents genéricos com instruções inline.
 

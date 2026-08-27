@@ -38,6 +38,9 @@ Quando entram, o escopo dos dois é **o ponto tocado**, nunca a branch inteira: 
 `developer` resolve só os arquivos do gatilho, o `code-reviewer` audita só o diff dessa
 resolução (gerador ≠ avaliador, decisão 4.30 — quem resolve não é quem aprova).
 
+Modelo de cada spawn (`developer`, `code-reviewer`): `ficha.sh --get models.<agent>` → `model:`;
+vazio → frontmatter do agent (régua em `sdd-conventions.md`).
+
 **Princípio inviolável 5**: falha de suíte ou reprovação de gate é **1 retry, depois
 escala** (régua geral do `sdd-conventions.md`) — nunca force o fechamento driblando a
 régua.
