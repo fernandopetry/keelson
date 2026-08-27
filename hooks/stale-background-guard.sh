@@ -198,7 +198,11 @@ suspeitos.sort(key=lambda s: -s["minutos"])
 linhas = []
 for s in suspeitos:
     marca = " ⟵ CHEIRO DE LOOP DE SONDAGEM" if s["sondagem"] else ""
-    dono = " · dono INDETERMINADO (cadeia orfa — pode ser seu)" if s["dono"] == "indeterminado" else ""
+    dono = (
+        " · dono INDETERMINADO (cadeia orfa nao prova nem afasta — antes de tratar "
+        "como seu, confira o cwd do processo contra o UUID do scratchpad DESTA sessao: "
+        "`lsof -a -p <pid> -d cwd` no macOS, `readlink /proc/<pid>/cwd` no Linux)"
+    ) if s["dono"] == "indeterminado" else ""
     linhas.append(f"  PID {s['pid']} · vivo há {s['etime']}{dono}{marca}\n    {s['cmd']}")
 
 tem_sondagem = any(s["sondagem"] for s in suspeitos)
@@ -215,8 +219,13 @@ reason = (
     + "\n\nAntes de encerrar, decida por cada um — nao presuma que trabalho longo e "
     "trabalho acontecendo:\n"
     "- Esta MESMO trabalhando? Prove: veja o output crescer (`Read` no arquivo de output) "
-    "ou o efeito no alvo. Idade nao e prova de progresso.\n"
-    "- Terminou e ninguem percebeu? Mate-o.\n"
+    "ou o efeito no alvo. Idade nao e prova de progresso. Subagente via Task nao entra "
+    "nesta regua: o arquivo de saida dele espelha o transcript, nao um stream — tamanho "
+    "parado nao prova travamento; a prova la e efeito no alvo ou a notificacao do harness.\n"
+    "- Terminou e ninguem percebeu? Mate a ARVORE inteira, nao so o PID listado: "
+    "descendentes (wrapper -> gerenciador de processo -> processo real) nao carregam a "
+    "marca do shell e nao reaparecem em varredura futura deste guard. Confirme por nova "
+    "lista de processos, nunca so pela porta/recurso liberado.\n"
     "- Nao consegue dizer qual dos dois? Trate como travado e mate: o custo de matar algo "
     "vivo e refazer; o de deixar um zumbi e voce achar que ha trabalho em curso quando nao ha.\n"
 )

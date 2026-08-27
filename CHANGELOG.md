@@ -23,6 +23,30 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.120.1] — 2026-08-27
+
+Re-init: none
+
+Decision 4.271 — a consumer's close-out postmortem reported three misfires of the same
+kind with the stale-background guard: the nudge offers one cheap signal for a binary
+decision (working vs. stuck, mine vs. someone else's) and did not warn when that signal
+fails to discriminate the hard case. Detection criteria and ownership attribution
+(4.206) are untouched — only the advice text changed.
+
+### Changed
+
+- **The stale-background guard's advice now covers the cases its signal cannot decide.**
+  Three fixes to the nudge text: the "is it really working?" bullet states that
+  Task-dispatched subagents are outside the growing-output heuristic — their output file
+  mirrors the transcript, not an incremental stream, so a flat size proves nothing; proof
+  there is effect on the target or the harness notification (a healthy gate had been
+  killed over this). The "indeterminate owner" verdict now instructs the discriminator
+  that exists — check the process cwd against this session's scratchpad UUID (portable
+  command per platform) before treating the process as yours; an orphaned PPID chain
+  neither proves nor rules out ownership. And "kill it" now names the whole process
+  tree: descendants do not carry the shell mark, so they survive the parent invisibly to
+  future sweeps — confirm by a fresh process list, never by the freed port alone.
+
 ## [0.120.0] — 2026-08-26
 
 Re-init: none
