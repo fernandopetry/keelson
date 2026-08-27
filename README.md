@@ -429,7 +429,8 @@ stay human. Re-init: required (the injected block gained the command's note). Se
 [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
-`docs/_meta/decisions.md`. Feedback and profile contributions welcome.
+`docs/_meta/decisions.md`. Feedback and contributions welcome — see
+[CONTRIBUTING.md](CONTRIBUTING.md) for how external PRs are reviewed and absorbed.
 
 ## Author & license
 

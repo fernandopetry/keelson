@@ -46,7 +46,11 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   **`/skill-standards`** (skill, 4.212) → skill/comando/agent criado ou editado, ou pedido
   de verificação de boas práticas de autoria (régua = digest re-buscável da doc Anthropic);
   o gatilho tem cutucada mecânica: hook `.claude/hooks/skill-standards-nudge.sh` via
-  `.claude/settings.json` (4.213 — lembrete 1×/arquivo/sessão, nunca gate).
+  `.claude/settings.json` (4.213 — lembrete 1×/arquivo/sessão, nunca gate) ·
+  **`/pr-review`** (skill, 4.267) → chegou PR no repositório; parecer com a régua de leva
+  interna e veredito absorver/parcial/recusar — nunca merge direto (rota 4.263). O registro
+  da chegada continua com o `/field-intake` (PR é insumo de campo com código junto); a face
+  pública da rota para o contribuidor é o `CONTRIBUTING.md`.
 - Adiado com gatilho (4.182): `doctrine-reviewer` (reincidência de defeito de conteúdo
   de doutrina que os checks de sincronia não pegam). `check-refs.sh` foi ativado antes
   do gatilho por decisão do Diretor (4.209, divergência declarada).
@@ -234,4 +238,5 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 
 - Commits: conventional commits **em inglês** (`feat(scope): …`), referenciando a
   decisão quando houver (ex.: `(4.16)`).
-- Docs e doutrina em **português**; `README.md` em **inglês**.
+- Docs e doutrina em **português**; a face pública do repo — `README.md`, `CHANGELOG.md`,
+  `CONTRIBUTING.md` — em **inglês** (4.267).
