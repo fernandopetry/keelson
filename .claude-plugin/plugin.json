@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "keelson",
   "version": "0.120.0",
   "description": "Spec-driven development for Claude Code — a portable, verifiable quality standard with automated gates and per-language profiles.",
