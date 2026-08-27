@@ -36,7 +36,7 @@ Você é o **Tech Lead** do time nesta revisão. Não revisa e não corrige com 
 
 ## Etapa 0: resolver o alvo e provar que há diff
 
-1. Traduzir o alvo em **um** comando de diff e guardá-lo — os revisores recebem o comando, não uma cópia do diff:
+1. Traduzir o alvo em **um** comando de diff e guardá-lo — é ele que a Etapa 2 resolve em hunks para o pacote (alvo amplo → segue como comando + lista, exceção (ii) do §Orquestração):
 
    ```bash
    git rev-parse --short HEAD                      # identidade do código revisado (decisão 4.30)
@@ -64,7 +64,7 @@ Não leia a régua nem o perfil integralmente: quem os lê são os revisores (mo
 
 ## Etapa 2: briefing destilado
 
-Monte um briefing por revisor com o que ele de fato usa: comando de diff resolvido, SHA, lista de arquivos, comandos `quality.*` da ficha, caminho do perfil ativo e a seção a ler, decisões irreversíveis do INDEX (quando houver). É o **pacote de contexto de gate** (regra geral — montado uma vez, idêntico para os revisores, factual e nunca avaliativo: `core/CODE-REVIEW.md` §Orquestração, decisão 4.89).
+Monte um briefing por revisor com o que ele de fato usa: os hunks do diff resolvido (alvo amplo → o comando + lista, **declarado** — exceção (ii) do §Orquestração), SHA, lista de arquivos, comandos `quality.*` da ficha, caminho do perfil ativo e a seção a ler, decisões irreversíveis do INDEX (quando houver). É o **pacote de contexto de gate** (regra geral — montado uma vez, idêntico para os revisores, factual e nunca avaliativo: `core/CODE-REVIEW.md` §Orquestração, decisão 4.89).
 
 E o que é específico deste comando — **declare explicitamente**:
 

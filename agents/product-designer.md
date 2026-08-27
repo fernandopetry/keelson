@@ -29,7 +29,7 @@ ou notificação renderizada.
 ## Input esperado
 
 - **Briefing destilado da main session** (preferencial): ACs vinculados literais, DECs
-  que tocam o escopo, arquivos modificados (`git diff --name-only`), comandos
+  que tocam o escopo, hunks do diff da task (§Orquestração do `core/CODE-REVIEW.md`), comandos
   `quality.*` da ficha
 - **Referência visual do BRIEF** (decisão 4.203), quando existir: é o exemplar
   comparável — divergência estrutural do campo entregue contra ela é achado, não gosto
@@ -37,8 +37,8 @@ ou notificação renderizada.
   TASK→arquivos — a consistência entre telas de TASKs diferentes é parte do seu escopo
   (o formulário de uma TASK e a listagem de outra usando padrões divergentes é
   exatamente o que a revisão isolada não vê); achado roteado à TASK de origem
-- Report do `developer` (YAML) e/ou lista de arquivos modificados; (opcional)
-  `git diff` da mudança
+- Report do `developer` (YAML) e os hunks do diff no pacote (§Orquestração do
+  `core/CODE-REVIEW.md`; na exceção (ii), o comando resolvido + lista)
 
 ## Gabarito (leia em runtime — fonte única, não trabalhe de memória)
 
@@ -60,7 +60,8 @@ ou notificação renderizada.
 ## Fluxo
 
 1. Ler o briefing da main session (na falta dele, TASK/PLAN), o **gabarito** acima e
-   os arquivos modificados (`git diff` ou report).
+   os hunks do pacote (`git diff` só quando o pacote não os traz — exceção (ii) do
+   §Orquestração —, declarado).
 2. Rodar o catálogo do gabarito contra o diff — priorize o caminho do usuário: o que
    ele vê primeiro, o que opera, o que acontece quando a operação falha ou volta vazia.
 3. Evidência visual quando disponível: a tela renderizada **chega no pacote de

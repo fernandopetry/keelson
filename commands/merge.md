@@ -153,8 +153,8 @@ Etapa 6** (é este o caminho barato do comando: nenhum agent despachado).
    (princípio 2) e escalar ao Diretor com o diagnóstico.
 3. **`code-reviewer` sobre o diff da resolução**: diff = **só o que o `developer` tocou**
    (arquivos de conflito/achado/teste resolvidos) — nunca a branch inteira; o
-   `code-reviewer` recebe o comando de diff restrito a esses arquivos (mesmo contrato de
-   pacote factual do `/keelson:review`). Régua degradada de "sem artefato SDD"
+   `code-reviewer` recebe os hunks do diff da resolução, restritos a esses arquivos (pacote
+   factual — `core/CODE-REVIEW.md` §Orquestração). Régua degradada de "sem artefato SDD"
    (`guidelines/core/CODE-REVIEW.md`): slug inferível pelos arquivos tocados → ler o
    `INDEX.md` para decisões irreversíveis (gate 5); não inferível → gate 5 `n/a`,
    declarado.

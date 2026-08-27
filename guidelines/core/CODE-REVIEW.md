@@ -291,6 +291,16 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   re-gate, o veredito anterior + o delta (régua de convergência abaixo). Cada revisor
   redescobrindo o mesmo contexto por conta própria é o maior custo silencioso da
   rodada.
+- **O pacote carrega os hunks resolvidos — não o comando, não só a lista.** Quem recebe
+  caminho abre o arquivo. Duas exceções, **nominais**: **(i)** a superfície (b) do gate 7
+  (Reúso/DRY, acima) — `git diff --name-status --diff-filter=A <base>...HEAD` sobre o
+  acumulado da branch procura o que **não está** no diff da rodada, logo o pacote não pode
+  trazê-la; vale a régua daquela superfície, inclusive o `(b): n/a` declarado sem base.
+  **(ii)** alvo `branch` do `/keelson:review` (tabela de alvos daquele comando): o pacote
+  leva o comando resolvido + a lista de arquivos e **declara** que os hunks não vieram.
+  Fora das duas, o revisor **não roda `git diff` nem relê arquivo cujo hunk já está no
+  pacote**; leitura extra é só para o entorno que o hunk não mostra (caller, teste,
+  assinatura), por trecho. Pacote sem hunks nem lista → vale o fallback de cada agent.
 - **O pacote é factual, nunca avaliativo.** Ele carrega o *quê* (diff, âncoras, fatias),
   jamais a opinião de quem o montou — sem hipótese de veredito, sem "acho que está ok,
   confere só X". A revisão vale pelo **contexto limpo** (gerador ≠ avaliador, abaixo);
