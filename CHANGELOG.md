@@ -23,6 +23,32 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.121.1] — 2026-08-27
+
+Re-init: none
+
+Decision 4.273 — final triage of the PR #2 / benchmark queue: four cheap, real fixes
+applied (proposed by an external contributor in PR #2, credited), three proposals
+declined with a documented reopening trigger.
+
+### Fixed
+
+- **Validator skill descriptions no longer carry an unresolved config token.** The
+  `{docsRoot}` placeholder sat in the frontmatter description — where the harness never
+  interpolates and which drives skill activation. Removed from the three validators;
+  descriptions now also fit under the 250-char cap the harness enforces on listing.
+- **Every hook declares an explicit 30s timeout.** The harness default is 600s per
+  command hook and the Stop event chains 8 scripts, so one hung hook could hold session
+  shutdown for 10 minutes. The constant is measurement-backed: worst hook measures 0.12s
+  on the fallback path.
+- **The developer reads from the briefing first.** TASK/PLAN/SPEC load by section, only
+  for what the briefing does not cover (the existing load rule now reaches the agent);
+  a full read is the declared exception when the briefing is not enough. Field data
+  showed 126 turns with 10 full re-reads on a 6-file diff.
+- **Plugin manifests carry the metadata the plugin browser renders** — `author.url` and
+  the marketplace entry `category`, both verified against the official plugin docs
+  before entering.
+
 ## [0.121.0] — 2026-08-27
 
 Re-init: required
