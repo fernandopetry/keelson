@@ -2900,6 +2900,14 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 **Aplicação**: `.claude/skills/field-intake/SKILL.md` (description + passo 4 + Entrega) · a rota de PR herda de graça — o `/pr-review` delega os passos 1–4 ao `/field-intake` (4.267) · tooling do mantenedor: sem bump/CHANGELOG (4.182) · wiki: nada (ferramenta interna, consumidor não vê).
 
+### 4.270 — Chegada de insumo de campo ganha cutucada mecânica: hook UserPromptSubmit aponta o `/field-intake`
+
+**Problema**: toda a malha do intake (4.111 → 4.72 → 4.149/4.269) só roda se a sessão reconhecer o material como insumo de campo e invocar o `/field-intake` — o elo mais frágil era exatamente a chegada, sem apoio mecânico (o parecer da 4.269 nomeou o furo e o deixou aberto de propósito). O precedente do padrão já existia: o gatilho do `/skill-standards` tem nudge-hook desde a 4.213.
+
+**Decisão**: hook `field-intake-nudge.sh` no evento **UserPromptSubmit** — prompt do Diretor que contém marcador forte de insumo de campo (`PROPOSTA_PLUGIN` · `postmortem`/`post-mortem` · `LRN-<n>` · "insumo/relato de campo", caixa ignorada) injeta **um lembrete por sessão** apontando a rota `/field-intake`. Cutucada, nunca gate: o texto manda ignorar se for só conversa sobre o processo — distinguir insumo de conversa é trabalho de LLM, não de grep. Cobertura declarada: relato que não usa nenhum dos marcadores não dispara — o nudge **reduz** o furo da chegada, não o fecha. Mesmo contrato dos hooks do repo: bash 3.2, fallback gracioso (sem `jq` / input inválido / repo alheio → `exit 0`), anti-renudge por fingerprint em janela append-only (4.141), fingerprint **por sessão** (não por arquivo — uma vez lembrada a rota, o sequenciador da skill assume).
+
+**Aplicação**: `.claude/hooks/field-intake-nudge.sh` (novo, `100755`) · `.claude/settings.json` (bloco UserPromptSubmit) · `CLAUDE.md` (linha de roteamento do `/field-intake`) · prova: `bash -n` (3.2) + shellcheck + teste sintético de 8 cenários em repo temporário no scratchpad (disparo, anti-renudge na mesma sessão, sessão nova, caixa variada, prompt sem marcador, input não-JSON, repo sem plugin.json keelson, PATH sem jq) · tooling do mantenedor: sem bump/CHANGELOG (4.182) · wiki: nada.
+
 ---
 
 ## 7. Roteamento de mudanças

@@ -37,7 +37,9 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 - Roteamento (o quê/como de cada ferramenta vive no frontmatter dela — não duplique aqui):
   **`impact-scout`** (agent) → mapa de impacto da 4.181; delegue quando a mudança tocar
   mais de um artefato ou o raio não for óbvio, lookup de um grep fica inline ·
-  **`/field-intake`** (skill) → chegou insumo de campo de consumidor ·
+  **`/field-intake`** (skill) → chegou insumo de campo de consumidor; o gatilho tem
+  cutucada mecânica: hook `.claude/hooks/field-intake-nudge.sh` via `.claude/settings.json`
+  (4.270 — lembrete 1×/sessão em prompt com marcador de campo, nunca gate) ·
   **`/idea-forge`** (skill, 4.222) → Diretor trouxe ideia crua de melhoria do keelson;
   refina por perguntas, conecta com decisões/doutrina existentes e devolve mini-brief
   julgado (report-only; insumo de consumidor continua indo ao `/field-intake`) ·
