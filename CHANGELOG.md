@@ -23,6 +23,35 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.124.0] — 2026-08-27
+
+Re-init: none
+
+Decisions 4.276/4.277 — a consumer's lessons ledger surfaced two holes in the behavior
+gate, both proven in the field: screen verification ran while a developer was still
+writing to the same tree (every "verified" item reflected an instant, not a commit),
+and a UI bugfix passed verification with Tab while the reported bug lived in the mouse
+click — the gesture divergence *was* the bug.
+
+### Added
+
+- **Behavior gate runs on frozen code — stability joins identity.** The code-identity
+  rule (decision 4.30) proves the process serves the right copy; nothing covered the
+  same copy being **written during** the exercise. The `qa` agent and the screen-verify
+  skill now capture `git rev-parse HEAD` + `git status --porcelain` (at the exercise
+  root) when the functional exercise starts and again when it ends: a change appearing
+  **during** the exercise in a file under verification is concurrent work — the gate
+  stops and reports PARCIAL with both captures as evidence, never a green of the
+  moment. Pre-existing state — the shared wave tree, the uncommitted diff of an
+  on-demand change — is the declared baseline, never a finding. (4.276)
+- **Repro and screen verification use the user's literal gesture.** When the AC, the
+  report or the symptom names a gesture (click, Tab/blur, theme toggle), that literal
+  gesture is what proves; the sibling gesture joins only when the event path diverges
+  per gesture or the AC equates them — a trigger, never a catalog. Forced state (an
+  injected CSS class, a script-set value) never replaces the real UI mechanism.
+  Applied to the bugfix red-repro rule (`/keelson:tasks`) and the `qa` functional
+  exercise. (4.277)
+
 ## [0.123.0] — 2026-08-27
 
 Re-init: none

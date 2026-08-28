@@ -78,6 +78,13 @@ suba pelo método do projeto e só então navegue.
 qualquer evidência, prove que o processo serve o código sob teste — path raiz do server,
 SHA/marcador exposto, ou o efeito de uma mudança já commitada na branch.
 
+**Estabilidade é o segundo eixo da identidade** (decisão 4.276): capture
+`git rev-parse HEAD` + `git status --porcelain` na raiz servida ao iniciar o roteiro e
+re-capture ao fechar — mudança surgida **durante** o exercício em arquivo do escopo
+verificado é trabalho concorrente: pare e escale com o par de capturas como evidência
+(verificação sob árvore mudando não é reprodutível). O estado pré-existente — o diff
+não-commitado sob verificação — é a linha de base declarada, nunca achado.
+
 ## 2. Login
 
 Tire um `browser_snapshot` da tela de login (é ele que dá os `ref` dos campos), preencha

@@ -116,6 +116,15 @@ O keelson **não finge** que verificou. A pendência vem com a causa nomeada:
 Uma entrega com handoff aberto é **parcial** até o handoff ser fechado — isso é
 intencional.
 
+### A verificação de tela parou com "trabalho concorrente"
+
+Antes de confiar no que a tela mostra, a verificação confere que ninguém está
+escrevendo no código durante o exercício: ela captura o estado do repositório ao
+começar e ao terminar. Se um arquivo do que estava sendo verificado mudou no meio, o
+resultado não vale para commit nenhum — em vez de fingir verde, o gate para e reporta
+parcial. Espere quem estava escrevendo terminar (ou pause a outra sessão) e rode a
+verificação de novo.
+
 ### O validator marcou ERROR e travou a promoção
 
 `ERROR` bloqueia mesmo: SPEC/PLAN não vai a `Approved`, TASK vira `Blocked`. Ou você
