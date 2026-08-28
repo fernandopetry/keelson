@@ -2944,6 +2944,16 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 ---
 
+### 4.275 — Telemetria da forja: rodadas de correção e classes de achado viram números medidos (Cronologia → report)
+
+**Problema**: o Diretor relata que a forja (specify → plan → tasks) "sempre tem ajustes na revisão" — a dor declarada é o tempo/tokens do ciclo de correção (validators de forma + crítica de mérito), e a pergunta é se dá para escrever melhor de primeira. A hipótese não é mensurável: o keelson mede duração por etapa (Cronologia, 4.56), tokens por papel (4.239) e intervenções humanas (4.244), mas **nenhum registro conta voltas de correção de artefato nem agrega achados por classe** — a contagem do relatório do validator é efêmera (protocolo §5) e o evento de aprendizado (§6) é qualitativo, por ocorrência. Sem os dois números, mudar os comandos de escrita (lint pré-validação, lessons→SPEC/PLAN, autocheck do scribe, exemplares) é palpite — e a régua da casa manda medir antes de mecanizar (4.149: 1ª ocorrência observa, ≥2 mecaniza).
+
+**Decisão**: instrumentar antes de mudar a escrita. (a) O relatório do validator ganha a linha `Classes:` no Resumo — agregação de errors+warnings pelo token `[<ID/check>]` que cada achado já carrega, insumo de **transcrição**, nunca gatilho (o canal de reação segue o evento de aprendizado do §6). (b) A linha da `## Cronologia` do BRIEF, nas etapas de forja, ganha a cauda medida `· correções: <N> · classes: <…>` — dono do formato: `index-contract.md`; o **timestamp permanece o primeiro campo** (a duração 4.56 e a janela do worklog §17 continuam lendo a mesma marca — anti-recaída da 4.234). (c) O report de fecho ganha a linha condicional `**Forja**` (padrão `# OMITIR`), transcrita da Cronologia — régua de telemetria: medida ou omitida, nunca estimada, jamais gatilho (4.23); "correção" = volta de correção de artefato pós-validação, recorte declaradamente distinto dos retries de gate de código do §17. Mecanismos de escrita ficam **adiados com gatilho nomeado**: 2–3 forjas medidas apontando classe reincidente (escada 4.149) reativam os candidatos mapeados — lint pré-despacho no padrão do `/keelson:tasks`, `lessons.md` como insumo em specify/plan, autocheck contável do scribe (padrão 4.214/4.135), exemplar aprovado ao scribe.
+
+**Aplicação**: `skills/_shared/validator-protocol.md` §5 (linha Classes) · `docs/_meta/conventions/index-contract.md` (cauda da Cronologia) · `docs/_meta/conventions/report-contract.md` §2/§3 (linha Forja) · `commands/auto.md` (Etapa 0.5 item 6 escreve a cauda; Entrega item 6.6 transcreve) — tudo conteúdo embarcado (4.194) · declarados sem mudança: output do specify avulso **resume** o relatório do validator, não o espelha (a linha Classes não entra); catálogo do ledger intacto (a fonte durável é a Cronologia — tipo novo de evento seria decisão própria, nunca efeito colateral); tabela curada de `Primeiros-passos.md` sem a linha (amostra por importância, não espelho do §2) · wiki: seção nova em `Solucao-de-problemas.md` (padrão da linha Custo por papel); espelho do report-contract republica sozinho · CHANGELOG 0.123.0, `Re-init: none` (bloco injetado e contrato da ficha intactos).
+
+---
+
 ## 7. Roteamento de mudanças
 
 Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir manualmente:

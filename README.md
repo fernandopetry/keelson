@@ -415,16 +415,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.122.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.123.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the closing report now suggests `/keelson:postmortem` when the
-session had difficulties (decision 4.274) — a conditional line names the signals
-(retries, failed gates, human corrections) and asks the human to type the command;
-healthy sessions never see it. The suggestion is the Tech Lead's judgment of the
-session it lived, never a parser over the ledger. Re-init: none. See the
-[CHANGELOG](CHANGELOG.md) for history.
+New in this release: forge telemetry (decision 4.275) — validator reports aggregate
+findings by check id, each forge stage records its measured correction rounds and
+finding classes in the BRIEF's `Cronologia`, and the closing report transcribes them
+into a conditional `Forja` line. Measured or omitted, never estimated, never a trigger:
+the numbers exist to distill recurring classes into writing criteria. Re-init: none.
+See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

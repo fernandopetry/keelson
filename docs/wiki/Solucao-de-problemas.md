@@ -315,6 +315,17 @@ mudou — nesse caso o parser ignora as linhas em vez de inventar número: repor
 mantenedor com a versão do Claude Code. O número é observação para a dieta de
 contexto — o ciclo nunca para nem encolhe por causa dele.
 
+### A entrega não trouxe a linha `Forja` (ou veio sem alguma etapa)
+
+A linha existe desde a 0.123.0 e é **telemetria**: medida ou omitida, nunca estimada —
+a ausência não é defeito quando não há o que medir. Ela só aparece em rota que teve
+etapa de forja (specify → plan → tasks) e se alimenta da cauda de telemetria que o
+ciclo anexa à `Cronologia` do brief ao fechar cada etapa: quantas voltas de correção o
+documento precisou depois da validação e quais classes de achado apareceram. Etapa sem
+relatório de validação fica sem cauda — e sai da linha. O número é observação para
+melhorar a escrita dos documentos ao longo do tempo; o ciclo nunca para nem muda de
+rota por causa dele.
+
 ### O `jira.<PROJECT>.md` está crescendo com listas de issues
 
 O mapa é **config, nunca ledger**: as três seções do protocolo (Campos, Etapas/Colunas,

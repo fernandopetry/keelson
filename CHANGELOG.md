@@ -23,6 +23,31 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.123.0] — 2026-08-27
+
+Re-init: none
+
+Decision 4.275 — every forge run (specify → plan → tasks) seemed to end with a round of
+review fixes, but the impression was not measurable: keelson tracked duration, tokens
+per role and human interventions, yet nothing counted artifact-correction rounds or
+aggregated validator findings by class. Without those two numbers, changing the writing
+commands would be guesswork — the house rule is measure first, mechanize on recurrence.
+
+### Added
+
+- **Forge telemetry: correction rounds and finding classes become measured numbers.**
+  Validator reports now aggregate errors and warnings by check id (new `Classes:` line
+  in the report summary — a transcription input, never a trigger); the BRIEF's
+  `Cronologia` line for each forge stage carries a measured tail
+  (`correções: N · classes: …`) with the timestamp kept as the first field, so the
+  duration line and the Jira worklog window keep reading the same mark; and the closing
+  report gains a conditional `Forja` line transcribed from it. Telemetry rules apply:
+  measured or omitted, never estimated — and never a trigger: the number exists so the
+  maintainer can distill recurring finding classes into writing criteria, never to stop
+  or reroute a cycle. Writing-side mechanisms (pre-dispatch lint, lessons feeding
+  SPEC/PLAN writers, a countable scribe self-check) stay deferred until measured forges
+  show a recurring class.
+
 ## [0.122.0] — 2026-08-27
 
 Re-init: none

@@ -80,7 +80,11 @@ inline sem arquivo, e trivial não tem brief. Fora do ciclo, a mudança avulsa u
 ## Fora de escopo
 
 ## Cronologia
-<anexada pelo condutor do ciclo — uma linha `- <etapa>: <timestamp>` ao concluir cada etapa>
+<anexada pelo condutor do ciclo — uma linha `- <etapa>: <timestamp>` ao concluir cada
+etapa; etapa de forja (specify/plan/tasks) com validação medida ganha a cauda
+`· correções: <N> · classes: <check-id(n) · …>` (decisão 4.275). O timestamp permanece
+o primeiro campo após a etapa — é a marca que a duração (4.56) e a janela do worklog
+(§17 do protocolo de sync) leem>
 ```
 
 **Seção opcional `## Estimativa` (decisões 4.223/4.224)**: a largada do

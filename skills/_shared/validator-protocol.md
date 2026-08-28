@@ -72,6 +72,7 @@ Respeite o override com justificativa; mantenha o ERROR no relatório com flag `
 
 ## Resumo
 - Errors: N (M corrigidos, K pendentes) | Warnings: N | Infos: N
+- Classes: <check-id>(N) · <check-id>(N) — decrescente | nenhuma
 
 ## Auto-fixes aplicados
 - linha 12: `[must]` → `[MUST]`
@@ -89,6 +90,12 @@ Respeite o override com justificativa; mantenha o ERROR no relatório com flag `
 ```
 
 Múltiplos artefatos no input → validar em sequência e consolidar num relatório só.
+
+A linha `Classes` agrega errors e warnings pelo token que cada achado já carrega
+(`[<ID/check>]`, tal como emitido — fato mecânico e julgamento da skill igualmente).
+É insumo de **transcrição** para a telemetria da forja — cauda da `## Cronologia` do
+BRIEF e linha `Forja` do report de fecho (decisão 4.275) — nunca gatilho de reação:
+o canal de reação continua sendo o evento de aprendizado (§6).
 
 ## §6. Evento de aprendizado (telemetria do processo)
 
