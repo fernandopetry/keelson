@@ -383,7 +383,8 @@ ela converge ou escala.
   cada descoberta parece legítima demais para não perseguir (caso real: 9 rodadas, cada
   uma "achado novo"). Por isso a varredura nasce com **teto de rodadas de gate declarado
   no despacho (default 2)**: eixo genuinamente novo além do teto não roda — vira dívida
-  declarada (brief/INDEX, com a régua registrada para quem pagar) ou decisão explícita
+  declarada em artefato-fonte, brief/PLAN, espelhada no INDEX pela regeneração (4.179 —
+  com a régua registrada para quem pagar) ou decisão explícita
   do Diretor de estender (proposta + default, 4.85). Padrão de corte ambíguo (manter ou
   cortar `X`?) se decide **antes** do despacho, uma vez para todos os lotes — sublotes
   com réguas opostas são retrabalho certo. Limite conhecido do fecho por busca: rótulo
@@ -485,3 +486,17 @@ que cita 2 de 3 e retry que fecha exatamente os 2 citados deixa o terceiro com d
 contrato e **sem consumidor**, sem que nada acuse; a régua acima não alcança este caso —
 o achado não era enumeração fechada de instâncias, era citação parcial e honesta de um
 requisito — e a re-leitura da origem é o complemento.
+
+A mesma enumeração-na-fonte vale quando a mudança **passa a recusar** operação que
+antes completava — guarda nova, validação, confirmação exigida (decisão 4.278): a
+cobertura se deriva dos **chamadores reais** da operação recusada (grep pelo
+método/rota/use case), nunca da lista de telas lembradas, e cada chamador declara a
+resposta à recusa — trata e reoferece, passa a confirmação explícita, ou não se
+aplica; chamador sem resposta declarada é buraco, não detalhe. Fechamento contável no
+formato já provado (4.139): N chamadores no grep, N respostas declaradas. Promessa de
+SPEC do tipo "o sistema nunca impede X" só está provada com **toda** superfície que
+faz X exercitada — 3 de 4 é promessa quebrada com aparência de entregue (caso real: a
+4ª superfície virou beco sem saída em produção). Demarcação: a "Guarda no sink"
+(`core/SECURITY.md`) enumera os **writers** de dado sensível; esta régua, os
+**chamadores** de operação que passou a poder recusar — recusa funcional, sensível ou
+não.

@@ -93,6 +93,14 @@ bloqueante no gate 1 — `./CODE-REVIEW.md`):
   Corolário para invariante **fotografado** (valor congelado no filho × config vigente
   no pai): os defaults do builder compartilhado nascem **divergentes** — pai e filho com
   o mesmo valor tornam ler um ou outro indistinguível, e a guarda vira decoração.
+- **Equivalência entre dois caminhos se prova na dimensão não-neutra (decisão 4.280)**:
+  teste que afirma que dois caminhos de cálculo produzem o mesmo resultado se escreve
+  na dimensão em que o fator que os **distingue** é não-neutro (fração ≠ 1, peso ≠ 1,
+  desconto ≠ 0) — a dimensão neutra entra como **controle**, nunca como o caso: no
+  eixo neutro os caminhos são trivialmente iguais e o teste **não tem como falhar**
+  com a divergência presente (caso real: verde por 6 waves com o bug vivo). A escolha
+  do eixo se prova por mutação na fixação: neutralizar o fator na fonte tem de
+  **reprovar** — se o teste sobrevive, ele está no eixo errado.
 
 ---
 

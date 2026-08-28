@@ -197,7 +197,14 @@ continua sem brief — com **teste operacional pré-despacho** (decisão 4.205):
 **introduz ou propaga campo/contrato através de uma fronteira de camada ou componente**
 (coluna/consulta nova, campo novo atravessando um serviço ou caso de uso, tipo/prop novo
 no consumidor da outra ponta)? → **não é trivial, por menor que pareça** — o brief nasce
-**antes** do código, nunca regularizado depois que o review aponta a ausência. Slug com avulsos ganha no INDEX a seção `## Avulsas`
+**antes** do código, nunca regularizado depois que o review aponta a ausência.
+**Default/comportamento alterado se confronta com os artefatos vivos do slug antes do
+código** (decisão 4.281): procure o valor na SPEC/PLAN — citado como **Mitigação de um
+RISK/TRISK**, ele é controle, não preferência de UX: mudá-lo é revisão de SPEC (FR/AC/
+RISK atualizados no mesmo commit, risco residual declarado e assinado por quem aceita),
+nunca ajuste de tela; queixa de "ninguém usa a opção" costuma ser saliência, não
+default — conserto de percepção (posição, moldura, microcópia) não custa risco nem
+mexe em artefato. Slug com avulsos ganha no INDEX a seção `## Avulsas`
 (tabela `| ID | Título | Status | Jira | Data |`), mantida por quem fecha o avulso.
 
 **Morada multi-slug (decisão 4.87)**: mudança avulsa que toca vários slugs continua com

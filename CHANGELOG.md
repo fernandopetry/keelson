@@ -23,6 +23,53 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.125.0] — 2026-08-27
+
+Re-init: none
+
+Decisions 4.278–4.281 — four gate-rule holes proven in the same consumer field batch:
+a new refusal guard left its 4th caller as a production dead end, two correct
+measurements of the same code diverged with no declared base composition, an
+equivalence test stayed green for 6 waves because it ran on the neutral axis, and an
+on-demand tweak almost inverted a default that was the first listed mitigation of a
+live risk.
+
+### Added
+
+- **A change that starts refusing an existing operation closes by enumerating its
+  real callers.** Trigger is the contract change (an operation that used to complete
+  and now can refuse), never the mere presence of a guard: coverage derives from a
+  grep for the callers (method/route/use case) — never the remembered screen list —
+  and each caller declares its response to the refusal (handles and reoffers, passes
+  explicit confirmation, or n/a), with a countable close (N callers, N declared
+  responses). Extends the multi-subject block in `core/CODE-REVIEW.md`; explicitly
+  demarcated from SECURITY's "guard at the sink" (writers of sensitive data vs.
+  callers of a refusable operation). (4.278)
+- **Cost measurement declares the base composition, not just volume.** With
+  short-circuit branches, cost depends on data distribution: declare N per entity and
+  the proportion that decides the branches, and measure the case that does NOT
+  short-circuit. Qualifies the cited measurement in the gate-10 rulebook
+  (`core/PERFORMANCE.md`, complement to 4.178) — never a benchmark requirement;
+  "by inspection" stays a legitimate outcome. (4.279)
+- **Equivalence between two calculation paths is proven on the non-neutral axis.**
+  The test lives in the dimension where the distinguishing factor is non-neutral
+  (fraction ≠ 1, weight ≠ 1); the neutral dimension is the control. The axis choice is
+  proven by mutation at fixation: neutralizing the factor at the source must fail the
+  test. New bullet in `core/TESTING.md` "assertions that prove". (4.280)
+- **The on-demand route confronts a changed default with the slug's living
+  artifacts.** A value cited as a RISK/TRISK mitigation is a control, not a UX
+  preference: changing it is a SPEC revision (FR/AC/RISK updated in the same commit,
+  residual risk signed off), never a screen tweak — and "nobody uses the option" is
+  usually salience, fixed by perception with zero risk. New falsifiable rule in the
+  standalone-brief contract; the injected block is unchanged. (4.281)
+
+### Fixed
+
+- `core/CODE-REVIEW.md` debt line now points at its owner: debt lives in a source
+  artifact (brief/PLAN) mirrored into the INDEX by regeneration (4.179), never
+  INDEX-only. The `code-reviewer` header counted "9 quality gates" and named only
+  gates 8–9 as delegated — corrected to 11 and 8–11 (post-4.155/4.218 sediment).
+
 ## [0.124.0] — 2026-08-27
 
 Re-init: none

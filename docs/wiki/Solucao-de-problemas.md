@@ -213,6 +213,17 @@ entrega. Se a interpretação do PO estava torta, é aí que se corrige — a co
 brief. A janela de veto existe justamente para isso; se você não estava olhando na hora,
 corrija e reemita.
 
+### Pedi um ajuste simples e o keelson pediu revisão de SPEC
+
+Antes de mudar um valor padrão ou um comportamento, o modo avulso procura esse valor
+nos documentos vivos da capacidade (SPEC e PLAN). Se ele aparece como **mitigação de um
+risco** — por exemplo, uma caixa que nasce desmarcada porque a especificação decidiu
+proteger quem usa computador compartilhado — ele não é preferência de interface: é um
+controle. Mudá-lo exige atualizar a especificação junto (requisito, critério e risco no
+mesmo commit), com o risco restante aceito por quem decide. Se a queixa era "ninguém
+usa a opção", o conserto costuma ser de percepção (posição, moldura, texto) — isso não
+custa risco nenhum e não mexe em documento.
+
 ### O ciclo fez perguntas demais / de menos
 
 - Perguntas demais antes da largada: o pedido tinha ambiguidade crítica. Use

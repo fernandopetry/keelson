@@ -52,7 +52,7 @@ achados:
     severidade: alta | media | sugestao   # sugestao = otimização sem medição — nunca bloqueia
     cenario_custo: <o que cresce e com quê — ex.: "1 consulta por item da listagem; 200 itens = 200 round-trips">
     correcao: <como corrigir, citando o padrão do core/PERFORMANCE.md ou do perfil ativo>
-    medicao: <evidência executada (contagem, EXPLAIN, tamanho); "por inspeção" quando indisponível>
+    medicao: <evidência executada (contagem, EXPLAIN, tamanho) — com volume e composição da base declarados (4.279, régua no core/PERFORMANCE.md); "por inspeção" quando indisponível>
 
 # Preencher SOMENTE quando o defeito tem causa-raiz GENERALIZÁVEL; senão null.
 # A main session roteia na closure (ver /keelson:implement, etapa 3.4.2).

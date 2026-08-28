@@ -70,3 +70,11 @@ Princípios agnósticos de renderização (o mecanismo idiomático está no perf
   invariante fixa a chamada em lote **e** a ausência de cada chamada de item único do
   mesmo laço. Chunking paga a parte invariante da consulta uma vez **por lote** — só é
   barato com essa parte escopada ao que a consulta realmente pergunta.
+- **Medição citada declara a composição da base, não só o volume (decisão 4.279):**
+  em consulta/fórmula com ramos de curto-circuito, o custo depende da **distribuição**
+  dos dados (a proporção que decide os ramos) — duas medições corretas do mesmo código
+  divergem e custam uma rodada de conferência sem que ninguém saiba por quê. Declare o
+  N por entidade **e** a proporção que decide os ramos, e meça o caso que **não**
+  curto-circuita (costuma ser o estado real de lançamento). A régua qualifica a
+  medição citada — não exige benchmark: sem medição, a saída legítima continua sendo
+  inspeção declarada.
