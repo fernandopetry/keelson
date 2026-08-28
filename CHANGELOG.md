@@ -23,6 +23,33 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.126.0] — 2026-08-27
+
+Re-init: none
+
+Decisions 4.282/4.283 — last two absorptions from the consumer field batch: a
+non-regression criterion written as "the test doesn't change" certified a broken
+public message with a green suite, and the canonical pathspec commit silently undid a
+partial stage, pulling a sibling task's hunks into the commit.
+
+### Added
+
+- **A non-regression criterion declares the complete observable value, never "the
+  test doesn't change".** Freezing the test artifact freezes nothing: a fragment
+  assertion stays green while the public value is rewritten. The criterion declares
+  the complete value and proves it with the mutant (change the production value → the
+  test goes red); and in a branch where the file was born, `git diff main...HEAD` is
+  inert — the non-regression diff anchors on the commit that delivered the behavior.
+  Refines the baseline rule in `/keelson:tasks`. (4.282)
+- **Pathspec limit: same-file isolation uses the verified index.** `git commit --
+  <file>` commits the working-tree state and undoes a partial stage (`git add -p`) —
+  with two tasks in one file, the sibling's hunks come along. Primary route: don't
+  share the file within a wave (sequencing is a decomposition decision). For the
+  residual case, a narrow exception with a double pre-commit check, both in the
+  report: `git diff --cached --stat` (no other file staged) + `git diff --cached --
+  <file>` (staged = exactly your hunks), then commit without pathspec. Owner:
+  `sdd-conventions.md`; the developer agent carries the half-line pointer. (4.283)
+
 ## [0.125.0] — 2026-08-27
 
 Re-init: none

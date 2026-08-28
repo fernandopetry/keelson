@@ -3000,6 +3000,22 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 **Aplicação**: `docs/_meta/conventions/index-contract.md` (variação avulsa) · wiki `Solucao-de-problemas.md` (entrada "Pedi um ajuste simples e o keelson pediu revisão de SPEC") · CHANGELOG **0.125.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-27.
 
+### 4.282 — Critério de não-regressão declara o valor observável completo, nunca "o teste não muda"
+
+**Problema**: campo (fila da 4.111, 2026-08-27): numa extração de guarda compartilhada, o critério de não-regressão dizia "o teste continua passando **sem alteração de asserção**" — congelou o artefato (a linha do teste), não a promessa (o comportamento público): a asserção existente casava um **fragmento** da mensagem, e a mensagem inteira — corpo literal do erro HTTP que o admin lê — mudou para um absurdo ("está Concluída e não pode ser concluída") com a suíte 100% verde e o critério cumprido à risca. Agravante: o comando de verificação era `git diff main...HEAD`, **inerte** naquela branch — o arquivo nasceu nela, o diff mostra "tudo inserido" e nunca exibiria a troca. A régua da linha 235 do `/keelson:tasks` já exige baseline capturada e execução na fixação; nada proibia a forma "o teste não muda" nem tratava a âncora do diff em arquivo nascido na branch.
+
+**Decisão**: refino colado na frase do baseline (nunca bullet novo — o risco de contradição com a âncora da 4.256, que roda ausência contra o commit-pai, se resolve mantendo as duas âncoras nomeadas no mesmo parágrafo com propósitos distintos): critério de não-regressão **declara o valor observável completo** e prova com o mutante (trocar o valor na produção → teste vermelho); a forma "o teste não muda"/"sem alteração de asserção" é proibida por nome; e o diff de não-regressão em arquivo nascido na branch ancora no **commit que entregou o comportamento**, nunca na base da branch. Check mecânico não desenhado (1ª ocorrência; a forma textual "sem alteração de asserção" é candidata a fato de lint se a classe reincidir — escada 4.149, e aí nasce com fixture e controle positivo, 4.260).
+
+**Aplicação**: `commands/tasks.md` (Etapa 3, linha da verificação executável) · CHANGELOG **0.126.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-27.
+
+### 4.283 — Limite da pathspec: isolamento intra-arquivo usa o índice conferido, com dupla conferência no report
+
+**Problema**: campo (mesma fila): com duas TASKs irmãs editando o **mesmo arquivo** na mesma working tree, o developer isolou os próprios hunks com `git add -p` e commitou com `git commit -- <arquivo>` — a forma canônica da 4.163 — e o commit **trouxe os hunks da irmã**: a pathspec commita o estado da working tree daqueles caminhos ignorando o índice, que é exatamente a garantia contra índice sujo *entre arquivos* e exatamente o que **desfaz** a seleção *dentro* de um arquivo. A regra do dono só nomeava uma das duas formas; cumpri-la à risca produzia o defeito.
+
+**Decisão**: a exceção entra no **dono** (sdd-conventions, bullet "Commit por pathspec") endurecida — o desenho ingênuo da proposta foi rejeitado com os riscos mapeados: (i) commit sem pathspec reabre o caso que **fundou** a 4.163 (índice compartilhado carregando trabalho alheio — o mutante de segurança que chegou à branch), então a **rota primária é não compartilhar o arquivo na mesma wave** (sequenciar é decisão de decomposição — princípio 2 do `/keelson:tasks`, 4.106/4.228) e a exceção só existe para o caso residual; (ii) a conferência proposta (`git show --stat`) **não discrimina** o defeito que existe para provar — lista arquivos, e o caso é *mesmo arquivo* (classe "âncora que não discrimina", 4.255) — substituída por **dupla conferência pré-commit, ambas no report**: `git diff --cached --stat` (nenhum outro arquivo no índice) + `git diff --cached -- <arquivo>` (staged = exatamente os hunks próprios), e só então `git commit` sem pathspec. O `developer.md` ganha a ressalva de meia-linha apontando o dono (a letra anterior — "nunca sem `--`" — coexistiria contraditória com a exceção no mesmo parágrafo, o defeito (e) da 4.161 aplicado à própria doutrina).
+
+**Aplicação**: `docs/_meta/conventions/sdd-conventions.md` (bullet da 4.163) · `agents/developer.md` (ressalva com ponteiro ao dono) · CHANGELOG **0.126.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-27.
+
 ---
 
 ## 7. Roteamento de mudanças
