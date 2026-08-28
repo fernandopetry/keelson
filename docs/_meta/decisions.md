@@ -3113,6 +3113,26 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 ---
 
+### 4.295 — Caso teammate no laudo do stale-background-guard: instrução incondicional, redação válida nos dois mundos
+
+**Problema**: pendência declarada da 4.294: a atribuição de dono por ancestralidade de PPIDs (4.206) não discrimina teammate de Agent Teams. O desenho inicial desta leva condicionava o aviso à env var `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`; o mapa de impacto derrubou o sinal pelos dois lados — setada não implica teammate (o despacho anônimo da 4.293 existe exatamente para isso: falso-positivo no caso normal) e teammate ativo não garante a var visível ao hook (ativação por `settings.json`) — e expôs que a premissa "teammate → INDETERMINADO" da 4.294 não tem amostra capturada: teammate in-process pode cair dentro da ancestralidade e sair como "meu" (classe da 4.285 — prova derivada da prosa, não de amostra).
+
+**Decisão**: o caso entra **incondicional** no texto de socorro (precedente literal da 4.271: instrução não tem superfície de falso-positivo e não depende de env nenhuma), com redação válida nos dois mundos ("pode aparecer como 'seu' ou como 'indeterminado'") e em ASCII (régua da 4.271). O critério de atribuição fica intacto. **Endurecimento adiado com gatilho**: amostra real de `ps -eo pid,ppid,etime,command` colhida em sessão com teammate vivo — ela vira fixture da suíte e só então a topologia é afirmada; sem amostra, nada se afirma.
+
+**Aplicação**: `hooks/stale-background-guard.sh` (cabeçalho + laudo — superfície una da 4.271) · `scripts/tests/stale-bg/run.sh` (asserção nova no caso 1) · CHANGELOG **0.129.0**, `Re-init: none`. Origem: pendência da 4.294.
+
+---
+
+### 4.296 — Cobertura da telemetria por papel declarada pelo chamador (`--teams`), nunca por env var
+
+**Problema**: (mesma pendência) a telemetria por papel (4.239) é extraída dos registros de resultado do Task — trabalho de teammate fica fora e, num ciclo teams, o ranking sai parcial em silêncio. O desenho inicial marcava o log pelo hook `window-marker` condicionado à env var; o mapa mostrou o sinal errado (os dois erros da 4.295) e a peça errada: o `window-marker` é o único artefato do raio sem suíte e sem gatilho de pre-commit — mudança sem rede de prova.
+
+**Decisão**: a declaração vive no **compositor** (`context-cost.sh`, cuja suíte dispara sozinha no pre-commit): flag nova `--teams` (aceita só com `--compose`; flag desconhecida continua `exit 2`) acrescenta a linha `cobertura:` **apenas quando há ranking** — qualifica medição existente, nunca inventa linha. Quem passa a flag é o invocador que conhece o enum `Orquestração: AGENT_TEAMS` (fecho do `/keelson:auto`, item 6.5) — sinal do observável do ciclo, nunca env var lida por script. Limite declarado: `/keelson:report` não passa `--teams` (não conhece o modo de um ciclo que não conduziu — §3 do contrato). O parse de registros de teammate no `window-marker` segue **fora até haver amostra capturada** (4.285) — mesmo gatilho da 4.295; `window-marker.sh` intocado nesta leva.
+
+**Aplicação**: `scripts/context-cost.sh` + `scripts/tests/context-cost/run.sh` · `commands/auto.md` (item 6.5) · `docs/_meta/conventions/report-contract.md` (linha da entrega, prosa da fonte, §3) · `docs/_meta/conventions/agent-teams.md` (bullet das lacunas re-datado) · CHANGELOG **0.129.0**, `Re-init: none`. Origem: pendência da 4.294.
+
+---
+
 ## 7. Roteamento de mudanças
 
 Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir manualmente:

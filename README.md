@@ -415,16 +415,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.128.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.129.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the cycle is deterministic under the experimental Agent Teams
-flag (decisions 4.292–4.294) — roles are dispatched by type without an instance name
-so the env var alone never converts them into teammates, the teams-mode return
-channel (`SendMessage`, injected even for read-only agents) is named in the
-teams-mode owner, and the cycle runs in the lead session. Re-init: none.
-See the [CHANGELOG](CHANGELOG.md) for history.
+New in this release: the two teams-mode gaps declared in 0.128.0 now degrade loudly
+(decisions 4.295–4.296) — the stale-background guard's advice covers teammate
+processes, and the closing report's per-role cost line carries a coverage note in
+`AGENT_TEAMS` cycles, driven by the caller's orchestration enum, never an env var.
+Re-init: none. See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

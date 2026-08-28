@@ -23,6 +23,33 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.129.0] — 2026-08-28
+
+Re-init: none
+
+Decisions 4.295–4.296 — the two teams-mode gaps declared in 4.294 now degrade
+loudly instead of silently. The impact map reshaped the design: the signal is the
+caller's orchestration enum, never an environment variable (which errs both ways),
+and the untested hook stayed untouched.
+
+### Added
+
+- **The stale-background guard's advice covers teammates.** The guard's ownership
+  attribution (PPID ancestry) cannot discriminate an Agent Teams teammate's
+  process, which may show up as "yours" or "undetermined". The advisory text now
+  instructs the case unconditionally — check live teammates before killing a PID;
+  a teammate's process is ended by the teammate or the human, never by this
+  report. Hardening is deferred until a real `ps` table from a teams session is
+  captured and becomes a suite fixture. (4.295)
+- **Per-role cost coverage is declared by the caller.** `context-cost.sh` gains a
+  `--teams` flag (valid only with `--compose`): when the cycle ran in
+  `AGENT_TEAMS`, the closing report's per-role ranking carries a `cobertura:`
+  line stating it covers only Task dispatches — teammate work is outside the
+  measurement. The flag comes from the invoker that knows the orchestration enum,
+  never from an environment variable; the line only qualifies an existing
+  ranking, never invents one. `/keelson:report` does not pass the flag (it cannot
+  know the mode of a cycle it did not conduct). (4.296)
+
 ## [0.128.0] — 2026-08-28
 
 Re-init: none

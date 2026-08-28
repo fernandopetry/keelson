@@ -22,7 +22,9 @@
 # de qualquer outra coisa da máquina do humano — e (2) atribuição de dono por ancestralidade
 # de PPIDs (decisão 4.206): só é ignorado o processo cuja cadeia leva PROVADAMENTE ao
 # processo `claude` de OUTRA sessão viva; cadeia órfã ou indeterminada continua acusando
-# (fail-closed — indeterminado nunca vira "de outra sessão").
+# (fail-closed — indeterminado nunca vira "de outra sessão"). Teammate de Agent Teams
+# fica fora desta discriminação — o laudo instrui o caso, incondicional (decisão 4.295);
+# a topologia real de teammate segue sem amostra capturada, nada aqui a afirma.
 # stop_hook_active evita loop: cutuca uma vez por encerramento.
 
 set -euo pipefail
@@ -228,6 +230,10 @@ reason = (
     "lista de processos, nunca so pela porta/recurso liberado.\n"
     "- Nao consegue dizer qual dos dois? Trate como travado e mate: o custo de matar algo "
     "vivo e refazer; o de deixar um zumbi e voce achar que ha trabalho em curso quando nao ha.\n"
+    "- Sessao com Agent Teams (teammates)? A atribuicao de dono por ancestralidade nao "
+    "discrimina teammate: o processo dele pode aparecer como 'seu' ou como 'indeterminado'. "
+    "Antes de matar, confira os teammates vivos (painel de agents / panes do tmux); "
+    "processo de teammate quem encerra e o proprio teammate ou o humano, nunca este laudo.\n"
 )
 
 if tem_sondagem:

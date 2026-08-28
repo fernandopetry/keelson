@@ -6,7 +6,8 @@
 # KEELSON_STALE_GUARD_SELF_PID — todo o resto roda de verdade (stdin JSON, wrapper
 # bash, heredoc Python). Casos inline (asserção por grep, saídas curtas):
 #   1. multi-sessão: acusa o processo da própria sessão e o órfão (indeterminado),
-#      ignora o provadamente de outra sessão, conta os ignorados;
+#      ignora o provadamente de outra sessão, conta os ignorados; o texto de socorro
+#      traz o caso teammate de Agent Teams, incondicional (4.295);
 #   2. raiz não identificável: degrada para o comportamento global (tudo com a marca);
 #   3. mesa limpa: exit 0 silencioso;
 #   4. stop_hook_active: exit 0 sem inspecionar;
@@ -85,6 +86,7 @@ contem    "multi-sessao/orfao-rotulo"  'INDETERMINADO'
 nao_contem "multi-sessao/outra-sessao" 'PID 310'
 contem    "multi-sessao/contador"      'outros 1 pertencem a outra'
 contem    "multi-sessao/sondagem"      'LOOP DE SONDAGEM'
+contem    "multi-sessao/teams-caso"    'Agent Teams (teammates)'
 
 # 2. Raiz não identificável (self fora da tabela): sem prova de dono, degrada para o
 #    comportamento global — 310, 410 e 600 entram, todos indeterminados.

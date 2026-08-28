@@ -8,13 +8,18 @@
 # FATOS do log, nunca estimativa do modelo. Sem log ou sem linhas → saída vazia,
 # exit 0: a linha do report é telemetria — medida ou omitida, nunca estimada.
 #
-# Uso: context-cost.sh <raiz-do-projeto> [--compose]
+# Uso: context-cost.sh <raiz-do-projeto> [--compose] [--teams]
 #
 #   (sem flag)  linhas cruas agregadas: `pico <tokens>` + `papel <tipo> <tokens> <spawns>`
 #               (papéis em ordem decrescente de tokens).
 #   --compose   linhas prontas para o report:
 #               `pico: ~<N>k tokens`
 #               `papel: <tipo> ~<N>k tokens (<M> spawns)` — maiores primeiro.
+#   --teams     (só com --compose) o CHAMADOR declara que o ciclo rodou em
+#               AGENT_TEAMS (enum de orquestração do implement — decisão 4.296):
+#               havendo ranking, acrescenta a linha `cobertura:` — o ranking cobre
+#               só despachos via Task; trabalho de teammate fica fora da medição.
+#               Flag do chamador, nunca env var: este script não detecta modo.
 #
 # Linha do log que não casa os formatos `<ts> janela=<N>` / `<ts> agente=<tipo>
 # tokens=<N>` é ignorada (4.156: parser casa o formato e degrada, nunca inventa).
@@ -28,20 +33,28 @@ export LC_ALL
 
 die2() { echo "ERRO: $*" >&2; exit 2; }
 
-[ $# -ge 1 ] || die2 "uso: context-cost.sh <raiz-do-projeto> [--compose]"
+[ $# -ge 1 ] || die2 "uso: context-cost.sh <raiz-do-projeto> [--compose] [--teams]"
 raiz="$1"
 shift
 compose=0
-if [ $# -ge 1 ]; then
-  [ "$1" = "--compose" ] || die2 "flag desconhecida: $1"
-  compose=1
+teams=0
+while [ $# -ge 1 ]; do
+  case "$1" in
+    --compose) compose=1 ;;
+    --teams)   teams=1 ;;
+    *) die2 "flag desconhecida: $1" ;;
+  esac
+  shift
+done
+if [ "$teams" -eq 1 ] && [ "$compose" -eq 0 ]; then
+  die2 "--teams requer --compose"
 fi
 [ -d "$raiz" ] || die2 "raiz inexistente: $raiz"
 
 log="$raiz/thoughts/local/session-window.log"
 [ -f "$log" ] || exit 0
 
-awk -v compose="$compose" '
+awk -v compose="$compose" -v teams="$teams" '
   $2 ~ /^janela=[0-9]+$/ && NF == 2 {
     v = substr($2, 8) + 0
     if (v > pico) pico = v
@@ -69,6 +82,9 @@ awk -v compose="$compose" '
         a = nome[i]
         printf "papel: %s ~%dk tokens (%d spawns)\n", a, int((soma[a] + 500) / 1000), cnt[a]
       }
+      # cobertura (4.296): qualifica ranking existente, nunca inventa linha
+      if (teams && n > 0)
+        printf "cobertura: ciclo em AGENT_TEAMS — ranking cobre só despachos via Task; trabalho de teammate fora da medição\n"
     } else {
       if (pico > 0) printf "pico %d\n", pico
       for (i = 1; i <= n; i++) {

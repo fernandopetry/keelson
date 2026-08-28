@@ -4,7 +4,8 @@
 # Casos inline em diretório temporário. Regras provadas: pico = maior janela do
 # log; ranking por papel somado e ordenado decrescente; --compose arredonda para
 # ~Nk; sem log / log vazio → saída vazia e exit 0 (telemetria, nunca trava);
-# linha malformada é ignorada, nunca inventa número (4.156).
+# linha malformada é ignorada, nunca inventa número (4.156); --teams (4.296) só
+# com --compose, e a linha `cobertura:` só qualifica ranking existente.
 #
 # Uso: scripts/tests/context-cost/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -56,11 +57,28 @@ papel: keelson:developer ~452k tokens (2 spawns)
 papel: keelson:code-reviewer ~210k tokens (1 spawns)"
 if [ "$out" = "$want" ]; then ok compose-completo; else falha "compose-completo: [$out]"; fi
 
+# --compose --teams (4.296): linha de cobertura fecha o ranking, flag do chamador
+out="$(bash "$CC" "$R" --compose --teams)"
+want="pico: ~623k tokens
+papel: keelson:developer ~452k tokens (2 spawns)
+papel: keelson:code-reviewer ~210k tokens (1 spawns)
+cobertura: ciclo em AGENT_TEAMS — ranking cobre só despachos via Task; trabalho de teammate fora da medição"
+if [ "$out" = "$want" ]; then ok compose-teams; else falha "compose-teams: [$out]"; fi
+
+# --teams sem --compose: uso incorreto → exit 2 (borda congelada do parser)
+if bash "$CC" "$R" --teams >/dev/null 2>&1; then falha "teams-sem-compose: aceitou"; else
+  bash "$CC" "$R" --teams >/dev/null 2>&1; [ $? -eq 2 ] && ok teams-sem-compose || falha "teams-sem-compose: exit != 2"
+fi
+
 # só janelas (rota sem subagents): pico sai, nenhum papel
 R2="$TMP/repo-so-janela"; mkdir -p "$R2/thoughts/local"
 printf '2026-08-20T10:00:00-0300 janela=88000\n' > "$R2/thoughts/local/session-window.log"
 out="$(bash "$CC" "$R2" --compose)"
 if [ "$out" = "pico: ~88k tokens" ]; then ok compose-so-janela; else falha "compose-so-janela: [$out]"; fi
+
+# --teams sem ranking: cobertura NÃO sai — qualifica medição existente, nunca inventa
+out="$(bash "$CC" "$R2" --compose --teams)"
+if [ "$out" = "pico: ~88k tokens" ]; then ok compose-teams-so-janela; else falha "compose-teams-so-janela: [$out]"; fi
 
 # sem log: saída vazia, exit 0 (telemetria omitida, nunca erro)
 R3="$TMP/repo-sem-log"; mkdir -p "$R3"

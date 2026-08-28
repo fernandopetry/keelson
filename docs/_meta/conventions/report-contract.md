@@ -63,7 +63,7 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 - **Fila do épico**: <fatia marcada `entregue` · próximo passo pronto: /keelson:continue <slug-âncora>>   # só demanda com **Epico**:
 - **Estimativa × realizado**: <~N waves/~N tasks previstos vs N/N reais · <min–max>h vs <duração medida> · desvio em meia linha · linha anexada em guidelines/project/estimates.md · espelho: <publicada | falhou (motivo) | n/a>>   # só quando o BRIEF da demanda tem seção ## Estimativa (estimate-contract.md §4, decisão 4.223); o realizado vem do TASK-MMM-INDEX e da duração MEDIDA — nunca o contrário
 - **Duração**: <total> (largada HH:MM → entrega HH:MM, horário de Brasília) · specify <n>min · plan <n>min · tasks <n>min · implement <n>min · janela pico ~<N>k tokens   # etapa que a rota não teve não aparece; marca ausente → o que foi medido + lacuna nomeada; janela só quando o log existe
-- **Custo por papel**: <papel ~<N>k tokens (<M> spawns) · …, maiores primeiro — saída literal de `context-cost.sh --compose`>   # OMITIR quando o log não tem linha de agente — telemetria da dieta (4.239), medida ou omitida, nunca estimada; custo jamais vira gatilho de parada (4.23)
+- **Custo por papel**: <papel ~<N>k tokens (<M> spawns) · …, maiores primeiro — saída literal de `context-cost.sh --compose`>   # OMITIR quando o log não tem linha de agente — telemetria da dieta (4.239), medida ou omitida, nunca estimada; custo jamais vira gatilho de parada (4.23); ciclo em AGENT_TEAMS → o invocador passa `--teams` e a linha `cobertura:` da saída viaja junto (4.296)
 - **Forja**: <specify <N> correções · plan <N> · tasks <N> · classes: <check-id(n) · …, decrescente | nenhuma>>   # só rota com etapa de forja — fonte única: cauda de telemetria da Cronologia do BRIEF (4.275); OMITIR sem cauda medida; correção = volta de correção de artefato pós-validação, ≠ retry de gate de código (§17 do protocolo de sync); telemetria — medida ou omitida, nunca estimada, jamais gatilho (4.23): o número existe para destilar classe recorrente (escada 4.149)
 - **Pendente de você**: <revisão da branch · merge · resposta a pergunta estacionada · handoff · nada>
 - **Sugestão de postmortem**: <a sessão teve dificuldades — <sinais em meia linha: retry, gate reprovado, correção/intervenção do Diretor> → vale rodar `/keelson:postmortem` para cobrir o episódio (o `PM-*.md` durável fica no repositório mesmo sem envio ao mantenedor)>   # OMITIR quando a sessão não teve retry, gate reprovado nem correção do Diretor (decisão 4.274) — juízo de quem viveu a sessão, nunca parser do ledger (4.227); a linha SUGERE que o Diretor digite o comando (humano-only), jamais o invoca; complementa a seção "Mensagem ao mantenedor": ela cobre o erro pontual, o postmortem cobre o episódio inteiro
@@ -94,7 +94,11 @@ hook `window-marker` fora do contexto do modelo — uma linha `<ts> janela=<toke
 por Stop e uma linha `<ts> agente=<tipo> tokens=<N>` por subagent concluído. Quem
 compõe as duas é `bash "${CLAUDE_PLUGIN_ROOT}/scripts/context-cost.sh" <raiz>
 --compose` (pico = maior janela; ranking = soma por papel, decrescente) — a saída é
-citada literal, jamais recalculada de memória. Sem log ou sem linhas de agente (hook
+citada literal, jamais recalculada de memória. Ciclo que rodou em `AGENT_TEAMS` → o
+invocador que conhece o enum de orquestração passa `--teams` ao compositor, e a saída
+ganha a linha `cobertura:` — o ranking cobre só despachos via Task (o fato do modo e
+suas lacunas têm dono em `agent-teams.md`); a flag é **do chamador, nunca env var**:
+o script não detecta modo (decisão 4.296). Sem log ou sem linhas de agente (hook
 indisponível, projeto sem ficha, rota sem subagents) → cauda/linha omitidas, sem
 lacuna declarada — são telemetria da dieta de contexto (meta da 4.103: ≤600k), não
 obrigação do report; e **custo nunca é gatilho** de parada ou de mudança de
@@ -110,4 +114,4 @@ repovoar o log novo com agentes já reportados.
 |---|---|---|
 | `/keelson:auto` (Entrega) | composição e aceitação do item 2.5 · tracker da reconciliação do item 4 · marcas e telemetria da forja da Cronologia (Etapa 0.5, item 6) | métrica de sucesso (item 6.4) · perguntas estacionadas em lote (item 9) · fecho do ledger (item 10) |
 | Modo sob demanda (4.75) | ledger + diff da mudança | versão mínima do bloco do consumidor; gate aplicável sem veredito → "não rodado"; linha "Lições da rodada" obrigatória (4.204) |
-| `/keelson:report` | **só** ledger + repositório (nunca impressão residual da conversa) | seção "Cobertura deste relatório" sempre presente; não commita nem faz push |
+| `/keelson:report` | **só** ledger + repositório (nunca impressão residual da conversa) | seção "Cobertura deste relatório" sempre presente; não commita nem faz push; não passa `--teams` ao compositor (não conhece o modo de um ciclo que não conduziu — a linha `cobertura:` é da rota do fecho, 4.296) |

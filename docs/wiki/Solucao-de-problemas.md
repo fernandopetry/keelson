@@ -351,7 +351,10 @@ rodaram e a linha saiu vazia mesmo assim, as causas prováveis: plugin anterior 
 0.109.0 durante parte do ciclo (rode `/keelson:update`); hook sem `python3` no PATH
 (ele degrada em silêncio, por desenho); ou o formato interno do transcript do harness
 mudou — nesse caso o parser ignora as linhas em vez de inventar número: reporte ao
-mantenedor com a versão do Claude Code. O número é observação para a dieta de
+mantenedor com a versão do Claude Code. Num ciclo que rodou no modo teams (opt-in,
+`--force-mode=teams`), a linha vem acompanhada de uma `cobertura:` avisando que o
+ranking mede só os papéis despachados como subagents — trabalho de teammates fica
+fora da medição por enquanto. O número é observação para a dieta de
 contexto — o ciclo nunca para nem encolhe por causa dele.
 
 ### A entrega não trouxe a linha `Forja` (ou veio sem alguma etapa)
