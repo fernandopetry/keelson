@@ -395,7 +395,7 @@ keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
 ├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer, performance-engineer, product-designer… + tools (not roles): code-scout, scribe, tracker-sync, estimator
 ├── skills/            # spec / plan / task validators + status + screen-verify
-├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard, jira-guard
+├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard, jira-guard, noverify-guard, compact-anchor, window-marker
 ├── guidelines/
 │   ├── _meta/         # QUALITY-CHARTER.md · PROFILE-OUTLINE.md
 │   ├── core/          # language-agnostic doctrine (always active)
