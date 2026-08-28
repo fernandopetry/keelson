@@ -283,7 +283,17 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   de falha) trata a working tree como recurso exclusivo: roda em `git worktree`
   isolada — nunca a mesma árvore de outro gate concorrente que também mute. Disciplina
   de restaurar ao fim não basta: o risco é a **leitura** na janela em que dois mutantes
-  convivem, não a limpeza depois (decisão 4.134, caso real de campo).
+  convivem, não a limpeza depois (decisão 4.134, caso real de campo). E a rodada
+  inteira pressupõe **âncora parada** (decisão 4.290 — 3ª camada da família
+  4.134/4.276): todo gate despachado captura, na largada da própria execução, o par
+  `git rev-parse HEAD` + `git status --porcelain` dos arquivos do diff e o reconfere
+  antes do veredito — divergência descarta o veredito e re-roda (ou escala), nunca
+  emite sobre árvore possivelmente mutada por gate concorrente; e o **orquestrador**
+  trata o SHA sob revisão como âncora parada: com veredito em voo, nenhum commit novo
+  entra na working tree — a correção espera, ou o gate é re-despachado com a âncora
+  nova **declarada**, nunca herdada em silêncio ("gerador ≠ avaliador" pressupõe
+  âncora parada; caso real: 2× na mesma sessão, o revisor congelou por hash próprio e
+  re-rodou os mecânicos — trabalho que o despacho causou).
 - **Pacote de contexto único.** O invocador monta **uma vez** e entrega o mesmo pacote
   a todos os revisores da rodada: diff resolvido + SHA · o artefato-âncora com os
   critérios literais (ACs da TASK, critério de aceite do brief) · as fatias da ficha
@@ -321,6 +331,15 @@ segue a natureza do que ele prova, não é uniforme por TASK:
   e cobrada mecanicamente pelo grafo (check `feat-sem-verificacao`, `graph-contract.md`).
 - **Adiamento é declarado, nunca silencioso** (régua da 4.85): a closure da TASK
   registra onde cada gate consolidado rodou/rodará (`wave N` · `FEAT-X` · `DoD`).
+  E o handoff declara **a quem** o invariante deferido se dirige (decisão 4.288):
+  `critério da TASK` (a wave seguinte tem o arquivo/contrato para satisfazê-lo — e
+  ele entra no despacho como critério, 4.140) ou `medição do revisor` (só a
+  ferramenta do próprio gate produz o número; o resultado vira demanda ao Diretor,
+  nunca reprovação de TASK que não tinha como entregá-lo). Handoff sem a etiqueta
+  obriga quem orquestra a wave seguinte a adivinhar — reprovar código correto ou
+  deixar risco real sem medição (caso real: "mostre que a contagem não cresce com N"
+  deixado à wave seguinte sem dizer de quem era; só o contador do próprio gate,
+  sobre volumes reais, podia produzi-la).
   No modo sob demanda nada muda: uma mudança = uma rodada.
 
 ---
@@ -343,7 +362,14 @@ ela converge ou escala.
   checks mecânicos do recorte (lint, typecheck, suíte relevante) re-rodam sobre ele
   **sempre** — baratos, e é onde a regressão de retry aparece primeiro. O "salvo quando
   o delta o toca" acima é obrigação ativa do revisor, não exceção que se espera
-  acontecer.
+  acontecer. E quando o achado classifica um estado como "reagiu ao **gatilho
+  errado**" sobre dois eixos independentes (identidade do assunto exibido × critério
+  de conteúdo), "o que este delta quebra" inclui levar ao extremo o eixo que a
+  correção **não** tocou (decisão 4.289): o espaço tem dois lados por construção —
+  reagir de menos / reagir de mais — e verificar só o lado que motivou a correção é
+  meio teste (caso real: proteção por identidade fechava sozinha; a troca para a
+  chave de assunto passou a expandir sozinha — cada correção passou no próprio teste
+  e reabriu o lado oposto).
 - **Teto: 1 retry por gate, depois escala.** Achado → correção → re-review do delta. Se
   o gate reprova de novo, a 3ª rodada **não roda por decisão própria**: escale ao
   Diretor com o estado (o que passou · o que resta · proposta + default). É a mesma

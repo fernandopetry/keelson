@@ -415,15 +415,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.126.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.127.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: forge telemetry (decision 4.275) — validator reports aggregate
-findings by check id, each forge stage records its measured correction rounds and
-finding classes in the BRIEF's `Cronologia`, and the closing report transcribes them
-into a conditional `Forja` line. Measured or omitted, never estimated, never a trigger:
-the numbers exist to distill recurring classes into writing criteria. Re-init: none.
+New in this release: nine field absorptions (decisions 4.284–4.291) against one
+signature — proofs that share their premise with what they verify: external payload
+shapes require a captured sample, two new contour-resistance tests at criterion
+fixation, front-to-back AC coverage with layer confrontation, addressee-tagged gate
+handoffs, mirror-axis re-verification, standing-anchor review rounds, and a
+walkthrough-derived behavior verdict. Re-init: none.
 See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in

@@ -23,7 +23,62 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
-## [0.126.0] — 2026-08-27
+## [0.127.0] — 2026-08-28
+
+Re-init: none
+
+Decisions 4.284–4.291 — nine field proposals absorbed from a consumer postmortem (a
+full SDD cycle whose two escaped defects shared one signature: the proof shared its
+premise with the target) plus two proposals from an earlier session that had never
+reached the queue.
+
+### Added
+
+- **Two new contour-resistance tests at criterion fixation.** (f) A round-trip
+  criterion (a channel one half writes and the other reads — cookie, token, session)
+  never installs the primitive under proof in the test arrange: the arrange restores
+  only the channel, and a MUST naming N subjects requires the mutant that dies per
+  subject. (g) A requirement combining two predicates through a uniqueness
+  comparative ("distinct from", "unique") names a literal-value or count assertion
+  for the distinction predicate — "contains"/"not empty" proves only the other half:
+  collapsing branches into one default, or swapping two values, stays green. (4.284)
+- **Claims about an external system's payload shape require a captured sample.** In
+  the SPEC, such a claim enters as fact only with a sample anchor (saved response,
+  integration dump, gate-9 capture) — without one it is born `[assumido]`. In task
+  generation, a fixture reproducing an external payload is checked against a real
+  captured sample, never against the SPEC/PLAN prose describing it — otherwise
+  generator and evaluator share the same belief and the gate turns green over the
+  error. (4.285)
+- **Coverage now also closes front-to-back.** An FR listed in "Realiza (FRs)" has its
+  AC set derived from the SPEC text and checked against the wave's distribution —
+  never enumerated from memory; a missing AC requires an explicit exclusion line. The
+  existence check is already mechanical (`ac-sem-task`); what only the generator sees
+  is the layer: a sibling task's mention counts only when its layer is the one
+  enforcing the AC. (4.286)
+- **Race-condition walkthrough steps target the call without a UI gate.** A
+  single-trigger screen's out-of-order AC exercises the fire-and-forget call — never
+  the primary call that the same task's loading guard already serializes, which makes
+  a two-primary-calls script structurally unreachable. (4.287)
+- **Cross-wave invariant handoffs declare their addressee.** Either `task criterion`
+  (the next wave has the file/contract to satisfy it, and it enters the dispatch) or
+  `reviewer measurement` (only the gate's own tooling produces the number; the result
+  becomes a question for the Director, never a task rejection). (4.288)
+- **Fixing a "reacted to the wrong trigger" state verifies the untouched axis too.**
+  When the state depends on two independent axes, the re-gate's "what does this delta
+  break?" includes pushing the axis the fix did not touch to its extreme — the space
+  has two mirrored failure sides by construction. (4.289)
+- **The review round presumes a standing anchor.** Every dispatched gate captures
+  HEAD + status of the diff's files at its own start and re-checks before its
+  verdict — divergence discards the verdict; and the orchestrator treats the SHA
+  under review as frozen: no new commit enters the working tree while a verdict is in
+  flight, or the gate is re-dispatched with the new anchor declared. The proposed
+  sentinel + hook mechanism is deferred with a declared trigger. (4.290)
+- **`verificado` in the behavior gate is derived from the task's own walkthrough.**
+  Each scripted step gets a result (executed | inherited from a covering gate | n/a
+  with reason) — evidence from another gate proves only the steps it covers; without
+  the rest confronted, the value is `consolidado`. The task template's enum is now in
+  sync with the report contract (placeholder written with angle brackets so the
+  `task-done-gate-aberto` lint keeps its teeth). (4.291)
 
 Re-init: none
 

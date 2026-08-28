@@ -154,7 +154,7 @@ quality_gates:
   seguranca_gate8: aprovado (wave N) | n/a # via security-engineer, 1× por wave, quando a wave tem mudança sensível e gates.security ativo
   performance_gate10: aprovado (wave N) | n/a # via performance-engineer, 1× por wave, quando a wave toca superfície de custo (lista canônica na description — 4.155)
   design_gate11: aprovado (wave N) | n/a   # via product-designer, 1× por wave, quando a wave toca superfície de interface (lista canônica na description — 4.218)
-  comportamento_gate9: consolidado (FEAT-NNN-XXX) | consolidado (DoD, Etapa 4) | verificado | pendente_handoff | n/a   # via qa por FEAT (4.90); SPEC sem FEATs → Etapa 4; pendente_handoff = ambiente sem tela (gates.screenVerify), seeds p/ Etapa 4
+  comportamento_gate9: consolidado (FEAT-NNN-XXX) | consolidado (DoD, Etapa 4) | verificado | pendente_handoff | n/a   # via qa por FEAT (4.90); SPEC sem FEATs → Etapa 4; pendente_handoff = ambiente sem tela (gates.screenVerify), seeds p/ Etapa 4; "verificado" é DERIVADO do Roteiro do gate 9 da própria TASK — cada passo com resultado (executado | herdado de gate que o cobre | n/a com motivo), nunca veredito solto: evidência de outro gate prova só os passos que ela cobre, e sem os demais confrontados o valor é consolidado (4.291; caso real: reprodução de achado do gate 8 cobriu 1 de 4 passos e a TASK fechou "verificado")
 notas: <opcional>
 ```
 
@@ -260,7 +260,7 @@ E sugira `/keelson:integrate {docsRoot}/<slug>/plans/PLAN-MMM-<nome>.md` — com
 - Por task (atribuição obrigatória — torna visível qualquer colapso de independência):
   | Task | implementado_por | revisado_por | gate 8 | gate 9 | gate 10 | gate 11 |
   |---|---|---|---|---|---|---|
-  | TASK-MMM-XXX | <id> | <id> | aprovado \| n/a | verificado \| pendente_handoff \| n/a | aprovado \| n/a | aprovado \| n/a |
+  | TASK-MMM-XXX | <id> | <id> | aprovado \| n/a | verificado \| consolidado \| pendente_handoff \| n/a | aprovado \| n/a | aprovado \| n/a |
 - Linha com `revisado_por` = `implementado_por`, gate 8 `n/a` em task que tocou área sensível (ou `aprovado` cujo report veio sem o inventário `conferido` — decisão 4.264), gate 10 `n/a` em task que tocou superfície de custo, ou gate 11 `n/a` em task que tocou superfície de interface → report **inválido**: rode o gate que falta antes de concluir.
 
 ## Closure

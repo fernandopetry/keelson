@@ -3016,6 +3016,70 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 **Aplicação**: `docs/_meta/conventions/sdd-conventions.md` (bullet da 4.163) · `agents/developer.md` (ressalva com ponteiro ao dono) · CHANGELOG **0.126.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-27.
 
+### 4.284 — Resiste a contorno ganha os itens (f) round-trip/por-sujeito e (g) comparativo de unicidade
+
+**Problema**: campo (postmortem de consumidor 0.121.1, fila da 4.111, 2026-08-28 — LRN-076 e LRN-078; a LRN-076 é de sessão anterior do mesmo consumidor e nunca tinha chegado à fila, mesma classe da linha LRN-015 de 2026-08-25): dois padrões de critério de gate 1 que a família (a)-(e) da 4.107 não cobre. (1) Critério de round-trip ("exercite start → callback com o mesmo cookie") cumprido à risca com o arrange instalando a primitiva que o callback deveria acionar sozinho — garantia idempotente, mutante do sujeito removido sobrevive, 1 retry. (2) AC que combina dois predicados por comparativo de unicidade ("mensagem própria e DISTINTA das demais") coberto por teste-canário cuja única asserção sobre o corpo era `assertNotEmpty` — colapsar as 4 mensagens num `default`, ou trocar duas entre si, mantinha tudo verde; a detecção ("unicidade provada com contém em vez de contagem") já era check do gate 1, mas detectar com código pronto custa o retry que prevenir na fixação não custa.
+
+**Decisão**: dois itens novos na família, **anexados** (nunca renumerar — TESTING.md:91 e o histórico ancoram por letra): (f) critério de round-trip/transporte nunca instala no preparo a primitiva sob prova — o arrange restaura só o canal; e requisito MUST com N sujeitos exige mutante que morre **por sujeito** (a 4.109 cobre o fechamento de achado multi-sujeito; o item cobre a geração, antes de achado existir). (g) comparativo de unicidade exige asserção de valor literal ou contagem para o predicado de distinção — "contém"/"não vazio" prova só o outro predicado. Check mecânico não desenhado (1ª ocorrência de cada classe, escada 4.149).
+
+**Aplicação**: `commands/tasks.md` (Etapa 3, família "resiste a contorno" — "cinco testes" vira "sete") · CHANGELOG **0.127.0**, `Re-init: none`. Origem: fila da 4.111, linhas 2026-08-28 (LRN-076, LRN-078).
+
+### 4.285 — Afirmação sobre payload de sistema externo: fato só com amostra capturada; fixture nunca nasce da prosa
+
+**Problema**: campo (mesma fila — LRN-082, mecanismo M1 do postmortem, o mais caro do ciclo): a SPEC afirmou 3 vezes, como fato, a forma de um payload de sistema externo — nunca como premissa `[assumido]`, então a rota de premissas nem foi acionada. O PLAN converteu a afirmação em constante, a TASK prescreveu o fixture, o developer o escreveu conforme prescrito e o teste passou: gerador e avaliador partiam da mesma crença, e a suíte verde provava a crença, não o payload. A tela cujo produto é evidência apontava 3 dos 9 descartes reais, com o gate 1 verde o tempo todo; só a convergência de fecho achou, ao buscar o dado real — que já existia no repositório. O item (a) da 4.107 só cobria fonte real interna e grep-ável.
+
+**Decisão**: a régua "conferido contra a fonte real, nunca presumido" ganha o eixo externo nos dois pontos da cadeia. No gerador (`/keelson:tasks`, item (a)): forma de payload externo que um fixture reproduz é conferida contra **amostra realmente capturada** (resposta salva, dump de integração, captura do gate 9), nunca contra a prosa da SPEC/PLAN. Na origem (`/keelson:specify`, princípio da proveniência 4.240): afirmação sobre forma/contrato de sistema externo entra como fato só com âncora de amostra; sem amostra, nasce `[assumido] [evidência: crença]` — o ponto de intervenção mais barato identificado pelo próprio postmortem. Sem consumidor mecânico (H9 do mapa de impacto): texto sem check é o default declarado; fato de lint/validator segue a escada 4.149.
+
+**Aplicação**: `commands/tasks.md` (item (a)) · `commands/specify.md` (princípio 2, frase da 4.240) · CHANGELOG **0.127.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-28 (LRN-082).
+
+### 4.286 — Cobertura fecha também de frente para trás: conjunto de ACs derivado da SPEC, com confronto de camada
+
+**Problema**: campo (mesma fila — LRN-079): TASK declarou um FR em "Realiza (FRs)" e enumerou à mão 13 dos 14 ACs que a SPEC associa a ele — pulando justamente a faceta "falhou"; achado só no gate 7, com código pronto. A mecanização proposta pelo consumidor ("confrontar o conjunto FR→AC da SPEC contra as TASKs") **já existe**: `ac-sem-task` (4.153) é ERROR na geração — e provadamente não pegava este caso: o motor atual, rodado sobre o snapshot do commit de geração do consumidor, fica verde porque as TASKs irmãs de backend citavam o AC nos critérios. O furo real é de **alocação por camada** (o AC de comportamento de tela citado só nas TASKs de backend), que a régua "decida qual camada enforça o AC" já governa mas nada mandava confrontar.
+
+**Decisão**: o parágrafo da cobertura ganha o sentido inverso: FR em "Realiza" tem o conjunto de ACs **derivado do texto da SPEC** e confrontado com a distribuição da wave — nunca enumerado de memória; AC sem critério em TASK nenhuma entra como exclusão explícita (AC + motivo + onde será provado); e menção em TASK irmã só conta se a camada dela é a que enforça o AC. Check mecânico novo **recusado como redundante** (a existência já é `ac-sem-task`); o eixo residual — camada — exige julgamento e fica no gerador, declarado imecanizável nesta forma.
+
+**Aplicação**: `commands/tasks.md` (Etapa 3, parágrafo da cobertura) · CHANGELOG **0.127.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-28 (LRN-079).
+
+### 4.287 — Roteiro de corrida mira a chamada sem gate de UI
+
+**Problema**: campo (mesma fila — LRN-081): roteiro de gate 9 fixado antes do código mandava simular corrida disparando duas chamadas primárias em sequência — cenário estruturalmente inatingível, porque o guard de loading exigido por **outro AC da mesma TASK** desabilita botão e campo durante toda a chamada primária: a 2ª não consegue nem começar. A corrida real vivia na chamada secundária (fire-and-forget, sem gate de UI). O `qa` salvou o gate ao perceber a impossibilidade na execução — nada na régua o teria alertado antes.
+
+**Decisão**: no dono do roteiro (mesmo parágrafo estendido pela 4.107): AC de corrida/resposta fora de ordem numa tela de disparo único mira a chamada assíncrona sem gate de UI, nunca a que o guard da própria TASK já serializa. Check mecânico não desenhado (1ª ocorrência, escada 4.149).
+
+**Aplicação**: `commands/tasks.md` ("Roteiro do gate 9") · CHANGELOG **0.127.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-28 (LRN-081).
+
+### 4.288 — Handoff de invariante entre waves declara a quem se dirige
+
+**Problema**: campo (mesma fila — LRN-080): gate dedicado deixou um invariante para a wave seguinte em prosa livre ("mostre que a contagem não cresce com N") — frase que soa como critério do developer, mas só a ferramenta do próprio gate (contador sobre volumes reais) podia produzir o número, e o developer não podia tocar o método pré-existente fora do contrato da TASK dele. O parágrafo "Adiamento é declarado" (4.85) manda declarar **onde** o gate rodará, nunca a **natureza** do que fica pendente; o Tech Lead decidiu sozinho o alcance — certo por leitura própria, sob risco de reprovar código correto ou deixar risco sem medição. A 4.140 cobre a metade "vira critério do despacho"; nada distinguia o caso em que o invariante não é satisfazível por TASK nenhuma.
+
+**Decisão**: o handoff declara a etiqueta: `critério da TASK` (a wave seguinte tem o arquivo/contrato — e ele entra no despacho como critério, 4.140) ou `medição do revisor` (só o gate produz o número; o resultado vira demanda ao Diretor, nunca reprovação). Vale para todo gate dedicado que difere invariante entre waves — por isso o dono é a doutrina de orquestração, não um revisor específico. Check mecânico não desenhado (1ª ocorrência, escada 4.149).
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (§Orquestração, parágrafo "Adiamento é declarado") · CHANGELOG **0.127.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-28 (LRN-080).
+
+### 4.289 — Correção de "reagiu ao gatilho errado" verifica também o eixo que não tocou
+
+**Problema**: campo (mesma fila — LRN-083, mecanismo M2 do postmortem): estado de UI dependia de dois eixos independentes (identidade do assunto exibido × critério de tamanho do conteúdo, que cresce dentro do mesmo assunto por carga em duas etapas). A proteção original nunca engatava; a 1ª correção (observar identidade) fez o painel fechar sozinho; a 2ª (observar chave de assunto) fez expandir sozinho — cada correção passou exatamente na verificação que a régua vigente exige (re-checar o delta contra o achado que o motivou) e reabriu o lado oposto. O gate 11 pegou as duas regressões por execução — depois de cada uma já declarada fechada; a final (dois eixos) foi confirmada por model checking exaustivo. Espaço com dois eixos tem dois defeitos espelhados por construção: reagir de menos e reagir de mais.
+
+**Decisão**: no bullet da 4.94 (convergência do re-gate): quando o achado classifica um estado como "reagiu ao gatilho errado" sobre dois eixos independentes, "o que este delta quebra" inclui levar ao extremo o eixo que a correção **não** tocou — verificar só o lado que doeu é meio teste. Autoria registrada como no postmortem: nenhum agente errou; o desenho não perguntava pelo lado espelhado. Check mecânico não desenhado (1ª ocorrência, escada 4.149).
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (§Convergência do re-gate, bullet da 4.94) · CHANGELOG **0.127.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-28 (LRN-083).
+
+### 4.290 — A rodada pressupõe âncora parada: integridade conferida por todo gate e orquestrador que não move a árvore
+
+**Problema**: campo (mesma fila — LRN-045, reincidência 2; escada 4.149 satisfeita: a proposta chegou com o mecanismo desenhado). A classe "árvore movendo sob veredito" tem três camadas e só a 1ª estava no plugin: (1) gate mutante isola-se em worktree (4.134, aplicada); (2) todo gate da rodada confere a integridade da árvore antes do veredito — proposta da reincidência 1 (2026-08-18) que ficou no ledger do consumidor e nunca chegou à fila; um revisor quase emitiu REPROVADO falso ao ler o mutante de um gate concorrente, salvo por conferência ad hoc; (3) o próprio **orquestrador**: re-review despachado sobre um SHA e commit novo na mesma árvore com o veredito em voo, 2 vezes na mesma sessão — o revisor congelou por hash próprio e re-rodou os mecânicos, trabalho que o despacho causou. A 4.276 deu o par de capturas ao gate 9; nada cobria os demais gates nem o lado de quem despacha.
+
+**Decisão**: as camadas 2 e 3 entram no dono (bullet do paralelismo, junto da 4.134): todo gate despachado captura `git rev-parse HEAD` + `git status --porcelain` dos arquivos do diff na largada e reconfere antes do veredito — divergência descarta e re-roda, nunca emite; e o orquestrador trata o SHA sob revisão como âncora parada — com veredito em voo, nenhum commit novo entra na working tree; correção espera ou o gate é re-despachado com âncora nova declarada. O **mecanismo** proposto (sentinela de revisor em voo no run-state + hook PreToolUse da família wave-guard bloqueando `git commit`) fica **adiado com gatilho, decisão em nome do Diretor** (precedente de custo 4.273: hook novo exige reincidência): reincidência da camada-orquestrador **após** este texto existir → a sentinela + hook entram como leva própria, com o desenho do consumidor como base.
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (§Orquestração, bullet do paralelismo) · CHANGELOG **0.127.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-28 (LRN-045 r2).
+
+### 4.291 — `verificado` no gate 9 é derivado do Roteiro; o enum do template sincronizado com o do report
+
+**Problema**: campo (mesma fila — LRN-077, de sessão anterior do mesmo consumidor, nunca chegada à fila): na closure, a linha `Comportamento (gate 9)` foi preenchida `verificado` com evidência autêntica porém **parcial** — a reprodução pessoal de um achado do gate 8 cobria 1 dos 4 passos do Roteiro fixado na própria TASK — e "Roteiro executado" ficou pendente na mesma passada; a contradição só foi lida 1 wave depois. Agravante estrutural: prova nascida de achado de gate chega com autoridade e evidência executada — o perfil que mais dispensa checagem. E o template da TASK listava só `verificado | n/a` enquanto o enum do report (§3.4.1) tem 5 valores — divergência confirmada na main atual.
+
+**Decisão**: no dono do enum (implement §3.4.1): `verificado` exige veredito **derivado** do Roteiro da própria TASK — cada passo com resultado (executado | herdado de gate que o cobre | n/a com motivo), nunca veredito solto; evidência de outro gate prova só os passos que cobre, e sem os demais confrontados o valor é `consolidado`. O template da TASK sincroniza com o enum pleno — com o placeholder do consolidado em delimitador angular (`consolidado <…>`), decisão em nome do Diretor mitigando a H1 do mapa de impacto: o placeholder literal com parênteses cegaria o lint `task-done-gate-aberto`, que absolve linhas contendo `consolidado (`; preenchido, o valor real usa parênteses e o lint o absolve corretamente. Endurecer o lint para não absolver placeholder fica como candidata adiada (fixture + contrato, leva própria). A coluna da tabela da Entrega ganha `consolidado` (era a 3ª forma do enum, H4 do mapa — as demais colunas seguem recorte abreviado declarado).
+
+**Aplicação**: `commands/implement.md` (§3.4.1, comentário do enum; tabela da Entrega) · `commands/tasks.md` (template, linha do gate 9) · CHANGELOG **0.127.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-28 (LRN-077).
+
 ---
 
 ## 7. Roteamento de mudanças
