@@ -254,6 +254,25 @@ reabre os gates de comportamento. Se uma sessão entrar nesse loop mesmo assim, 
 parar e fechar declarando o estado dos gates — e rode `/keelson:postmortem`: a mensagem
 ao mantenedor é o caminho de correção do processo.
 
+### Os papéis ficaram "mudos" numa sessão com Agent Teams
+
+O sintoma: você usa o recurso experimental **Agent Teams** do Claude Code
+(`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, com ou sem tmux) e, no meio de um ciclo,
+os papéis (PO, analistas, revisores) parecem não devolver parecer nenhum — ou a
+sessão sugere dar mais ferramentas aos agents "para conseguirem responder".
+
+O que acontece: com Agent Teams habilitado, um subagent que recebe **nome** vira um
+*teammate* — uma sessão separada que não devolve o resultado automaticamente a quem
+chamou; ela responde por mensagem (`SendMessage`), canal que o Claude Code garante
+até para agents somente-leitura. Fora do tmux a conversão é invisível (o teammate
+roda dentro do próprio terminal), o que torna o sintoma mais confuso. Não é preciso
+— nem correto — dar Bash ou Write a nenhum papel para "destravar" a resposta.
+
+O conserto: conduza o ciclo na **sessão principal**, nunca de dentro de uma pane de
+teammate; e atualize o plugin (`/keelson:update`) — desde a versão 0.128.0 os
+comandos despacham os papéis sem nome, o que impede a conversão acidental. Se você
+quer o modo teams de verdade, ele é opt-in: `/keelson:implement --force-mode=teams`.
+
 ## Jira
 
 ### O ciclo terminou e o Jira não soube de nada

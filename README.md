@@ -415,16 +415,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.127.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.128.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: nine field absorptions (decisions 4.284–4.291) against one
-signature — proofs that share their premise with what they verify: external payload
-shapes require a captured sample, two new contour-resistance tests at criterion
-fixation, front-to-back AC coverage with layer confrontation, addressee-tagged gate
-handoffs, mirror-axis re-verification, standing-anchor review rounds, and a
-walkthrough-derived behavior verdict. Re-init: none.
+New in this release: the cycle is deterministic under the experimental Agent Teams
+flag (decisions 4.292–4.294) — roles are dispatched by type without an instance name
+so the env var alone never converts them into teammates, the teams-mode return
+channel (`SendMessage`, injected even for read-only agents) is named in the
+teams-mode owner, and the cycle runs in the lead session. Re-init: none.
 See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in

@@ -23,6 +23,37 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.128.0] — 2026-08-28
+
+Re-init: none
+
+Decisions 4.292–4.294 — field report: with the experimental Agent Teams feature enabled
+in the environment, a consumer session saw read-only roles converted into teammates,
+concluded they "couldn't return anything" and proposed granting them Bash. This batch
+makes the cycle deterministic under that flag and names the teams-mode return channel.
+
+### Added
+
+- **Teams-mode return channel named in the teams-mode owner.** A teammate has no
+  implicit return to its caller: every dispatched role reports to the lead via
+  `SendMessage`, carrying the same per-agent output contract — the transport changes,
+  never the format. The harness injects `SendMessage` into teammates even with a
+  read-only `tools:` list, so a missing tool is never a diagnosis for granting
+  `Write`/`Edit`/`Bash` to an evaluator "so it can reply". (4.292)
+- **Dispatch is by type, never by instance name.** With
+  `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in the environment, a *named* subagent
+  launches as a teammate in any interactive session — even without
+  `--force-mode=teams`, and invisibly outside tmux (in-process display). Cycle roles
+  are now dispatched anonymously (`subagent_type` only), so the env var alone never
+  converts the cycle; teams stays opt-in via the flag. Headless (`-p`/Agent SDK)
+  sessions never convert. (4.293)
+- **The cycle runs in the lead session, never from inside a teammate.** Run-state
+  ownership and the wave-guard belong to the conducting session, and the feature
+  itself documents that in-process teammates cannot spawn background subagents. Two
+  gaps in teams mode are declared without mitigation this batch (fixing the guards is
+  its own batch): the stale-background guard and per-role telemetry may degrade —
+  reports name the gap, never estimate it. (4.294)
+
 ## [0.127.0] — 2026-08-28
 
 Re-init: none

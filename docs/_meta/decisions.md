@@ -2,7 +2,7 @@
 
 > Memória institucional das decisões sobre como o keelson (spec-driven development) é praticado. Diferente da doutrina de código (QUALITY-CHARTER + perfil ativo, que regem o **código**), este arquivo rege o **processo de desenvolvimento**.
 
-**Última revisão**: 2026-08-27
+**Última revisão**: 2026-08-28
 **Status do documento**: vivo, atualizado conforme decisões evoluem
 
 > **Nota de rename (decisão 4.40, 2026-07-26)**: entradas anteriores à 0.21.0 citam agents pelos IDs antigos (`task-implementer`, `task-reviewer`, `task-verifier`, `security-reviewer`, `product-critic`, `process-tuner`, `profile-writer`). Histórico não se reescreve — o de-para completo está na decisão 4.40.
@@ -2845,6 +2845,7 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 - Teammates independentes, coordenados por task list compartilhado + mensagens diretas
 - Worktrees por task e branches separadas (isolamento criado pelo setup do keelson — não é nativo do Agent Teams)
 - Custo: 3-5x tokens, ganho: até 2x mais rápido
+- Conversão espontânea: subagent **nomeado** vira teammate com a env var ativa em sessão interativa, mesmo sem a flag — neutralizada pelo despacho anônimo (4.293); headless (`-p`/SDK) nunca converte; retorno de papel em teams via `SendMessage` (4.292)
 
 ### 6.3 Modo SINGLE_THREAD (wave única e sequencial de tasks pequenas)
 
@@ -3079,6 +3080,36 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 **Decisão**: no dono do enum (implement §3.4.1): `verificado` exige veredito **derivado** do Roteiro da própria TASK — cada passo com resultado (executado | herdado de gate que o cobre | n/a com motivo), nunca veredito solto; evidência de outro gate prova só os passos que cobre, e sem os demais confrontados o valor é `consolidado`. O template da TASK sincroniza com o enum pleno — com o placeholder do consolidado em delimitador angular (`consolidado <…>`), decisão em nome do Diretor mitigando a H1 do mapa de impacto: o placeholder literal com parênteses cegaria o lint `task-done-gate-aberto`, que absolve linhas contendo `consolidado (`; preenchido, o valor real usa parênteses e o lint o absolve corretamente. Endurecer o lint para não absolver placeholder fica como candidata adiada (fixture + contrato, leva própria). A coluna da tabela da Entrega ganha `consolidado` (era a 3ª forma do enum, H4 do mapa — as demais colunas seguem recorte abreviado declarado).
 
 **Aplicação**: `commands/implement.md` (§3.4.1, comentário do enum; tabela da Entrega) · `commands/tasks.md` (template, linha do gate 9) · CHANGELOG **0.127.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-28 (LRN-077).
+
+---
+
+### 4.292 — Retorno de papel em modo teams: mesmo contrato, canal `SendMessage`; ferramenta nunca é concedida "para devolver"
+
+**Problema**: relato do Diretor (fila da 4.111): numa sessão de consumidor com Agent Teams ativo (tmux), papéis avaliadores read-only convertidos em teammates ficaram "mudos" — teammate não tem retorno implícito ao invocador — e a sessão, sem doutrina cobrindo o caso, diagnosticou "sem Bash não devolvem nada" e propôs conceder Bash aos papéis de produto, armando o fazedor≠aprovador que o desenho read-only existe para impedir. O diagnóstico é falso: a doc oficial documenta que o harness injeta `SendMessage` no teammate mesmo com `tools:` só de leitura.
+
+**Decisão**: o contrato de retorno (duas camadas, 4.103) declara no dono a **independência de transporte** — despacho aguardado, notificação de background ou mensagem de teammate: muda o canal, nunca o formato. O `agent-teams.md` (dono das especificidades do modo — 4.74) nomeia o canal (`SendMessage` ao lead, injetado pelo harness) e registra o anti-padrão: falta de ferramenta nunca é diagnóstico para conceder `Write`/`Edit`/`Bash` a avaliador. A formulação segue o precedente do bullet do escriba ("read-only por desenho e não ganham `Write`"), evitando o vocabulário falso "avaliador sem Bash" (gates de código têm Bash; o fato verdadeiro é: nenhum ganha ferramenta de escrita para *devolver*).
+
+**Aplicação**: `docs/_meta/conventions/sdd-conventions.md` (bloco 4.103 + bullet do escriba) · `docs/_meta/conventions/agent-teams.md` · CHANGELOG **0.128.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-28 (relato do Diretor).
+
+---
+
+### 4.293 — Despacho por tipo, sem nome de instância: a env var sozinha nunca converte o ciclo
+
+**Problema**: (mesma fila) com `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` no ambiente, subagent **nomeado** é lançado como teammate em qualquer sessão interativa — mesmo sem `--force-mode=teams`, "teams se forma sem ninguém pedir" (doc oficial) — e a percepção depende da superfície: panes visíveis no tmux, in-process invisível em terminal comum e extensão de IDE. O canal de retorno do ciclo vira função do ambiente, debaixo da doutrina; e a conversão espontânea rouba as garantias que o modo teams só ganha via flag (worktree por task, dry-run de merge). Sessão não-interativa (`-p`/SDK) nunca converte.
+
+**Decisão**: papel do ciclo é despachado por `subagent_type` (`keelson:<agent>`), **sem nome/identidade de instância** — subagent anônimo nunca converte; teams continua opt-in exclusivo da flag. A regra distingue os dois parâmetros de propósito: o `agent-guard` (4.42) continua negando spawn genérico com impressão digital de papel — nome de instância não é `subagent_type`. Limite declarado: a regra governa os despachos dos comandos e **não entra no bloco injetado** (sessão livre segue o default do harness; levá-la ao bloco custaria `Re-init: required` sem caso de campo que o justifique). Bump **minor** decidido em nome do Diretor: regra nova de comportamento de despacho, não correção de texto — o precedente 0.22.1 (patch) cobre só precisão de fato no dono do modo.
+
+**Aplicação**: `sdd-conventions.md` (bloco de despacho) · `commands/implement.md` (Etapa 0.1) · anexo §6.2 · CHANGELOG **0.128.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-28 (relato do Diretor).
+
+---
+
+### 4.294 — O ciclo se conduz na sessão lead; lacunas do modo teams declaradas, nunca estimadas
+
+**Problema**: (mesma fila) ciclo conduzido de dentro de um teammate: o próprio recurso documenta que teammate in-process não spawna subagents em background e que o lead é fixo; no repo, a posse do run-state é da sessão que o escreveu (4.251) e o `wave-guard` cobra o fecho dela. E dois mecanismos assumem topologia de subagents: o `stale-background-guard` (ancestralidade de PPIDs — laudo tende a INDETERMINADO com teammate) e o `window-marker` (telemetria por papel extraída dos registros de resultado do Task — pode sair vazia).
+
+**Decisão**: o `agent-teams.md` registra: o ciclo se conduz na sessão lead, nunca de dentro de um teammate — ancorado primeiro nos fatos verificáveis do repo (posse do run-state, wave-guard), com os fatos do harness como secundários (mudam entre versões). As duas lacunas ficam **declaradas sem mitigação nesta leva** (risco subido ao Diretor pela 4.188 na entrega — mexer nos guards é leva própria com suíte); no report do consumidor, lacuna **nomeada**, nunca estimada.
+
+**Aplicação**: `docs/_meta/conventions/agent-teams.md` · CHANGELOG **0.128.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-28 (relato do Diretor).
 
 ---
 
