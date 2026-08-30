@@ -127,7 +127,7 @@ case "$ACTION" in
   list)
     MODE="active"
     [ "${1:-}" = "--archived" ] && MODE="archived"
-    # shellcheck disable=SC2329  # invocada indiretamente via em_cada_casa
+    # shellcheck disable=SC2329,SC2317  # invocada indiretamente via em_cada_casa (SC2317: shellcheck novo re-acusa o corpo)
     list_casa() {
       if [ "$MODE" = "active" ]; then
         for f in "$1"/*.md; do
@@ -144,7 +144,7 @@ case "$ACTION" in
     exit 0 ;;
 
   count)
-    # shellcheck disable=SC2329  # invocada indiretamente via em_cada_casa
+    # shellcheck disable=SC2329,SC2317  # invocada indiretamente via em_cada_casa (SC2317: shellcheck novo re-acusa o corpo)
     count_casa() {
       for f in "$1"/*.md; do
         [ -f "$f" ] || continue
@@ -167,7 +167,7 @@ case "$ACTION" in
       shift
     done
     have=0
-    # shellcheck disable=SC2329  # invocada indiretamente via em_cada_casa
+    # shellcheck disable=SC2329,SC2317  # invocada indiretamente via em_cada_casa (SC2317: shellcheck novo re-acusa o corpo)
     have_casa() {
       for f in "$1"/*.md; do
         [ -f "$f" ] && { have=1; break; }
@@ -182,7 +182,7 @@ case "$ACTION" in
     pair="$(stamp "$TS")" || exit 2
     compact="${pair%%	*}"
     # cada casa arquiva DENTRO DE SI (4.314 — nunca mistura); casa sem ativo fica muda
-    # shellcheck disable=SC2329  # invocada indiretamente via em_cada_casa
+    # shellcheck disable=SC2329,SC2317  # invocada indiretamente via em_cada_casa (SC2317: shellcheck novo re-acusa o corpo)
     archive_casa() {
       tem=0
       for f in "$1"/*.md; do

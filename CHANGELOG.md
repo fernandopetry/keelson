@@ -23,6 +23,20 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.140.1] — 2026-08-30
+
+Re-init: none
+
+CI validation pass over the 4.314–4.316 arc.
+
+### Fixed
+
+- **CI green again on newer shellcheck**: Ubuntu's shellcheck emits
+  SC2317 (unreachable) for the whole body of `ledger.sh`'s
+  indirectly-invoked per-home functions — a false positive the older
+  local version reports as SC2329 only. The existing per-function
+  directives now cover both codes. No behavior change.
+
 ## [0.140.0] — 2026-08-30
 
 Re-init: none
