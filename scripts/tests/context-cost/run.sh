@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 # run.sh — suíte de regressão do context-cost.sh (decisão 4.239).
 #
-# Casos inline em diretório temporário. Regras provadas: pico = maior janela do
-# log; ranking por papel somado e ordenado decrescente; --compose arredonda para
-# ~Nk; sem log / log vazio → saída vazia e exit 0 (telemetria, nunca trava);
-# linha malformada é ignorada, nunca inventa número (4.156); --teams (4.296) só
-# com --compose, e a linha `cobertura:` só qualifica ranking existente.
+# Casos inline em diretório temporário, ambiente de sessão controlado pelo
+# wrapper cc(). Regras provadas: pico = maior janela do log; ranking por papel
+# somado e ordenado decrescente; --compose arredonda para ~Nk; sem log / log
+# vazio → saída vazia e exit 0 (telemetria, nunca trava); linha malformada é
+# ignorada, nunca inventa número (4.156); --teams (4.296) só com --compose, e a
+# linha `cobertura:` só qualifica ranking existente; casa da sessão (4.314):
+# window.log da casa é lido, e sessão que atravessou o update soma os dois
+# trechos (legado + casa).
 #
 # Uso: scripts/tests/context-cost/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -29,6 +32,9 @@ falha() { echo "FAIL $1"; fail=$((fail + 1)); }
 bash -n "$CC" || { echo "FAIL bash -n context-cost.sh"; exit 1; }
 echo "ok   bash -n context-cost.sh"
 
+# cc — invocação com ambiente de sessão controlado ("" no 1º arg = modo legado)
+cc() { sess="$1"; shift; env -u CLAUDE_CODE_SESSION_ID KEELSON_SESSAO="$sess" bash "$CC" "$@"; }
+
 # repo completo: janelas + agentes (com repetição de papel) + linhas malformadas
 R="$TMP/repo"; mkdir -p "$R/thoughts/local"
 cat > "$R/thoughts/local/session-window.log" <<'EOF'
@@ -44,21 +50,21 @@ linha malformada sem formato nenhum
 EOF
 
 # saída crua: pico + ranking decrescente, malformadas ignoradas
-out="$(bash "$CC" "$R")"
+out="$(cc "" "$R")"
 want="pico 623400
 papel keelson:developer 451600 2
 papel keelson:code-reviewer 210000 1"
 if [ "$out" = "$want" ]; then ok cru-completo; else falha "cru-completo: [$out]"; fi
 
 # --compose: arredondamento ~Nk e formato pronto para o report
-out="$(bash "$CC" "$R" --compose)"
+out="$(cc "" "$R" --compose)"
 want="pico: ~623k tokens
 papel: keelson:developer ~452k tokens (2 spawns)
 papel: keelson:code-reviewer ~210k tokens (1 spawns)"
 if [ "$out" = "$want" ]; then ok compose-completo; else falha "compose-completo: [$out]"; fi
 
 # --compose --teams (4.296): linha de cobertura fecha o ranking, flag do chamador
-out="$(bash "$CC" "$R" --compose --teams)"
+out="$(cc "" "$R" --compose --teams)"
 want="pico: ~623k tokens
 papel: keelson:developer ~452k tokens (2 spawns)
 papel: keelson:code-reviewer ~210k tokens (1 spawns)
@@ -66,30 +72,52 @@ cobertura: ciclo em AGENT_TEAMS — ranking cobre só despachos via Task; trabal
 if [ "$out" = "$want" ]; then ok compose-teams; else falha "compose-teams: [$out]"; fi
 
 # --teams sem --compose: uso incorreto → exit 2 (borda congelada do parser)
-if bash "$CC" "$R" --teams >/dev/null 2>&1; then falha "teams-sem-compose: aceitou"; else
-  bash "$CC" "$R" --teams >/dev/null 2>&1; [ $? -eq 2 ] && ok teams-sem-compose || falha "teams-sem-compose: exit != 2"
+if cc "" "$R" --teams >/dev/null 2>&1; then falha "teams-sem-compose: aceitou"; else
+  cc "" "$R" --teams >/dev/null 2>&1; [ $? -eq 2 ] && ok teams-sem-compose || falha "teams-sem-compose: exit != 2"
 fi
 
 # só janelas (rota sem subagents): pico sai, nenhum papel
 R2="$TMP/repo-so-janela"; mkdir -p "$R2/thoughts/local"
 printf '2026-08-20T10:00:00-0300 janela=88000\n' > "$R2/thoughts/local/session-window.log"
-out="$(bash "$CC" "$R2" --compose)"
+out="$(cc "" "$R2" --compose)"
 if [ "$out" = "pico: ~88k tokens" ]; then ok compose-so-janela; else falha "compose-so-janela: [$out]"; fi
 
 # --teams sem ranking: cobertura NÃO sai — qualifica medição existente, nunca inventa
-out="$(bash "$CC" "$R2" --compose --teams)"
+out="$(cc "" "$R2" --compose --teams)"
 if [ "$out" = "pico: ~88k tokens" ]; then ok compose-teams-so-janela; else falha "compose-teams-so-janela: [$out]"; fi
 
 # sem log: saída vazia, exit 0 (telemetria omitida, nunca erro)
 R3="$TMP/repo-sem-log"; mkdir -p "$R3"
-out="$(bash "$CC" "$R3" --compose)"; rc=$?
+out="$(cc "" "$R3" --compose)"; rc=$?
 if [ "$rc" -eq 0 ] && [ -z "$out" ]; then ok sem-log; else falha "sem-log: rc=$rc [$out]"; fi
 
 # log vazio: idem
 R4="$TMP/repo-log-vazio"; mkdir -p "$R4/thoughts/local"
 : > "$R4/thoughts/local/session-window.log"
-out="$(bash "$CC" "$R4")"; rc=$?
+out="$(cc "" "$R4")"; rc=$?
 if [ "$rc" -eq 0 ] && [ -z "$out" ]; then ok log-vazio; else falha "log-vazio: rc=$rc [$out]"; fi
+
+# casa da sessão (4.314): window.log da casa é a fonte
+R5="$TMP/repo-casa"; mkdir -p "$R5/thoughts/local/sessions/20260830-100000-sessaoc1"
+printf 'sessao: sessao-c-11112222\niniciada: 2026-08-30T10:00:00-0300\nestado: ativa\nslugs:\n' \
+  > "$R5/thoughts/local/sessions/20260830-100000-sessaoc1/session.meta"
+printf '2026-08-30T10:05:00-0300 janela=200000\n' > "$R5/thoughts/local/sessions/20260830-100000-sessaoc1/window.log"
+out="$(cc "sessao-c-11112222" "$R5" --compose)"
+if [ "$out" = "pico: ~200k tokens" ]; then ok casa-da-sessao; else falha "casa-da-sessao: [$out]"; fi
+
+# sessão que atravessou o update soma os dois trechos (legado + casa)
+printf '2026-08-30T09:00:00-0300 janela=310000\n2026-08-30T09:01:00-0300 agente=keelson:qa tokens=50000\n' \
+  > "$R5/thoughts/local/session-window.log"
+out="$(cc "sessao-c-11112222" "$R5" --compose)"
+want="pico: ~310k tokens
+papel: keelson:qa ~50k tokens (1 spawns)"
+if [ "$out" = "$want" ]; then ok casa-soma-legado; else falha "casa-soma-legado: [$out]"; fi
+
+# outra sessão não lê o window.log da casa alheia (só o legado)
+out="$(cc "sessao-outra-9999" "$R5")"
+want="pico 310000
+papel keelson:qa 50000 1"
+if [ "$out" = "$want" ]; then ok casa-alheia-invisivel; else falha "casa-alheia-invisivel: [$out]"; fi
 
 # uso incorreto: sem raiz → exit 2
 if bash "$CC" >/dev/null 2>&1; then falha "uso-sem-raiz: aceitou"; else
@@ -97,8 +125,8 @@ if bash "$CC" >/dev/null 2>&1; then falha "uso-sem-raiz: aceitou"; else
 fi
 
 # raiz inexistente → exit 2
-if bash "$CC" "$TMP/nao-existe" >/dev/null 2>&1; then falha "raiz-inexistente: aceitou"; else
-  bash "$CC" "$TMP/nao-existe" >/dev/null 2>&1; [ $? -eq 2 ] && ok raiz-inexistente || falha "raiz-inexistente: exit != 2"
+if cc "" "$TMP/nao-existe" >/dev/null 2>&1; then falha "raiz-inexistente: aceitou"; else
+  cc "" "$TMP/nao-existe" >/dev/null 2>&1; [ $? -eq 2 ] && ok raiz-inexistente || falha "raiz-inexistente: exit != 2"
 fi
 
 if [ "$fail" -gt 0 ]; then

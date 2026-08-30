@@ -89,9 +89,12 @@ parada ("fôlego não é gatilho", 4.23/4.24). Fontes das marcas: `Cronologia` d
 rota formal; eventos `marco` do ledger nas rotas sem arquivo (`sdd-conventions.md`).
 A cauda **`janela pico`** (decisão 4.148) e a linha **`Custo por papel`** (decisão
 4.239, extensão da 4.148) seguem a mesma régua da duração — **medidas ou omitidas,
-nunca estimadas**: a fonte única é `thoughts/local/session-window.log`, escrito pelo
-hook `window-marker` fora do contexto do modelo — uma linha `<ts> janela=<tokens>`
-por Stop e uma linha `<ts> agente=<tipo> tokens=<N>` por subagent concluído. Quem
+nunca estimadas**: a fonte única é o log de janela `window.log` da **casa da sessão**
+(decisão 4.314, resolvida por `session-dir.sh`; legado
+`thoughts/local/session-window.log` em leitura dupla — sessão que atravessou o
+update soma os dois trechos), escrito pelo hook `window-marker` fora do contexto do
+modelo — uma linha `<ts> janela=<tokens>` por Stop e uma linha
+`<ts> agente=<tipo> tokens=<N>` por subagent concluído. Quem
 compõe as duas é `bash "${CLAUDE_PLUGIN_ROOT}/scripts/context-cost.sh" <raiz>
 --compose` (pico = maior janela; ranking = soma por papel, decrescente) — a saída é
 citada literal, jamais recalculada de memória. Ciclo que rodou em `AGENT_TEAMS` → o
@@ -104,9 +107,9 @@ lacuna declarada — são telemetria da dieta de contexto (meta da 4.103: ≤600
 obrigação do report; e **custo nunca é gatilho** de parada ou de mudança de
 comportamento (4.23/4.24). O fecho que move o ledger para `reported-*/` move o log
 junto — mesma razão: sem o corte, o pico e o ranking da próxima rodada herdam os da
-anterior. O arquivo de offset (`thoughts/local/.window-offset.*`) **permanece**: é
-ponteiro de leitura do transcript, não medição — apagá-lo faria o hook reprocessar e
-repovoar o log novo com agentes já reportados.
+anterior. O arquivo de offset (`.window-offset.*`, ao lado do log — na casa da
+sessão ou no legado) **permanece**: é ponteiro de leitura do transcript, não medição
+— apagá-lo faria o hook reprocessar e repovoar o log novo com agentes já reportados.
 
 ## §3. O que cada invocador acrescenta
 

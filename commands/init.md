@@ -193,7 +193,7 @@ Insira o conteúdo de `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.keelson-block.md` 
 
 ## Etapa 5.5 — Garantir `thoughts/` fora do versionamento
 
-Memos de exploração e backups do keelson vivem em `thoughts/local/`; os artefatos da verificação de tela (screenshot, dump de console/rede), em `thoughts/screen-verify/<slug>/` — nada disso é versionado. Garanta que o `.gitignore` do projeto contém `thoughts/` **e** `keelson.local.json` (dados de acesso locais — credenciais de dev, nunca versionadas) — adicione as linhas que faltarem.
+O transitório do keelson vive sob `thoughts/local/` — memo de exploração na raiz dela e o restante do ciclo (run-state, ledger, telemetria, backups) na casa da sessão `thoughts/local/sessions/<ts>-<sid8>/` (decisão 4.314); os artefatos da verificação de tela (screenshot, dump de console/rede), em `thoughts/screen-verify/<slug>/` — nada disso é versionado. Garanta que o `.gitignore` do projeto contém `thoughts/` **e** `keelson.local.json` (dados de acesso locais — credenciais de dev, nunca versionadas) — adicione as linhas que faltarem.
 
 **Cobertura se verifica, não se infere** (decisão 4.51): não conclua que o `artifactsDir` está ignorado porque existe uma linha `thoughts/` — o projeto pode versionar parte de `thoughts/` de propósito (um consumidor real versiona `thoughts/shared/`). Prove com `git check-ignore -v <artifactsDir>/x.png`; sem cobertura, acrescente a linha do caminho exato.
 

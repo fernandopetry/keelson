@@ -178,8 +178,9 @@ essa saída nunca deve virar artefato publicado de CI.
 ### A sessão não encerra o turno
 
 Há um ciclo em andamento. O hook de wave lê o arquivo de estado da execução
-(`thoughts/local/run-state-<slug>.md`) **fora do contexto do modelo** e bloqueia o
-encerramento enquanto o status for `em_andamento`. Ou deixe o ciclo terminar, ou peça
+(`run-state-<slug>.md`, na pasta da sessão `thoughts/local/sessions/<...>/` — ou
+direto em `thoughts/local/` em instalações antigas) **fora do contexto do modelo**
+e bloqueia o encerramento enquanto o status for `em_andamento`. Ou deixe o ciclo terminar, ou peça
 explicitamente para parar — aí o estado é encerrado com o motivo registrado.
 
 ### O bloqueio cita um ciclo que não é desta sessão
@@ -367,8 +368,10 @@ lançamento do ciclo completo no card — os worklogs por etapa já contêm o te
 
 A linha existe desde a 0.109.0 (decisão 4.239) e é **telemetria**: medida ou omitida,
 nunca estimada — a ausência dela **não** é defeito quando não há o que medir. Fonte:
-o hook `window-marker` grava tokens por subagent em `thoughts/local/session-window.log`
-a cada Stop, e `scripts/context-cost.sh` compõe o ranking no fecho. Se subagents
+o hook `window-marker` grava tokens por subagent no log de janela da pasta da sessão
+(`window.log` em `thoughts/local/sessions/<...>/`; instalações antigas usam
+`thoughts/local/session-window.log`) a cada Stop, e `scripts/context-cost.sh` compõe
+o ranking no fecho. Se subagents
 rodaram e a linha saiu vazia mesmo assim, as causas prováveis: plugin anterior à
 0.109.0 durante parte do ciclo (rode `/keelson:update`); hook sem `python3` no PATH
 (ele degrada em silêncio, por desenho); ou o formato interno do transcript do harness

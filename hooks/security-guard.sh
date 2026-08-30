@@ -60,7 +60,8 @@ active="$(printf '%s' "$input" | jq -r '.stop_hook_active // false' 2>/dev/null 
 # dono desconhecido/formato antigo/sem session_id → silêncio como antes (nunca
 # reativar nudge por dúvida).
 session_id="$(printf '%s' "$input" | jq -r '.session_id // ""' 2>/dev/null || echo "")"
-for rs in "$proj"/thoughts/local/run-state-*.md; do
+# casa da sessão (4.314) + caminho legado
+for rs in "$proj"/thoughts/local/run-state-*.md "$proj"/thoughts/local/sessions/*/run-state-*.md; do
   [ -f "$rs" ] || continue
   grep -q "^status: em_andamento" "$rs" 2>/dev/null || continue
   dono="$(sed -n 's/^sessao:[ 	]*//p' "$rs" 2>/dev/null | sed -n 1p)"

@@ -64,9 +64,10 @@ seção **"Cobertura deste relatório"** é sempre presente.
 
 ## Etapa 3: fechar o ciclo do ledger
 
-Emitido o relatório, mova os eventos consumidos para
-`thoughts/local/session-ledger/reported-<yyyymmdd-hhmmss>/` (timestamp medido com
-`TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z`). Evento **ainda pendente** (handoff aberto,
+Emitido o relatório, arquive os eventos consumidos —
+`bash "${CLAUDE_PLUGIN_ROOT}/scripts/ledger.sh" <raiz> archive --keep <pendente>…`
+(decisão 4.314: cada casa do ledger arquiva em `reported-<yyyymmdd-hhmmss>/` dentro de si;
+timestamp medido pelo próprio script). Evento **ainda pendente** (handoff aberto,
 parte estacionada sem resposta) permanece ativo — ele é matéria do próximo fecho também.
 
 ## Limites

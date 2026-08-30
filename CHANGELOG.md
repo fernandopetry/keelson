@@ -23,6 +23,50 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.138.0] — 2026-08-30
+
+Re-init: required
+
+Decision 4.314 — session home for cycle-transient files (slice 1 of the
+session-folder mini-brief; re-init refreshes the injected block, which
+referenced the old ledger path).
+
+### Added
+
+- **Session home**: each session's cycle-transient files now live in one
+  folder per session — `thoughts/local/sessions/<yyyymmdd-hhmmss>-<sid8>/`
+  — holding `run-state-<slug>.md`, `ledger/` (+ `reported-*/` inside),
+  `window.log` + its offset, `tools/` (4.184) and `backups/`, plus a
+  `session.meta` manifest (full session id, start time, state, slugs
+  touched). New canonical resolver `scripts/session-dir.sh`
+  (`dir`/`ledger-dir`/`window-log`, `--create`, `--slug`) owns the path
+  rule; with no session id everything falls back to the legacy
+  `thoughts/local/` paths unchanged.
+- **Test suites for previously uncovered hooks**: `window-marker`,
+  `compact-anchor`, `review-guard` and `security-guard` gained
+  characterization suites (green before the migration; the new-layout
+  cases were born red to prove they bite), wired into pre-commit and CI
+  alongside the new `session-dir` suite.
+
+### Changed
+
+- **Writers** (`run-state.sh`, `ledger.sh`, `window-marker` hook) write
+  only to the session home; **readers** (`context-cost.sh`, the
+  `wave-guard`/`review-guard`/`security-guard`/`compact-anchor` hooks and
+  the scripts themselves) accept both layouts — a run, ledger or window
+  log started before the update stays operable by the same session, and
+  ledger `list`/`count`/`archive` aggregate both homes (each archives
+  `reported-*/` inside itself).
+- **Ownership becomes structural**: through the scripts, a session only
+  reaches its own home (the 4.251 textual refusal remains for legacy
+  files); cross-session visibility — third-party ownership warnings —
+  stays with the hooks, which scan both homes.
+- Exploration memos intentionally stay at
+  `thoughts/local/exploration-<slug>.md` (they cross sessions by design;
+  they move with the session-handover slice), and
+  `thoughts/screen-verify/` / `thoughts/e2e/` are config-pointed tool
+  homes and do not move.
+
 ## [0.137.2] — 2026-08-30
 
 Re-init: none

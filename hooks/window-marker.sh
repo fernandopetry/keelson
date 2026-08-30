@@ -6,16 +6,19 @@
 # linha de duração do report (4.56) é "relógio medido, nunca estimativa" — mas a
 # janela em si só existia como observação manual. Este hook lê o final do
 # transcript a cada Stop e appenda uma linha com o tamanho atual da janela
-# (input + cache) em thoughts/local/session-window.log; o report de fecho cita o
-# pico quando o arquivo existe (dono da linha: report-contract.md), e a lacuna é
-# nomeada quando não existe. Medido ou omitido — nunca estimado.
+# (input + cache) no log de janela da CASA DA SESSÃO (decisão 4.314, resolvida
+# por scripts/session-dir.sh via session_id do payload: <casa>/window.log; sem
+# session_id ou sem o resolvedor, o caminho legado
+# thoughts/local/session-window.log); o report de fecho cita o pico quando o
+# arquivo existe (dono da linha: report-contract.md), e a lacuna é nomeada
+# quando não existe. Medido ou omitido — nunca estimado.
 #
 # Custo por papel (decisão 4.239, extensão da 4.148): o mesmo log ganha uma linha
 # `<ts> agente=<tipo> tokens=<N>` por subagent concluído — extraída dos registros
 # de resultado do Task no transcript (campos agentType/totalTokens), processando
 # só o DELTA desde o último Stop (offset por transcript em
-# thoughts/local/.window-offset.<cksum>; o fecho move o log, nunca o offset — sem
-# ele o próximo report herdaria os agentes já reportados). O formato do transcript
+# .window-offset.<cksum>, AO LADO do log; o fecho move o log, nunca o offset —
+# sem ele o próximo report herdaria os agentes já reportados). O formato do transcript
 # é interno ao harness e pode mudar entre versões: linha que não parseia é
 # ignorada em silêncio — telemetria degrada, nunca inventa.
 #
@@ -71,9 +74,19 @@ for line in sys.stdin:
 print(best if best is not None else "")
 ' 2>/dev/null || echo "")"
 
-mkdir -p "$cwd/thoughts/local" 2>/dev/null || exit 0
+# casa da sessão (4.314): resolvida pelo session-dir.sh com o session_id do
+# payload; sem id ou sem o resolvedor → caminho legado, comportamento antigo
+sid="$(printf '%s' "$input" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("session_id", ""))' 2>/dev/null || echo "")"
+SDS="$(cd "$(dirname "$0")/../scripts" 2>/dev/null && pwd)/session-dir.sh"
+log=""
+if [ -n "$sid" ] && [ -f "$SDS" ]; then
+  log="$(KEELSON_SESSAO="$sid" bash "$SDS" "$cwd" window-log --create 2>/dev/null)" || log=""
+fi
+if [ -z "$log" ]; then
+  mkdir -p "$cwd/thoughts/local" 2>/dev/null || exit 0
+  log="$cwd/thoughts/local/session-window.log"
+fi
 ts="$(TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z 2>/dev/null || date +%Y-%m-%dT%H:%M:%S)"
-log="$cwd/thoughts/local/session-window.log"
 
 if [ -n "$janela" ]; then
   echo "${ts} janela=${janela}" >> "$log" 2>/dev/null || true
@@ -82,7 +95,7 @@ fi
 # custo por papel (4.239): processa só o delta do transcript desde o último Stop.
 key="$(printf '%s' "$transcript" | cksum 2>/dev/null | awk '{print $1}')"
 [ -n "$key" ] || exit 0
-off_file="$cwd/thoughts/local/.window-offset.$key"
+off_file="$(dirname "$log")/.window-offset.$key"
 offset=0
 if [ -f "$off_file" ]; then
   offset="$(cat "$off_file" 2>/dev/null || echo 0)"

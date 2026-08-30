@@ -12,7 +12,9 @@
 #   4. por-arquivo (4.298): run do lead + run MEU no mesmo diretório → block
 #      citando o meu e omitindo o do lead;
 #   5. stop_hook_active → silêncio;
-#   6. sem run-state → silêncio.
+#   6. sem run-state → silêncio;
+#   7. casa da sessão (4.314): run MEU em thoughts/local/sessions/*/ também é
+#      visto — o glob duplo cobre as duas casas.
 #
 # Os cwd de cada caso NÃO são repos git: sem janela de fingerprints (4.165), cada
 # invocação cutuca de novo — o que isola os casos entre si.
@@ -132,6 +134,24 @@ silencio "stop-active"
 D6="$TMP/c6"; mkdir -p "$D6"
 roda "{\"stop_hook_active\": false, \"cwd\": \"$D6\", \"session_id\": \"$EU\"}"
 silencio "mesa-limpa"
+
+# 7. Casa da sessão (4.314): run MEU sob thoughts/local/sessions/*/ é visto.
+run_state_casa() { # dir slug sessao — run-state no layout novo
+  mkdir -p "$1/thoughts/local/sessions/20260830-100000-teste001"
+  cat > "$1/thoughts/local/sessions/20260830-100000-teste001/run-state-$2.md" <<EOF
+status: em_andamento
+slug: $2
+plan: PLAN-001
+waves_concluidas: 1
+waves_total: 3
+retomada: wave 2 em curso
+sessao: $3
+EOF
+}
+D7="$TMP/c7"; run_state_casa "$D7" epsilon "$EU"
+roda "{\"stop_hook_active\": false, \"cwd\": \"$D7\", \"session_id\": \"$EU\"}"
+contem "casa/decision" '"decision": "block"'
+contem "casa/slug"     'slug: epsilon'
 
 if [ "$fail" -gt 0 ]; then
   echo "wave-guard: $fail/$total asserções falharam"

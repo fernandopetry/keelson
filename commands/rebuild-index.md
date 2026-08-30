@@ -32,7 +32,7 @@ INDEX.md deletado por engano, corrompido, divergente dos arquivos individuais (i
 ## Etapa 0: pré-checks
 
 1. Validar que `{docsRoot}/<slug>/` existe. Se não, parar.
-2. **Fazer backup** do INDEX atual (se existir): copiar para `thoughts/local/INDEX-<slug>.backup-<timestamp>.md` (fora da árvore versionada — um backup em `{docsRoot}/` acabaria commitado por engano). Avisar.
+2. **Fazer backup** do INDEX atual (se existir): copiar para `<casa-da-sessão>/backups/INDEX-<slug>.backup-<timestamp>.md` — a casa vem de `bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-dir.sh" <raiz> dir --create` (decisão 4.314; fora da árvore versionada — um backup em `{docsRoot}/` acabaria commitado por engano). Avisar.
 3. Listar arquivos a serem lidos:
    - `{docsRoot}/<slug>/briefs/BRIEF-*.md` (quando existirem — contrato do BRIEF no index-contract.md)
    - `{docsRoot}/<slug>/specs/SPEC-*.md`

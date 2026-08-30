@@ -107,9 +107,10 @@
   — **por modo** (decisão 4.91): no sob demanda, o commit é seu; no ciclo, a branch já
   chega commitada TASK a TASK (e pushada pelo `/keelson:auto`) — seus atos são revisão,
   PR e merge (decisão 4.41). O relatório é montado a partir do **ledger de sessão**
-  (`thoughts/local/session-ledger/`), onde cada evento é escrito **quando acontece** — não
-  se relê a sessão para produzi-lo, e o que o contexto comprimiu não se perde. Relatório
-  perdido ou sessão retomada → `/keelson:report` reconstrói.
+  (no `ledger/` da casa da sessão — `thoughts/local/sessions/<ts>-<sid8>/`; instalações
+  antigas usam `thoughts/local/session-ledger/`), onde cada evento é escrito **quando
+  acontece** — não se relê a sessão para produzi-lo, e o que o contexto comprimiu não se
+  perde. Relatório perdido ou sessão retomada → `/keelson:report` reconstrói.
 - **Varredura ampla → `code-scout`**: pergunta que exige varrer a codebase (entender
   um fluxo, mapear consumidores, "de onde vem este dado?") é delegada ao `code-scout`,
   que devolve conclusão ancorada em `arquivo:linha` — os arquivos lidos não entram no

@@ -9,8 +9,11 @@
 #      ledger.sh <raiz-do-repo> count
 #      ledger.sh <raiz-do-repo> archive [--keep <arquivo>]… [--ts <iso>]
 #
-#   append   cria thoughts/local/session-ledger/<yyyymmdd-hhmmss>-<tipo>-<origem>.md
-#            com o cabeçalho canônico; o corpo (2–3 linhas) entra pelo stdin.
+#   append   cria <yyyymmdd-hhmmss>-<tipo>-<origem>.md no ledger da CASA DA SESSÃO
+#            (decisão 4.314 — resolvida por session-dir.sh:
+#            thoughts/local/sessions/<ts>-<sid8>/ledger/; sem id de sessão, o
+#            caminho legado thoughts/local/session-ledger/) com o cabeçalho
+#            canônico; o corpo (2–3 linhas) entra pelo stdin.
 #            Tipos (catálogo FECHADO): gate decisao intervencao fora_de_escopo pendencia tracker marco.
 #            Timestamp medido (TZ=America/Sao_Paulo); --ts <iso> só para testes.
 #            A linha `ts:` do cabeçalho é DESTE script — linha `ts:` no início do
@@ -20,6 +23,10 @@
 #   count    contagem de eventos ativos por tipo
 #   archive  move os ativos para reported-<yyyymmdd-hhmmss>/, preservando os --keep
 #            (evento que continua pendente permanece na pasta ativa)
+#
+# Leitura dupla (carência 4.314): list/count/archive agregam a casa da sessão E a
+# legada quando distintas (legado primeiro — é o trecho mais antigo da sessão que
+# atravessou o update); archive arquiva cada casa dentro de si mesma, nunca mistura.
 #
 # Exit: 0 ok · 2 uso incorreto. Nunca é gate: ledger vazio não é erro.
 # Bash 3.2-compatível, sem dependências novas.
@@ -40,7 +47,23 @@ ACTION="${1:-}"
 [ -n "$ACTION" ] || { usage >&2; exit 2; }
 shift
 
-LDIR="$ROOT/thoughts/local/session-ledger"
+# Casa da sessão (4.314): session-dir.sh é o dono da resolução; ausente ou
+# falhando, degrada para o caminho legado. LDIRS lista as casas de leitura
+# (legado primeiro quando as duas existem como conceitos distintos).
+SDS="$(cd "$(dirname "$0")" && pwd)/session-dir.sh"
+LDIR_LEG="$ROOT/thoughts/local/session-ledger"
+LDIR="$LDIR_LEG"
+if [ -f "$SDS" ]; then
+  d="$(bash "$SDS" "$ROOT" ledger-dir 2>/dev/null)" || d=""
+  [ -n "$d" ] && LDIR="$d"
+fi
+# em_cada_casa <fn>: aplica fn ao legado e (quando distinta) à casa da sessão —
+# roda no shell corrente, então fn pode acumular em variáveis globais
+em_cada_casa() {
+  "$1" "$LDIR_LEG"
+  [ "$LDIR" != "$LDIR_LEG" ] && "$1" "$LDIR"
+  return 0
+}
 
 stamp() { # $1 = iso opcional; ecoa "yyyymmdd-hhmmss<TAB>iso"
   iso="$1"
@@ -76,6 +99,11 @@ case "$ACTION" in
     done
     pair="$(stamp "$TS")" || exit 2
     compact="${pair%%	*}"; iso="${pair##*	}"
+    # escrita é sempre na casa resolvida com --create (registra o slug no meta)
+    if [ -f "$SDS" ]; then
+      d="$(bash "$SDS" "$ROOT" ledger-dir --create --slug "$SLUG" ${TS:+--ts "$TS"} 2>/dev/null)" || d=""
+      [ -n "$d" ] && LDIR="$d"
+    fi
     mkdir -p "$LDIR" || die2 "não consegui criar $LDIR"
     base="$LDIR/$compact-$TIPO-$ORIGEM"
     f="$base.md"; n=1
@@ -99,22 +127,32 @@ case "$ACTION" in
   list)
     MODE="active"
     [ "${1:-}" = "--archived" ] && MODE="archived"
-    if [ "$MODE" = "active" ]; then
-      for f in "$LDIR"/*.md; do
-        [ -f "$f" ] && printf '%s\n' "$f"
-      done | sort
-    else
-      for f in "$LDIR"/reported-*/*.md; do
-        [ -f "$f" ] && printf '%s\n' "$f"
-      done | sort
-    fi
+    # shellcheck disable=SC2329  # invocada indiretamente via em_cada_casa
+    list_casa() {
+      if [ "$MODE" = "active" ]; then
+        for f in "$1"/*.md; do
+          [ -f "$f" ] && printf '%s\n' "$f"
+        done | sort
+      else
+        for f in "$1"/reported-*/*.md; do
+          [ -f "$f" ] && printf '%s\n' "$f"
+        done | sort
+      fi
+      return 0
+    }
+    em_cada_casa list_casa
     exit 0 ;;
 
   count)
-    for f in "$LDIR"/*.md; do
-      [ -f "$f" ] || continue
-      printf '%s\n' "$(basename "$f")"
-    done | sed -n 's/^[0-9]\{8\}-[0-9]\{6\}-\([a-z_]*\)-.*/\1/p' | sort | uniq -c | awk '{ print $2 "\t" $1 }'
+    # shellcheck disable=SC2329  # invocada indiretamente via em_cada_casa
+    count_casa() {
+      for f in "$1"/*.md; do
+        [ -f "$f" ] || continue
+        printf '%s\n' "$(basename "$f")"
+      done
+      return 0
+    }
+    em_cada_casa count_casa | sed -n 's/^[0-9]\{8\}-[0-9]\{6\}-\([a-z_]*\)-.*/\1/p' | sort | uniq -c | awk '{ print $2 "\t" $1 }'
     exit 0 ;;
 
   archive)
@@ -129,33 +167,49 @@ case "$ACTION" in
       shift
     done
     have=0
-    for f in "$LDIR"/*.md; do
-      [ -f "$f" ] && { have=1; break; }
-    done
+    # shellcheck disable=SC2329  # invocada indiretamente via em_cada_casa
+    have_casa() {
+      for f in "$1"/*.md; do
+        [ -f "$f" ] && { have=1; break; }
+      done
+      return 0
+    }
+    em_cada_casa have_casa
     if [ "$have" = 0 ]; then
       echo "ledger: nada a arquivar."
       exit 0
     fi
     pair="$(stamp "$TS")" || exit 2
     compact="${pair%%	*}"
-    dest="$LDIR/reported-$compact"
-    mkdir -p "$dest" || die2 "não consegui criar $dest"
-    moved=0; kept=0
-    for f in "$LDIR"/*.md; do
-      [ -f "$f" ] || continue
-      b="$(basename "$f")"
-      keep=0
-      for k in $KEEPLIST; do
-        [ "$b" = "$k" ] && { keep=1; break; }
+    # cada casa arquiva DENTRO DE SI (4.314 — nunca mistura); casa sem ativo fica muda
+    # shellcheck disable=SC2329  # invocada indiretamente via em_cada_casa
+    archive_casa() {
+      tem=0
+      for f in "$1"/*.md; do
+        [ -f "$f" ] && { tem=1; break; }
       done
-      if [ "$keep" = 1 ]; then
-        kept=$((kept + 1))
-      else
-        mv "$f" "$dest/" || die2 "não consegui mover $b"
-        moved=$((moved + 1))
-      fi
-    done
-    printf 'ledger: %d evento(s) arquivado(s) em %s · %d pendente(s) preservado(s)\n' "$moved" "$dest" "$kept"
+      [ "$tem" = 1 ] || return 0
+      dest="$1/reported-$compact"
+      mkdir -p "$dest" || die2 "não consegui criar $dest"
+      moved=0; kept=0
+      for f in "$1"/*.md; do
+        [ -f "$f" ] || continue
+        b="$(basename "$f")"
+        keep=0
+        for k in $KEEPLIST; do
+          [ "$b" = "$k" ] && { keep=1; break; }
+        done
+        if [ "$keep" = 1 ]; then
+          kept=$((kept + 1))
+        else
+          mv "$f" "$dest/" || die2 "não consegui mover $b"
+          moved=$((moved + 1))
+        fi
+      done
+      printf 'ledger: %d evento(s) arquivado(s) em %s · %d pendente(s) preservado(s)\n' "$moved" "$dest" "$kept"
+      return 0
+    }
+    em_cada_casa archive_casa
     exit 0 ;;
 
   *) die2 "ação desconhecida: $ACTION (use append, list, count ou archive)" ;;

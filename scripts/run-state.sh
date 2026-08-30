@@ -10,14 +10,21 @@
 #      run-state.sh <raiz-do-repo> remove <slug>
 #      run-state.sh <raiz-do-repo> show <slug>
 #
-#   init       escreve thoughts/local/run-state-<slug>.md com as chaves canônicas
-#              (waves_concluidas: 0, status: em_andamento, sessao: <id>). Arquivo
-#              em_andamento DESTA sessão é sobrescrito com aviso em stderr (a
-#              largada é a dona).
+#   init       escreve run-state-<slug>.md na CASA DA SESSÃO (decisão 4.314 —
+#              resolvida por session-dir.sh: thoughts/local/sessions/<ts>-<sid8>/;
+#              sem id de sessão, o caminho legado thoughts/local/) com as chaves
+#              canônicas (waves_concluidas: 0, status: em_andamento, sessao: <id>).
+#              Arquivo em_andamento DESTA sessão é sobrescrito com aviso em stderr
+#              (a largada é a dona); run legado em_andamento não-alheio do mesmo
+#              slug é absorvido (removido com aviso) — nunca fica órfão.
 #   wave-done  incrementa waves_concluidas (exit 2 se o arquivo não existe)
 #   close      status: encerrado — <motivo> (o wave-guard deixa de bloquear)
-#   remove     apaga o arquivo (idempotente)
+#   remove     apaga o arquivo (idempotente; cobre casa da sessão E legado)
 #   show       imprime o arquivo (nada se ausente)
+#
+# Leitura dupla (carência 4.314): wave-done/close/show operam no arquivo da casa
+# da sessão quando ele existe, senão no caminho legado — um run iniciado antes do
+# update continua operável; a ESCRITA de run novo é sempre na casa resolvida.
 #
 # Posse (decisão 4.251): `sessao:` identifica quem escreveu — fonte RUN_STATE_SESSAO,
 # senão CLAUDE_CODE_SESSION_ID (mesmo UUID que os hooks recebem no payload), senão
@@ -48,18 +55,31 @@ SLUG="${1:-}"
 shift
 case "$SLUG" in */*|*" "*) die2 "slug inválido: $SLUG" ;; esac
 
-DIR="$ROOT/thoughts/local"
-F="$DIR/run-state-$SLUG.md"
-
 SESSAO="${RUN_STATE_SESSAO:-${CLAUDE_CODE_SESSION_ID:-desconhecida}}"
+
+# Casa da sessão (4.314): session-dir.sh é o dono da resolução; ausente ou
+# falhando, degrada para o caminho legado (nunca trava o run por causa de layout).
+SDS="$(cd "$(dirname "$0")" && pwd)/session-dir.sh"
+DIR_LEG="$ROOT/thoughts/local"
+F_LEG="$DIR_LEG/run-state-$SLUG.md"
+sd() { KEELSON_SESSAO="$SESSAO" bash "$SDS" "$ROOT" "$@" 2>/dev/null; }
+
+resolve_leitura() { # F = arquivo da casa da sessão se existe, senão o legado
+  F="$F_LEG"
+  [ -f "$SDS" ] || return 0
+  d="$(sd dir)" || d=""
+  [ -n "$d" ] || return 0
+  [ -f "$d/run-state-$SLUG.md" ] && F="$d/run-state-$SLUG.md"
+}
 
 # Posse (4.251): run em_andamento de outra sessão não se toca — exit 2 com instrução
 # de terceira saída. Só acusa com ambos os ids conhecidos; na dúvida, degrada (nunca
 # bloqueio cego). FORCE=1 é a assunção deliberada.
-recusa_se_alheio() {
-  [ -f "$F" ] || return 0
-  grep -q '^status: em_andamento' "$F" 2>/dev/null || return 0
-  dono="$(sed -n 's/^sessao:[ 	]*//p' "$F" 2>/dev/null | sed -n 1p)"
+recusa_se_alheio() { # $1 = arquivo (default: $F)
+  alvo="${1:-$F}"
+  [ -f "$alvo" ] || return 0
+  grep -q '^status: em_andamento' "$alvo" 2>/dev/null || return 0
+  dono="$(sed -n 's/^sessao:[ 	]*//p' "$alvo" 2>/dev/null | sed -n 1p)"
   [ -n "$dono" ] || return 0
   [ "$dono" = "desconhecida" ] && return 0
   [ "$SESSAO" = "desconhecida" ] && return 0
@@ -77,8 +97,21 @@ case "$ACTION" in
     shift 2
     RET="${*:-}"
     [ -n "$RET" ] || die2 "init exige a linha de retomada (caminhos dos artefatos)."
+    DIR="$DIR_LEG"
+    if [ -f "$SDS" ]; then
+      d="$(sd dir --create --slug "$SLUG")" || d=""
+      [ -n "$d" ] && DIR="$d"
+    fi
     mkdir -p "$DIR" || die2 "não consegui criar $DIR"
-    recusa_se_alheio
+    F="$DIR/run-state-$SLUG.md"
+    recusa_se_alheio "$F"
+    # run LEGADO em_andamento do mesmo slug: alheio recusa; não-alheio é absorvido
+    # (removido com aviso) — a largada nova é a dona e órfão re-acusaria no wave-guard
+    if [ "$F" != "$F_LEG" ] && [ -f "$F_LEG" ] && grep -q '^status: em_andamento' "$F_LEG" 2>/dev/null; then
+      recusa_se_alheio "$F_LEG"
+      echo "run-state: aviso — absorvendo run legado em andamento de $SLUG (largada nova, casa da sessão)." >&2
+      rm -f "$F_LEG"
+    fi
     if [ -f "$F" ] && grep -q '^status: em_andamento' "$F" 2>/dev/null; then
       echo "run-state: aviso — sobrescrevendo run em andamento de $SLUG (largada nova é a dona)." >&2
     fi
@@ -94,8 +127,9 @@ case "$ACTION" in
     exit 0 ;;
 
   wave-done)
+    resolve_leitura
     [ -f "$F" ] || die2 "run-state ausente: $F (init não rodou?)"
-    recusa_se_alheio
+    recusa_se_alheio "$F"
     cur="$(sed -n 's/^waves_concluidas:[ 	]*//p' "$F" | sed -n 1p)"
     case "$cur" in ''|*[!0-9]*) die2 "waves_concluidas ilegível em $F: \"$cur\"" ;; esac
     nxt=$((cur + 1))
@@ -106,8 +140,9 @@ case "$ACTION" in
     exit 0 ;;
 
   close)
+    resolve_leitura
     [ -f "$F" ] || die2 "run-state ausente: $F (nada a encerrar)"
-    recusa_se_alheio
+    recusa_se_alheio "$F"
     MOT="${*:-}"
     [ -n "$MOT" ] || die2 "close exige o <motivo> (parada é ato deliberado, nunca esquecimento)."
     tmp="$F.tmp.$$"
@@ -116,11 +151,19 @@ case "$ACTION" in
     exit 0 ;;
 
   remove)
-    recusa_se_alheio
+    # cobre as DUAS casas (resíduo legado da mesma sessão não fica para trás),
+    # cada arquivo com a própria checagem de posse
+    resolve_leitura
+    recusa_se_alheio "$F"
     rm -f "$F"
+    if [ "$F" != "$F_LEG" ] && [ -f "$F_LEG" ]; then
+      recusa_se_alheio "$F_LEG"
+      rm -f "$F_LEG"
+    fi
     exit 0 ;;
 
   show)
+    resolve_leitura
     [ -f "$F" ] && cat "$F"
     exit 0 ;;
 

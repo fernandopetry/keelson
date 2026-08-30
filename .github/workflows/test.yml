@@ -104,6 +104,21 @@ jobs:
       - name: Suíte do wave-guard (scripts/tests/wave-guard/run.sh)
         run: bash scripts/tests/wave-guard/run.sh
 
+      - name: Suíte do session-dir.sh (scripts/tests/session-dir/run.sh)
+        run: bash scripts/tests/session-dir/run.sh
+
+      - name: Suíte do window-marker (scripts/tests/window-marker/run.sh)
+        run: bash scripts/tests/window-marker/run.sh
+
+      - name: Suíte do compact-anchor (scripts/tests/compact-anchor/run.sh)
+        run: bash scripts/tests/compact-anchor/run.sh
+
+      - name: Suíte do review-guard (scripts/tests/review-guard/run.sh)
+        run: bash scripts/tests/review-guard/run.sh
+
+      - name: Suíte do security-guard (scripts/tests/security-guard/run.sh)
+        run: bash scripts/tests/security-guard/run.sh
+
       - name: Suíte do check-refs.sh (scripts/tests/refs/run.sh)
         run: bash scripts/tests/refs/run.sh
 

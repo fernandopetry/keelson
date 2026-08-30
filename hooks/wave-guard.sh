@@ -86,7 +86,9 @@ descende_do_dono() {
 n=0
 alheio=0
 detalhes=""
-for f in "$cwd"/thoughts/local/run-state-*.md; do
+# casa da sessão (4.314) + caminho legado: run de qualquer sessão desta máquina
+# é visto — a posse (4.251) decide o que fazer com ele
+for f in "$cwd"/thoughts/local/run-state-*.md "$cwd"/thoughts/local/sessions/*/run-state-*.md; do
   [ -f "$f" ] || continue
   grep -q '^status: em_andamento' "$f" 2>/dev/null || continue
   # Posse (decisão 4.251): run cuja `sessao:` aponta outra sessão viva não é deste

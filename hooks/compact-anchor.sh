@@ -30,7 +30,8 @@ fi
 
 runs=""
 n=0
-for f in "$cwd"/thoughts/local/run-state-*.md; do
+# casa da sessão (4.314) + caminho legado
+for f in "$cwd"/thoughts/local/run-state-*.md "$cwd"/thoughts/local/sessions/*/run-state-*.md; do
   [ -f "$f" ] || continue
   grep -q '^status: em_andamento' "$f" 2>/dev/null || continue
   n=$((n + 1))
@@ -40,13 +41,27 @@ for f in "$cwd"/thoughts/local/run-state-*.md; do
 ${campos}"
 done
 
-ledger_line=""
+# conta só eventos ativos (a raiz de cada casa), não os já consumidos em
+# reported-*/. Casas (4.314): a legada + o ledger da PRÓPRIA sessão (session_id
+# do payload, resolvido pelo session-dir.sh) — ledger de outra sessão não entra.
+ev=0
 if [ -d "$cwd/thoughts/local/session-ledger" ]; then
-  # conta só eventos ativos (a raiz da pasta), não os já consumidos em reported-*/
   ev=$(find "$cwd/thoughts/local/session-ledger" -maxdepth 1 -name '*.md' -type f 2>/dev/null | wc -l | tr -d ' ')
-  if [ "${ev:-0}" -gt 0 ] 2>/dev/null; then
-    ledger_line="Ledger de sessão: ${ev} evento(s) ativo(s) em thoughts/local/session-ledger/ — o report lê a pasta, não a memória."
+  case "$ev" in ''|*[!0-9]*) ev=0 ;; esac
+fi
+sid="$(printf '%s' "$input" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("session_id", ""))' 2>/dev/null || echo "")"
+SDS="$(cd "$(dirname "$0")/../scripts" 2>/dev/null && pwd)/session-dir.sh"
+if [ -n "$sid" ] && [ -f "$SDS" ]; then
+  ld="$(KEELSON_SESSAO="$sid" bash "$SDS" "$cwd" ledger-dir 2>/dev/null)" || ld=""
+  if [ -n "$ld" ] && [ "$ld" != "$cwd/thoughts/local/session-ledger" ] && [ -d "$ld" ]; then
+    ev2=$(find "$ld" -maxdepth 1 -name '*.md' -type f 2>/dev/null | wc -l | tr -d ' ')
+    case "$ev2" in ''|*[!0-9]*) ev2=0 ;; esac
+    ev=$((ev + ev2))
   fi
+fi
+ledger_line=""
+if [ "${ev:-0}" -gt 0 ] 2>/dev/null; then
+  ledger_line="Ledger de sessão: ${ev} evento(s) ativo(s) — o report lê a pasta do ledger (ledger.sh list), não a memória."
 fi
 
 # nada em andamento e nada no ledger → nenhum contexto a injetar

@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # context-cost.sh — compõe o custo de contexto do ciclo para o report de fecho
-# (decisão 4.239, extensão da 4.148). Lê SOMENTE thoughts/local/session-window.log
-# (escrito pelo hook window-marker, fora do contexto do modelo) — nunca o
-# transcript: o dono da leitura do transcript é o hook, este script é o compositor.
+# (decisão 4.239, extensão da 4.148). Lê SOMENTE o log de janela escrito pelo
+# hook window-marker, fora do contexto do modelo — nunca o transcript: o dono da
+# leitura do transcript é o hook, este script é o compositor. O log vive na casa
+# da sessão (decisão 4.314, resolvida por session-dir.sh: <casa>/window.log) com
+# leitura dupla do caminho legado thoughts/local/session-window.log — sessão que
+# atravessou o update soma os dois trechos.
 #
 # O que este script prova: o pico da janela e o ranking de tokens por papel são
 # FATOS do log, nunca estimativa do modelo. Sem log ou sem linhas → saída vazia,
@@ -51,8 +54,18 @@ if [ "$teams" -eq 1 ] && [ "$compose" -eq 0 ]; then
 fi
 [ -d "$raiz" ] || die2 "raiz inexistente: $raiz"
 
-log="$raiz/thoughts/local/session-window.log"
-[ -f "$log" ] || exit 0
+# casa da sessão (4.314) + caminho legado — awk agrega o que existir
+SDS="$(cd "$(dirname "$0")" && pwd)/session-dir.sh"
+log_leg="$raiz/thoughts/local/session-window.log"
+log_new=""
+if [ -f "$SDS" ]; then
+  log_new="$(bash "$SDS" "$raiz" window-log 2>/dev/null)" || log_new=""
+fi
+[ "$log_new" = "$log_leg" ] && log_new=""
+set --
+[ -n "$log_new" ] && [ -f "$log_new" ] && set -- "$@" "$log_new"
+[ -f "$log_leg" ] && set -- "$@" "$log_leg"
+[ $# -gt 0 ] || exit 0
 
 awk -v compose="$compose" -v teams="$teams" '
   $2 ~ /^janela=[0-9]+$/ && NF == 2 {
@@ -93,6 +106,6 @@ awk -v compose="$compose" -v teams="$teams" '
       }
     }
   }
-' "$log"
+' "$@"
 
 exit 0
