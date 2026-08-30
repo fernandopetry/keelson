@@ -3229,6 +3229,16 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 ---
 
+### 4.306 — Pendência da poda estrutural dissolvida por fato; a cópia stale do teto é o defeito real
+
+**Problema**: a 4.300 agendou "poda estrutural" de `tasks.md` (337) e `implement.md` (319) por estarem "acima do teto de classe 300" — mas o dono declarado da régua é a **4.217** ("o teto sobe para 500…; as menções a 'teto de 300' em decisões anteriores são históricas"): a divergência foi declarada contra um teto que não vigora, e a 4.304 registrou a disputa 300×500 como exemplo de juízo sem número. O mapa de impacto desta leva (impact-scout) mediu o resto: a candidata nomeada ("extrair a régua *resiste a contorno* para `conventions/`") vale **1–2 linhas físicas** (parágrafo único em `tasks.md`), a regra já vive em três donos coordenados (geração em `tasks.md` Etapa 3 · fato mecânico em `lint-contract.md` · escalada em `task-validator`) — extrair criaria a 4ª cópia — e a extração **quebraria em silêncio** o caso nº 1 da camada de evals (o `eval-run.sh` fatia a janela Etapa 1→4 do `tasks.md`; régua movida some do braço HEAD sem erro). Censo de duplicação entre os dois comandos (10 pares): os ponteiros já estão corretos no padrão "não a replique aqui". O defeito real encontrado no caminho: `agents/agile-coach.md` ainda ensinava "command ≤ 300, agent ≤ 220, skill ≤ 250" — **cópia viva da régua que a 4.217 revogou sem editar**, embarcada, apertando o orçamento de todo patch do coach; e os fatos de lint eram citados por nome em `tasks.md` sem caminho ao dono.
+
+**Decisão**: (a) a **poda estrutural agendada na 4.300 fecha sem execução** — os dois arquivos estão sob o teto vigente (500), a candidata é aritmética nula com risco real (4ª cópia + eval cego), e a saída da 4.217 para arquivos grandes é divisão em auxiliar *perto de 500*, nunca compressão de regra viva. Gatilhos de reabertura: arquivo se aproximando de 500 → progressive disclosure pela própria 4.217; dedup real observado entre os dois comandos → leva própria com o par na mão. (b) **A cópia stale corrige-se no dono do texto**: o orçamento do `agile-coach` passa a citar o teto único de 500 com o dono (4.217), preservando saldo ≤ 10 e a regra do saldo ≤ 0 no teto. (c) `tasks.md` ganha o **ponteiro ao dono dos fatos de lint** (`lint-contract.md` — a regra estava partida em três donos sem seta entre dois deles). (d) A disputa que a 4.304 citou (300×500) encerra-se **por leitura do dono**, não por eval — o instrumento certo para regra com dono declarado é a leitura; eval mede efeito, não vigência.
+
+**Aplicação**: `agents/agile-coach.md` (linha do orçamento — saldo 0) · `commands/tasks.md` (+1 linha, ponteiro; janela do scribe/eval intacta) · CHANGELOG **0.134.1**, `Re-init: none`. Guardas: `check-refs.sh` à mão (230 citações ok — prova o ponteiro novo), `check-sync`/`check-release` no pre-commit; corpus não dispara (nenhuma linha estrutural). Origem: C4 do benchmark harness-engineering 2026-08 (pendência herdada da 4.300) + mapa do impact-scout (H1–H10).
+
+---
+
 ## 7. Roteamento de mudanças
 
 Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir manualmente:

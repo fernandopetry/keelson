@@ -23,6 +23,29 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.134.1] — 2026-08-30
+
+Re-init: none
+
+Decision 4.306 — the structural-pruning backlog item from 4.300 closes without
+execution: both command files sit well under the governing 500-line ceiling
+(4.217), and the named extraction candidate measured 1–2 physical lines with
+real risk attached (a 4th copy of an already-owned rule, and a silent break of
+eval case #1, which slices that exact section). What the investigation did
+find gets fixed here.
+
+### Fixed
+
+- **`agile-coach` no longer enforces revoked ceilings**: its patch-budget rule
+  taught "command ≤ 300, agent ≤ 220, skill ≤ 250" — a live copy of the rule
+  that 4.217 superseded with a single 500-line ceiling. The budget line now
+  cites the owner; the ≤10-line patch budget and the zero-balance-at-ceiling
+  rule are unchanged.
+- **`/keelson:tasks` points at the lint-fact owner**: the lint facts named in
+  the criterion-hardening rules now carry the path to
+  `conventions/lint-contract.md` (the rule lived in three owners with no
+  pointer between two of them).
+
 ## [0.134.0] — 2026-08-30
 
 Re-init: none

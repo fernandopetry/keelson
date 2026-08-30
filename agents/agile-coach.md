@@ -52,7 +52,7 @@ Para as causas instrucionais, a pergunta-guia: *"qual instrução, se existisse/
 
 - Formato: ajuste na regra/etapa existente mais próxima; só crie item novo se nenhuma regra atual cobrir o tema.
 - Texto: imperativo, 1–3 linhas, com o contra-exemplo real entre parênteses quando ele valer mais que mil palavras.
-- **Orçamento**: patch com saldo líquido ≤ **10 linhas**; tetos por classe — command ≤ **300** linhas, agent ≤ **220**, skill ≤ **250**. Artefato no teto → o patch deve ter saldo **≤ 0** (consolide: funda regras irmãs, corte exemplo redundante, generalize).
+- **Orçamento**: patch com saldo líquido ≤ **10 linhas**; teto por arquivo — **500 linhas** para command, agent e skill (dono da régua: decisão 4.217; perto do teto, a saída é dividir em arquivo auxiliar, nunca comprimir regra viva). Artefato no teto → o patch deve ter saldo **≤ 0** (consolide: funda regras irmãs, corte exemplo redundante, generalize).
 - Antes de editar, `Read` no artefato real (nunca de memória) e confirme que a regra não existe com outras palavras.
 
 ### 5. Registrar no ledger
