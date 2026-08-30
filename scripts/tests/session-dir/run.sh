@@ -115,7 +115,116 @@ total=$((total + 1))
 got="$(env -u KEELSON_SESSAO CLAUDE_CODE_SESSION_ID="sessao-a-11112222" bash "$SD" "$R" dir 2>/dev/null)"
 [ "$got" = "$D" ] && ok fonte-env-harness || falha "fonte-env-harness: [$got]"
 
+# --- handover local (4.315): latest-for · memo-find · adopt-memo · mark-reported ---
+
+R2="$TMP/repo-handover"; mkdir -p "$R2"
+S2="$R2/thoughts/local/sessions"
+casa() { # nome sessao slugs — casa sintética com manifest
+  mkdir -p "$S2/$1"
+  printf 'sessao: %s\niniciada: 2026-08-29T09:00:00-0300\nestado: ativa\nslugs: %s\n' "$2" "$3" > "$S2/$1/session.meta"
+}
+casa 20260829-090000-sessanti sessao-antiga-1111 "gama"
+casa 20260830-090000-sessmedi sessao-media-2222 "gama delta"
+printf 'memo antigo\n' > "$S2/20260829-090000-sessanti/exploration-gama.md"
+printf 'memo medio\n'  > "$S2/20260830-090000-sessmedi/exploration-gama.md"
+mkdir -p "$R2/thoughts/local"
+printf 'memo legado\n' > "$R2/thoughts/local/exploration-gama.md"
+printf 'memo omega legado\n' > "$R2/thoughts/local/exploration-omega.md"
+NOVA="sessao-nova-3333"
+
+# latest-for devolve a casa mais recente com o slug
+total=$((total + 1))
+got="$(sd "$NOVA" "$R2" latest-for gama 2>/dev/null)"
+[ "$got" = "$S2/20260830-090000-sessmedi" ] && ok latest-for-mais-recente || falha "latest-for-mais-recente: [$got]"
+
+# latest-for exclui a casa da sessão corrente
+sd "$NOVA" "$R2" dir --create --slug gama --ts "2026-08-30T12:00:00-0300" >/dev/null 2>&1
+DN="$S2/20260830-120000-sessaono"
+total=$((total + 1))
+got="$(sd "$NOVA" "$R2" latest-for gama 2>/dev/null)"
+[ "$got" = "$S2/20260830-090000-sessmedi" ] && ok latest-for-exclui-corrente || falha "latest-for-exclui-corrente: [$got]"
+
+# latest-for sem match → vazio, exit 0
+total=$((total + 1))
+got="$(sd "$NOVA" "$R2" latest-for slug-inexistente 2>/dev/null)"; st=$?
+[ -z "$got" ] && [ "$st" -eq 0 ] && ok latest-for-vazio || falha "latest-for-vazio: [$got]"
+
+# memo-find: cadeia — anterior mais recente primeiro (corrente sem memo próprio)
+total=$((total + 1))
+got="$(sd "$NOVA" "$R2" memo-find gama 2>/dev/null)"
+[ "$got" = "$S2/20260830-090000-sessmedi/exploration-gama.md" ] && ok memo-find-cadeia || falha "memo-find-cadeia: [$got]"
+
+# memo-find --all lista todos: anteriores (recente→antiga) e o legado por último
+total=$((total + 1))
+got="$(sd "$NOVA" "$R2" memo-find gama --all 2>/dev/null)"
+want="$S2/20260830-090000-sessmedi/exploration-gama.md
+$S2/20260829-090000-sessanti/exploration-gama.md
+$R2/thoughts/local/exploration-gama.md"
+[ "$got" = "$want" ] && ok memo-find-all || falha "memo-find-all: [$got]"
+
+# memo-find cai no legado quando nenhuma casa tem o memo; vazio quando nada existe
+total=$((total + 1))
+got="$(sd "$NOVA" "$R2" memo-find omega 2>/dev/null)"
+[ "$got" = "$R2/thoughts/local/exploration-omega.md" ] && ok memo-find-legado || falha "memo-find-legado: [$got]"
+total=$((total + 1))
+got="$(sd "$NOVA" "$R2" memo-find nada 2>/dev/null)"; st=$?
+[ -z "$got" ] && [ "$st" -eq 0 ] && ok memo-find-vazio || falha "memo-find-vazio: [$got]"
+
+# sem id de sessão a cadeia degrada para o legado
+total=$((total + 1))
+got="$(sd "" "$R2" memo-find gama 2>/dev/null)"
+[ "$got" = "$R2/thoughts/local/exploration-gama.md" ] && ok memo-find-sem-id-legado || falha "memo-find-sem-id-legado: [$got]"
+
+# adopt-memo herda o mais recente da cadeia para a casa própria e grava anterior:
+total=$((total + 1))
+got="$(sd "$NOVA" "$R2" adopt-memo gama 2>/dev/null)"
+[ "$got" = "$DN/exploration-gama.md" ] && [ "$(cat "$DN/exploration-gama.md" 2>/dev/null)" = "memo medio" ] \
+  && grep -qxF "anterior: sessao-media-2222" "$DN/session.meta" && ok adopt-herda || falha "adopt-herda: [$got]"
+
+# memo-find passa a devolver o próprio (topo da cadeia)
+total=$((total + 1))
+got="$(sd "$NOVA" "$R2" memo-find gama 2>/dev/null)"
+[ "$got" = "$DN/exploration-gama.md" ] && ok memo-find-proprio-primeiro || falha "memo-find-proprio-primeiro: [$got]"
+
+# adopt-memo é idempotente e a primeira herança não é sobrescrita
+printf 'memo editado pela nova\n' > "$DN/exploration-gama.md"
+total=$((total + 1))
+got="$(sd "$NOVA" "$R2" adopt-memo gama 2>/dev/null)"
+[ "$got" = "$DN/exploration-gama.md" ] && [ "$(cat "$DN/exploration-gama.md")" = "memo editado pela nova" ] \
+  && ok adopt-idempotente || falha "adopt-idempotente: [$got]"
+total=$((total + 1))
+got="$(sd "$NOVA" "$R2" adopt-memo omega 2>/dev/null)"
+[ "$(cat "$DN/exploration-omega.md" 2>/dev/null)" = "memo omega legado" ] \
+  && grep -qxF "anterior: sessao-media-2222" "$DN/session.meta" \
+  && ! grep -qxF "anterior: legado" "$DN/session.meta" && ok adopt-legado-sem-sobrescrever-anterior || falha adopt-legado-sem-sobrescrever-anterior
+
+# adopt-memo sem nada na cadeia ecoa o caminho e NÃO cria o arquivo
+total=$((total + 1))
+got="$(sd "$NOVA" "$R2" adopt-memo virgem 2>/dev/null)"
+[ "$got" = "$DN/exploration-virgem.md" ] && [ ! -f "$DN/exploration-virgem.md" ] && ok adopt-virgem || falha "adopt-virgem: [$got]"
+
+# adopt-memo sem id de sessão → caminho legado (comportamento antigo)
+total=$((total + 1))
+got="$(sd "" "$R2" adopt-memo gama 2>/dev/null)"
+[ "$got" = "$R2/thoughts/local/exploration-gama.md" ] && ok adopt-sem-id-legado || falha "adopt-sem-id-legado: [$got]"
+
+# mark-reported marca o estado; escrita posterior com --create reabre
+total=$((total + 1))
+sd "$NOVA" "$R2" mark-reported 2>/dev/null
+grep -qxF "estado: reportada" "$DN/session.meta" && ok mark-reported || falha mark-reported
+total=$((total + 1))
+sd "$NOVA" "$R2" dir --create >/dev/null 2>&1
+grep -qxF "estado: ativa" "$DN/session.meta" && ok reabertura-no-create || falha reabertura-no-create
+
+# mark-reported sem casa → no-op silencioso
+total=$((total + 1))
+got="$(sd "sessao-sem-casa-9" "$R2" mark-reported 2>&1)"; st=$?
+[ -z "$got" ] && [ "$st" -eq 0 ] && ok mark-reported-sem-casa || falha "mark-reported-sem-casa: [$got]"
+
 # erros de uso
+total=$((total + 1))
+sd "x" "$R" latest-for >/dev/null 2>&1
+[ $? -eq 2 ] && ok latest-for-sem-slug-exit-2 || falha latest-for-sem-slug-exit-2
 total=$((total + 1))
 sd "x" "$TMP/nao-existe" dir >/dev/null 2>&1
 [ $? -eq 2 ] && ok raiz-inexistente-exit-2 || falha raiz-inexistente-exit-2

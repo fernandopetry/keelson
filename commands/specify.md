@@ -17,7 +17,7 @@ Você é um Senior Product Engineer especialista em escrever especificações fu
 
 1. Ler a **ficha** (`keelson.config.json`) na raiz — convenção comum (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`).
 2. Ler o `CLAUDE.md` do projeto se existir e extrair apenas o relevante para SPEC: glossário de domínio, convenções de linguagem, anti-padrões de spec.
-3. **Memo de exploração**: se a demanda exigiu explorar o código/domínio, salve/complemente o memo (convenção comum — sdd-conventions.md). Varredura ampla é delegada ao `code-scout`, que devolve conclusão ancorada em `arquivo:linha` (decisão 4.75) — a main session não varre a codebase inline.
+3. **Memo de exploração**: se a demanda exigiu explorar o código/domínio, salve/complemente o memo — o caminho editável vem de `session-dir.sh <raiz> adopt-memo <slug>`, que herda memo de sessão anterior desta máquina quando houver (cadeia e regras: convenção comum — sdd-conventions.md, 4.315). Varredura ampla é delegada ao `code-scout`, que devolve conclusão ancorada em `arquivo:linha` (decisão 4.75) — a main session não varre a codebase inline.
 
 ### 0.2 Resolver slug
 

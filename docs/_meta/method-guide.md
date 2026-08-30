@@ -199,7 +199,7 @@ Detalhe completo (flags, fluxo, regras): `commands/mutation-setup.md`.
 
 ### 3.21 `/keelson:continue` — retomar um slug de onde parou (humano-only)
 
-A porta única de retomada: você aponta um slug e o comando deriva **dos artefatos commitados** onde o trabalho parou, mostra o "você está aqui" e propõe **um** próximo passo com default — executa só após a sua confirmação. Depois de um fim de semana, ninguém precisa lembrar de nada: `continue` + o slug.
+A porta única de retomada: você aponta um slug e o comando deriva **dos artefatos commitados** onde o trabalho parou, mostra o "você está aqui" e propõe **um** próximo passo com default — executa só após a sua confirmação. Depois de um fim de semana, ninguém precisa lembrar de nada: `continue` + o slug. Na mesma máquina, se uma sessão anterior deixou casa em `thoughts/local/sessions/` (memo de exploração, estado de run), isso entra como **insumo e sugestão rotulada** — a decisão continua vindo só do que está commitado, e sugestão que diverge perde, com a divergência dita (4.315).
 
 Detalhe completo (flags, fluxo, regras): `commands/continue.md`.
 

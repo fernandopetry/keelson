@@ -206,7 +206,10 @@ tudo (instalação com confirmação, config, smoke spec) e grava o campo após 
 
 `/keelson:continue <slug>`. Ele lê a fila viva do épico e os artefatos commitados,
 mostra o "você está aqui" e propõe o próximo passo com o comando já montado — retomar
-a wave interrompida, disparar a próxima fatia ou abrir o PR. Com a estratégia
+a wave interrompida, disparar a próxima fatia ou abrir o PR. Se uma sessão anterior
+na mesma máquina deixou anotações de exploração, elas entram de carona no comando
+proposto (menos re-exploração); qualquer pista local aparece rotulada como sugestão —
+a decisão vem sempre do que está commitado. Com a estratégia
 `por-fatia`, ele também verifica se a fatia da qual a próxima depende já mergeou na
 main — se não, mostra a pendência de merge em vez de propor. Nada roda sem a sua
 confirmação, mas nada depende da sua memória. O passo a passo completo está em

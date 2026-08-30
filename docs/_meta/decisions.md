@@ -3311,6 +3311,16 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 ---
 
+### 4.315 — Handover local entre sessões: memo na casa da sessão com cadeia de leitura; continue com sugestão declarada (refina a 4.127)
+
+**Problema**: a fatia 1 (4.314) deu casa por sessão ao transitório do ciclo, mas a retomada na mesma máquina seguia descartando o que estava em disco — a quarta dor confirmada no mini-brief: o memo de exploração morria no caminho legado compartilhado, o continue era proibido de sequer citar o que a sessão anterior sabia (4.127, absoluta por desenho), e o `/keelson:report` de sessão retomada não alcançava o ledger da sessão que morreu.
+
+**Decisão** (fatia 2 do mini-brief; o Diretor pediu o encadeamento recuperável entre sessões): **(a) o memo de exploração passa a morar na casa da sessão**, com regra assimétrica — **ler** segue a cadeia do `memo-find <slug>` (casa própria → casas anteriores, mais recente primeiro → legado), **editar** passa por `adopt-memo <slug>`: memo de outra sessão nunca se edita no lugar; ele é copiado para a casa própria e a origem fica em `anterior:` no manifest. O durável cross-máquina continua sendo o `MAP.md` (4.104); a remoção na closure do PLAN cobre a cadeia inteira (cópia herdável velha induziria leitura stale). **(b) A 4.127 é refinada, declaradamente, no seu núcleo preservado**: o `/keelson:continue` continua derivando **só dos artefatos commitados**; ganha a Etapa 1.5 (handover local) onde `latest-for <slug>` acha a casa anterior e o que vem dela é **insumo** (caminho do memo anexado ao comando proposto) ou **sugestão rotulada por-clone** (run-state anterior cotejado com o derivado — divergiu, o commitado vence com a divergência dita; manifest `estado: ativa` = possível sessão viva → terceira saída da 4.251, nunca herança). **(c) O manifest ganha os escritores prometidos**: o fecho que consome o ledger marca `estado: reportada` (`mark-reported` — auto Etapa 10, implement avulso, `/keelson:report`), e a próxima escrita da mesma sessão reabre para `ativa` sozinha; o `/keelson:report` de sessão retomada pode reconstruir do ledger da casa anterior **declarando a origem** (o ledger alheio nunca alimenta em silêncio o report da sessão nova — 4.76 intacta).
+
+**Aplicação**: `scripts/session-dir.sh` (+`latest-for`/`memo-find`/`adopt-memo`/`mark-reported`, reabertura de estado) e suíte (38 casos); donos `sdd-conventions.md` (blocos *Casa da sessão* e *Memo de exploração*); `commands/{continue,report,auto,implement,specify,brief}.md`; method-guide §3.21 (espelho da wiki acompanha) e Perguntas-frequentes. CHANGELOG **0.139.0**, `Re-init: none` (bloco injetado e ficha intactos). Fatia 3 (limpeza de sessões reportadas) permanece com gatilho: o Diretor pedir.
+
+---
+
 ## 7. Roteamento de mudanças
 
 Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir manualmente:

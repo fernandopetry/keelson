@@ -23,6 +23,44 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.139.0] — 2026-08-30
+
+Re-init: none
+
+Decision 4.315 — local session handover (slice 2 of the session-folder
+mini-brief; explicit, declared refinement of 4.127).
+
+### Added
+
+- **Local handover between sessions on the same machine**:
+  `session-dir.sh` gains `latest-for <slug>` (most recent other session
+  that touched the slug), `memo-find <slug> [--all]` (exploration-memo
+  read chain: own home → previous homes, newest first → legacy path),
+  `adopt-memo <slug>` (guarantees an *editable* memo in the own home —
+  an inherited memo is copied, never edited in place, with the origin
+  recorded as `anterior:` in the manifest) and `mark-reported` (the
+  report closing step stamps `estado: reportada`; a later write by the
+  same session reopens it automatically).
+- **`/keelson:continue` step 1.5**: after deriving the state from
+  committed artifacts (unchanged — the 4.127 core is preserved), the
+  previous session's home enters as **input** (memo path attached to the
+  proposed command) or **labeled per-clone suggestion** (previous
+  run-state checked against the derivation; on divergence the committed
+  state wins, divergence stated; a manifest still `ativa` may be a live
+  parallel session → 4.251 third exit, never inheritance).
+- **`/keelson:report` on a resumed session**: with an empty current
+  ledger, the previous home's active ledger is a legitimate source —
+  used only with the origin declared in the report header.
+
+### Changed
+
+- **Exploration memo moves into the session home** (write via
+  `adopt-memo`; read via the `memo-find` chain; legacy
+  `thoughts/local/exploration-<slug>.md` stays readable as the chain's
+  tail). PLAN closure now removes the memo across the whole chain — a
+  stale inheritable copy would poison a future resume. Cross-machine
+  durability remains `MAP.md`'s job (4.104).
+
 ## [0.138.1] — 2026-08-30
 
 Re-init: none

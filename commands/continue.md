@@ -10,7 +10,7 @@ Você é o **Tech Lead** do time keelson (decisão 4.37) abrindo a **porta únic
 
 **Princípios invioláveis**:
 
-1. **O markdown é a fonte; o continue nunca guarda estado próprio** (mesmo princípio do grafo e da wiki). Ele **deriva** — e só dos artefatos **commitados** em `{docsRoot}/`: `thoughts/local/` é por-clone e não viaja entre as máquinas do time.
+1. **O markdown é a fonte; o continue nunca guarda estado próprio** (mesmo princípio do grafo e da wiki). Ele **deriva** — e só dos artefatos **commitados** em `{docsRoot}/`: `thoughts/local/` é por-clone e não viaja entre as máquinas do time. O que existir dele nesta máquina entra apenas como **insumo e sugestão declarada** (Etapa 1.5 — decisão 4.315, refinamento declarado da 4.127), nunca como fonte da derivação: sugestão que divergir do derivado perde, com a divergência dita.
 2. **Verificado, não deduzido (4.58)**: a fila do épico é registro curado — divergência entre fila e artefatos filhos resolve **pelos artefatos**, e a fila é corrigida declarando.
 3. **Apontar é o ato do Diretor**: nada dispara sem confirmação (proposta + default, uma pergunta). A régua "disparar cada ciclo é decisão do Diretor" (4.41) fica intacta — só deixa de exigir memória.
 
@@ -39,6 +39,16 @@ A derivação chega como **fato** (4.154): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/
 | Fila toda `entregue` | Nada a continuar: apontar `/keelson:integrate` para o PR do épico (ato do Diretor) |
 | Modo demanda única | O mesmo raciocínio sem fila: brief → SPEC → PLAN → TASKs/closures dizem o ponto; propor a etapa que falta |
 
+## Etapa 1.5: handover local (mesma máquina — decisão 4.315)
+
+Derivado o estado, consulte a casa de sessão anterior desta máquina: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-dir.sh" <raiz> latest-for <slug>`. Vazio → siga direto, sem menção. Com casa anterior:
+
+1. **Memo de exploração** na cadeia (`memo-find <slug>`) → anexe o **caminho** como insumo ao comando proposto na Etapa 2 — specify/plan/tasks/implement já o consomem; é a economia de re-exploração local (o durável cross-máquina continua sendo o `MAP.md`).
+2. **Run-state** na casa achada → **sugestão rotulada**, nunca fonte: acrescente ao "você está aqui" uma linha `sugestão local (por-clone): a sessão anterior (<estado do manifest>) parou na wave N de M` e coteje com o derivado dos commitados — divergiu, **o commitado vence** e a divergência é declarada. Manifest `estado: ativa` → a sessão pode estar **viva em paralelo**: isso não é retomada, é a terceira saída da posse (4.251) — não proponha herdar nada dela; inventarie e aponte ao Diretor.
+3. **Ledger ativo** na casa → mencione em meia linha que o `/keelson:report` reconstrói o fecho da sessão anterior a partir dele.
+
+Nada daqui muda a regra que casou na Etapa 1 — a proposta é sempre a da derivação.
+
 ## Etapa 2: propor e executar
 
 1. Apresente o **"você está aqui"** no corpo da conversa: a fila com estados (ou o ponto do ciclo avulso), em meia tela no máximo — detalhe fica nos artefatos, referenciados por caminho (4.124).
@@ -47,4 +57,4 @@ A derivação chega como **fato** (4.154): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/
 
 ## Limites
 
-Não guarda estado próprio nem cria artefato (a correção de fila declarada da Etapa 1 é a única escrita); não dispara nada sem confirmação; não re-decompõe épico (expansão de escopo é escalação do PO — 4.38); não faz merge nem PR (aponta o `/keelson:integrate`); não lê `thoughts/local/` para decidir. Épico sem fila viva (anterior à 4.125) → degrade com clareza: mostre a decomposição estática, derive o estado só dos artefatos filhos e sugira anotar a fila no formato novo.
+Não guarda estado próprio nem cria artefato (a correção de fila declarada da Etapa 1 é a única escrita); não dispara nada sem confirmação; não re-decompõe épico (expansão de escopo é escalação do PO — 4.38); não faz merge nem PR (aponta o `/keelson:integrate`); não **decide** por `thoughts/local/` — o handover da Etapa 1.5 é insumo/sugestão declarada e a derivação continua exclusivamente dos artefatos commitados (4.315). Épico sem fila viva (anterior à 4.125) → degrade com clareza: mostre a decomposição estática, derive o estado só dos artefatos filhos e sugira anotar a fila no formato novo.

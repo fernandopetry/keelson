@@ -31,6 +31,15 @@ Ledger vazio **e** branch sem mudanças → diga isso em uma linha e pare (não 
 
 ## Etapa 1: reunir a matéria-prima
 
+0.5. **Sessão retomada (decisão 4.315)**: `list` vazio na sessão corrente e o alvo é slug já
+trabalhado nesta máquina → consulte
+`bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-dir.sh" <raiz> latest-for <slug>`; a casa
+anterior com eventos ativos em `ledger/` é fonte legítima deste relatório — **declare a
+origem** no cabeçalho (`reconstruído do ledger da sessão <id>, estado <estado do manifest>`)
+e leia os eventos de lá. O arquivamento da Etapa 3 então é sobre aquela casa (o `ledger.sh`
+da sessão corrente não a alcança — mova os arquivos consumidos para `reported-*/` dela à mão,
+mesmo formato).
+
 1. **Ledger de sessão** — `bash "${CLAUDE_PLUGIN_ROOT}/scripts/ledger.sh" <raiz> list` (mecanismo
    e formato: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`). Leia os
    eventos **ativos** em ordem de timestamp. `reported-*/` é histórico já entregue: só entra se
@@ -67,8 +76,10 @@ seção **"Cobertura deste relatório"** é sempre presente.
 Emitido o relatório, arquive os eventos consumidos —
 `bash "${CLAUDE_PLUGIN_ROOT}/scripts/ledger.sh" <raiz> archive --keep <pendente>…`
 (decisão 4.314: cada casa do ledger arquiva em `reported-<yyyymmdd-hhmmss>/` dentro de si;
-timestamp medido pelo próprio script). Evento **ainda pendente** (handoff aberto,
-parte estacionada sem resposta) permanece ativo — ele é matéria do próximo fecho também.
+timestamp medido pelo próprio script) — e marque a casa:
+`bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-dir.sh" <raiz> mark-reported` (decisão 4.315;
+uma escrita posterior da mesma sessão reabre sozinha). Evento **ainda pendente** (handoff
+aberto, parte estacionada sem resposta) permanece ativo — ele é matéria do próximo fecho também.
 
 ## Limites
 
