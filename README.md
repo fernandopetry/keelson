@@ -415,16 +415,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.132.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.133.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the field postmortem behind 0.130.0 lands as executable
-lines at the point of use (decisions 4.302–4.303) — inherited gate criteria
-prescribe the condition with countable closure, retry items ship with the
-kill-the-defect/keep-the-benign proof pair, gate briefings declare the write
-surface, empty-channel redispatch requires proof of death, and a named
-teammate is treated as the persistent process it is.
+New in this release: a behavior-eval layer for the maintainer (decision
+4.304) — versioned A/B cases in `evals/` run by `scripts/eval-run.sh` over
+hermetic `claude -p` sessions, with an advisory per-axis verdict (HOLD on
+variance) and a plant control that invalidates any round it fools. Case #1
+rebuilds the 4.301 synthetic decomposition bench as a re-runnable artifact.
 Re-init: none. See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in

@@ -72,9 +72,10 @@ Para cada artefato, veredito **por item** — `ok` ou desvio com proposta concre
 - **Dono único vence DRY-para-dentro**: quando a doc sugere embutir contexto na skill mas
   a regra já tem dono (`guidelines/`, `conventions/`), o artefato **aponta** para o dono
   (4.20) — duplicar para "ficar autocontido" é desvio aqui, não aderência.
-- **Avaliação**: o análogo do eval-driven da doc no keelson é fixture/suíte
-  (`scripts/tests/`) para o mecânico e rodada de campo para o comportamental — não crie
-  harness de eval paralelo.
+- **Avaliação**: o análogo do eval-driven da doc no keelson tem três camadas (4.304) —
+  fixture/suíte (`scripts/tests/`) para o mecânico, `evals/` + `scripts/eval-run.sh` para
+  efeito de doutrina em caso controlado A/B, e rodada de campo para o resto; harness novo
+  fora dessas camadas continua sendo desvio.
 
 ## Relatório
 

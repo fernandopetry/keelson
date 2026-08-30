@@ -1,0 +1,16 @@
+# eval-run — case
+braços: A=file:reguas/regua-boa.md · B=file:reguas/regua-ma.md · plant=file:reguas/regua-plant.md
+runs por braço: 2 · modelo: default do executor · executor: fake-executor.sh
+
+## Veredito por eixo (consultivo — 4.304)
+- deck-presente: A=PASS · B=PASS → empate (PASS nos dois)
+- eixo-um: A=PASS · B=FAIL → A
+- sem-defeito: A=PASS · B=FAIL → A
+
+## Plant (controle positivo — 4.186)
+- eixo-um: plant reprovado — grader detecta o defeito (ok)
+- sem-defeito: plant reprovado — grader detecta o defeito (ok)
+
+## Telemetria
+- custo: US$0.0660 (12 chamadas)
+- duracao: 7s somados

@@ -23,6 +23,42 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.133.0] — 2026-08-30
+
+Re-init: none
+
+Decision 4.304 — a behavior-eval layer for the maintainer: doctrine changes
+can now be A/B-measured on versioned, re-runnable cases instead of settled by
+judgment alone. Advisory by design; the mechanical guard suites stay the
+blocking layer.
+
+### Added
+
+- **`evals/` layer + `scripts/eval-run.sh`**: versioned eval cases in the
+  `claude plugin eval` format (prompt + llm/file_exists/regex graders), run
+  today by a self-contained runner over hermetic `claude -p` sessions
+  (`--strict-mcp-config`, one throwaway workspace per run). Doctrine arms are
+  selected by `git:<ref>`/`file:` source; the per-axis verdict is
+  **advisory** — intra-arm variance yields HOLD, never a silent average — and
+  a plant control that gets approved (or returns no valid verdict)
+  invalidates the whole round. Runs on the Director's demand or before a
+  doctrine batch of a covered class; never in pre-commit/CI. Ships with a
+  deterministic test suite (fake executor, 12 assertions) wired into
+  pre-commit.
+- **Case #1 — `evals/decomposicao-comportamento`**: the 4.301 synthetic bench
+  (decoy PLAN with an unfrozen internal interface, an unmeasured numeric risk
+  and a layer-cut temptation) rebuilt as a re-runnable artifact. Its first
+  real round (n=1, sonnet) reproduced the original bench's pattern — the
+  0.131.0 rule wins the measurement-task axis, ties elsewhere, plant detected
+  on all three axes — at US$5.71 / ~17 min / 12 calls.
+
+### Changed
+
+- The 4.260 "no formal trigger" deferral of LLM behavior evals is superseded,
+  and the maintainer authoring ruler now names three evaluation layers
+  (script suites · behavior evals · field rounds) — both amended as declared
+  divergences (Director's act, 4.209 precedent).
+
 ## [0.132.0] — 2026-08-29
 
 Re-init: none

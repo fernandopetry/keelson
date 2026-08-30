@@ -53,7 +53,12 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   interna e veredito mergear direto (escada 4.268 completa) / absorver / parcial / recusar —
   default é absorção com crédito (4.263). O registro da chegada continua com o
   `/field-intake` (PR é insumo de campo com código junto); a face pública da rota para o
-  contribuidor é o `CONTRIBUTING.md`.
+  contribuidor é o `CONTRIBUTING.md` ·
+  **`evals/` + `scripts/eval-run.sh`** (camada de evals de comportamento, 4.304) → medir
+  o efeito de mudança de doutrina em caso controlado A/B (braços `git:<ref>`/`file:`,
+  n≥2, plant 4.186); veredito **consultivo** — HOLD em divergência, plant aprovado
+  invalida a rodada; roda sob demanda do Diretor ou pré-leva de classe coberta, nunca em
+  pre-commit/CI; casos no formato `claude plugin eval`, o runner só orquestra.
 - Adiado com gatilho (4.182): `doctrine-reviewer` (reincidência de defeito de conteúdo
   de doutrina que os checks de sincronia não pegam). `check-refs.sh` foi ativado antes
   do gatilho por decisão do Diretor (4.209, divergência declarada).

@@ -20,5 +20,9 @@
 # Saídas de auditoria do harness (relatórios derivados, nunca fonte)
 .harness-eval/
 
+# Saídas da camada de evals de comportamento (4.304) — o CASO é versionado, o
+# resultado bruto é derivado; o veredito resumido entra na decisão que o consumiu
+evals/*/results/
+
 # Worktrees de sessão (cópia integral do repo — nunca versionar nem auditar)
 .claude/worktrees/

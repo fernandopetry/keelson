@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: decomposicao-comportamento
+# Caso nº 1 da camada de evals do mantenedor (decisão 4.304) — reconstitui a
+# bancada sintética da observação pós-leva da 4.301: PLAN-isca com interface
+# deliberadamente não congelada + risco numérico não medido + tentação de corte
+# por camada. Braços típicos: régua velha (git:<ref>) × régua vigente (git:HEAD).
+# Executado hoje por scripts/eval-run.sh; formato compatível com `claude plugin eval`
+# (early access — quando o portão abrir, o executor troca e o caso fica).
