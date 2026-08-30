@@ -23,6 +23,23 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.137.2] — 2026-08-30
+
+Re-init: none
+
+Decision 4.313 — closes the loop on forge telemetry analysis.
+
+### Fixed
+
+- **`/keelson:postmortem`**: the BRIEF's `Cronologia` (telemetry tails —
+  `correções`/`classes`/`janelas`, 4.275/4.311) and `Estimativa` section
+  are now an enumerated evidence source in Step 1. A postmortem run
+  outside the original session (slug/branch target) previously lost the
+  measured forge numbers — exactly the ones that decide the 4.312
+  deferred-scaffold trigger; expensive forge rework is a candidate row
+  under the existing `retrabalho de processo` nature. Missing numbers
+  stay omitted, never estimated.
+
 ## [0.137.1] — 2026-08-30
 
 Re-init: none

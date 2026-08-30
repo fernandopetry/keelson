@@ -3291,6 +3291,14 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 **Aplicação**: `docs/_meta/conventions/graph-contract.md` §4.1 item 1 (ID na âncora) · `commands/auto.md` Etapa 1 (bullet de antecipação) · `commands/plan.md` Etapa 2 (não re-despachar reconhecimento entregue). CHANGELOG **0.137.1**, `Re-init: none`. Parecer integral e decomposição dos números: registro do mantenedor (memória da sessão, benchmark-gpt-sol-2026-08).
 
+### 4.313 — O postmortem enumera o BRIEF/Cronologia como fonte de evidência: os números da forja não se perdem fora da sessão
+
+**Problema**: pergunta direta do Diretor expôs o furo — a Etapa 1 do `/keelson:postmortem` enumera interações da sessão, git, SPEC/PLAN/TASKs, handoffs e lessons, mas **não o BRIEF**. Rodado na mesma sessão, os tempos de forja entram de carona pela fonte primária; rodado depois (alvo slug/branch — o caso do "analisar depois"), a `Cronologia` do BRIEF é a única fonte durável das caudas de telemetria (`correções`/`classes`/`janelas`, 4.275/4.311) e não era citada: o postmortem chegaria ao mantenedor sem exatamente os números que decidem o gatilho da 4.312.
+
+**Decisão**: a Etapa 1 ganha a fonte enumerada — BRIEF do slug com `Cronologia` (caudas de telemetria) e seção `Estimativa`; retrabalho de forja caro é candidato a linha da tabela de fatos sob a natureza já existente `retrabalho de processo`. Régua da família intacta: número ausente é telemetria omitida, nunca se estima.
+
+**Aplicação**: `commands/postmortem.md` (Etapa 1, um bullet). CHANGELOG **0.137.2**, `Re-init: none`.
+
 ---
 
 ## 7. Roteamento de mudanças

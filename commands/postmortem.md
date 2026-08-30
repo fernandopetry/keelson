@@ -79,6 +79,12 @@ mecanismo inclui "por que chegou a produção / por que a detecção demorou".
   correções (a regressão introduzida corrigindo é uma classe própria, procure-a).
 - Artefatos do ciclo: SPEC/PLAN/TASKs com "Histórico de execução", reports citados na
   closure, handoffs, `acs_nao_verificados`.
+- O **BRIEF do slug** — `Cronologia` com as caudas de telemetria (`correções`, `classes`,
+  `janelas` — 4.275/4.311) e a seção `Estimativa` (decisão 4.313): são os números
+  **medidos** da forja, a única fonte deles quando o postmortem roda fora da sessão.
+  Retrabalho de forja caro (voltas de correção, janela de scribe longa) é candidato a
+  linha da Etapa 2, natureza `retrabalho de processo`; número ausente na cauda é
+  telemetria omitida, nunca se estima.
 - `<docsRoot>/_meta/learning-log.md` e `guidelines/project/lessons.md` — o que o ciclo
   **já registrou** (não redescubra; cite).
 - Quando um teste está implicado, **abra o teste** e cite a asserção literal — é a
