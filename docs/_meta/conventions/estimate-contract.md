@@ -34,11 +34,15 @@ Três regras invioláveis:
 
 A dimensão de uma demanda é expressa em **duas camadas**:
 
-- **Estrutura prevista**: `~N waves · ~N tasks (~X small · ~Y medium)` — a mesma
-  semântica que `commands/tasks.md` já define (`small` = comportamento único e raso,
-  30 min–2 h · `medium` = caso de uso fim-a-fim, 2–4 h). O vocabulário `small|medium`
-  aparece **só** como mix previsto de tasks; o campo `Tamanho estimado` continua
-  exclusivo da TASK (enum fechado, ERROR de lint fora dele).
+- **Estrutura prevista**: `~N waves · ~N tasks (~X small · ~Y medium)` — a semântica e
+  as faixas de horas de `small`/`medium` são as do **dono único**, o princípio 7 de
+  `commands/tasks.md` (nunca copiadas aqui — a cópia literal divergiu uma vez). O
+  vocabulário `small|medium` aparece **só** como mix previsto de tasks; o campo
+  `Tamanho estimado` continua exclusivo da TASK (enum fechado, ERROR de lint fora dele).
+  **Descontinuidade de calibração (decisão 4.300)**: a semântica mudou em 2026-08-29
+  (`medium` passou de "caso de uso, 2–4 h" a "comportamento fim-a-fim, ~2–8 h") — par
+  estimado × realizado anterior a essa data calibra com a régua velha; compare eras
+  separadas em `estimates.md`, nunca a série inteira como contínua.
 - **Faixa de tempo por fase** (`min–max`, em horas — ordem de grandeza, precedente do
   `value-test-protocol.md`), cobrindo o **ciclo inteiro**:
   - **forja/entrevista** — rodadas de brief prováveis, proporcional às lacunas do pedido;

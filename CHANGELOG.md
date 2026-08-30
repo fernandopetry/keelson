@@ -23,6 +23,55 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.131.0] — 2026-08-29
+
+Re-init: none
+
+Decisions 4.300–4.301 — task decomposition is re-founded for AI execution:
+the governed unit becomes the smallest end-to-end verifiable behavior, seams
+between tasks are only allowed on frozen contracts, and wave composition can
+be refined between waves. Motivated by six recurring internal-boundary defect
+batches and external research (MSR Sharp Tools, Anthropic C-compiler, OpenAI
+Symphony, arXiv runtime decomposition, MSR E3, METR); validated on a desk
+re-slicing of the real field plan before shipping (8 layer-cut tasks / 6 waves
+→ 3 behaviors + 1 measurement, with every observed seam defect gone by
+construction).
+
+### Changed
+
+- **Decomposition principles get a declared precedence** (`/keelson:tasks`,
+  Step 1): behavior provable at its own closure > independence > size. The
+  governed unit is the behavior; technical decomposition below it belongs to
+  the developer at execution time, not to the plan.
+- **Seams only on frozen contracts.** An interface both halves would still
+  negotiate is never split across tasks — merge the halves or freeze the
+  contract first (PLAN DEC, decided schema, external API). The former edge
+  protocol (4.106/4.164) is explicitly rescoped to the unavoidable residual,
+  by the maintainer's decision — the primary route is not creating the seam.
+- **Vertical slicing hardened**: the behavior's entry point (route, command,
+  screen) belongs to the task itself — a later "wiring task" is layer-cutting;
+  a behavior larger than the size ceiling splits into smaller behaviors, never
+  into technical slices.
+- **Size semantics redefined without touching the enum**: `medium` = complete
+  end-to-end behavior, ~2–8 h; the real ceiling is the developer's reliable
+  execution horizon, not the context window. The estimate contract now points
+  at the single owner and declares the calibration discontinuity.
+- **Waves can be refined between waves** (`/keelson:implement` §3.6): with the
+  facts of a closed wave, not-yet-started waves may be recomposed via the
+  plan-gap rite; the wave total never changes and dispatched tasks are never
+  re-sliced.
+- **A measured TRISK no longer forces a sequential wave**: a TRISK with an
+  unmeasured number becomes a measurement task (type `chore`) scheduled before
+  the implementation tasks; once measured, the sequential-forcing condition no
+  longer applies by itself.
+- **Forced-sequential waves now leave a durable trace**: new `wave_sequencial`
+  ledger event recording the forcing condition and its family (shared resource
+  vs. dependency/risk) — the measurement series that decision 4.157 requires
+  before any scheduler change.
+- **Partial decomposition (`--only`) gets its missing caveat**: coverage
+  errors for components outside the cut are the reported gap, not a blocker;
+  every other error still blocks. The graph engine is untouched.
+
 ## [0.130.0] — 2026-08-29
 
 Re-init: none

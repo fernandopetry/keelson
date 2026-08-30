@@ -57,7 +57,7 @@ Qualquer uma:
 - Migração, schema, config global
 - Segurança, auth, criptografia, compliance
 - Breaking change de API
-- TRISK declarado (qualquer severidade)
+- TRISK declarado **e não medido** — TRISK cuja incerteza numérica já fechou por task de medição (número medido no PLAN — decisão 4.301) não força sequencial por si
 - Overlap de arquivos
 - COMP compartilhado na wave
 - Decisão irreversível tocada
@@ -73,6 +73,13 @@ território generalizada aos arquivos de registro capturou hunks de TASK irmã 3
 sessão — com a lição escrita em prosa 2× pelo próprio autor entre as ocorrências.
 
 Wave com >1 task e **nenhuma** condição presente → paralela. Na dúvida, sequencial (princípio 1).
+
+**Motivo registrado (decisão 4.301)**: wave sequencial-forçada com 2+ tasks ganha um evento
+`wave_sequencial` no ledger com a condição que a forçou, classificada por família — **recurso
+compartilhado** (arquivo/registro/schema/config: segurança de escrita concorrente) ou
+**dependência/risco** (TRISK não medido, decisão irreversível, breaking change). A segunda
+família reincidindo wave após wave é sinal para o refino do §3.6, e a série é a medição que a
+condição da 4.157 exige antes de qualquer mudança de scheduler.
 
 ## Etapa 2: imprimir plano de execução
 
@@ -205,8 +212,9 @@ Closure falha se qualquer alvo dos itens 1–3 ficou desatualizado, o Status no 
 4. Rodar a suíte **relevante ao escopo da wave** no working tree principal — ampla o bastante para pegar regressão cross-task (não só os `--filter` de cada task), mas **não** a suíte completa a cada wave. A completa roda 1× na Etapa 4 (verificação forte e única). **Dispensa por diff inerte**: se o diff da wave não toca código que a suíte exercita (só docs/artefatos SDD — régua e âncora mecânica em `core/TESTING.md`, "Diff inerte"), a rodada é dispensada e **declarada no boletim**, nunca omitida.
 5. Regressão: parar e reportar.
 6. `bash "${CLAUDE_PLUGIN_ROOT}/scripts/run-state.sh" <raiz> wave-done <slug>` (o `status` continua `em_andamento` até a Entrega).
-7. **Boletim de wave (ao Diretor)**: 3–6 linhas em linguagem de time (Developer, Code Reviewer, QA, Security, PO), cobrindo o que fechou, sinais laterais tratados e decisões tomadas, fechando com o estado de pendência do Diretor (ex.: *"nada pendente de você"*). O boletim é **narração na mesma mensagem em que a próxima wave inicia** — nunca uma parada nem fim de turno (4.23/4.24; o `wave-guard` reforça).
-8. **Iniciar a próxima wave imediatamente** — o loop da Etapa 3 só termina com a última wave fechada (→ Etapa 4) ou falha listada em "Comportamento em caso de falha"; não termine o turno entre waves nem pergunte se deve continuar.
+7. **Refino das waves seguintes (decisão 4.301)**: com os fatos desta wave (medições, achados, furos), a composição das waves **ainda não iniciadas** pode ser refinada — fundir/dividir/reordenar TASKs não-despachadas segue o rito do furo no plano (§3.5: ajuste localizado ou ajuste de PLAN, com linha no Histórico recente do INDEX); o `waves_total` do run-state não muda (refina-se a composição, nunca a contagem) e TASK despachada ou Done nunca se refatia. Nada a refinar → pular, sem menção.
+8. **Boletim de wave (ao Diretor)**: 3–6 linhas em linguagem de time (Developer, Code Reviewer, QA, Security, PO), cobrindo o que fechou, sinais laterais tratados e decisões tomadas, fechando com o estado de pendência do Diretor (ex.: *"nada pendente de você"*). O boletim é **narração na mesma mensagem em que a próxima wave inicia** — nunca uma parada nem fim de turno (4.23/4.24; o `wave-guard` reforça).
+9. **Iniciar a próxima wave imediatamente** — o loop da Etapa 3 só termina com a última wave fechada (→ Etapa 4) ou falha listada em "Comportamento em caso de falha"; não termine o turno entre waves nem pergunte se deve continuar.
 
 ## Etapa 4: validação final contra DoD do PLAN
 

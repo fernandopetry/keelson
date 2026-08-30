@@ -81,7 +81,7 @@ Detalhe completo (flags, fluxo, regras): `commands/plan.md`.
 
 ### 3.3 `/keelson:tasks` — decompor PLAN em TASKs
 
-Quebra o PLAN em tarefas atômicas ordenadas em **waves** por dependência topológica (tasks da mesma wave são paralelizáveis), com campos de closure preparados que o `/keelson:implement` preenche — não os preencha manualmente. Gate: `task-validator` (modo batch); próximo passo: `/keelson:implement PLAN-MMM` (ou `--dry-run` primeiro).
+Quebra o PLAN em tarefas atômicas — cada uma o menor **comportamento verificável de ponta a ponta**, cortado por capacidade e nunca por camada técnica — ordenadas em **waves** por dependência topológica (tasks da mesma wave são paralelizáveis; a composição das waves ainda não iniciadas pode ser refinada no fecho de cada wave, com os fatos da anterior), com campos de closure preparados que o `/keelson:implement` preenche — não os preencha manualmente. Gate: `task-validator` (modo batch); próximo passo: `/keelson:implement PLAN-MMM` (ou `--dry-run` primeiro).
 
 Detalhe completo (flags, fluxo, regras): `commands/tasks.md`.
 

@@ -58,36 +58,36 @@ só o delta. Agent indisponível → Etapas 1–4 inline como fallback, declarad
 
 ## Etapa 1: princípios de decomposição (contrato — executado pelo `scribe`)
 
-1. **Atomicidade**: executável e revisável em uma sessão.
-2. **Independência máxima — mas a aresta entre tasks irmãs tem dono** (decisão 4.106).
-   Duas tasks da mesma wave cujo resultado só se completa combinado — mesmo consumidor de
-   dado ou uma cria a superfície que a outra expõe — não são independentes: uma cria e
-   **nomeia** o símbolo/ponto de entrada (constante/enum, nunca grafia solta); a que fecha
-   a ponta carrega o item no próprio "Escopo > Inclui", nunca deduzido por quem achar a
-   lacuna. Casos reais: flag gravada `remember_me` numa task e `remember` na irmã;
-   listagem sem o clique para o detalhe da irmã. Nenhum gate vê duas tasks ao mesmo tempo — só a decomposição previne.
-   E quando o dado atravessa **3+ camadas** (persistência → aplicação → apresentação)
-   com a decomposição nomeando só as duas pontas, a camada **intermediária** carrega
-   item próprio no "Escopo > Inclui" de alguma task da wave, mesmo quando parece só
-   repasse (decisão 4.164): nó que nunca virou task não é aresta que algum gate
-   alcance — caso real: caso de uso com lista fixa de chaves descartava dois campos
-   que o repositório já calculava; "repassar campo que já existe" não pareceu trabalho,
-   e nenhuma task da wave tinha o arquivo no Inclui.
+Colisão entre princípios resolve por precedência declarada (decisão 4.300): comportamento
+que se prova no próprio fecho (4) > independência (2) > tamanho (7). A unidade governada do
+ciclo é o **comportamento**; a decomposição técnica abaixo dela — arquivos, métodos, ordem
+interna — é do developer na execução, nunca do plano.
+
+1. **Atomicidade**: um comportamento por TASK, executável e revisável de uma vez.
+2. **Costura só em contrato congelado** (decisão 4.300): interface que as duas metades
+   ainda vão negociar **não se divide** entre TASKs — funda as metades ou congele o
+   contrato antes (DEC do PLAN, schema decidido, API externa). Teste: dois developers
+   independentes começariam atacando o mesmo problema? Então a fronteira ainda não
+   existe. No **resíduo** inevitável (a fusão estoura o teto do princípio 7 e o contrato
+   não congela), vale o protocolo da aresta (decisões 4.106/4.164, rebaixadas a exceção
+   do resíduo): quem cria **nomeia** o símbolo (constante/enum, nunca grafia solta); quem
+   fecha a ponta carrega o item no próprio "Escopo > Inclui", nunca deduzido — inclusive
+   a camada **intermediária** quando o dado atravessa 3+ camadas (nó que nunca virou task
+   não é aresta que algum gate alcance).
 3. **Verificabilidade**: critério de pronto observável.
-4. **Vertical slicing — com teste** (decisão 4.157): concluída, a TASK entrega um
-   comportamento verificável **sozinho** — o critério de gate 1 (e o roteiro de gate 9,
-   quando houver) executa sem esperar TASK de outra camada. Se a verificação de
-   comportamento só existe quando uma irmã de wave posterior terminar, o corte foi
-   horizontal: refatie pelo comportamento, atravessando as camadas que ele exigir
-   (`Componente` aceita lista). O mapa FR→COMP do PLAN documenta arquitetura — **não
-   dita granularidade de TASK**. Fatias do mesmo fluxo que disputam a mesma superfície
-   declaram a aresta (princípio 2): a primeira fatia abre o esqueleto, as seguintes
-   adicionam. Exceções com nome: fatia sensível destacada (princípio 8) e **refactor
-   largo** — mudança mecânica cujo raio de dano atravessa a base inteira não cabe em
-   fatia vertical; sequencie como **expand–contract**: expandir (a forma nova nasce ao
-   lado da velha, nada quebra), migrar os call sites em lotes dimensionados pelo raio
-   (cada lote uma TASK dependente do expand, suíte verde a cada lote), contrair (apagar
-   a forma velha numa TASK que depende de todos os lotes).
+4. **Vertical slicing — a prova executa no próprio fecho** (decisões 4.157/4.300):
+   concluída, a TASK entrega um comportamento verificável **sozinho** — o critério de
+   gate 1 (e o roteiro de gate 9, quando houver) executa sem esperar TASK de outra
+   camada, e o **ponto de entrada** do comportamento (rota, comando, tela) pertence à
+   própria TASK, nunca a uma task de wiring posterior. Corte por **capacidade, nunca por
+   camada** (`Componente` aceita lista; o mapa FR→COMP documenta arquitetura — **não dita
+   granularidade**). Comportamento maior que o teto do princípio 7 divide-se em
+   comportamentos menores, jamais em rodelas técnicas. Exceções com nome: fatia sensível
+   (princípio 8) e **refactor largo** — mudança mecânica cujo raio de dano atravessa a
+   base inteira segue **expand–contract**: expandir (a forma nova nasce ao lado da velha,
+   nada quebra), migrar os call sites em lotes dimensionados pelo raio (cada lote uma
+   TASK dependente do expand, suíte verde a cada lote), contrair (apagar a forma velha
+   numa TASK que depende de todos os lotes).
 5. **Setup-first**: scaffolding/migration com IDs baixos.
 6. **Sem invenção de escopo — nem por dedução**: a TASK só afirma o que **verificou**.
    Caminho citado no "Inclui" foi confirmado pela **cadeia do dado** (*quem consome a
@@ -101,18 +101,24 @@ só o delta. Agent indisponível → Etapas 1–4 inline como fallback, declarad
 7. **Granularidade** (sobrescrita pela ficha/`CLAUDE.md` se declarado): medida por
    **esforço e comportamento entregue, nunca por contagem de arquivos** — a fatia
    vertical típica toca 1 arquivo por camada e continua atômica. `small` = comportamento
-   único e raso, 30 min a 2 h · `medium` = um caso de uso fim-a-fim, 2 a 4 h.
-8. **Corte por risco, não por camada**. Cada TASK custa um ciclo developer + code-reviewer —
+   único e raso, ~30 min a 2 h · `medium` = comportamento fim-a-fim completo, ~2 a 8 h —
+   o teto real é o **horizonte de execução confiável** do developer, não a janela de
+   contexto; estourou → princípio 4: dividir por capacidade.
+8. **Corte por risco, não por camada**. Cada TASK custa um ciclo developer + revisão —
    granularidade fina multiplica revisões, não qualidade. **Fatia sensível** (seed de
    permissão, autorização, endpoint novo, migração, regra de negócio central) → TASK
-   **própria**, mesmo pequena, para receber `security-engineer`/revisão focada. **Fatias
-   mecânicas do mesmo fluxo** (as classes/módulos de um mesmo caso de uso) → agrupe numa
-   TASK `medium` com uma revisão só; NÃO crie TASK por classe/camada quando nada exige
-   revisão dedicada. Heurística: se duas tasks só fazem sentido revisadas juntas, elas são uma.
+   **própria**, mesmo pequena, para receber `security-engineer`/revisão focada. **TRISK
+   com incerteza numérica** (teto/volume/latência estimados, nunca medidos) → **task de
+   medição** (tipo `chore`) antes das de implementação: o número medido corrige o PLAN, e
+   TRISK medido deixa de forçar wave sequencial (implement, Etapa 1 — decisão 4.301).
+   Heurística de fecho: duas tasks que só fazem sentido revisadas juntas são uma.
 
 ## Etapa 2: ordenação (contrato — executado pelo `scribe`)
 
-Identificar dependências entre TASKs; ordenar topologicamente (paralelizáveis = mesma wave); numerar sequencialmente.
+Identificar dependências entre TASKs; ordenar topologicamente (paralelizáveis = mesma
+wave); numerar sequencialmente. As dependências declaradas são o DAG que o implement
+executa; a composição das waves **ainda não iniciadas** é refinável no fecho de cada wave,
+com os fatos da anterior (decisão 4.301 — o rito é do `/keelson:implement`, §3.6).
 
 ## Etapa 3: estrutura obrigatória de cada TASK (contrato — executado pelo `scribe`)
 
@@ -299,6 +305,9 @@ Criar/atualizar `{docsRoot}/<slug>/tasks/TASK-MMM-INDEX.md`:
 Após gerar todas as TASKs e o TASK-MMM-INDEX, **conferir o grafo mecanicamente**:
 `${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh {docsRoot}/<slug> --check --stage=tasks --plan MMM`
 (contrato: `graph-contract.md`). Defeito de geração (ciclo, wave incoerente, referência quebrada) → corrija antes do gate; script indisponível/falhou → siga declarando a degradação.
+**Decomposição parcial declarada** (`--only`): ERRORs `fr-sem-task`/`ac-sem-task` de COMPs
+fora do recorte são o gap que o Input manda reportar — liste-os no output como estado
+conhecido; qualquer outro ERROR bloqueia normalmente (decisão 4.301).
 
 **Correção** (decisão 4.114): delta ao `scribe`, **aguardado**, com a lista literal de
 ERRORs; buraco de numeração não é defeito, arquivo existente nunca se renumera — protocolo do invocador: `graph-contract.md` §4.1.

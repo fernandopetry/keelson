@@ -35,7 +35,7 @@ não-trivial atravessa quatro etapas, cada uma com seu artefato durável:
 |---|---|---|
 | **SPEC** | O **quê** — requisitos em EARS, critérios de aceite em Given-When-Then, glossário | **Não fala de tecnologia.** Linguagem, framework, banco e protocolo só entram no PLAN |
 | **PLAN** | O **como** — componentes (COMP), decisões arquiteturais (DEC) com alternativas, mapa FR→componente | Herda stack e padrões da ficha e do perfil ativo; não reescolhe |
-| **TASK** | O **pedaço** — tarefas atômicas (30min–4h) ordenadas em *waves* por dependência | Tarefas da mesma wave rodam em paralelo |
+| **TASK** | O **pedaço** — cada tarefa entrega um comportamento verificável de ponta a ponta, ordenadas em *waves* por dependência | Tarefas da mesma wave rodam em paralelo |
 | **INDEX** | O **estado** do slug | **É gerado** — nunca edite à mão |
 
 Tudo isso vive em `<docsRoot>/<slug>/` (`docs/` por padrão). Um **slug** é uma área de
