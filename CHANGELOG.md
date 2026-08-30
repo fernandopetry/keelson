@@ -23,6 +23,48 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.132.0] — 2026-08-29
+
+Re-init: none
+
+Decisions 4.302–4.303 — absorbing the field postmortem of the session that
+motivated 0.130.0. Its central finding: every rule violated there already
+existed in the installed package, correctly written and cited at the point of
+use — so each fix lands as an executable line in the dispatcher's hand, never
+more adjacent prose. Two of its five mechanisms were already fixed hours
+earlier (0.130.0's agent-guard and wave-guard).
+
+### Changed
+
+- **Inherited gate criteria prescribe the CONDITION, with countable closure**
+  ("every per-item write inside the loop", "N volume axes → N volume pairs in
+  the proof") — a named instance is a non-exhaustive illustration. Third
+  occurrence of the instance-list-vs-countable-closure class; a loop with two
+  or more volume axes must be proven on each axis (in the field, the
+  prescription named 2 of 4 writes and the next gate measured exactly the cost
+  the criterion's own justification had predicted).
+- **Retry items are dispatched with the proof PAIR**: the mutant that kills
+  the defect and the proof that the legitimate/boundary case survives the fix.
+  A briefing with one-sided mutants breeds the benign-side regression inside
+  the correction — the two-axes rule now reaches the developer at dispatch,
+  not only the reviewer at re-review.
+- **The gate-round briefing declares the write surface**: a gate whose proof
+  creates or mutates files (measurement harness, mutants) works in an isolated
+  worktree — never in the tree the parallel gates of the same round are
+  reading (in the field, a measurement harness broke the build under two
+  parallel gates).
+- **Empty-channel redispatch requires proof of death**: a silent teammate may
+  be working, delivered-but-lost, or dead — all look identical. One follow-up
+  through the channel plus a process check come first; an unreported role is
+  redispatched once, with the duplication declared (in the field, two
+  redispatched reviewers duplicated finished reviews).
+- **A named teammate is a persistent process**: measured field experiment —
+  all 10 named dispatches left living processes after delivering (~10% CPU/RAM
+  until a manual kill), while the 4 anonymous dispatches of the same session
+  exited on their own. Session teardown after a teams run checks the process
+  table; a live process after delivery is not proof of work. The
+  troubleshooting wiki page follows.
+
 ## [0.131.0] — 2026-08-29
 
 Re-init: none

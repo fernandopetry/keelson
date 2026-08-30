@@ -3189,6 +3189,26 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 ---
 
+### 4.302 — Critério que viaja prescreve a condição e o par de provas
+
+**Problema**: postmortem de consumidor 0.129.0 (fecho da sessão que originou 4.297–4.299) — dois mecanismos da mesma família, "régua certa que não chegou inteira a quem executa": (a) critério herdado de gate cumprido em forma e falho em substância, 2× na mesma wave — a prescrição nomeou 2 escritas de 4 (as outras 2 seguiram por item e o gate seguinte mediu o custo que a própria justificativa previra), a guarda de largura foi para o campo que estruturalmente não estoura, e o teste do critério passou medindo o eixo errado — **3ª ocorrência da classe LRN-034/4.139** (lista de instâncias vs. fechamento contável), agora na superfície do handoff; (b) o briefing do retry nasceu com 12 mutantes de um lado só ("remova a correção → reprova") e os 2 achados do re-review tinham a mesma assinatura: a regressão do lado benigno nasceu no conserto — a régua dos dois eixos (4.289) existia, mas chegou ao **revisor** no re-review, não ao **developer** no despacho. E o briefing da rodada não carregou a 4.134: harness de medição na árvore compartilhada derrubou o build dos gates paralelos (no re-gate, com a linha no briefing, os agents acertaram sozinhos).
+
+**Decisão**: três adições no despachante, todas no ponto de uso: (a) **critério herdado prescreve a CONDIÇÃO com fechamento contável** ("toda escrita por item do laço", "N eixos → N pares de volumes na prova") — instância citada é ilustração não-exaustiva; laço com 2+ eixos de volume prova cada eixo. Escada 4.149 satisfeita: 3ª ocorrência chega com o autocheck contável no formato (mesma rota da 4.139). (b) **Item de retry nasce com o par de provas** no despacho: mutante que mata o defeito + prova de que o caso legítimo/valor-limite sobrevive. (c) **O briefing da rodada declara a superfície de escrita**: gate cuja prova cria/muta arquivo trabalha em worktree isolada (4.134) — a regra do avaliador vira linha do pacote 4.89. Contagem de linhas do `implement.md` estável (319 — as adições estenderam linhas existentes); a divergência de teto da 4.300 e a poda estrutural agendada seguem valendo.
+
+**Aplicação**: `commands/implement.md` (§3.2 linha da 4.140 · §3.3 briefing · §3.3 parágrafo do retry) · CHANGELOG **0.132.0**, `Re-init: none`. Origem: fila da 4.111, linhas 2026-08-29 (PM M1-b, M1-c/M4, M1-d/M3).
+
+---
+
+### 4.303 — Canal vazio: redespacho exige prova de morte; teammate é processo persistente
+
+**Problema**: (mesmo postmortem) o sintoma do canal vazio é ambíguo — teammate trabalhando, entregou-e-perdeu e morto se apresentam iguais ("idle, sem mensagem"); o lead deu os vereditos por perdidos e redespachou 2 revisores, os originais entregaram minutos depois (2 revisões duplicadas — e a 2ª de segurança não viu o achado mais grave da 1ª: quem executou viu, quem leu não). E o ledger da mesma sessão trouxe o experimento natural medido: os 10 despachos com `name:` deixaram os 10 processos vivos após entregar (um a 4,1% de CPU horas depois; ~10% CPU/RAM até kill manual do Diretor), enquanto os 4 anônimos encerraram sozinhos — o custo do `name:` tem dois eixos, canal **e** recurso.
+
+**Decisão**: o dono do modo ganha os dois fatos: (a) **redespacho exige prova de morte** — antes de redespachar papel por canal vazio: cobrança única pelo canal (4.299) + checagem do processo; papel não-reportado redespacha-se uma vez, com a duplicação declarada no boletim; (b) **teammate é processo persistente** — a parada/fecho de sessão que rodou teams confere a mesa de processos e encerra os que já entregaram; processo vivo pós-entrega não é prova de trabalho. A página de solução de problemas da wiki acompanha (sintoma visível ao consumidor: "muitos agentes pendurados").
+
+**Aplicação**: `docs/_meta/conventions/agent-teams.md` (bullets 4.292/novo) · wiki `Solucao-de-problemas.md` · CHANGELOG **0.132.0**, `Re-init: none`. Origem: fila da 4.111, linhas 2026-08-29 (PM M2 · ledger pendência 233854).
+
+---
+
 ## 7. Roteamento de mudanças
 
 Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir manualmente:

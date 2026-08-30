@@ -286,6 +286,15 @@ pedir o parecer **por arquivo** (arquivo em pasta temporária pode nem ser visí
 entre agents, por causa do sandbox) e inventar um veredito para gate que ficou mudo —
 gate sem parecer é gate que não rodou, e é assim que deve ser declarado.
 
+Dois sintomas irmãos, do mesmo episódio: um papel "mudo" **não está necessariamente
+perdido** — ele pode estar trabalhando, ou ter entregado e a mensagem se perdido.
+Redespachar outro no lugar sem conferir se o processo original morreu costuma terminar
+em trabalho duplicado (aconteceu em campo: duas revisões completas da mesma coisa).
+E papel despachado **com nome** vira um processo que fica vivo esperando mensagem
+mesmo depois de entregar — se ao fim de uma sessão dessas você vê vários processos
+`claude` pendurados consumindo CPU, é isso: pode encerrá-los; processo vivo depois da
+entrega não é sinal de trabalho em curso.
+
 ## Jira
 
 ### O ciclo terminou e o Jira não soube de nada
