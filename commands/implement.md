@@ -22,7 +22,7 @@ Você é o **Tech Lead** do time keelson (decisão 4.37), orquestrando implement
 ### 0.1 Modo de orquestração
 
 1. **Padrão: `SUBAGENTS`** (subagents na main session). Não gaste turno detectando alternativas.
-2. `--force-mode=teams` habilita `AGENT_TEAMS` quando o ambiente suportar → ler `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/agent-teams.md` (especificidades do modo; estrutura idêntica). Sem a flag, papéis são despachados **sem nome de instância** (`sdd-conventions.md`, 4.293) — a env var do recurso sozinha nunca converte o ciclo em teams.
+2. `--force-mode=teams` habilita `AGENT_TEAMS` quando o ambiente suportar → ler `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/agent-teams.md` (especificidades do modo; estrutura idêntica). Sem a flag, papéis são despachados **sem nome de instância** (`sdd-conventions.md`, 4.293) — a env var do recurso sozinha nunca converte o ciclo em teams; o `agent-guard` nega o spawn nomeado uma vez (4.297 — no teams deliberado, repetir a chamada passa).
 3. Wave única e sequencial de tasks pequenas → `SINGLE_THREAD` (main session direto) é aceitável. **SINGLE_THREAD dispensa a orquestração, não a independência**: os gates de 3.3 continuam rodando via subagents (`code-reviewer`, e `security-engineer`/`qa`/`performance-engineer` quando o gatilho aplica) — a main session que implementou **nunca** aprova o próprio diff (decisão 4.30). Colapsar para SINGLE_THREAD com >1 wave ou task não-pequena é desvio: declare-o no output final.
 
 ### 0.2 Carregar guidelines e memo

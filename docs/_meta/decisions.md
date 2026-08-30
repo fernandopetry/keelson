@@ -3133,6 +3133,36 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 ---
 
+### 4.297 — Despacho nomeado de papel vira check mecânico no agent-guard
+
+**Problema**: reincidência ×1 pós-4.293 (fila da 4.111, linha 2026-08-29): sessão de consumidor 0.129.0, retomada com contexto compactado, despachou todos os papéis do ciclo com `name:` — a regra estava no `implement.md` instalado e não preveniu (o precedente das waves anteriores, com teammates nomeados, sobreviveu à compactação; a regra não). Os papéis converteram em teammates, o retorno implícito sumiu e o lead gastou turnos colhendo resultado por fora (git, fonte externa) e improvisando canal de arquivo para vereditos de gate. Texto de novo não resolve o que texto não preveniu (escada 4.149; precedente 4.161 — 1ª reincidência pós-regra já mecanizou).
+
+**Decisão**: o `agent-guard` (4.42) ganha o check: spawn com `subagent_type` do elenco (`keelson:*`) **e** `name` de instância → deny 1× pela válvula de fingerprint existente (4.141) — a mensagem instrui refazer sem `name` e nomeia a rota do teams deliberado (`--force-mode=teams` → repetir a chamada passa). Campo `name` ausente ou com outro nome no payload → **fail-open** declarado (falso-negativo possível, falso-positivo nunca — não há amostra de payload de spawn nomeado capturada; o nome do campo vem do schema do harness). A leva nasce com a rede de prova (precedente 4.296 — hook sem suíte não se mexe): `scripts/tests/agent-guard/run.sh` (5 casos, com controle positivo do comportamento 4.42 preservado) + gatilho no pre-commit + step no CI. Âncora podre anotada, sem editar registro: a Aplicação da 4.293 cita "anexo §6.2", que não existe no repo — o espelho real da regra é `commands/implement.md` Etapa 0.1.
+
+**Aplicação**: `hooks/agent-guard.sh` · `scripts/tests/agent-guard/run.sh` (nova) · `scripts/git-hooks/pre-commit` · `.github/workflows/test.yml` · `docs/_meta/conventions/sdd-conventions.md` (bullet da 4.293) · `commands/implement.md` (Etapa 0.1) · CHANGELOG **0.130.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-29 (1ª).
+
+---
+
+### 4.298 — Guarda de posse reconhece descendência: run do lead não é "de terceiro"
+
+**Problema**: (mesma fila, 3ª linha) o `wave-guard` compara `sessao:` do run-state com o session_id literal (4.251); subagent/teammate tem session_id próprio, então todo papel despachado durante um run em andamento lia o run do **próprio lead** como "de terceiro" e gastava turnos (ps, git worktree) para concluir não-ação — caso real de campo, com amostra de invocação capturada: o processo de teammate carrega `--parent-session-id <lead>` e `--team-name`. É o gatilho registrado na 4.295 disparando **parcialmente**: os argumentos de invocação ganharam amostra; a topologia de PPIDs ainda não.
+
+**Decisão**: antes de acusar posse de terceiro, o `wave-guard` sobe a ancestralidade de PPIDs do próprio processo (`ps -ww -o ppid=,command=`, limitado a 20 saltos): ancestral com `--parent-session-id <dono>` prova equipe do dono → aquele arquivo sai da checagem em silêncio. A decisão é **por arquivo** (hipótese H5 do mapa de impacto): run do próprio teammate no mesmo diretório continua cobrado. Falha de `ps`/parse degrada para a acusação de posse atual — erro de leitura nunca vira absolvição (H4; espelho do fail-closed do stale-bg). Suíte nova com wrapper que reproduz a marca real de invocação (a amostra de campo virou fixture). **Assimetria declarada com gatilho** (H6): as cutucadas de `security-guard`/`review-guard` (4.252) e a recusa do escritor `run-state.sh` mantêm a comparação literal — teammate batendo nelas em campo reabre como leva própria (estender agora custaria helper triplicado em runtimes distintos, sem dono único de código shell no pacote).
+
+**Aplicação**: `hooks/wave-guard.sh` · `scripts/tests/wave-guard/run.sh` (nova) · `scripts/git-hooks/pre-commit` · `.github/workflows/test.yml` · `docs/_meta/conventions/agent-teams.md` (bullet da 4.294 re-datado) · CHANGELOG **0.130.0**, `Re-init: none`. Origem: fila da 4.111, linha 2026-08-29 (3ª) + gatilho da 4.295.
+
+---
+
+### 4.299 — A instrução de retorno viaja no prompt de despacho; arquivo não é canal
+
+**Problema**: (mesma fila, 2ª e 4ª linhas) quando a conversão em teammates aconteceu, nenhum dos três gates chamou `SendMessage` — o contrato do agent ("o texto final é o retorno") evapora na conversão, e nenhum prompt de despacho dizia o canal. O lead, crendo o canal quebrado, instruiu devolução por **arquivo** — o anti-padrão da 4.292, desta vez induzido pelo orquestrador — e a primeira gravação caiu em overlay de sandbox: o autor via o arquivo, o lead não.
+
+**Decisão**: o dono do modo (`agent-teams.md`) registra: (a) o prompt de despacho em teams encerra com a ordem literal de reportar o YAML do contrato via `SendMessage` **antes de ficar idle**; (b) teammate ocioso sem report → **uma** cobrança pelo próprio canal; persistindo vazio, o papel é declarado **não-reportado** (gate sem veredito é gate não rodado — nunca inventar); (c) arquivo não é canal — e arquivo em diretório temporário é não-confiável sob sandbox (overlay por processo, caso real); (d) o deny único do `agent-guard` no teams deliberado é esperado (válvula da 4.297). A conduta do lead de campo no resto fica confirmada como padrão: colher código do git e conferir efeito na fonte externa é o "verificado, não deduzido" (4.58) aplicado ao transporte.
+
+**Aplicação**: `docs/_meta/conventions/agent-teams.md` (bullet da 4.292) · CHANGELOG **0.130.0**, `Re-init: none`. Origem: fila da 4.111, linhas 2026-08-29 (2ª e 4ª).
+
+---
+
 ## 7. Roteamento de mudanças
 
 Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir manualmente:

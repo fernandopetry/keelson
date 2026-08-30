@@ -23,6 +23,51 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.130.0] — 2026-08-29
+
+Re-init: none
+
+Decisions 4.297–4.299 — field evidence from a real consumer session (a resumed,
+compacted cycle dispatched every role with an instance name, converting them into
+teammates and losing the implicit return channel) turns the anonymous-dispatch
+rule into a mechanical guard and makes the ownership guard teammate-aware.
+
+### Added
+
+- **The agent-guard now enforces anonymous role dispatch (4.293).** Spawning a
+  cast agent (`keelson:*`) with an instance `name` is denied once, through the
+  existing fingerprint valve: with Agent Teams enabled in the environment, a
+  named subagent becomes a teammate and the role's implicit return disappears.
+  The denial explains the fix (drop `name`) and the deliberate-teams route
+  (`--force-mode=teams` → repeat the call and it passes). A missing or renamed
+  payload field fails open — never a false positive. Ships with its own test
+  suite, wired into the pre-commit hook and CI.
+- **The wave guard recognizes descent (4.298).** A subagent or teammate used to
+  read its own lead's run-state as "someone else's run" (literal session-id
+  comparison) and burn turns proving non-action. The guard now walks its own
+  PPID ancestry: a process invoked with `--parent-session-id <owner>` belongs to
+  the owner's team, and that run silently leaves the check — per file, so the
+  teammate's own runs are still enforced. A `ps` failure degrades to the current
+  ownership warning, never to silence. Ships with its own test suite (the
+  captured field sample became the fixture), wired into pre-commit and CI.
+
+### Changed
+
+- **Teams mode: the return instruction travels in the dispatch prompt (4.299).**
+  An agent's "your final text is the return" contract evaporates on teammate
+  conversion — in the field, three gates finished without ever calling
+  `SendMessage`. The mode's owner doc now requires the lead to end every teams
+  dispatch prompt with the literal order to report the contract YAML via
+  `SendMessage` before going idle; an idle teammate without a report gets one
+  follow-up through the same channel, and a still-silent role is declared
+  unreported (a gate without a verdict is a gate that did not run — never
+  invented). Files are not a return channel: temp-dir handoffs are unreliable
+  under sandboxing (per-process overlay, observed in the field).
+- The remaining ownership asymmetry (security/review guard nudges and the
+  run-state writer still compare session ids literally) is declared with a
+  reopening trigger, and the 4.295 hardening trigger is updated: invocation
+  arguments now have a captured sample; PPID topology still does not.
+
 ## [0.129.0] — 2026-08-28
 
 Re-init: none

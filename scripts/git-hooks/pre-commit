@@ -179,6 +179,40 @@ if printf '%s\n' "$staged" | grep -qE '^(hooks/stale-background-guard\.sh$|scrip
   fi
 fi
 
+# Suíte do agent-guard: obrigatória quando o hook ou a suíte mudam (4.297)
+if printf '%s\n' "$staged" | grep -qE '^(hooks/agent-guard\.sh$|scripts/tests/agent-guard/)'; then
+  if [ -f scripts/tests/agent-guard/run.sh ]; then
+    echo "[keelson pre-commit] agent-guard/suíte no commit — rodando scripts/tests/agent-guard/run.sh" >&2
+    if ! out="$(bash scripts/tests/agent-guard/run.sh 2>&1)"; then
+      printf '%s\n' "$out" | tail -25 | sed 's/^/    /' >&2
+      echo "[keelson pre-commit] BLOQUEADO: suíte do agent-guard falhou (acima, resumida)." >&2
+      echo "  Corrija — ou, se a mudança de comportamento é intencional, ajuste as asserções" >&2
+      echo "  (fixture nova acompanha critério novo). Escape consciente: KEELSON_SKIP_TESTS=1" >&2
+      exit 1
+    fi
+    printf '%s\n' "$out" | tail -1 | sed 's/^/[keelson pre-commit] /' >&2
+  else
+    echo "[keelson pre-commit] aviso: scripts/tests/agent-guard/run.sh ausente — suíte não conferida." >&2
+  fi
+fi
+
+# Suíte do wave-guard: obrigatória quando o hook ou a suíte mudam (4.298)
+if printf '%s\n' "$staged" | grep -qE '^(hooks/wave-guard\.sh$|scripts/tests/wave-guard/)'; then
+  if [ -f scripts/tests/wave-guard/run.sh ]; then
+    echo "[keelson pre-commit] wave-guard/suíte no commit — rodando scripts/tests/wave-guard/run.sh" >&2
+    if ! out="$(bash scripts/tests/wave-guard/run.sh 2>&1)"; then
+      printf '%s\n' "$out" | tail -25 | sed 's/^/    /' >&2
+      echo "[keelson pre-commit] BLOQUEADO: suíte do wave-guard falhou (acima, resumida)." >&2
+      echo "  Corrija — ou, se a mudança de comportamento é intencional, ajuste as asserções" >&2
+      echo "  (fixture nova acompanha critério novo). Escape consciente: KEELSON_SKIP_TESTS=1" >&2
+      exit 1
+    fi
+    printf '%s\n' "$out" | tail -1 | sed 's/^/[keelson pre-commit] /' >&2
+  else
+    echo "[keelson pre-commit] aviso: scripts/tests/wave-guard/run.sh ausente — suíte não conferida." >&2
+  fi
+fi
+
 # Suíte do map: obrigatória quando o motor ou as fixtures mudam (4.104)
 if printf '%s\n' "$staged" | grep -qE '^scripts/(map-check\.sh$|tests/map/)'; then
   if [ -f scripts/tests/map/run.sh ]; then

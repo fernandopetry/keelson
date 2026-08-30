@@ -195,6 +195,12 @@ sessão continua nem encerra o ciclo de outra. Se a sessão dona realmente morre
 arquivo ficou órfão, peça na sessão atual para assumir ou limpar o estado — a
 assunção é sempre um ato deliberado, nunca automático.
 
+Uma exceção é reconhecida sozinha desde a 0.130.0: um **ajudante da própria sessão
+dona** (um subagent ou teammate que ela despachou) não é "outra sessão" — o guard
+identifica o parentesco pelo processo e deixa o ajudante encerrar em paz, sem
+inventário nem alarme. Se você ainda vê um ajudante gastando turnos "provando" que o
+ciclo não é dele, atualize o plugin (`/keelson:update`).
+
 ## Ciclo e comportamento do time
 
 ### Digitei um comando no meio de um ciclo e ele não rodou
@@ -270,8 +276,15 @@ roda dentro do próprio terminal), o que torna o sintoma mais confuso. Não é p
 
 O conserto: conduza o ciclo na **sessão principal**, nunca de dentro de uma pane de
 teammate; e atualize o plugin (`/keelson:update`) — desde a versão 0.128.0 os
-comandos despacham os papéis sem nome, o que impede a conversão acidental. Se você
-quer o modo teams de verdade, ele é opt-in: `/keelson:implement --force-mode=teams`.
+comandos despacham os papéis sem nome, o que impede a conversão acidental, e desde a
+0.130.0 um guard **bloqueia** o despacho nomeado no ato (uma vez; a mensagem explica
+como refazer). Se você quer o modo teams de verdade, ele é opt-in:
+`/keelson:implement --force-mode=teams` — nesse modo, cada despacho precisa terminar
+instruindo o papel a devolver o parecer por `SendMessage` antes de ficar ocioso, e o
+guard deixa passar a chamada nomeada repetida. Dois improvisos que não funcionam:
+pedir o parecer **por arquivo** (arquivo em pasta temporária pode nem ser visível
+entre agents, por causa do sandbox) e inventar um veredito para gate que ficou mudo —
+gate sem parecer é gate que não rodou, e é assim que deve ser declarado.
 
 ## Jira
 

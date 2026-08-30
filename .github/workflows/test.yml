@@ -98,6 +98,12 @@ jobs:
       - name: Suíte do stale-background-guard (scripts/tests/stale-bg/run.sh)
         run: bash scripts/tests/stale-bg/run.sh
 
+      - name: Suíte do agent-guard (scripts/tests/agent-guard/run.sh)
+        run: bash scripts/tests/agent-guard/run.sh
+
+      - name: Suíte do wave-guard (scripts/tests/wave-guard/run.sh)
+        run: bash scripts/tests/wave-guard/run.sh
+
       - name: Suíte do check-refs.sh (scripts/tests/refs/run.sh)
         run: bash scripts/tests/refs/run.sh
 

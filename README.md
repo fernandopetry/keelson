@@ -415,15 +415,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.129.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.130.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the two teams-mode gaps declared in 0.128.0 now degrade loudly
-(decisions 4.295–4.296) — the stale-background guard's advice covers teammate
-processes, and the closing report's per-role cost line carries a coverage note in
-`AGENT_TEAMS` cycles, driven by the caller's orchestration enum, never an env var.
-Re-init: none. See the [CHANGELOG](CHANGELOG.md) for history.
+New in this release: anonymous role dispatch is now mechanically enforced and the
+ownership guard is teammate-aware (decisions 4.297–4.299) — the agent-guard denies
+named cast spawns once (with a valve for deliberate `--force-mode=teams`), the wave
+guard recognizes a lead's run through PPID descent instead of flagging it as a
+third party's, and teams dispatch prompts must carry the `SendMessage` return
+instruction. Re-init: none. See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

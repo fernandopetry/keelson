@@ -5,7 +5,13 @@
 #
 # O modelo escolhe o subagent_type a cada spawn; este guard corrige o desvio no
 # ato, uma única vez por chamada (anti-renudge por fingerprint):
-#   - subagent_type keelson:* → passa (é o elenco).
+#   - subagent_type keelson:* SEM nome de instância → passa (é o elenco).
+#   - subagent_type keelson:* COM `name` → deny 1× (decisões 4.293/4.297): com
+#     Agent Teams ativo no ambiente, subagent nomeado vira teammate e o retorno
+#     implícito do papel desaparece — a válvula deixa o modo teams deliberado
+#     (--force-mode=teams) repetir a chamada e passar. Campo `name` ausente ou
+#     com outro nome no payload → fail-open (falso-negativo declarado, nunca
+#     falso-positivo — sem amostra de payload de spawn nomeado capturada).
 #   - genérico com prompt "cara de trabalho de papel" (gates, crítica de mérito,
 #     modos do po/qa, implementar TASK...) → deny com instrução de refazer a
 #     chamada com o agent certo.
@@ -36,15 +42,26 @@ case "$tool_name" in
 esac
 
 stype="$(printf '%s' "$input" | jq -r '.tool_input.subagent_type // empty' 2>/dev/null || true)"
+nome="$(printf '%s' "$input" | jq -r '.tool_input.name // empty' 2>/dev/null || true)"
+modo_nomeado=0
 case "$stype" in
-  keelson:*) exit 0 ;;   # elenco do keelson → sempre legítimo
+  keelson:*)
+    # Elenco: anônimo passa sempre; nomeado segue para o deny 1× (4.293/4.297).
+    [ -n "$nome" ] || exit 0
+    modo_nomeado=1
+    ;;
 esac
 
 texto="$(printf '%s' "$input" | jq -r '((.tool_input.description // "") + " " + (.tool_input.prompt // ""))' 2>/dev/null || true)"
-[ -z "${texto// /}" ] && exit 0
+if [ "$modo_nomeado" -eq 0 ]; then
+  [ -z "${texto// /}" ] && exit 0
+fi
 
+# --- despacho nomeado de papel (4.293/4.297): motivo próprio, sem heurística ---
+if [ "$modo_nomeado" -eq 1 ]; then
+  motivo_extra=""
 # --- validators (skills): genérico passa SE o briefing cita o SKILL.md canônico ---
-if printf '%s' "$texto" | grep -Eiq 'spec-validator|plan-validator|task-validator'; then
+elif printf '%s' "$texto" | grep -Eiq 'spec-validator|plan-validator|task-validator'; then
   if printf '%s' "$texto" | grep -q 'SKILL\.md'; then
     exit 0
   fi
@@ -65,12 +82,22 @@ git_dir="$(git -C "$proj" rev-parse --absolute-git-dir 2>/dev/null || true)"
 marker="" fingerprint=""
 if [ -n "$git_dir" ]; then
   marker="$git_dir/keelson-agent-guard.recent"
-  fingerprint="$(printf '%s\n%s' "$stype" "$texto" | git hash-object --stdin 2>/dev/null || true)"
+  fingerprint="$(printf '%s\n%s\n%s' "$stype" "$nome" "$texto" | git hash-object --stdin 2>/dev/null || true)"
   if [ -n "$fingerprint" ] && [ -f "$marker" ] && grep -qxF "$fingerprint" "$marker" 2>/dev/null; then
     exit 0
   fi
 fi
 
+if [ "$modo_nomeado" -eq 1 ]; then
+reason="$(cat <<EOF
+agent-guard (keelson, decisões 4.293/4.297): spawn do papel "${stype}" com nome de instância ("${nome}").
+
+Com Agent Teams habilitado no ambiente, subagent NOMEADO é lançado como teammate em qualquer sessão interativa — o retorno implícito do papel desaparece e a topologia do ciclo muda sem ninguém pedir (caso real de campo: gates terminando "mudos", veredito colhido por improviso). Papel do ciclo é despachado por tipo, SEM \`name\` — é o que mantém o canal de retorno determinístico em toda superfície.
+
+Refaça a chamada sem o parâmetro \`name\`. Se o modo teams é DELIBERADO (\`--force-mode=teams\`, opt-in do ciclo): repita a chamada como está — este aviso não se repete para esta mesma chamada — e garanta que o prompt de despacho instrui o retorno via SendMessage (docs/_meta/conventions/agent-teams.md).
+EOF
+)"
+else
 reason="$(cat <<EOF
 agent-guard (keelson, decisão 4.42): subagent_type "${stype:-ausente}" para trabalho do ciclo keelson.
 
@@ -81,6 +108,7 @@ Refaça a chamada com o agent correto do elenco: keelson:developer (implementar 
 Se o uso genérico for INTENCIONAL (exploração, pesquisa, tarefa fora do ciclo), repita a chamada — este aviso não se repete para esta mesma chamada.
 EOF
 )"
+fi
 
 if [ -n "$marker" ] && [ -n "$fingerprint" ]; then
   printf '%s\n' "$fingerprint" >> "$marker" 2>/dev/null || true

@@ -23,6 +23,16 @@
 # saída: inventariar e escalar ao humano. Sem o campo ou sem session_id →
 # comportamento antigo, nunca acusa (falso-positivo é o pior defeito da camada).
 #
+# Descendência (decisão 4.298): subagent/teammate tem session_id próprio e lia o
+# run do PRÓPRIO lead como "de terceiro", gastando turnos para concluir não-ação
+# (caso real de campo). Antes de acusar, o guard sobe a ancestralidade de PPIDs
+# do próprio processo: um ancestral cuja invocação carrega
+# `--parent-session-id <dono>` prova que ESTE processo é da equipe do dono — o
+# run é do lead, não é meu para continuar/encerrar nem para inventariar → aquele
+# arquivo sai da checagem em silêncio. A decisão é POR ARQUIVO: um run meu no
+# mesmo diretório continua cobrado. Falha de `ps`/parse degrada para a acusação
+# de posse atual (nunca para silêncio — erro de leitura não vira absolvição).
+#
 # Cutuca 1× por ESTADO do run, não por turno (decisão 4.165): com agents em
 # background, encerrar o turno e ser reacordado pela task-notification é o
 # desenho correto (anti-polling, 4.118) — bloquear todo encerramento cobrava um
@@ -51,21 +61,49 @@ fi
 
 session_id="$(printf '%s' "$input" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("session_id", ""))' 2>/dev/null || echo "")"
 
+# Descendência (4.298): devolve 0 se algum ancestral do próprio processo carrega
+# `--parent-session-id <dono>` na invocação — a marca que o harness põe no
+# processo de subagent/teammate (amostra de campo na fixture da suíte). Qualquer
+# falha de ps/parse devolve 1: o run segue acusado como de terceiro (degradação
+# preserva a mensagem de posse, nunca silencia). Bounded: 20 saltos.
+descende_do_dono() {
+  _dono="$1"; _pid=$$; _hops=0
+  while [ "$_hops" -lt 20 ]; do
+    _linha="$(ps -ww -o ppid=,command= -p "$_pid" 2>/dev/null | sed -n 1p || true)"
+    [ -n "$_linha" ] || return 1
+    case "$_linha" in
+      *"--parent-session-id $_dono"*|*"--parent-session-id=$_dono"*) return 0 ;;
+    esac
+    _novo="$(printf '%s\n' "$_linha" | awk '{print $1}')"
+    case "$_novo" in ''|*[!0-9]*) return 1 ;; esac
+    [ "$_novo" -le 1 ] && return 1
+    [ "$_novo" = "$_pid" ] && return 1
+    _pid="$_novo"; _hops=$((_hops + 1))
+  done
+  return 1
+}
+
 n=0
 alheio=0
 detalhes=""
 for f in "$cwd"/thoughts/local/run-state-*.md; do
   [ -f "$f" ] || continue
   grep -q '^status: em_andamento' "$f" 2>/dev/null || continue
-  n=$((n + 1))
-  campos="$(grep -E '^(slug|plan|waves_concluidas|waves_total|retomada|sessao):' "$f" 2>/dev/null | sed 's/^/    /' || true)"
   # Posse (decisão 4.251): run cuja `sessao:` aponta outra sessão viva não é deste
   # turno — a mensagem muda para a terceira saída. Sem session_id no payload ou sem
   # o campo (formato antigo/"desconhecida") → comporta-se como antes, nunca acusa.
   dono="$(sed -n 's/^sessao:[ 	]*//p' "$f" 2>/dev/null | sed -n 1p)"
   if [ -n "$session_id" ] && [ -n "$dono" ] && [ "$dono" != "desconhecida" ] && [ "$dono" != "$session_id" ]; then
+    # Equipe do dono (4.298): run do meu lead não é meu nem de terceiro — este
+    # arquivo sai da checagem; a decisão é por arquivo (um run MEU ao lado
+    # continua cobrado).
+    if descende_do_dono "$dono"; then
+      continue
+    fi
     alheio=1
   fi
+  n=$((n + 1))
+  campos="$(grep -E '^(slug|plan|waves_concluidas|waves_total|retomada|sessao):' "$f" 2>/dev/null | sed 's/^/    /' || true)"
   detalhes="${detalhes}
 — ${f#"$cwd"/}:
 ${campos}"
