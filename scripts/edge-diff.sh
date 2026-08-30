@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# edge-diff.sh — diff de arestas antes/depois da reescrita de um artefato (decisão 4.117/4.154).
-# A reescrita por Write integral (scribe) preserva toda aresta que o ajuste não mira;
-# este script PROVA isso: extrai os campos de aresta e os ACs citados em critérios das
+# edge-diff.sh — diff de arestas antes/depois de um pacote de correção num artefato (decisão 4.117/4.154).
+# O arquivo depois do pacote (Write integral ou lote de Edits — 4.309) preserva toda
+# aresta que nenhum ajuste mira; este script PROVA isso, nos dois modos: extrai os campos
+# de aresta e os ACs citados em critérios das
 # duas versões e reporta o delta. Quem roda é a main session, após o retorno do scribe
 # (ele não tem shell — 4.114); aresta perdida de propósito é decisão declarada, nunca
 # efeito colateral silencioso.

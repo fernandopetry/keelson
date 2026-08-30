@@ -42,9 +42,14 @@ Ler `{docsRoot}/<slug>/INDEX.md`: confirmar que o PLAN está listado e identific
 
 Próximo XXX: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/next-id.sh" {docsRoot}/<slug> task <MMM>` — nunca de cabeça. Criar pasta `tasks/` se não existir.
 
-## Etapa 0.5: redação delegada ao `scribe` (decisão 4.103)
+## Etapa 0.5: redação delegada ao `scribe` (decisões 4.103, 4.310)
 
-A decomposição e a redação das TASKs **não acontecem nesta janela** — despache o agent `scribe` com o pacote:
+A decomposição e a redação das TASKs **não acontecem nesta janela** — e a rota do despacho
+segue o tamanho **previsto** (fonte: seção `## Estimativa` do BRIEF quando existe; senão,
+contagem de COMPs do PLAN — >10 COMPs indica decomposição grande). Previsão errada custa
+pouco: as duas rotas produzem os mesmos arquivos e passam pelas mesmas provas da Etapa 5.
+
+**Rota única (previsão ≤8 TASKs)** — despache **um** `scribe` com o pacote:
 
 - **Contrato**: este arquivo (`${CLAUDE_PLUGIN_ROOT}/commands/tasks.md`), Etapas 1 a 4 — princípios
   de decomposição, ordenação, template da TASK **e** o `TASK-MMM-INDEX.md` (parte da autoria).
@@ -52,7 +57,30 @@ A decomposição e a redação das TASKs **não acontecem nesta janela** — des
 - **Insumos** (caminhos): PLAN, SPEC (ACs e mapa FR→FEAT da 0.2), convenções extraídas na
   0.1 (resumo inline), memo de exploração e/ou `MAP.md` do slug, e `guidelines/project/lessons.md` se existir (cruzamento da Etapa 3).
 
-Receba o sumário estruturado (`agents/scribe.md`): `insumos_index.contagens` alimenta a
+**Rota fan-out (previsão >8 TASKs — decisão 4.310)**: uma janela serial que decide E
+redige 12+ arquivos é o gargalo medido da forja; a rota divide em duas fases do **mesmo
+agent** (briefings distintos do `scribe`, nunca agents novos):
+
+1. **Decompositor**: um `scribe` com o pacote acima, Etapas 1 a 3 como régua de decisão,
+   e a instrução de **não escrever arquivo nenhum**: o retorno é um **manifesto
+   congelado** — por TASK: ID, título, tipo, tamanho, wave, `Depende de`/`Bloqueia`,
+   FRs/FEATs/COMPs, distribuição AC×gate, bullets de Inclui/Não inclui e lições ativas
+   aplicáveis. O manifesto é o produto intelectual da decomposição: ID e aresta ficam
+   decididos aqui, e só aqui.
+2. **Redatores**: 2–3 `scribe`s **em paralelo**, cada um com o manifesto + o contrato
+   (Etapas 1 a 3, template da Etapa 3) + os insumos e uma **lista literal de arquivos**
+   a redigir (fatia por wave; nunca "as TASKs da wave 2", que se sobrepõe). Redator
+   **não cria nem renomeia ID e não toca aresta** — divergência com o manifesto volta
+   em `duvidas`, nunca se corrige localmente (mesmo mecanismo da 4.114).
+3. **`TASK-MMM-INDEX.md` é da main session nesta rota** (dono único — nenhum redator tem
+   o todo): derive-o do manifesto (waves e tabelas de cobertura são projeção mecânica
+   dele) **após o retorno de todos** os redatores; o commit do marco só então, por
+   pathspec (4.163).
+
+A consistência global não depende de disciplina dos redatores: o `graph.sh --check`
+(Etapa 5) e o `task-validator` provam o resultado nas duas rotas.
+
+Receba o(s) sumário(s) estruturado(s) (`agents/scribe.md`): `insumos_index.contagens` alimenta a
 Etapa 6; `duvidas` não-vazias → resolva (pergunte; no modo autônomo, escada) e re-despache
 só o delta. Agent indisponível → Etapas 1–4 inline como fallback, declarado no output.
 
@@ -311,7 +339,7 @@ fora do recorte são o gap que o Input manda reportar — liste-os no output com
 conhecido; qualquer outro ERROR bloqueia normalmente (decisão 4.301).
 
 **Correção** (decisão 4.114): delta ao `scribe`, **aguardado**, com a lista literal de
-ERRORs; buraco de numeração não é defeito, arquivo existente nunca se renumera — protocolo do invocador: `graph-contract.md` §4.1.
+ERRORs e âncora por ajuste — modo de aplicação pela régua do pacote (4.309); buraco de numeração não é defeito, arquivo existente nunca se renumera — protocolo do invocador: `graph-contract.md` §4.1.
 
 Com o grafo limpo (e o scribe encerrado), invocar a skill `task-validator` em modo batch
 (apontando para o TASK-MMM-INDEX) — em paralelo com o `tracker-sync` da Etapa 7 quando o

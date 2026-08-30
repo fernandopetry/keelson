@@ -145,11 +145,19 @@ Quando o `--check` acusa ERROR logo após a geração de artefatos (Etapa 5 do
 1. **Quem roda o script é quem tem shell**: a main session executa o `graph.sh` e entrega
    ao `scribe` a **lista literal de ERRORs** no re-despacho — nunca a instrução "rode o
    grafo até limpar" (o scribe não tem Bash; exigência impossível volta em `duvidas`).
+   Cada ajuste do pacote viaja com **âncora** — heading da seção afetada + trecho literal
+   a localizar (a main os tem do relatório do validator/gate/PO): é a âncora que habilita
+   o modo localizado da 4.309 (lote de `Edit`s lendo só as seções citadas — régua de
+   aplicação no `agents/scribe.md`, passo 4). Ajuste sem âncora rebaixa o pacote inteiro
+   ao modo estrutural. E a 4.309 governa o **modo de aplicar** um pacote, nunca o número
+   de voltas — a consolidação da 4.116 (uma rodada, uma volta) permanece intacta:
+   correção pingada continua defeito, por mais barata que a volta tenha ficado.
 2. **Correção é aguardada**: o re-despacho é síncrono do ponto de vista do fluxo — a main
    session espera o retorno e re-roda o script ela mesma. Agent em background + polling
    de filesystem é anti-padrão (caso real: ~14 min de `sleep`-loop para um delta; régua
    geral de espera de subagent: `sdd-conventions.md` — 4.118). A preservação de arestas
-   da reescrita (4.117) também se **prova**, não se presume:
+   do **arquivo depois do pacote** (4.117) também se **prova**, não se presume — nos
+   **dois** modos de aplicação da 4.309 (lote de `Edit`s ou `Write` integral):
    `scripts/edge-diff.sh <arquivo> [--base <ref>]` compara os campos de aresta e os ACs
    de critérios antes/depois — linha `perdida` que nenhum ajuste pediu volta no
    re-despacho seguinte (decisão 4.154).

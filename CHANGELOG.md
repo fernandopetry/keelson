@@ -23,7 +23,45 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
-## [0.136.0] — 2026-08-30
+## [0.137.0] — 2026-08-30
+
+Re-init: none
+
+Decisions 4.309–4.311 — forge-speed batch, from a measured consumer session
+(~4h33 of artifact phase before the first line of code; the single largest
+block was a ~37-minute SPEC correction window that rewrote a ~900-line
+document to apply 19 localized fixes).
+
+### Added
+
+- **`/keelson:tasks`**: fan-out route for large decompositions (predicted
+  >8 tasks): one scribe returns a frozen manifest (IDs, waves, edges,
+  AC×gate distribution) without writing files, then 2–3 scribes write
+  disjoint literal file lists in parallel; `TASK-MMM-INDEX.md` becomes the
+  main session's to derive from the manifest, and the existing mechanical
+  proofs (`graph.sh --check` + task-validator) guarantee global consistency
+  in both routes (4.310). Small decompositions keep the single-window route.
+- **Forge telemetry — window cost**: the per-stage telemetry tail in the
+  BRIEF's `Cronologia` gains a `janelas` field (minutes measured by the
+  main session's clock between dispatch and return of each scribe window,
+  lines via `wc -l` over the returned artifact paths — never self-reported),
+  and the report's `Forja` line transcribes it per stage. Measured or
+  omitted, never estimated; never a trigger (4.311). This is the field
+  instrument that will prove — or refute — the effect of 4.309/4.310.
+
+### Changed
+
+- **`scribe` correction packages**: a localized package (≤ ~20 fixes, no
+  section renumbering/restructuring) is now applied as a batch of surgical
+  `Edit`s in a single turn, reading only the sections the package anchors
+  cite — instead of rewriting the whole file (4.309 revises 4.112 on this
+  branch; 4.112 still owns first-draft writing and structural packages).
+  Every fix in a package now travels with an anchor (section heading +
+  literal excerpt) supplied by the invoker; a fix without an anchor
+  demotes the package to the structural mode. `edge-diff.sh` proves edge
+  preservation (4.117) in both modes, and the one-round consolidation rule
+  (4.116) is explicitly untouched — the branch changes how a package is
+  applied, never how many rounds are allowed.
 
 Re-init: none
 

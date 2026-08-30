@@ -385,8 +385,10 @@ A linha existe desde a 0.123.0 e é **telemetria**: medida ou omitida, nunca est
 a ausência não é defeito quando não há o que medir. Ela só aparece em rota que teve
 etapa de forja (specify → plan → tasks) e se alimenta da cauda de telemetria que o
 ciclo anexa à `Cronologia` do brief ao fechar cada etapa: quantas voltas de correção o
-documento precisou depois da validação e quais classes de achado apareceram. Etapa sem
-relatório de validação fica sem cauda — e sai da linha. O número é observação para
+documento precisou depois da validação, quanto custou cada janela de escrita (minutos e
+linhas, quando o ciclo mediu — desde a 0.137.0) e quais classes de achado apareceram.
+Etapa sem relatório de validação fica sem cauda — e sai da linha; janela sem medição
+fica sem o parêntese de custo. O número é observação para
 melhorar a escrita dos documentos ao longo do tempo; o ciclo nunca para nem muda de
 rota por causa dele.
 
