@@ -52,7 +52,7 @@ Próximo MMM pelo alocador único (4.86): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/n
 
 ## Etapa 2: triagem técnica
 
-Reconhecer o código existente (arquitetura atual, pontos de integração, "onde isso se encaixa") é varredura ampla → delegue ao `code-scout` e desenhe sobre a conclusão ancorada (decisão 4.75); confira as âncoras que virarem decisão DEC.
+Reconhecer o código existente (arquitetura atual, pontos de integração, "onde isso se encaixa") é varredura ampla → delegue ao `code-scout` e desenhe sobre a conclusão ancorada (decisão 4.75); confira as âncoras que virarem decisão DEC. Invocador que já antecipou o reconhecimento (conclusão ancorada em mãos — `/keelson:auto`, fecho da Etapa 1, decisão 4.312) → não re-despache: desenhe sobre ela.
 
 Pare e faça até 4 perguntas apenas se houver ambiguidade técnica afetando:
 - Stack ou padrão arquitetural irreversível

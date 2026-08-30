@@ -76,6 +76,7 @@ Execute `/keelson:specify` (incluindo a Etapa 0.2 dele).
 - Crítica do `product-analyst` emitida → o `/keelson:specify` já invocou o **`po` (modo aprovação)** com BRIEF + SPEC + crítica. Aja pelo veredito:
   - `decisao: APROVAR` → aplique as `resolucoes` (viram premissas `[assumido]` na SPEC quando couber), registre as `decisoes_em_nome_do_diretor` (alimentam o "Caminho tomado" da Entrega), **promova a SPEC para `Approved`** e siga. (Não peça aprovação de etapa.)
   - `decisao: ESCALAR` → cada escalação já vem com **proposta + default**: escada de reação — em geral degrau 2 (siga pelo default do PO, isole o que depende da resposta e pergunte em lote na Entrega); degrau 3 só se a direção contaminar todo o ciclo.
+- **Antecipação do reconhecimento (decisão 4.312)**: com o conteúdo da SPEC estável (veredito do PO aplicado, revalidação limpa), despache **já** o `code-scout` da triagem técnica do `/keelson:plan` (Etapa 2 dele), em paralelo com promoção, INDEX e commit — o território que ele mapeia é o código, que o fecho desta etapa não altera (moldura 4.113). A conclusão ancorada chega pronta à Etapa 2 do plan; reconhecimento entregue não se re-despacha.
 
 ## Etapa 2: PLAN (feature)
 

@@ -145,11 +145,14 @@ Quando o `--check` acusa ERROR logo após a geração de artefatos (Etapa 5 do
 1. **Quem roda o script é quem tem shell**: a main session executa o `graph.sh` e entrega
    ao `scribe` a **lista literal de ERRORs** no re-despacho — nunca a instrução "rode o
    grafo até limpar" (o scribe não tem Bash; exigência impossível volta em `duvidas`).
-   Cada ajuste do pacote viaja com **âncora** — heading da seção afetada + trecho literal
-   a localizar (a main os tem do relatório do validator/gate/PO): é a âncora que habilita
-   o modo localizado da 4.309 (lote de `Edit`s lendo só as seções citadas — régua de
-   aplicação no `agents/scribe.md`, passo 4). Ajuste sem âncora rebaixa o pacote inteiro
-   ao modo estrutural. E a 4.309 governa o **modo de aplicar** um pacote, nunca o número
+   Cada ajuste do pacote viaja com **âncora** — o **ID do elemento** mirado (FR/AC/NFR/
+   DEC/COMP/TASK; todo relatório de validator/gate já o traz) mais heading da seção +
+   trecho literal a localizar (a main os tem do relatório do validator/gate/PO). O ID é
+   a parte estável da âncora: sobrevive quando outro ajuste do mesmo pacote desloca o
+   trecho (decisão 4.312); defeito em prosa sem elemento identificável ancora só por
+   heading + trecho. É a âncora que habilita o modo localizado da 4.309 (lote de `Edit`s
+   lendo só as seções citadas — régua de aplicação no `agents/scribe.md`, passo 4).
+   Ajuste sem âncora nenhuma rebaixa o pacote inteiro ao modo estrutural. E a 4.309 governa o **modo de aplicar** um pacote, nunca o número
    de voltas — a consolidação da 4.116 (uma rodada, uma volta) permanece intacta:
    correção pingada continua defeito, por mais barata que a volta tenha ficado.
 2. **Correção é aguardada**: o re-despacho é síncrono do ponto de vista do fluxo — a main

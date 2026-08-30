@@ -23,7 +23,30 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
-## [0.137.0] — 2026-08-30
+## [0.137.1] — 2026-08-30
+
+Re-init: none
+
+Decision 4.312 — partial absorption of an external forge benchmark
+(the Director's second opinion). Two refinements land; the deterministic
+task-scaffold idea is deferred with a declared telemetry trigger; the
+semantic-compiler core is refused with recorded reasons (it inverts
+"markdown is the source", 4.82, and makes evaluators write corrections,
+breaking generator ≠ evaluator).
+
+### Changed
+
+- **Correction-package anchors**: each fix now leads with the ID of the
+  element it targets (FR/AC/NFR/DEC/COMP/TASK — validator reports already
+  carry it) ahead of the section heading + literal excerpt; the ID is the
+  stable half of the anchor when another fix in the same package shifts
+  the text. Prose-only defects still anchor textually (4.312, refining
+  4.309).
+- **`/keelson:auto`**: the PLAN-stage `code-scout` reconnaissance is now
+  dispatched during the SPEC promotion/INDEX/commit window instead of
+  after it — the territory it maps is the code, which stage closure does
+  not touch; `/keelson:plan` reuses a delivered reconnaissance instead of
+  re-dispatching (4.312).
 
 Re-init: none
 
