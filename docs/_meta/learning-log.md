@@ -9,6 +9,9 @@ Papel do ledger: memória de longo prazo do auto-aprendizado. É ele que permite
 
 **Escada de promoção por contagem (decisão 4.149)** — o campo `reincidencia:` não é só registro, é gatilho: `1` → a regra existente é **reformulada** (nunca duplicada — regra acima); `≥ 2` → texto provou duas vezes que não segura sozinho, e a proposta **obrigatoriamente vem com o check mecânico ou autocheck desenhado** (script, validator, fixture, autocheck de agent — o que provar a regra fora do contexto do modelo); se a classe for imecanizável, a proposta **declara por quê** e a aceitação do texto-de-novo vira decisão explícita do Diretor, nunca default. A contagem é o fato que dispara — não o juízo de quem propõe (precedente: LRN-038 e LRN-046 seguiram exatamente esta escada, caso a caso; a 4.149 a torna regra).
 
+**Catálogo fechado de causa (decisão 4.305 — este cabeçalho é o dono; quem consome não amplia, 4.71/4.133)** — `causa_raiz:` traz um valor do catálogo + a explicação de 1 linha. O catálogo refina o lado "verificação" da 4.69; cada valor prescreve a saída:
+`instrucao_ausente` (não havia regra que prevenisse → o patch cria) · `instrucao_ambigua` (havia e permitia duas leituras → reformular a existente) · `instrucao_nao_chegou` (regra certa, ponto de uso errado → mover/citar no ponto de uso, nunca redigir de novo) · `verificador_furado` (guarda mecânica existia e não pegou → consertar o check, não escrever texto) · `ferramenta_ambiente` (script/MCP/ambiente falhou, não instrução → conserto de tooling ou `alvo: projeto`) · `especificacao` (task/brief/fronteira errada na origem → rota do furo de plano, não patch de processo) · `raciocinio_pontual` (regra nenhuma pegaria — 4.69 → `DESCARTADO`). **Só as três primeiras justificam patch de instrução.** Evento sem valor do catálogo é incompleto: o fecho que o carrega declara-se parcial (régua 4.204).
+
 > **Origem das entradas abaixo**: são o registro de gênese, herdado do projeto que deu origem ao keelson. Referências a slugs/PLANs/ACs concretos (ex.: `jira`, `professionals`, `team-map`) são a **proveniência real** de cada lição — preservada porque genericizá-la falsearia o histórico. Os caminhos de artefato (`commands/`, `skills/`, `agents/`) já estão no layout do keelson.
 
 ## Formato canônico
@@ -18,7 +21,7 @@ Papel do ledger: memória de longo prazo do auto-aprendizado. É ele que permite
 data: <YYYY-MM-DD>
 gatilho: validator_error | gate_reprovado | retry | correcao_humana | verificacao_falhou
 origem: <SPEC/PLAN/TASK/sessão em que ocorreu>
-causa_raiz: <por que o processo deixou acontecer — 1 linha>
+causa_raiz: <valor do catálogo (cabeçalho, 4.305)> — <por que o processo deixou acontecer, 1 linha>
 artefato_patchado: <caminho ou "proposta_doutrina (não aplicado)">
 patch: <resumo de 1 linha do que mudou no artefato>
 reincidencia: 0        # incrementado quando a mesma causa-raiz volta

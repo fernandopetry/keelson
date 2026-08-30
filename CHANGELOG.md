@@ -23,6 +23,39 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.134.0] — 2026-08-30
+
+Re-init: none
+
+Decision 4.305 — cause is attributed before instructions get edited. The
+process-learning flow gains a closed root-cause catalog and, most
+importantly, the exit that was missing: "no instruction would have prevented
+this" is now a legitimate outcome, so failures stop turning into prompt
+bloat by default.
+
+### Added
+
+- **Closed root-cause catalog on `causa_raiz:`** — `instrucao_ausente ·
+  instrucao_ambigua · instrucao_nao_chegou · verificador_furado ·
+  ferramenta_ambiente · especificacao · raciocinio_pontual`, each value with
+  a prescribed exit. It refines only the "verification" side of the 4.69
+  axis (model-blame stays banned — reasoning-class failures still never
+  become rules); consumers never widen the catalog, a new value enters
+  through the owner (the maintainer learning-log header), mirroring the
+  handoff-cause precedent.
+
+### Changed
+
+- **`agile-coach` attributes before it patches**: step 3 now classifies the
+  cause first, and only the three instructional causes proceed to an
+  instruction patch — a broken checker gets its check fixed (never more
+  text), tool/environment failures route to tooling, wrong task boundaries
+  route to the plan-gap flow, and one-off reasoning failures are discarded.
+  A ledger entry without a catalog value is malformed and is not written.
+- **`/field-intake` verdicts name the cause** for process-failure reports,
+  or the delivery declares itself partial — non-instructional causes no
+  longer produce new doctrine text.
+
 ## [0.133.0] — 2026-08-30
 
 Re-init: none

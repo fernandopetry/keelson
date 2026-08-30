@@ -415,15 +415,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.133.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.134.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a behavior-eval layer for the maintainer (decision
-4.304) — versioned A/B cases in `evals/` run by `scripts/eval-run.sh` over
-hermetic `claude -p` sessions, with an advisory per-axis verdict (HOLD on
-variance) and a plant control that invalidates any round it fools. Case #1
-rebuilds the 4.301 synthetic decomposition bench as a re-runnable artifact.
+New in this release: cause is attributed before instructions get edited
+(decision 4.305) — `causa_raiz` becomes a closed catalog with a prescribed
+exit per value, and the `agile-coach` gains the missing outcome: "no
+instruction would have prevented this" routes to a check fix, tooling, the
+plan-gap flow or a discard, so process failures stop becoming prompt bloat
+by default.
 Re-init: none. See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in

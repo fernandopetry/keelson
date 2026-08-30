@@ -42,9 +42,11 @@ Ler `<docsRoot>/_meta/learning-log.md` e procurar entrada com a mesma causa-raiz
 - **Inédita** → siga para o passo 3 como caso novo.
 - **Reincidente** → a regra aplicada da outra vez **falhou**. Não adicione uma segunda regra: localize a existente no artefato, **reformule-a** (mais específica, mais imperativa, movida para perto do ponto de decisão, ou convertida em check do validator — o que atacar a causa da falha) e incremente `reincidencia:` na entrada do ledger. **Escada de promoção (decisão 4.149)**: com `reincidencia: ≥ 2`, texto reformulado deixa de ser resposta suficiente — sua proposta (patch ou `PROPOSTA_PLUGIN`) **inclui o check mecânico ou autocheck desenhado** (o que prova a regra fora do contexto do modelo); classe imecanizável → declare por quê, e manter só texto vira decisão explícita do Diretor.
 
-### 3. Identificar o artefato dono
+### 3. Atribuir a causa, depois identificar o artefato dono
 
-Pergunta-guia: *"qual instrução, se existisse/estivesse clara, teria prevenido este erro no ponto mais cedo possível?"* Prevenir no gerador vence detectar no validator; detectar no validator vence reprovar no reviewer. Exemplos: SPEC gerada com FR sem AC → dono é o comando `/keelson:specify` (não o validator, que já pegou); reviewer reprovando sempre o mesmo padrão → dono é o `developer`; validator com falso positivo recorrente → dono é o próprio validator (afrouxar/precisar o check).
+Antes de pensar em patch, atribua `causa_raiz:` a **um valor do catálogo fechado** (enum no formato do passo 5; dono e saídas por valor: cabeçalho do `learning-log.md` do keelson, decisão 4.305 — você não amplia o catálogo). **Só `instrucao_ausente`, `instrucao_ambigua` e `instrucao_nao_chegou` seguem para patch de instrução.** As demais têm saída própria: `verificador_furado` → conserte o check, nunca texto novo; `ferramenta_ambiente` → `alvo: projeto`/tooling; `especificacao` → rota do furo de plano; `raciocinio_pontual` → `DESCARTADO` (4.69: regra nenhuma pegaria — "nenhuma instrução preveniria" é resposta legítima, não fracasso da análise).
+
+Para as causas instrucionais, a pergunta-guia: *"qual instrução, se existisse/estivesse clara, teria prevenido este erro no ponto mais cedo possível?"* Prevenir no gerador vence detectar no validator; detectar no validator vence reprovar no reviewer. Exemplos: SPEC gerada com FR sem AC → dono é o comando `/keelson:specify` (não o validator, que já pegou); reviewer reprovando sempre o mesmo padrão → dono é o `developer`; validator com falso positivo recorrente → dono é o próprio validator (afrouxar/precisar o check).
 
 ### 4. Compor o patch cirúrgico
 
@@ -68,12 +70,14 @@ Acrescentar (ou atualizar, se reincidência) entrada em `<docsRoot>/_meta/learni
 data: <YYYY-MM-DD>
 gatilho: validator_error | gate_reprovado | retry | correcao_humana | verificacao_falhou
 origem: <SPEC/PLAN/TASK/sessão em que ocorreu>
-causa_raiz: <por que o processo deixou acontecer — 1 linha>
+causa_raiz: instrucao_ausente | instrucao_ambigua | instrucao_nao_chegou | verificador_furado | ferramenta_ambiente | especificacao | raciocinio_pontual — <por quê, 1 linha>
 artefato_patchado: <caminho ou "proposta_doutrina (não aplicado)">
 patch: <resumo de 1 linha do que mudou no artefato>
 reincidencia: 0        # incrementado quando a mesma causa-raiz volta
 estado: ativa | destilada
 ````
+
+Entrada sem valor do catálogo em `causa_raiz:` é malformada — não a escreva: sem causa atribuível, o desfecho é `DESCARTADO` com motivo.
 
 ### 6. Report à main session
 
