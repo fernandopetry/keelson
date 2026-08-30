@@ -11,7 +11,8 @@
 #      session-dir.sh <raiz-do-repo> latest-for <slug>
 #      session-dir.sh <raiz-do-repo> memo-find <slug> [--all]
 #      session-dir.sh <raiz-do-repo> adopt-memo <slug> [--ts <iso>]
-#      session-dir.sh <raiz-do-repo> mark-reported
+#      session-dir.sh <raiz-do-repo> mark-reported [--ts <iso>]
+#      session-dir.sh <raiz-do-repo> gc [--days <N>] [--apply] [--ts <iso>]
 #
 #   dir         ecoa a pasta da sessão corrente: thoughts/local/sessions/<yyyymmdd-hhmmss>-<sid8>
 #               (criada com session.meta sob --create). SEM id de sessão → ecoa a
@@ -36,9 +37,19 @@
 #               sessão de origem, ou "legado") no manifest; nada na cadeia →
 #               ecoa o caminho próprio para o chamador criar. Sem id de sessão,
 #               ecoa o caminho legado (comportamento antigo).
-#   mark-reported  marca `estado: reportada` no manifest da casa corrente
-#               (fecho de report — 4.315); sem casa, no-op silencioso. Uma
-#               escrita posterior com --create reabre para `estado: ativa`.
+#   mark-reported  marca `estado: reportada` + `reportada_em: <iso>` no manifest
+#               da casa corrente (fecho de report — 4.315); sem casa, no-op
+#               silencioso. Uma escrita posterior com --create reabre para
+#               `estado: ativa` (a linha `reportada_em:` fica como histórico).
+#   gc          limpeza das sobras (4.316) — REPORT-ONLY por default: lista
+#               casas elegíveis (`estado: reportada` · idade ≥ --days, default
+#               14, medida por `reportada_em:` ou, sem a linha, pela criação no
+#               nome — declarado · SEM pendência: nada ativo no ledger/ e nenhum
+#               run-state em_andamento) e os `reported-*/` do ledger LEGADO com
+#               a mesma idade. `--apply` remove o que listou como elegível —
+#               aplicar é ato do humano, nunca de fecho automático. Casa
+#               `ativa` jamais é candidata (pode ser sessão viva). `--ts` fixa
+#               o "agora" (teste).
 #
 #   --create    cria a pasta (e o session.meta, se nascendo agora) antes de ecoar.
 #               Idempotente: pasta existente é resolvida, nunca duplicada.
@@ -60,7 +71,7 @@ LC_ALL=C
 export LC_ALL
 
 die2() { echo "ERRO: $*" >&2; exit 2; }
-usage() { sed -n '2,56p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,67p' "$0" | sed 's/^# \{0,1\}//'; }
 
 ROOT="${1:-}"
 [ -n "$ROOT" ] || { usage >&2; exit 2; }
@@ -81,11 +92,14 @@ case "$ACTION" in
 esac
 case "$ARG_SLUG" in */*|*" "*) die2 "slug inválido: $ARG_SLUG" ;; esac
 
-CREATE=0; SLUG=""; TS=""; ALL=0
+CREATE=0; SLUG=""; TS=""; ALL=0; APPLY=0; DAYS=14
 while [ $# -gt 0 ]; do
   case "$1" in
     --create) CREATE=1 ;;
-    --all)  ALL=1 ;;
+    --all)   ALL=1 ;;
+    --apply) APPLY=1 ;;
+    --days) shift; [ $# -gt 0 ] || die2 "--days exige um número."; DAYS="$1"
+            case "$DAYS" in ''|*[!0-9]*) die2 "--days deve ser numérico: $DAYS" ;; esac ;;
     --slug) shift; [ $# -gt 0 ] || die2 "--slug exige o slug."; SLUG="$1" ;;
     --ts)   shift; [ $# -gt 0 ] || die2 "--ts exige um ISO 8601."; TS="$1" ;;
     *) die2 "opção desconhecida: $1" ;;
@@ -307,10 +321,103 @@ case "$ACTION" in
     [ -n "$RESOLVED" ] || exit 0
     meta="$RESOLVED/session.meta"
     [ -f "$meta" ] || exit 0
+    iso="$TS"
+    [ -n "$iso" ] || iso="$(TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z)"
     tmp="$meta.tmp.$$"
-    sed 's/^estado:.*/estado: reportada/' "$meta" > "$tmp" 2>/dev/null \
-      && mv "$tmp" "$meta" 2>/dev/null || rm -f "$tmp" 2>/dev/null
+    sed 's/^estado:.*/estado: reportada/' "$meta" > "$tmp" 2>/dev/null || { rm -f "$tmp" 2>/dev/null; exit 0; }
+    if grep -q '^reportada_em:' "$tmp" 2>/dev/null; then
+      sed "s/^reportada_em:.*/reportada_em: $iso/" "$tmp" > "$tmp.2" 2>/dev/null && mv "$tmp.2" "$tmp" 2>/dev/null || rm -f "$tmp.2" 2>/dev/null
+    else
+      printf 'reportada_em: %s\n' "$iso" >> "$tmp"
+    fi
+    mv "$tmp" "$meta" 2>/dev/null || rm -f "$tmp" 2>/dev/null
     exit 0 ;;
 
-  *) die2 "ação desconhecida: $ACTION (use dir, ledger-dir, window-log, show, latest-for, memo-find, adopt-memo ou mark-reported)" ;;
+  gc)
+    hoje="$TS"
+    if [ -n "$hoje" ]; then
+      hoje="$(printf '%s' "$hoje" | sed 's/[^0-9]//g' | cut -c1-8)"
+    else
+      hoje="$(date +%Y%m%d)"
+    fi
+    case "$hoje" in
+      [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]) ;;
+      *) die2 "timestamp ilegível para o gc: $TS" ;;
+    esac
+    # dia juliano em awk POSIX — idade sem depender de date -d/-j (BSD × GNU)
+    jdn() {
+      printf '%s\n' "$1" | awk '{
+        y = substr($0,1,4)+0; m = substr($0,5,2)+0; d = substr($0,7,2)+0
+        a = int((14-m)/12); yy = y+4800-a; mm = m+12*a-3
+        print d + int((153*mm+2)/5) + 365*yy + int(yy/4) - int(yy/100) + int(yy/400) - 32045
+      }'
+    }
+    j_hoje="$(jdn "$hoje")"
+    achou=0
+    for d in "$SESSIONS"/*; do
+      [ -d "$d" ] || continue
+      meta="$d/session.meta"
+      [ -f "$meta" ] || continue
+      # `ativa` jamais é candidata (pode ser sessão viva) — nem aparece na saída
+      grep -qx 'estado: reportada' "$meta" 2>/dev/null || continue
+      # pendência segura a casa: evento ativo no ledger, run em andamento
+      pend=""
+      for f in "$d/ledger"/*.md; do
+        [ -f "$f" ] && { pend="ledger com evento ativo"; break; }
+      done
+      if [ -z "$pend" ]; then
+        for f in "$d"/run-state-*.md; do
+          [ -f "$f" ] || continue
+          grep -q '^status: em_andamento' "$f" 2>/dev/null && { pend="run-state em_andamento"; break; }
+        done
+      fi
+      if [ -n "$pend" ]; then
+        printf 'mantida: %s · %s\n' "$d" "$pend"
+        continue
+      fi
+      # idade: reportada_em preferido; sem a linha, a criação do nome (declarado)
+      rep="$(sed -n 's/^reportada_em:[ 	]*//p' "$meta" 2>/dev/null | sed -n 1p)"
+      data="$(printf '%s' "$rep" | sed 's/[^0-9]//g' | cut -c1-8)"
+      quando="reportada"
+      case "$data" in
+        [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]) ;;
+        *) data="$(basename "$d" | cut -c1-8)"; quando="criada (sem reportada_em)" ;;
+      esac
+      case "$data" in
+        [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]) ;;
+        *) printf 'mantida: %s · data ilegível\n' "$d"; continue ;;
+      esac
+      idade=$((j_hoje - $(jdn "$data")))
+      if [ "$idade" -lt "$DAYS" ]; then
+        printf 'mantida: %s · %s há %s dia(s) (limiar %s)\n' "$d" "$quando" "$idade" "$DAYS"
+        continue
+      fi
+      achou=1
+      if [ "$APPLY" -eq 1 ]; then
+        rm -rf "$d" && printf 'removida: %s · %s há %s dia(s)\n' "$d" "$quando" "$idade"
+      else
+        printf 'elegivel: %s · %s há %s dia(s)\n' "$d" "$quando" "$idade"
+      fi
+    done
+    # sobras do ledger LEGADO: reported-*/ já consumidos por report, idade pelo nome
+    for d in "$LEGACY/session-ledger"/reported-*; do
+      [ -d "$d" ] || continue
+      data="$(basename "$d" | sed 's/^reported-//' | cut -c1-8)"
+      case "$data" in
+        [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]) ;;
+        *) continue ;;
+      esac
+      idade=$((j_hoje - $(jdn "$data")))
+      [ "$idade" -ge "$DAYS" ] || continue
+      achou=1
+      if [ "$APPLY" -eq 1 ]; then
+        rm -rf "$d" && printf 'removida: %s · arquivado há %s dia(s)\n' "$d" "$idade"
+      else
+        printf 'elegivel: %s · arquivado há %s dia(s)\n' "$d" "$idade"
+      fi
+    done
+    [ "$achou" = 0 ] && echo "gc: nada a limpar."
+    exit 0 ;;
+
+  *) die2 "ação desconhecida: $ACTION (use dir, ledger-dir, window-log, show, latest-for, memo-find, adopt-memo, mark-reported ou gc)" ;;
 esac

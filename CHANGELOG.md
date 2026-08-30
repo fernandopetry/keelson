@@ -23,6 +23,31 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.140.0] — 2026-08-30
+
+Re-init: none
+
+Decision 4.316 — session-home garbage collection (slice 3, closing the
+session-folder mini-brief).
+
+### Added
+
+- **`session-dir.sh gc`** — report-only by default: lists session homes
+  that are safe to remove (state `reportada` · age ≥ `--days`, default
+  14, measured from the new `reportada_em:` stamp with a declared
+  fallback to the folder's creation date · no pending material — nothing
+  active in `ledger/`, no `em_andamento` run state) plus aged
+  `reported-*/` leftovers of the legacy ledger. `--apply` removes exactly
+  what the report listed; an `ativa` home is never a candidate (it may be
+  a live parallel session). Age math uses a pure-awk Julian day (no
+  GNU/BSD `date` divergence).
+- **`mark-reported` now stamps `reportada_em:`** alongside the state —
+  the age source for gc; re-reporting refreshes it.
+- **`/keelson:continue` (step 1.5) and `/keelson:init` (step 5.5)** run
+  the report-only gc and *suggest* `gc --apply` when something is
+  eligible — applying is always the human's act; no automatic closing
+  step ever removes a session home.
+
 ## [0.139.0] — 2026-08-30
 
 Re-init: none

@@ -3321,6 +3321,16 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 ---
 
+### 4.316 — Limpeza das sobras da casa da sessão: gc report-only com régua conservadora; aplicar é ato do humano
+
+**Problema**: a segunda dor do mini-brief (sobras acumulam sem dono de limpeza) ficou aberta pelas fatias 1–2: casas de sessão reportadas e os `reported-*/` do ledger legado crescem para sempre, e não havia critério mecânico de "seguro apagar" — o pior defeito possível aqui seria remover casa de sessão viva ou material ainda pendente (a família do falso-positivo, mesma régua do grafo).
+
+**Decisão** (fatia 3, última do mini-brief): `session-dir.sh gc` — **report-only por default**, no padrão do harness-audit. Elegível é a interseção de três condições: `estado: reportada` (o sinal que o `mark-reported` da 4.315 grava — casa `ativa` **jamais** é candidata, pode ser sessão viva em paralelo) · idade ≥ `--days` (default 14), medida por `reportada_em:` — linha nova que o `mark-reported` passa a gravar — com fallback declarado à data de criação no nome · **sem pendência** (nenhum evento ativo no `ledger/`, nenhum run-state `em_andamento`). Os `reported-*/` do ledger **legado** entram pela idade do próprio nome. `--apply` remove exatamente o que o report listou como `elegivel:` — e **aplicar é ato do humano**: o `/keelson:continue` (Etapa 1.5) e o `/keelson:init` (Etapa 5.5) rodam o report-only e **sugerem** o comando quando há elegíveis; nenhum fecho automático remove casa de sessão. Idade calculada por dia juliano em awk POSIX (sem `date -d`/`-j` — BSD × GNU); memo legado órfão fica **fora** do gc, declarado: ele é a cauda viva da cadeia de leitura da 4.315 e a remoção dele já tem dono (closure do PLAN).
+
+**Aplicação**: `scripts/session-dir.sh` (gc + `reportada_em:` no mark-reported) e suíte (48 casos); dono `sdd-conventions.md` (bloco *Casa da sessão*); `commands/{continue,init}.md` (sugestão); wiki Perguntas-frequentes. CHANGELOG **0.140.0**, `Re-init: none`. Com esta leva o mini-brief da casa da sessão fecha inteiro (4.314 → 4.315 → 4.316).
+
+---
+
 ## 7. Roteamento de mudanças
 
 Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir manualmente:

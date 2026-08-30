@@ -202,6 +202,22 @@ fica só para comportamento novo e julgamento visual. Prints e traces continuam 
 git; só o código do spec é commitado. Não sabe configurar? `/keelson:e2e-setup` monta
 tudo (instalação com confirmação, config, smoke spec) e grava o campo após prova.
 
+### A pasta `thoughts/` está crescendo. Posso apagar coisas dela?
+
+Pode — mas deixe o keelson dizer o que é seguro. Cada sessão de trabalho guarda seus
+arquivos temporários numa pasta própria dentro de `thoughts/local/sessions/`, e as que
+já viraram relatório ficam marcadas. Rode:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-dir.sh" . gc
+```
+
+Ele só **lista** o que é elegível (sessões reportadas há mais de 14 dias, sem nada
+pendente) — nada é removido. Para limpar de verdade, repita com `--apply`. Sessões
+ainda ativas ou com pendências nunca entram na lista, e o `/keelson:continue` e o
+`/keelson:init` avisam quando há o que limpar. Nada em `thoughts/` é versionado, então
+o pior caso de um engano é perder anotação temporária — o que importa está commitado.
+
 ### Voltei de um fim de semana e não lembro onde o épico parou. E agora?
 
 `/keelson:continue <slug>`. Ele lê a fila viva do épico e os artefatos commitados,

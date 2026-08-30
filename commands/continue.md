@@ -46,6 +46,7 @@ Derivado o estado, consulte a casa de sessão anterior desta máquina: `bash "${
 1. **Memo de exploração** na cadeia (`memo-find <slug>`) → anexe o **caminho** como insumo ao comando proposto na Etapa 2 — specify/plan/tasks/implement já o consomem; é a economia de re-exploração local (o durável cross-máquina continua sendo o `MAP.md`).
 2. **Run-state** na casa achada → **sugestão rotulada**, nunca fonte: acrescente ao "você está aqui" uma linha `sugestão local (por-clone): a sessão anterior (<estado do manifest>) parou na wave N de M` e coteje com o derivado dos commitados — divergiu, **o commitado vence** e a divergência é declarada. Manifest `estado: ativa` → a sessão pode estar **viva em paralelo**: isso não é retomada, é a terceira saída da posse (4.251) — não proponha herdar nada dela; inventarie e aponte ao Diretor.
 3. **Ledger ativo** na casa → mencione em meia linha que o `/keelson:report` reconstrói o fecho da sessão anterior a partir dele.
+4. **Sobras** (decisão 4.316): rode `session-dir.sh <raiz> gc` (report-only); linhas `elegivel:` → acrescente meia linha ao "você está aqui" sugerindo `gc --apply` — **sugestão, nunca execução**: limpar é ato do Diretor.
 
 Nada daqui muda a regra que casou na Etapa 1 — a proposta é sempre a da derivação.
 

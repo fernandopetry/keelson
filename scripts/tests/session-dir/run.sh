@@ -221,6 +221,86 @@ total=$((total + 1))
 got="$(sd "sessao-sem-casa-9" "$R2" mark-reported 2>&1)"; st=$?
 [ -z "$got" ] && [ "$st" -eq 0 ] && ok mark-reported-sem-casa || falha "mark-reported-sem-casa: [$got]"
 
+# mark-reported com --ts grava reportada_em determinístico (e re-report atualiza)
+total=$((total + 1))
+sd "$NOVA" "$R2" mark-reported --ts "2026-08-30T18:00:00-0300" 2>/dev/null
+grep -qxF "reportada_em: 2026-08-30T18:00:00-0300" "$DN/session.meta" && ok mark-reported-em || falha "mark-reported-em: [$(cat "$DN/session.meta")]"
+total=$((total + 1))
+sd "$NOVA" "$R2" mark-reported --ts "2026-08-30T19:00:00-0300" 2>/dev/null
+grep -qxF "reportada_em: 2026-08-30T19:00:00-0300" "$DN/session.meta" \
+  && [ "$(grep -c '^reportada_em:' "$DN/session.meta")" = "1" ] && ok mark-reported-atualiza || falha mark-reported-atualiza
+
+# --- gc (4.316): report-only por default, régua conservadora ---
+
+R3="$TMP/repo-gc"; mkdir -p "$R3"
+S3="$R3/thoughts/local/sessions"
+HOJE="2026-08-30T12:00:00-0300"
+casa_gc() { # nome sessao estado [reportada_em]
+  mkdir -p "$S3/$1"
+  printf 'sessao: %s\niniciada: 2026-07-01T09:00:00-0300\nestado: %s\nslugs: gama\n' "$2" "$3" > "$S3/$1/session.meta"
+  [ -n "${4:-}" ] && printf 'reportada_em: %s\n' "$4" >> "$S3/$1/session.meta"
+}
+casa_gc 20260801-090000-gvelha11 sessao-gv-1 reportada "2026-08-01T10:00:00-0300"   # 29 dias → elegível
+casa_gc 20260825-090000-grecent1 sessao-gr-1 reportada "2026-08-25T10:00:00-0300"   # 5 dias → mantida
+casa_gc 20260701-090000-gativa11 sessao-ga-1 ativa                                   # ativa → invisível
+casa_gc 20260801-090000-gledger1 sessao-gl-1 reportada "2026-08-01T10:00:00-0300"
+mkdir -p "$S3/20260801-090000-gledger1/ledger"
+printf 'x\n' > "$S3/20260801-090000-gledger1/ledger/20260801-100000-pendencia-qa.md"  # pendência → mantida
+casa_gc 20260801-090000-grunst11 sessao-gs-1 reportada "2026-08-01T10:00:00-0300"
+printf 'status: em_andamento\nslug: gama\nsessao: sessao-gs-1\n' > "$S3/20260801-090000-grunst11/run-state-gama.md"  # → mantida
+casa_gc 20260710-090000-gsemrep1 sessao-gn-1 reportada                                # sem reportada_em → idade pela criação (51d) → elegível
+mkdir -p "$R3/thoughts/local/session-ledger/reported-20260701-120000"                 # 60 dias → elegível
+printf 'x\n' > "$R3/thoughts/local/session-ledger/reported-20260701-120000/20260701-110000-gate-qa.md"
+mkdir -p "$R3/thoughts/local/session-ledger/reported-20260829-120000"                 # 1 dia → fora
+
+# report-only: lista elegíveis e mantidas, remove nada, ativa invisível
+total=$((total + 1))
+got="$(sd "sessao-gc-atual" "$R3" gc --ts "$HOJE" 2>/dev/null)"
+echo "$got" | grep -q "elegivel: $S3/20260801-090000-gvelha11 · reportada há 29 dia(s)" \
+  && echo "$got" | grep -q "elegivel: $S3/20260710-090000-gsemrep1 · criada (sem reportada_em) há 51 dia(s)" \
+  && echo "$got" | grep -q "elegivel: $R3/thoughts/local/session-ledger/reported-20260701-120000 · arquivado há 60 dia(s)" \
+  && ok gc-report-elegiveis || falha "gc-report-elegiveis: [$got]"
+total=$((total + 1))
+echo "$got" | grep -q "mantida: $S3/20260825-090000-grecent1 · reportada há 5 dia(s) (limiar 14)" \
+  && echo "$got" | grep -q "mantida: $S3/20260801-090000-gledger1 · ledger com evento ativo" \
+  && echo "$got" | grep -q "mantida: $S3/20260801-090000-grunst11 · run-state em_andamento" \
+  && ok gc-report-mantidas || falha "gc-report-mantidas: [$got]"
+total=$((total + 1))
+! echo "$got" | grep -q "gativa11" && [ -d "$S3/20260801-090000-gvelha11" ] && ok gc-report-only-nao-remove || falha gc-report-only-nao-remove
+
+# --days sobe o limiar
+total=$((total + 1))
+got="$(sd "sessao-gc-atual" "$R3" gc --days 40 --ts "$HOJE" 2>/dev/null)"
+echo "$got" | grep -q "mantida: $S3/20260801-090000-gvelha11 · reportada há 29 dia(s) (limiar 40)" \
+  && echo "$got" | grep -q "elegivel: $R3/thoughts/local/session-ledger/reported-20260701-120000" \
+  && ok gc-days || falha "gc-days: [$got]"
+
+# --apply remove só os elegíveis
+total=$((total + 1))
+got="$(sd "sessao-gc-atual" "$R3" gc --apply --ts "$HOJE" 2>/dev/null)"
+[ ! -d "$S3/20260801-090000-gvelha11" ] && [ ! -d "$S3/20260710-090000-gsemrep1" ] \
+  && [ ! -d "$R3/thoughts/local/session-ledger/reported-20260701-120000" ] \
+  && [ -d "$S3/20260825-090000-grecent1" ] && [ -d "$S3/20260701-090000-gativa11" ] \
+  && [ -d "$S3/20260801-090000-gledger1" ] && [ -d "$S3/20260801-090000-grunst11" ] \
+  && [ -d "$R3/thoughts/local/session-ledger/reported-20260829-120000" ] \
+  && echo "$got" | grep -q "removida: $S3/20260801-090000-gvelha11" && ok gc-apply || falha "gc-apply: [$got]"
+
+# nova passada: nada elegível → "nada a limpar" (mantidas continuam listadas)
+total=$((total + 1))
+got="$(sd "sessao-gc-atual" "$R3" gc --ts "$HOJE" 2>/dev/null)"
+! echo "$got" | grep -q "^elegivel:" && echo "$got" | grep -q "gc: nada a limpar." && ok gc-nada || falha "gc-nada: [$got]"
+
+# repo vazio → nada a limpar, exit 0
+total=$((total + 1))
+R4="$TMP/repo-gc-vazio"; mkdir -p "$R4"
+got="$(sd "" "$R4" gc --ts "$HOJE" 2>/dev/null)"; st=$?
+[ "$got" = "gc: nada a limpar." ] && [ "$st" -eq 0 ] && ok gc-vazio || falha "gc-vazio: [$got]"
+
+# --days não-numérico → exit 2
+total=$((total + 1))
+sd "" "$R3" gc --days abc >/dev/null 2>&1
+[ $? -eq 2 ] && ok gc-days-invalido-exit-2 || falha gc-days-invalido-exit-2
+
 # erros de uso
 total=$((total + 1))
 sd "x" "$R" latest-for >/dev/null 2>&1

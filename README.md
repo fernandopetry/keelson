@@ -415,16 +415,17 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.139.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.140.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: local session handover (decision 4.315) — on the same
-machine, a new session inherits the previous session's exploration memo through
-a read chain, and `/keelson:continue` surfaces the previous run state as a
-labeled per-clone suggestion while still deciding only from committed artifacts
-(a declared refinement of 4.127). Builds on the per-session home introduced in
-`0.138.0` (decision 4.314, which required a re-init).
+New in this release: session-home garbage collection (decision 4.316) closes
+the session-folder arc (4.314–4.316) — `session-dir.sh gc` lists, report-only,
+the session homes that are provably safe to remove (reported, aged, nothing
+pending; a live-looking session is never a candidate), and `--apply` — always
+the human's act, suggested by `/keelson:continue` and `/keelson:init` — cleans
+them. Builds on the per-session home (`0.138.0`, re-init) and the local
+handover (`0.139.0`).
 Re-init: none. See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
