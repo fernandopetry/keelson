@@ -4,10 +4,15 @@
 # Roda o hook de verdade (stdin JSON, jq, repo git sintético sem base main —
 # a detecção cai no working tree e os untracked entram). Foco: o silenciador de
 # ciclo formal (run-state ativo → a rede da sessão livre cala) nos DOIS layouts:
-#   1. controle positivo: diff acima do limiar, sem run-state → block;
+#   1. controle positivo: diff acima do limiar, sem run-state → block, com a
+#      contagem de linhas ÍNTEGRA na mensagem (repo sem HEAD: o `git diff
+#      --numstat HEAD` falha e, sob pipefail, o `|| echo 0` empilhava um segundo
+#      "0" — added_lines="0\n0" quebrava o limiar e a mensagem);
 #   2. run-state LEGADO em andamento → silêncio;
 #   3. run-state na casa da sessão (thoughts/local/sessions/*/ — 4.314) → silêncio;
-#   4. run-state de OUTRA sessão (4.252) → NÃO silencia, block.
+#   4. run-state de OUTRA sessão (4.252) → NÃO silencia, block;
+#   5. mudança trivial (abaixo do limiar) em repo sem HEAD → silêncio — o
+#      added_lines malformado fazia o teste do limiar errar e cutucar à toa.
 # Cada caso usa repo próprio (o anti-renudge de .git/ não vaza entre casos).
 #
 # Uso: scripts/tests/review-guard/run.sh
@@ -80,11 +85,13 @@ silencio() {
   fi
 }
 
-# 1. Controle positivo: mudança acima do limiar, sem run-state → cutuca
+# 1. Controle positivo: mudança acima do limiar, sem run-state → cutuca,
+#    e a contagem de linhas sai íntegra mesmo sem HEAD (untracked contam)
 D1="$TMP/c1"; repo "$D1"
 roda "$D1" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 contem "positivo/decision" '"decision": "block"'
 contem "positivo/gate"     'Gate de Code Review'
+contem "positivo/linhas"   '~40 linha(s) adicionada(s)'
 
 # 2. Run-state LEGADO em andamento → rede da sessão livre cala
 D2="$TMP/c2"; repo "$D2"; run_state "$D2/thoughts/local" alfa desconhecida
@@ -102,6 +109,14 @@ D4="$TMP/c4"; repo "$D4"
 run_state "$D4/thoughts/local/sessions/20260830-100000-sessoutr" gama sessao-outra
 roda "$D4" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 contem "alheio/decision" '"decision": "block"'
+
+# 5. Mudança trivial (1 arquivo, 5 linhas — abaixo de 2/30) em repo sem HEAD → silêncio
+D5="$TMP/c5"; mkdir -p "$D5/src"
+( cd "$D5" && git init -q . )
+printf '{ "codePaths": { "backend": ["src"] } }\n' > "$D5/keelson.config.json"
+printf 'a;\nb;\nc;\nd;\ne;\n' > "$D5/src/pequeno.php"
+roda "$D5" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
+silencio "trivial-sem-head"
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

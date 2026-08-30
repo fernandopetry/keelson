@@ -23,6 +23,25 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.138.1] — 2026-08-30
+
+Re-init: none
+
+Pre-existing bug surfaced by the 4.314 characterization suite.
+
+### Fixed
+
+- **`review-guard` hook**: in a git repo with no commit yet (no HEAD), the
+  added-lines pipeline failed under `pipefail` and the `|| echo 0` stacked a
+  second value on top of the "0" awk had already printed — the multiline
+  count silently broke the size-threshold test (trivial changes nudged as if
+  above threshold) and rendered malformed in the message. The capture now
+  falls back via `|| true` and is sanitized to an integer; untracked files
+  keep counting. `security-guard` was checked for the same class and is not
+  affected (its equivalent region is textual and already uses `|| true`).
+  New red-first suite cases: intact line count without HEAD, and
+  below-threshold silence without HEAD.
+
 ## [0.138.0] — 2026-08-30
 
 Re-init: required

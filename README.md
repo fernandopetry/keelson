@@ -415,7 +415,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.138.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.138.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
@@ -424,8 +424,11 @@ telemetry, disposable tooling, backups) move into one folder per session —
 `thoughts/local/sessions/<ts>-<sid8>/` with a `session.meta` manifest — resolved
 by a single canonical script, with dual-read of the legacy paths so runs that
 cross the update keep working (decision 4.314). Four previously untested hooks
-gained regression suites in the same batch.
-Re-init: required. See the [CHANGELOG](CHANGELOG.md) for history.
+gained regression suites in the same batch — one of which immediately caught a
+pre-existing `review-guard` line-count bug in repos without a first commit,
+fixed in `0.138.1`.
+Re-init: none for this patch (`0.138.0` required it). See the
+[CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

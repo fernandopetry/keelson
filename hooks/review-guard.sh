@@ -143,8 +143,12 @@ done <<< "$code_files"
 
 added_lines=0
 if [ "${#code_arr[@]}" -gt 0 ]; then
+  # sob pipefail, git sem HEAD (repo sem commit) falha o pipeline e um `|| echo 0`
+  # empilharia um segundo valor sobre o "0" que o awk já emitiu — added_lines
+  # multiline quebrava o teste do limiar em silêncio
   added_lines="$(git diff --numstat "$diff_ref" -- "${code_arr[@]}" 2>/dev/null \
-    | awk '$1 != "-" { s += $1 } END { print s + 0 }' || echo 0)"
+    | awk '$1 != "-" { s += $1 } END { print s + 0 }' || true)"
+  case "$added_lines" in ''|*[!0-9]*) added_lines=0 ;; esac
 fi
 # Arquivos novos (não rastreados) não aparecem no diff — conta as linhas deles.
 while IFS= read -r f; do
