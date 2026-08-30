@@ -23,6 +23,35 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.135.0] — 2026-08-30
+
+Re-init: none
+
+Decision 4.304 (post-batch notes) — the eval bench gains its pruning
+instrument and delivers its first triangular verdict. Full-phase cost:
+US$58.97 across 6 rounds (one round self-invalidated by the plant discipline
+and was discarded as evidence — by design).
+
+### Added
+
+- **Minimal-rule control arm** (`evals/decomposicao-comportamento/arms/
+  REGUA-MINIMA.md`): a format-only ruleset with zero decomposition
+  principles, measuring rule-vs-model-default per axis — the proof
+  instrument behind "prune only with evidence". First triangular result
+  (old rule n=4 · no rule n=4 · current rule n=8): the 0.130.0 rule scored
+  **below no-rule at all** on 2 of 3 axes; the frozen-interface and
+  behavior-cut rules convert 3/4→8/8 and 1/4→7/8 (they earn their keep);
+  the measurement rule's decomposition half becomes a pruning candidate
+  with a declared reopening trigger — recorded, not cut.
+
+### Fixed
+
+- **Plant sabotage is now deterministic**: layer-slicing could accidentally
+  fuse the open interface into a single "service" task, letting the plant
+  pass one axis and invalidating the whole round (the positive-control
+  discipline caught it and discarded the round). Read and write are now
+  distinct layers in the plant ruleset.
+
 ## [0.134.1] — 2026-08-30
 
 Re-init: none

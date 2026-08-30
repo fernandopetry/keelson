@@ -415,16 +415,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.134.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.135.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: cause is attributed before instructions get edited
-(decision 4.305) — `causa_raiz` becomes a closed catalog with a prescribed
-exit per value, and the `agile-coach` gains the missing outcome: "no
-instruction would have prevented this" routes to a check fix, tooling, the
-plan-gap flow or a discard, so process failures stop becoming prompt bloat
-by default.
+New in this release: the eval bench gains a minimal-rule control arm and
+becomes a pruning arbiter (decision 4.304, post-batch) — doctrine rules are
+now measured against the model's bare default, per axis. First triangular
+verdict: the old decomposition rule scored below no-rule on 2 of 3 axes,
+two current rules proved they earn their keep, and one pruning candidate
+was recorded with evidence instead of being cut on judgment.
 Re-init: none. See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
