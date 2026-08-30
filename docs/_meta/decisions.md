@@ -3185,6 +3185,8 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 **Aplicação**: `commands/implement.md` (Etapa 1 + §3.6) · `commands/tasks.md` (P8 · Etapa 2 · Etapa 5) · `docs/_meta/conventions/sdd-conventions.md` (catálogo de eventos do ledger) · CHANGELOG **0.131.0**, `Re-init: none`. Origem: mesmo mini-brief.
 
+**Observação pós-leva (bancada sintética com controle, 2026-08-29)**: dois scribes cegos decompuseram o mesmo PLAN-isca (interface deliberadamente não congelada + TRISK numérico não medido + tentação de corte por camada), um com a régua 0.130.0 e outro com a 0.131.0. A régua nova **guiou nos eixos dela** — a task de medição nasceu na wave 1 (o controle empurrou o TRISK para a DoD) e a fusão na interface aberta saiu como aplicação declarada do princípio 2 (o controle fundiu por instinto, mas nomeou a aresta para a sucessora — o reflexo antigo). Grafo zero-ERROR nos dois. **Resíduo aberto com gatilho**: o hábito 1 FR ≈ 1 TASK sobreviveu às duas réguas (controle 8 tasks/5 waves; nova 10 tasks/4 waves, dominante `small`; a FEAT de entrega esticada em 3 waves sequenciais nos dois) — "menor comportamento verificável" pousa no grão do FR, não da FEAT. Candidata desenhada, **não aplicada** (bancada é n=1 sintético; mesma régua da 4.157 — com medição, nunca antes dela): consolidação intra-FEAT — FRs da mesma FEAT que compartilham a mesma superfície/mecanismo formam uma task, salvo fatia sensível. **Gatilho**: grão-FR reincidindo na primeira decomposição real de campo com a 0.131.0+ reabre como leva, com o caso real na mão. Nota menor da bancada: os dois scribes geraram task `chore` sem `-chore-` no nome (o lint da Etapa 5 pegaria; nenhuma ação — a guarda existe).
+
 ---
 
 ## 7. Roteamento de mudanças
