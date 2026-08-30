@@ -7,8 +7,10 @@
 ## Princípios
 
 1. **Divida por camada técnica**, uma task por camada, na ordem natural da arquitetura:
-   (1) migração/entidades; (2) repositório/acesso a dados; (3) serviço/regra de negócio;
-   (4) endpoint/controller; (5) validação; (6) tela/apresentação; (7) relatório.
+   (1) migração/entidades; (2) repositório/acesso a dados; (3) leitura/parsing de arquivo
+   ou entrada; (4) gravação/regra de negócio; (5) endpoint/controller; (6) validação;
+   (7) tela/apresentação; (8) relatório. Leitura e gravação são camadas **distintas** —
+   nunca as junte numa task só, mesmo que pareçam o mesmo "serviço".
 2. **O ponto de entrada é sempre a última task**: uma task final de wiring/integração
    liga as camadas prontas e habilita a rota/tela.
 3. **Risco com número desconhecido não vira task**: registre o número a descobrir como
@@ -16,7 +18,8 @@
    já existe.
 4. **Interface interna ainda não definida divide-se entre as duas tasks envolvidas**:
    cada metade registra em nota o que espera da outra, e o formato é negociado quando as
-   duas estiverem em andamento — isso maximiza o paralelismo.
+   duas estiverem em andamento — isso maximiza o paralelismo. As duas metades ficam
+   **sempre em tasks separadas**, sem exceção.
 
 ## Ordenação
 
