@@ -78,6 +78,17 @@ ou notificação renderizada.
    canônico, e a trilha real era 124px vs 20px — 2ª reprovação pela mesma causa). Isto
    é verificação do achado, não direção de arte; sem os valores das duas trilhas
    legíveis no diff/tokens, o achado sai como `sugestao` com a medida faltante nomeada.
+   **A mesma verificação vale para eco/espelho de estado, não só medida (decisão
+   4.307, extensão da 4.230)**: quando a correção prescreve que um elemento reflita o
+   estado de outro ("o cabeçalho mostra o item selecionado", "o contador acompanha o
+   filtro"), localize por `grep` **todos** os pontos que escrevem o estado espelhado
+   antes de escrever a correção e nomeie cada um na correção — ponto de escrita sem
+   tratamento nomeado é buraco, não detalhe (caso real: a tela decidia o estado por
+   dois caminhos — o seletor e o campo de id manual —; a correção nomeou um, o
+   developer ligou só esse, e o eco passou a afirmar com confiança um valor diferente
+   do que o corpo mostrava — defeito pior que o original). Sem a lista de escritores
+   legível no diff, o achado sai como `sugestao` com os pontos faltantes nomeados —
+   a mesma queda de severidade da medida faltante.
 5. Decisão: **qualquer** padrão descuidado do catálogo em superfície que o usuário vê
    ou opera → REPROVADO.
 

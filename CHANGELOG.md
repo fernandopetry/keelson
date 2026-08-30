@@ -23,6 +23,44 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.136.0] — 2026-08-30
+
+Re-init: none
+
+Decisions 4.307–4.308 — field-intake batch from a consumer postmortem
+(0.132.0, plan closeout): three pathways of the same family — "name the
+condition, not the instances; verify before prescribing" — each patched in
+its own owner, plus `data_inicio` capture moved to the dispatch step.
+
+### Changed
+
+- **`/keelson:implement`**: a consolidated retry item that merges findings
+  from distinct dedicated gates (8/9/10/11) now names the CONDITION the
+  mechanism describes, with a closing grep — instances cited by each gate
+  are non-exhaustive illustration (4.307; field case: gates cited 3 of 4
+  truncatable enumerations of the same method, the retry closed exactly
+  those 3 with a mutant each, and the 4th — the largest — reproduced the
+  defect after "closure").
+- **`/keelson:implement`**: `data_inicio` is captured by the orchestrator
+  BEFORE dispatching a task's first execution — the developer's report
+  becomes reinforcement, never the only source; a retry does not recapture
+  a lost instant (4.308; field case: both sources failed together for 3
+  rounds and the field closed with an honest "not measured" placeholder
+  that the closure gate cannot see).
+- **`product-designer` (gate 11)**: the "verify before prescribing" rule
+  (4.230) now also covers state echo/mirror corrections — every writer of
+  the mirrored state is located by grep and named in the fix before it is
+  written; without the writer list the finding degrades to a suggestion
+  (4.307; field case: 1 of 2 writers named, and the patch produced a worse
+  defect than the original).
+- **`/keelson:tasks`**: new anti-circumvention test (h) — a merged file
+  cited as template/exemplar outside the Criteria has its prescribed
+  literal checked against the template's real content, and the template
+  itself is checked against active lessons before becoming a copy
+  instruction (4.307; field cases: a binding contradicted by the template
+  cited in the same sentence, and templates that already carried the
+  documented defect).
+
 ## [0.135.0] — 2026-08-30
 
 Re-init: none
