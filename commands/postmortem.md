@@ -85,6 +85,11 @@ mecanismo inclui "por que chegou a produção / por que a detecção demorou".
   Retrabalho de forja caro (voltas de correção, janela de scribe longa) é candidato a
   linha da Etapa 2, natureza `retrabalho de processo`; número ausente na cauda é
   telemetria omitida, nunca se estima.
+- O **relógio do ciclo** — saída de `bash "${CLAUDE_PLUGIN_ROOT}/scripts/cycle-clock.sh"
+  <docsRoot>/<slug>/tasks PLAN-MMM` (decisão 4.325): parede, soma-tasks e completude da
+  implementação, deriváveis fora da sessão porque as marcas moram na closure commitada
+  das TASKs (4.200/4.308) — o confronto com a seção `Estimativa` do BRIEF entra como
+  fato quando ela existe; grandeza omitida na saída segue omitida, nunca se estima.
 - `<docsRoot>/_meta/learning-log.md` e `guidelines/project/lessons.md` — o que o ciclo
   **já registrou** (não redescubra; cite).
 - Quando um teste está implicado, **abra o teste** e cite a asserção literal — é a

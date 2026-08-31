@@ -254,14 +254,14 @@ E sugira `/keelson:integrate {docsRoot}/<slug>/plans/PLAN-MMM-<nome>.md` — com
 
 ## Etapa 5: output final ao usuário
 
-**Run-state antes do output**: executado **dentro do `/keelson:auto`**, mantenha `status: em_andamento` — a Entrega do auto encerra/remove o arquivo após o push. Executado **avulso**, rode `bash "${CLAUDE_PLUGIN_ROOT}/scripts/run-state.sh" <raiz> close <slug> "implement concluído (integração é humana)"`; sem isso o `wave-guard` bloqueia o encerramento do turno. **Ledger**: executado avulso, emitido o output abaixo, arquive os eventos consumidos (`ledger.sh <raiz> archive --keep <pendente>…`) e marque a casa (`session-dir.sh <raiz> mark-reported` — 4.315); **dentro do `/keelson:auto`, não arquive** — a Entrega dele ainda vai lê-los.
+**Run-state antes do output**: executado **dentro do `/keelson:auto`**, mantenha `status: em_andamento` — a Entrega do auto encerra/remove o arquivo após o push. Executado **avulso**, rode `bash "${CLAUDE_PLUGIN_ROOT}/scripts/run-state.sh" <raiz> close <slug> "implement concluído (integração é humana)"`; sem isso o `wave-guard` bloqueia o encerramento do turno. **Ledger**: executado avulso, emitido o output abaixo, arquive os eventos consumidos (`ledger.sh <raiz> archive --keep <pendente>…`) e marque a casa (`session-dir.sh <raiz> mark-reported` — 4.315); **dentro do `/keelson:auto`, não arquive** — a Entrega dele ainda vai lê-los. **Relógio do ciclo** (decisão 4.325): o campo de tempo do Resumo transcreve a saída de `bash "${CLAUDE_PLUGIN_ROOT}/scripts/cycle-clock.sh" <docsRoot>/<slug>/tasks PLAN-MMM` — parede e soma-tasks derivadas das marcas commitadas das closures, válidas mesmo com waves de sessões anteriores; medido ou omitido com a completude no lugar, nunca estimado (4.56/4.196).
 
 ```markdown
 # Implementação concluída: PLAN-MMM
 
 ## Resumo
 - Orquestração: AGENT_TEAMS | SUBAGENTS | SINGLE_THREAD · paralelismo máx <N> · branches: <lista>
-- Tasks executadas: N · tempo total: ~Tmin · tokens: ~Z
+- Tasks executadas: N · relógio do ciclo: <parede <H>h<MM>min · trabalho <H>h<MM>min | omitido — <completude>> · tokens: ~Z
 
 ## Quality gates
 - Aprovadas 1ª tentativa: N | retry: M | falhadas: 0

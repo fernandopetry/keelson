@@ -415,19 +415,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.142.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.143.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: twelve field proposals from a consumer postmortem
-absorbed in one batch (decisions 4.318–4.324) — oracle fixation hardened
-against inverted tautologies and unread matches, gate-9 scripts prescribe
-the observation technique and the right observer, deferred obligations
-name their carrier, the condition-not-address discipline becomes the
-family's mother rule, reviewer depth rules (value ≠ wiring; same-round
-disagreements arbitrated by cited verification), the design gate gains
-the composition axis, and `diff-facts.sh` now says only what it
-verified. See `CHANGELOG.md`.
+New in this release: the cycle clock (decision 4.325) — `cycle-clock.sh`
+derives a PLAN's implementation duration (wall + work, with a
+completeness line) from the committed task closure marks, so a cycle
+that crosses sessions finally closes its `Estimativa × realizado` line
+with a measured number, and the implement report stops estimating time.
+See `CHANGELOG.md`.
 Re-init: none. See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in

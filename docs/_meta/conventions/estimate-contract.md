@@ -85,6 +85,12 @@ disciplina de proposta + default da escalação — cada lacuna vem com a pergun
 - **Confronto no fecho**: rota com `## Estimativa` no BRIEF → o report emite a linha
   `Estimativa × realizado` (`report-contract.md` §2): estrutura prevista vs. waves/tasks
   reais do `TASK-MMM-INDEX` · faixa total vs. duração **medida** · desvio em meia linha.
+  A duração medida vem do `cycle-clock.sh` sobre as TASKs do PLAN (decisão 4.325 —
+  formato e degradação são do `report-contract.md`, dono da linha): a `soma-tasks`
+  (trabalho, união de intervalos) é a grandeza comparável à faixa em horas; a `parede`
+  acompanha como lead time. Funciona com o ciclo atravessando sessões, porque lê as
+  marcas commitadas das closures — grandeza sem marca é omitida com a completude
+  declarada, nunca estimada (§1.2).
 - **Calibração**: o mesmo fecho anexa **uma linha** em
   `guidelines/project/estimates.md` (par do `lessons.md` — memória do projeto, não do
   plugin):
@@ -92,6 +98,10 @@ disciplina de proposta + default da escalação — cada lacuna vem com a pergun
   ```markdown
   - <YYYY-MM-DD> · <slug — demanda> · previsto: ~N waves/~N tasks · <min–max>h · realizado: N waves/N tasks · <duração medida> · desvio: <meia linha>
   ```
+
+  A `<duração medida>` transcreve as duas grandezas do `cycle-clock` rotuladas
+  (`parede <H>h<MM>min · trabalho <H>h<MM>min`); grandeza omitida na saída → a
+  completude no lugar (`N de M TASKs com marca`).
 
   O `estimator` **lê este arquivo antes de estimar** e usa os desvios como corretor;
   com **menos de 3 demandas fechadas**, declara `sem base histórica` na linha `Base` e

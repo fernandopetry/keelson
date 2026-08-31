@@ -23,6 +23,40 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.143.0] — 2026-08-31
+
+Re-init: none
+
+Decision 4.325 — cycle clock: implementation duration derived from committed task
+marks, across sessions.
+
+### Added
+
+- **`scripts/cycle-clock.sh` + test suite (13 cases)**: a read-only reader (bash 3.2 +
+  POSIX awk, epoch math in pure awk — no GNU/BSD `date` dependency) that derives, from
+  each task's committed `Data início`/`Data conclusão` closure marks, two labeled
+  durations for a PLAN's implementation: **wall** (earliest start → latest finish,
+  waiting time included) and **work** (`soma-tasks`, interval union — overlapping
+  parallel waves are not double-counted), always with a completeness line ("N of M
+  tasks with both marks"). Because the source is the committed closure, the numbers
+  survive session boundaries — a cycle resumed via `/keelson:continue` finally gets a
+  measured end-to-end duration. Degradation follows the graph rule: empty/placeholder
+  marks are known holes (no noise), unparseable values emit `WARNING nao-parseavel`
+  and count as absent, a metric without enough marks is reported `omitida` — never
+  estimated.
+- **The measured number now has consumers**: the report's `Estimativa × realizado`
+  line and the calibration line in the consumer's `estimates.md` name `cycle-clock`
+  as the source of the measured duration (work is the figure comparable to the
+  estimator's hour range; wall is lead time), and `/keelson:postmortem` lists the
+  cycle clock as an evidence source next to the BRIEF's forge telemetry.
+
+### Fixed
+
+- **`/keelson:implement` output no longer estimates time**: the `tempo total: ~Tmin`
+  field — the only time field outside the "measured or omitted, never estimated"
+  rule — is replaced by the cycle clock's measured wall/work pair (or an explicit
+  omission with the completeness count).
+
 ## [0.142.0] — 2026-08-31
 
 Re-init: none

@@ -315,7 +315,7 @@ for par in "ficha:ficha diff-facts" "next-id:next-id" "index-check:index" \
            "edge-diff:edge-diff" "e2e-coverage:e2e-coverage" \
            "update:release" "check-release:release" "check-refs:refs" \
            "check-frontmatter:frontmatter" "context-cost:context-cost" \
-           "check-mermaid:mermaid" "eval-run:eval-run" \
+           "check-mermaid:mermaid" "eval-run:eval-run" "cycle-clock:cycle-clock" \
            "session-dir:session-dir run-state ledger context-cost window-marker compact-anchor review-guard security-guard"; do
   motor="${par%%:*}"; suites="${par#*:}"
   dirs_re="$(printf '%s' "$suites" | sed 's/ /|/g')"
