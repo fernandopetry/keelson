@@ -415,17 +415,18 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.140.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.141.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: session-home garbage collection (decision 4.316) closes
-the session-folder arc (4.314–4.316) — `session-dir.sh gc` lists, report-only,
-the session homes that are provably safe to remove (reported, aged, nothing
-pending; a live-looking session is never a candidate), and `--apply` — always
-the human's act, suggested by `/keelson:continue` and `/keelson:init` — cleans
-them. Builds on the per-session home (`0.138.0`, re-init) and the local
-handover (`0.139.0`).
+New in this release: cross-session messages carry no authority (decision
+4.317) — Claude Code ≥ 2.1.224 lets sessions on the same machine message
+each other, and the doctrine now states that such a message is input, not
+orders: it never transfers run ownership or changes a cycle's route
+(human acts only), while `ListAgents` becomes a first-class probe of the
+ownership inventory. The agent-teams facts are refreshed and the settings
+trap is recorded: denying `SendMessage` also kills the teammates' return
+channel — receiver-side `crossSessionInbound` is the right control.
 Re-init: none. See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in

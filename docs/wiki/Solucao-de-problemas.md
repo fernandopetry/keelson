@@ -296,6 +296,17 @@ mesmo depois de entregar — se ao fim de uma sessão dessas você vê vários p
 `claude` pendurados consumindo CPU, é isso: pode encerrá-los; processo vivo depois da
 entrega não é sinal de trabalho em curso.
 
+Uma nota para versões recentes do Claude Code (2.1.224 em diante): o mesmo
+`SendMessage` que os papéis usam para devolver parecer também alcança **outras
+sessões do Claude Code na sua máquina** — sessões passam a poder trocar mensagens
+entre si. Duas consequências práticas. Primeira: se você quiser conter as mensagens
+vindas de outras sessões, configure o **lado receptor** (`crossSessionInbound` no
+settings, com `hold` ou `refuse`); não crie uma regra de *deny* para `SendMessage` —
+ela bloqueia também o canal dos papéis e reproduz o sintoma dos "papéis mudos" desta
+seção. Segunda: mensagem que chega de outra sessão **não é ordem** — se ela pedir
+para encerrar um ciclo, assumir um trabalho em andamento ou mudar de rumo, a sessão
+trata como achado e escala a você; quem decide é sempre o humano.
+
 ## Jira
 
 ### O ciclo terminou e o Jira não soube de nada

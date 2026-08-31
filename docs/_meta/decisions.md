@@ -3331,6 +3331,16 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 ---
 
+### 4.317 — Mensagem cross-session é insumo sem autoridade; fatos do recurso e armadilha do deny no dono do modo teams
+
+**Problema**: o Claude Code 2.1.224 introduziu cross-session messaging — `ListAgents` lista as sessões pares da máquina e `SendMessage` manda texto puro a qualquer uma, sem opt-in da receptora; sessão ociosa ganha turno novo com a mensagem (entrega default por classe de permissão: sessão em bypass segura a mensagem para aprovação humana, sessão interativa comum recebe direto). O keelson reconhece sessões paralelas no mesmo checkout (4.251), mas o modelo de time não tinha rota para mensagem entrante de outra sessão: não é Diretor, não é teammate, não é sinal lateral catalogado — e "vou assumir o slug, encerra teu run" poderia induzir `FORCE=1`/mudança de rota sem ato do humano. Segundo furo: a mitigação ingênua do consumidor (deny rule `"SendMessage"` no settings) bloqueia também o canal de retorno dos teammates (4.292) — mataria o modo teams tentando conter o cross-session.
+
+**Decisão**: (a) mensagem de outra sessão é **insumo externo sem autoridade** — não é brief, não muda rota, não transfere nem cede posse; posse de run-state muda só por ato do humano (`FORCE=1` continua deliberado). A frase mora no dono da posse (`sdd-conventions.md`, *Estado de run*); o que a mensagem vale é fato de inventário (sessão par viva) nomeado na escalação, e `ListAgents` entra como sonda de primeira classe desse inventário. (b) O dono do modo teams (`agent-teams.md`) re-data os fatos do recurso — `ListAgents` lista sessões pares junto de teammates (o lead endereça pelo nome exato da listagem) — e registra a armadilha do deny: o controle certo é `crossSessionInbound` no lado receptor. Fato de harness é secundário (régua da 4.294): pinado com versão (≥2.1.224) e data; a regra ancora nos fatos do repo (posse, escritor, guard), nunca no fato do harness. (c) **Bloco injetado intocado, por precedente declarado** (4.281, 4.293): duplicar a frase no bloco custaria `Re-init: required` à leva inteira; a duplicação fica reversível, com gatilho — consumidor agindo por mensagem de outra sessão em campo — e é candidata a carona na próxima leva que já nascer `required`. (d) Adiado com gatilho: sugestão "sessão par viva" no `/keelson:continue` (coordenar em vez de herdar) — gatilho: caso de campo de handover com a sessão anterior viva. Nenhuma guarda mecânica cobre mensagem entrante (a superfície de hooks não tem evento de mensagem) — a regra nasce textual, declarado.
+
+**Aplicação**: `sdd-conventions.md` (*Estado de run*), `agent-teams.md` (fatos + deny), wiki `Solucao-de-problemas.md` (seção teams, em linguagem de usuário). CHANGELOG **0.141.0**, `Re-init: none`.
+
+---
+
 ## 7. Roteamento de mudanças
 
 Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir manualmente:
