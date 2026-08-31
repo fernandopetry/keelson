@@ -269,6 +269,16 @@ Quem escreveu o código não aprova o próprio diff. A revisão vale pelo **cont
 (Charter, régua geral); onde não há teste possível (ex.: refactor de legibilidade), a
 revisão independente **é** a prova.
 
+E **confirmar uma premissa sobre o VALOR de um campo não é confirmar seu CABEAMENTO**
+(decisão 4.322) — que ele lê de uma propriedade/coluna dedicada: os dois atos terminam
+na mesma frase ("confirmei na fonte") sem provar a mesma coisa, e um tipo permissivo
+(`T | null`) acomoda as duas leituras sem que nada mecânico acuse a diferença. Premissa
+sobre o comportamento num **estado/ramo específico** exige traçar a lógica que **atribui**
+o valor nesse ramo — nunca só a origem declarada do campo, nem a palavra do comentário
+vizinho, que pode estar descrevendo outro ramo (caso real: cabeamento correto — o campo
+lia a propriedade dedicada — mas o ramo em pauta emite `null` fixo; o comentário do
+próprio ramo descrevia o ramo oposto e sustentou a confirmação errada por 2 rodadas).
+
 ---
 
 ## Orquestração da rodada: paralelismo e pacote de contexto (decisão 4.89)
@@ -308,6 +318,20 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
 - **O pacote não substitui a régua.** Cada revisor continua lendo a própria régua em
   runtime (este arquivo, `SECURITY.md`, a seção do perfil) — o pacote poupa a
   redescoberta do contexto do trabalho, nunca resume doutrina de memória.
+- **Divergência factual entre dois gates da mesma rodada, antes de qualquer retry,
+  arbitra-se por verificação própria citada** (decisão 4.322) — nunca por antiguidade,
+  severidade ou especialidade do gate, nem por voto. Paralelismo e pacote único (acima)
+  não impedem dois revisores medirem a mesma grandeza sob o mesmo nome com **unidades
+  diferentes**, ou descreverem em prosa idêntica dois trechos de código genuinamente
+  **distintos**: antes de decidir um lado, pergunte **"os dois podem estar certos?"** —
+  a divergência costuma ser aparente, e escolher um lado sem essa checagem descarta um
+  achado real. Resolva abrindo o arquivo/rodando o comando você mesmo e leve o veredito
+  ao despacho do retry **com a evidência que decidiu**, para o revisor que errou se
+  corrigir de forma explícita (casos reais: dois gates divergiram sobre o custo de uma
+  rota — um contava *use cases*, o outro chamadas HTTP, e a unidade ambígua nascera no
+  próprio pacote de contexto; dois revisores divergiram sobre a posição de um card —
+  certos sobre condicionais distintas do mesmo componente, e os dois achados
+  sobreviveram como itens do retry).
 
 **Recorte da rodada no ciclo (decisão 4.90)** — a unidade de execução de cada gate
 segue a natureza do que ele prova, não é uniforme por TASK:
@@ -504,6 +528,20 @@ A **Solução nomeia a condição, nunca só uma instância dela** — mesma ré
 lista dos códigos conhecidos hoje. Enumeração fechada só acompanhada do teste que prova
 completude. Instância cumprida à risca que diverge da condição nasce como correção
 incompleta — e nada acusa (decisão 4.93).
+
+**A mesma disciplina — condição, nunca endereço ou instância — vale em qualquer ponto
+do ciclo que nomeie o alvo de uma verificação, correção ou remoção, não só na Solução
+deste gate** (decisão 4.321 — régua-mãe da família 4.93 · 4.139/4.232 · 4.302a ·
+4.307): Escopo/Inclui e Critério de pronto na geração das TASKs, item de retry na
+composição do despacho, achado de gate dedicado (8/10/11) na escrita — todos citam a
+**condição do domínio** ("nenhuma superfície afirma X", "todo escritor do estado
+espelhado", "todo chamador da operação recusada"), nunca a lista fechada de
+endereços/instâncias vista no momento da redação; lista citada é sempre rotulada
+**ilustração não-exaustiva**, acompanhada da varredura de fechamento que a torna
+falsificável (caso real: remoção de premissa revogada escopada ao endereço técnico —
+"comentários/docblock" — sobreviveu exatamente na copy que o operador lê; reescrita
+como condição, a varredura achou 3 superfícies onde dois revisores, pensando por
+endereço, tinham visto 2).
 
 E quando o achado deriva de um requisito **MUST multi-sujeito** (ex.: "para cada A, B
 e C"), o **fechamento** re-lê o texto do FR/AC de **origem** e confirma cobertura de

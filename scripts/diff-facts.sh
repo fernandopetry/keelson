@@ -10,9 +10,12 @@
 #
 #   --inert           classifica cada arquivo do diff e dá o veredito:
 #                     linhas `inerte|codigo<TAB>bucket<TAB>path` + `veredito<TAB>…`.
-#                     Exit 0 = diff inerte (dispensa declarada da suíte) · 1 = tem
-#                     código que a suíte exercita (rode a suíte). Na dúvida, o
-#                     arquivo conta como código — "na dúvida, rode" é o default.
+#                     Exit 0 = diff inerte (dispensa declarada da suíte) · 1 = há
+#                     código que os codePaths classificam como produção (rode a
+#                     suíte) — bater com codePaths não prova que `quality.test` o
+#                     exercita; confirme a cobertura antes de citar como prova.
+#                     Na dúvida, o arquivo conta como código — "na dúvida, rode"
+#                     é o default.
 #   --compose         composição do diff para o report de fecho: linhas
 #                     `arquivo<TAB>bucket<TAB>+<TAB>-<TAB>path` + resumo
 #                     `total<TAB>bucket<TAB>arquivos<TAB>+<TAB>-` por bucket
@@ -169,7 +172,7 @@ case "$MODE" in
       printf 'veredito\tinerte\t%d arquivo(s), nenhum exercitado pela suite\n' "$n"
       exit 0
     fi
-    printf 'veredito\tnao-inerte\t%d de %d arquivo(s) exercitado(s) pela suite\n' "$bad" "$n"
+    printf 'veredito\tnao-inerte\t%d de %d arquivo(s) classificado(s) como codigo pelos codePaths — nao prova que quality.test os exercita; confirme a cobertura antes de citar como prova\n' "$bad" "$n"
     exit 1 ;;
 
   compose)

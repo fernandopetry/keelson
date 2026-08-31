@@ -23,6 +23,65 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.142.0] — 2026-08-31
+
+Re-init: none
+
+Decisions 4.318–4.324 — twelve field proposals from a consumer postmortem on 0.141.0,
+absorbed in one batch through the intake queue (4.111). All twelve defects were caught
+by the gates before reaching the human — the batch hardens the points where agents
+saved the cycle by diligence rather than by written rule.
+
+### Added
+
+- **Done-criterion fixation hardened** (4.318): new "resists gaming" check (i) — a
+  criterion never derives its shape from the same task's *suggested implementation*
+  (copying makes the oracle inherit the prescription's defect and become an inverted
+  tautology; real case: the mutant proved the oracle approved the defective code and
+  would reject the correct one); and criteria targeting **pre-existing code** the task
+  must not touch run against HEAD at fixation with the match **read**, not just
+  counted — assumptions about order/position or syntax the file does not use fail
+  silently under the non-empty check.
+- **Gate-9 scripts prescribe the observation technique** (4.319): a step that
+  falsifies a *transient state* (in-flight item, disabled control) prescribes network
+  interception — holding/delaying the relevant response — instead of relying on real
+  latency; and a step confirming the *absence of an external effect* names an observer
+  that structurally reaches that effect (a backend call to an external API never shows
+  in the browser's network panel — the wrong observer makes the step pass by
+  construction).
+- **Implement closes three deferral gaps** (4.320): the wave close reconciles data
+  shapes (type, nullability, enum) prescribed by not-yet-dispatched tasks against the
+  source the wave just created (divergence is a plan gap fixed before dispatch, never
+  left for gate 7); a finding closed across multiple files/tasks uses the **same
+  oracle form** everywhere (two oracles of different strength are worth the weaker
+  one); and `consolidado` on an observable AC **names its carrier in the same act** —
+  edit the target task's script or record a plan gap — so deferred obligations stop
+  evaporating between waves.
+- **Condition-not-address becomes the family's mother rule** (4.321, firing the
+  consolidation trigger declared in 4.307): the 4.93 discipline now explicitly governs
+  every point in the cycle that names the target of a verification, correction or
+  removal — scope/criteria at generation, retry items at dispatch composition,
+  dedicated-gate findings at writing; any cited list is labeled a non-exhaustive
+  illustration with its closing sweep. Local rules stay; fusing them into short
+  references is deferred to an eval-proven distillation batch.
+- **Reviewer depth rules** (4.322): confirming a premise about a field's *value* is
+  not confirming its *wiring* — a state/branch premise requires tracing the logic that
+  assigns the value in that branch; and a factual disagreement between two gates of
+  the same round is arbitrated by cited first-hand verification, asking "could both be
+  right?", never by seniority, severity or vote.
+- **Design gate gains the composition axis** (4.323): a correction that moves,
+  un-nests or regroups a block composes the alternative before the finding is written,
+  simulating the combined states the new position exposes — so the screen never starts
+  asserting something false as a side effect of the fix.
+
+### Fixed
+
+- **`diff-facts.sh --inert` says only what it verified** (4.324): the `nao-inerte`
+  verdict no longer claims files are "exercised by the suite" — it reports them as
+  classified as code by the ficha's `codePaths`, with an explicit warning that this
+  does not prove `quality.test` exercises them. Exit codes unchanged (the conservative
+  "when in doubt, run" stands); twin test-suite assertions updated.
+
 ## [0.141.0] — 2026-08-30
 
 Re-init: none

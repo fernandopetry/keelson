@@ -85,7 +85,7 @@ inerte	documentacao	public/img/logo.png
 codigo	producao	resources/js/app.js
 codigo	producao	src/servico.php
 codigo	teste	tests/ServicoTest.php
-veredito	nao-inerte	5 de 8 arquivo(s) exercitado(s) pela suite" "$got" "$st"
+veredito	nao-inerte	5 de 8 arquivo(s) classificado(s) como codigo pelos codePaths — nao prova que quality.test os exercita; confirme a cobertura antes de citar como prova" "$got" "$st"
 
 got="$(bash "$DF" --repo "$R" --base main --compose 2>/dev/null)"; st=$?
 assert compose 0 "arquivo	config	1	0	.env.example
@@ -146,7 +146,7 @@ printf 'x\n' > "$R3/src/main.go"
 git -C "$R3" add -A && git -C "$R3" commit -qm código
 got="$(bash "$DF" --repo "$R3" --base main --inert 2>/dev/null)"; st=$?
 assert inert-sem-ficha 1 "codigo	config	src/main.go
-veredito	nao-inerte	1 de 1 arquivo(s) exercitado(s) pela suite" "$got" "$st"
+veredito	nao-inerte	1 de 1 arquivo(s) classificado(s) como codigo pelos codePaths — nao prova que quality.test os exercita; confirme a cobertura antes de citar como prova" "$got" "$st"
 
 # a degradação é declarada em stderr
 total=$((total + 1))

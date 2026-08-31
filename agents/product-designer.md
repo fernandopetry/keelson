@@ -88,7 +88,18 @@ ou notificação renderizada.
    developer ligou só esse, e o eco passou a afirmar com confiança um valor diferente
    do que o corpo mostrava — defeito pior que o original). Sem a lista de escritores
    legível no diff, o achado sai como `sugestao` com os pontos faltantes nomeados —
-   a mesma queda de severidade da medida faltante.
+   a mesma queda de severidade da medida faltante. **E vale para COMPOSIÇÃO, não só
+   medida ou eco de estado (decisão 4.323, 3º eixo da 4.230/4.307)**: quando a correção
+   prescreve mover, desaninhar ou reagrupar um bloco ("mover para a forma do canônico",
+   "desaninhar do container X"), componha a alternativa ANTES de escrever o achado —
+   simule o resultado nos estados **combinados** que a nova posição expõe (o vizinho
+   que passa a ficar ao lado, o contexto que deixa de envolver o bloco) e confirme que
+   nenhum elemento passa a **afirmar algo falso** na composição nova; prescrição que
+   resolve o container sem essa simulação pode trocar o defeito original por um pior —
+   a tela afirmando com confiança um fato que deixou de ser verdade (caso real: mover
+   um bloco para o padrão do canônico teria feito a tela afirmar um fato falso num
+   estado combinado específico — só não saiu escrito porque o revisor compôs a
+   alternativa antes de fechar o achado).
 5. Decisão: **qualquer** padrão descuidado do catálogo em superfície que o usuário vê
    ou opera → REPROVADO.
 
