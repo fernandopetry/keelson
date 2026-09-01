@@ -35,6 +35,7 @@ ERROR	task-secao-ausente	subsecao "### Nao inclui" ausente (TASK-001-001-mal-for
 ERROR	task-status-enum	Status "Feito" fora de {Todo, In Progress, Done, Blocked} (TASK-001-004-duas-feats.md)
 ERROR	task-tamanho-enum	Tamanho estimado "large" fora de {small, medium} (TASK-001-001-mal-formada.md)
 WARNING	plan-dec-alternativa-unica	DEC-001-2 com apenas 1 alternativa (caminho unico?) (PLAN-001-login.md)
+WARNING	plan-dec-irreversivel-forma	DEC-001-003: Irreversivel "não." fora da forma canonica minuscula (auto-fix) (PLAN-001-login.md)
 WARNING	plan-dec-irreversivel-forma	DEC-001-2: Irreversivel "SIM" fora da forma canonica minuscula (auto-fix) (PLAN-001-login.md)
 WARNING	plan-dec-sem-reabrir	DEC-002-001 sem linha **Reabrir se**: (4.97) (PLAN-002-lote.md)
 WARNING	plan-dod-sem-perfil	DoD nao menciona aderencia a ficha/perfil (PLAN-001-login.md)

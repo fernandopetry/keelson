@@ -57,6 +57,17 @@ Envio e validação de credencial.
 **Reabrir se**: nunca
 **Irreversível**: SIM
 
+### DEC-001-003: Formato do valor de irreversibilidade
+
+**Contexto**: o campo é propagado ao INDEX e comparado como enum.
+**Decisão**: manter o enum sim/não.
+**Alternativas consideradas**:
+- Texto livre.
+- Booleano numérico.
+**Consequências**: nenhuma além da propagação.
+**Reabrir se**: o INDEX passar a aceitar outro vocabulário.
+**Irreversível**: não.
+
 ## 7. Mapeamento FR -> componente
 
 | FR | Componente | ACs |

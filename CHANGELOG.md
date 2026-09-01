@@ -23,6 +23,57 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.149.0] — 2026-09-01
+
+Re-init: none
+
+Decisions 4.340–4.344 — consumer-ledger batch (plugin 0.147.0): one generator defect,
+one checker defect fixed with a positive-control fixture, and three rule extensions —
+two of them first reincidences of 4.318 and 4.140, each with its promotion trigger
+declared.
+
+### Added
+
+- **Acceptance-criteria template models the Portuguese keywords** (4.340,
+  `commands/specify.md` §7): the section comment opens with a literal
+  `Dado … quando … então` example and names the `spec-ac-fora-gwt` check —
+  Given/When/Then in English fails the check even with the right structure, because the
+  check tests vocabulary, not shape. Field case: 43 warnings across three SPECs of one
+  slug, gone as soon as the template modelled the form.
+- **A criterion whose target file does not exist yet runs against the cited template
+  file** (4.342, `commands/tasks.md`, reincidence 1 of 4.318): when the TASK itself
+  creates the target, the parent commit cannot contain it — the executable check runs
+  against the cited exemplar at fixing time, with the same flags the criterion demands
+  (a missing tool, or a present tool without its `--standard`/`--config`, shows up
+  there). Pre-existing proof cited as evidence of an AC is read on the predicate's
+  axis — which field the assertion compares — before it is cited. Trigger declared: the
+  next reincidence promotes the "tool absent from manifest/PATH" check.
+- **A retry that changes user-visible text asks "who cites this text?"** (4.343,
+  `commands/implement.md` §3.3 and §3.6, reincidence 1 of 4.140): every not-yet-executed
+  proof artifact quoting the old string (pending gate-9 script, undispatched TASK
+  criterion — non-exhaustive, closing grep on the old string) is rewritten in the same
+  dispatch; the gate-9 script reconciliation now also covers literally quoted visible
+  text and includes gate-11/copy retries. Field case: two script steps left pointing
+  at a string the component no longer rendered.
+- **Gate 11 anchors the finding's premise, not only its fix** (4.344,
+  `agents/product-designer.md` item 4, fourth axis): when severity depends on a state
+  being reachable, the proof comes from whoever produces the state (backend guard,
+  state machine, API contract — located by grep and cited), never from the tolerance
+  of the layer that only displays it; without the anchor the finding ships as a
+  suggestion. Field case: a `high` finding for a state the backend made unreachable.
+
+### Fixed
+
+- **`plan-dec-irreversivel-enum` no longer fires on trailing punctuation** (4.341,
+  `scripts/artifact-lint.sh`): `Irreversível: não.` is a form deviation (WARNING
+  `plan-dec-irreversivel-forma`, auto-fix), not a value outside the enum (an ERROR that
+  blocked Approved). Fixture with positive control added; `plan-validator` gains the
+  matching auto-fix; `lint-contract.md` documents the normalization. Field case: six
+  false ERRORs in one PLAN, with about half of the consumer's DECs ending the value
+  with a period.
+- **Troubleshooting page** (`docs/wiki/Solucao-de-problemas.md`): entries for both
+  recognizable failures above.
+
 ## [0.148.0] — 2026-09-01
 
 Re-init: required

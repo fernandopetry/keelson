@@ -189,6 +189,28 @@ Como resolver: se a marca real existe em algum lugar (o commit da TASK, por exem
 grave-a no formato completo; se o instante se perdeu de vez, deixe o campo **vazio** ou
 com um `—` — a lacuna honesta é a ausência, nunca uma frase no lugar do valor.
 
+### O validator acusa `spec-ac-fora-gwt` em ACs que já estão em Given-When-Then
+
+O aviso é sobre **vocabulário**, não sobre estrutura: o lint procura as palavras "dado",
+"quando" e "então" no corpo do critério de aceitação. Um AC escrito com Given/When/Then em
+inglês tem a forma certa e reprova mesmo assim — o nome do padrão é em inglês, a SPEC é em
+português.
+
+Como resolver: reescreva o corpo do AC com as três palavras em português ("Dado …, quando …,
+então …"). A partir da 0.149.0 o template da SPEC traz o exemplo; SPECs antigas com o aviso
+acumulado continuam válidas — é WARNING, não trava a promoção sozinho.
+
+### O lint acusa `plan-dec-irreversivel-enum` numa DEC escrita como `não.`
+
+O campo `Irreversível` de uma DEC é um enum de dois valores — `sim` ou `não` — porque é
+propagado ao `INDEX.md`. Até a 0.148.0, um ponto final depois do valor caía no ERROR de enum
+e travava a promoção do PLAN. A partir da 0.149.0, pontuação no fim do valor é desvio de
+forma: vira WARNING `plan-dec-irreversivel-forma`, que o `plan-validator` corrige sozinho
+(auto-fix), como já fazia com `SIM` em maiúsculas.
+
+Como resolver numa versão anterior: apague a pontuação depois do valor. Valor fora de
+`sim`/`não` continua ERROR — aí a DEC precisa de resposta, não de formato.
+
 ### Apareceu senha em trace, screenshot ou contexto de erro do E2E
 
 A saída de execução da suíte E2E autenticada é **material sensível**: o setup de login

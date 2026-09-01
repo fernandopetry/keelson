@@ -169,7 +169,13 @@ derivam da FEAT do FR que cobrem. Forma:
 
 ## 7. Critérios de aceitação (Given-When-Then)
 - **AC-NNN-001** (cobre FR-NNN-001, FR-NNN-002)
-<!-- O "(cobre …)" é campo de aresta do grafo: IDs completos de FR/NFR separados por
+<!-- Corpo do AC em português, com as três palavras-chave — ex.: "Dado um operador sem a
+permissão de exportar, quando ele aciona a exportação, então o sistema recusa e informa o
+motivo." O check `spec-ac-fora-gwt` (`scripts/artifact-lint.sh`, WARNING — régua:
+${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/lint-contract.md §1) exige "dado"/"quando"/
+"então" no corpo: Given/When/Then em inglês reprova mesmo com a estrutura certa — o título
+da seção nomeia o padrão, não o vocabulário (decisão 4.340).
+O "(cobre …)" é campo de aresta do grafo: IDs completos de FR/NFR separados por
 vírgula — sem barra-abreviação (FR-x/y) nem sub-item (FR-x-001a). Com FEATs declaradas
 na §5, os FRs de um mesmo "(cobre …)" pertencem à MESMA FEAT — a filiação do AC deriva
 dela; AC atravessando FEATs é cenário mal fatiado: divida o AC. Régua:

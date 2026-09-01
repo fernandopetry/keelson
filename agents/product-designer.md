@@ -99,7 +99,17 @@ ou notificação renderizada.
    a tela afirmando com confiança um fato que deixou de ser verdade (caso real: mover
    um bloco para o padrão do canônico teria feito a tela afirmar um fato falso num
    estado combinado específico — só não saiu escrito porque o revisor compôs a
-   alternativa antes de fechar o achado).
+   alternativa antes de fechar o achado). **E a PREMISSA do achado se ancora antes da
+   severidade, não só a correção (decisão 4.344, 4º eixo — parente da 4.329 do gate 7)**:
+   quando a severidade depende de um ESTADO ser alcançável (combinação de valores, ordem
+   de eventos, condição de borda), a prova de alcançabilidade vem de quem **produz** o
+   estado — localize por `grep` o validador/guard/máquina de estados/contrato de API que
+   decide se ele ocorre e cite-o no cenário; "o formulário aceita o valor" ou "a tela não
+   impede" prova só ausência de bloqueio numa camada que apenas **exibe**. Sem a âncora
+   no produtor, o achado sai como `sugestao` com a premissa a verificar nomeada — a mesma
+   queda de severidade da medida faltante (caso real: cenário classificado `alta` por um
+   formulário tolerante a um valor que o backend recusava estruturalmente antes de o
+   estado existir; ancorada no produtor, a severidade caiu ao nível real).
 5. Decisão: **qualquer** padrão descuidado do catálogo em superfície que o usuário vê
    ou opera → REPROVADO.
 

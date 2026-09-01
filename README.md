@@ -418,20 +418,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.148.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.149.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a field-postmortem batch (decisions 4.331–4.339) —
-gate dispatch derived from the diff in every route, mutation proofs must
-declare each mutant's axis, quantitative claims travel with denominator
-and source, lesson routing is verified at the destination, parallel waves
-require a worktree per task (else sequential), isolated trees are real
-`git worktree`s (never directory copies), a new lint check rejects prose
-in TASK clock marks, and inherited red suites reach the Director's
-report. Recent: screen-verify artifacts grouped by session key (4.330).
-Re-init: required (the injected block's on-demand close and gate-dispatch
-bullets changed). See the [CHANGELOG](CHANGELOG.md) for history.
+New in this release: a consumer-ledger batch (decisions 4.340–4.344) — the SPEC
+template models the Portuguese Given/When/Then keywords the lint checks, trailing
+punctuation on `Irreversível` is a form warning instead of an enum error, criteria
+against not-yet-existing files run against the cited template file, a retry that
+changes visible text sweeps the proof artifacts that quote it, and gate 11 anchors
+reachability premises in whoever produces the state. See `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

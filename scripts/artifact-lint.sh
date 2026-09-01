@@ -336,6 +336,7 @@ function flushdec() {
   if (dIrr) {
     v = irrval
     lv = tolower(v); gsub(/\303\243/, "a", lv)  # ã→a
+    gsub(/[.:;!]+$/, "", lv)                     # pontuacao terminal e forma, nao enum (4.341): cai na WARNING abaixo
     if (lv != "sim" && lv != "nao")
       emit("ERROR", "plan-dec-irreversivel-enum", cur_dec ": Irreversivel \"" v "\" fora de {sim, nao}")
     else if (v != "sim" && v != "n\303\243o" && v != "nao")

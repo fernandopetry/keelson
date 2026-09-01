@@ -32,6 +32,7 @@ blocos DEC (campos obrigatórios, zero ou uma alternativa, enum e forma do
 DoD vazia/com placeholder/sem menção a teste ou ficha/perfil. Invocado com o
 **diretório do slug**, acrescenta `plan-overlap-fr` (FR coberto por 2+ PLANs).
 Auto-fixes que continuam seus (protocolo §3): `Irreversível: SIM` → `sim` ·
+`Irreversível: não.` → `não` (pontuação terminal — 4.341) ·
 `Irreversivel:` → `Irreversível:` · zero-padding · formato de `Data`.
 
 Cada achado entra como `**[artifact-lint]** SEVERIDADE check — detalhe`; degradação
