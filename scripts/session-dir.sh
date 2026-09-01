@@ -12,6 +12,7 @@
 #      session-dir.sh <raiz-do-repo> memo-find <slug> [--all]
 #      session-dir.sh <raiz-do-repo> adopt-memo <slug> [--ts <iso>]
 #      session-dir.sh <raiz-do-repo> mark-reported [--ts <iso>]
+#      session-dir.sh <raiz-do-repo> session-key [--create] [--slug <slug>] [--ts <iso>]
 #      session-dir.sh <raiz-do-repo> gc [--days <N>] [--apply] [--ts <iso>]
 #
 #   dir         ecoa a pasta da sessão corrente: thoughts/local/sessions/<yyyymmdd-hhmmss>-<sid8>
@@ -41,6 +42,10 @@
 #               da casa corrente (fecho de report — 4.315); sem casa, no-op
 #               silencioso. Uma escrita posterior com --create reabre para
 #               `estado: ativa` (a linha `reportada_em:` fica como histórico).
+#   session-key ecoa só o NOME da casa da sessão corrente (<yyyymmdd-hhmmss>-<sid8>) —
+#               a chave que agrupa por sessão os artefatos que moram FORA da casa
+#               (espelho do screen-verify, 4.330). Sem id de sessão → vazio: o
+#               chamador cai no padrão legado, declarando.
 #   gc          limpeza das sobras (4.316) — REPORT-ONLY por default: lista
 #               casas elegíveis (`estado: reportada` · idade ≥ --days, default
 #               14, medida por `reportada_em:` ou, sem a linha, pela criação no
@@ -49,7 +54,12 @@
 #               a mesma idade. `--apply` remove o que listou como elegível —
 #               aplicar é ato do humano, nunca de fecho automático. Casa
 #               `ativa` jamais é candidata (pode ser sessão viva). `--ts` fixa
-#               o "agora" (teste).
+#               o "agora" (teste). Espelho do screen-verify (4.330): casa
+#               elegível lista/remove também <artifactsDir>/*/<chave-da-casa>
+#               (artifactsDir e docsRoot via ficha.sh; ficha ilegível → aviso e
+#               nenhuma varredura); HANDOFF `status: Pendente` que cite a chave
+#               segura o espelho (docsRoot ilegível → mantido, declarado); e
+#               subpasta órfã (casa já removida) entra pela idade do nome.
 #
 #   --create    cria a pasta (e o session.meta, se nascendo agora) antes de ecoar.
 #               Idempotente: pasta existente é resolvida, nunca duplicada.
@@ -71,7 +81,7 @@ LC_ALL=C
 export LC_ALL
 
 die2() { echo "ERRO: $*" >&2; exit 2; }
-usage() { sed -n '2,67p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,78p' "$0" | sed 's/^# \{0,1\}//'; }
 
 ROOT="${1:-}"
 [ -n "$ROOT" ] || { usage >&2; exit 2; }
@@ -315,6 +325,11 @@ case "$ACTION" in
     printf '%s\n' "$alvo"
     exit 0 ;;
 
+  session-key)
+    home="$(session_home)" || exit 2
+    [ -n "$home" ] && basename "$home"
+    exit 0 ;;
+
   mark-reported)
     [ -n "$SID" ] || exit 0
     RESOLVED=""; resolve_dir
@@ -353,6 +368,51 @@ case "$ACTION" in
       }'
     }
     j_hoje="$(jdn "$hoje")"
+    # espelho do screen-verify (4.330): artifactsDir e docsRoot vêm da ficha; o
+    # resolvedor degrada declarado — ficha ilegível avisa e não varre espelho.
+    FICHA="$(cd "$(dirname "$0")" && pwd)/ficha.sh"
+    ARTDIR=""; DOCSROOT=""
+    if [ -f "$FICHA" ] && [ -f "$ROOT/keelson.config.json" ]; then
+      if sv="$(bash "$FICHA" "$ROOT" --screen-verify 2>/dev/null)"; then
+        ARTDIR="$(printf '%s\n' "$sv" | sed -n 's/^artifactsDir=//p' | sed -n 1p)"
+        DOCSROOT="$(bash "$FICHA" "$ROOT" --get docsRoot 2>/dev/null | sed -n 1p)"
+      else
+        printf 'aviso: ficha ilegível — espelho do screen-verify não varrido\n'
+      fi
+    fi
+    espelho_handoff() { # $1 = chave; ecoa o 1º HANDOFF Pendente que a cita (vazio = nenhum)
+      find "$ROOT/$DOCSROOT" -type f -name 'HANDOFF-*.md' 2>/dev/null | while IFS= read -r h; do
+        grep -q '^status:[ 	]*Pendente' "$h" 2>/dev/null || continue
+        grep -qF "$1" "$h" 2>/dev/null && { printf '%s\n' "$h"; break; }
+      done
+      return 0
+    }
+    gc_espelho_um() { # $1 = pasta do espelho · $2 = chave · $3 = rótulo da saída
+      if [ -z "$DOCSROOT" ] || [ ! -d "$ROOT/$DOCSROOT" ]; then
+        printf 'mantida: %s · HANDOFF não checável (docsRoot ilegível)\n' "$1"
+        return 0
+      fi
+      h="$(espelho_handoff "$2")"
+      if [ -n "$h" ]; then
+        printf 'mantida: %s · citado em HANDOFF pendente (%s)\n' "$1" "$h"
+        return 0
+      fi
+      achou=1
+      if [ "$APPLY" -eq 1 ]; then
+        rm -rf "$1" && printf 'removida: %s · %s\n' "$1" "$3"
+      else
+        printf 'elegivel: %s · %s\n' "$1" "$3"
+      fi
+      return 0
+    }
+    gc_espelho() { # $1 = chave da casa — as subpastas homônimas seguem a casa elegível
+      [ -n "$ARTDIR" ] && [ -d "$ROOT/$ARTDIR" ] || return 0
+      for e in "$ROOT/$ARTDIR"/*/"$1"; do
+        [ -d "$e" ] || continue
+        gc_espelho_um "$e" "$1" "espelho da casa $1"
+      done
+      return 0
+    }
     achou=0
     for d in "$SESSIONS"/*; do
       [ -d "$d" ] || continue
@@ -393,11 +453,13 @@ case "$ACTION" in
         continue
       fi
       achou=1
+      chave="$(basename "$d")"
       if [ "$APPLY" -eq 1 ]; then
         rm -rf "$d" && printf 'removida: %s · %s há %s dia(s)\n' "$d" "$quando" "$idade"
       else
         printf 'elegivel: %s · %s há %s dia(s)\n' "$d" "$quando" "$idade"
       fi
+      gc_espelho "$chave"
     done
     # sobras do ledger LEGADO: reported-*/ já consumidos por report, idade pelo nome
     for d in "$LEGACY/session-ledger"/reported-*; do
@@ -416,8 +478,26 @@ case "$ACTION" in
         printf 'elegivel: %s · arquivado há %s dia(s)\n' "$d" "$idade"
       fi
     done
+    # espelhos órfãos: subpasta com cara de chave de sessão cuja casa já se foi —
+    # idade pela criação no nome, mesma guarda de HANDOFF (casa existente já
+    # arrastou — ou segurou — o espelho no loop acima).
+    if [ -n "$ARTDIR" ] && [ -d "$ROOT/$ARTDIR" ]; then
+      for e in "$ROOT/$ARTDIR"/*/[0-9]*; do
+        [ -d "$e" ] || continue
+        chave="$(basename "$e")"
+        case "$chave" in
+          [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9]-*) ;;
+          *) continue ;;
+        esac
+        [ -d "$SESSIONS/$chave" ] && continue
+        data="$(printf '%s' "$chave" | cut -c1-8)"
+        idade=$((j_hoje - $(jdn "$data")))
+        [ "$idade" -ge "$DAYS" ] || continue
+        gc_espelho_um "$e" "$chave" "espelho órfão (sem casa) há $idade dia(s)"
+      done
+    fi
     [ "$achou" = 0 ] && echo "gc: nada a limpar."
     exit 0 ;;
 
-  *) die2 "ação desconhecida: $ACTION (use dir, ledger-dir, window-log, show, latest-for, memo-find, adopt-memo, mark-reported ou gc)" ;;
+  *) die2 "ação desconhecida: $ACTION (use dir, ledger-dir, window-log, show, latest-for, memo-find, adopt-memo, mark-reported, session-key ou gc)" ;;
 esac

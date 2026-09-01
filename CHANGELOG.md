@@ -23,6 +23,41 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.147.0] — 2026-09-01
+
+Re-init: none
+
+Decision 4.330 — screen-verify artifacts group by session key; the session gc
+treats them as a mirror of the session home.
+
+### Added
+
+- **`session-dir.sh session-key`**: echoes just the current session-home name
+  (`<yyyymmdd-hhmmss>-<sid8>`) — the key that groups per-session artifacts
+  living *outside* the home; empty without a session id, so callers fall back
+  to the legacy layout, declared.
+- **Screen-verify artifacts group by session** (`skills/screen-verify`): the
+  relative `filename` the skill already composes gains the session key —
+  `<slug>/<key>/<PLAN|date>/<item>` — so parallel sessions stop mixing evidence
+  in the same folder and each session's captures are identifiable at a glance.
+  The physical home stays `gates.screenVerify.artifactsDir` (the server's
+  `--output-dir`, fixed at boot in the versioned `.mcp.json`): decision 4.49's
+  reason stands — heavy binaries stay out of the session home the handover
+  scans.
+- **Session `gc` covers the mirror**: an eligible session home also lists (and
+  under `--apply` removes) its homonymous screen-verify subfolders, giving
+  those leftovers a cleanup owner for the first time. A still-`Pendente`
+  verification HANDOFF citing the key keeps the mirror; unreadable ficha or
+  `docsRoot` degrades declared, never removes on doubt; orphan subfolders
+  (home already gone) qualify by the age in their name; pre-4.330 folders
+  without a key stay untouched.
+
+### Changed
+
+- `thoughts/e2e/` is explicitly **out of scope**, with the asymmetry stated:
+  `.auth/` is cross-session login state by design, and its paths live in the
+  consumer's versioned `playwright.config.ts`.
+
 ## [0.146.0] — 2026-09-01
 
 Re-init: none

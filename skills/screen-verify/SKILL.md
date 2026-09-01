@@ -122,18 +122,24 @@ Chegando à tela com dados reais, escolha os passos relevantes:
 Registre a evidência item a item. Ao fechar um `HANDOFF-*.md`, grave a evidência no próprio
 doc (`✅`/`❌`).
 
-### Artefatos: `thoughts/screen-verify/<slug>/`
+### Artefatos: `thoughts/screen-verify/<slug>/<chave-da-sessão>/`
 
 Screenshot, dump de console e dump de rede são gravados em **arquivo**, na pasta de
 artefatos do gate — `gates.screenVerify.artifactsDir` da ficha (default
 `thoughts/screen-verify`), que é o `--output-dir` do servidor. `thoughts/` é **gitignored**:
 esses arquivos são material transitório para o desenvolvedor, nunca vão para o git.
 
-- **Caminho relativo, organizado por slug e artefato**: passe `filename` nas chamadas —
-  `"<slug>/<PLAN-MMM|yyyy-mm-dd-descrição>/<item>-<o-que-é>.png"` (ex.:
-  `"professional-portal/PLAN-003/V1-dashboard-vazio.png"`). Nome falante, não o
-  `page-{timestamp}` default. `browser_console_messages` e `browser_network_requests`
-  aceitam `filename` do mesmo jeito — use quando o dump for longo demais para o report.
+- **Caminho relativo, agrupado por slug e sessão** (decisão 4.330): obtenha a chave da
+  sessão uma vez — `bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-dir.sh" <raiz> session-key
+  --create --slug <slug>` — e passe `filename` nas chamadas:
+  `"<slug>/<chave>/<PLAN-MMM|yyyy-mm-dd-descrição>/<item>-<o-que-é>.png"` (ex.:
+  `"professional-portal/20260901-101530-a1b2c3d4/PLAN-003/V1-dashboard-vazio.png"`).
+  Chave **vazia** (sem id de sessão) → omita o nível da sessão (padrão legado) e declare
+  isso no report. Nome falante, não o `page-{timestamp}` default. `browser_console_messages`
+  e `browser_network_requests` aceitam `filename` do mesmo jeito — use quando o dump for
+  longo demais para o report. A subpasta da sessão é o **espelho** que o
+  `session-dir.sh gc` lista e remove junto com a casa da sessão; HANDOFF `Pendente` que
+  cite a chave segura o espelho.
 - **Registre o caminho que a ferramenta devolveu**, não o que você pediu: se o servidor
   estiver com outro `--output-dir`, o arquivo caiu em outro lugar e o report tem que dizer
   onde. Arquivo em **`.playwright-mcp/`** é o sinal de que o servidor está sem

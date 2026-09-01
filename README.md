@@ -229,10 +229,13 @@ decision 4.43). Re-run `/keelson:init` to change it.
 ### Artifacts
 
 Screenshots and console/network dumps are written under
-`gates.screenVerify.artifactsDir` (default `thoughts/screen-verify/<slug>/`), which is the
-server's `--output-dir`. `thoughts/` is gitignored — these files are for the developer
-looking at the problem now, and **never the proof**: the durable evidence stays textual, in
-the HANDOFF and the slug INDEX, so a fresh clone doesn't lose the gate.
+`gates.screenVerify.artifactsDir` (default `thoughts/screen-verify/<slug>/<session-key>/`),
+which is the server's `--output-dir`. The per-session subfolder mirrors the session home
+(decision 4.330): the session `gc` lists and removes it together with the session's own
+folder, unless a still-pending verification HANDOFF cites it. `thoughts/` is gitignored —
+these files are for the developer looking at the problem now, and **never the proof**: the
+durable evidence stays textual, in the HANDOFF and the slug INDEX, so a fresh clone doesn't
+lose the gate.
 
 Tracing and video are available behind `--caps devtools`, and origin allowlisting behind
 `--allowed-origins`. Both are opt-in: extra capabilities add tools to every session's
@@ -415,17 +418,17 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.146.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.147.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the cycle clock gains the parallelism instrument
-(decision 4.328) — `cycle-clock.sh --paralelismo` derives the parallel
-gain and the critical path of a PLAN from committed marks plus task
-dependencies, so the postmortem can tell "add more parallelism" apart
-from "restructure the decomposition"; ISO offsets with a colon now
-parse. Recent: mechanical wave file-collision lint (4.326) and the
-blind-review hypothesis measured and refuted on the eval bench (4.327).
+New in this release: screen-verify artifacts group by session key
+(decision 4.330) — the skill composes `<slug>/<session-key>/…` filenames
+so parallel sessions stop mixing evidence, and the session `gc` treats
+those subfolders as a mirror of the session home: listed and cleaned
+together, kept while a pending verification HANDOFF cites them. Recent:
+the executed-predicate bar for rejecting behavioral findings (4.329) and
+the cycle clock's parallelism instrument (4.328).
 Re-init: none. See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in

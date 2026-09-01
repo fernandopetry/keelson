@@ -215,8 +215,12 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-dir.sh" . gc
 Ele só **lista** o que é elegível (sessões reportadas há mais de 14 dias, sem nada
 pendente) — nada é removido. Para limpar de verdade, repita com `--apply`. Sessões
 ainda ativas ou com pendências nunca entram na lista, e o `/keelson:continue` e o
-`/keelson:init` avisam quando há o que limpar. Nada em `thoughts/` é versionado, então
-o pior caso de um engano é perder anotação temporária — o que importa está commitado.
+`/keelson:init` avisam quando há o que limpar. Os screenshots da verificação de tela
+também entram na conta: eles ficam em `thoughts/screen-verify/`, agrupados por sessão,
+e a limpeza remove junto os da sessão listada — a menos que um handoff de verificação
+ainda pendente cite aquela pasta, caso em que ela fica. Nada em `thoughts/` é
+versionado, então o pior caso de um engano é perder anotação temporária — o que
+importa está commitado.
 
 ### Voltei de um fim de semana e não lembro onde o épico parou. E agora?
 

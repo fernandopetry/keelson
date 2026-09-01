@@ -301,6 +301,87 @@ total=$((total + 1))
 sd "" "$R3" gc --days abc >/dev/null 2>&1
 [ $? -eq 2 ] && ok gc-days-invalido-exit-2 || falha gc-days-invalido-exit-2
 
+# ---------- session-key (4.330) ----------
+total=$((total + 1))
+R5="$TMP/repo-key"; mkdir -p "$R5"
+got="$(sd "sessao-key-1122" "$R5" session-key --create --slug gama --ts "$TS1" 2>/dev/null)"
+dir5="$(sd "sessao-key-1122" "$R5" dir 2>/dev/null)"
+[ "$got" = "20260830-100000-sessaoke" ] && [ "$got" = "$(basename "$dir5")" ] \
+  && ok session-key-ecoa-chave || falha "session-key-ecoa-chave: [$got] vs [$dir5]"
+total=$((total + 1))
+got="$(sd "" "$R5" session-key 2>/dev/null)"; st=$?
+[ -z "$got" ] && [ "$st" -eq 0 ] && ok session-key-sem-id-vazio || falha "session-key-sem-id-vazio: [$got]"
+total=$((total + 1))
+got="$(sd "sessao-nova-3344" "$R5" session-key 2>/dev/null)"; st=$?
+[ -z "$got" ] && [ "$st" -eq 0 ] && ok session-key-sem-casa-vazio || falha "session-key-sem-casa-vazio: [$got]"
+
+# ---------- gc espelho do screen-verify (4.330) ----------
+R6="$TMP/repo-gc-espelho"; S6="$R6/thoughts/local/sessions"; A6="$R6/thoughts/screen-verify"
+mkdir -p "$S6" "$R6/docs/demandas/gama/handoffs"
+printf '{"docsRoot":"docs/demandas","gates":{"screenVerify":{"enabled":true,"method":"skill:screen-verify"}}}\n' > "$R6/keelson.config.json"
+casa_esp() { # nome sessao estado [reportada_em] — casa em S6
+  mkdir -p "$S6/$1"
+  printf 'sessao: %s\niniciada: 2026-07-01T09:00:00-0300\nestado: %s\nslugs: gama\n' "$2" "$3" > "$S6/$1/session.meta"
+  [ -n "${4:-}" ] && printf 'reportada_em: %s\n' "$4" >> "$S6/$1/session.meta"
+}
+casa_esp 20260801-090000-evelha11 sessao-ev-1 reportada "2026-08-01T10:00:00-0300"  # elegível + espelho
+mkdir -p "$A6/gama/20260801-090000-evelha11"; printf 'png\n' > "$A6/gama/20260801-090000-evelha11/V1.png"
+casa_esp 20260801-090000-ehand111 sessao-eh-1 reportada "2026-08-01T10:00:00-0300"  # elegível; espelho seguro por HANDOFF
+mkdir -p "$A6/gama/20260801-090000-ehand111"; printf 'png\n' > "$A6/gama/20260801-090000-ehand111/V1.png"
+printf -- '---\nid: HANDOFF-01\nstatus: Pendente\n---\nEvidência: thoughts/screen-verify/gama/20260801-090000-ehand111/V1.png\n' \
+  > "$R6/docs/demandas/gama/handoffs/HANDOFF-01.md"
+casa_esp 20260701-090000-eativa11 sessao-ea-1 ativa                                  # ativa → invisível, espelho intocado
+mkdir -p "$A6/gama/20260701-090000-eativa11"
+mkdir -p "$A6/gama/20260701-090000-orfao111"                                         # órfão (sem casa, 60d) → elegível
+mkdir -p "$A6/gama/PLAN-003"; printf 'png\n' > "$A6/gama/PLAN-003/antigo.png"        # acervo sem chave → invisível
+
+# report-only: casa e espelho elegíveis; handoff segura; ativa e acervo invisíveis; órfão entra
+total=$((total + 1))
+got="$(sd "sessao-gc-esp" "$R6" gc --ts "$HOJE" 2>/dev/null)"
+echo "$got" | grep -q "elegivel: $S6/20260801-090000-evelha11 · reportada há 29 dia(s)" \
+  && echo "$got" | grep -q "elegivel: $A6/gama/20260801-090000-evelha11 · espelho da casa 20260801-090000-evelha11" \
+  && ok gc-espelho-elegivel || falha "gc-espelho-elegivel: [$got]"
+total=$((total + 1))
+echo "$got" | grep -q "mantida: $A6/gama/20260801-090000-ehand111 · citado em HANDOFF pendente ($R6/docs/demandas/gama/handoffs/HANDOFF-01.md)" \
+  && ok gc-espelho-handoff-segura || falha "gc-espelho-handoff-segura: [$got]"
+total=$((total + 1))
+echo "$got" | grep -q "elegivel: $A6/gama/20260701-090000-orfao111 · espelho órfão (sem casa) há 60 dia(s)" \
+  && ok gc-espelho-orfao || falha "gc-espelho-orfao: [$got]"
+total=$((total + 1))
+! echo "$got" | grep -q "eativa11" && ! echo "$got" | grep -q "PLAN-003" \
+  && ok gc-espelho-ativa-e-acervo-invisiveis || falha "gc-espelho-ativa-e-acervo-invisiveis: [$got]"
+
+# --apply: remove casa+espelho+órfão; preserva espelho com handoff, ativa e acervo
+total=$((total + 1))
+got="$(sd "sessao-gc-esp" "$R6" gc --apply --ts "$HOJE" 2>/dev/null)"
+[ ! -d "$S6/20260801-090000-evelha11" ] && [ ! -d "$A6/gama/20260801-090000-evelha11" ] \
+  && [ ! -d "$A6/gama/20260701-090000-orfao111" ] \
+  && [ -d "$A6/gama/20260801-090000-ehand111" ] && [ -d "$A6/gama/20260701-090000-eativa11" ] \
+  && [ -d "$A6/gama/PLAN-003" ] \
+  && echo "$got" | grep -q "removida: $A6/gama/20260801-090000-evelha11" \
+  && ok gc-espelho-apply || falha "gc-espelho-apply: [$got]"
+
+# docsRoot ilegível → espelho mantido, declarado (casa segue a régua própria)
+total=$((total + 1))
+R7="$TMP/repo-gc-semdocs"; S7="$R7/thoughts/local/sessions"; A7="$R7/thoughts/screen-verify"
+mkdir -p "$S7" "$A7/gama/20260801-090000-svelha11"
+printf '{"gates":{"screenVerify":{"enabled":true}}}\n' > "$R7/keelson.config.json"
+mkdir -p "$S7/20260801-090000-svelha11"
+printf 'sessao: sessao-sv-1\niniciada: 2026-07-01T09:00:00-0300\nestado: reportada\nslugs: gama\nreportada_em: 2026-08-01T10:00:00-0300\n' \
+  > "$S7/20260801-090000-svelha11/session.meta"
+got="$(sd "sessao-gc-sd" "$R7" gc --ts "$HOJE" 2>/dev/null)"
+echo "$got" | grep -q "elegivel: $S7/20260801-090000-svelha11" \
+  && echo "$got" | grep -q "mantida: $A7/gama/20260801-090000-svelha11 · HANDOFF não checável (docsRoot ilegível)" \
+  && ok gc-espelho-docsroot-ilegivel || falha "gc-espelho-docsroot-ilegivel: [$got]"
+
+# ficha presente mas ilegível → aviso declarado, espelho não varrido (casa segue a régua)
+total=$((total + 1))
+R8="$TMP/repo-gc-ficha-quebrada"; mkdir -p "$R8/thoughts/local/sessions"
+printf '{quebrada\n' > "$R8/keelson.config.json"
+got="$(sd "" "$R8" gc --ts "$HOJE" 2>/dev/null)"
+echo "$got" | grep -q "aviso: ficha ilegível — espelho do screen-verify não varrido" \
+  && ok gc-espelho-ficha-quebrada-avisa || falha "gc-espelho-ficha-quebrada-avisa: [$got]"
+
 # erros de uso
 total=$((total + 1))
 sd "x" "$R" latest-for >/dev/null 2>&1
