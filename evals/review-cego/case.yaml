@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: review-cego
+# Caso nº 2 da camada de evals do mantenedor (decisão 4.304) — mede o C2 do
+# benchmark graph-foreman 2026-08: o report do developer no pacote de contexto do
+# reviewer (a doutrina 4.89 o inclui; o graph-foreman defende contrato+diff cegos,
+# "a narrativa do executor é o que mais induz um pass") mascara defeito plantado
+# que a leitura fria pegaria? Fixture: contrato com AC de escopo por tenant + diff
+# cujo caminho de consulta por ID perde o predicado, e report que vende a lacuna
+# como decisão deliberada (UUID não-enumerável + 404 de inexistente). Braços
+# típicos: com-report=file:arms/PACOTE-COM-REPORT.md × cego=file:arms/PACOTE-CEGO.md
+# (idênticos exceto a seção do report); plant carimbador (confirma a entrega).
+# Executado por scripts/eval-run.sh; formato compatível com `claude plugin eval`
+# (early access — quando o portão abrir, o executor troca e o caso fica).
