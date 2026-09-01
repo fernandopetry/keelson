@@ -23,6 +23,28 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.146.0] — 2026-09-01
+
+Re-init: none
+
+Decision 4.329 — a rejecting finding that asserts runtime behavior requires the
+predicate executed, symmetric to the gate-8 approval bar.
+
+### Added
+
+- **CODE-REVIEW.md ("reviewer's rule: generator ≠ evaluator")**: a finding that
+  asserts what the code *does* with a real datum (leaks, masks, computes,
+  refuses) is proven by executing the predicate against the datum — inspecting
+  the same list/table the diff copied is not an independent measurement: brief,
+  implementation and reviewer agreeing on that source is one reading copied
+  three times, not triple confirmation. Findings of this shape on gate-8
+  territory (personal data, secrets, authorization) travel as a signal to the
+  `security-engineer`, never as an independent verdict without execution.
+  Symmetric of the gate-8 approval bar (4.264). Field case: a HIGH "PII leaking
+  in the clear" rejection on an already-correct delivery cost a full retry —
+  the field was already masked by substring collision, which executing the mask
+  would have shown.
+
 ## [0.145.0] — 2026-09-01
 
 Re-init: none

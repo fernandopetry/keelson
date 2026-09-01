@@ -279,6 +279,19 @@ vizinho, que pode estar descrevendo outro ramo (caso real: cabeamento correto �
 lia a propriedade dedicada — mas o ramo em pauta emite `null` fixo; o comentário do
 próprio ramo descrevia o ramo oposto e sustentou a confirmação errada por 2 rodadas).
 
+E achado que afirma o que o código **faz** com um dado real — vaza, mascara, calcula,
+recusa — prova-se com o **predicado executado contra o dado** (decisão 4.329, o simétrico
+de reprovação da régua de aprovação do gate 8, 4.264): inspecionar a olho a mesma
+lista/tabela que o diff copiou não é medição independente — brief, implementação e
+revisor concordando sobre essa fonte é **uma leitura copiada três vezes**, não tripla
+confirmação (caso real: gate 7 reprovou ALTA por "dado pessoal em claro" conferindo a
+implementação contra a tabela do brief, sem rodar a máscara contra o campo; o campo já
+era mascarado por colisão de substring — e o gate 8, que executou o predicado com
+controle positivo, reportou o fato certo na mesma rodada; custo: um retry inteiro numa
+entrega correta). Achado dessa forma cujo tópico é do gate 8 (dado pessoal, segredo,
+autorização) viaja como **sinal ao `security-engineer`** — nunca veredito independente
+sem execução.
+
 ---
 
 ## Orquestração da rodada: paralelismo e pacote de contexto (decisão 4.89)
