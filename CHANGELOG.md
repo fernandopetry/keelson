@@ -23,7 +23,33 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
-## [0.144.0] — 2026-08-31
+## [0.145.0] — 2026-09-01
+
+Re-init: none
+
+Decision 4.328 — cycle clock gains the parallelism instrument; "expensive gate
+that never rejects" deferred pending durable capture.
+
+### Added
+
+- **`cycle-clock.sh --paralelismo` (opt-in)**: two new derived lines — `ganho`
+  (raw sum of task durations ÷ wall clock: how much agent work fit per hour of
+  wall time; 1.0x = sequential) and `caminho-critico` (longest dependent chain,
+  from committed marks plus each TASK's `Depende de` edges, Kahn + DP in POSIX
+  awk). Critical path ≈ wall clock means more parallelism buys nothing — the
+  lever is restructuring the decomposition; `/keelson:postmortem` reads it as
+  evidence. Default output stays byte-identical to the 4.325 contract; the two
+  headline quantities are unchanged. Dependency cycles yield an omitted line
+  with a reason; deps pointing outside the read set or at unmarked TASKs are
+  dropped and counted on the line itself — never silently. Suite grows 13 → 19
+  cases. Inspired by the graph-foreman benchmark's results tab.
+
+### Fixed
+
+- **ISO offsets with a colon (`-03:00`) now parse**: the mark extractor accepted
+  only `±HHMM`, silently downgrading valid ISO 8601 marks to "unparseable" — the
+  repo's own realistic corpus lost 4 real marks this way (completeness 0 of 7,
+  now 2 of 7). Colon offsets are normalized to `±HHMM` in the output.
 
 Re-init: none
 

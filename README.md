@@ -415,16 +415,17 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.144.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.145.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the cycle clock (decision 4.325) — `cycle-clock.sh`
-derives a PLAN's implementation duration (wall + work, with a
-completeness line) from the committed task closure marks, so a cycle
-that crosses sessions finally closes its `Estimativa × realizado` line
-with a measured number, and the implement report stops estimating time.
-See `CHANGELOG.md`.
+New in this release: the cycle clock gains the parallelism instrument
+(decision 4.328) — `cycle-clock.sh --paralelismo` derives the parallel
+gain and the critical path of a PLAN from committed marks plus task
+dependencies, so the postmortem can tell "add more parallelism" apart
+from "restructure the decomposition"; ISO offsets with a colon now
+parse. Recent: mechanical wave file-collision lint (4.326) and the
+blind-review hypothesis measured and refuted on the eval bench (4.327).
 Re-init: none. See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in

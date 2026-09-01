@@ -86,10 +86,16 @@ mecanismo inclui "por que chegou a produção / por que a detecção demorou".
   linha da Etapa 2, natureza `retrabalho de processo`; número ausente na cauda é
   telemetria omitida, nunca se estima.
 - O **relógio do ciclo** — saída de `bash "${CLAUDE_PLUGIN_ROOT}/scripts/cycle-clock.sh"
-  <docsRoot>/<slug>/tasks PLAN-MMM` (decisão 4.325): parede, soma-tasks e completude da
-  implementação, deriváveis fora da sessão porque as marcas moram na closure commitada
-  das TASKs (4.200/4.308) — o confronto com a seção `Estimativa` do BRIEF entra como
-  fato quando ela existe; grandeza omitida na saída segue omitida, nunca se estima.
+  <docsRoot>/<slug>/tasks PLAN-MMM --paralelismo` (decisões 4.325/4.328): parede,
+  soma-tasks e completude da implementação, deriváveis fora da sessão porque as marcas
+  moram na closure commitada das TASKs (4.200/4.308) — o confronto com a seção
+  `Estimativa` do BRIEF entra como fato quando ela existe. Com `--paralelismo`, mais
+  duas linhas de instrumento: `ganho` (soma crua ÷ parede — quanto trabalho de agente
+  coube por hora de parede) e `caminho-critico` (cadeia dependente mais longa, pelas
+  marcas + `Depende de`); **caminho-critico ≈ parede diz que mais paralelismo não
+  compraria tempo — a alavanca é reestruturar a decomposição**, e é achado candidato
+  da Etapa 2 (natureza `retrabalho de processo`); dep ignorada e ciclo saem contados/
+  declarados na própria linha. Grandeza omitida na saída segue omitida, nunca se estima.
 - `<docsRoot>/_meta/learning-log.md` e `guidelines/project/lessons.md` — o que o ciclo
   **já registrou** (não redescubra; cite).
 - Quando um teste está implicado, **abra o teste** e cite a asserção literal — é a
