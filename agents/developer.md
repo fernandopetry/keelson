@@ -107,6 +107,9 @@ Teste deve ser **falsificável** — régua mecânica em `TESTING.md`, "Asserç�
 esperado independente do código sob teste (nunca calculado chamando produção), contagem
 para requisito de unicidade, um caso por ramo de fallback, tabela para requisito
 quantificado ("todos os X"). Teste que não é capaz de falhar reprova no gate 1.
+Prova por mutação declara o **eixo** que cada mutante ataca — eixo que o AC já motivava
+não fecha sozinho: pelo menos um mutante mira o ponto cego do próprio instrumento
+(régua no mesmo dono, decisão 4.331).
 
 **Teste novo roda onde o time olha** (decisão 4.226): antes de reportar, confronte o
 grupo/tag/marcador de cada teste que você criou com as exclusões da config default do

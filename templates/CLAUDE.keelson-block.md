@@ -60,7 +60,9 @@
   `performance-engineer` quando o diff toca superfície de custo (lista canônica na
   description do agent — gate 10), `product-designer` quando o diff toca superfície
   de interface (lista canônica na description do agent — gate 11) e `qa`
-  quando há comportamento observável — mesmos gatilhos do ciclo. A orquestração da
+  quando há comportamento observável — mesmos gatilhos do ciclo, e o despacho nasce
+  do **inventário derivado do diff, nunca de memória** (decisão 4.335 — a régua vive
+  na seção *Orquestração da rodada*, abaixo). A orquestração da
   rodada — gates em paralelo sobre pacote de contexto único factual (4.89), correção
   que converge com teto de 1 retry e escalação ao Diretor (4.88) — tem **dono único**
   na seção *Orquestração da rodada* de
@@ -99,8 +101,10 @@
   `/keelson:report`; fecho com gate pendente se declara **parcial** e não convida ao
   commit — decisão 4.85) · decisões tomadas em seu nome · o que ficou fora de
   escopo ou pendente · **toda `licao_candidata` devolvida por qualquer gate da rodada
-  — inclusive retry — com destino registrado** (`alvo: projeto` →
-  `guidelines/project/lessons.md` · `alvo: processo` → `agile-coach`): aplicar a
+  — inclusive retry — com destino registrado e verificado** (`alvo: projeto` →
+  `guidelines/project/lessons.md` · `alvo: processo` → `agile-coach`; a linha só se
+  escreve com a lição conferida **presente** no destino — declarar "roteada" sem
+  escrever no destino é a forma que reincidiu, decisão 4.333): aplicar a
   correção de código que o achado pede **não é** rotear a lição que ele carrega — são
   dois atos, e lição sem destino também declara o fecho **parcial** (decisão 4.204) ·
   estado do tracker (com `jira.enabled`) · e o que depende de você

@@ -3443,6 +3443,78 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 **Aplicação**: `scripts/session-dir.sh` (`session-key` + gc espelho) e suíte (58 casos; espelho elegível, HANDOFF segura, órfão, ativa invisível, acervo invisível, docsRoot ilegível, ficha quebrada avisa); `skills/screen-verify/SKILL.md` (seção *Artefatos*); dono `sdd-conventions.md` (bloco *Casa da sessão* — espelho + fronteira reescrita); `README.md` (seção *Artifacts*); wiki `Perguntas-frequentes.md` (entrada do gc). `agents/qa.md` intocado (cita o gate, não o caminho). CHANGELOG **0.147.0**, `Re-init: none` (ficha e bloco injetado intactos — o `filename` é composição interna da skill).
 
+### 4.331 — Mutante se escolhe pelo ponto cego do instrumento: eixo declarado por mutante
+
+**Problema**: PM de consumidor 0.143.0, M1 (inbox 2026-09-01): 13 provas nasceram incapazes de falhar → 7 reprovações de gate na mesma janela. A tabela de mutantes do developer foi **declarada e rodada** — 10 de 13 morriam; os 3 sobreviventes atacavam, cada um, o eixo que o AC já motivava, e nenhum o ponto cego do próprio instrumento (fixture de ordenação com inserção idêntica ao esperado — o mutante que anula a ordenação sobreviveu à suíte inteira; contador de uma rota cego ao fetch novo noutra). Família falsificabilidade 4.52/4.93/4.280 em pathway inédito: **viés de seleção do mutante pelo autor** — gerador ≠ avaliador colapsado na escolha, não na execução. `causa_raiz: instrucao_ausente`.
+
+**Decisão**: fechamento de prova por mutação declara, **por mutante, o eixo que ele ataca** — eixo coincidente com o que o AC já motivava não fecha sozinho; pelo menos um mutante deriva da **forma do instrumento**. Dono: `TESTING.md` §Asserções que provam (bullet novo); o gate 1 ganha o item na lista de checks mecânicos (ponteiro ao dono); `developer.md` estende de meia-frase o parágrafo de falsificabilidade que já cita o dono. H7 do mapa (3ª formulação) mitigada por escopo: a 4.280 segue dona do eixo em teste de equivalência, a 4.302b do par de provas do retry — esta cobre a **seleção** da tabela.
+
+**Aplicação**: `guidelines/core/TESTING.md` · `guidelines/core/CODE-REVIEW.md` (gate 1, item novo) · `agents/developer.md` · inbox 2026-09-01/M1 → `aplicada`.
+
+### 4.332 — Número viaja com denominador e fonte (régua-mãe)
+
+**Problema**: PM 0.143.0, M2: `77%` **verdadeiro** na SPEC (46 de 60, amostra citada) propagou a PLAN (2×), TASK e comentário de produção **perdendo o denominador** — no comentário ganhou proveniência que a amostra não sustentava, e a medição no recorte real dava ~40%; o gate 7 achou um segundo overclaim no mesmo comentário (superlativo que exige >50%, falso a 39%). E o próprio revisor citou **endereço** onde a condição era o observável — reincidência da família 4.321 pós-régua, agora no formato de achado (conta para a leva de destilação-por-eval adiada na 4.321; nenhum texto novo da família nesta leva). `causa_raiz: instrucao_ausente` no eixo quantitativo; a parte de pura memória (mitigação trocada, contagem de colunas errada) é `raciocinio_pontual` — o que a régua mecaniza é o ato de citar, que força a releitura.
+
+**Decisão**: afirmação quantitativa em artefato, briefing ou comentário viaja com **denominador e fonte** (`arquivo:linha` ou o comando que produz o número); critério/achado que cita contagem traz o comando — ou vira **condição sem número**; superlativo quantitativo sem denominador é overclaim por construção. Régua-mãe única em `sdd-conventions.md` (padrão da 4.321); as instâncias existentes (4.264 no SECURITY.md, 4.250, 4.232) seguem intocadas como leituras da mesma disciplina — `CODE-REVIEW.md` sem 2ª cópia de propósito (H10 do mapa).
+
+**Aplicação**: `docs/_meta/conventions/sdd-conventions.md` · inbox 2026-09-01/M2 → `aplicada`.
+
+### 4.333 — Adiar confronta os ACs da própria task; destino de lição é verificado, nunca declarado
+
+**Problema**: PM 0.143.0, M3 — **reincidência 2 da classe LRN-060** (4.199 → 4.204), gatilho pré-declarado da 4.204 disparado ("nova reincidência da classe → autocheck mecânico, nunca 3ª prosa"): (a) achado de gate 11 roteado como carry-over sob o enquadramento "média, não bloqueia" do próprio gate, quando violava AC **da task corrente** — a sonda do code review provou; empurrar entregaria a wave com AC descumprido; (b) DEC declarou lição "roteada a `lessons.md`" e o gate 7 conferiu: **não estava lá** — destino declarado sem escrita no destino. `causa_raiz`: (a) `instrucao_ausente`; (b) escada 4.149 executada.
+
+**Decisão**: (a) adiamento de achado exige o **confronto com os ACs da task corrente** — achado que viola AC dela é bloqueante dela, severidade sugerida pelo gate não decide; aplicável à etiqueta `critério da TASK` (a `medição do revisor` por definição não tem AC que a satisfaça — H11); (b) **autocheck mecânico do destino**: a linha "Lições da rodada" só se escreve com a lição conferida **presente** no destino (grep em `lessons.md` · evento no ledger) — "roteada a X" com X vazio conta como lição sem destino, fecho parcial. O bloco injetado acompanha na versão mínima — é a superfície onde o defeito ocorreu (fecho sob demanda) → **Re-init: required** desta leva.
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (§Adiamento, 4.288) · `docs/_meta/conventions/report-contract.md` (linha Lições) · `templates/CLAUDE.keelson-block.md` · inbox 2026-09-01/M3 → `aplicada`.
+
+### 4.334 — Paralelismo pergunta por recurso: wave paralela exige árvore por task, senão serializa
+
+**Problema**: PM 0.143.0, M4 — 3ª manifestação da família árvore-como-recurso (LRN-045: 4.134 gates mutantes → 4.290 orquestrador → agora **developers**): duas TASKs paralelas na mesma working tree, arquivos disjuntos (o cruzamento 4.228 e o lint 4.326 não alcançam), **zero conflito de conteúdo** — e a suíte oscilou na medição, uma edição desapareceu no meio da rodada e voltou a mão, e o developer improvisou `git worktree` para produzir evidência confiável. `causa_raiz: instrucao_ausente` — a régua de despacho só perguntava por arquivo/aresta.
+
+**Decisão**: condição nova no SEQUENTIAL_FORCED — (modo SUBAGENTS) tasks paralelas na mesma working tree **sem isolamento de árvore por task**: a árvore é recurso compartilhado de **medição e edição**, não só conjunto de arquivos. Paralelo exige worktree por task (a disciplina que a 4.134 já impõe a gate que muta e o modo teams já pratica); sem ela, a wave roda **sequencial**, declarado na Etapa 2. **Decisão em nome do Diretor** (o mapa recomendava escalar — H4; os critérios de exceção do contrato de escalação foram conferidos um a um: sem ambiguidade que mude o resultado — o PM propõe literalmente "worktree por task, ou serialização" —, sem expansão de escopo, reversível a uma palavra, sem conflito com diretriz — `agent-teams.md` veta *relaxar* o SEQUENTIAL_FORCED; esta linha *acrescenta*): aplicada com **janela de veto na Entrega**. Efeito declarado: wave paralela SUBAGENTS sem worktrees passa a rodar sequencial — vazão trocada por medição confiável, custo mensurável pelo instrumento da 4.328 (parede × soma-tasks). O desenho completo do fluxo por worktree (branch por task, merge de wave) fica **adiado como leva própria**, gatilho: primeiro ciclo real cuja parede degradar visivelmente pela serialização.
+
+**Aplicação**: `commands/implement.md` (Etapa 1 + §3.1) · inbox 2026-09-01/M4 → `aplicada`.
+
+### 4.335 — Gates aplicáveis derivam do diff no DESPACHO, em toda rota
+
+**Problema**: PM 0.143.0, M5 — gate 10 não despachado no modo sob demanda com o diff tocando item da lista canônica (laço de render sobre volume variável); o furo só apareceu no fecho, porque o report exige gate aplicável declarado (4.85/4.214) — e o gate, despachado então, aprovou com decomposição que o palpite não tinha. Irmã da 4.197 (mesmo furo fechado no fim de wave do ciclo) e da 4.219 (âncora das listas no bloco), agora na superfície do **despacho**. `causa_raiz: instrucao_nao_chegou` — o confronto mecânico existia no fim de wave, nunca no momento do despacho das demais rotas.
+
+**Decisão**: a §Orquestração da rodada (que já vale para **todo invocador**) ganha a régua primeira: **quais gates são aplicáveis se deriva do diff** confrontado com as listas canônicas, sim/não declarado por gate, **antes** do despacho — a tabela do fecho transcreve a derivação, nunca o inverso. **Pouso corrigido pelo mapa (H5)**: a régua vive no `CODE-REVIEW.md`, lido em runtime — alcança todo consumidor via `/keelson:update`, sem depender de re-init; o bloco injetado ganha só o ponteiro (carona no Re-init já exigido pela 4.333).
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (§Orquestração, bullet primeiro) · `templates/CLAUDE.keelson-block.md` (ponteiro) · inbox 2026-09-01/M5 → `aplicada`.
+
+### 4.336 — Árvore própria tem o COMO no contrato: `git worktree`, nunca cópia; montagem read-only
+
+**Problema**: PM 0.143.0, M6 — dois gates independentes, precisando de árvore própria, **copiaram o repositório inteiro** para o scratchpad — com o `.env` real e o config local de credenciais dev; um terceiro deixou arquivo de cookies; e um arquivo novo criado dentro de caminho bind-mountado nasceu 0-byte **no repo real**. Sem exposição externa (escopo local da sessão — não é caso de rotação). Dois agents na mesma prática = o COMO não estava no contrato: "worktree isolada" sem anti-forma nomeada tem `cp -R` como leitura natural — e a cópia carrega o que o git não versiona. `causa_raiz: instrucao_ambigua`.
+
+**Decisão**: o parágrafo da 4.134 nomeia o COMO e a anti-forma: árvore própria é `git worktree` **de fato** (untracked — logo segredo — fica fora por construção); **cópia de diretório é proibida por nome**; prova em container monta o repo **read-only** e escreve fora do caminho montado. O briefing da rodada (transportador de runtime — os gates dedicados não leem `CODE-REVIEW.md`) carrega a mesma frase. Raio conferido pelo mapa: fora de registro, só `implement.md:131` cita a 4.134 — os dois pontos editados são o conjunto completo.
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (parágrafo da 4.134) · `commands/implement.md` (briefing da rodada) · inbox 2026-09-01/M6 → `aplicada`.
+
+### 4.337 — Marca de relógio: prosa não preenche — `task-marca-nao-timestamp` (promoção do check adiado da 4.308)
+
+**Problema**: PM 0.143.0, M7 — **reincidência ×1 pós-4.308** (a 0.143.0 continha o passo ativo do despacho): 4 de 6 TASKs com `Data início` em prosa ("não medida na abertura — lacuna declarada"), que o parser do `cycle-clock` recusa; completude 2/6 inutilizou dois terços da amostra — honesto, e ainda assim inútil. Gatilho pré-declarado na 4.308 **disparado**: reincidência promove o check (escada 4.149), com o candidato já desenhado.
+
+**Decisão**: (a) lint ganha `task-marca-nao-timestamp` (WARNING): campo `Data início`/`Data conclusão` não-vazio que não começa em `AAAA-MM-DDTHH:MM`; **não acusam** vazio, `—` exato (lacuna nomeada canônica — H12: uma definição só de "vazio") e placeholder angular; reconhecedor por prefixo, compatível com `±HH:MM` e `±HHMM` (H1 — corpus intocado, sem recongelamento, H3). **Fronteira com o `cycle-clock` declarada** no lint-contract (H2): o lint cobra a forma na escrita; o `nao-parseavel` segue degradando na medição — mesmo fato, momentos distintos, sem promoção de um sobre o outro. (b) §3.4.1: marca perdida → lacuna canônica, nunca prosa. Bônus da fixação: a fixture `done-aberta` revelou a variante **data-sem-hora**, acusada legitimamente pelo mesmo check.
+
+**Aplicação**: `scripts/artifact-lint.sh` · `scripts/tests/artifact-lint/` (fixture nova + controle positivo na `valido`; suíte 10 verdes · corpus 6 verdes) · `docs/_meta/conventions/lint-contract.md` · `commands/implement.md` (§3.4.1) · inbox 2026-09-01/M7 → `aplicada`.
+
+### 4.338 — Suíte herdada vermelha chega ao Diretor no fecho e sobrevive entre sessões
+
+**Problema**: PM 0.143.0, Intervenção 1 — 4 falhas herdadas de commit anterior à sessão atravessaram sessões **invisíveis**; achadas por acaso pelo self-check do `/keelson:init`. Dentro do ciclo, o baseline 4.66 declara e sanciona por TASK — mas a sanção morria no report do developer: nada a levava ao Diretor nem à sessão seguinte. `causa_raiz: instrucao_ausente` (de visibilidade/durabilidade — a medição já existia). **Divergência declarada** com a proposta literal do PM ("obrigar a olhar `# fail` antes de começar"): a largada **não** roda suíte nova (H8 — suíte completa é 1× na Etapa 4 por desenho; a medição já existe no baseline do developer e nas waves); o furo era a dívida não chegar ao fecho.
+
+**Decisão**: vermelho herdado **estacionado ou sancionado** vira evento `pendencia` no ledger, e a linha "Fora de escopo / pendente" do fecho o transcreve com contagem e origem — dívida herdada nunca fecha só no report do developer. Sem linha nova no esqueleto (H6 — aritmética do autocheck 4.214 intacta).
+
+**Aplicação**: `commands/implement.md` (§3.5, destino baseline vermelho) · `docs/_meta/conventions/report-contract.md` (linha existente estendida) · inbox 2026-09-01/Int-1 → `aplicada`.
+
+### 4.339 — Staleness de perfil declarada por gate é item roteado, nunca só declaração
+
+**Problema**: PM 0.143.0, Intervenção 3 — perfis `reviewed: false` com dezenas de pendências; o gate 7 declarou staleness explícita (o perfil prescreve runner que a casa não usa) e **acertou apesar do perfil** — e nada roteava a correção: o perfil seguiu ensinando errado às próximas gerações. Via inversa da 4.220, que cobre só "diff fecha armadilha viva do perfil". `causa_raiz: instrucao_ausente`.
+
+**Decisão**: gate que constata staleness do perfil roteia o achado como **item com destino registrado** — a linha curta de atualização no parágrafo do perfil ativo (mesma rota da 4.220); perfil `reviewed: true` → re-olhada humana sinalizada na entrega. Mesma disciplina dois-registros da 4.199/4.204: declarar sem rotear é o defeito.
+
+**Aplicação**: `guidelines/core/CODE-REVIEW.md` (gate 6, bullet doc-trap) · inbox 2026-09-01/Int-3 → `aplicada`.
+
 ---
 
 ## 7. Roteamento de mudanças

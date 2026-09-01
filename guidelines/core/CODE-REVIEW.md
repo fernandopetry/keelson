@@ -37,7 +37,10 @@ Cada AC dos critérios de pronto tem ≥ 1 teste que o verifica, e o teste é **
   da config do runner — teste excluído da rodada default existe e passa isolado, mas
   **nunca roda** onde o time olha (caso real: provas de segurança de 2 waves inertes,
   4ª ocorrência no mesmo projeto). O dono da régua na geração é `commands/tasks.md`
-  (4.161/4.215 — fixação com conjunto não-vazio); aqui é o momento do gate.
+  (4.161/4.215 — fixação com conjunto não-vazio); aqui é o momento do gate;
+- fechamento de prova por **mutação** sem o eixo declarado por mutante, ou com todos
+  os mutantes no eixo que o AC já motivava — nenhum no ponto cego do próprio
+  instrumento (decisão 4.331; régua no mesmo dono, `./TESTING.md`).
 
 Cada um é **achado bloqueante**: o teste existe e passa, mas não é capaz de falhar junto
 com o comportamento — o AC conta como **sem teste**.
@@ -144,7 +147,14 @@ reabertura declarada.
   (linguagem tipo "não conte com", "ainda não faz", "armadilha verificada e viva"), o
   mesmo commit atualiza esse parágrafo — perfil que segue descrevendo como presente um
   defeito que o diff acabou de fechar ensina o próximo developer a remendar na tela o
-  que a primitiva já resolve.
+  que a primitiva já resolve. **E a via inversa tem a mesma obrigação (decisão
+  4.339)**: gate que constata **staleness do perfil** — o perfil prescreve o que a
+  casa comprovadamente não usa (runner, convenção, primitiva) — não para na
+  declaração: o achado vira **item roteado** com destino registrado (a linha curta de
+  atualização no parágrafo do perfil ativo, mesma rota da armadilha acima; perfil
+  `reviewed: true` → a edição pede re-olhada humana, sinalizada na entrega). Declarar
+  a staleness e acertar apesar do perfil deixa o perfil envenenando as próximas
+  gerações — mesma disciplina dois-registros da 4.199/4.204.
 
 **Falha**: violação de qualquer item — citar exatamente qual.
 
@@ -298,6 +308,17 @@ sem execução.
 
 Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
 
+- **Quais gates são aplicáveis se deriva do diff, nunca da memória (decisão 4.335).**
+  Antes de despachar a rodada, confronte o diff com a lista canônica de cada gate
+  dedicado (8 · 10 · 11, nas descriptions dos agents; 9 pelo comportamento observável)
+  e declare **sim/não por gate** — é essa derivação que a tabela do fecho (régua
+  simétrica 4.85) transcreve, nunca o inverso. O fim de wave do ciclo já tem o
+  inventário mecânico (4.197); esta régua leva o mesmo confronto ao **momento do
+  despacho** em toda rota — gate lembrado só no fecho é o furo que o inventário
+  previne (caso real de campo, modo sob demanda: diff tocando laço de render sobre
+  volume variável, gate de performance não despachado; auto-detectado apenas na
+  montagem do fecho, e o gate, despachado então, mediu decomposição que o palpite
+  não tinha).
 - **Gates aplicáveis rodam em paralelo por padrão.** Os gates de uma rodada (7 ·
   8 · 9 · 10) são independentes entre si: despache os agentes **no mesmo turno** e espere
   os reports. Sequência é exceção **declarada** — só quando um gate consome a saída de
@@ -306,7 +327,15 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   de falha) trata a working tree como recurso exclusivo: roda em `git worktree`
   isolada — nunca a mesma árvore de outro gate concorrente que também mute. Disciplina
   de restaurar ao fim não basta: o risco é a **leitura** na janela em que dois mutantes
-  convivem, não a limpeza depois (decisão 4.134, caso real de campo). E a rodada
+  convivem, não a limpeza depois (decisão 4.134, caso real de campo). E **árvore
+  própria é `git worktree` de fato, nunca cópia do diretório de trabalho** (decisão
+  4.336): a cópia (`cp -R`) carrega o que o git não versiona — `.env`, config local
+  com credencial — e planta segredo real fora do repo (caso real: dois gates
+  independentes, sem o COMO no contrato, copiaram o repositório inteiro com o `.env`
+  para o scratchpad; o worktree, por construção, deixa untracked para trás). Prova que
+  monta a árvore em container monta o caminho **read-only** e escreve fora dele —
+  arquivo novo criado dentro de caminho montado nasce no repo real (caso real: sonda
+  0-byte apareceu na árvore verdadeira). E a rodada
   inteira pressupõe **âncora parada** (decisão 4.290 — 3ª camada da família
   4.134/4.276): todo gate despachado captura, na largada da própria execução, o par
   `git rev-parse HEAD` + `git status --porcelain` dos arquivos do diff e o reconfere
@@ -368,6 +397,14 @@ segue a natureza do que ele prova, não é uniforme por TASK:
   e cobrada mecanicamente pelo grafo (check `feat-sem-verificacao`, `graph-contract.md`).
 - **Adiamento é declarado, nunca silencioso** (régua da 4.85): a closure da TASK
   registra onde cada gate consolidado rodou/rodará (`wave N` · `FEAT-X` · `DoD`).
+  **E adiar exige o confronto com os ACs da própria task** (decisão 4.333): antes de
+  aceitar um achado como carry-over da wave seguinte, confronte o comportamento
+  apontado com os ACs vinculados da task corrente — achado que viola AC dela é
+  **bloqueante dela**, seja qual for a severidade que o próprio gate sugeriu (caso
+  real: achado de design enquadrado "média, não bloqueia" roteado como carry-over; a
+  sonda do code review provou que violava AC da task em execução — empurrar entregaria
+  a wave com um AC descumprido). Rotear a lição do achado nunca substitui esse
+  confronto: são registros de estados independentes (4.199/4.204).
   E o handoff declara **a quem** o invariante deferido se dirige (decisão 4.288):
   `critério da TASK` (a wave seguinte tem o arquivo/contrato para satisfazê-lo — e
   ele entra no despacho como critério, 4.140) ou `medição do revisor` (só a

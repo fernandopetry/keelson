@@ -418,18 +418,20 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.147.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.148.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: screen-verify artifacts group by session key
-(decision 4.330) — the skill composes `<slug>/<session-key>/…` filenames
-so parallel sessions stop mixing evidence, and the session `gc` treats
-those subfolders as a mirror of the session home: listed and cleaned
-together, kept while a pending verification HANDOFF cites them. Recent:
-the executed-predicate bar for rejecting behavioral findings (4.329) and
-the cycle clock's parallelism instrument (4.328).
-Re-init: none. See the [CHANGELOG](CHANGELOG.md) for history.
+New in this release: a field-postmortem batch (decisions 4.331–4.339) —
+gate dispatch derived from the diff in every route, mutation proofs must
+declare each mutant's axis, quantitative claims travel with denominator
+and source, lesson routing is verified at the destination, parallel waves
+require a worktree per task (else sequential), isolated trees are real
+`git worktree`s (never directory copies), a new lint check rejects prose
+in TASK clock marks, and inherited red suites reach the Director's
+report. Recent: screen-verify artifacts grouped by session key (4.330).
+Re-init: required (the injected block's on-demand close and gate-dispatch
+bullets changed). See the [CHANGELOG](CHANGELOG.md) for history.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

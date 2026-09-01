@@ -23,6 +23,62 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.148.0] — 2026-09-01
+
+Re-init: required
+
+Decisions 4.331–4.339 — consumer-postmortem batch: seven failure mechanisms and two
+Director-level gaps from a real field session (plugin 0.143.0) absorbed in one batch.
+Re-init is required because the injected block's on-demand close now verifies lesson
+routing at the destination and points gate dispatch at the derivation rule.
+
+### Added
+
+- **Gate dispatch derives from the diff, in every route** (4.335,
+  `guidelines/core/CODE-REVIEW.md` §Round orchestration): before dispatching a review
+  round, the diff is confronted with each dedicated gate's canonical trigger list and
+  a yes/no is declared per gate — the close-out table transcribes that derivation,
+  never the dispatcher's memory. Field case: a render-loop diff shipped through an
+  on-demand round with the performance gate silently missing until the close-out.
+- **Mutation proofs declare each mutant's axis** (4.331, `guidelines/core/TESTING.md`
+  "Assertions that prove"; gate 1 check + developer report): a mutant whose axis the
+  AC already motivated does not close the proof by itself — at least one mutant must
+  target the instrument's own blind spot. Field case: a declared-and-run mutant table
+  where all three survivors attacked AC-motivated branches.
+- **Quantitative claims travel with denominator and source** (4.332,
+  `docs/_meta/conventions/sdd-conventions.md`): any percentage/count entering an
+  artifact, briefing or comment carries its denominator and `file:line` (or the
+  command that produces it) — or is rewritten as a number-free condition.
+- **Parallel waves require a tree per task** (4.334, `commands/implement.md` Step 1):
+  the working tree is a shared measurement/edit resource — same-tree parallel dispatch
+  without per-task worktrees now forces sequential execution, declared in the plan.
+- **Isolated trees are real `git worktree`s** (4.336, CODE-REVIEW + round briefing):
+  directory copies are banned by name (they carry `.env`/untracked secrets); container
+  probes mount the repo read-only and write outside the mounted path.
+- **New lint check `task-marca-nao-timestamp`** (4.337, WARNING — promotion of the
+  check deferred in 4.308): a TASK clock-mark field filled with prose or a date
+  without time is flagged; the honest gap is an empty field or a bare `—`, which the
+  cycle clock then reports as completeness. Boundary with the cycle clock's
+  `nao-parseavel` declared in the lint contract.
+- **Inherited red suites reach the Director** (4.338, `commands/implement.md` §3.5 +
+  report contract): a pre-existing red baseline that gets sanctioned or parked becomes
+  a ledger `pendencia` and lands on the close-out's pending line — inherited debt no
+  longer dies inside the developer's report.
+
+### Changed
+
+- **Deferring a finding now confronts the current task's ACs** (4.333,
+  CODE-REVIEW §Deferral): a finding that violates an AC of the task under execution is
+  blocking for that task regardless of the severity the gate suggested.
+- **Lesson routing is verified at the destination** (4.333, report contract + injected
+  block): the close-out's "Lições da rodada" line is only written after checking the
+  lesson is actually present in the destination file — declaring "routed" without
+  writing counts as an unrouted lesson and makes the close partial.
+- **Profile staleness declared by a gate becomes a routed item** (4.339, CODE-REVIEW
+  gate 6): when a gate proves the profile teaches something the codebase contradicts,
+  the profile-update line is routed like any finding — declaring and moving on leaves
+  the profile poisoning the next generations.
+
 ## [0.147.0] — 2026-09-01
 
 Re-init: none

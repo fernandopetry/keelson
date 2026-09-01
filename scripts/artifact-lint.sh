@@ -570,6 +570,17 @@ sect == "crit" && line ~ /^- \[[ xX]\]/ {
   next
 }
 sect == "gate9" { g9 = g9 " " line; next }
+sect == "hist" && line ~ /^\*\*Data (in[ií]+cio|conclus[aã]+o)\*\*[ \t]*:/ {
+  # 4.337 (promocao do check adiado da 4.308): marca de relogio e timestamp ou lacuna —
+  # prosa ("nao medida — lacuna declarada") ou data sem hora quebram o cycle-clock
+  # (4.325) e derrubam a completude da amostra. Nao acusam: vazio, "—" exato (lacuna
+  # nomeada canonica) e placeholder angular (template). A lacuna honesta e campo
+  # vazio/"—", nunca prosa no lugar da marca. Fronteira com o cycle-clock declarada
+  # no lint-contract: mesmo fato, momentos distintos (escrita vs medicao).
+  v = line; sub(/^[^:]*:/, "", v); v = trim(v)
+  if (v != "" && v != "—" && v !~ /^</ && v !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]/)
+    nMarcaProsa++
+}
 sect == "hist" {
   if (line ~ /^- \[ \]/) {
     if (index(line, "aprovado (wave") == 0 && index(line, "consolidado (") == 0) nGateAberto++
@@ -659,6 +670,9 @@ END {
     if (!(lcAll ~ /[0-9]+[ \t]*m[eé]+todos?/ && lcAll ~ /[0-9]+[ \t]*provas?/))
       emit("WARNING", "task-mutacao-sem-contagem", "criterio menciona mutacao de predicado de escopo sem o par contavel \"N metodos ... N provas\" (4.232)")
   }
+  # marca de relogio preenchida com prosa/data-sem-hora no Historico de execucao
+  if (nMarcaProsa > 0)
+    emit("WARNING", "task-marca-nao-timestamp", nMarcaProsa " campo(s) Data inicio/conclusao preenchido(s) sem timestamp (AAAA-MM-DDTHH:MM) — prosa ou lacuna declarada nao e marca: campo fica vazio ou recebe a marca medida (4.308/4.337)")
 }
 AWK
 

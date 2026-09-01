@@ -72,6 +72,18 @@ bloqueante no gate 1 — `./CODE-REVIEW.md`):
 - **Quantificador vira tabela**: requisito quantificado ("todos os locales", "cada
   tipo", "os N países") exige um caso por elemento — ou por classe de equivalência
   **demonstrada** — via tabela de casos. Só o caso default testado = AC não coberto.
+- **Mutante se escolhe pelo ponto cego do instrumento (decisão 4.331)**: fechamento
+  de prova por mutação declara, por mutante, o **eixo** que ele ataca — e mutante
+  cujo eixo o AC já motivava não fecha sozinho: quem monta a tabela a partir do que
+  acabou de escrever gera os mutantes que lhe ocorreram, nunca o que o próprio
+  instrumento não vê. Pelo menos um mutante deriva da **forma do instrumento** — o
+  que o tornaria incapaz de falhar: fixture de ordenação cuja ordem de inserção
+  coincide com a esperada não distingue "ordenou" de "não ordenou" (o mutante que a
+  neutraliza sobrevive à suíte inteira); contador de uma rota não vê o efeito novo
+  que nasce noutra rota (o mutante que o acrescenta sobrevive). Caso real: tabela
+  declarada **e rodada**, 10 de 13 mutantes morrendo — e os 3 sobreviventes
+  atacavam, cada um, o ramo que o AC motivava, nenhum o ponto cego; com a régua
+  derivada da forma do AC no retry, os 6 morreram e o gate acrescentou 10 próprios.
 - **Predicado correlacionado exige o agregado vizinho (decisão 4.175)**: predicado que
   vincula filho ao pai (escopo de tenant, correlação de subconsulta, junção por dono)
   tem **dois** modos de falha e por isso duas provas — apagar o **predicado** (morre com

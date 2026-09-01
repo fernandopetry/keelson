@@ -68,6 +68,8 @@ WARNING	task-comando-contradiz-criterio	comando de verificacao usa --group skip-
 WARNING	task-criterio-grep-nao-ancorado	1 criterio(s) com grep/rg de padrao textual sem exclusao de comentario nem ancora executavel — fronteira de simbolo (\b/::/->) limita a palavra mas segue casando docblock/prosa (4.161, 4.255) (TASK-001-002-corrige-login.md)
 WARNING	task-criterio-grep-nao-ancorado	2 criterio(s) com grep/rg de padrao textual sem exclusao de comentario nem ancora executavel — fronteira de simbolo (\b/::/->) limita a palavra mas segue casando docblock/prosa (4.161, 4.255) (TASK-001-010-ac-substring.md)
 WARNING	task-done-gate-aberto	1 item(ns) de Quality gates desmarcado(s) sem consolidacao declarada (4.90) (TASK-001-006-done-aberta.md)
+WARNING	task-marca-nao-timestamp	1 campo(s) Data inicio/conclusao preenchido(s) sem timestamp (AAAA-MM-DDTHH:MM) — prosa ou lacuna declarada nao e marca: campo fica vazio ou recebe a marca medida (4.308/4.337) (TASK-001-014-marca-prosa.md)
+WARNING	task-marca-nao-timestamp	2 campo(s) Data inicio/conclusao preenchido(s) sem timestamp (AAAA-MM-DDTHH:MM) — prosa ou lacuna declarada nao e marca: campo fica vazio ou recebe a marca medida (4.308/4.337) (TASK-001-006-done-aberta.md)
 WARNING	task-mutacao-sem-contagem	criterio menciona mutacao de predicado de escopo sem o par contavel "N metodos ... N provas" (4.232) (TASK-001-009-mutacao-sem-contagem.md)
 WARNING	task-nome-tipo	Tipo bugfix sem marcador -fix- no nome do arquivo (TASK-001-002-corrige-login.md)
 WARNING	task-overlap-fr	FR-001-001 realizado por 3 TASKs do mesmo PLAN (TASK-001-001-mal-formada.md, TASK-001-002-corrige-login.md, TASK-001-005-refactor-extrai.md)

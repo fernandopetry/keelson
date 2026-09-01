@@ -21,5 +21,6 @@
 - [Contrato do INDEX](Contrato-do-INDEX)
 - [Contrato do grafo](Contrato-do-grafo)
 - [Contrato do relatório](Contrato-do-relatorio)
+- [Contrato do lint](Contrato-do-lint)
 - [Convenção de commits](Convencao-de-commits)
 - [Handoff de verificação](Handoff-de-verificacao)

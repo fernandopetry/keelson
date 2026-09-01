@@ -176,6 +176,19 @@ Pasta de docs sem `INDEX.md` é slug legado:
 Migre **antes** de qualquer outra coisa naquele slug. A migração não cria SPECs
 retroativas — o histórico keelson começa ali.
 
+### O lint acusa `task-marca-nao-timestamp` numa TASK
+
+Os campos `Data início` e `Data conclusão` do histórico de execução de uma TASK guardam
+a marca de relógio medida (data **e hora**, com fuso — ex.: `2026-09-01T14:03:22-0300`).
+O aviso aparece quando o campo foi preenchido com outra coisa: uma explicação em texto
+("não medida na abertura"), ou só a data sem hora. Esse conteúdo parece honesto, mas
+inutiliza a medição — o [relógio do ciclo](Conceitos) não consegue derivar a duração e
+descarta a TASK da conta.
+
+Como resolver: se a marca real existe em algum lugar (o commit da TASK, por exemplo),
+grave-a no formato completo; se o instante se perdeu de vez, deixe o campo **vazio** ou
+com um `—` — a lacuna honesta é a ausência, nunca uma frase no lugar do valor.
+
 ### Apareceu senha em trace, screenshot ou contexto de erro do E2E
 
 A saída de execução da suíte E2E autenticada é **material sensível**: o setup de login
