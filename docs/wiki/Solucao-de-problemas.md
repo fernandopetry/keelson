@@ -79,6 +79,18 @@ dos testes apontados, ou recalibrar o threshold no comando da ficha (decisão su
 keelson não define score mínimo). Remover o campo desliga o gate por completo: ele é
 opt-in.
 
+### O validator acusou colisão de arquivo entre TASKs da mesma wave
+
+O lint achou o mesmo arquivo declarado no "Escopo > Inclui" de duas ou mais TASKs da
+mesma wave do mesmo PLAN. TASKs da mesma wave são candidatas a rodar em paralelo —
+duas delas editando o mesmo arquivo é receita para uma sobrescrever o trabalho da
+outra. O conserto certo é na decomposição, antes de implementar: mover uma das TASKs
+para outra wave (declarando a dependência entre elas) ou redesenhar o corte para que
+cada uma tenha seus próprios arquivos. Nasce como WARNING porque a detecção lê os
+caminhos escritos nos bullets: item descrito só em prosa (sem caminho de arquivo) não
+entra na conta — achado ausente não garante que não há colisão, então a conferência
+na hora de implementar continua valendo.
+
 ### O validator acusou "comando contradiz critério" numa TASK
 
 O lint achou, na mesma TASK, um comando de verificação usando `--group <tag>` e outra

@@ -23,6 +23,37 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.144.0] — 2026-08-31
+
+Re-init: none
+
+Decision 4.326 — file collision between same-wave TASKs becomes a mechanical lint fact.
+
+### Added
+
+- **`task-wave-overlap-arquivo` lint check (WARNING)**: in directory (batch) mode,
+  `artifact-lint.sh` now flags the same file declared under `Escopo > Inclui` by 2+
+  TASKs of the same wave of the same PLAN — a write collision in a parallelizable
+  wave, caught at forge time instead of at dispatch. Extraction uses a closed,
+  declared universe (tokens with `/` and a final extension; URLs and prose never
+  count), so a bullet that does not parse as a path emits nothing: declared
+  best-effort — no finding does not prove no collision. `Done` TASKs and TASKs
+  without a numeric `Wave` are excluded. Inspired by the graph-foreman benchmark,
+  where overlapping `touches` reject the plan before any agent starts.
+- **Regression fixtures for the four falsifiers**: colliding pair · same wave with
+  distinct paths · `Done` excluded · same wave across different PLANs (frozen
+  expected output; realistic corpus stays clean — zero false positives).
+
+### Changed
+
+- **`task-validator` batch invocation is now literal**: the SKILL shows the
+  directory-mode command explicitly (previously prose-only, so cross-file checks
+  had no caller), and the new fact gets the family's WARNING→ERROR escalation
+  rule — confirmed same-file edits by both TASKs escalate; prose tokens
+  misread as paths stay WARNING. The human check in `/keelson:implement` Step 1
+  remains the owner at dispatch time — the lint fact anticipates it, never
+  replaces it.
+
 ## [0.143.0] — 2026-08-31
 
 Re-init: none

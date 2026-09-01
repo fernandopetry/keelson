@@ -683,7 +683,8 @@ lint_file() { # $1 = caminho
   esac
 }
 
-# overlap de FR entre PLANs e entre TASKs do mesmo PLAN (só no modo diretório)
+# checks cross-arquivo (só no modo diretório): overlap de FR entre PLANs e entre
+# TASKs do mesmo PLAN; arquivo do Inclui repetido em TASKs da mesma wave (4.326)
 lint_dir_cross() { # $1 = dir do slug
   d="$1"
   for f in "$d"/plans/PLAN-*.md; do
@@ -738,6 +739,46 @@ lint_dir_cross() { # $1 = dir do slug
     END { for (k in cnt) if (cnt[k] > 1)
       printf "WARNING\ttask-overlap-fr\t%s realizado por %d TASKs do mesmo PLAN (%s)\n", fr[k], cnt[k], seen[k] }
   ' "$TMP/taskcov.tsv" >> "$OUT"
+
+  # mesmo arquivo no "Escopo > Inclui" de 2+ TASKs da mesma wave do mesmo PLAN (4.326).
+  # Universo fechado (4.227): token com "/" e extensao final, sem "//" — o resto do
+  # bullet nao emite nada. TASK Done ou sem Wave numerica fica fora da conta.
+  for f in "$d"/tasks/TASK-*.md; do
+    [ -f "$f" ] || continue
+    b="$(basename "$f")"
+    case "$b" in *-INDEX.md) continue ;; esac
+    m="$(printf '%s\n' "$b" | sed -n 's/^TASK-\([0-9][0-9]*\)-[0-9][0-9]*[-.].*/\1/p')"
+    [ -n "$m" ] || continue
+    awk -v FILE="$b" -v M="$m" '
+      function trim(s) { sub(/^[ \t]+/, "", s); sub(/[ \t]+$/, "", s); return s }
+      { line = $0; sub(/\r$/, "", line) }
+      sect == "" && line ~ /^\*\*Status\*\*[ \t]*:/ { v = line; sub(/^[^:]*:/, "", v); ST = trim(v) }
+      sect == "" && line ~ /^\*\*Wave\*\*[ \t]*:/   { v = line; sub(/^[^:]*:/, "", v); WV = trim(v) }
+      /^## /  { sect = (line ~ /^## Escopo/) ? "esc" : "x"; q = ""; next }
+      /^### / { q = (sect == "esc" && line ~ /^### Inclui/) ? "inc" : ""; next }
+      q == "inc" && line ~ /^- / {
+        s = line
+        while (match(s, /[A-Za-z0-9_.\/-]+/)) {
+          t = substr(s, RSTART, RLENGTH); s = substr(s, RSTART + RLENGTH)
+          sub(/[.-]+$/, "", t)
+          if (index(t, "//") > 0) continue
+          if (t !~ /\//) continue
+          if (t !~ /\.[A-Za-z0-9]+$/) continue
+          if (!(t in paths)) { paths[t] = 1; order[++np] = t }
+        }
+      }
+      END {
+        if (ST == "Done") exit
+        if (WV !~ /^[0-9]+$/) exit
+        for (i = 1; i <= np; i++) print M "\t" WV "\t" order[i] "\t" FILE
+      }
+    ' "$f"
+  done > "$TMP/waveinc.tsv"
+  awk -F'\t' '
+    { k = $1 SUBSEP $2 SUBSEP $3; seen[k] = (k in seen) ? seen[k] ", " $4 : $4; cnt[k]++; wv[k] = $2; p[k] = $3 }
+    END { for (k in cnt) if (cnt[k] > 1)
+      printf "WARNING\ttask-wave-overlap-arquivo\t%s no Inclui de %d TASKs da wave %s do mesmo PLAN (%s) — colisao de escrita em wave paralelizavel (4.228)\n", p[k], cnt[k], wv[k], seen[k] }
+  ' "$TMP/waveinc.tsv" >> "$OUT"
 }
 
 for arg in "$@"; do

@@ -34,7 +34,8 @@ executor sem a env var, derive a raiz do plugin do caminho deste SKILL.md — o 
 antes de `/skills/`):
 
 ```
-bash "${CLAUDE_PLUGIN_ROOT}/scripts/artifact-lint.sh" <caminho-da-TASK>
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/artifact-lint.sh" <caminho-da-TASK>      # TASK avulsa
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/artifact-lint.sh" <diretório-do-slug>    # modo batch (via INDEX): + checks cross-arquivo
 ```
 
 Chega como fato (`task-*` do lint-contract §3): campos e enums do cabeçalho (`Slug`,
@@ -46,7 +47,10 @@ AC, critério com `grep`/`rg` de padrão textual sem âncora de símbolo/frontei
 bugfix sem `**AC violado**:` (forma antiga dentro de `Realiza` → INFO, não
 reprova), refactor sem "comportamento observável idêntico", `Done` com gate desmarcado
 sem consolidação declarada (4.90). Invocado com o **diretório do slug** (batch),
-acrescenta `task-overlap-fr` (FR realizado por 2+ TASKs do mesmo PLAN).
+acrescenta `task-overlap-fr` (FR realizado por 2+ TASKs do mesmo PLAN) e
+`task-wave-overlap-arquivo` (mesmo arquivo no Inclui de 2+ TASKs da mesma wave —
+best-effort declarado: só caminho parseável conta, e ausência de achado não prova
+ausência de colisão; 4.326).
 
 Cada achado entra como `**[artifact-lint]** SEVERIDADE check — detalhe`; degradação
 por resultado e cobertura mista seguem o §5 do graph-contract.md.
@@ -93,6 +97,7 @@ aberta (`plan-status-vs-tasks` — 4.153) e closure preenchida com Status ≠ Do
 - Critério com **proibição** (nunca/proibido/não deve + chamada, símbolo ou padrão) que o **PLAN-pai prescreve** criar/usar — contradição critério×PLAN (decisão 4.257, 4ª forma da família 4.162/4.215/4.233): o confronto é seu — você tem o PLAN em contexto, e fato de lint é imecanizável aqui sem parser semântico de prescrição (anti-padrão 4.227); proibição sobre contexto que o PLAN não alcança → não é contradição
 - Fato `task-comando-contradiz-criterio` (4.215) **e** a proibição é regra de lição/convenção do projeto que o comando viola de verdade (o developer executa o comando, nunca a prosa — o comando vence em silêncio): escale para ERROR; menção legítima da tag (ex.: proibição sobre outro contexto que o comando não alcança) → o WARNING fica como está
 - Fato `task-prova-seguranca-com-grupo` (4.233) **e** a tag é grupo que a config default da suíte do projeto exclui (lição/convenção do projeto o diz, ou a ficha/perfil o declara): escale para ERROR — prova de segurança fixada fora da rodada default nunca roda onde o time olha; tag de grupo que a suíte default seleciona → o WARNING fica como está
+- Fato `task-wave-overlap-arquivo` (4.326) **e** o caminho é de fato o mesmo arquivo de código/config que ambas as TASKs editam: escale para ERROR — mesma wave é candidata a paralelo, e o conserto é da decomposição (re-sequenciar por wave/dependência, princípio 2 do `/keelson:tasks`), nunca confiar que o dispatch do implement vai pegar; token de prosa que o parser leu como caminho, ou arquivo que só uma das TASKs de fato edita → o WARNING fica como está
 - Fato `task-mutacao-sem-contagem` (4.232) **e** a TASK toca camada de persistência com escopo (tenant/dono/agregado): escale para ERROR — sem o denominador "todo método que toca a tabela", método de escrita sem predicado sai da contagem por construção (IDOR real chegou ao gate 8 assim); menção a mutação fora de contexto de persistência → o WARNING fica como está
 
 ### WARNING se:

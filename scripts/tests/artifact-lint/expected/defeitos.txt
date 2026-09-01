@@ -74,4 +74,5 @@ WARNING	task-overlap-fr	FR-001-001 realizado por 3 TASKs do mesmo PLAN (TASK-001
 WARNING	task-prova-seguranca-com-grupo	teste de seguranca no Inclui (tests/Security/ExportPermissionTest.php) e comando de verificacao com --group integration — confirme que a config default da suite nao exclui a tag (4.233) (TASK-001-008-prova-seguranca-grupo.md)
 WARNING	task-secao-ausente	secao "## Riscos especificos" ausente [legacy] (TASK-001-006-done-aberta.md)
 WARNING	task-tipo-ausente	campo **Tipo**: ausente (auto-fix: feature) (TASK-001-001-mal-formada.md)
+WARNING	task-wave-overlap-arquivo	src/Rotas/registro.php no Inclui de 2 TASKs da wave 3 do mesmo PLAN (TASK-001-011-rota-registro-a.md, TASK-001-012-rota-registro-b.md) — colisao de escrita em wave paralelizavel (4.228)
 WARNING	task-wave2-sem-dep	Wave 2 sem nenhuma dependencia declarada (suspeito) (TASK-001-002-corrige-login.md)
