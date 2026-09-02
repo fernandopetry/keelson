@@ -23,6 +23,24 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.152.3] — 2026-09-02
+
+Re-init: none
+
+Decision 4.358 — the "real case" narratives inside `commands/tasks.md` are proven no-op by
+an A/B eval and removed; the rules stay, each with its owning decision cited.
+
+### Changed
+
+- **`commands/tasks.md` Steps 1–3 lose 23 "caso real" parentheticals** (4.358): eval
+  `decomposicao-comportamento`, arm A = current text, arm B = same slice without the
+  narratives, plant reproved on all three axes, three runs per arm — three axes tied
+  (PASS in both), and on the fourth only the current text varied while the no-case slice
+  passed every run. Every rule sentence survives with its decision cited; the literal-
+  example rule gains the 4.64 pointer it lacked. About 10% fewer bytes in the densest
+  contract of the package. Other surfaces with the same pattern (CODE-REVIEW, implement)
+  stay candidates until a case of their own measures them.
+
 ## [0.152.2] — 2026-09-01
 
 Re-init: none
