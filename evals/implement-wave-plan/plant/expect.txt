@@ -1,0 +1,4 @@
+sequencial-por-registro
+retry-condicao-e-par-de-provas
+copy-citada-no-roteiro
+pendencia-como-criterio

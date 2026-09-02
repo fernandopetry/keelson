@@ -35,8 +35,7 @@ Cada AC dos critérios de pronto tem ≥ 1 teste que o verifica, e o teste é **
 - teste-prova em **grupo/tag/marcador que a configuração default da suíte não
   seleciona** (decisão 4.226): confronte o marcador de cada teste novo com as exclusões
   da config do runner — teste excluído da rodada default existe e passa isolado, mas
-  **nunca roda** onde o time olha (caso real: provas de segurança de 2 waves inertes,
-  4ª ocorrência no mesmo projeto). O dono da régua na geração é `commands/tasks.md`
+  **nunca roda** onde o time olha. O dono da régua na geração é `commands/tasks.md`
   (4.161/4.215 — fixação com conjunto não-vazio); aqui é o momento do gate;
 - fechamento de prova por **mutação** sem o eixo declarado por mutante, ou com todos
   os mutantes no eixo que o AC já motivava — nenhum no ponto cego do próprio
@@ -245,8 +244,7 @@ que também envia e-mail) é o mesmo smell, mais grave — viola a régua do Art
 legível; nome genérico com alternativa de domínio disponível (só bloqueia se esconder
 intenção ou efeito colateral); comentário que reprova no teste do Art. 7 — entra como
 **remoção sugerida**, com os trechos apontados (`arquivo:linha`). A sugestão **nunca abre
-rodada nem conta como falha — e nunca morre no report** (decisão 4.249; caso real de
-campo: rodada sem retry shippava o comentário reprovado): com retry aberto por outro
+rodada nem conta como falha — e nunca morre no report** (decisão 4.249): com retry aberto por outro
 achado, pega carona no despacho (delta inerte — re-verifica com o mesmo revisor,
 §Convergência); sem retry, a rota de fecho do invocador a aplica antes da entrega — no
 ciclo, 1 aplicação por wave no fim dela (`/keelson:implement` §3.6); no diff avulso, a
@@ -285,20 +283,14 @@ na mesma frase ("confirmei na fonte") sem provar a mesma coisa, e um tipo permis
 (`T | null`) acomoda as duas leituras sem que nada mecânico acuse a diferença. Premissa
 sobre o comportamento num **estado/ramo específico** exige traçar a lógica que **atribui**
 o valor nesse ramo — nunca só a origem declarada do campo, nem a palavra do comentário
-vizinho, que pode estar descrevendo outro ramo (caso real: cabeamento correto — o campo
-lia a propriedade dedicada — mas o ramo em pauta emite `null` fixo; o comentário do
-próprio ramo descrevia o ramo oposto e sustentou a confirmação errada por 2 rodadas).
+vizinho, que pode estar descrevendo outro ramo.
 
 E achado que afirma o que o código **faz** com um dado real — vaza, mascara, calcula,
 recusa — prova-se com o **predicado executado contra o dado** (decisão 4.329, o simétrico
 de reprovação da régua de aprovação do gate 8, 4.264): inspecionar a olho a mesma
 lista/tabela que o diff copiou não é medição independente — brief, implementação e
 revisor concordando sobre essa fonte é **uma leitura copiada três vezes**, não tripla
-confirmação (caso real: gate 7 reprovou ALTA por "dado pessoal em claro" conferindo a
-implementação contra a tabela do brief, sem rodar a máscara contra o campo; o campo já
-era mascarado por colisão de substring — e o gate 8, que executou o predicado com
-controle positivo, reportou o fato certo na mesma rodada; custo: um retry inteiro numa
-entrega correta). Achado dessa forma cujo tópico é do gate 8 (dado pessoal, segredo,
+confirmação. Achado dessa forma cujo tópico é do gate 8 (dado pessoal, segredo,
 autorização) viaja como **sinal ao `security-engineer`** — nunca veredito independente
 sem execução.
 
@@ -315,10 +307,7 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   simétrica 4.85) transcreve, nunca o inverso. O fim de wave do ciclo já tem o
   inventário mecânico (4.197); esta régua leva o mesmo confronto ao **momento do
   despacho** em toda rota — gate lembrado só no fecho é o furo que o inventário
-  previne (caso real de campo, modo sob demanda: diff tocando laço de render sobre
-  volume variável, gate de performance não despachado; auto-detectado apenas na
-  montagem do fecho, e o gate, despachado então, mediu decomposição que o palpite
-  não tinha).
+  previne.
 - **Gates aplicáveis rodam em paralelo por padrão.** Os gates de uma rodada (7 ·
   8 · 9 · 10) são independentes entre si: despache os agentes **no mesmo turno** e espere
   os reports. Sequência é exceção **declarada** — só quando um gate consome a saída de
@@ -327,15 +316,12 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   de falha) trata a working tree como recurso exclusivo: roda em `git worktree`
   isolada — nunca a mesma árvore de outro gate concorrente que também mute. Disciplina
   de restaurar ao fim não basta: o risco é a **leitura** na janela em que dois mutantes
-  convivem, não a limpeza depois (decisão 4.134, caso real de campo). E **árvore
+  convivem, não a limpeza depois (decisão 4.134). E **árvore
   própria é `git worktree` de fato, nunca cópia do diretório de trabalho** (decisão
   4.336): a cópia (`cp -R`) carrega o que o git não versiona — `.env`, config local
-  com credencial — e planta segredo real fora do repo (caso real: dois gates
-  independentes, sem o COMO no contrato, copiaram o repositório inteiro com o `.env`
-  para o scratchpad; o worktree, por construção, deixa untracked para trás). Prova que
+  com credencial — e planta segredo real fora do repo. Prova que
   monta a árvore em container monta o caminho **read-only** e escreve fora dele —
-  arquivo novo criado dentro de caminho montado nasce no repo real (caso real: sonda
-  0-byte apareceu na árvore verdadeira). E a rodada
+  arquivo novo criado dentro de caminho montado nasce no repo real. E a rodada
   inteira pressupõe **âncora parada** (decisão 4.290 — 3ª camada da família
   4.134/4.276): todo gate despachado captura, na largada da própria execução, o par
   `git rev-parse HEAD` + `git status --porcelain` dos arquivos do diff e o reconfere
@@ -344,8 +330,7 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   trata o SHA sob revisão como âncora parada: com veredito em voo, nenhum commit novo
   entra na working tree — a correção espera, ou o gate é re-despachado com a âncora
   nova **declarada**, nunca herdada em silêncio ("gerador ≠ avaliador" pressupõe
-  âncora parada; caso real: 2× na mesma sessão, o revisor congelou por hash próprio e
-  re-rodou os mecânicos — trabalho que o despacho causou).
+  âncora parada).
 - **Pacote de contexto único.** O invocador monta **uma vez** e entrega o mesmo pacote
   a todos os revisores da rodada: diff resolvido + SHA · o artefato-âncora com os
   critérios literais (ACs da TASK, critério de aceite do brief) · as fatias da ficha
@@ -369,11 +354,7 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   a divergência costuma ser aparente, e escolher um lado sem essa checagem descarta um
   achado real. Resolva abrindo o arquivo/rodando o comando você mesmo e leve o veredito
   ao despacho do retry **com a evidência que decidiu**, para o revisor que errou se
-  corrigir de forma explícita (casos reais: dois gates divergiram sobre o custo de uma
-  rota — um contava *use cases*, o outro chamadas HTTP, e a unidade ambígua nascera no
-  próprio pacote de contexto; dois revisores divergiram sobre a posição de um card —
-  certos sobre condicionais distintas do mesmo componente, e os dois achados
-  sobreviveram como itens do retry).
+  corrigir de forma explícita.
 
 **Recorte da rodada no ciclo (decisão 4.90)** — a unidade de execução de cada gate
 segue a natureza do que ele prova, não é uniforme por TASK:
@@ -411,9 +392,7 @@ segue a natureza do que ele prova, não é uniforme por TASK:
   ferramenta do próprio gate produz o número; o resultado vira demanda ao Diretor,
   nunca reprovação de TASK que não tinha como entregá-lo). Handoff sem a etiqueta
   obriga quem orquestra a wave seguinte a adivinhar — reprovar código correto ou
-  deixar risco real sem medição (caso real: "mostre que a contagem não cresce com N"
-  deixado à wave seguinte sem dizer de quem era; só o contador do próprio gate,
-  sobre volumes reais, podia produzi-la).
+  deixar risco real sem medição.
   No modo sob demanda nada muda: uma mudança = uma rodada.
 
 ---
@@ -429,9 +408,7 @@ ela converge ou escala.
   o toca. Reler o diff inteiro do zero a cada rodada é retrabalho que só produz achado
   marginal novo — e é o motor do loop. O delta chega no pacote como **diff resolvido do
   retry** (`git diff <SHA do veredito>..<SHA da correção>`, com o veredito anterior ao
-  lado), nunca como o diff acumulado da wave (decisão 4.350 — caso real de campo: um
-  re-review "delta" de 2 arquivos releu o entorno inteiro, 48 leituras e greps, e custou
-  16,9 min contra 11 da primeira passada).
+  lado), nunca como o diff acumulado da wave (decisão 4.350).
 - **O delta é um diff próprio, não um checklist do achado (decisão 4.94).** Código
   nascido no retry ainda não passou por gate nenhum: a rodada N+1 responde **duas**
   perguntas — "o achado fechou?" e "o que este delta quebra?" — aplicando ao delta os
@@ -445,9 +422,7 @@ ela converge ou escala.
   de conteúdo), "o que este delta quebra" inclui levar ao extremo o eixo que a
   correção **não** tocou (decisão 4.289): o espaço tem dois lados por construção —
   reagir de menos / reagir de mais — e verificar só o lado que motivou a correção é
-  meio teste (caso real: proteção por identidade fechava sozinha; a troca para a
-  chave de assunto passou a expandir sozinha — cada correção passou no próprio teste
-  e reabriu o lado oposto).
+  meio teste.
 - **Teto: 1 retry por gate, depois escala.** Achado → correção → re-review do delta. Se
   o gate reprova de novo, a 3ª rodada **não roda por decisão própria**: escale ao
   Diretor com o estado (o que passou · o que resta · proposta + default). É a mesma
@@ -470,22 +445,18 @@ ela converge ou escala.
   falsos positivos separados com justificativa e exclusões com dono. O revisor
   **re-executa o comando**; é isso que ele valida — declaração de "varri tudo" sem o
   comando não fecha o achado, porque não distingue "a classe fechou" de "os exemplos que
-  o revisor viu fecharam". Caso real: 4 rodadas corrigindo os exemplos citados; na 3ª, o
-  report declarou 3 arquivos e a mesma string sobrevivia em 8 outros dentro do range.
+  o revisor viu fecharam".
 - **Evidência mecânica de ausência carrega controle positivo (decisão 4.186).** "O
   comando retornou 0 ocorrências" só é evidência se, no mesmo universo e na mesma
   execução, um padrão que **tem** de bater bateu — sem o controle, "limpo" é
-  indistinguível de "o comando nunca executou". Caso real: 5 greps de prova falharam por
-  expansão de shell e um `|| echo 0` converteu o erro em "0 ocorrências"; só a
-  auto-auditoria do revisor evitou o falso "limpo". A falsificabilidade dos gates
+  indistinguível de "o comando nunca executou". A falsificabilidade dos gates
   (4.52/4.93) cobre o código sob revisão; esta cláusula cobre o **instrumento do
   avaliador** — inclusive o comando re-executado da varredura (4.173).
 - **Varredura por classe tem teto declarado; eixo novo é decisão, não deriva (decisão
   4.187).** A convergência (4.88/4.94) trava o retry do **mesmo** achado; numa varredura
   cujo aceite é "nenhuma instância da classe sobra", cada rodada tende a descobrir
   **escopo novo** — outro eixo do mesmo defeito — e nenhuma dispara a escalação, porque
-  cada descoberta parece legítima demais para não perseguir (caso real: 9 rodadas, cada
-  uma "achado novo"). Por isso a varredura nasce com **teto de rodadas de gate declarado
+  cada descoberta parece legítima demais para não perseguir. Por isso a varredura nasce com **teto de rodadas de gate declarado
   no despacho (default 2)**: eixo genuinamente novo além do teto não roda — vira dívida
   declarada em artefato-fonte, brief/PLAN, espelhada no INDEX pela regeneração (4.179 —
   com a régua registrada para quem pagar) ou decisão explícita
@@ -502,8 +473,7 @@ ela converge ou escala.
   discriminante. Reescrever o existente deixa um teste com nome plausível, passando, que
   não discrimina mais — e nenhuma leitura acusa. O fechamento é comparado: o mutante que
   neutraliza o valor alterado morre **no delta e no commit pai**; sobreviver só no delta
-  é regressão de prova, achado bloqueante. Caso real: o único teste do ramo invertido foi
-  reaproveitado e a suíte inteira (4107 verdes) deixou de provar que o gate bloqueava.
+  é regressão de prova, achado bloqueante.
 - **Achado só-texto não reabre o ciclo.** Correção cujo delta é **inerte** (comentário,
   docblock, doc — teste mecânico em `./TESTING.md`, "Diff inerte") re-verifica com o
   **mesmo revisor**, sobre o delta, e nada mais: os gates de comportamento (1/2/9)
@@ -592,10 +562,7 @@ composição do despacho, achado de gate dedicado (8/10/11) na escrita — todos
 espelhado", "todo chamador da operação recusada"), nunca a lista fechada de
 endereços/instâncias vista no momento da redação; lista citada é sempre rotulada
 **ilustração não-exaustiva**, acompanhada da varredura de fechamento que a torna
-falsificável (caso real: remoção de premissa revogada escopada ao endereço técnico —
-"comentários/docblock" — sobreviveu exatamente na copy que o operador lê; reescrita
-como condição, a varredura achou 3 superfícies onde dois revisores, pensando por
-endereço, tinham visto 2).
+falsificável.
 
 E quando o achado deriva de um requisito **MUST multi-sujeito** (ex.: "para cada A, B
 e C"), o **fechamento** re-lê o texto do FR/AC de **origem** e confirma cobertura de
@@ -613,8 +580,7 @@ resposta à recusa — trata e reoferece, passa a confirmação explícita, ou n
 aplica; chamador sem resposta declarada é buraco, não detalhe. Fechamento contável no
 formato já provado (4.139): N chamadores no grep, N respostas declaradas. Promessa de
 SPEC do tipo "o sistema nunca impede X" só está provada com **toda** superfície que
-faz X exercitada — 3 de 4 é promessa quebrada com aparência de entregue (caso real: a
-4ª superfície virou beco sem saída em produção). Demarcação: a "Guarda no sink"
+faz X exercitada — 3 de 4 é promessa quebrada com aparência de entregue. Demarcação: a "Guarda no sink"
 (`core/SECURITY.md`) enumera os **writers** de dado sensível; esta régua, os
 **chamadores** de operação que passou a poder recusar — recusa funcional, sensível ou
 não.

@@ -1,0 +1,11 @@
+schema_version: "1.1"
+name: review-gates-wave
+# Caso nº 4 da camada de evals (decisão 4.304) — mede o code-reviewer aplicando a
+# régua inteira de guidelines/core/CODE-REVIEW.md a uma wave sintética com três
+# defeitos plantados: prova de segurança inerte (grupo excluído da suíte default,
+# 4.226) e asserção fraca; correção parcial de uma condição (2 de 4 campos truncados —
+# Solução deve nomear a condição com varredura, 4.321/4.93); comentários supérfluos
+# (Art. 7 — ação sugerida, nunca bloqueio, 4.245/4.249). Braços típicos: régua com e
+# sem as narrativas "caso real" (file:). Executado por scripts/eval-run.sh.
+# Controle positivo: só condicao-nao-instancia e comentario-e-sugestao — o eixo da prova
+# inerte é default do modelo (plant ignorado em 2 rodadas) e fica como sanidade.

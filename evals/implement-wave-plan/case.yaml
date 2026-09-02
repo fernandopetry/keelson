@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: implement-wave-plan
+# Caso nº 5 da camada de evals (decisão 4.304) — mede o Tech Lead aplicando
+# commands/implement.md NO PAPEL a uma wave sintética: duas TASKs que citam o mesmo
+# arquivo de registro (rotas) sem worktree por task (4.228/4.334 → sequencial);
+# despacho de retry para achado de gate 8 que citou 3 de 4 instâncias (condição +
+# fechamento + par de provas, 4.302/4.307) e achado de gate 11 que trocou copy citada
+# no roteiro de gate 9 de outra TASK (4.343); pendência herdada da wave anterior que
+# deve entrar como critério contável, nunca prosa (4.140/4.302). Braços típicos: régua
+# com e sem as narrativas "caso real" (file:). Executado por scripts/eval-run.sh.
