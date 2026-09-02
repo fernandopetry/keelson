@@ -8,7 +8,10 @@
 #      run-state → block;
 #   2. run-state LEGADO em andamento → silêncio;
 #   3. run-state na casa da sessão (thoughts/local/sessions/*/ — 4.314) → silêncio;
-#   4. run-state de OUTRA sessão (4.252) → NÃO silencia, block.
+#   4. run-state de OUTRA sessão (4.252) → NÃO silencia, block;
+#   5–7. veredito no ledger (4.365): evento `gate` do security-engineer mais novo que
+#      todo arquivo sensível → silêncio; arquivo editado depois do veredito e veredito
+#      de outro gate → cutuca.
 # Cada caso usa repo próprio (o anti-renudge de .git/ não vaza entre casos).
 #
 # Uso: scripts/tests/security-guard/run.sh
@@ -20,6 +23,7 @@ export LC_ALL
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 HOOK="$HERE/../../../hooks/security-guard.sh"
+LEDGER="$HERE/../../ledger.sh"
 
 [ -f "$HOOK" ] || { echo "ERRO: hook não encontrado em $HOOK" >&2; exit 1; }
 if ! command -v jq >/dev/null 2>&1; then
@@ -98,6 +102,27 @@ D4="$TMP/c4"; repo "$D4"
 run_state "$D4/thoughts/local/sessions/20260830-100000-sessoutr" gama sessao-outra
 roda "$D4" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 contem "alheio/decision" '"decision": "block"'
+
+# 5. Veredito do security-engineer no ledger da sessão mais novo que os arquivos → silêncio (4.365)
+D5="$TMP/c5"; repo "$D5"
+touch -t 202601010000 "$D5/src/auth.php"
+printf 'APROVADO — sem achado\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D5" append gate security-engineer meu-slug >/dev/null 2>&1
+roda "$D5" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
+silencio "veredito-cobre-arvore"
+
+# 6. Arquivo sensível editado DEPOIS do veredito → cutuca de novo
+D6="$TMP/c6"; repo "$D6"
+ev="$(printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D6" append gate security-engineer meu-slug 2>/dev/null)"
+touch -t 202601010000 "$ev"
+roda "$D6" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
+contem "pos-veredito/decision" '"decision": "block"'
+
+# 7. Veredito de OUTRO gate (code-reviewer) não cala o security-guard
+D7="$TMP/c7"; repo "$D7"
+touch -t 202601010000 "$D7/src/auth.php"
+printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D7" append gate code-reviewer meu-slug >/dev/null 2>&1
+roda "$D7" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
+contem "outro-gate/decision" '"decision": "block"'
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

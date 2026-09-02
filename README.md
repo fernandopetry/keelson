@@ -418,21 +418,18 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.152.6` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.153.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the Tech Lead stops timing subagent windows by hand (decision
-4.354) — the `window-marker` hook records each subagent's duration, tool calls and return
-time plus the start of every turn, and `context-cost.sh` derives from that log the
-`janelas` tail of the brief's Cronologia (`--janelas`), minutes and tool calls per role,
-and the wait between turns in the closing report. No gate changes; no new report line.
-0.152.1 makes the delivery pre-check delta-scoped on the implement route (4.355); 0.152.2
-applies the dated-sediment findings of the second harness audit (4.357); 0.152.3 removes
-the 23 "real case" narratives from `tasks.md`, proven no-op by an A/B eval (4.358); 0.152.4
-does the same for `CODE-REVIEW.md` and `implement.md` with two new eval cases (4.359); 0.152.6
-extends it to po, developer, TESTING and specify with five more cases (4.360). See
-`CHANGELOG.md`.
+New in this release: a consumer postmortem absorbed (decisions 4.361–4.366) — a gate
+whose proof writes to the tree always works in its own worktree, with an autocheck before
+the first write; the `review-guard`/`security-guard` stop hooks read the session ledger
+and stay silent once the matching verdict is newer than every changed file
+(`ledger.sh last`); the postmortem dispatches one coach at a time and counts its
+dispatches; the developer enumerates every writer and reader of shared state before
+adding one; mechanism availability is probed once per round and inherited by the gates;
+and a guarantee in a comment needs executed proof. See `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

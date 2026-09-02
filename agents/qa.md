@@ -64,7 +64,7 @@ testes:
 exercicio_funcional:
   ambiente: disponivel | ambiente_indisponivel
   causa_indisponibilidade: runtime_browser | credencial | app_fora_do_ar | permissao_ambiente   # null quando ambiente disponível (handoff-protocol.md §8.1; permissão negada 2× = causa provada, não flakiness — 4.133)
-  evidencia_indisponibilidade: <o que a sondagem tentou, o que retornou e a saída que resolve, por realm — OBRIGATÓRIO quando ambiente_indisponivel; senão null>
+  evidencia_indisponibilidade: <o que a sondagem tentou, o que retornou e a saída que resolve, por realm — própria, ou HERDADA do pacote de contexto (4.364: cite a chamada e a causa que o Tech Lead registrou, sem re-sondar); OBRIGATÓRIO quando ambiente_indisponivel; senão null>
   evidencias:
     - ac: AC-NNN-XXX
       como: "<chamada/fluxo executado>"

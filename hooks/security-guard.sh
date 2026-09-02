@@ -25,6 +25,9 @@
 # um marcador em .git/ evita re-cutucar em turnos seguintes enquanto o diff
 # sensível for o mesmo (a comparação é da branch inteira — sem o marcador, uma
 # mudança sensível já commitada dispararia o bloqueio ao fim de todo turno).
+# E veredito do security-engineer já registrado no ledger da sessão (evento `gate`,
+# 4.76) mais novo que todo arquivo sensível alterado cala o hook (decisão 4.365 —
+# mesma forma do review-guard).
 #
 # Natureza: a DETECÇÃO é heurística (padrão de conteúdo + path). Não prova que a
 # revisão rodou — cutuca para forçá-la.
@@ -78,6 +81,10 @@ sec_gate="$(jq -r 'if .gates.security == false then "off" else "on" end' "$confi
 
 # Globs sensíveis vindos da ficha. Sem eles ainda vigiamos dependências (abaixo).
 sensitive_globs="$(jq -r '.sensitiveGlobs[]?' "$config" 2>/dev/null || true)"
+
+# ledger.sh resolvido ANTES do cd (o $0 pode ser relativo); ausente → a consulta ao
+# veredito registrado (abaixo) é pulada e o hook se comporta como sempre.
+LEDGER="$(cd "$(dirname "$0")/../scripts" 2>/dev/null && pwd || true)/ledger.sh"
 
 cd "$proj" 2>/dev/null || exit 0
 
@@ -176,6 +183,25 @@ content_sensitive="$(printf '%s\n%s\n' "$added" "$unt_content" | grep -nEi "$PAT
 path_sensitive="$(printf '%s\n' "$sensitive_files" | grep -iE '(auth|login|security|permiss|role|password|token|session|upload|payment|crypto|sql|query)' || true)"
 
 if [ -n "$content_sensitive" ] || [ -n "$path_sensitive" ] || [ -n "$dep_changed" ]; then
+  # Veredito já registrado cobre a árvore (decisão 4.365): o security-engineer que revisou
+  # ESTE estado do diff deixou evento `gate` no ledger da sessão (4.76 — escrito pelo
+  # Tech Lead ao receber o report). Se nenhum arquivo sensível alterado é mais novo que o
+  # veredito mais recente, a revisão cobre o que está na árvore → silêncio. No modo sob
+  # demanda não há commit para ancorar o marcador (4.91) e o diff cumulativo cresce a cada
+  # correção: sem esta consulta, cada rodada genuína de re-review re-disparava a cutucada.
+  # Arquivo alterado que não existe mais no disco conta como mais novo (conservador).
+  # Sem ledger, sem evento do agent ou sem o script → comportamento de sempre.
+  if [ -f "$LEDGER" ]; then
+    verdict="$(KEELSON_SESSAO="$session_id" bash "$LEDGER" "$proj" last gate security-engineer 2>/dev/null || true)"
+    if [ -n "$verdict" ] && [ -f "$verdict" ]; then
+      newer=0
+      while IFS= read -r f; do
+        [ -z "$f" ] && continue
+        if [ ! -e "$f" ] || [ "$f" -nt "$verdict" ]; then newer=1; break; fi
+      done <<< "$sensitive_files"
+      [ "$newer" -eq 0 ] && exit 0
+    fi
+  fi
   # Anti-renudge entre turnos: stop_hook_active só cobre o turno atual.
   git_dir="$(git rev-parse --absolute-git-dir 2>/dev/null || true)"
   marker="" fingerprint=""

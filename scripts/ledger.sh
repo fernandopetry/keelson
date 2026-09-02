@@ -7,6 +7,7 @@
 # Uso: ledger.sh <raiz-do-repo> append <tipo> <origem> <slug> [--ref <caminho>] [--ts <iso>]
 #      ledger.sh <raiz-do-repo> list [--archived]
 #      ledger.sh <raiz-do-repo> count
+#      ledger.sh <raiz-do-repo> last <tipo> <origem>
 #      ledger.sh <raiz-do-repo> archive [--keep <arquivo>]… [--ts <iso>]
 #
 #   append   cria <yyyymmdd-hhmmss>-<tipo>-<origem>.md no ledger da CASA DA SESSÃO
@@ -14,13 +15,17 @@
 #            thoughts/local/sessions/<ts>-<sid8>/ledger/; sem id de sessão, o
 #            caminho legado thoughts/local/session-ledger/) com o cabeçalho
 #            canônico; o corpo (2–3 linhas) entra pelo stdin.
-#            Tipos (catálogo FECHADO): gate decisao intervencao fora_de_escopo pendencia tracker marco.
+#            Tipos (catálogo FECHADO): gate decisao intervencao fora_de_escopo pendencia tracker marco wave_sequencial.
 #            Timestamp medido (TZ=America/Sao_Paulo); --ts <iso> só para testes.
 #            A linha `ts:` do cabeçalho é DESTE script — linha `ts:` no início do
 #            stdin é descartada (4.156: ts estimado de memória não entra no evento).
 #            Colisão de segundo ganha sufixo -2, -3… Ecoa o caminho criado.
 #   list     eventos ativos (um por linha, ordenados); --archived lista os consumidos
 #   count    contagem de eventos ativos por tipo
+#   last     caminho do evento MAIS RECENTE do par tipo/origem — ativos e arquivados
+#            (reported-*/), casa da sessão e legado; vazio + exit 0 sem evento.
+#            Leitor: os stop-guards (review-guard/security-guard, 4.365) comparam o
+#            mtime dele com o dos arquivos alterados — "o veredito cobre a árvore?".
 #   archive  move os ativos para reported-<yyyymmdd-hhmmss>/, preservando os --keep
 #            (evento que continua pendente permanece na pasta ativa)
 #
@@ -36,7 +41,7 @@ LC_ALL=C
 export LC_ALL
 
 die2() { echo "ERRO: $*" >&2; exit 2; }
-usage() { sed -n '2,26p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'; }
 
 ROOT="${1:-}"
 [ -n "$ROOT" ] || { usage >&2; exit 2; }
@@ -84,8 +89,8 @@ case "$ACTION" in
     [ -n "$TIPO" ] && [ -n "$ORIGEM" ] && [ -n "$SLUG" ] || die2 "append exige <tipo> <origem> <slug>."
     shift 3
     case "$TIPO" in
-      gate|decisao|intervencao|fora_de_escopo|pendencia|tracker|marco) ;;
-      *) die2 "tipo fora do catálogo fechado (4.76/4.244): $TIPO — use gate, decisao, intervencao, fora_de_escopo, pendencia, tracker ou marco" ;;
+      gate|decisao|intervencao|fora_de_escopo|pendencia|tracker|marco|wave_sequencial) ;;
+      *) die2 "tipo fora do catálogo fechado (4.76/4.244/4.301): $TIPO — use gate, decisao, intervencao, fora_de_escopo, pendencia, tracker, marco ou wave_sequencial" ;;
     esac
     case "$ORIGEM" in */*|*" "*) die2 "origem inválida (sem espaço/barra): $ORIGEM" ;; esac
     REF=""; TS=""
@@ -122,6 +127,25 @@ case "$ACTION" in
       if [ -n "$REF" ]; then printf 'ref: %s\n' "$REF"; fi
     } > "$f" || die2 "não consegui escrever $f"
     printf '%s\n' "$f"
+    exit 0 ;;
+
+  last)
+    TIPO="${1:-}"; ORIGEM="${2:-}"
+    [ -n "$TIPO" ] && [ -n "$ORIGEM" ] || die2 "last exige <tipo> <origem>."
+    # evento MAIS RECENTE do par tipo/origem — ativos e arquivados (reported-*/), casa
+    # legada e casa da sessão: o nome é ordenável (yyyymmdd-hhmmss), o maior basename
+    # vence. Leitor: os stop-guards perguntam "o último veredito cobre a árvore?"
+    # (decisão 4.365) comparando o mtime deste arquivo com o dos arquivos alterados.
+    # Vazio + exit 0 quando não há evento (nunca é gate).
+    # shellcheck disable=SC2329,SC2317  # invocada indiretamente via em_cada_casa (SC2317: shellcheck novo re-acusa o corpo)
+    last_casa() {
+      for f in "$1"/*-"$TIPO"-"$ORIGEM"*.md "$1"/reported-*/*-"$TIPO"-"$ORIGEM"*.md; do
+        [ -f "$f" ] || continue
+        printf '%s\t%s\n' "$(basename "$f")" "$f"
+      done
+      return 0
+    }
+    em_cada_casa last_casa | sort | tail -n 1 | cut -f2-
     exit 0 ;;
 
   list)
@@ -212,5 +236,5 @@ case "$ACTION" in
     em_cada_casa archive_casa
     exit 0 ;;
 
-  *) die2 "ação desconhecida: $ACTION (use append, list, count ou archive)" ;;
+  *) die2 "ação desconhecida: $ACTION (use append, last, list, count ou archive)" ;;
 esac

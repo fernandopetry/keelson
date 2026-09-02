@@ -23,6 +23,75 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.153.0] — 2026-09-02
+
+Re-init: none
+
+Decisions 4.361–4.366 — a consumer postmortem absorbed (plugin 0.147.0, on-demand mode:
+six rounds for a three-bullet request, five regressions born in fixes, one false gate
+finding, six stop-guard nudges). A gate whose proof writes to the tree always isolates,
+the stop guards read the session ledger before nudging, the postmortem serialises its
+coaches and counts its dispatches, the developer enumerates every writer and reader of
+shared state before adding one, mechanism availability is probed once per round and
+inherited, and a guarantee in a comment needs executed proof.
+
+### Added
+
+- **`ledger.sh last <tipo> <origem>`** (4.365): path of the newest event of a type/origin
+  pair across the session home and the legacy path, active and archived — empty and exit 0
+  when there is none. Suite +6 cases.
+- **`/keelson:review` records each verdict in the session ledger** (4.365, Step 4 item 5):
+  a `gate` event with origin `code-reviewer` (and `security-engineer` when it ran) — the
+  standalone route never said so, and without the event the stop guard keeps nudging.
+- **Developer step 4, item 6 — shared state** (4.363): before adding a writer or reader to
+  state that already has several (module variable, DOM attribute/class, flag, cache,
+  mirrored field), enumerate every existing one — late callbacks and timers included — and
+  decide one by one; `notas` closes the count in half a line. A pointer to 4.321 on the
+  writer's side, not a second wording.
+- **Postmortem countable autocheck** (4.362, Step 5): N mechanisms classified `processo`
+  must equal N `mensagem_mantenedor` attached before the document is written — a mechanism
+  without its message goes back to Step 4 and is dispatched.
+
+### Changed
+
+- **Stop guards fall silent after a recorded verdict** (4.365, `review-guard` and
+  `security-guard`): above the threshold, if the ledger holds a `gate` verdict of the
+  matching reviewer and no changed file of that class is newer than it, the hook exits
+  without nudging; a changed file missing from disk counts as newer, the anti-renudge
+  fingerprint is not written on that path, and no ledger/no event keeps today's behaviour
+  (conservative: it may nudge in vain, never stays silent without a verdict). Suites +5/+3.
+- **A gate whose proof writes to the tree always works in its own worktree** (4.361,
+  `CODE-REVIEW.md` §Orquestração, `implement.md` gate briefing): mutation, fault injection,
+  fixtures and temporary tests included; the named risk is any concurrent reader — the
+  other gates, the Tech Lead's suite, reviewer 7 — not only a second mutant, and restoring
+  (or proving it by `md5`) says nothing about who read in between. **Autocheck before the
+  first write**: `git rev-parse --show-toplevel` must differ from the main checkout root.
+- **Dispatch derivation asks, per applicable gate, whether its proof writes** (4.361, the
+  4.335 bullet): yes → the dispatch line names the worktree, on every route, not only in
+  the cycle's briefing.
+- **Probe once per round, inherit the evidence** (4.364, `handoff-protocol.md` §8.1 as
+  owner · `CODE-REVIEW.md` context-package bullet · `qa.md` report field): the availability
+  of the mechanisms the gates use (screen tool/MCP, app up, runner) is probed once by the
+  Tech Lead at the start of the round — the tool call and what it returned, never an OS
+  process being alive — and travels in the package; a gate that receives it does not
+  re-probe, it degrades declaring with the inherited evidence.
+- **Postmortem dispatches one `agile-coach` at a time** (4.362, Step 4): the 4.95 contract
+  cited at the point of use — the ledger allocates the `LRN` on write and has no lock.
+- **Guarantees in comments and numbers in agent reports** (4.366, `sdd-conventions.md`
+  rule 4.332 reformulated): a comment asserting a guarantee ("does not corrupt", "never X",
+  "the backend returns Y") travels with the executed proof that backs it or is not written;
+  and an agent report joins the surfaces where a number must carry the command that
+  produced it.
+- Wiki: `Ficha-do-projeto` (`gates.review` row) and a new *Solução de problemas* entry —
+  "the review reminder came back after I had already reviewed".
+
+### Fixed
+
+- **`ledger.sh` rejected `wave_sequencial`** (4.365, lateral found by the impact map): the
+  convention has listed the type since 4.301 and `implement.md` asks for it, but `append`
+  refused it with exit 2. Accepted now, with a suite case.
+- **`ledger.sh --help`** printed a fixed line window; it now ends at the usage block.
+
 ## [0.152.6] — 2026-09-02
 
 Re-init: none

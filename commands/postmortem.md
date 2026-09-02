@@ -134,8 +134,9 @@ Classificar cada mecanismo pelo dono — e agir no que é daqui:
   `guidelines/project/lessons.md` (formato canônico do `core/WORKFLOW.md`, dedup) e/ou no
   perfil do projeto — **aplicado nesta sessão**, citado no postmortem como contexto.
 - **Processo** (artefato do keelson induziu ou não preveniu): despachar o **`agile-coach`**
-  — **uma invocação por causa-raiz** (`gatilho: correcao_humana`, com descrição, causa-raiz
-  e origem). Ele deduplica no ledger, decide o dono e devolve `PROPOSTA_PLUGIN` +
+  — **uma invocação por causa-raiz, uma de cada vez** (o ledger aloca o `LRN` na escrita
+  e não tem lock: dois em paralelo colidem o número — contrato do agent, decisão 4.95;
+  `gatilho: correcao_humana`, com descrição, causa-raiz e origem). Ele deduplica no ledger, decide o dono e devolve `PROPOSTA_PLUGIN` +
   `mensagem_mantenedor` com o **diff literal** contra a versão instalada (decisões
   4.54/4.64). Você não redige proposta de plugin por conta própria — o formato dela tem dono.
 - **Pergunta que o `/keelson:init` não fez** ou **contrato do Diretor** (intervenção
@@ -155,7 +156,10 @@ Classificar cada mecanismo pelo dono — e agir no que é daqui:
    repo (versão do plugin, stack, gates, custo real do episódio; vocabulário local
    explicado em meia linha), a tabela dos fatos, os mecanismos com evidência, e as
    `mensagem_mantenedor` do `agile-coach` anexadas — uma por problema, cada uma com seu
-   diff. O que já foi consertado localmente aparece como contexto, não como pedido.
+   diff. **Autocheck contável antes de gravar** (decisão 4.362): N mecanismos
+   classificados `processo` na Etapa 4 = N `mensagem_mantenedor` anexadas — mecanismo
+   sem a sua volta à Etapa 4 e é despachado; "proposto ao plugin" sem entrada no ledger
+   não existe. O que já foi consertado localmente aparece como contexto, não como pedido.
 3. Sem achado generalizável → o postmortem existe do mesmo jeito (a conta honesta e os
    descartes **são** o resultado); o bloco ao mantenedor é que não se inventa.
 

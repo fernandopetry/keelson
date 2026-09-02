@@ -12,7 +12,11 @@
 #   3. run-state na casa da sessão (thoughts/local/sessions/*/ — 4.314) → silêncio;
 #   4. run-state de OUTRA sessão (4.252) → NÃO silencia, block;
 #   5. mudança trivial (abaixo do limiar) em repo sem HEAD → silêncio — o
-#      added_lines malformado fazia o teste do limiar errar e cutucar à toa.
+#      added_lines malformado fazia o teste do limiar errar e cutucar à toa;
+#   6–10. veredito no ledger (4.365): evento `gate` do code-reviewer mais novo que
+#      todo arquivo de código → silêncio; arquivo editado depois do veredito, veredito
+#      de outro gate, veredito de outra sessão e arquivo alterado ausente do disco →
+#      cutuca (conservador).
 # Cada caso usa repo próprio (o anti-renudge de .git/ não vaza entre casos).
 #
 # Uso: scripts/tests/review-guard/run.sh
@@ -24,6 +28,7 @@ export LC_ALL
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 HOOK="$HERE/../../../hooks/review-guard.sh"
+LEDGER="$HERE/../../ledger.sh"
 
 [ -f "$HOOK" ] || { echo "ERRO: hook não encontrado em $HOOK" >&2; exit 1; }
 if ! command -v jq >/dev/null 2>&1; then
@@ -117,6 +122,43 @@ printf '{ "codePaths": { "backend": ["src"] } }\n' > "$D5/keelson.config.json"
 printf 'a;\nb;\nc;\nd;\ne;\n' > "$D5/src/pequeno.php"
 roda "$D5" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 silencio "trivial-sem-head"
+
+# 6. Veredito do code-reviewer no ledger da sessão mais novo que os arquivos → silêncio (4.365)
+D6="$TMP/c6"; repo "$D6"
+touch -t 202601010000 "$D6/src/novo.php"
+printf 'APROVADO — diff avulso\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D6" append gate code-reviewer meu-slug >/dev/null 2>&1
+roda "$D6" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
+silencio "veredito-cobre-arvore"
+
+# 7. Arquivo de código editado DEPOIS do veredito → cutuca de novo
+D7="$TMP/c7"; repo "$D7"
+ev="$(printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D7" append gate code-reviewer meu-slug 2>/dev/null)"
+touch -t 202601010000 "$ev"
+roda "$D7" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
+contem "pos-veredito/decision" '"decision": "block"'
+
+# 8. Veredito de OUTRO gate (qa) não cala o review-guard
+D8="$TMP/c8"; repo "$D8"
+touch -t 202601010000 "$D8/src/novo.php"
+printf 'PASSOU\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D8" append gate qa meu-slug >/dev/null 2>&1
+roda "$D8" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
+contem "outro-gate/decision" '"decision": "block"'
+
+# 9. Veredito na casa de OUTRA sessão não cala esta
+D9="$TMP/c9"; repo "$D9"
+touch -t 202601010000 "$D9/src/novo.php"
+printf 'APROVADO\n' | KEELSON_SESSAO=sessao-outra bash "$LEDGER" "$D9" append gate code-reviewer meu-slug >/dev/null 2>&1
+roda "$D9" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
+contem "sessao-alheia/decision" '"decision": "block"'
+
+# 10. Arquivo alterado que não existe mais no disco conta como mais novo (conservador)
+D10="$TMP/c10"; repo "$D10"
+( cd "$D10" && printf 'x;\n' > src/velho.php && git add src/velho.php \
+  && git -c user.email=t@t -c user.name=t commit -q -m base && git rm -q src/velho.php )
+touch -t 202601010000 "$D10/src/novo.php"
+printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D10" append gate code-reviewer meu-slug >/dev/null 2>&1
+roda "$D10" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
+contem "ausente/decision" '"decision": "block"'
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

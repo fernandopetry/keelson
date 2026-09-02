@@ -303,20 +303,26 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
 - **Quais gates são aplicáveis se deriva do diff, nunca da memória (decisão 4.335).**
   Antes de despachar a rodada, confronte o diff com a lista canônica de cada gate
   dedicado (8 · 10 · 11, nas descriptions dos agents; 9 pelo comportamento observável)
-  e declare **sim/não por gate** — é essa derivação que a tabela do fecho (régua
-  simétrica 4.85) transcreve, nunca o inverso. O fim de wave do ciclo já tem o
-  inventário mecânico (4.197); esta régua leva o mesmo confronto ao **momento do
-  despacho** em toda rota — gate lembrado só no fecho é o furo que o inventário
-  previne.
+  e declare **sim/não por gate** — e, para cada sim, **se a prova dele escreve na
+  árvore** (mutante, injeção de falha, fixture ou teste temporário): sim → a linha de
+  despacho nomeia a worktree própria (parágrafo abaixo, decisão 4.361). É essa
+  derivação que a tabela do fecho (régua simétrica 4.85) transcreve, nunca o inverso.
+  O fim de wave do ciclo já tem o inventário mecânico (4.197); esta régua leva o mesmo
+  confronto ao **momento do despacho** em toda rota — gate lembrado só no fecho é o
+  furo que o inventário previne.
 - **Gates aplicáveis rodam em paralelo por padrão.** Os gates de uma rodada (7 ·
   8 · 9 · 10) são independentes entre si: despache os agentes **no mesmo turno** e espere
   os reports. Sequência é exceção **declarada** — só quando um gate consome a saída de
   outro ou disputa recurso exclusivo; "um de cada vez" sem motivo é latência pura.
-  Gate cujo mecanismo de prova **muta** arquivos do diff (mutation testing, injeção
-  de falha) trata a working tree como recurso exclusivo: roda em `git worktree`
-  isolada — nunca a mesma árvore de outro gate concorrente que também mute. Disciplina
-  de restaurar ao fim não basta: o risco é a **leitura** na janela em que dois mutantes
-  convivem, não a limpeza depois (decisão 4.134). E **árvore
+  Gate cuja prova **escreve** na árvore — muta arquivo do diff (mutation testing,
+  injeção de falha), cria fixture ou teste temporário — trabalha em `git worktree`
+  própria, **sempre** (decisões 4.134/4.361): a árvore principal tem leitores o tempo
+  todo — os outros gates da rodada, a suíte que o Tech Lead roda, o próprio revisor
+  7 — e qualquer leitura na janela do mutante mede o mutante e o reporta como estado
+  real; dois mutantes convivendo é só o caso mais visível. Restaurar ao fim (ou
+  provar por `md5` que restaurou) não diz quem leu no meio. **Autocheck do gate antes
+  da primeira escrita**: `git rev-parse --show-toplevel` diferente da raiz do
+  checkout principal — igual → pare e crie a worktree. E **árvore
   própria é `git worktree` de fato, nunca cópia do diretório de trabalho** (decisão
   4.336): a cópia (`cp -R`) carrega o que o git não versiona — `.env`, config local
   com credencial — e planta segredo real fora do repo. Prova que
@@ -335,9 +341,15 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   a todos os revisores da rodada: diff resolvido + SHA · o artefato-âncora com os
   critérios literais (ACs da TASK, critério de aceite do brief) · as fatias da ficha
   que eles usam (`quality.*`, `sensitiveGlobs`) · a **seção** do perfil a ler · e, em
-  re-gate, o veredito anterior + o delta (régua de convergência abaixo). Cada revisor
+  re-gate, o veredito anterior + o delta (régua de convergência abaixo) · e o **estado
+  provado dos mecanismos** que os gates da rodada usam — ferramenta de tela/MCP, app
+  de pé, runner (decisão 4.364): a sondagem da 4.26 é feita **uma vez** pelo Tech Lead
+  na largada da rodada e viaja com a evidência (a chamada da ferramenta e o que
+  devolveu, causa nomeada pelo §8.1 do `handoff-protocol.md`; processo do SO de pé não
+  prova toolset). Gate que recebe o estado no pacote não re-sonda: degrada declarando,
+  com a evidência herdada. Cada revisor
   redescobrindo o mesmo contexto por conta própria é o maior custo silencioso da
-  rodada.
+  rodada — e redescobrir um mecanismo morto é a forma mais cara dela.
 - **O pacote é factual, nunca avaliativo.** Ele carrega o *quê* (diff, âncoras, fatias),
   jamais a opinião de quem o montou — sem hipótese de veredito, sem "acho que está ok,
   confere só X". A revisão vale pelo **contexto limpo** (gerador ≠ avaliador, abaixo);

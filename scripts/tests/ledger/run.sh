@@ -7,7 +7,9 @@
 # arquivamento preservando pendentes — tudo no caminho LEGADO quando não há id de
 # sessão (carência 4.314 intacta); e, com id, escrita na casa da sessão
 # (<casa>/ledger/, slug registrado no meta), agregação legado+casa em list/count
-# e archive arquivando cada casa dentro de si mesma.
+# e archive arquivando cada casa dentro de si mesma. `last` (4.365): evento mais
+# recente do par tipo/origem entre casas, ativos e arquivados; `wave_sequencial`
+# aceito no catálogo (4.301 — o script recusava o tipo que a convenção lista).
 #
 # Uso: scripts/tests/ledger/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -170,6 +172,43 @@ total=$((total + 1))
 printf 'novo evento na casa\n' | lg "$SID" "$R3" append marco tech-lead meu-slug --ts "2026-08-30T19:00:00-0300" >/dev/null 2>&1
 got="$(lg "" "$R3" list 2>/dev/null)"
 [ -z "$got" ] && ok legado-nao-ve-casa-alheia || falha "legado-nao-ve-casa-alheia: [$got]"
+
+# --- last (4.365): evento mais recente do par tipo/origem, entre casas e pastas ---
+
+R4="$TMP/repo4"; mkdir -p "$R4"
+SID4="sessao-last-1234"
+printf 'legado antigo\n' | lg "" "$R4" append gate code-reviewer s --ts "2026-08-30T08:00:00-0300" >/dev/null 2>&1
+printf 'casa mais nova\n' | lg "$SID4" "$R4" append gate code-reviewer s --ts "2026-08-30T10:00:00-0300" >/dev/null 2>&1
+printf 'outro gate\n' | lg "$SID4" "$R4" append gate qa s --ts "2026-08-30T11:00:00-0300" >/dev/null 2>&1
+SDIR4="sessions/20260830-100000-sessaola"
+total=$((total + 1))
+got="$(lg "$SID4" "$R4" last gate code-reviewer 2>/dev/null | sed "s|$R4/thoughts/local/||")"
+[ "$got" = "$SDIR4/ledger/20260830-100000-gate-code-reviewer.md" ] && ok last-mais-recente-entre-casas || falha "last-mais-recente-entre-casas: [$got]"
+
+# arquivado continua contando (reported-*/ entra na busca)
+lg "$SID4" "$R4" archive --ts "2026-08-30T12:00:00-0300" >/dev/null 2>&1
+total=$((total + 1))
+got="$(lg "$SID4" "$R4" last gate code-reviewer 2>/dev/null | sed "s|$R4/thoughts/local/||")"
+[ "$got" = "$SDIR4/ledger/reported-20260830-120000/20260830-100000-gate-code-reviewer.md" ] && ok last-inclui-arquivado || falha "last-inclui-arquivado: [$got]"
+
+# legado mais novo que a casa vence pelo timestamp do nome, não pela ordem das casas
+printf 'legado mais novo\n' | lg "" "$R4" append gate code-reviewer s --ts "2026-08-30T13:00:00-0300" >/dev/null 2>&1
+total=$((total + 1))
+got="$(lg "$SID4" "$R4" last gate code-reviewer 2>/dev/null | sed "s|$R4/thoughts/local/||")"
+[ "$got" = "session-ledger/20260830-130000-gate-code-reviewer.md" ] && ok last-legado-mais-novo || falha "last-legado-mais-novo: [$got]"
+
+# sem evento do par → vazio, exit 0 (nunca é gate); sem argumentos → exit 2
+total=$((total + 1))
+got="$(lg "$SID4" "$R4" last gate security-engineer 2>/dev/null)"; st=$?
+if [ -z "$got" ] && [ "$st" -eq 0 ]; then ok last-vazio-exit-0; else falha "last-vazio-exit-0: [$got] exit $st"; fi
+total=$((total + 1))
+lg "$SID4" "$R4" last gate >/dev/null 2>&1
+[ $? -eq 2 ] && ok last-sem-origem-exit-2 || falha last-sem-origem-exit-2
+
+# wave_sequencial pertence ao catálogo (sdd-conventions, 4.301) — o append aceita
+total=$((total + 1))
+fw="$(printf 'recurso compartilhado: mesma tabela\n' | lg "" "$R4" append wave_sequencial tech-lead s --ts "2026-08-30T14:00:00-0300" 2>/dev/null)"
+if [ -f "$fw" ] && [ "$(basename "$fw")" = "20260830-140000-wave_sequencial-tech-lead.md" ]; then ok append-wave-sequencial; else falha "append-wave-sequencial: [$fw]"; fi
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

@@ -125,7 +125,7 @@ fica registrada aqui; o `/keelson:init` anota no relatório o desvio que o human
 | Campo | Efeito |
 |---|---|
 | `security` | `true`/`false` — liga o `security-engineer` (gate 8) quando a mudança é sensível |
-| `review` | `true`/`false` — governa a **cutucada de encerramento** do hook `review-guard`: mudança de código **fora do ciclo** acima do limiar bloqueia o fim da sessão uma vez, pedindo revisão. **Não desliga** a revisão do ciclo — os gates 1–7 rodam sempre no `/keelson:implement` |
+| `review` | `true`/`false` — governa a **cutucada de encerramento** do hook `review-guard`: mudança de código **fora do ciclo** acima do limiar bloqueia o fim da sessão uma vez, pedindo revisão — e cala quando o veredito do `code-reviewer` já está no ledger da sessão e nenhum arquivo de código mudou depois dele. **Não desliga** a revisão do ciclo — os gates 1–7 rodam sempre no `/keelson:implement` |
 | `reviewThreshold` | Tamanho mínimo do diff (`files`/`lines`) para a cutucada do `review-guard` disparar — não afeta a revisão do ciclo |
 | `screenVerify.enabled` | `true`/`false` — liga o gate de verificação de tela |
 | `screenVerify.method` | Como a tela é verificada: `"skill:screen-verify"` (default — a skill embarcada dirige o browser via Playwright MCP, lendo credenciais do `keelson.local.json`) ou o identificador de um método próprio do projeto (aí a Etapa 4.4 do init é pulada e o projeto responde pelo motor) |

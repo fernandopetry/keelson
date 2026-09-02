@@ -59,6 +59,15 @@ sem revisão **fora do ciclo**. A revisão do ciclo (gates 1–7 do `/keelson:im
 não é configurável — é parte do método. O efeito de cada campo está na
 [Ficha do projeto](Ficha-do-projeto).
 
+### O lembrete de revisão voltou depois de eu já ter revisado
+
+A cutucada de encerramento (`review-guard`, e a irmã `security-guard` para mudança
+sensível) olha o diff acumulado da branch — que cresce a cada correção quando o commit
+fica para o fim, como no modo sob demanda. Ela cala quando o veredito do revisor está no
+**ledger da sessão** (o Tech Lead anota o evento `gate` ao receber o report) e nenhum
+arquivo de código foi editado depois dele. Se voltou, ou algo mudou depois do veredito
+(re-revise só o delta) ou o veredito não foi anotado — anote-o e encerre.
+
 ## Gates que reprovam
 
 ### O gate de testes reprova, mas os testes passam na minha mão
