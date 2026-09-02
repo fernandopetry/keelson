@@ -23,6 +23,23 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.152.2] — 2026-09-01
+
+Re-init: none
+
+Decision 4.357 — second harness-audit round (84 surfaces, six blind judges): only the
+dated-sediment pattern is applied, the one `ls`/`grep` can prove; the other three patterns
+stay candidates behind an eval.
+
+### Fixed
+
+- **PHP 8.0 profile, §1** (4.357): the unconfirmed commercial extended-support note said
+  "announced until December 2025"; that date has passed and the note now says so. The
+  rule (assume an unpatched runtime without an active contract) is unchanged.
+- Maintainer `CLAUDE.md` (outside the package): the conventions list names all 12 owners,
+  the cast names the performance-engineer, the product-designer and the tools outside the
+  team metaphor, and the deferral note drops history already recorded in 4.209.
+
 ## [0.152.1] — 2026-09-01
 
 Re-init: none

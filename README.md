@@ -418,7 +418,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.152.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.152.2` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
@@ -427,7 +427,8 @@ New in this release: the Tech Lead stops timing subagent windows by hand (decisi
 time plus the start of every turn, and `context-cost.sh` derives from that log the
 `janelas` tail of the brief's Cronologia (`--janelas`), minutes and tool calls per role,
 and the wait between turns in the closing report. No gate changes; no new report line.
-0.152.1 makes the delivery pre-check delta-scoped on the implement route (4.355). See
+0.152.1 makes the delivery pre-check delta-scoped on the implement route (4.355); 0.152.2
+applies the dated-sediment findings of the second harness audit (4.357). See
 `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
