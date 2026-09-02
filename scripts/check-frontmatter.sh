@@ -45,11 +45,13 @@ if [ -z "$FILES" ]; then
   if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
     # --others --exclude-standard: pega também untracked não-ignorados (fixture
     # recém-criada conta; worktrees/.harness-eval ficam fora via .gitignore).
-    FILES="$(git -C "$ROOT" ls-files --cached --others --exclude-standard -- '*.md' 2>/dev/null)"
+    FILES="$(git -C "$ROOT" ls-files --cached --others --exclude-standard -- '*.md' 2>/dev/null | LC_ALL=C sort)"
   else
+    # ordem de `find` depende do sistema de arquivos (o runner do CI a inverteu em
+    # 2026-09-02) — a saída é congelada nas suítes, então a enumeração é ordenada.
     FILES="$(find "$ROOT" \( -name .git -o -path '*/.claude/worktrees' \
       -o -name .harness-eval -o -name .wiki \) -prune -o -name '*.md' -print \
-      | sed "s|^$ROOT/||")"
+      | sed "s|^$ROOT/||" | LC_ALL=C sort)"
   fi
 fi
 
