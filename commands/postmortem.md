@@ -91,7 +91,9 @@ mecanismo inclui "por que chegou a produção / por que a detecção demorou".
   moram na closure commitada das TASKs (4.200/4.308) — o confronto com a seção
   `Estimativa` do BRIEF entra como fato quando ela existe. Com `--paralelismo`, mais
   duas linhas de instrumento: `ganho` (soma crua ÷ parede — quanto trabalho de agente
-  coube por hora de parede) e `caminho-critico` (cadeia dependente mais longa, pelas
+  coube por hora de parede; **piso**, como a própria linha rotula: as marcas datam o
+  fechamento após gates/retry, e wave sequencial forçada sai com ganho > 1.0x — confronte
+  com o ledger antes de ler como paralelismo, 4.346) e `caminho-critico` (cadeia dependente mais longa, pelas
   marcas + `Depende de`); **caminho-critico ≈ parede diz que mais paralelismo não
   compraria tempo — a alavanca é reestruturar a decomposição**, e é achado candidato
   da Etapa 2 (natureza `retrabalho de processo`); dep ignorada e ciclo saem contados/

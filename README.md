@@ -418,16 +418,15 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.149.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.150.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a consumer-ledger batch (decisions 4.340–4.344) — the SPEC
-template models the Portuguese Given/When/Then keywords the lint checks, trailing
-punctuation on `Irreversível` is a form warning instead of an enum error, criteria
-against not-yet-existing files run against the cited template file, a retry that
-changes visible text sweeps the proof artifacts that quote it, and gate 11 anchors
-reachability premises in whoever produces the state. See `CHANGELOG.md`.
+New in this release: a consumer-postmortem batch (decisions 4.345–4.347) — the explicit
+AC exclusion has an address (Scope > Not included) while partial coverage stays qualified
+in the criteria, the cycle clock labels its parallelism gain as a floor that includes
+gate/retry wait, and the developer no longer duplicates the start mark in the TASK
+header. See `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

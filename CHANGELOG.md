@@ -23,6 +23,39 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.150.0] — 2026-09-01
+
+Re-init: none
+
+Decisions 4.345–4.347 — consumer-postmortem batch (plugin 0.147.0): the explicit AC
+exclusion gets an address, the parallelism gain is labelled as a floor, and the developer
+stops duplicating the start mark in the TASK header.
+
+### Added
+
+- **Explicit AC exclusion has an address** (4.345, `commands/tasks.md` coverage paragraph):
+  an AC the TASK does not prove at all is excluded under "Scope > Not included", never in
+  the Done criteria — any line there is a `covers-ac` edge and would fabricate the very
+  coverage the note denies. Partial coverage stays in the criteria, qualified inline. The
+  exclusion line is neither an edge nor a tolerance: `ac-sem-task` still fires and follows
+  the existing Step 5 rule. Field case: the exclusion written among the criteria tripped
+  `index-desatualizado` twice in one session; the first fix moved the whole line out and
+  zeroed the TASK's ACs.
+
+### Changed
+
+- **`cycle-clock.sh --paralelismo` labels `ganho` as a floor** (4.346): closure marks date
+  the TASK's close-out after the wave's gates/retry, so overlap between tasks of one wave
+  can be shared waiting, never simultaneous work — a forced-sequential wave reads as
+  `1.2x`. The header says so, the `ganho` line carries `(piso - inclui espera de gate/retry)`
+  inside its third column (no new column; default output unchanged), and
+  `commands/postmortem.md` mirrors the label. Four frozen suite strings updated.
+- **Developer step 3 writes only the Status** (4.347, `agents/developer.md`): the start
+  instant is still measured there, but goes to the report's `data_inicio` — `Data início`
+  lives only in the execution history, filled by the main session at closure (4.308).
+  Field case: two TASKs with the field duplicated and divergent, one carrying the cycle's
+  start 4h25 before the task was dispatched.
+
 ## [0.149.0] — 2026-09-01
 
 Re-init: none

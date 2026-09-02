@@ -32,6 +32,12 @@
 #   ganho       <X.Y>x  soma-crua <N>min / parede <M>min
 #               # soma CRUA das durações ÷ parede: quanto trabalho de agente coube
 #               # por hora de parede (1.0x = sequencial)
+#               # PISO, nunca medida pura de paralelismo (4.346): as marcas datam o
+#               # FECHAMENTO da TASK (closure após gates/retry da wave — §3.4.1 do
+#               # implement), então sobreposição entre TASKs da mesma wave pode ser
+#               # espera compartilhada de gate/retry, nunca trabalho simultâneo —
+#               # wave sequencial forçada sai com ganho > 1.0x. Vale para o
+#               # caminho-critico abaixo; confronte com o ledger/boletim da wave.
 #   caminho-critico  <N>min  <H>h<MM>min  <ID> -> <ID> (<K> TASK(s)[, <J> dep(s) ignoradas: ...])
 #               # cadeia dependente mais longa (marcas + "- **Depende de**:" das
 #               # TASKs com par); caminho-critico ≈ parede ⇒ mais paralelismo não
@@ -189,7 +195,7 @@ END {
 
   # --- ganho de paralelismo: soma CRUA / parede (4.328) ------------------------
   if (nini > 0 && nfim > 0 && maxfim > minini)
-    printf "ganho\t%.1fx\tsoma-crua %dmin / parede %dmin\n", cru / (maxfim - minini), int(cru / 60), int((maxfim - minini) / 60)
+    printf "ganho\t%.1fx\tsoma-crua %dmin / parede %dmin (piso - inclui espera de gate/retry)\n", cru / (maxfim - minini), int(cru / 60), int((maxfim - minini) / 60)
   else
     printf "ganho\tomitido\tparede omitida ou nula\n"
 

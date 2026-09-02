@@ -72,12 +72,19 @@ rodar — cada um é a mesma violação de gate do furo silencioso (decisão 4.3
 
 ### 3. Atualizar Status para In Progress
 
-Antes de codar, atualizar o arquivo da TASK:
+Antes de codar, atualizar o arquivo da TASK — só o Status:
 
 ```markdown
 **Status**: In Progress
-**Data início**: <ISO 8601 com timezone atual>
 ```
+
+E **medir o instante** (`TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z`) para o campo
+`data_inicio` do report (passo 8) — **nunca escrever `Data início` no cabeçalho** (decisão
+4.347): o campo tem dono único no "## Histórico de execução" do template, preenchido pela
+main session na closure com a marca do despacho (4.308); linha no cabeçalho duplica o campo
+com valor divergente, e como o relógio do ciclo lê a última ocorrência ela só engana quem
+retoma a TASK depois (caso real: cabeçalho com a largada do ciclo inteiro, 4h25 antes do
+despacho da TASK, commitado ao lado do Histórico correto).
 
 ### 4. Implementar
 

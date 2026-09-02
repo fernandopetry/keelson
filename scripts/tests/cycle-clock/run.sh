@@ -9,7 +9,7 @@
 # de execução), filtro por PLAN + exclusão do INDEX, anotação após o token ISO
 # tolerada, fuso misto convertido por epoch, exit 2 sem TASK elegível. Com
 # --paralelismo (4.328): cadeia linear (ganho 1.0x, caminho = soma), waves paralelas
-# (ganho > 1x, empate determinístico), ciclo omitido com motivo, dep ignorada
+# (ganho > 1x, rótulo de piso — 4.346, empate determinístico), ciclo omitido com motivo, dep ignorada
 # contada, tudo omitido sem par; offset -03:00 normalizado (default).
 #
 # Uso: scripts/tests/cycle-clock/run.sh
@@ -183,7 +183,7 @@ task	TASK-001-003-c	2026-01-10T11:30:00-0300	2026-01-10T12:30:00-0300
 completude	3 de 3 TASK(s) com par de marcas
 parede	2026-01-10T10:00:00-0300 -> 2026-01-10T12:30:00-0300	150min	2h30min
 soma-tasks	150min	2h30min	uniao de intervalos - sobreposicao descontada
-ganho	1.0x	soma-crua 150min / parede 150min
+ganho	1.0x	soma-crua 150min / parede 150min (piso - inclui espera de gate/retry)
 caminho-critico	150min	2h30min	TASK-001-001 -> TASK-001-002 -> TASK-001-003 (3 TASK(s))" "$got" "$st"
 
 # waves paralelas: caminho < soma crua; ganho > 1x; empate resolve pela ordem
@@ -198,7 +198,7 @@ task	TASK-001-003-c	2026-01-10T11:00:00-0300	2026-01-10T12:00:00-0300
 completude	3 de 3 TASK(s) com par de marcas
 parede	2026-01-10T10:00:00-0300 -> 2026-01-10T12:00:00-0300	120min	2h00min
 soma-tasks	120min	2h00min	uniao de intervalos - sobreposicao descontada
-ganho	1.5x	soma-crua 180min / parede 120min
+ganho	1.5x	soma-crua 180min / parede 120min (piso - inclui espera de gate/retry)
 caminho-critico	120min	2h00min	TASK-001-001 -> TASK-001-003 (2 TASK(s))" "$got" "$st"
 
 # ciclo de dependência: caminho omitido com motivo; ganho segue saindo
@@ -211,7 +211,7 @@ task	TASK-001-002-b	2026-01-10T11:00:00-0300	2026-01-10T11:30:00-0300
 completude	2 de 2 TASK(s) com par de marcas
 parede	2026-01-10T10:00:00-0300 -> 2026-01-10T11:30:00-0300	90min	1h30min
 soma-tasks	90min	1h30min	uniao de intervalos - sobreposicao descontada
-ganho	1.0x	soma-crua 90min / parede 90min
+ganho	1.0x	soma-crua 90min / parede 90min (piso - inclui espera de gate/retry)
 caminho-critico	omitido	ciclo de dependencia entre as TASKs" "$got" "$st"
 
 # dep fora do conjunto lido (cross-PLAN/inexistente) e dep para TASK sem par:
@@ -227,7 +227,7 @@ task	TASK-001-003-c	2026-01-10T11:00:00-0300	2026-01-10T12:00:00-0300
 completude	2 de 3 TASK(s) com par de marcas
 parede	2026-01-10T10:00:00-0300 -> 2026-01-10T12:00:00-0300	120min	2h00min
 soma-tasks	120min	2h00min	uniao de intervalos - sobreposicao descontada
-ganho	1.0x	soma-crua 120min / parede 120min
+ganho	1.0x	soma-crua 120min / parede 120min (piso - inclui espera de gate/retry)
 caminho-critico	120min	2h00min	TASK-001-001 -> TASK-001-003 (2 TASK(s), 2 dep(s) ignoradas: fora do conjunto ou sem par de marcas)" "$got" "$st"
 
 # sem nenhum par de marcas: as duas grandezas novas saem omitidas
