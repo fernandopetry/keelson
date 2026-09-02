@@ -7,7 +7,11 @@
 # re-reporta agente já visto; gate de projeto keelson (fora dele, nada é
 # escrito); casa da sessão (4.314): payload com session_id → escreve em
 # thoughts/local/sessions/<ts>-<sid8>/window.log (pasta criada com meta);
-# sem session_id → caminho legado, comportamento antigo intacto.
+# sem session_id → caminho legado, comportamento antigo intacto. Campos medidos
+# (decisão 4.354): registro com totalDurationMs/totalToolUseCount → `dur=<S>s`
+# e `tools=<N>` ao fim da linha `agente=`, carimbada com o timestamp do RETORNO
+# (horário de Brasília); registro sem os campos → linha antiga, byte-idêntica;
+# primeiro registro de usuário do delta → ` inicio=<ts>` na linha `janela=`.
 #
 # Uso: scripts/tests/window-marker/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -94,6 +98,33 @@ roda "{\"cwd\": \"$D4\", \"transcript_path\": \"$T4\", \"session_id\": \"sessao-
 total=$((total + 1))
 n="$(grep -c ' agente=' "$SDIR4/window.log" 2>/dev/null)"
 [ "$n" = "1" ] && ok sessao-delta-nao-duplica || falha "sessao-delta-nao-duplica: [$n]"
+
+# 5. Campos medidos (4.354): dur/tools do registro, ts do retorno, inicio do turno
+D5="$TMP/c5"; mkdir -p "$D5/thoughts/local"
+T5="$TMP/t5.jsonl"
+cat > "$T5" <<'EOF'
+{"type":"user","timestamp":"2026-08-02T01:19:47.529Z","message":{"role":"user","content":"prompt que abre o turno"}}
+{"type":"assistant","timestamp":"2026-08-02T01:19:50.000Z","message":{"usage":{"input_tokens":1000,"cache_read_input_tokens":2000,"cache_creation_input_tokens":500}}}
+{"type":"user","timestamp":"2026-08-02T01:25:00.000Z","toolUseResult":{"agentType":"keelson:developer","totalTokens":300000,"totalDurationMs":3132,"totalToolUseCount":7}}
+{"type":"user","timestamp":"2026-08-02T01:26:00.000Z","toolUseResult":{"agentType":"keelson:po","totalTokens":20000}}
+{"type":"user","isSidechain":true,"timestamp":"2026-08-02T01:27:00.000Z","message":{"role":"user","content":"registro de sidechain nunca abre turno"}}
+EOF
+roda "{\"cwd\": \"$D5\", \"transcript_path\": \"$T5\"}"
+LOG5="$D5/thoughts/local/session-window.log"
+total=$((total + 1))
+grep -q ' janela=3500 inicio=2026-08-01T22:19:47-0300$' "$LOG5" 2>/dev/null && ok janela-com-inicio-do-turno || falha "janela-com-inicio-do-turno: [$(cat "$LOG5" 2>/dev/null)]"
+total=$((total + 1))
+grep -q '^2026-08-01T22:25:00-0300 agente=keelson:developer tokens=300000 dur=3s tools=7$' "$LOG5" 2>/dev/null && ok agente-dur-tools-ts-do-retorno || falha "agente-dur-tools-ts-do-retorno: [$(grep agente= "$LOG5" 2>/dev/null)]"
+total=$((total + 1))
+grep -q '^2026-08-01T22:26:00-0300 agente=keelson:po tokens=20000$' "$LOG5" 2>/dev/null && ok agente-sem-medida-linha-antiga || falha "agente-sem-medida-linha-antiga: [$(grep 'agente=keelson:po' "$LOG5" 2>/dev/null)]"
+# 2º Stop sem delta: janela sem inicio (nenhum registro novo), nada duplica
+roda "{\"cwd\": \"$D5\", \"transcript_path\": \"$T5\"}"
+total=$((total + 1))
+n="$(grep -c ' janela=3500$' "$LOG5" 2>/dev/null)"
+[ "$n" = "1" ] && ok janela-sem-delta-sem-inicio || falha "janela-sem-delta-sem-inicio: [$n]"
+total=$((total + 1))
+n="$(grep -c ' agente=' "$LOG5" 2>/dev/null)"
+[ "$n" = "2" ] && ok medidos-nao-duplicam || falha "medidos-nao-duplicam: [$n]"
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

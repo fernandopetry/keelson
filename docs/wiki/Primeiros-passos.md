@@ -69,8 +69,8 @@ O relatório final traz, em ordem de importância:
 | Gates | O que passou, o que degradou e **o que ficou pendente** — pendência nomeada nunca vira "Done" |
 | Pendências do Diretor | Decisões que sobraram para você, em lote |
 | Intervenções humanas | Quantas vezes o ciclo precisou de uma resposta sua (veto, escalação respondida, handoff devolvido) — decisões tomadas **em seu nome** não contam |
-| Duração | Relógio de parede por etapa |
-| Custo por papel | Tokens aproximados por membro do time (quando medidos) — observação para a dieta de contexto, nunca motivo de parada |
+| Duração | Relógio de parede por etapa — e, quando medido, quanto dele foi espera entre turnos (por você ou por um agent em background) |
+| Custo por papel | Tokens, minutos de janela e chamadas de ferramenta aproximados por membro do time (quando medidos) — observação para a dieta de contexto, nunca motivo de parada |
 
 Consulte o estado a qualquer momento:
 

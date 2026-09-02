@@ -438,10 +438,13 @@ lançamento do ciclo completo no card — os worklogs por etapa já contêm o te
 
 A linha existe desde a 0.109.0 (decisão 4.239) e é **telemetria**: medida ou omitida,
 nunca estimada — a ausência dela **não** é defeito quando não há o que medir. Fonte:
-o hook `window-marker` grava tokens por subagent no log de janela da pasta da sessão
-(`window.log` em `thoughts/local/sessions/<...>/`; instalações antigas usam
-`thoughts/local/session-window.log`) a cada Stop, e `scripts/context-cost.sh` compõe
-o ranking no fecho. Se subagents
+o hook `window-marker` grava tokens por subagent — e, desde a 0.152.0, a duração e as
+chamadas de ferramenta de cada janela, mais o início de cada turno — no log de janela da
+pasta da sessão (`window.log` em `thoughts/local/sessions/<...>/`; instalações antigas
+usam `thoughts/local/session-window.log`) a cada Stop, e `scripts/context-cost.sh`
+compõe o ranking no fecho (minutos e chamadas só aparecem para os spawns que o
+harness mediu; parcial vem marcado `em N medidos`). A mesma fonte alimenta a cauda
+`espera entre turnos` da linha `Duração` e a cauda `janelas` da `Cronologia` do brief. Se subagents
 rodaram e a linha saiu vazia mesmo assim, as causas prováveis: plugin anterior à
 0.109.0 durante parte do ciclo (rode `/keelson:update`); hook sem `python3` no PATH
 (ele degrada em silêncio, por desenho); ou o formato interno do transcript do harness
@@ -459,7 +462,9 @@ a ausência não é defeito quando não há o que medir. Ela só aparece em rota
 etapa de forja (specify → plan → tasks) e se alimenta da cauda de telemetria que o
 ciclo anexa à `Cronologia` do brief ao fechar cada etapa: quantas voltas de correção o
 documento precisou depois da validação, quanto custou cada janela de escrita (minutos e
-linhas, quando o ciclo mediu — desde a 0.137.0) e quais classes de achado apareceram.
+linhas, quando o ciclo mediu — desde a 0.137.0; desde a 0.152.0 os minutos vêm do hook
+`window-marker`, que mede cada janela de subagent, e não mais do relógio à mão do
+condutor) e quais classes de achado apareceram.
 Etapa sem relatório de validação fica sem cauda — e sai da linha; janela sem medição
 fica sem o parêntese de custo. O número é observação para
 melhorar a escrita dos documentos ao longo do tempo; o ciclo nunca para nem muda de

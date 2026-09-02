@@ -250,7 +250,7 @@ Retrato de maturidade — o que sustenta a autonomia dos agentes neste projeto
 - **Invariantes do projeto**: <guidelines/project/invariants.md presente | ausente → gate 6 declara n/a (opt-in — 4.242)>
 ```
 
-Feche com uma nota informativa de observabilidade (decisão 4.239 — **só informa, nunca grava config**): o report de fecho do ciclo já mede janela de contexto e custo por papel em tokens aproximados (hook `window-marker` + `scripts/context-cost.sh`); quem quiser número exato de tokens/custo por modelo tem a **exportação OTEL do Claude Code** — opt-in do harness via `CLAUDE_CODE_ENABLE_TELEMETRY=1` + endpoint OTLP próprio (métrica `claude_code.token.usage`). Configurar é ato do Diretor, fora do keelson: env de telemetria exporta dados de uso para o coletor que ele escolher (a régua "sem dado sensível em telemetria" de `core/SECURITY.md` vale para o destino).
+Feche com uma nota informativa de observabilidade (decisão 4.239 — **só informa, nunca grava config**): o report de fecho do ciclo já mede janela de contexto e custo por papel em tokens aproximados — e, desde a 0.152.0, minutos de janela e chamadas de ferramenta por papel e a espera entre turnos (hook `window-marker` + `scripts/context-cost.sh`, decisão 4.354); quem quiser número exato de tokens/custo por modelo tem a **exportação OTEL do Claude Code** — opt-in do harness via `CLAUDE_CODE_ENABLE_TELEMETRY=1` + endpoint OTLP próprio (métrica `claude_code.token.usage`). Configurar é ato do Diretor, fora do keelson: env de telemetria exporta dados de uso para o coletor que ele escolher (a régua "sem dado sensível em telemetria" de `core/SECURITY.md` vale para o destino).
 
 ## Config incremental (durante o uso)
 

@@ -83,10 +83,13 @@ inline sem arquivo, e trivial não tem brief. Fora do ciclo, a mudança avulsa u
 <anexada pelo condutor do ciclo — uma linha `- <etapa>: <timestamp>` ao concluir cada
 etapa; etapa de forja (specify/plan/tasks) com validação medida ganha a cauda
 `· correções: <N> · classes: <check-id(n) · …>` (decisão 4.275) e, quando medido, o campo
-`· janelas: redação <N>min/<N>l[ · correção <N>min/<N>l]` (decisão 4.311 — custo das
-janelas de scribe da etapa: minutos pelo relógio da main session entre despacho e
-retorno, linhas por `wc -l` dos `artefatos` do sumário; janelas paralelas medem do
-despacho ao último retorno, linhas somadas; sem medição, o campo não existe). Telemetria
+`· janelas: redação <N>min/<N>l[ · correção <N>min/<N>l]` (decisões 4.311/4.354 — custo
+das janelas de scribe da etapa: minutos medidos pelo hook `window-marker` (retorno e
+duração de cada subagent, no log de janela) e compostos por `context-cost.sh --janelas`,
+que separa a redação (os N primeiros despachos, declarados pelo condutor) das correções
+(agrupadas por sobreposição) e soma as linhas por `wc -l` dos `artefatos` do sumário;
+janelas paralelas medem do despacho ao último retorno; o condutor transcreve a saída
+literal — sem medição, o campo não existe). Telemetria
 é sempre **cauda da linha da etapa, nunca linha própria** — o timestamp permanece
 o primeiro campo após a etapa — é a marca que a duração (4.56) e a janela do worklog
 (§17 do protocolo de sync) leem>

@@ -62,8 +62,8 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 - **Telemetria**: <worklog <duração> publicado em <KEY> | falhou (<motivo>) | sem marca de largada — não publicável>   # só com jira.telemetry: true (§17 do protocolo, decisão 4.196); ativo sem linha é defeito do report, nunca omissão válida; <duração> é a do trecho do fecho (janela do §17, 4.234) — o total do ciclo vive na linha Duração, nunca em worklog
 - **Fila do épico**: <fatia marcada `entregue` · próximo passo pronto: /keelson:continue <slug-âncora>>   # só demanda com **Epico**:
 - **Estimativa × realizado**: <~N waves/~N tasks previstos vs N/N reais · <min–max>h vs <duração medida — parede <H>h<MM>min · trabalho <H>h<MM>min (N de M TASKs com marca)> · desvio em meia linha · linha anexada em guidelines/project/estimates.md · espelho: <publicada | falhou (motivo) | n/a>>   # só quando o BRIEF da demanda tem seção ## Estimativa (estimate-contract.md §4, decisão 4.223); o realizado vem do TASK-MMM-INDEX e da duração MEDIDA — nunca o contrário; a duração medida é a saída literal de `bash "${CLAUDE_PLUGIN_ROOT}/scripts/cycle-clock.sh" <docsRoot>/<slug>/tasks PLAN-MMM` (decisão 4.325): `parede` (min início → max conclusão — inclui esperas) e `soma-tasks` (união de intervalos — o trabalho, comparável à faixa em horas), derivadas das marcas commitadas das closures (4.200/4.308) e por isso válidas mesmo com o ciclo atravessando sessões; grandeza `omitida` na saída fica omitida na linha, com a completude no lugar — nunca estimada
-- **Duração**: <total> (largada HH:MM → entrega HH:MM, horário de Brasília) · specify <n>min · plan <n>min · tasks <n>min · implement <n>min · janela pico ~<N>k tokens   # etapa que a rota não teve não aparece; marca ausente → o que foi medido + lacuna nomeada; janela só quando o log existe
-- **Custo por papel**: <papel ~<N>k tokens (<M> spawns) · …, maiores primeiro — saída literal de `context-cost.sh --compose`>   # OMITIR quando o log não tem linha de agente — telemetria da dieta (4.239), medida ou omitida, nunca estimada; custo jamais vira gatilho de parada (4.23); ciclo em AGENT_TEAMS → o invocador passa `--teams` e a linha `cobertura:` da saída viaja junto (4.296)
+- **Duração**: <total> (largada HH:MM → entrega HH:MM, horário de Brasília) · specify <n>min · plan <n>min · tasks <n>min · implement <n>min · janela pico ~<N>k tokens · espera entre turnos ~<N>min (<K> intervalos >10min)   # etapa que a rota não teve não aparece; marca ausente → o que foi medido + lacuna nomeada; janela e espera só quando o log existe (espera = linha `espera:` do `--compose`, decisão 4.354 — telemetria, jamais gatilho)
+- **Custo por papel**: <papel ~<N>k tokens (<M> spawns[ · <N>min[ em <k> medidos]][ · <C> chamadas]) · …, maiores primeiro — saída literal de `context-cost.sh --compose`>   # OMITIR quando o log não tem linha de agente — telemetria da dieta (4.239), medida ou omitida, nunca estimada; minutos de janela e chamadas de ferramenta só quando o hook os mediu (4.354 — spawn sem medida → `em <k> medidos`, nunca soma parcial calada); custo jamais vira gatilho de parada (4.23); ciclo em AGENT_TEAMS → o invocador passa `--teams` e a linha `cobertura:` da saída viaja junto (4.296)
 - **Forja**: <specify <N> correções (<N>min/<N>l) · plan <N> (…) · tasks <N> (…) · classes: <check-id(n) · …, decrescente | nenhuma>>   # só rota com etapa de forja — fonte única: cauda de telemetria da Cronologia do BRIEF (4.275); o parêntese por etapa transcreve o campo `janelas` da cauda quando ele existe (custo medido das janelas de scribe — minutos e linhas, medição da main session, decisão 4.311) e é omitido sem ele; OMITIR a linha sem cauda medida; correção = volta de correção de artefato pós-validação, ≠ retry de gate de código (§17 do protocolo de sync); telemetria — medida ou omitida, nunca estimada, jamais gatilho (4.23): o número existe para destilar classe recorrente (escada 4.149) e, desde a 4.311, para dar denominador de custo à destilação
 - **Pendente de você**: <revisão da branch · merge · resposta a pergunta estacionada · handoff · nada>
 - **Sugestão de postmortem**: <a sessão teve dificuldades — <sinais em meia linha: retry, gate reprovado, correção/intervenção do Diretor> → vale rodar `/keelson:postmortem` para cobrir o episódio (o `PM-*.md` durável fica no repositório mesmo sem envio ao mantenedor)>   # OMITIR quando a sessão não teve retry, gate reprovado nem correção do Diretor (decisão 4.274) — juízo de quem viveu a sessão, nunca parser do ledger (4.227); a linha SUGERE que o Diretor digite o comando (humano-only), jamais o invoca; complementa a seção "Mensagem ao mantenedor": ela cobre o erro pontual, o postmortem cobre o episódio inteiro
@@ -93,11 +93,18 @@ nunca estimadas**: a fonte única é o log de janela `window.log` da **casa da s
 (decisão 4.314, resolvida por `session-dir.sh`; legado
 `thoughts/local/session-window.log` em leitura dupla — sessão que atravessou o
 update soma os dois trechos), escrito pelo hook `window-marker` fora do contexto do
-modelo — uma linha `<ts> janela=<tokens>` por Stop e uma linha
-`<ts> agente=<tipo> tokens=<N>` por subagent concluído. Quem
-compõe as duas é `bash "${CLAUDE_PLUGIN_ROOT}/scripts/context-cost.sh" <raiz>
---compose` (pico = maior janela; ranking = soma por papel, decrescente) — a saída é
-citada literal, jamais recalculada de memória. Ciclo que rodou em `AGENT_TEAMS` → o
+modelo — uma linha `<ts> janela=<tokens>[ inicio=<ts>]` por Stop (`inicio=` é o
+registro que abriu o turno — decisão 4.354) e uma linha
+`<ts> agente=<tipo> tokens=<N>[ dur=<S>s][ tools=<N>]` por subagent concluído,
+carimbada com o instante do retorno (duração e chamadas de ferramenta quando o
+harness as traz — 4.354). Quem
+compõe é `bash "${CLAUDE_PLUGIN_ROOT}/scripts/context-cost.sh" <raiz>
+--compose` (pico = maior janela; ranking = soma por papel, decrescente, com minutos e
+chamadas quando medidos; `espera:` = soma dos intervalos > 10 min entre o fim de um
+turno e o início do seguinte) — a saída é
+citada literal, jamais recalculada de memória. A cauda `janelas` da `Cronologia` do
+BRIEF (index-contract.md, 4.311) nasce do mesmo log, via `--janelas` (4.354) — o
+formato é o do index-contract; só a origem mudou, da mão para o hook. Ciclo que rodou em `AGENT_TEAMS` → o
 invocador que conhece o enum de orquestração passa `--teams` ao compositor, e a saída
 ganha a linha `cobertura:` — o ranking cobre só despachos via Task (o fato do modo e
 suas lacunas têm dono em `agent-teams.md`); a flag é **do chamador, nunca env var**:
