@@ -216,7 +216,7 @@ Despachado em paralelo com o `spec-validator` (Etapa 4 — decisão 4.113), o ag
 
 A crítica **não bloqueia** a criação da SPEC nem a atualização do INDEX (a SPEC nasce em `Draft`); o resultado é reportado ao usuário.
 
-**Com BRIEF pareado** (front-matter `Brief:` preenchido — a demanda entrou pelo ciclo com brief): após a crítica **e o veredito de forma** (o PO consome ambos — ele fica fora da rodada paralela), invocar o agent `po` em **modo aprovação** (BRIEF + SPEC + crítica + INDEX). O veredito (`APROVAR | ESCALAR`, com resoluções e decisões em nome do Diretor) entra no output final; quem age sobre ele é o invocador — `/keelson:auto` promove ou aplica a escada; `/keelson:guided` o apresenta como recomendação no CHECKPOINT 1. **Sem BRIEF** (specify avulso): não invocar o `po` — a promoção a `Approved` permanece com o humano.
+**Com BRIEF pareado** (front-matter `Brief:` preenchido — a demanda entrou pelo ciclo com brief): após a crítica **e o veredito de forma** (o PO consome ambos — ele fica fora da rodada paralela), invocar o agent `po` em **modo aprovação** (BRIEF + SPEC + crítica + INDEX + a **proveniência do BRIEF**: forjado no `/keelson:brief`, com as seções da forja e sem pendência que bloqueie o núcleo, ou montado na largada — é o que liga a lente do brief forjado, decisão 4.351; régua no `agents/po.md`). O veredito (`APROVAR | ESCALAR`, com resoluções e decisões em nome do Diretor) entra no output final; quem age sobre ele é o invocador — `/keelson:auto` promove ou aplica a escada; `/keelson:guided` o apresenta como recomendação no CHECKPOINT 1. **Sem BRIEF** (specify avulso): não invocar o `po` — a promoção a `Approved` permanece com o humano.
 
 ## Etapa 5: atualização do INDEX.md
 
@@ -243,7 +243,7 @@ Só quando a ficha tem `jira.enabled: true`: **despache o agent `tracker-sync`**
    - Errors pendentes (se houver)
    - Warnings relevantes
    - Crítica de produto (`product-analyst`): riscos de mérito e perguntas a decidir antes de `Approved`
-   - Veredito do PO (quando há BRIEF): decisão, resoluções pelo brief e escalações com proposta + default
+   - Veredito do PO (quando há BRIEF): decisão, resoluções pelo brief, escalações com proposta + default — e as sugestões (contagem e itens) quando a lente do brief forjado as separou (4.351): não aplicadas, não decididas
 6. Premissas `[assumido]` que precisam confirmação — destacando selo `crença`/`anedota` em requisito central (4.96).
 6.5. Vereditos de métrica pendentes no slug (4.99), com os vencidos destacados — no ciclo, a Entrega do `/keelson:auto` cobra (item 6.4); no specify avulso, repasse ao Diretor.
 7. Estado do INDEX após esta operação.

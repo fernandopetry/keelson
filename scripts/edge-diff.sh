@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # edge-diff.sh — diff de arestas antes/depois de um pacote de correção num artefato (decisão 4.117/4.154).
-# O arquivo depois do pacote (Write integral ou lote de Edits — 4.309) preserva toda
+# O arquivo depois do pacote (`modo: reescrita` = Write integral · `modo: edits` = lote de Edits — 4.309/4.349) preserva toda
 # aresta que nenhum ajuste mira; este script PROVA isso, nos dois modos: extrai os campos
 # de aresta e os ACs citados em critérios das
 # duas versões e reporta o delta. Quem roda é a main session, após o retorno do scribe

@@ -82,7 +82,8 @@ A consistência global não depende de disciplina dos redatores: o `graph.sh --c
 
 Receba o(s) sumário(s) estruturado(s) (`agents/scribe.md`): `insumos_index.contagens` alimenta a
 Etapa 6; `duvidas` não-vazias → resolva (pergunte; no modo autônomo, escada) e re-despache
-só o delta. Agent indisponível → Etapas 1–4 inline como fallback, declarado no output.
+só o delta (em correção, `modo_aplicado` divergente do declarado sem motivo é lição
+candidata de processo — 4.349). Agent indisponível → Etapas 1–4 inline como fallback, declarado no output.
 
 ## Etapa 1: princípios de decomposição (contrato — executado pelo `scribe`)
 
@@ -339,7 +340,7 @@ fora do recorte são o gap que o Input manda reportar — liste-os no output com
 conhecido; qualquer outro ERROR bloqueia normalmente (decisão 4.301).
 
 **Correção** (decisão 4.114): delta ao `scribe`, **aguardado**, com a lista literal de
-ERRORs e âncora por ajuste — modo de aplicação pela régua do pacote (4.309); buraco de numeração não é defeito, arquivo existente nunca se renumera — protocolo do invocador: `graph-contract.md` §4.1.
+ERRORs e âncora por ajuste — com `modo:` declarado pela régua do pacote (4.309/4.349, `graph-contract.md` §4.1) e revalidação pela régua do protocolo (`validator-protocol.md` §4.5, 4.350); buraco de numeração não é defeito, arquivo existente nunca se renumera — protocolo do invocador: `graph-contract.md` §4.1.
 
 Com o grafo limpo (e o scribe encerrado), invocar a skill `task-validator` em modo batch
 (apontando para o TASK-MMM-INDEX) — em paralelo com o `tracker-sync` da Etapa 7 quando o

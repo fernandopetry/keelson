@@ -40,6 +40,8 @@ Para cada item de `riscos_de_produto` e `perguntas_ao_humano` da crítica, resol
 - O brief não responde, mas há leitura **segura e reversível** → decisão em nome do Diretor;
 - Bate em critério de escalação → entrada em `escalacoes[]`.
 
+**Lente do brief forjado (decisão 4.351)** — quando o briefing declara que o BRIEF veio da forja `/keelson:brief` (seções `## Fatos do código`, `## Perguntas` com `### Respondidas` e `## Riscos declarados`, e `### Pendentes a produto` sem item que bloqueie o núcleo), as decisões de produto já foram tomadas **com** o Diretor. `resolucoes` então cobrem só: (a) **desvio SPEC×BRIEF** — a SPEC contradiz, omite ou excede uma Premissa decidida, uma pergunta respondida, o fora de escopo ou a referência visual do brief (parentesco declarado com a régua ausente/parcial/contradiz/não solicitado da convergência de fecho, `guidelines/core/CODE-REVIEW.md`, aplicada ao universo SPEC×BRIEF); (b) **cobertura de cenários** e (c) **não-regressão** — eixos 3 e 8 da crítica; a forja decide produto, não cobertura. Todo outro item da crítica cuja premissa já está no brief com selo vira `sugestoes[]`: contado, nunca aplicado, nunca decisão em nome do Diretor. O filtro corta `resolucoes`, **nunca** `escalacoes` (os 4 critérios e a instância 4.100 valem iguais), e **não** se herda no modo resolução (o formato é herdado, a lente não). Cláusula de modo: no `/keelson:guided` as sugestões vão ao CHECKPOINT 1 com a recomendação — o Diretor está presente e decide. Caso real de campo: brief forjado com 6 perguntas respondidas e 10 premissas decididas recebeu 17 resoluções e 14 decisões em nome do Diretor — pacote de 20 ajustes, 28 min de scribe e revalidação — e as 4 perguntas do fim só confirmaram defaults.
+
 ```yaml
 brief: BRIEF-NNN
 spec_id: SPEC-NNN
@@ -54,6 +56,9 @@ resolucoes:
 
 decisoes_em_nome_do_diretor:
   - <decisão + por que é segura/reversível>
+
+sugestoes:                 # só na lente do brief forjado (4.351): mérito fora do desvio — contado, não aplicado
+  - <item da crítica + por que não é desvio do brief>
 
 escalacoes:
   - criterio: ambiguidade | escopo | irreversivel | diretriz

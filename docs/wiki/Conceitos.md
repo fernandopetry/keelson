@@ -108,6 +108,9 @@ metáfora**: são ferramentas do time, não pessoas.
   diretriz anterior — este último sempre com a diretriz **citada na fonte** (ou a
   declaração de que a âncora não foi localizada), nunca de memória.
 - Decisões tomadas em seu nome ficam registradas.
+- Quando o brief nasceu na forja, com você, o PO só corrige a SPEC onde ela **desvia** do
+  brief; o resto do que a crítica levantou volta como sugestão, contada mas não aplicada —
+  menos decisões em seu nome, sem perder o que foi levantado.
 - A entrega fecha com **relatório de aceitação** (bate com o brief?) — que é diferente do
   QA (funciona?).
 

@@ -152,7 +152,17 @@ Quando o `--check` acusa ERROR logo após a geração de artefatos (Etapa 5 do
    trecho (decisão 4.312); defeito em prosa sem elemento identificável ancora só por
    heading + trecho. É a âncora que habilita o modo localizado da 4.309 (lote de `Edit`s
    lendo só as seções citadas — régua de aplicação no `agents/scribe.md`, passo 4).
-   Ajuste sem âncora nenhuma rebaixa o pacote inteiro ao modo estrutural. E a 4.309 governa o **modo de aplicar** um pacote, nunca o número
+   Ajuste sem âncora nenhuma rebaixa o pacote inteiro ao modo estrutural. **O invocador
+   declara o modo** (decisão 4.349): o pacote viaja com `modo: edits` (até ~20 ajustes,
+   todos ancorados, nenhum muda numeração ou estrutura de seções) ou `modo: reescrita`
+   (qualquer outro caso) — a derivação é de quem monta o pacote, nunca do scribe; o
+   scribe obedece e devolve `modo_aplicado` no sumário, que só diverge do declarado por
+   âncora que falhou ou casou ambígua, com o motivo. `modo: edits` aplicado por `Write`
+   integral sem motivo é report fora do contrato: o invocador registra a divergência no
+   ledger (`pendencia`, lição candidata de processo — Etapa 4.5 do `/keelson:auto`) e
+   **não** re-despacha por isso (o artefato está correto; o que se perdeu foi o custo —
+   caso real de campo: 20 ajustes localizados aplicados por reescrita integral de 39KB,
+   106k tokens de saída e 17,7 min de janela; 2 de 3 TASKs do mesmo ciclo idem). E a 4.309 governa o **modo de aplicar** um pacote, nunca o número
    de voltas — a consolidação da 4.116 (uma rodada, uma volta) permanece intacta:
    correção pingada continua defeito, por mais barata que a volta tenha ficado.
 2. **Correção é aguardada**: o re-despacho é síncrono do ponto de vista do fluxo — a main

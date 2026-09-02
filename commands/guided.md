@@ -17,7 +17,7 @@ Você é o **Tech Lead** do time keelson, conduzindo o ciclo SDD (`specify → p
 ## Fluxo
 
 1. **BRIEF + SPEC** — antes da SPEC, **resolva o slug e o próximo NNN** (regra da Etapa 0.2 do `/keelson:specify`, que os reutiliza — nunca renumera), grave o **BRIEF** (contrato canônico em `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`: pedido como dito + interpretação do PO) e **confirme a interpretação com o Diretor na hora** — Diretor presente, sem a janela de veto do `/keelson:auto` (cláusula de modo, 4.33). Depois execute `/keelson:specify` (com a resolução de slug da Etapa 0.2: reusar/migrar slug de domínio existente antes de criar novo). Rode o `spec-validator`.
-   - ⏸ **CHECKPOINT 1**: apresente a SPEC pronta **com a recomendação do PO** (veredito do modo aprovação, vindo do specify com brief) e pergunte se pode promover para `Approved` e seguir para o PLAN. A recomendação é do PO; **o martelo é do Diretor**. Aplique ajustes que o Diretor pedir antes de seguir.
+   - ⏸ **CHECKPOINT 1**: apresente a SPEC pronta **com a recomendação do PO** (veredito do modo aprovação, vindo do specify com brief) e pergunte se pode promover para `Approved` e seguir para o PLAN. A recomendação é do PO; **o martelo é do Diretor** — inclusive sobre as `sugestoes` que a lente do brief forjado separou (4.351): aqui ele está presente e decide sobre elas. Aplique ajustes que o Diretor pedir antes de seguir.
 
 2. **PLAN** — execute `/keelson:plan`. Rode o `plan-validator`.
    - ⏸ **CHECKPOINT 2**: apresente o PLAN pronto (componentes, DECs, cobertura) e pergunte se pode seguir para TASKs + desenvolvimento.

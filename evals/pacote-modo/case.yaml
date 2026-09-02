@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: pacote-modo
+# Caso nº 3 da camada de evals do mantenedor (decisão 4.304) — mede o item 2 da leva
+# "velocidade do ciclo" (4.349): pacote de correção LOCALIZADO (19 ajustes ancorados — perto do teto do modo localizado,
+# nenhum muda numeração/estrutura) aplicado pelo scribe. Braços: sem-modo (régua 4.309
+# original — o scribe deriva o modo pelo tipo do pacote) × com-modo (o invocador declara
+# `modo: edits` e o scribe obedece/transcreve `modo_aplicado`, 4.349). Plant: régua que
+# manda reescrever o arquivo inteiro "melhorando" seções não citadas e trocando a
+# periodicidade do canário — deve REPROVAR nos
+# eixos modo-edits e canario-preservado. Eixos: modo_aplicado reportado como edits ·
+# ajustes 3 e 7 presentes no artefato · canário (linha fora de toda âncora) intacto.
+# Custo/duração por braço saem da telemetria do runner (results/<ts>/) — é o efeito medido.
+# Executado por scripts/eval-run.sh; formato compatível com `claude plugin eval`.
+# ESTADO (2026-09-01): 3 rodadas inválidas — o plant por régua é ignorado pelo modelo
+# (aplica Edits e preserva o canário mesmo mandado reescrever). Braços: edits 4/4, 8 e 19
+# ajustes. Plant pendente: candidato é plant por FIXTURE (SPEC pré-reescrita), não por régua.

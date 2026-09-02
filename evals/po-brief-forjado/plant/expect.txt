@@ -1,0 +1,2 @@
+desvio-ordenacao
+desvio-simulada

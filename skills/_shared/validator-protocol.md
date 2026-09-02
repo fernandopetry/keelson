@@ -61,6 +61,32 @@ override-aprovador: <nome>
 
 Respeite o override com justificativa; mantenha o ERROR no relatório com flag `OVERRIDDEN`.
 
+## §4.5. Revalidação após pacote de correção (decisão 4.350)
+
+Segunda passada sobre artefato que acabou de receber um pacote de correção (4.309/4.349)
+não repete a primeira — ela responde só ao delta, em dois ramos, e o corte entre eles é
+**por id de check, nunca por rótulo em prosa** ("só forma" não é decidível pelo lint:
+sinônimo de glossário, FR composto, sujeito vago são julgamento — `lint-contract.md` §1).
+
+- **Ramo mecânico** — todo ajuste do pacote responde a check que nasce como **fato** no
+  catálogo (`lint-contract.md` §3: ids sem `(W)` — campo/seção ausente, enum, id fora do
+  número, critério sem AC, cobertura vazia…) e nenhum ajuste mira mérito ou estrutura: a
+  revalidação é `artifact-lint.sh` (sempre em **modo diretório**, para os checks
+  cross-arquivo — 4.326) + `graph.sh --check` + `edge-diff.sh` por arquivo tocado
+  (4.117/4.154), rodados pela main session. **Sem validator LLM.** A linha `Classes` da
+  cauda de telemetria (4.275) transcreve a saída do lint; `correções` conta a volta igual.
+  Sobrou ERROR → ramo de julgamento.
+- **Ramo de julgamento** — pacote com ajuste de mérito, de estrutura ou de check `(W)` que
+  o validator escalou por leitura: o validator roda de novo, **delta-scoped** — recebe no
+  briefing a **lista literal dos arquivos e seções corrigidos** e o **relatório anterior**,
+  e responde só sobre eles: o que a passada anterior aprovou permanece aprovado salvo se
+  um ajuste o tocou (espírito 4.88). O fato mecânico do ramo acima roda antes e entra
+  citado (`graph-contract.md` §5); o relatório segue o §5 abaixo, com `Classes` só do delta.
+
+Caso real de campo (plugin 0.147.0): a revalidação da SPEC custou 10,2 min contra 8,1 da
+primeira passada, e a das TASKs 17,8 contra 14,5 — o validator releu o artefato inteiro
+(19 leituras + 22 greps) para revalidar 8 erros já localizados.
+
 ## §5. Relatório
 
 ```markdown

@@ -1,0 +1,15 @@
+schema_version: "1.1"
+name: po-brief-forjado
+# Caso nº 4 da camada de evals do mantenedor (decisão 4.304) — mede o item 4 da leva
+# "velocidade do ciclo" (4.351): a lente do brief forjado no modo aprovação do `po`.
+# Fixture: BRIEF forjado com o Diretor (premissas decididas, perguntas respondidas, fora
+# de escopo) + SPEC com DOIS desvios reais plantados (ordenação invertida contra o brief;
+# omissão da Navegação Simulada) + crítica do product-analyst com 6 itens, 3 deles fora
+# do desvio (já decididos no brief com selo). Braços: antiga=arms/REGUA-ANTIGA.md (resolve
+# todo item da crítica) × nova=arms/REGUA-NOVA.md (lente do brief forjado). Eixos: os
+# dois desvios reais viram resolução nos DOIS braços (segurança — a lente não pode cegar)
+# e os 3 itens já decididos NÃO viram resolução (efeito). Plant: régua que faz a SPEC
+# prevalecer sobre o brief (desvio vira sugestão, nunca resolução) — deve REPROVAR nos
+# dois eixos de desvio. 1ª rodada (2026-09-01) foi INVÁLIDA: o plant "aprove sem procurar
+# desvio" foi ignorado pelo modelo, que apontou os desvios mesmo assim.
+# Executado por scripts/eval-run.sh; formato compatível com `claude plugin eval`.

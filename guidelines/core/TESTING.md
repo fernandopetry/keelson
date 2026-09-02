@@ -161,7 +161,9 @@ que asserção não captura (layout, tema, estado visual).
   (ex.: `npx playwright test`); como em `quality.test`, **exit code é o veredito**.
 - **O spec é código, e o developer o entrega**: AC com efeito observável em tela → o
   spec que o prova faz parte da task; o `qa` executa, nunca escreve (gerador ≠
-  avaliador). Commitado como qualquer teste; artefato de execução (screenshot, trace,
+  avaliador). A ausência é **cobrada no fecho da wave** (`/keelson:implement` §3.6, decisão
+  4.353): AC do Roteiro do gate 9 sem spec tagueado é achado roteado à TASK, entregue pelo
+  developer no retry — nunca descoberta pelo `qa` na hora de exercitar. Commitado como qualquer teste; artefato de execução (screenshot, trace,
   report, estado de auth) fica em pasta gitignored — consolidado numa casa só
   (`thoughts/e2e/` no setup guiado, decisão 4.168), nunca espalhado em diretórios
   soltos. Em suíte autenticada essa saída é **material sensível** (4.169 — instância da

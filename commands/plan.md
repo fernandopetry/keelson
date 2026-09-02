@@ -79,7 +79,7 @@ A redação do PLAN **não acontece nesta janela**. Despache o agent `scribe` co
 - **Alvo resolvido**: slug, MMM e caminho (Etapa 0.4).
 - **Insumos** (caminhos): SPEC alvo, INDEX.md, perfil de linguagem (as **seções** da carga
   da 0.1 — o scribe lê por seção, não o arquivo inteiro), memo de exploração e/ou `MAP.md`
-  do slug, a **conclusão ancorada do `code-scout`** da Etapa 2 (inline no prompt — é curta)
+  do slug, a **conclusão ancorada do `code-scout`** da Etapa 2 — **primeiro insumo** do pacote, por caminho quando gravada no memo de exploração (auto, Etapa 1 — decisão 4.352), inline só quando não persistida; o scribe desenha sobre ela e explora só o que ela não responde (régua no `agents/scribe.md`)
   e as **decisões irreversíveis de outros slugs** da 0.3.5 (inline — a lista extraída é
   curta; sem elas a justificativa da §Aderência não chega ao arquivo).
 - **Decisões desta execução**: cobertura alvo da Etapa 1 (caso A–D), respostas da triagem

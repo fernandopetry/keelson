@@ -427,7 +427,11 @@ ela converge ou escala.
 - **Re-review é sobre o delta.** O revisor da rodada N+1 recebe o veredito anterior e o
   **delta da correção**; o que já foi aprovado permanece aprovado, salvo quando o delta
   o toca. Reler o diff inteiro do zero a cada rodada é retrabalho que só produz achado
-  marginal novo — e é o motor do loop.
+  marginal novo — e é o motor do loop. O delta chega no pacote como **diff resolvido do
+  retry** (`git diff <SHA do veredito>..<SHA da correção>`, com o veredito anterior ao
+  lado), nunca como o diff acumulado da wave (decisão 4.350 — caso real de campo: um
+  re-review "delta" de 2 arquivos releu o entorno inteiro, 48 leituras e greps, e custou
+  16,9 min contra 11 da primeira passada).
 - **O delta é um diff próprio, não um checklist do achado (decisão 4.94).** Código
   nascido no retry ainda não passou por gate nenhum: a rodada N+1 responde **duas**
   perguntas — "o achado fechou?" e "o que este delta quebra?" — aplicando ao delta os
