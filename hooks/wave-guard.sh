@@ -7,8 +7,9 @@
 # agente volta a encerrar o turno na wave 2 de 6 perguntando "continuo?". Este
 # guard não depende do contexto do modelo: lê o arquivo de estado em disco
 # (thoughts/local/run-state-<slug>.md, formato canônico em docs/_meta/conventions/sdd-conventions.md,
-# escrito pelo /keelson:implement a cada wave) e renudgeia o agente se ele
-# tentar encerrar com `status: em_andamento`.
+# aberto pelo /keelson:auto na largada — decisão 4.348, a guarda cobre a forja —
+# e promovido/atualizado pelo /keelson:implement a cada wave) e renudgeia o agente
+# se ele tentar encerrar com `status: em_andamento`.
 #
 # O que este guard NÃO faz: julgar mérito da parada. Parada legítima existe
 # (Entrega concluída, degrau 3 da escada, pedido explícito do humano) — e a
@@ -143,7 +144,7 @@ else
 ${detalhes}
 
 Fôlego não é gatilho: sessão longa, contexto sumarizado ou \"ponto limpo\" não autorizam parar. Faça agora UMA das duas coisas:
-1. CONTINUE: leia os artefatos apontados em 'retomada' (INDEX do slug + TASK-INDEX), execute a próxima wave e siga até a Entrega. Os artefatos SDD são o checkpoint — nada se perdeu. (Agents em voo em background contam como continuar: encerre o turno e reaja às notificações — este aviso não se repete para este mesmo estado do run.)
+1. CONTINUE: leia os artefatos apontados em 'retomada' e siga a etapa em curso até a Entrega — na forja ('plan: —'), a próxima etapa do ciclo (SPEC → PLAN → TASKs → implement); na implementação, a próxima wave. Os artefatos SDD são o checkpoint — nada se perdeu. Agents em voo em background contam como continuar: encerre o turno e reaja às notificações — este aviso não se repete para este mesmo estado do run. MAS só conta agent que AINDA NÃO devolveu o report: um subagent acorda esta sessão UMA vez, ao reportar; mensagem (SendMessage) a agent que já reportou não tem retorno que reacorde o turno (decisão 4.348 — caso real: 72 min parados esperando um PO que já tinha respondido). Precisa de mais alguma coisa de um agent que já reportou? Re-despache com o delta ANTES de encerrar.
 2. Se a parada é LEGÍTIMA (Entrega já concluída, degrau 3 da escada com a pergunta já disparada, ou pedido explícito do humano NESTA execução): atualize o arquivo acima para 'status: encerrado — <motivo>' (ou remova-o) e aí sim encerre.
 Não encerre sem fazer uma das duas. (Exceção de posse, decisão 4.251: run cujo campo 'sessao' aponte OUTRA sessão viva não é seu — esse não se continua nem se encerra; inventarie e escale ao humano.)"
 fi

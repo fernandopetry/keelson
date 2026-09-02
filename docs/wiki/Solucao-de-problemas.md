@@ -227,8 +227,9 @@ essa saída nunca deve virar artefato publicado de CI.
 Há um ciclo em andamento. O hook de wave lê o arquivo de estado da execução
 (`run-state-<slug>.md`, na pasta da sessão `thoughts/local/sessions/<...>/` — ou
 direto em `thoughts/local/` em instalações antigas) **fora do contexto do modelo**
-e bloqueia o encerramento enquanto o status for `em_andamento`. Ou deixe o ciclo terminar, ou peça
-explicitamente para parar — aí o estado é encerrado com o motivo registrado.
+e bloqueia o encerramento enquanto o status for `em_andamento`. O arquivo nasce na largada do
+ciclo, não só na implementação: SPEC, PLAN e TASKs também são cobertos. Ou deixe o ciclo
+terminar, ou peça explicitamente para parar — aí o estado é encerrado com o motivo registrado.
 
 ### O bloqueio cita um ciclo que não é desta sessão
 
@@ -250,6 +251,17 @@ inventário nem alarme. Se você ainda vê um ajudante gastando turnos "provando
 ciclo não é dele, atualize o plugin (`/keelson:update`).
 
 ## Ciclo e comportamento do time
+
+### O ciclo parou no meio, sem erro e sem pergunta
+
+A sessão ficou em silêncio depois de dizer que "aguarda" um agent, e nada aconteceu por
+muito tempo. A causa mais comum: o Tech Lead mandou uma mensagem a um agent que **já tinha
+devolvido o resultado**. Um agent acorda a sessão uma vez, quando termina; uma mensagem
+enviada depois disso pode até ser processada por ele, mas a resposta não acorda ninguém.
+Digite `continue`: o ciclo retoma dos artefatos em disco, e o Tech Lead re-despacha o agent
+com o que faltava. Desde a versão 0.151.0 o arquivo de estado do ciclo existe desde a
+largada e o hook de wave bloqueia esse encerramento com a instrução de re-despachar — se
+o problema aparece, o plugin está desatualizado (`/keelson:update`).
 
 ### Digitei um comando no meio de um ciclo e ele não rodou
 

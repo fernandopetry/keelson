@@ -171,6 +171,43 @@ total=$((total + 1))
 got="$(rs sessao-a "$R" show meu-slug 2>/dev/null)"
 if [ -z "$got" ]; then ok show-ausente-vazio; else falha "show-ausente-vazio: [$got]"; fi
 
+# open (4.348): run da forja nasce na largada com plan — e waves_total 0, chaves exatas
+total=$((total + 1))
+rs sessao-a "$R" open forja-slug "docs/forja-slug/briefs/BRIEF-007.md" 2>/dev/null
+FO="$DA/run-state-forja-slug.md"
+want="status: em_andamento
+slug: forja-slug
+plan: —
+waves_concluidas: 0
+waves_total: 0
+retomada: docs/forja-slug/briefs/BRIEF-007.md
+sessao: sessao-a"
+if [ "$(cat "$FO" 2>/dev/null)" = "$want" ]; then ok open-forja-canonico; else falha "open-forja-canonico: $(cat "$FO" 2>&1)"; fi
+# o wave-guard vê o run da forja (mesmo grep do hook)
+total=$((total + 1))
+if grep -q '^status: em_andamento' "$FO" 2>/dev/null; then ok open-guard-ve-ativo; else falha open-guard-ve-ativo; fi
+# init PROMOVE o run aberto: plan/waves_total entram, posse mantida, aviso de promoção (não de sobrescrita)
+total=$((total + 1))
+err="$(rs sessao-a "$R" init forja-slug PLAN-007 3 "docs/forja-slug/INDEX.md + docs/forja-slug/tasks/TASK-007-INDEX.md" 2>&1 >/dev/null)"
+case "$err" in *promovendo*) ok init-promove-forja ;; *) falha "init-promove-forja: [$err]" ;; esac
+total=$((total + 1))
+if grep -q '^plan: PLAN-007$' "$FO" && grep -q '^waves_total: 3$' "$FO" && grep -q '^waves_concluidas: 0$' "$FO" && grep -q '^sessao: sessao-a$' "$FO"; then ok init-promove-campos; else falha "init-promove-campos: $(cat "$FO")"; fi
+# init sobre run JÁ promovido volta ao aviso de sobrescrita (não é forja)
+total=$((total + 1))
+err="$(rs sessao-a "$R" init forja-slug PLAN-007 3 "docs/forja-slug/INDEX.md" 2>&1 >/dev/null)"
+case "$err" in *sobrescrevendo*) ok init-pos-promocao-sobrescreve ;; *) falha "init-pos-promocao-sobrescreve: [$err]" ;; esac
+rs sessao-a "$R" remove forja-slug 2>/dev/null
+# open exige retomada
+total=$((total + 1))
+rs sessao-a "$R" open forja-slug >/dev/null 2>&1
+[ $? -eq 2 ] && ok open-sem-retomada-exit-2 || falha open-sem-retomada-exit-2
+# open respeita a posse (4.251): run legado em_andamento de terceiro → exit 2
+legado forja-leg sessao-a
+total=$((total + 1))
+err="$(rs sessao-b "$R" open forja-leg "docs/forja-leg/briefs/BRIEF-001.md" 2>&1 >/dev/null)"; rc=$?
+case "$rc:$err" in 2:*"posse de terceiro"*) ok open-posse-recusa ;; *) falha "open-posse-recusa: [$rc:$err]" ;; esac
+rs sessao-a "$R" remove forja-leg 2>/dev/null
+
 # erros de uso
 total=$((total + 1))
 rs sessao-a "$R" wave-done meu-slug >/dev/null 2>&1

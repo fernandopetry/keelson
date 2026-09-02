@@ -14,7 +14,9 @@
 #   5. stop_hook_active → silêncio;
 #   6. sem run-state → silêncio;
 #   7. casa da sessão (4.314): run MEU em thoughts/local/sessions/*/ também é
-#      visto — o glob duplo cobre as duas casas.
+#      visto — o glob duplo cobre as duas casas;
+#   8. forja (4.348): run aberto na largada (plan: —, waves_total: 0) bloqueia e a
+#      mensagem carrega a regra do subagent que já reportou (re-despacho).
 #
 # Os cwd de cada caso NÃO são repos git: sem janela de fingerprints (4.165), cada
 # invocação cutuca de novo — o que isola os casos entre si.
@@ -152,6 +154,28 @@ D7="$TMP/c7"; run_state_casa "$D7" epsilon "$EU"
 roda "{\"stop_hook_active\": false, \"cwd\": \"$D7\", \"session_id\": \"$EU\"}"
 contem "casa/decision" '"decision": "block"'
 contem "casa/slug"     'slug: epsilon'
+
+# 8. Forja (4.348): run aberto na largada, antes de existir PLAN → bloqueia como
+#    qualquer run, e a mensagem ensina que agent que já reportou não reacorda a sessão.
+run_state_forja() { # dir slug sessao — run aberto pelo /keelson:auto (plan: —)
+  mkdir -p "$1/thoughts/local/sessions/20260901-120000-teste002"
+  cat > "$1/thoughts/local/sessions/20260901-120000-teste002/run-state-$2.md" <<EOF
+status: em_andamento
+slug: $2
+plan: —
+waves_concluidas: 0
+waves_total: 0
+retomada: docs/$2/briefs/BRIEF-001.md
+sessao: $3
+EOF
+}
+D8="$TMP/c8"; run_state_forja "$D8" zeta "$EU"
+roda "{\"stop_hook_active\": false, \"cwd\": \"$D8\", \"session_id\": \"$EU\"}"
+contem "forja/decision"   '"decision": "block"'
+contem "forja/plan"       'waves_total: 0'
+contem "forja/etapa"      'na forja'
+contem "forja/regra"      'reportou'
+contem "forja/redespacho" 'Re-despache com o delta'
 
 if [ "$fail" -gt 0 ]; then
   echo "wave-guard: $fail/$total asserções falharam"

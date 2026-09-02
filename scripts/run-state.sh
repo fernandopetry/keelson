@@ -4,12 +4,19 @@
 # o leitor é o hook wave-guard (Stop), que bloqueia encerramento com status em_andamento.
 # Este script garante que as chaves canônicas nunca nasçam erradas de memória.
 #
-# Uso: run-state.sh <raiz-do-repo> init <slug> <PLAN-MMM> <waves_total> <retomada…>
+# Uso: run-state.sh <raiz-do-repo> open <slug> <retomada…>
+#      run-state.sh <raiz-do-repo> init <slug> <PLAN-MMM> <waves_total> <retomada…>
 #      run-state.sh <raiz-do-repo> wave-done <slug>
 #      run-state.sh <raiz-do-repo> close <slug> <motivo…>
 #      run-state.sh <raiz-do-repo> remove <slug>
 #      run-state.sh <raiz-do-repo> show <slug>
 #
+#   open       abre o run NA LARGADA do /keelson:auto (decisão 4.348), antes de
+#              existir PLAN: mesmas chaves canônicas com `plan: —` (lacuna
+#              canônica) e `waves_total: 0` — a guarda anti-parada passa a cobrir
+#              a forja (SPEC/PLAN/TASKs), onde a sessão também encerra turno com
+#              agents em voo. O `init` do implement PROMOVE o run aberto (plan e
+#              waves_total, posse mantida); a Entrega o remove.
 #   init       escreve run-state-<slug>.md na CASA DA SESSÃO (decisão 4.314 —
 #              resolvida por session-dir.sh: thoughts/local/sessions/<ts>-<sid8>/;
 #              sem id de sessão, o caminho legado thoughts/local/) com as chaves
@@ -40,7 +47,7 @@ LC_ALL=C
 export LC_ALL
 
 die2() { echo "ERRO: $*" >&2; exit 2; }
-usage() { sed -n '2,21p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'; }
 
 ROOT="${1:-}"
 [ -n "$ROOT" ] || { usage >&2; exit 2; }
@@ -88,15 +95,10 @@ recusa_se_alheio() { # $1 = arquivo (default: $F)
   die2 "run em andamento de $SLUG pertence à sessão '$dono' (esta é '$SESSAO') — posse de terceiro (4.251). Não continue nem encerre o run alheio: inventarie (mtime, git status da worktree em 'retomada', sessões pares vivas) e escale ao humano. FORCE=1 assume a posse de propósito."
 }
 
-case "$ACTION" in
-  init)
-    PLAN="${1:-}"; TOTAL="${2:-}"
-    [ -n "$PLAN" ] && [ -n "$TOTAL" ] || die2 "init exige <PLAN-MMM> e <waves_total>."
-    case "$PLAN" in PLAN-[0-9]*) ;; *) die2 "PLAN-MMM inválido: $PLAN" ;; esac
-    case "$TOTAL" in ''|*[!0-9]*) die2 "waves_total deve ser numérico: $TOTAL" ;; esac
-    shift 2
-    RET="${*:-}"
-    [ -n "$RET" ] || die2 "init exige a linha de retomada (caminhos dos artefatos)."
+# escreve_run PLAN TOTAL RET — corpo comum de open (largada, 4.348) e init (1ª wave):
+# resolve a casa, aplica posse (4.251), absorve legado (4.314) e grava as chaves canônicas.
+escreve_run() {
+    PLAN="$1"; TOTAL="$2"; RET="$3"
     DIR="$DIR_LEG"
     if [ -f "$SDS" ]; then
       d="$(sd dir --create --slug "$SLUG")" || d=""
@@ -113,7 +115,13 @@ case "$ACTION" in
       rm -f "$F_LEG"
     fi
     if [ -f "$F" ] && grep -q '^status: em_andamento' "$F" 2>/dev/null; then
-      echo "run-state: aviso — sobrescrevendo run em andamento de $SLUG (largada nova é a dona)." >&2
+      # run aberto na largada (plan: —) sendo promovido pelo init da 1ª wave (4.348):
+      # é o caminho normal do ciclo, não uma sobrescrita — aviso distinto
+      if [ "$PLAN" != "—" ] && grep -q '^plan: —$' "$F" 2>/dev/null; then
+        echo "run-state: promovendo run da forja de $SLUG para $PLAN ($TOTAL waves)." >&2
+      else
+        echo "run-state: aviso — sobrescrevendo run em andamento de $SLUG (largada nova é a dona)." >&2
+      fi
     fi
     {
       printf 'status: em_andamento\n'
@@ -124,6 +132,24 @@ case "$ACTION" in
       printf 'retomada: %s\n' "$RET"
       printf 'sessao: %s\n' "$SESSAO"
     } > "$F" || die2 "não consegui escrever $F"
+}
+
+case "$ACTION" in
+  open)
+    RET="${*:-}"
+    [ -n "$RET" ] || die2 "open exige a linha de retomada (caminho do BRIEF da demanda)."
+    escreve_run "—" 0 "$RET"
+    exit 0 ;;
+
+  init)
+    PLAN="${1:-}"; TOTAL="${2:-}"
+    [ -n "$PLAN" ] && [ -n "$TOTAL" ] || die2 "init exige <PLAN-MMM> e <waves_total>."
+    case "$PLAN" in PLAN-[0-9]*) ;; *) die2 "PLAN-MMM inválido: $PLAN" ;; esac
+    case "$TOTAL" in ''|*[!0-9]*) die2 "waves_total deve ser numérico: $TOTAL" ;; esac
+    shift 2
+    RET="${*:-}"
+    [ -n "$RET" ] || die2 "init exige a linha de retomada (caminhos dos artefatos)."
+    escreve_run "$PLAN" "$TOTAL" "$RET"
     exit 0 ;;
 
   wave-done)
@@ -167,5 +193,5 @@ case "$ACTION" in
     [ -f "$F" ] && cat "$F"
     exit 0 ;;
 
-  *) die2 "ação desconhecida: $ACTION (use init, wave-done, close, remove ou show)" ;;
+  *) die2 "ação desconhecida: $ACTION (use open, init, wave-done, close, remove ou show)" ;;
 esac
