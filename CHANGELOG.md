@@ -23,6 +23,33 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.152.4] — 2026-09-02
+
+Re-init: none
+
+Decision 4.359 — two new eval cases prove the "real case" narratives no-op in
+`guidelines/core/CODE-REVIEW.md` and `commands/implement.md`; both files lose them, every
+rule kept with its owning decision cited.
+
+### Added
+
+- **Eval cases `evals/review-gates-wave` and `evals/implement-wave-plan`** (4.359): the
+  first runs the code-reviewer over a synthetic wave with three planted defects (inert
+  security proof in an excluded test group, a condition closed for 2 of 4 fields, noise
+  comments); the second runs the Tech Lead through `/keelson:implement` on paper (shared
+  routes file without per-task worktree, retry dispatch for a 3-of-4 finding, copy change
+  quoted in another task's gate-9 script, inherited pending as a countable criterion).
+  Both take `file:` arms and ship with a plant.
+
+### Changed
+
+- **`CODE-REVIEW.md` loses 19 "caso real" narratives, `implement.md` loses 18** (4.359):
+  implement round valid, plant reproved 3/3 on four axes, arms tied PASS 3/3 everywhere;
+  review round valid on its third attempt after two case defects (an accent-blind regex,
+  and a plant the model refused to obey on the inert-proof axis, which is therefore the
+  model's default and stays as a sanity axis), arms tied PASS 3/3 on all five axes.
+  Remaining narratives in other surfaces stay candidates until a case measures them.
+
 ## [0.152.3] — 2026-09-02
 
 Re-init: none

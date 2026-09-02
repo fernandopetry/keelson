@@ -418,7 +418,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.152.3` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.152.4` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
@@ -429,7 +429,8 @@ time plus the start of every turn, and `context-cost.sh` derives from that log t
 and the wait between turns in the closing report. No gate changes; no new report line.
 0.152.1 makes the delivery pre-check delta-scoped on the implement route (4.355); 0.152.2
 applies the dated-sediment findings of the second harness audit (4.357); 0.152.3 removes
-the 23 "real case" narratives from `tasks.md`, proven no-op by an A/B eval (4.358). See
+the 23 "real case" narratives from `tasks.md`, proven no-op by an A/B eval (4.358); 0.152.4
+does the same for `CODE-REVIEW.md` and `implement.md` with two new eval cases (4.359). See
 `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
