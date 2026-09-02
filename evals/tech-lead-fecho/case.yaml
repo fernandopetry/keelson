@@ -7,3 +7,5 @@ name: tech-lead-fecho
 # sessão (4.251), merge limpo com símbolos divergentes (4.235), teammate read-only sem
 # canal (4.292) e report que tenta virar prosa (4.130). Braços: régua com e sem as
 # narrativas "caso real" (file:).
+# 1ª rodada (20260902-134306) inválida: em 4 eixos o modelo ignorou o plant em 1/3 runs;
+# controle positivo confiável: merge-simbolos-consumidores e esqueleto-literal.

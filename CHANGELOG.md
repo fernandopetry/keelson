@@ -23,6 +23,30 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.152.6] — 2026-09-02
+
+Re-init: none
+
+Decision 4.360 — eval cases by actor for the smaller surfaces: four more files lose their
+"real case" narratives with proof; three groups keep theirs, declared.
+
+### Added
+
+- **Five eval cases** (4.360): `developer-closure`, `designer-gate11`, `tech-lead-fecho`,
+  `developer-testes`, `scribe-spec` — each with fixtures, LLM graders and a plant; the
+  `case.yaml` of the two whose plants the model refused to obey records the limitation.
+
+### Changed
+
+- **`po.md`, `developer.md`, `TESTING.md`, `specify.md` lose 9 narratives** (4.360): po
+  and developer with plant 3/3 and arms tied PASS 3/3; TESTING on a valid second round
+  (the first was invalidated by a CLI rate limit) with all three axes tied; specify on two
+  valid rounds with symmetric variance on one axis (5/6 vs 5/6). Every rule stays with its
+  decision cited.
+- Kept, declared: `scribe.md` and `product-designer.md` (no working positive control on
+  this model), `sdd-conventions.md`/`agent-teams.md`/`report-contract.md` (invalid round
+  and a signal in favour of the 4.332 narrative), and the four surfaces without a case.
+
 ## [0.152.5] — 2026-09-02
 
 Re-init: none

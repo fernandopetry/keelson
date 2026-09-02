@@ -5,3 +5,6 @@ name: designer-gate11
 # trilhas (4.230), eco de estado com dois escritores (4.307) e severidade que depende de
 # estado inalcançável pelo guard do backend (4.344). DESIGN.md vai como fixture (gabarito,
 # igual nos dois braços). Braços: régua com e sem narrativas "caso real" (file:).
+# 1ª rodada (20260902-113249) inválida: plants de eco e premissa ignorados pelo modelo (default);
+# eixo medida-somada reprovou o texto atual 3/3 (prescreve alinhamento sem somar) — gatilho
+# de leva própria, não deste caso. Controle positivo confiável: só medida-somada.
