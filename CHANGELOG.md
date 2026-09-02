@@ -23,6 +23,20 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.152.5] — 2026-09-02
+
+Re-init: none
+
+Guard determinism: `scripts/check-frontmatter.sh` sorts its file enumeration.
+
+### Fixed
+
+- **`check-frontmatter.sh` enumerates in a fixed order**: the `find` fallback (used when
+  the root is not a git repo, i.e. the suite's fixtures) returned files in filesystem
+  order, and the CI runner of 2026-09-02 flipped it, breaking the frozen expected output of
+  the `quebrada` case. Both branches now pipe through `LC_ALL=C sort`; the suite's expected
+  files are unchanged. No behaviour change for consumers beyond a stable report order.
+
 ## [0.152.4] — 2026-09-02
 
 Re-init: none
