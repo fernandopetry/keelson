@@ -23,6 +23,54 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.152.0] — 2026-09-01
+
+Re-init: none
+
+Decision 4.354 — cycle-speed batch, second session: the Tech Lead stops timing subagent
+windows by hand. The `window-marker` hook already reads the Task result record; it now
+also records what the harness measures, and the composer derives from that log the
+`janelas` tail of the brief's Cronologia, minutes and tool calls per role, and the wait
+between turns. No gate changes; the closing report gains no new line.
+
+### Added
+
+- **Measured fields in the window log** (4.354, `hooks/window-marker.sh`): the `agente=`
+  line gains `dur=<S>s` and `tools=<N>` when the Task result carries
+  `totalDurationMs`/`totalToolUseCount`, and is stamped with the subagent's return time
+  instead of the Stop; the `janela=` line gains `inicio=<ts>` with the record that opened
+  the turn. A record without the fields keeps the old line byte for byte.
+- **`context-cost.sh --janelas <papel>`** (4.354): composes the Cronologia `janelas` tail
+  in the literal format of `index-contract.md` from the log — each spawn is the interval
+  [return − dur, return]; the first `--redacao N` spawns (declared by the invoker: 1, or
+  1 + writers in the 4.310 fan-out) are the drafting window, later ones are corrections
+  grouped by overlap; `--since`/`--until` cut by return time; `-- <files>` adds the
+  `wc -l` line count. No spawn in the window → empty output, exit 0.
+- **`espera:` line in `--compose`** (4.354): the sum of the intervals longer than 10
+  minutes between the end of one turn and the start of the next (waiting on the human or
+  on a background agent), transcribed as the `espera entre turnos` tail of the report's
+  `Duração` line. Telemetry with the same seal as `janela pico`: measured or omitted,
+  never a trigger.
+
+### Changed
+
+- **`Custo por papel` carries minutes and tool calls** (4.354, `report-contract.md`): the
+  `papel:` line becomes `~<N>k tokens (<M> spawns · <N>min · <C> chamadas)` when the hook
+  measured them; a role with unmeasured spawns says `em <k> medidos` instead of summing a
+  subset silently. Old logs compose exactly as before — the parser now scans `key=value`
+  fields instead of counting them.
+- **`/keelson:auto` Step 0.5 item 6 transcribes instead of timing** (4.354): the `janelas`
+  tail comes from `context-cost.sh --janelas scribe --since <previous mark> --redacao <N>
+  -- <artefacts>`, run before the log is archived; no more `date` at the dispatch and
+  return of each scribe window. Delivery items 6.3/6.5 transcribe the new tail and line.
+  The tail's format is unchanged, so the series behind the 4.312/4.352 triggers stays
+  comparable.
+- Wiki: the "Custo por papel" and "Forja" troubleshooting entries and the first-steps
+  table name the new source; the `Duração` row mentions the wait between turns.
+  `/keelson:init`'s observability note lists the new measures.
+- Test suites: window-marker +5 cases, context-cost +13 cases (the `janelas` expected
+  string is copied verbatim from `index-contract.md`).
+
 ## [0.151.0] — 2026-09-01
 
 Re-init: none
