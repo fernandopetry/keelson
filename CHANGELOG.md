@@ -23,6 +23,55 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.151.0] — 2026-09-01
+
+Re-init: none
+
+Decisions 4.348–4.353 — cycle-speed batch: a measured anatomy of a real consumer cycle
+(3 tasks, 2 waves, ~8h30 wall) showed that the biggest costs were not the gates but idle
+time, wholesale rewrites, second passes that re-read everything, and re-litigation of
+decisions the Director had already made. Six levers land here; none removes a gate.
+
+### Added
+
+- **The run opens at launch and the guard covers the forge** (4.348): `run-state.sh` gains
+  `open <slug> <BRIEF>` (`plan: —`, `waves_total: 0`); `/keelson:auto` opens it in Step 0.5
+  and `/keelson:implement`'s `init` promotes it. The `wave-guard` now blocks a stop during
+  SPEC/PLAN/TASKs too, and its message teaches the rule that failed in the field: **a
+  subagent wakes the main session once**, when it reports — a message sent to an agent that
+  already reported never wakes the turn again, so new facts for it are a re-dispatch, never
+  a `SendMessage`. Field case: 72 minutes idle waiting for a PO that had already answered.
+- **Declared package mode for the scribe** (4.349): the invoker derives `modo: edits |
+  reescrita` from the 4.309 rule and puts it in the correction package; the scribe obeys and
+  reports `modo_aplicado` (divergence only for a failed anchor, with the reason). New eval
+  case `evals/pacote-modo`.
+- **Revalidation after a correction package has an owner** (4.350, `validator-protocol.md`
+  §4.5): packages made only of catalogue facts are revalidated mechanically
+  (`artifact-lint.sh` in directory mode + `graph.sh --check` + `edge-diff.sh`), with no LLM
+  validator; packages that touch judgement get a delta-scoped validator run (corrected
+  files/sections + previous report). The cut is by check id, never by prose label.
+- **Forged-brief lens in the PO's approval mode** (4.351): when the brief was forged with the
+  Director, resolutions cover only SPEC×BRIEF deviations, scenario coverage and
+  non-regression; everything else the critique raised comes back as counted `sugestoes`,
+  never applied, never a decision in the Director's name. Escalations are untouched. New
+  eval case `evals/po-brief-forjado`.
+
+### Changed
+
+- **Re-gate delta travels as the resolved diff of the retry** (4.350, `CODE-REVIEW.md`):
+  `git diff <verdict SHA>..<fix SHA>` plus the previous verdict, never the wave's
+  accumulated diff.
+- **The code-scout's early reconnaissance is persisted in the exploration memo** (4.352)
+  and reaches the PLAN scribe by path, as first input; the scribe's gap now has a named
+  destination (`duvidas`/`nao_encontrado`) instead of its own sweep.
+- **Missing E2E specs are charged at wave close** (4.353): with `quality.e2e` set,
+  `e2e-coverage.sh` runs before the gate-9 dispatch; an `ac-sem-spec-e2e` on an AC of the
+  FEAT's gate-9 script is a finding routed to the originating TASK — the developer delivers
+  the spec in the retry, the `qa` runs the `--grep @AC` slice and keeps the driven browser
+  for what assertions cannot capture. The `qa` still never writes specs (4.166 preserved).
+- Troubleshooting wiki: new entry for a cycle that stalls silently in the middle; the
+  "session will not end the turn" entry now says the state file exists from launch.
+
 ## [0.150.0] — 2026-09-01
 
 Re-init: none
