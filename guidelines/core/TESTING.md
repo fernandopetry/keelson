@@ -80,17 +80,13 @@ bloqueante no gate 1 — `./CODE-REVIEW.md`):
   que o tornaria incapaz de falhar: fixture de ordenação cuja ordem de inserção
   coincide com a esperada não distingue "ordenou" de "não ordenou" (o mutante que a
   neutraliza sobrevive à suíte inteira); contador de uma rota não vê o efeito novo
-  que nasce noutra rota (o mutante que o acrescenta sobrevive). Caso real: tabela
-  declarada **e rodada**, 10 de 13 mutantes morrendo — e os 3 sobreviventes
-  atacavam, cada um, o ramo que o AC motivava, nenhum o ponto cego; com a régua
-  derivada da forma do AC no retry, os 6 morreram e o gate acrescentou 10 próprios.
+  que nasce noutra rota (o mutante que o acrescenta sobrevive).
 - **Predicado correlacionado exige o agregado vizinho (decisão 4.175)**: predicado que
   vincula filho ao pai (escopo de tenant, correlação de subconsulta, junção por dono)
   tem **dois** modos de falha e por isso duas provas — apagar o **predicado** (morre com
   um agregado só) e apagar a **correlação** (só morre com um segundo agregado no
   fixture: duas linhas, uma satisfazendo e outra não). Fixture de um agregado deixa o
-  mutante de maior raio invisível por construção — caso real: apagar a correlação
-  sobreviveu a 51/51 testes, e em produção recusaria toda submissão de todo usuário.
+  mutante de maior raio invisível por construção
 - **Guard textual nasce como inventário, nunca como parser (decisão 4.227)**: teste ou
   guard que prova propriedade do código-fonte por varredura de texto nasce com
   **universo declarado e fechamento contável** — uma lista fechada (allowlist de
@@ -110,7 +106,7 @@ bloqueante no gate 1 — `./CODE-REVIEW.md`):
   na dimensão em que o fator que os **distingue** é não-neutro (fração ≠ 1, peso ≠ 1,
   desconto ≠ 0) — a dimensão neutra entra como **controle**, nunca como o caso: no
   eixo neutro os caminhos são trivialmente iguais e o teste **não tem como falhar**
-  com a divergência presente (caso real: verde por 6 waves com o bug vivo). A escolha
+  com a divergência presente. A escolha
   do eixo se prova por mutação na fixação: neutralizar o fator na fonte tem de
   **reprovar** — se o teste sobrevive, ele está no eixo errado.
 

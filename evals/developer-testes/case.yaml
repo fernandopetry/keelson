@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: developer-testes
+# Caso nº 9 (decisão 4.304) — o developer desenha, NO PAPEL, os testes e a tabela de
+# mutantes de uma TASK aplicando guidelines/core/TESTING.md: ordenação cuja fixture
+# tenta esconder o mutante (4.331 — ponto cego do instrumento), predicado correlacionado
+# de tenant (4.175 — dois agregados, dois mutantes) e equivalência de dois caminhos com
+# fator neutro por default (4.280 — eixo não-neutro). Braços: régua com e sem as
+# narrativas "caso real" (file:).

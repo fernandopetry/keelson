@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: developer-closure
+# Caso nº 7 (decisão 4.304) — o developer aplica agents/developer.md NO PAPEL a uma
+# TASK: atualiza o Status sem escrever `Data início` no cabeçalho (4.347/4.308) e aplica
+# uma lista de remoções de comentário do gate 7 por CORTE, nunca reescrevendo (4.185).
+# Braços: régua com e sem narrativas "caso real" (file:).
+# Lição da 1ª rodada (20260902-113252): o juiz LLM só vê deck/*.md — código entregue como
+# .php ficou invisível e o eixo reprovou por falta de evidência; o código vai num .md.

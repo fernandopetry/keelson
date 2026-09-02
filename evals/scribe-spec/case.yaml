@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: scribe-spec
+# Caso nº 10 (decisão 4.304) — o scribe redige uma SPEC a partir de um BRIEF forjado
+# aplicando a fatia "Etapas 2–3" de commands/specify.md, com duas armadilhas: forma de
+# payload de parceiro afirmada em prosa sem amostra capturada (4.285 → premissa com selo,
+# nunca fato) e campo persistido sem par de leitura (4.225 → FR/AC de onde o valor
+# reaparece). Braços: fatia com e sem as narrativas "caso real" (file:).

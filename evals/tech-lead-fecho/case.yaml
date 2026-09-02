@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: tech-lead-fecho
+# Caso nº 8 (decisão 4.304) — o Tech Lead aplica, NO PAPEL, as convenções comuns
+# (sdd-conventions.md + agent-teams.md + report-contract.md concatenados como régua) ao
+# fecho de uma sessão sintética com seis situações plantadas: lista de pendências com
+# itens já resolvidos (4.237), percentual sem denominador (4.332), run-state de outra
+# sessão (4.251), merge limpo com símbolos divergentes (4.235), teammate read-only sem
+# canal (4.292) e report que tenta virar prosa (4.130). Braços: régua com e sem as
+# narrativas "caso real" (file:).

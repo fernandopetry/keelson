@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: designer-gate11
+# Caso nº 6 (decisão 4.304) — o product-designer aplica agents/product-designer.md a um
+# diff de UI sintético com três armadilhas: correção de alinhamento que exige somar as
+# trilhas (4.230), eco de estado com dois escritores (4.307) e severidade que depende de
+# estado inalcançável pelo guard do backend (4.344). DESIGN.md vai como fixture (gabarito,
+# igual nos dois braços). Braços: régua com e sem narrativas "caso real" (file:).

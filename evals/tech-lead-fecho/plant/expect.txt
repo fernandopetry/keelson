@@ -1,0 +1,6 @@
+lista-medida
+numero-com-denominador
+posse-de-terceiro
+merge-simbolos-consumidores
+teams-canal-de-retorno
+esqueleto-literal

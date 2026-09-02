@@ -1,0 +1,2 @@
+sem-data-inicio-no-cabecalho
+corte-nao-reescrita
