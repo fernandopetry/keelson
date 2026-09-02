@@ -60,8 +60,7 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   invalida a rodada; roda sob demanda do Diretor ou pré-leva de classe coberta, nunca em
   pre-commit/CI; casos no formato `claude plugin eval`, o runner só orquestra.
 - Adiado com gatilho (4.182): `doctrine-reviewer` (reincidência de defeito de conteúdo
-  de doutrina que os checks de sincronia não pegam). `check-refs.sh` foi ativado antes
-  do gatilho por decisão do Diretor (4.209, divergência declarada).
+  de doutrina que os checks de sincronia não pegam).
 
 ## Versionamento
 
@@ -116,14 +115,20 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   provada pelo `check-sync.sh`; comentário do README e decisions.md seguem humanos.
 - **Um dono por regra**: o core (`guidelines/core/`) diz *o quê* (agnóstico); o perfil diz
   *como* na linguagem. Não duplicar regra entre eles. Blocos compartilhados dos comandos
-  têm dono único em `docs/_meta/conventions/` — `sdd-conventions.md` (convenções comuns,
-  ex-§3.0), `index-contract.md` (artefatos/IDs + contrato/template/receita do INDEX, ex-§6),
+  têm dono único em `docs/_meta/conventions/` (12 arquivos; o cabeçalho de cada um
+  declara o dono): `sdd-conventions.md` (convenções comuns, ex-§3.0),
+  `index-contract.md` (artefatos/IDs + contrato/template/receita do INDEX, ex-§6),
   `handoff-protocol.md` (handoff de verificação de tela, ex-§8), `commit-convention.md`
   (tipo/escopo/quebra da mensagem de commit no consumidor — o bloco de keys do tracker
   continua no §15 do protocolo Jira), `graph-contract.md` (sintaxe canônica de aresta,
-  catálogo de arestas/checks do grafo e contrato do `scripts/graph.sh` — decisão 4.82)
-  e `report-contract.md` (esqueleto canônico do relatório de fecho — Entrega do auto,
-  modo sob demanda e `/keelson:report` — decisão 4.130);
+  catálogo de arestas/checks do grafo e contrato do `scripts/graph.sh` — decisão 4.82),
+  `report-contract.md` (esqueleto canônico do relatório de fecho — Entrega do auto,
+  modo sob demanda e `/keelson:report` — decisão 4.130), `lint-contract.md` (checks,
+  regex e severidades do `scripts/artifact-lint.sh`), `map-contract.md` (MAP do slug —
+  decisão 4.104), `estimate-contract.md` (contrato da estimativa — decisão 4.223),
+  `production-intake-protocol.md` (entrada de bug/incidente de produção — decisão 4.101),
+  `value-test-protocol.md` (menor teste de valor — decisão 4.100) e `agent-teams.md`
+  (especificidades do modo teams — decisão 4.292);
   o `method-guide.md`
   segue guia humano, com os headings §3.0/§6/§8 preservados como ponteiros. A moldura dos
   validators vive em `skills/_shared/validator-protocol.md`; a **régua dos gates 1–7**
@@ -140,9 +145,11 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 - O keelson simula um **time real** — desde a 4.40, os IDs dos agents **são** os nomes
   dos papéis. Elenco: **Diretor** = humano · **Tech Lead** = main session · agents
   `po` (dono da demanda) · `pm` (decompõe épico — nunca abaixo do PO; 4.39) ·
-  `developer` · `code-reviewer` · `qa` · `security-engineer` · `product-analyst`
-  (sob o PO) · `agile-coach` · `staff-engineer`. Validators ficam **fora da metáfora**
-  (ferramentas do time, não pessoas). Histórico (decisions.md, learning-log.md) e
+  `developer` · `code-reviewer` · `qa` · `security-engineer` · `performance-engineer`
+  (gate 10, 4.155) · `product-designer` (gate 11, 4.218) · `product-analyst` (sob o PO) ·
+  `agile-coach` · `staff-engineer`. Ficam **fora da metáfora** (ferramentas do time, não
+  pessoas): os validators, `scribe` e `tracker-sync` (4.103), `code-scout` (4.73) e
+  `estimator` (4.223). Histórico (decisions.md, learning-log.md) e
   `generated-by:` de perfis gerados mantêm os IDs antigos — de-para na 4.40.
 - **Contrato Diretor–PO**: o Diretor emite intenção (**brief**, artefato-âncora), não
   aprova artefatos de rotina. O PO valida tudo **contra o brief** (nunca contra a própria

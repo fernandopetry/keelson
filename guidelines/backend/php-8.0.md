@@ -35,8 +35,8 @@ reviewer: null
 > com as duas versões), nunca aumentá-la. Mitigação operacional enquanto o upgrade não
 > sai: abertura do §6.
 > ⚠️ não confirmado: suporte estendido comercial existiu (ex.: Zend PHP LTS para 8.0,
-> anunciado até dezembro/2025; TuxCare ELS) — sem contrato desses ativo, assuma
-> runtime sem patches.
+> anunciado até dezembro/2025 — prazo já vencido; TuxCare ELS) — sem contrato desses
+> ativo e vigente, assuma runtime sem patches.
 
 O alvo é **PHP 8.0** (lançado em novembro de 2020), com `declare(strict_types=1)`
 obrigatório no topo de todo arquivo — sem coerção silenciosa de tipo.
