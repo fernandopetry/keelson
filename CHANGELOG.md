@@ -23,6 +23,34 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.152.1] — 2026-09-01
+
+Re-init: none
+
+Decision 4.355 — the delivery pre-check of gates stops re-reading the whole branch on the
+route where `/keelson:implement` ran.
+
+### Changed
+
+- **Delivery pre-check is delta-scoped on the implement route** (4.355, `commands/auto.md`
+  Step 5 item 2): the wave inventory (§3.6 item 1b) and the per-task table of the
+  implement's final output already confronted every wave diff against the gate 8/10/11
+  surfaces, so the delivery no longer repeats that over the accumulated branch. It now
+  checks a mechanical fact (`artifact-lint.sh` on the tasks directory without
+  `task-done-gate-aberto`, `graph.sh --check` without `feat-sem-verificacao`), the ledger
+  record (at least one `gate` event from the `code-reviewer` per wave of this session —
+  the source of the report's Gates line), and judges only the delta after the last
+  closure commit (fatia sync, comment removals, anything later). The inline route keeps
+  the full-branch check unchanged. No gate is removed.
+- The three gate bullets cite the verdict "on the judged slice" instead of "on the final
+  diff" — the final diff on the inline route, the wave diffs plus the post-closure delta
+  on the implement route.
+
+### Fixed
+
+- `commands/implement.md` Step 3: the ledger `gate` event list now names the
+  `product-designer` (missing since the gate 11 landed in 4.218).
+
 ## [0.152.0] — 2026-09-01
 
 Re-init: none
