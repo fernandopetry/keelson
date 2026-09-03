@@ -27,7 +27,8 @@ docs/_meta/conventions/commit-convention.md|Convencao-de-commits
 docs/_meta/conventions/handoff-protocol.md|Handoff-de-verificacao
 docs/_meta/conventions/graph-contract.md|Contrato-do-grafo
 docs/_meta/conventions/report-contract.md|Contrato-do-relatorio
-docs/_meta/conventions/lint-contract.md|Contrato-do-lint'
+docs/_meta/conventions/lint-contract.md|Contrato-do-lint
+docs/_meta/conventions/warroom-contract.md|Contrato-do-warroom'
 
 DRY_RUN=0
 CHECK=0

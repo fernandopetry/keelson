@@ -316,7 +316,8 @@ for par in "ficha:ficha diff-facts" "next-id:next-id" "index-check:index" \
            "update:release" "check-release:release" "check-refs:refs" \
            "check-frontmatter:frontmatter" "context-cost:context-cost" \
            "check-mermaid:mermaid" "eval-run:eval-run" "cycle-clock:cycle-clock" \
-           "session-dir:session-dir run-state ledger context-cost window-marker compact-anchor review-guard security-guard"; do
+           "warroom:warroom" \
+           "session-dir:session-dir run-state ledger context-cost window-marker compact-anchor review-guard security-guard warroom"; do
   motor="${par%%:*}"; suites="${par#*:}"
   dirs_re="$(printf '%s' "$suites" | sed 's/ /|/g')"
   if printf '%s\n' "$staged" | grep -qE "^scripts/($motor\.sh\$|tests/($dirs_re)/)"; then
@@ -327,7 +328,8 @@ done
 # Hooks com suíte própria (4.314): hook ou fixtures no commit → a suíte roda
 # (o run_suite dedupa contra as rodadas acima).
 for par in "window-marker:window-marker" "compact-anchor:compact-anchor" \
-           "review-guard:review-guard" "security-guard:security-guard"; do
+           "review-guard:review-guard" "security-guard:security-guard" \
+           "warroom-guard:warroom"; do
   hook="${par%%:*}"; suite="${par#*:}"
   if printf '%s\n' "$staged" | grep -qE "^(hooks/$hook\.sh\$|scripts/tests/$suite/)"; then
     run_suite "$suite"

@@ -122,6 +122,9 @@ jobs:
       - name: Suíte do security-guard (scripts/tests/security-guard/run.sh)
         run: bash scripts/tests/security-guard/run.sh
 
+      - name: Suíte do warroom (scripts/tests/warroom/run.sh)
+        run: bash scripts/tests/warroom/run.sh
+
       - name: Suíte do check-refs.sh (scripts/tests/refs/run.sh)
         run: bash scripts/tests/refs/run.sh
 

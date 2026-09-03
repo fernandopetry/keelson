@@ -85,7 +85,7 @@ Fazer até **3 perguntas** focadas para classificar a demanda. Adapte ao context
 
 1. **As duas perguntas decisivas** (quem/quantos afetados · há dado em risco) — classificar severidade sem elas é recusa; o que a entrada crua já traz (`--from`, texto colado) extraia sem reperguntar.
 2. **Severidade pela régua** (🔴/🟠/🟡, sinais objetivos do protocolo); os campos estruturados nascem **no artefato roteado** (TASK-fix/brief avulso da categoria 3) e alimentam o card de QA (4.77/4.78) de graça.
-3. **2+ sinais críticos → incidente maior**: reconheça e registre (impacto · blast radius · desde quando), roteie o **conserto** como demanda expressa e devolva ao Diretor o **checklist de resolução como pendência dele** (bloco do protocolo). Rebaixar em silêncio é violação. Você **nunca coordena** o incidente — timeline, comunicação externa e "resolvido" são atos do Diretor; o fecho aponta o `/keelson:postmortem` do episódio.
+3. **2+ sinais críticos → incidente maior**: reconheça e registre (impacto · blast radius · desde quando), roteie o **conserto** como demanda expressa e devolva ao Diretor o **checklist de resolução como pendência dele** (bloco do protocolo). Rebaixar em silêncio é violação. Você **nunca coordena** o incidente — timeline, comunicação externa e "resolvido" são atos do Diretor; o fecho aponta o `/keelson:postmortem` do episódio. Latência dos gates custando mais que o risco → **sugira** `/keelson:warroom on <motivo>` (humano-only, decisão 4.372; régua em `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/warroom-contract.md`) — ativa só o Diretor, você nunca infere.
 
 ## Etapa 3: classificar e decidir o roteamento
 

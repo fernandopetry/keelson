@@ -115,7 +115,7 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   provada pelo `check-sync.sh`; comentário do README e decisions.md seguem humanos.
 - **Um dono por regra**: o core (`guidelines/core/`) diz *o quê* (agnóstico); o perfil diz
   *como* na linguagem. Não duplicar regra entre eles. Blocos compartilhados dos comandos
-  têm dono único em `docs/_meta/conventions/` (12 arquivos; o cabeçalho de cada um
+  têm dono único em `docs/_meta/conventions/` (13 arquivos; o cabeçalho de cada um
   declara o dono): `sdd-conventions.md` (convenções comuns, ex-§3.0),
   `index-contract.md` (artefatos/IDs + contrato/template/receita do INDEX, ex-§6),
   `handoff-protocol.md` (handoff de verificação de tela, ex-§8), `commit-convention.md`
@@ -127,8 +127,9 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   regex e severidades do `scripts/artifact-lint.sh`), `map-contract.md` (MAP do slug —
   decisão 4.104), `estimate-contract.md` (contrato da estimativa — decisão 4.223),
   `production-intake-protocol.md` (entrada de bug/incidente de produção — decisão 4.101),
-  `value-test-protocol.md` (menor teste de valor — decisão 4.100) e `agent-teams.md`
-  (especificidades do modo teams — decisão 4.292);
+  `value-test-protocol.md` (menor teste de valor — decisão 4.100), `agent-teams.md`
+  (especificidades do modo teams — decisão 4.292) e `warroom-contract.md` (janela sem
+  gate bloqueante + contrato do `DEBT.md` — decisão 4.372);
   o `method-guide.md`
   segue guia humano, com os headings §3.0/§6/§8 preservados como ponteiros. A moldura dos
   validators vive em `skills/_shared/validator-protocol.md`; a **régua dos gates 1–7**

@@ -176,6 +176,44 @@ Quando um gate não pode rodar (sem tela, sem credencial, app fora do ar), ele *
 finge**: a indisponibilidade é provada, nomeada por causa e vira pendência — e, no caso
 do gate de tela, um [handoff de verificação](Handoff-de-verificacao).
 
+## Warroom — quando a correção não pode esperar os gates
+
+Às vezes o custo de esperar é maior que o risco de errar: produção sangrando, hotfix com
+hora marcada. Para isso existe o **warroom**, uma janela que **só você abre**, com um
+motivo, pelo comando `/keelson:warroom on <motivo>`. O keelson nunca entra nela sozinho
+por achar que o pedido parecia urgente — sem o comando, a rota é a normal.
+
+Dentro da janela, nenhum gate bloqueia: o code review, o QA e os validadores não são
+chamados, e nada precisa virar SPEC ou plano antes do código. A única exceção é a
+**segurança**: se a mudança toca autenticação, permissão, dados pessoais e afins, o
+revisor de segurança roda e o veredito dele vale, warroom ou não. Cada mudança é
+commitada na hora, com um rastro `Warroom: <motivo>` na mensagem.
+
+O que faz o atalho ser honesto é a **conta**: cada commit feito na janela vira uma linha
+aberta num arquivo versionado, o `DEBT.md` na raiz da sua pasta de documentação. Quem
+escreve essa linha é um hook, ao fim de cada turno, lendo o histórico do git — você não
+precisa lembrar de pedir, e um commit que você fez no terminal entra do mesmo jeito.
+A linha diz qual commit, quais gates não rodaram e por quê.
+
+`/keelson:warroom close` fecha a janela e cobra a conta: roda os gates sobre tudo o que
+mudou, marca cada linha como resolvida quando eles passam e deixa aberta, como pendência
+sua, o que não convergiu — você pode assumir a dívida com um motivo, mas isso é um ato
+seu, nunca do keelson. Se a sessão acabar sem o `close`, a próxima é lembrada da dívida
+aberta ao encerrar. A janela vale só para a sessão em que foi aberta: sessão nova nasce
+normal. Push, PR, merge e deploy continuam com você, como sempre.
+
+```mermaid
+flowchart TD
+    A["/keelson:warroom on 'motivo'"] --> B["Mudanças sem gate bloqueante<br/>(segurança ainda roda em área sensível)"]
+    B --> C["Commit por mudança<br/>com rastro 'Warroom: motivo'"]
+    C --> D["Hook no fim do turno:<br/>cada commit vira linha aberta no DEBT.md"]
+    D --> B
+    D --> E["/keelson:warroom close"]
+    E --> F["Gates sobre o diff acumulado"]
+    F -- "passou" --> G["Linha marcada como resolvida"]
+    F -- "não convergiu" --> H["Linha fica aberta:<br/>pendência sua (assumir é ato seu)"]
+```
+
 ## Charter e perfis de linguagem
 
 - O **[Quality Charter](Quality-Charter)** tem nove artigos agnósticos de linguagem. Cada

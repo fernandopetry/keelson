@@ -23,6 +23,51 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.155.0] — 2026-09-03
+
+Re-init: required
+
+Decision 4.372 — new human-only command `/keelson:warroom`:
+a declared window where speed beats rigor and the bill is recorded. Inside the window no
+gate blocks and every commit becomes an open line in `{docsRoot}/DEBT.md`, written by a
+Stop hook from `git log` — nobody has to remember to log the debt. Gate 8 survives on
+sensitive surfaces; `close` runs the gates over the accumulated diff and settles the debt.
+The injected CLAUDE block gains the warroom bullet, so consumers re-run `/keelson:init`.
+
+### Added
+
+- **`/keelson:warroom on <motivo> | status | close`** (`commands/warroom.md`, human-only):
+  only the Director opens the window — apparent urgency without the command is the normal
+  route, never inferred. Inside it the code-reviewer, qa and validators are not dispatched
+  and promotion to the cycle is suspended; the Tech Lead commits each change with a
+  `Warroom: <motivo>` trailer; push, PR, merge and deploy stay human.
+- **`docs/_meta/conventions/warroom-contract.md`** — single owner of the mode's rule and of
+  the `DEBT.md` contract (location, generated line format, `resolvida`/`assumida` states,
+  ownership and rebuild rule under 4.179). Mirrored to the wiki as *Contrato do warroom*.
+- **`scripts/warroom.sh`** (`open | status | reconcile | settle | close | open-debts`,
+  bash 3.2): per-session marker in the session home, `DEBT.md` reconciliation from
+  `git log base..HEAD` (idempotent, `sensivel: sim` flag from `sensitiveGlobs`), ledger
+  events reusing the closed catalogue (`marco` on open/close, `pendencia` when debt
+  remains). Suite `scripts/tests/warroom/run.sh` (41 cases) in pre-commit and CI.
+- **`hooks/warroom-guard.sh`** (Stop): with the window active, reconciles `DEBT.md`
+  silently every turn (never blocks); with it inactive and open lines left, blocks the
+  stop once per set of open lines pointing at `/keelson:warroom close` or `settle`.
+  Measured at well under a second; timeout 30 like its siblings.
+- **`/keelson:triage` step 2.5** suggests the lever when gate latency outweighs the risk;
+  `report-contract.md` §3 gains the warroom route (gate skipped → `não rodado — warroom`,
+  open lines under *Pendente de você*, postmortem suggestion always present).
+- Wiki: *Conceitos* (section on the warroom), *Perguntas frequentes* (how to skip the
+  gates when a fix cannot wait), *Solução de problemas* (the stop reminder about open
+  debt).
+
+### Changed
+
+- **`hooks/review-guard.sh`**: a `warroom.meta` marker owned by this session silences the
+  gate-7 reminder (the debt goes to `DEBT.md`); another session's marker does not. The
+  security-guard is deliberately untouched — gate 8 survives the warroom. Suite +2 cases.
+- **Injected CLAUDE block**: new bullet next to the on-demand mode, and `/keelson:warroom`
+  in the human-only list.
+
 ## [0.154.0] — 2026-09-03
 
 Re-init: none

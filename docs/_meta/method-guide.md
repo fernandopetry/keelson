@@ -244,6 +244,25 @@ mergeia para a branch principal remota, nunca abre PR, nunca faz deploy.
 
 Detalhe completo (flags, fluxo, regras): `commands/merge.md`.
 
+### 3.27 `/keelson:warroom` — janela sem gate bloqueante, com dívida registrada (humano-only)
+
+Abre (`on <motivo>`) ou fecha (`close`) uma janela em que velocidade vale mais que rigor:
+na janela, nenhum gate bloqueia (o `code-reviewer`, o `qa` e os validators não são
+despachados; a promoção ao ciclo fica suspensa), o Tech Lead commita cada mudança com o
+trailer `Warroom: <motivo>` e **cada commit vira linha aberta em `{docsRoot}/DEBT.md`**,
+escrita pelo hook `warroom-guard` a cada fim de turno a partir do `git log` — o registro
+da dívida não depende de ninguém lembrar. O gate 8 sobrevive: diff em superfície sensível
+despacha o `security-engineer` e o veredito bloqueia. O `close` roda os gates sobre o diff
+acumulado da janela (contrato do `/keelson:review`), fecha cada linha como `resolvida` ou
+deixa-a aberta para o Diretor assumir com motivo, e entrega o relatório com a dívida
+restante como pendência dele. Só o Diretor abre (o modelo nunca infere warroom de
+urgência aparente); o marcador vive na casa da sessão, então sessão nova nasce normal; e
+dívida aberta com o modo inativo cutuca o encerramento uma vez por conjunto. Push, PR,
+merge e deploy continuam humanos. Régua e contrato do `DEBT.md`:
+`docs/_meta/conventions/warroom-contract.md` (decisão 4.372).
+
+Detalhe completo: `commands/warroom.md`.
+
 ---
 
 ## 4. Skills

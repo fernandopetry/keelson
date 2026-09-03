@@ -16,7 +16,9 @@
 #   6–10. veredito no ledger (4.365): evento `gate` do code-reviewer mais novo que
 #      todo arquivo de código → silêncio; arquivo editado depois do veredito, veredito
 #      de outro gate, veredito de outra sessão e arquivo alterado ausente do disco →
-#      cutuca (conservador).
+#      cutuca (conservador);
+#   11–12. warroom (4.372): marcador `warroom.meta` DESTA sessão cala o gate 7 (a dívida
+#      vai ao DEBT.md); marcador de outra sessão não cala.
 # Cada caso usa repo próprio (o anti-renudge de .git/ não vaza entre casos).
 #
 # Uso: scripts/tests/review-guard/run.sh
@@ -159,6 +161,22 @@ touch -t 202601010000 "$D10/src/novo.php"
 printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D10" append gate code-reviewer meu-slug >/dev/null 2>&1
 roda "$D10" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 contem "ausente/decision" '"decision": "block"'
+
+# 11. Warroom ativo NESTA sessão (4.372) → gate 7 não cutuca (a dívida vai ao DEBT.md)
+D11="$TMP/c11"; repo "$D11"
+mkdir -p "$D11/thoughts/local/sessions/20260903-100000-sessaoeu"
+printf 'inicio: 2026-09-03T10:00:00-0300\nmotivo: incidente\nbranch: main\nbase: abc\nsessao: sessao-eu\n' \
+  > "$D11/thoughts/local/sessions/20260903-100000-sessaoeu/warroom.meta"
+roda "$D11" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
+silencio "warroom-desta-sessao-silencia"
+
+# 12. Warroom de OUTRA sessão não cala esta (posse, 4.252)
+D12="$TMP/c12"; repo "$D12"
+mkdir -p "$D12/thoughts/local/sessions/20260903-100000-sessoutr"
+printf 'inicio: 2026-09-03T10:00:00-0300\nmotivo: incidente\nbranch: main\nbase: abc\nsessao: sessao-outra\n' \
+  > "$D12/thoughts/local/sessions/20260903-100000-sessoutr/warroom.meta"
+roda "$D12" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
+contem "warroom-alheio/decision" '"decision": "block"'
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

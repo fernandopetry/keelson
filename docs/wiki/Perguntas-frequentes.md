@@ -113,6 +113,18 @@ flowchart TD
     G -- "Sim" --> I["Promove ao ciclo,<br/>dizendo o motivo antes"]
 ```
 
+### Está pegando fogo e não posso esperar os gates. Existe um atalho honesto?
+
+Existe: `/keelson:warroom on <motivo>`. Abre uma janela em que nenhum gate bloqueia — o
+code review, o QA e os validadores ficam de fora e nada precisa virar SPEC ou plano antes
+do código. Só a segurança continua rodando quando a mudança toca área sensível. Cada
+commit feito na janela vira uma linha aberta no `DEBT.md` da sua pasta de documentação,
+escrita por um hook ao fim de cada turno lendo o git — você não precisa lembrar de nada.
+Quando o incêndio passar, `/keelson:warroom close` roda os gates sobre tudo o que mudou e
+fecha as linhas; o que não passar fica como pendência sua, com nome e motivo. Só você
+abre a janela: pedir "urgente" sem o comando segue a rota normal. Veja
+[Conceitos](Conceitos#warroom--quando-a-correção-não-pode-esperar-os-gates).
+
 ## Sobre autonomia e controle
 
 ### O keelson faz merge ou deploy sozinho?

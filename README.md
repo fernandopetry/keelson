@@ -112,6 +112,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:migrate-legacy` | Migrate a legacy slug (docs without `INDEX.md`) to the SDD layout |
 | `/keelson:rebuild-index` | Rebuild a slug's `INDEX.md` from scratch out of its artifacts |
 | `/keelson:lessons-audit` | Audit the project lessons ledger — retrofit the lifecycle format, measure provenance via git, flag expired or obsolete lessons; judgment cuts apply only with your OK |
+| `/keelson:warroom` † | Open (`on <motivo>`) or close a warroom window — changes ship with no blocking gate and every commit becomes an open line in `{docsRoot}/DEBT.md`, written by a Stop hook from `git log` so nobody has to remember; gate 8 survives on sensitive surfaces; `close` runs the gates over the accumulated diff and settles each line as resolved or leaves it as the Director's debt (push, PR, merge and deploy stay human) |
 | `/keelson:verify-handoff` † | Close a pending screen-verification `HANDOFF` — consolidates the branch, exercises each item in the real environment; no merge (points to `/keelson:integrate`) |
 | `/keelson:postmortem` † | End-of-session postmortem — re-reads the whole session's interactions (corrections, retries, failed gates), separates defects from new scope, traces each gap to the mechanism that let it through, and produces the copy-paste maintainer message (with literal diffs via the agile-coach) that evolves the plugin |
 | `/keelson:mutation-setup` † | Guided setup of the mutation gate — detects the stack from the ficha, installs the canonical tool with confirmation, generates its config, proves the pipeline with a sample run and writes `quality.mutation` (diff-scoped, no threshold at first) |
@@ -398,7 +399,7 @@ keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
 ├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer, performance-engineer, product-designer… + tools (not roles): code-scout, scribe, tracker-sync, estimator
 ├── skills/            # spec / plan / task validators + status + screen-verify
-├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard, jira-guard, noverify-guard, compact-anchor, window-marker
+├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard, jira-guard, noverify-guard, warroom-guard, compact-anchor, window-marker
 ├── guidelines/
 │   ├── _meta/         # QUALITY-CHARTER.md · PROFILE-OUTLINE.md
 │   ├── core/          # language-agnostic doctrine (always active)
@@ -418,7 +419,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.154.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.155.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 

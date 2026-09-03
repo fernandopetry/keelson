@@ -68,6 +68,17 @@ fica para o fim, como no modo sob demanda. Ela cala quando o veredito do revisor
 arquivo de código foi editado depois dele. Se voltou, ou algo mudou depois do veredito
 (re-revise só o delta) ou o veredito não foi anotado — anote-o e encerre.
 
+### A sessão não encerra: "dívida de verificação do warroom"
+
+Existe linha aberta no `DEBT.md` (raiz da sua pasta de documentação) e nenhuma janela de
+warroom ativa nesta sessão — sobrou dívida de uma janela anterior, ou de outra sessão,
+sem `/keelson:warroom close`. O lembrete aparece **uma vez** por conjunto de linhas
+abertas e some quando elas fecham. Duas saídas: `/keelson:warroom close` roda os gates
+sobre o diff acumulado e fecha o que passar; ou, linha a linha, `scripts/warroom.sh
+<raiz> settle <hash> resolvida|assumida "<nota>"` do plugin — `assumida` é você dizendo
+que aceita a dívida, com motivo. Se a cutucada vier num repositório onde você nunca usou
+warroom, alguém commitou um `DEBT.md` com linha aberta: veja o histórico do arquivo.
+
 ## Gates que reprovam
 
 ### O gate de testes reprova, mas os testes passam na minha mão

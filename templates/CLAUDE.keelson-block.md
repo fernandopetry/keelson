@@ -93,6 +93,15 @@
   execução) → **escale ao Diretor com proposta + default** antes de codar, **nunca
   arbitre em silêncio**: os dois contratos foram configurados por ele, e só ele decide
   qual prevalece (decisão 4.85).
+- **Warroom = velocidade acima de rigor, com a conta registrada** (decisão 4.372): só o
+  Diretor abre, por `/keelson:warroom on <motivo>` (humano-only) — urgência aparente
+  **sem** o comando é rota normal, nunca inferida. Na janela: sem `code-reviewer`/`qa`/
+  validators nem promoção ao ciclo; **gate 8 sobrevive** em superfície sensível; commit
+  por mudança com trailer `Warroom: <motivo>`; **cada commit vira linha aberta em
+  `{docsRoot}/DEBT.md`**, escrita pelo hook a cada turno — gate pulado é registrado,
+  nunca omitido. `/keelson:warroom close` roda os gates sobre o diff acumulado e cobra a
+  dívida; linha aberta é pendência do Diretor, cutucada no encerramento. Régua:
+  `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/warroom-contract.md`.
 - **Toda mudança fecha com relatório** (decisão 4.76): terminado o ajuste — sob demanda ou
   ciclo — o Tech Lead **exibe o fecho sem que você peça**, em 6–10 linhas: o que mudou
   (produção · teste · doc · migration/config) · **cada gate aplicável com estado
@@ -142,6 +151,7 @@ Humanos-only (não aparecem na listagem): `/keelson:guided` (ciclo com checkpoin
 `/keelson:merge` (mesclar uma ou mais branches na branch de trabalho corrente, uma de
 cada vez, com commit de merge próprio por branch — push, merge remoto, PR e deploy
 continuam humanos) ·
+`/keelson:warroom` (abrir/fechar janela sem gate bloqueante, dívida em `DEBT.md`) ·
 `/keelson:verify-handoff` (fechar gate de tela remoto) ·
 `/keelson:continue` (retomar um slug de onde parou — fila do épico, wave interrompida
 ou próxima fatia, derivado dos artefatos commitados) ·

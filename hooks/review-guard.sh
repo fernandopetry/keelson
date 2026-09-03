@@ -70,6 +70,20 @@ for rs in "$proj"/thoughts/local/run-state-*.md "$proj"/thoughts/local/sessions/
   exit 0
 done
 
+# Warroom ativo NESTA sessão (decisão 4.372): o gate 7 não bloqueia — cada commit vira
+# linha de dívida em DEBT.md (warroom-guard) e a cobrança é no fecho da janela. Mesma
+# régua de posse do run-state: marcador de OUTRA sessão não cala esta; legado sem dono
+# (`sessao: desconhecida`) cala como antes. O security-guard NÃO tem este silenciador —
+# gate 8 sobrevive ao warroom.
+for wm in "$proj"/thoughts/local/warroom.meta "$proj"/thoughts/local/sessions/*/warroom.meta; do
+  [ -f "$wm" ] || continue
+  dono="$(sed -n 's/^sessao:[ 	]*//p' "$wm" 2>/dev/null | sed -n 1p)"
+  if [ -n "$session_id" ] && [ -n "$dono" ] && [ "$dono" != "desconhecida" ] && [ "$dono" != "$session_id" ]; then
+    continue
+  fi
+  exit 0
+done
+
 # gates.review desligado na ficha → não cutuca (default: ligado quando ausente).
 # Obs.: `//` do jq trata `false` como vazio, então NÃO serve aqui — testamos == false.
 rev_gate="$(jq -r 'if .gates.review == false then "off" else "on" end' "$config" 2>/dev/null || echo on)"
