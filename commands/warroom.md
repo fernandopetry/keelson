@@ -1,5 +1,5 @@
 ---
-description: Abre ou fecha uma janela de warroom — mudança sai sem gate bloqueante e cada commit vira dívida de verificação registrada em DEBT.md; o fecho roda os gates sobre o diff acumulado e cobra a dívida (gate 8 sobrevive; push, PR, merge e deploy continuam humanos)
+description: Abre ou fecha uma janela de warroom — mudança sai sem gate bloqueante e cada commit vira dívida registrada em DEBT.md; o fecho roda os gates sobre o diff acumulado e cobra a dívida (gate 8 sobrevive; push, PR, merge e deploy continuam humanos)
 argument-hint: "on <motivo> | status | close"
 disable-model-invocation: true
 ---
