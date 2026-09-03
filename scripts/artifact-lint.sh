@@ -568,8 +568,10 @@ line ~ /(@group|--group)[ \t]+[A-Za-z0-9_-]/ {
 sect == "crit" && line ~ /^- \[[ xX]\]/ {
   ncrit++
   crit = crit " " line
+  nItem++; items[nItem] = line
   next
 }
+sect == "crit" && nItem > 0 && line ~ /^[ \t]+[^ \t]/ { items[nItem] = items[nItem] " " line; next }
 sect == "gate9" { g9 = g9 " " line; next }
 sect == "hist" && line ~ /^\*\*Data (in[ií]+cio|conclus[aã]+o)\*\*[ \t]*:/ {
   # 4.337 (promocao do check adiado da 4.308): marca de relogio e timestamp ou lacuna —
@@ -671,6 +673,27 @@ END {
     if (!(lcAll ~ /[0-9]+[ \t]*m[eé]+todos?/ && lcAll ~ /[0-9]+[ \t]*provas?/))
       emit("WARNING", "task-mutacao-sem-contagem", "criterio menciona mutacao de predicado de escopo sem o par contavel \"N metodos ... N provas\" (4.232)")
   }
+  # 4.368 (LRN-021, 2a reincidencia da 4.93): criterio que nomeia arquivo de teste como
+  # alvo e cita comando de suite sem isolar o alvo — "OK (N tests)" do agregado nao prova
+  # que o alvo rodou quando a config exclui por grupo/tag. Absolvem: --filter/--group/
+  # grep/-k/-t/--testNamePattern no comando, ou o proprio arquivo citado dentro dele.
+  nAlvo = 0; alvoTok = ""
+  for (i = 1; i <= nItem; i++) {
+    it = items[i]
+    if (index(it, "`") == 0) continue
+    if (!match(it, /[A-Za-z0-9_]+Test\.php|[A-Za-z0-9_.-]+\.(test|spec)\.[jt]sx?|[A-Za-z0-9_]+_test\.go|test_[A-Za-z0-9_]+\.py/)) continue
+    tok = substr(it, RSTART, RLENGTH)
+    s = it; iso = 0; hasCmd = 0
+    while (match(s, /`[^`]+`/)) {
+      seg = substr(s, RSTART + 1, RLENGTH - 2)
+      if (seg ~ /(^|[ \t|])(grep|egrep|rg)([ \t]|$)/ || seg ~ /--filter|--group|--testNamePattern|--grep|(^|[ \t])-[kt][ \t]/ || index(seg, tok) > 0 || seg ~ /Test\.php|\.(test|spec)\.[jt]s|_test\.go|test_[A-Za-z0-9_]+\.py/) iso = 1
+      if (seg ~ /(^|[ \t\/])(test|tests|phpunit|pest|jest|vitest|pytest|mocha|rspec|cargo|go)([ \t:]|$)/) hasCmd = 1
+      s = substr(s, RSTART + RLENGTH)
+    }
+    if (hasCmd && !iso) { nAlvo++; if (alvoTok == "") alvoTok = tok }
+  }
+  if (nAlvo > 0)
+    emit("WARNING", "task-criterio-alvo-nao-isolado", nAlvo " criterio(s) nomeia(m) arquivo de teste como alvo (" alvoTok ") e o comando de suite nao o isola (--filter/--group/grep/caminho) — agregado nao-vazio nao prova que o alvo rodou sob exclusao por grupo/tag (4.93/4.368)")
   # marca de relogio preenchida com prosa/data-sem-hora no Historico de execucao
   if (nMarcaProsa > 0)
     emit("WARNING", "task-marca-nao-timestamp", nMarcaProsa " campo(s) Data inicio/conclusao preenchido(s) sem timestamp (AAAA-MM-DDTHH:MM) — prosa ou lacuna declarada nao e marca: campo fica vazio ou recebe a marca medida (4.308/4.337)")

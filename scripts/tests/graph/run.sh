@@ -63,6 +63,10 @@ runcase plan-sem-tasks-check     plan-sem-tasks     1 plan-sem-tasks--check.txt 
 runcase plan-sem-tasks-stage     plan-sem-tasks     0 plan-sem-tasks--check-stage-plan.txt --check --stage=plan
 runcase parse-degrade-check      defeito-parse-degrade 0 defeito-parse-degrade--check.txt --check
 runcase feat-verificacao-check   defeito-feat-verificacao 1 defeito-feat-verificacao--check.txt --check
+# bullet com lista inline / bullet "nenhuma" nos campos de cobertura (decisão 4.367):
+# variação inócua — as arestas plan-covers saem inteiras e o --check fica limpo
+runcase bullet-lista-check       tolerancia-bullet-lista 0 tolerancia-bullet-lista--check.txt --check
+runcase bullet-lista-tsv         tolerancia-bullet-lista 0 tolerancia-bullet-lista--tsv.txt   --format=tsv
 # --plan aceita MMM sem zero-padding (mesmo resultado do padded)
 runcase cobertura-plan-1         defeito-cobertura  1 defeito-cobertura--check-plan.txt --check --plan 1
 # brief avulso (decisão 4.86): nó BRIEF + âncora task-brief; defeitos plantados

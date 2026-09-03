@@ -264,6 +264,14 @@ ftype == "P" && sect == "cob" && line ~ /^\*\*NFRs cobertos\*\*/ {
 ftype == "P" && sect == "cob" && line ~ /^\*\*/                  { covermode = "";    next }
 ftype == "P" && sect == "cob" && covermode != "" && line ~ /^- / {
   v = trimtok(substr(line, 3))
+  # 4.367: bullet que carrega a lista inline ("- FR-001-001, FR-001-002, …") é tolerado
+  # como variação inócua — cortar no 1º espaço derrubava a cobertura inteira a zero
+  # (14 IDs num bullet só → 0 plan-covers) e as carências degradavam a [parse].
+  if (tolower(v) ~ /^(nenhuma|nenhum)$/) next
+  if (index(v, ",") > 0) {
+    listedges("plan-covers", NDI[cur_nd], v, (covermode == "fr" ? "^FR-[0-9]+-[0-9]+$" : "^NFR-[0-9]+-[0-9]+$"), (covermode == "fr" ? "FRs cobertos" : "NFRs cobertos"))
+    next
+  }
   sub(/[ \t].*$/, "", v)
   if (covermode == "fr" && v ~ /^FR-[0-9]+-[0-9]+$/)        edge("plan-covers", NDI[cur_nd], v)
   else if (covermode == "nfr" && v ~ /^NFR-[0-9]+-[0-9]+$/) edge("plan-covers", NDI[cur_nd], v)

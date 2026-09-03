@@ -66,6 +66,7 @@ WARNING	spec-sem-risco	nenhum risco listado na secao 9 (SPEC-001-login-defeituos
 WARNING	spec-sem-should-may	nenhum FR SHOULD ou MAY (SPEC-002-lote.md)
 WARNING	spec-tecnologia	"PostgreSQL" citado na secao 6 (dominio, nao tecnologia — pode ser falso positivo) (SPEC-001-login-defeituosa.md)
 WARNING	task-comando-contradiz-criterio	comando de verificacao usa --group skip-migration e outra linha da mesma TASK proibe a tag skip-migration (4.215) (TASK-001-007-contradiz-grupo.md)
+WARNING	task-criterio-alvo-nao-isolado	1 criterio(s) nomeia(m) arquivo de teste como alvo (EnviaEmailTest.php) e o comando de suite nao o isola (--filter/--group/grep/caminho) — agregado nao-vazio nao prova que o alvo rodou sob exclusao por grupo/tag (4.93/4.368) (TASK-001-015-alvo-nao-isolado.md)
 WARNING	task-criterio-grep-nao-ancorado	1 criterio(s) com grep/rg de padrao textual sem exclusao de comentario nem ancora executavel — fronteira de simbolo (\b/::/->) limita a palavra mas segue casando docblock/prosa (4.161, 4.255) (TASK-001-002-corrige-login.md)
 WARNING	task-criterio-grep-nao-ancorado	2 criterio(s) com grep/rg de padrao textual sem exclusao de comentario nem ancora executavel — fronteira de simbolo (\b/::/->) limita a palavra mas segue casando docblock/prosa (4.161, 4.255) (TASK-001-010-ac-substring.md)
 WARNING	task-done-gate-aberto	1 item(ns) de Quality gates desmarcado(s) sem consolidacao declarada (4.90) (TASK-001-006-done-aberta.md)

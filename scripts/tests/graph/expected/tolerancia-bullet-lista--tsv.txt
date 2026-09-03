@@ -1,0 +1,25 @@
+edge	ac-covers	AC-001-001	FR-001-001	specs/SPEC-001-lista.md:13
+edge	ac-covers	AC-001-002	FR-001-002	specs/SPEC-001-lista.md:14
+edge	belongs-to	TASK-001-001	PLAN-001	tasks/TASK-001-001-nucleo.md:4
+edge	comp-realiza	COMP-001-001	FR-001-001	plans/PLAN-001-lista.md:20
+edge	comp-realiza	COMP-001-001	FR-001-002	plans/PLAN-001-lista.md:20
+edge	covers-ac	TASK-001-001	AC-001-001	tasks/TASK-001-001-nucleo.md:18
+edge	covers-ac	TASK-001-001	AC-001-002	tasks/TASK-001-001-nucleo.md:19
+edge	implements	TASK-001-001	COMP-001-001	tasks/TASK-001-001-nucleo.md:6
+edge	maps	FR-001-001	COMP-001-001	plans/PLAN-001-lista.md:27
+edge	maps	FR-001-002	COMP-001-001	plans/PLAN-001-lista.md:28
+edge	maps-ac	FR-001-001	AC-001-001	plans/PLAN-001-lista.md:27
+edge	maps-ac	FR-001-002	AC-001-002	plans/PLAN-001-lista.md:28
+edge	plan-covers	PLAN-001	FR-001-001	plans/PLAN-001-lista.md:11
+edge	plan-covers	PLAN-001	FR-001-002	plans/PLAN-001-lista.md:11
+edge	realiza	TASK-001-001	FR-001-001	tasks/TASK-001-001-nucleo.md:5
+edge	realiza	TASK-001-001	FR-001-002	tasks/TASK-001-001-nucleo.md:5
+edge	spec-ref	PLAN-001	SPEC-001	plans/PLAN-001-lista.md:8
+node	AC	AC-001-001	specs/SPEC-001-lista.md	
+node	AC	AC-001-002	specs/SPEC-001-lista.md	
+node	COMP	COMP-001-001	plans/PLAN-001-lista.md	
+node	FR	FR-001-001	specs/SPEC-001-lista.md	
+node	FR	FR-001-002	specs/SPEC-001-lista.md	
+node	PLAN	PLAN-001	plans/PLAN-001-lista.md	status=Approved
+node	SPEC	SPEC-001	specs/SPEC-001-lista.md	status=Approved
+node	TASK	TASK-001-001	tasks/TASK-001-001-nucleo.md	wave=1 status=Todo tipo=feature

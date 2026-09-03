@@ -23,6 +23,48 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.154.0] — 2026-09-03
+
+Re-init: none
+
+Decisions 4.367–4.370 — five field lessons absorbed (plugin 0.153.0, `/keelson:auto`).
+The graph no longer drops a PLAN's whole coverage when the scribe writes the FR list in
+one bullet, a new lint check catches a suite-wide command cited as proof for named test
+files it may never run, the task generator reproduces the AC's Given and proves each named
+sink and each conjunct, and a finding carried from one gate into another gate's retry
+must name its parent.
+
+### Added
+
+- **`task-criterio-alvo-nao-isolado`** (4.368, `scripts/artifact-lint.sh`, WARNING): a
+  "Critérios de pronto" item that names a test file as its target and cites a suite
+  command without isolating it (`--filter`/`--group`/`grep`/`-k`/`-t`/the file itself)
+  is flagged — an aggregate "OK (N tests)" does not prove a target excluded by
+  group/tag ever ran. Best-effort, declared in the lint contract. Fixture + expected.
+- **Graph fixture `tolerancia-bullet-lista`** (4.367): proves the two tolerated forms
+  below and, with the previous parser, reproduced the silent failure (only `[parse]`
+  warnings, exit 0).
+
+### Changed
+
+- **Coverage bullets tolerate an inline list and `nenhuma`** (4.367, `scripts/graph.sh`,
+  `graph-contract.md` §1): `- FR-001-001, FR-001-002` under `FRs cobertos`/`NFRs
+  cobertos` now emits every `plan-covers` edge instead of degrading the whole field to
+  `nao-parseavel` and letting `fr-sem-task`/`ac-sem-task` fall to `[parse]` warnings;
+  `- nenhuma` is silent like the empty field.
+- **`/keelson:plan` step 4 item 8** (4.367): `Irreversível` takes the literal enum value;
+  the justification lives in the DEC's prose.
+- **`/keelson:tasks`** (4.368, 4.369): the 4.93 paragraph gains the mirror case (broad
+  suite command + named target → isolated confirmation of the target); the 4.286
+  paragraph reproduces the AC's Given and asserts every sink the AC names; item (f)
+  extends the per-part mutant to conjunctions ("X and Y"); item (d) closes "known
+  consumers" by sweep or labels the list non-exhaustive; the template's lint line derives
+  its condition from the diff (all touched files, production and test).
+- **`/keelson:implement` §3.3** (4.370): a dedicated-gate finding the orchestrator carries
+  into another gate's retry in the same round is born with its parent (AC/Scope item or a
+  written sanctioned extension) next to the condition and the proof pair; without one it
+  becomes its own TASK or a formal handoff (4.288), never a loose retry item.
+
 ## [0.153.0] — 2026-09-02
 
 Re-init: none

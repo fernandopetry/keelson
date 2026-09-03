@@ -25,6 +25,11 @@ separados por vírgula** ou a palavra **`nenhuma`**:
   aviso). Conteúdo **irreconhecível** (prosa, ID fora do formato do
   `index-contract.md`) degrada: `WARNING nao-parseavel`, nunca ERROR, nunca aborta.
 - Variação inócua é tolerada: espaços, crase em volta do ID, negrito, CRLF/BOM.
+- Nos campos de cobertura do PLAN (`FRs cobertos`/`NFRs cobertos`), o bullet que carrega
+  a lista inline (`- FR-001-001, FR-001-002`) e o bullet `- nenhuma` são variação inócua
+  (decisão 4.367): antes, o corte no 1º espaço derrubava a cobertura do PLAN inteira a
+  zero e as carências degradavam a `[parse]` com exit 0. A forma canônica segue: lista
+  inline no campo, ou um ID por bullet.
 - O `(cobre …)` do AC segue a mesma régua em forma parentética:
   `(cobre FR-NNN-XXX, NFR-NNN-YYY)` — IDs completos, separados por vírgula; sem
   barra-abreviação (`FR-x/y`) nem sub-item (`FR-x-001a`).

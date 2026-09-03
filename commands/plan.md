@@ -105,7 +105,7 @@ indisponível → executar as Etapas 4–5 inline é o fallback, declarado no ou
 5. **Mapeamento FR → componente**.
 6. **Definition of Done do PLAN** — SPEC com `**Fonte de medição**:` na §1.3 → a DoD inclui o item de métrica operacional (template §9; decisão 4.99). Sabor `instrumentação` → o trabalho de instrumentar entra nos componentes deste PLAN (sem componente que emita o evento, o item da DoD é insatisfazível).
 7. **IDs escopados**: `DEC-MMM-XXX`, `COMP-MMM-XXX`, `TRISK-MMM-XXX`.
-8. **DEC marcada como irreversível ou não**: cada DEC tem campo `Irreversível: sim | não`. Se sim, será propagada ao INDEX.
+8. **DEC marcada como irreversível ou não**: cada DEC tem campo `Irreversível: sim | não` — valor **literal** do enum, sem prosa; a justificativa mora em Contexto/Consequências da própria DEC (valor fora do enum é ERROR do lint, `plan-dec-irreversivel-enum` — decisão 4.367). Se sim, será propagada ao INDEX.
 9. **Superfície de API e schema verificados contra a fonte real, nunca deduzidos** (decisão 4.108): ao listar endpoints na interface pública de um `COMP`, percorra as **invariantes de construção** de cada entidade nova (campo obrigatório que referencia outro recurso) e confirme que existe rota que o satisfaz **antes** de precisar dele — entidade que exige o id de um anexo no construtor sem endpoint de upload prévio deixa o fluxo real irrealizável pela API, e o FR correspondente nasce insatisfazível sem que ninguém note até o código bater na realidade. Todo tipo de coluna citado na §5 é **lido do schema/migration real** (grep na tabela existente), nunca presumido pela convenção do domínio.
 
 ## Etapa 5: estrutura obrigatória do arquivo PLAN (contrato de forma — executado pelo `scribe`)
