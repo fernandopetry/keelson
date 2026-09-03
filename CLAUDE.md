@@ -236,8 +236,10 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   específica demais.
 - **Proposta de consumidor tem fila no mantenedor** (decisão 4.111): `PROPOSTA_PLUGIN`
   que chega (postmortem, ledger, mensagem) é registrada em `docs/_meta/proposal-inbox.md`
-  **antes do parecer** e fechada na leva que a aplica/recusa (`aplicada (4.x)` /
-  `recusada (motivo)`). Nada entra em doutrina sem passar pela fila; reincidência
+  **antes do parecer** e fechada na leva que a aplica/recusa/adia (`aplicada (4.x)` /
+  `recusada (motivo)` / `adiada (gatilho)` — esta é o **default** da proposta só-de-texto em
+  1ª ocorrência sem prova, decisão 4.371; contrato no cabeçalho da fila). Nada entra em
+  doutrina sem passar pela fila; reincidência
   referencia a linha anterior.
 - **Poda de doutrina tem régua** (decisão 4.160): em leva de destilação/refino de
   comando, agent ou skill, cada frase passa por três testes — **no-op** (muda o

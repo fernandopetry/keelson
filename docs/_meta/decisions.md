@@ -3769,6 +3769,14 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 **Aplicação**: `commands/implement.md` (§3.3 — 318 linhas estáveis) · CHANGELOG **0.154.0**. Origem: fila da 4.111, linha 2026-09-03 (LRN-112).
 
+### 4.371 — `adiada` é a saída default do intake para proposta só-de-texto em 1ª ocorrência
+
+**Problema**: a fila da 4.111 fechou **170 `aplicada` contra 15 `recusada`** (92% de aceite, 0 `adiada`). O intake avalia — precedente (4.269), reincidência (4.149), causa (4.305), no-op (4.160) — mas a régua é assimétrica: **cortar** doutrina exige eval A/B (diretriz do Diretor, 4.304/4.321), **acrescentar** exige um grep de precedente. O teste no-op da 4.160 pergunta se a frase muda o comportamento vs. o default do modelo, e toda frase com caso real embutido passa — o que ninguém mede é o custo de atenção que ela cobra das 40 KB que já existem na mesma superfície. O `agile-coach` chega com patch pronto, dono declarado, dedup e contra-exemplo: o parecer tende a corrigir o *como* e nunca o *se* (leva 4.367–4.370: 6/6 aplicadas, 3 ajustadas no como). Receio do Diretor, explícito: trazer insumo de campo e o mantenedor "achar na obrigação de fazer alguma coisa e piorar a versão".
+
+**Decisão**: terceiro estado da fila, **`adiada (gatilho: reincidência | eval)`**, e ele é o **default** quando as três condições valem juntas: patch só de texto de doutrina (sem script/check/fixture/hook), 1ª ocorrência (sem linha anterior na fila nem no ledger de origem) e sem prova de efeito (eval 4.304 ou controle positivo mecânico). O patch fica no ledger do consumidor; a fila guarda o ponteiro. Sai de `adiada` quando o gatilho dispara: a busca de reincidência do passo 4 varre as linhas `adiada`, e o match reabre a linha como reincidência 1 e aplica na leva de agora; ou eval que prove o efeito. **Passes** que aplicam de primeira, sempre nomeados no parecer: reincidência ≥1 na chegada · patch com check mecânico + fixture · causa `verificador_furado`/`ferramenta_ambiente` (conserto de script) · ordem do Diretor. Risco de segurança/corrupção sem mitigação sobe ao Diretor (4.181), nunca fica adiado em silêncio. Sem retroatividade: a leva 4.367–4.370 fica como está (sob esta régua, as cláusulas (a)/(c) da 4.369 e a 4.370 teriam nascido `adiada`; a 4.367 e a 4.368 passariam por mecanismo, a (b) da 4.369 por reincidência). Opções 2 (eval obrigatório para acrescentar em superfície quente) e 3 (orçamento de bytes por arquivo) ficam como escada se a taxa de aceite não cair.
+
+**Aplicação**: `docs/_meta/proposal-inbox.md` (contrato — dono do estado) · `.claude/skills/field-intake/SKILL.md` (passos 4/5/6 e Entrega) · `CLAUDE.md` (§Registro e governança). Tooling do mantenedor (4.182): sem bump, sem CHANGELOG. Origem: pergunta do Diretor na sessão de 2026-09-03, após a leva 4.367–4.370.
+
 ---
 
 ## 7. Roteamento de mudanças

@@ -12,8 +12,22 @@ registrada aqui **antes do parecer**, e nenhuma entra em doutrina sem passar por
   registro no ledger de origem, ex. `LRN-031`, sem nome/paths do consumidor), 1 linha do
   padrão genérico, alvo no plugin.
 - **Fechar na leva**: a leva que aplica/recusa atualiza o Estado — `aplicada (4.x)` com a
-  decisão que a absorveu, ou `recusada (motivo curto)`. `recebida` que atravessa uma leva
-  é pendência visível, não backlog silencioso.
+  decisão que a absorveu, `recusada (motivo curto)`, ou `adiada (gatilho)`. `recebida` que
+  atravessa uma leva é pendência visível, não backlog silencioso.
+- **`adiada` é a saída default da proposta só-de-texto** (decisão 4.371): proposta cujo
+  patch é **apenas frase de doutrina** (nenhum script, check, fixture ou hook junto), em
+  **1ª ocorrência** (sem linha anterior na fila nem no ledger de origem) e **sem prova de
+  efeito** (nem eval A/B da 4.304, nem controle positivo mecânico) fica `adiada (gatilho:
+  reincidência | eval)` — o ledger do consumidor guarda o patch; a fila guarda o ponteiro.
+  Ela vira `aplicada` quando o gatilho dispara: 2ª ocorrência (a busca de reincidência do
+  intake varre também as linhas `adiada`, e o match reabre a linha com a contagem), ou
+  eval que prove o efeito. Vão direto a `aplicada` sem passar por `adiada`: reincidência
+  ≥1 já na chegada; patch que traz check mecânico + fixture; causa `verificador_furado` /
+  `ferramenta_ambiente` (conserto de script, não texto); e ordem explícita do Diretor.
+  Risco de segurança ou de corrupção de dado sem mitigação sobe ao Diretor (4.181), nunca
+  fica `adiada` em silêncio. Motivo: a fila fechou 170 `aplicada` contra 15 `recusada`
+  (92% de aceite) — cada frase nova compete por atenção com a doutrina que já existe, e
+  só a reincidência ou a medição prova que ela paga o custo.
 - **Reincidência referencia a linha anterior** — é o sinal de que o elo falhou uma vez. A partir da **2ª reincidência**, a proposta chega com o **check mecânico/autocheck desenhado** ou com a justificativa de imecanizável (escada da 4.149 — dono: `learning-log.md`); proposta de texto-de-novo sem uma das duas volta para o proponente.
 - A fila carrega **ponteiros, nunca texto de doutrina** — o dono da regra é o arquivo dela.
 
