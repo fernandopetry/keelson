@@ -51,6 +51,17 @@ arquivo existe antes de gravar o caminho, e o relatório abre com
 (`/keelson:update`) e rode `/keelson:init` de novo — a Regra de merge preserva o que
 você já configurou; confira no relatório o item de perfil do self-check.
 
+### O init disse "tudo íntegro" mas o `CLAUDE.md` está desatualizado
+
+Sintoma: `/keelson:update` trouxe uma versão nova do plugin (um comando novo, um modo
+novo), mas o bloco gerenciado do `CLAUDE.md` do projeto não ganhou a atualização
+correspondente — mesmo com o `/keelson:init` relatando adoção íntegra. A partir da
+versão `0.156.0` o self-check compara o bloco do projeto **byte-a-byte** contra o
+template do pacote (item `claude-block-sincronizado`): divergência, marcadores
+ausentes ou `CLAUDE.md` ausente aparecem como `falha` no relatório, nunca como
+silêncio. Reparo: rode `/keelson:init` de novo — a Etapa 5 sempre substitui o bloco
+pelo template atual (o bloco gerado nunca é "preservado" como um valor seu).
+
 ### Desliguei `gates.review` na ficha e o reviewer continuou rodando
 
 Não é defeito. `gates.review` (e `gates.reviewThreshold`) governam a **cutucada de

@@ -189,7 +189,7 @@ faltante); ficha antiga sem o bloco → acrescenta com o detectado.
 
 ## Etapa 5 — Injetar o bloco no `CLAUDE.md`
 
-Insira o conteúdo de `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.keelson-block.md` no `CLAUDE.md` do projeto (crie o arquivo se não existir). Se um bloco keelson já existir (entre os marcadores `<!-- ... keelson ... -->`), **substitua-o** — não duplique.
+Insira o conteúdo de `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.keelson-block.md` no `CLAUDE.md` do projeto (crie o arquivo se não existir). Se um bloco keelson já existir (entre os marcadores `<!-- ... keelson ... -->`), **substitua-o** — não duplique. Este bloco **não** entra na Regra de merge do topo do comando: ele é gerado, não personalizado pelo humano, então "já existe" nunca é motivo para preservá-lo — a única prova de que está correto é o conteúdo bater com o template atual (Etapa 6 confere mecanicamente; caso real, 4.373: um `/keelson:init` confirmou só a existência do bloco e reportou "tudo íntegro" com uma decisão inteira faltando).
 
 ## Etapa 5.5 — Garantir `thoughts/` fora do versionamento
 
@@ -209,8 +209,11 @@ hooks do plugin instalado, codePaths, binários
 dos `quality.*`, matching real dos `sensitiveGlobs`, resolução/`reviewed`/`charter`
 do perfil, `keelson.local.*` (versionamento, gitignore provado, placeholders),
 `check-ignore` dos diretórios de artefato, flags efetivas do Playwright por escopo,
-campos mínimos do Jira e validade do bloco `models` (chave existe no elenco de agents
-do pacote, alias conhecido). Cada linha `falha`/`aviso` vira item do relatório. Exceção com
+campos mínimos do Jira, validade do bloco `models` (chave existe no elenco de agents
+do pacote, alias conhecido) e o bloco injetado do `CLAUDE.md` **byte-a-byte** contra o
+template do pacote (item `claude-block-sincronizado` — divergência, marcadores ausentes
+ou arquivo ausente são `falha`, nunca aviso: "o bloco existe" não é "o bloco está
+atualizado", decisão 4.373). Cada linha `falha`/`aviso` vira item do relatório. Exceção com
 reparo imediato: `falha` em `hooks-executaveis` (hook sem `+x` falha em **silêncio** a
 cada disparo — decisão 4.180) → aplique o `chmod +x` que a linha indica no cache do
 plugin, declare no relatório que o reparo local **evapora no próximo update** e

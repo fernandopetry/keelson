@@ -5,7 +5,9 @@
 # compara a saída inteira com a esperada. Regras provadas: matching real dos
 # sensitiveGlobs, check-ignore provado, local.json versionado é falha, flags efetivas
 # do Playwright por escopo, charter antigo vira aviso, jira com campo vazio é falha,
-# bloco models validado contra o elenco de agents do plugin (4.272).
+# bloco models validado contra o elenco de agents do plugin (4.272), bloco do CLAUDE.md
+# comparado byte-a-byte contra o template do plugin — sincronizado, desatualizado,
+# sem marcadores e ausente (4.373).
 #
 # Uso: scripts/tests/init-selfcheck/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível; exige git.
@@ -33,9 +35,22 @@ PR="$TMP/plugin"
 mkdir -p "$PR/guidelines/_meta" "$PR/guidelines/backend"
 printf '# QUALITY-CHARTER\n\n> **Versão: 0.5.1** — é esta versão que o campo `charter:`...\n' > "$PR/guidelines/_meta/QUALITY-CHARTER.md"
 printf -- '---\nlang: php\nversion: "8.5"\ncharter: 0.5.1\nreviewed: true\n---\n# PHP\n' > "$PR/guidelines/backend/php.md"
-mkdir -p "$PR/hooks"
+mkdir -p "$PR/hooks" "$PR/templates"
 printf '#!/bin/sh\nexit 0\n' > "$PR/hooks/guarda.sh"
 chmod +x "$PR/hooks/guarda.sh"
+BLOCO_TMPL='<!-- ============================================================= -->
+<!-- keelson — bloco gerenciado. Gerado por /keelson:init.          -->
+<!-- Edite keelson.config.json, não este bloco.                    -->
+<!-- ============================================================= -->
+
+## Keelson — padrão de qualidade e fluxo
+
+Conteúdo canônico do bloco.
+
+<!-- ============================================================= -->
+<!-- fim do bloco keelson                                          -->
+<!-- ============================================================= -->'
+printf '%s\n' "$BLOCO_TMPL" > "$PR/templates/CLAUDE.keelson-block.md"
 
 mkrepo() { r="$TMP/$1"; mkdir -p "$r"; git -C "$r" init -q; git -C "$r" config user.email t@t; git -C "$r" config user.name t; printf '%s\n' "$r"; }
 
@@ -67,12 +82,14 @@ EOF
 cat > "$R/.mcp.json" <<'EOF'
 { "mcpServers": { "playwright": { "command": "npx", "args": ["@playwright/mcp@latest", "--headless", "--output-dir", "thoughts/screen-verify", "--isolated"] } } }
 EOF
+printf '# Projeto\n\nTexto do humano, preservado.\n\n%s\n' "$BLOCO_TMPL" > "$R/CLAUDE.md"
 git -C "$R" add -A >/dev/null 2>&1
 git -C "$R" commit -qm base >/dev/null 2>&1
 
 total=$((total + 1))
 got="$(bash "$SC" "$R" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
 want="ok	artefatos-ignorados	artifactsDir e .playwright-mcp/ ignorados (provado)
+ok	claude-block-sincronizado	bloco do CLAUDE.md idêntico ao template do plugin
 ok	codepaths-existem	todos os codePaths existem
 ok	ficha-legivel	keelson.config.json parseado
 ok	hooks-executaveis	todos os hooks do plugin têm bit de execução
@@ -85,6 +102,36 @@ ok	quality-existe	todos os quality.* declarados resolvem
 ok	sensitive-globs	todos os candidatos em disco casam com sensitiveGlobs"
 if [ "$st" -eq 0 ] && [ "$got" = "$want" ]; then echo "ok   valido"
 else echo "FAIL valido (exit $st)"; printf 'esperado:\n%s\nobtido:\n%s\n' "$want" "$got" | sed 's/^/  /'; fail=$((fail + 1)); fi
+
+# ---- bloco CLAUDE.md desatualizado (caso real: init reportou "tudo íntegro" com o ----
+# bloco divergindo do template — falha, não aviso, e independe do resto da ficha) ----
+sed -i.bak 's/Conteúdo canônico do bloco\./Conteúdo canônico do bloco. Falta um parágrafo novo./' "$R/CLAUDE.md"
+rm -f "$R/CLAUDE.md.bak"
+total=$((total + 1))
+got="$(bash "$SC" "$R" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
+case "$got" in
+  *"falha	claude-block-sincronizado	bloco do CLAUDE.md diverge do template atual do plugin — rode /keelson:init para substituí-lo (Etapa 5)"*)
+    [ "$st" -eq 1 ] && echo "ok   claude-block-desatualizado" || { echo "FAIL claude-block-desatualizado: exit $st"; fail=$((fail + 1)); } ;;
+  *) echo "FAIL claude-block-desatualizado:"; printf '%s\n' "$got" | grep claude-block | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+sed -i.bak 's/Conteúdo canônico do bloco\. Falta um parágrafo novo\./Conteúdo canônico do bloco./' "$R/CLAUDE.md"
+rm -f "$R/CLAUDE.md.bak"
+
+# ---- CLAUDE.md sem bloco (marcadores ausentes) ----
+R6="$(mkrepo sem-bloco)"
+cp -R "$R/." "$R6/" 2>/dev/null
+rm -rf "$R6/.git"
+git -C "$R6" init -q; git -C "$R6" config user.email t@t; git -C "$R6" config user.name t
+printf '# Projeto sem bloco keelson\n' > "$R6/CLAUDE.md"
+git -C "$R6" add -A >/dev/null 2>&1
+git -C "$R6" commit -qm base >/dev/null 2>&1
+total=$((total + 1))
+got="$(bash "$SC" "$R6" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
+case "$got" in
+  *"falha	claude-block-sincronizado	CLAUDE.md sem bloco gerenciado do keelson (marcadores ausentes) — rode /keelson:init"*)
+    [ "$st" -eq 1 ] && echo "ok   claude-block-sem-marcadores" || { echo "FAIL claude-block-sem-marcadores: exit $st"; fail=$((fail + 1)); } ;;
+  *) echo "FAIL claude-block-sem-marcadores:"; printf '%s\n' "$got" | grep claude-block | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
 
 # ---- caso defeituoso ----
 R2="$(mkrepo defeituoso)"
@@ -116,6 +163,7 @@ aviso	perfil-charter	charter do perfil menor que o atual — re-derivar/revisar:
 aviso	perfil-reviewed	perfil pendente de revisão humana (reviewed: false): backend
 aviso	quality-existe	comando não encontrado no PATH nem na raiz: quality.test(comando-que-nao-existe-xyz)
 falha	artefatos-ignorados	não cobertos por git check-ignore: thoughts/screen-verify/ .playwright-mcp/
+falha	claude-block-sincronizado	CLAUDE.md ausente na raiz do projeto — rode /keelson:init
 falha	codepaths-existem	não existem no disco: src
 falha	jira-campos	jira.enabled com campo vazio: projectKey issueType.task
 falha	local-json-ignorado	keelson.local.json está VERSIONADO — segredo no repositório

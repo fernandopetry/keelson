@@ -3789,6 +3789,16 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 ---
 
+### 4.373 — Self-check do `/keelson:init` prova o bloco do `CLAUDE.md` byte-a-byte, não só a existência
+
+**Problema**: caso de campo do Diretor (2026-09-03, `b2b-workspace`, exatamente a janela em que a 4.372 nasceu): rodou `/keelson:init` e recebeu o relatório de sempre — "ficha, guidelines, Playwright, Jira, tudo provado e íntegro". Perguntou "tem certeza que estava tudo configurado? sei que a nova versão tem uma atualização do CLAUDE.md para o modo warroom" — e estava certo: o bloco do projeto não tinha o parágrafo inteiro da 4.372 nem a linha do comando na lista de humanos-only. A Etapa 6 (`init-selfcheck.sh`) prova hooks, `codePaths`, binários de `quality.*`, `sensitiveGlobs`, perfil, `keelson.local.*`, flags do Playwright, campos do Jira e o bloco `models` — **nunca o próprio bloco que a Etapa 5 injeta**. A Etapa 5 diz "se já existir, substitua" mas isso depende do modelo aplicar o passo a cada rodada; numa adoção já madura, a leitura mais natural da Regra de merge do topo do comando ("valor já presente e válido → mantém, não regenere por regenerar") vaza para o bloco gerado e vira "bloco existe → não mexo", que é exatamente o oposto do que a Etapa 5 pede. Sem prova mecânica, "tudo íntegro" foi a palavra do modelo sobre o próprio trabalho — o defeito de fundo que a Etapa 6 existe para fechar (decisão 4.51/4.71, "cobertura se verifica, não se infere"). Era pendência aberta nomeada na §8 deste documento ("skill validadora do próprio bloco keelson do `CLAUDE.md`").
+
+**Decisão**: `init-selfcheck.sh` ganha o item `claude-block-sincronizado`: extrai o bloco do `CLAUDE.md` do projeto (entre os marcadores `<!-- ... keelson ... -->`, via `awk`, sem depender de `python3`) e compara **byte-a-byte** (tolerando só newline final, via substituição de comando) contra `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.keelson-block.md`. Três formas de defeito, todas **falha** (nunca aviso — "quase igual" ainda deixa uma decisão inteira de fora): bloco divergente do template atual, marcadores ausentes num `CLAUDE.md` que existe, e `CLAUDE.md` ausente na raiz. `commands/init.md` ganha uma frase na Etapa 5 declarando que o bloco injetado **não** entra na Regra de merge do topo (é gerado, não personalizado — "já existe" nunca é motivo para preservá-lo) e a Etapa 6 passa a citar o item na lista do que prova. Sem mecanismo, a Etapa 5 seguiria dependendo de o modelo lembrar de recomparar a cada rodada — com mecanismo, o `/keelson:init` seguinte (ou uma rodada de `/keelson:audit`) denuncia sozinho.
+
+**Aplicação**: `scripts/init-selfcheck.sh` (item novo + docstring) · `scripts/tests/init-selfcheck/run.sh` (+4 casos: sincronizado, desatualizado, sem marcadores, ausente) · `commands/init.md` (Etapas 5 e 6). Bump minor 0.156.0, **Re-init: none** (o item é só do self-check; o template do bloco em si não mudou). Fecha a pendência da §8 ("skill validadora do próprio bloco keelson do `CLAUDE.md`") — não como skill dedicada, mas como item mecânico da Etapa 6 já existente, mais barato e no mesmo lugar onde o resto da adoção já se prova. Riscos com mitigação (4.188): falso-positivo por diferença cosmética (espaço/newline) → comparação via substituição de comando (`$(...)`), que já normaliza newlines finais — sem tolerância a mais, porque tolerância a mais é exatamente a classe de bug desta decisão; projeto que **deliberadamente** personalizou o bloco fora do fluxo do `/keelson:init` (fora de contrato, nunca visto em campo) → o item falharia sempre e o relatório instruiria rodar `/keelson:init`, que sobrescreve — **sem mitigação mecânica**, declarado: o bloco nunca foi contratualmente editável pelo humano (Etapa 5), então não há caso legítimo a proteger.
+
+---
+
 ## 7. Roteamento de mudanças
 
 Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir manualmente:
@@ -3812,7 +3822,7 @@ Quando aparece uma demanda nova, usar `/keelson:triage` (triagem) ou decidir man
 - Hook de pre-commit bloqueando merge sem closure.
 - Convenção de UX-FRs (como escrever requisito de comportamento de interface em EARS).
 - Como integrar com ferramentas de wireframe externas referenciadas pelo PLAN.
-- Skill validadora do próprio bloco keelson do `CLAUDE.md`.
+- ~~Skill validadora do próprio bloco keelson do `CLAUDE.md`~~ — resolvida pela 4.373: não como skill dedicada, como item mecânico (`claude-block-sincronizado`) do self-check da Etapa 6 do `/keelson:init`, que já é o lugar onde o resto da adoção se prova.
 - ~~Agente dedicado `request-mirror` para o espelho do entendimento~~ — resolvido pela 4.38: a redação ficou com o Tech Lead, a validação independente com o `po`, e o corretor é a janela de veto do Diretor; a pendência perdeu a premissa (o espelho não é mais confirmado).
 - Política de arquivamento de slugs concluídos.
 - Política de aposentadoria do `/keelson:migrate-legacy` quando não houver mais slug legado no projeto.

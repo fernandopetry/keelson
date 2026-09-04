@@ -12,7 +12,7 @@
 #        sensitive-globs · perfil-resolve · perfil-reviewed · perfil-charter ·
 #        local-example · local-json-ignorado · local-placeholder ·
 #        artefatos-ignorados · playwright-flags · jira-campos · git-branch-config ·
-#        models-validos
+#        models-validos · claude-block-sincronizado
 # Exit: 0 sem falha · 1 com falha · 2 uso incorreto.
 #
 # Bash 3.2-compatível; JSON via ficha.sh (irmão) e python3 (playwright/local.json;
@@ -314,6 +314,31 @@ PY
     else emit ok models-validos "desvios de modelo apontam agents do pacote: $m_n"; fi
   else
     emit aviso models-validos "sem python3 para validar o bloco models — confira à mão"
+  fi
+fi
+
+# ---- bloco CLAUDE.md sincronizado com o template atual do plugin (Etapa 5) ----
+# Caso real (2026-09-03): /keelson:init confirmou só a EXISTÊNCIA do bloco e reportou
+# "tudo provado e íntegro" com o bloco desatualizado (faltava a decisão 4.372 inteira) —
+# a Etapa 6 provava hooks, paths, binários etc., mas nunca o próprio bloco que ela injeta.
+tmpl="$PLUGROOT/templates/CLAUDE.keelson-block.md"
+if [ -f "$tmpl" ]; then
+  if [ ! -f "$ROOT/CLAUDE.md" ]; then
+    emit falha claude-block-sincronizado "CLAUDE.md ausente na raiz do projeto — rode /keelson:init"
+  else
+    block="$(awk '
+      /bloco gerenciado\. Gerado por/ { start=NR - 1 }
+      /fim do bloco keelson/ { end=NR + 1 }
+      { buf[NR] = $0 }
+      END { if (start && end) for (i = start; i <= end; i++) print buf[i] }
+    ' "$ROOT/CLAUDE.md")"
+    if [ -z "$block" ]; then
+      emit falha claude-block-sincronizado "CLAUDE.md sem bloco gerenciado do keelson (marcadores ausentes) — rode /keelson:init"
+    elif [ "$block" = "$(cat "$tmpl")" ]; then
+      emit ok claude-block-sincronizado "bloco do CLAUDE.md idêntico ao template do plugin"
+    else
+      emit falha claude-block-sincronizado "bloco do CLAUDE.md diverge do template atual do plugin — rode /keelson:init para substituí-lo (Etapa 5)"
+    fi
   fi
 fi
 

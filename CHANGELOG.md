@@ -23,6 +23,32 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.156.0] — 2026-09-04
+
+Re-init: none
+
+Decision 4.373 — the `/keelson:init` self-check now proves the injected CLAUDE block
+byte-for-byte against the plugin's template instead of only checking it exists. A field
+case caught the gap: init reported everything "provado e íntegro" while the project's
+block was missing an entire decision paragraph. New item `claude-block-sincronizado` in
+`init-selfcheck.sh` fails (never warns) on a stale block, missing markers, or a missing
+`CLAUDE.md`.
+
+### Added
+
+- **`claude-block-sincronizado`** item in `scripts/init-selfcheck.sh`: extracts the
+  managed block from the project's `CLAUDE.md` (between the `<!-- ... keelson ... -->`
+  markers) and diffs it against `templates/CLAUDE.keelson-block.md`. Divergent content,
+  missing markers, and a missing `CLAUDE.md` are all `falha`. Suite +4 cases
+  (`scripts/tests/init-selfcheck/run.sh`).
+
+### Changed
+
+- **`commands/init.md`**: Etapa 5 now states that the injected block is exempt from the
+  command's general merge-preserving rule (it is generated, never human-customized, so
+  "it already exists" is never a reason to keep it); Etapa 6 lists the new item among
+  what the self-check proves.
+
 ## [0.155.0] — 2026-09-03
 
 Re-init: required
