@@ -23,6 +23,26 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.157.1] — 2026-09-06
+
+Re-init: none
+
+Decision 4.375 — the `tracker-sync` agent now knows where the Jira sync protocol lives
+(`${CLAUDE_PLUGIN_ROOT}/skills/_shared/jira-sync-protocol.md`, plus `jira-sync-feat.md`
+for the third level) instead of relying on the dispatching briefing to carry the path. A
+consumer session showed 4 of 5 dispatches opening with `find /` — about eleven and a half
+minutes of wall clock in one cycle, two of them hitting the 120 s timeout — because the
+Tech Lead omitted the path every time and the agent only had a relative name to go on.
+
+### Fixed
+
+- **`agents/tracker-sync.md`** — Principle 1 carries the protocol's address itself, with a
+  declared fallback when the variable is not expanded (the plugin's `installPath` in
+  `~/.claude/plugins/installed_plugins.json`) and an explicit rule: never `find` outside
+  those two roots. The briefing may still repeat the path; its absence changes nothing.
+  Commands are untouched — their "protocol paths" phrase becomes a harmless redundancy,
+  flagged for the next doctrine audit rather than cut without proof.
+
 ## [0.157.0] — 2026-09-06
 
 Re-init: required
