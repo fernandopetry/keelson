@@ -60,8 +60,9 @@ In your project, run the interactive setup:
 It **detects what it can** (language, version, test/lint commands, whether there's a
 frontend) and **only asks what it can't infer**. When your stack has no bundled profile,
 it offers to **generate one from the Charter** at the same quality bar as the PHP
-example — which you then review. It writes `keelson.config.json` and a managed block
-into your `CLAUDE.md`.
+example — which you then review. It writes `keelson.config.json`, a managed block
+into your `CLAUDE.md`, and an `AGENTS.md` pointer to it (created only if absent, for
+tools that look for `AGENTS.md` instead).
 
 Then work the cycle:
 
@@ -102,7 +103,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 
 | Command | What it does |
 |---------|--------------|
-| `/keelson:init` | Interactive setup — detects the stack, writes the ficha and the `CLAUDE.md` block; `init jira` scopes the run to the Jira integration (enable it late, re-measure a changed board) |
+| `/keelson:init` | Interactive setup — detects the stack, writes the ficha, the `CLAUDE.md` block and an `AGENTS.md` pointer (created only if absent); `init jira` scopes the run to the Jira integration (enable it late, re-measure a changed board) |
 | `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
 | `/keelson:merge` † | Merge one or more branches into the current working branch, one at a time — one merge commit per branch; a clean branch (no conflict, no semantic-reconciliation finding, green suite) commits directly with no agent dispatched, otherwise the developer resolves only the triggered files and the code-reviewer audits only that resolution's diff (push, remote merge, PR and deploy stay human) |
 | `/keelson:jira-sync` | Reconcile a slug — or a single SPEC subtree — with Jira via the Atlassian MCP connector; `--phase start-dev\|finish-dev` walks the tree across the board — idempotent, best-effort (optional) |
@@ -419,7 +420,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.156.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.157.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 

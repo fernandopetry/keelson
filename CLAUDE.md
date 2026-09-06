@@ -72,9 +72,11 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 - **Bump sem entrada no `CHANGELOG.md` é release incompleto** (decisão 4.48 — provado
   mecanicamente por `scripts/check-release.sh` no pre-commit e no CI, 4.83): a mesma leva
   que mexe nos 3 lugares escreve a entrada. Formato: `## [X.Y.Z] — AAAA-MM-DD`, linha
-  `Re-init: required|none` logo abaixo do heading (4.189: `required` = a entrada mudou o
-  bloco injetado ou o contrato da ficha; é o que `scripts/update.sh` lê para avisar o
-  consumidor — provado por `check-release.sh` na entrada corrente), linha de
+  `Re-init: required|none` logo abaixo do heading (4.189, redação ampliada pela 4.374:
+  `required` = a entrada mudou algum artefato que o `/keelson:init` escreve no projeto —
+  o bloco injetado, o contrato da ficha ou um arquivo novo como o ponteiro `AGENTS.md`;
+  é o que `scripts/update.sh` lê para avisar o consumidor — provado por
+  `check-release.sh` na entrada corrente), linha de
   âncora (`Decisão 4.x · <hash do commit de bump>`; `Charter A.B.C` quando ele mudou) e
   bullets sob `Added` / `Changed` / `Fixed` / `Removed`, em **inglês** (é a face pública do
   pacote, como o `README.md`). Escreva pelo efeito no consumidor — o *porquê* fica na

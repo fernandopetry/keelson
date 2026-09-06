@@ -35,6 +35,8 @@ existência de frontend) e **só pergunta o que não dá para inferir**. Ao fina
 
 - `keelson.config.json` — a [ficha do projeto](Ficha-do-projeto), versionada no repositório;
 - um bloco gerenciado no `CLAUDE.md` do projeto, que ensina o Claude a operar pelo keelson;
+- um `AGENTS.md` na raiz, criado só se o projeto ainda não tiver um — um ponteiro para o
+  `CLAUDE.md`, para ferramentas que seguem a convenção `agents.md` (Codex, Cursor e afins);
 - `keelson.local.json` *(quando necessário)* — credenciais de ambiente local; **não** vai para o git.
 
 Quando a sua stack não tem perfil embarcado, o `init` oferece **gerar um** a partir do

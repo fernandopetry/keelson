@@ -17,6 +17,7 @@ Ao final existem, no projeto:
 - `keelson.config.json` na raiz (a ficha) — preenchida e validada;
 - um perfil de linguagem ativo (exemplar embarcado **ou** gerado e pendente de revisão);
 - o bloco gerenciado do keelson no `CLAUDE.md`;
+- um `AGENTS.md` na raiz apontando para o `CLAUDE.md` (criado só se ausente);
 - um relatório do que foi detectado, perguntado e o que falta revisar.
 
 ## Regra de merge — preservar × completar (vale para TODAS as etapas)
@@ -196,6 +197,10 @@ Insira o conteúdo de `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.keelson-block.md` 
 O transitório do keelson vive sob `thoughts/local/`, na casa da sessão `thoughts/local/sessions/<ts>-<sid8>/` (memo de exploração, run-state, ledger, telemetria, backups — decisões 4.314/4.315); os artefatos da verificação de tela (screenshot, dump de console/rede), em `thoughts/screen-verify/<slug>/` — nada disso é versionado. Aproveite a passada para as **sobras** (decisão 4.316): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-dir.sh" <raiz> gc` (report-only) — havendo linhas `elegivel:`, **sugira** `gc --apply` no relatório; aplicar é ato do humano, nunca deste comando. Garanta que o `.gitignore` do projeto contém `thoughts/` **e** `keelson.local.json` (dados de acesso locais — credenciais de dev, nunca versionadas) — adicione as linhas que faltarem.
 
 **Cobertura se verifica, não se infere** (decisão 4.51): não conclua que o `artifactsDir` está ignorado porque existe uma linha `thoughts/` — o projeto pode versionar parte de `thoughts/` de propósito (um consumidor real versiona `thoughts/shared/`). Prove com `git check-ignore -v <artifactsDir>/x.png`; sem cobertura, acrescente a linha do caminho exato.
+
+## Etapa 5.7 — Garantir um `AGENTS.md` apontando para o `CLAUDE.md` (decisão 4.374)
+
+Ferramentas de agente que não conhecem o `CLAUDE.md` — Codex CLI/GPT, Cursor, Amp e outras que seguem a convenção [agents.md](https://agents.md) — procuram um `AGENTS.md` na raiz. **Só se o arquivo estiver ausente**, crie-o a partir de `${CLAUDE_PLUGIN_ROOT}/templates/AGENTS.keelson.md`: um ponteiro puro para o `CLAUDE.md` do projeto, sem repetir nenhuma regra (mesmo princípio "um dono por regra" do `CLAUDE.md` do próprio keelson). **Se já existir** — de qualquer origem, inclusive conteúdo próprio de outra ferramenta —, **não toque**: este arquivo não tem marcadores como o bloco da Etapa 5, então não há como inserir sem risco de apagar instrução alheia. Registre no relatório que o projeto já tem `AGENTS.md` próprio e sugira, como nota, acrescentar à mão um ponteiro para o `CLAUDE.md` se ainda não houver um.
 
 Com `method: skill:screen-verify`, garanta **também** a linha `.playwright-mcp/`: é o diretório de saída **default** do servidor, usado sempre que o `--output-dir` estiver ausente ou divergente — e screenshot de sessão autenticada não pode ficar a um `git add .` de distância do repositório. **Atenção**: só o `keelson.local.json` fica de fora; o `keelson.local.example.json` **é versionado** (não o adicione ao `.gitignore`).
 

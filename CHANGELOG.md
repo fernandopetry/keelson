@@ -23,6 +23,38 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.157.0] — 2026-09-06
+
+Re-init: required
+
+Decision 4.374 — `/keelson:init` now also drops an `AGENTS.md` pointer at the
+consumer's root (created only when absent) so tools that follow the
+[agents.md](https://agents.md) convention — Codex CLI/GPT, Cursor and others that don't
+know `CLAUDE.md` — find their way to the project's real doctrine. It never touches an
+existing `AGENTS.md`, from this tool or any other: the file carries no markers, so there
+is no safe way to merge into it. The `Re-init: required|none` marker (4.189) and
+`scripts/update.sh`'s matching warning are reworded from "changed the injected block or
+the ficha contract" to "changed an artifact the init writes into the project", since the
+previous wording didn't cover a third artifact.
+
+### Added
+
+- **`templates/AGENTS.keelson.md`** — the pointer template, mirroring the plugin's own
+  `AGENTS.md`.
+- **Etapa 5.7** in `commands/init.md`: creates the pointer only when `AGENTS.md` is
+  absent; an existing one (of any origin) is left untouched, with a report note
+  suggesting the human add the pointer by hand.
+- **`agents-presente`** item in `scripts/init-selfcheck.sh`: `ok` when the file exists,
+  `aviso` (never `falha`) when absent — absence is legitimate for anyone who hasn't
+  re-run `/keelson:init` since this version. Suite +1 case for each state
+  (`scripts/tests/init-selfcheck/run.sh`).
+
+### Changed
+
+- **`CLAUDE.md`** (4.189) and **`scripts/update.sh`**: the `Re-init: required` wording
+  now names "an artifact the init writes into the project" instead of only the injected
+  block or the ficha contract.
+
 ## [0.156.0] — 2026-09-04
 
 Re-init: none

@@ -7,7 +7,8 @@
 # do Playwright por escopo, charter antigo vira aviso, jira com campo vazio é falha,
 # bloco models validado contra o elenco de agents do plugin (4.272), bloco do CLAUDE.md
 # comparado byte-a-byte contra o template do plugin — sincronizado, desatualizado,
-# sem marcadores e ausente (4.373).
+# sem marcadores e ausente (4.373); AGENTS.md presente vira ok, ausente vira aviso,
+# nunca falha (4.374).
 #
 # Uso: scripts/tests/init-selfcheck/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível; exige git.
@@ -83,12 +84,14 @@ cat > "$R/.mcp.json" <<'EOF'
 { "mcpServers": { "playwright": { "command": "npx", "args": ["@playwright/mcp@latest", "--headless", "--output-dir", "thoughts/screen-verify", "--isolated"] } } }
 EOF
 printf '# Projeto\n\nTexto do humano, preservado.\n\n%s\n' "$BLOCO_TMPL" > "$R/CLAUDE.md"
+printf '# AGENTS.md\n\nVeja o CLAUDE.md.\n' > "$R/AGENTS.md"
 git -C "$R" add -A >/dev/null 2>&1
 git -C "$R" commit -qm base >/dev/null 2>&1
 
 total=$((total + 1))
 got="$(bash "$SC" "$R" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
-want="ok	artefatos-ignorados	artifactsDir e .playwright-mcp/ ignorados (provado)
+want="ok	agents-presente	AGENTS.md presente na raiz
+ok	artefatos-ignorados	artifactsDir e .playwright-mcp/ ignorados (provado)
 ok	claude-block-sincronizado	bloco do CLAUDE.md idêntico ao template do plugin
 ok	codepaths-existem	todos os codePaths existem
 ok	ficha-legivel	keelson.config.json parseado
@@ -157,7 +160,8 @@ git -C "$R2" commit -qm base >/dev/null 2>&1
 
 total=$((total + 1))
 got="$(bash "$SC" "$R2" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
-want="aviso	local-example	keelson.local.example.json ausente
+want="aviso	agents-presente	AGENTS.md ausente — rode /keelson:init para criar o ponteiro (ou, se o projeto já tem AGENTS.md de outra ferramenta, acrescente à mão um ponteiro para o CLAUDE.md)
+aviso	local-example	keelson.local.example.json ausente
 aviso	local-placeholder	keelson.local.json com campos em placeholder <...> — preencher (dev-only)
 aviso	perfil-charter	charter do perfil menor que o atual — re-derivar/revisar: backend(0.4.0<0.5.1)
 aviso	perfil-reviewed	perfil pendente de revisão humana (reviewed: false): backend

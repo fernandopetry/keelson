@@ -12,7 +12,7 @@
 #        sensitive-globs · perfil-resolve · perfil-reviewed · perfil-charter ·
 #        local-example · local-json-ignorado · local-placeholder ·
 #        artefatos-ignorados · playwright-flags · jira-campos · git-branch-config ·
-#        models-validos · claude-block-sincronizado
+#        models-validos · claude-block-sincronizado · agents-presente
 # Exit: 0 sem falha · 1 com falha · 2 uso incorreto.
 #
 # Bash 3.2-compatível; JSON via ficha.sh (irmão) e python3 (playwright/local.json;
@@ -340,6 +340,16 @@ if [ -f "$tmpl" ]; then
       emit falha claude-block-sincronizado "bloco do CLAUDE.md diverge do template atual do plugin — rode /keelson:init para substituí-lo (Etapa 5)"
     fi
   fi
+fi
+
+# ---- AGENTS.md presente na raiz (ponteiro para o CLAUDE.md — Etapa 5.7, decisão 4.374) ----
+# Ausência é estado legítimo em quem ainda não re-rodou o /keelson:init depois desta
+# versão — nunca falha, só aviso (reprovar adoção existente por capacidade nova seria
+# o próprio defeito que a calibração de severidade evita).
+if [ -f "$ROOT/AGENTS.md" ]; then
+  emit ok agents-presente "AGENTS.md presente na raiz"
+else
+  emit aviso agents-presente "AGENTS.md ausente — rode /keelson:init para criar o ponteiro (ou, se o projeto já tem AGENTS.md de outra ferramenta, acrescente à mão um ponteiro para o CLAUDE.md)"
 fi
 
 sort "$OUT"

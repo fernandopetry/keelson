@@ -11,8 +11,10 @@
 # (~/.claude/plugins/installed_plugins.json, via jq, selecionada pelo scope);
 # sem jq, cai para o parse best-effort de `claude plugin list`.
 # Após o update, lê o CHANGELOG.md recém-instalado (marcadores
-# "Re-init: required|none" por entrada — decisão 4.189) e reporta se alguma
-# versão do salto (BEFORE, AFTER] exige re-rodar /keelson:init no consumidor.
+# "Re-init: required|none" por entrada — decisão 4.189, redação ampliada pela 4.374)
+# e reporta se alguma versão do salto (BEFORE, AFTER] mudou algum artefato que o
+# /keelson:init escreve no projeto (bloco do CLAUDE.md, ficha ou arquivo novo como
+# o ponteiro AGENTS.md), exigindo re-rodar /keelson:init no consumidor.
 # Sem CHANGELOG legível, sem marcador ou com a árvore lida divergindo da versão
 # instalada, degrada para "não determinável" — nunca afirma "não precisa" sem
 # evidência (régua da 4.156).
@@ -111,8 +113,9 @@ reinit_scan() {
       rs_req="$(printf '%s\n' "$rs_out" | sed -n 's/^REQ: *//p')"
       rs_ind="$(printf '%s\n' "$rs_out" | sed -n 's/^IND: *//p')"
       if [ -n "$rs_req" ]; then
-        echo "ATENCAO: este salto inclui versao(oes) que mudaram o bloco do CLAUDE.md ou a"
-        echo "ficha — re-rode /keelson:init apos reiniciar a sessao. Versao(oes): $rs_req"
+        echo "ATENCAO: este salto inclui versao(oes) que mudaram algo que o /keelson:init"
+        echo "escreve no projeto (bloco do CLAUDE.md, ficha ou arquivo novo) — re-rode"
+        echo "/keelson:init apos reiniciar a sessao. Versao(oes): $rs_req"
       elif [ -n "$rs_ind" ]; then
         echo "Re-init: nao determinavel para a(s) versao(oes): $rs_ind (entrada sem marcador"
         echo "\"Re-init:\" no CHANGELOG). Confira essas entradas a mao antes de assumir que nao."
