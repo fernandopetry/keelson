@@ -199,23 +199,51 @@ nenhuma atualização em `docsRoot`.
 
 ## Ciclo de auto-aperfeiçoamento
 
-Após **qualquer** correção do usuário, registre o padrão aprendido no arquivo de lições
-do projeto (`guidelines/project/lessons.md`), para que o mesmo erro não se repita.
+Após **qualquer** correção do usuário, registre o padrão aprendido no acervo de lições
+do projeto, para que o mesmo erro não se repita.
 
-**Formato canônico** — uma lição por bloco, deduplicada (se já existe equivalente,
-**atualize** em vez de duplicar — e atualizar **é** o evento de confirmação: incremente
-`confirmada`):
+**Morada canônica** (decisão 4.376) — **um arquivo por lição** em
+`guidelines/project/lessons/<slug>.md`, onde `<slug>` é o heading em minúsculas ASCII
+(`[a-z0-9-]`, sem a área); nunca número sequencial — duas branches gravando a mesma
+lição colidem no **mesmo arquivo**, e resolver esse conflito **é** o dedup. O arquivo
+único `guidelines/project/lessons.md` é **legado**: continua lido (leitura dupla do
+`scripts/lessons.sh`) até o `/keelson:lessons-audit` migrá-lo; lição nova nunca nasce
+nele.
+
+**Formato canônico** — frontmatter YAML plano com o ciclo de vida e o recorte, corpo com
+o conteúdo; deduplicada (se já existe equivalente, **atualize** em vez de duplicar — e
+atualizar **é** o evento de confirmação: incremente `confirmada`):
 
 ```markdown
+---
+area: <Área>
+estado: ativa | em-observacao | revogada
+validade: <condição verificável que a mantém válida — ex.: "enquanto <lib> < 3.0"> | indeterminada
+confirmada: N
+contestada: N
+paths:                 # globs relativos à raiz do repo que a lição nomeia; AUSENTE = lição de classe/transversal (entra em todo recorte)
+  - src/Domain/**
+tags: [teste, seguranca]   # classe da lição (tipo de teste, comando, superfície) — opcional
+absorvida_em: <âncora do check/regra/perfil que passou a garantir a lição>   # só com estado revogada; opcional
+---
 ## [Área] Descrição curta
 
 **Erro:** o que aconteceu
 **Causa:** por que aconteceu
 **Solução:** como resolver (citar arquivo/padrão de referência)
-**Validade:** <condição verificável que a mantém válida — ex.: "enquanto <lib> < 3.0"> | indeterminada
-**Estado:** ativa | em-observacao | revogada
-**Contadores:** confirmada N · contestada N
 ```
+
+**Recorte** — os leitores não abrem o acervo inteiro: pedem o recorte a
+`bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" <raiz> match --paths <arquivos> [--tags <classes>]`
+(ou `--paths-file -` com `git diff --name-only`) e citam a saída como fato. A regra é
+**inclusiva**: entra a lição cujo `paths` casa algum arquivo dado, a que tem `tag` entre
+as dadas e **toda lição sem `paths`** — recorte que esconde lição é o pior defeito desta
+camada, por isso `paths` é opt-in de precisão, nunca filtro de exclusão; frontmatter
+ilegível degrada para "sempre incluída" com `WARNING`. O cabeçalho da saída declara a
+contagem (`recorte=R (path=P tag=T sempre=S) excluidas=E`); `list`/`index` dão os títulos
+(o índice é derivado — imprime-se, nunca se commita como fonte); `show <id|heading>` traz
+uma lição inteira. Quem escreve lição declara `paths`/`tags` quando o arquivo ou a classe
+é nomeável — é o que torna a lição encontrável sem carregar o acervo.
 
 **Ciclo de vida** (decisão 4.221) — o estado governa a força da lição:
 
@@ -230,16 +258,21 @@ do projeto (`guidelines/project/lessons.md`), para que o mesmo erro não se repi
   com razão declarada, incrementa `contestada` — 1ª → **reformule** a lição (nunca
   duplique nem crie exceção ao lado); 2ª → **revogue**. O sinal chega pelo report do
   developer (`licao_contestada`) e é roteado no fecho, como `licao_candidata`.
-- **Revogação**: mova o bloco para a seção `## Revogadas` no fim do arquivo, reduzido a
-  1 linha — `- [Área] título — <motivo> (revogada em <data>; histórico no git)`. O
-  conteúdo integral vive no histórico de commits; a seção ativa fica limpa e a
-  reincidência de lição revogada continua detectável.
-- **Eixos ortogonais**: `Estado` é a vida da lição; "em vigor | pendente de merge"
+- **Revogação**: `estado: revogada` no próprio arquivo, corpo reduzido a 1 linha —
+  `<motivo> (revogada em <data>; histórico no git)`. O conteúdo integral vive no
+  histórico de commits; a reincidência de lição revogada continua detectável pelo
+  `show`. No acervo legado, a revogada vai para a seção `## Revogadas` do arquivo único.
+- **Absorção** (decisão 4.376): lição que ganhou **casa mecânica** — check de lint,
+  teste na suíte, regra no perfil ou no `invariants.md` — é revogada com
+  `absorvida_em: <âncora>` apontando a casa. Não é um 4º estado: é revogação com
+  proveniência, e a âncora é obrigatória (absorvida sem âncora é revogação comum). A
+  lição sai do recorte e a regra fica onde o mecanismo a prova.
+- **Eixos ortogonais**: `estado` é a vida da lição; "em vigor | pendente de merge"
   (decisão 4.71) é o vigor da *escrita* — lição `ativa` numa branch não mergeada segue
   pendente de merge.
 
-Auditoria periódica do acervo (retrofit de formato, origem via git, validade expirada,
-sedimento): `/keelson:lessons-audit`.
+Auditoria periódica do acervo (migração do arquivo único para um arquivo por lição,
+origem via git, validade expirada, sedimento, absorção): `/keelson:lessons-audit`.
 
 Quando a regra for de uma área com guideline de referência (perfil de linguagem, `core/`),
 adicione também uma linha curta de anti-padrão lá.

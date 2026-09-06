@@ -111,9 +111,10 @@
   commit — decisão 4.85) · decisões tomadas em seu nome · o que ficou fora de
   escopo ou pendente · **toda `licao_candidata` devolvida por qualquer gate da rodada
   — inclusive retry — com destino registrado e verificado** (`alvo: projeto` →
-  `guidelines/project/lessons.md` · `alvo: processo` → `agile-coach`; a linha só se
-  escreve com a lição conferida **presente** no destino — declarar "roteada" sem
-  escrever no destino é a forma que reincidiu, decisão 4.333): aplicar a
+  `guidelines/project/lessons/<slug>.md` · `alvo: processo` → `agile-coach`; a linha só se
+  escreve com a lição conferida **presente** no destino —
+  `bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . show <id>` sai 0, decisão 4.376 —
+  declarar "roteada" sem escrever no destino é a forma que reincidiu, decisão 4.333): aplicar a
   correção de código que o achado pede **não é** rotear a lição que ele carrega — são
   dois atos, e lição sem destino também declara o fecho **parcial** (decisão 4.204) ·
   estado do tracker (com `jira.enabled`) · e o que depende de você

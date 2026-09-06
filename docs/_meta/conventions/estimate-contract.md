@@ -92,7 +92,7 @@ disciplina de proposta + default da escalação — cada lacuna vem com a pergun
   marcas commitadas das closures — grandeza sem marca é omitida com a completude
   declarada, nunca estimada (§1.2).
 - **Calibração**: o mesmo fecho anexa **uma linha** em
-  `guidelines/project/estimates.md` (par do `lessons.md` — memória do projeto, não do
+  `guidelines/project/estimates.md` (par do acervo `lessons/` — memória do projeto, não do
   plugin):
 
   ```markdown

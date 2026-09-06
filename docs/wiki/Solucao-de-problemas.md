@@ -133,6 +133,16 @@ típico), ou a proibição, se ela não se aplica a este contexto. Nasce como WA
 `task-validator` escala para ERROR quando a proibição é uma lição real do projeto que o
 comando viola (decisão 4.215).
 
+### O fecho diz "lição sem destino" mas eu vi a lição ser escrita
+
+O fecho só aceita "roteada" quando `scripts/lessons.sh <raiz> show <id>` encontra a
+lição — o `id` é o nome do arquivo em `guidelines/project/lessons/` (o heading e um
+trecho dele também servem). Causas comuns: a lição foi escrita fora da morada (na raiz
+de `guidelines/project/`, ou num `lessons.md` novo em vez de arquivo próprio), ou o
+arquivo nasceu sem frontmatter — nesse caso o script avisa `WARNING nao-parseavel` e
+ainda a encontra. Rode `lessons.sh <raiz> list --estado todas` para ver o que o acervo
+contém de fato e mova a lição para o formato do `core/WORKFLOW.md`.
+
 ### O gate 1 reprovou um teste que passa: "grupo excluído da suíte default"
 
 O teste existe e passa quando rodado isolado, mas carrega um grupo/tag/marcador que a

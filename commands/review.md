@@ -167,7 +167,7 @@ Para cada estrutural, proponha o roteamento — **sem executar** (a régua é a 
 - <gate degradado, n/a, verificação de tela sem ambiente, dívida sem dono>
 ```
 
-Se algum report trouxe `licao_candidata` não-nula, roteie pelo campo `alvo` — `projeto` → `guidelines/project/lessons.md` (formato canônico e dedup: dono em `${CLAUDE_PLUGIN_ROOT}/guidelines/core/WORKFLOW.md`); `processo` → `agile-coach` — e mencione no output. Mecânica idêntica à closure do `/keelson:implement` (etapa 3.4.2, item 5).
+Se algum report trouxe `licao_candidata` não-nula, roteie pelo campo `alvo` — `projeto` → arquivo novo em `guidelines/project/lessons/<slug>.md`, deduplicado antes pelo `bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . match --paths <arquivos do achado>` (formato canônico, morada e dedup: dono em `${CLAUDE_PLUGIN_ROOT}/guidelines/core/WORKFLOW.md`, decisão 4.376); `processo` → `agile-coach` — e mencione no output. Mecânica idêntica à closure do `/keelson:implement` (etapa 3.4.2, item 5).
 
 ## Limites
 

@@ -112,7 +112,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:status` | Executive summary of a slug's current state — what's done, in flight, planned |
 | `/keelson:migrate-legacy` | Migrate a legacy slug (docs without `INDEX.md`) to the SDD layout |
 | `/keelson:rebuild-index` | Rebuild a slug's `INDEX.md` from scratch out of its artifacts |
-| `/keelson:lessons-audit` | Audit the project lessons ledger — retrofit the lifecycle format, measure provenance via git, flag expired or obsolete lessons; judgment cuts apply only with your OK |
+| `/keelson:lessons-audit` | Audit the project lessons archive — migrate the legacy single file to one file per lesson, measure provenance via git, flag expired, obsolete or mechanically absorbed lessons; judgment cuts apply only with your OK |
 | `/keelson:warroom` † | Open (`on <motivo>`) or close a warroom window — changes ship with no blocking gate and every commit becomes an open line in `{docsRoot}/DEBT.md`, written by a Stop hook from `git log` so nobody has to remember; gate 8 survives on sensitive surfaces; `close` runs the gates over the accumulated diff and settles each line as resolved or leaves it as the Director's debt (push, PR, merge and deploy stay human) |
 | `/keelson:verify-handoff` † | Close a pending screen-verification `HANDOFF` — consolidates the branch, exercises each item in the real environment; no merge (points to `/keelson:integrate`) |
 | `/keelson:postmortem` † | End-of-session postmortem — re-reads the whole session's interactions (corrections, retries, failed gates), separates defects from new scope, traces each gap to the mechanism that let it through, and produces the copy-paste maintainer message (with literal diffs via the agile-coach) that evolves the plugin |
@@ -420,7 +420,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.157.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.158.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 

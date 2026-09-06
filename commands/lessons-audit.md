@@ -1,5 +1,5 @@
 ---
-description: Audita o ciclo de vida das lições do projeto (guidelines/project/lessons.md) — retrofita o formato da 4.221, mede a origem via git, testa validade e sedimento, e aplica vereditos por lição (revogar/reformular só com confirmação)
+description: Audita o acervo de lições do projeto (guidelines/project/lessons/) — migra o lessons.md legado para um arquivo por lição, mede origem via git, testa validade, sedimento e absorção; revogar/reformular só com confirmação
 argument-hint: [--dry-run]
 ---
 
@@ -7,10 +7,12 @@ argument-hint: [--dry-run]
 
 Você é o auditor do acervo de lições do projeto. Sua função é medir o que é mensurável
 (git, filesystem), julgar o que exige juízo (sedimento, obsolescência) e devolver o
-acervo mais limpo sem perder história. O formato, os estados e as escadas têm dono
-único: `${CLAUDE_PLUGIN_ROOT}/guidelines/core/WORKFLOW.md` (§Ciclo de
-auto-aperfeiçoamento, decisão 4.221) — leia-o antes de auditar; este comando não o
-replica.
+acervo mais limpo sem perder história. O formato, a morada (um arquivo por lição em
+`guidelines/project/lessons/`), os estados e as escadas têm dono único:
+`${CLAUDE_PLUGIN_ROOT}/guidelines/core/WORKFLOW.md` (§Ciclo de auto-aperfeiçoamento,
+decisões 4.221/4.376) — leia-o antes de auditar; este comando não o replica. O fato
+mecânico do acervo vem de `bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . <list|show|match>`
+(leitura dupla: diretório + `lessons.md` legado) — cite a saída, não re-derive.
 
 **Princípio inviolável 1 — a dúvida mantém a lição.** Falso-positivo do auditor
 (revogar lição válida) é o pior defeito desta camada, pela mesma régua do
@@ -35,7 +37,8 @@ se aplica com confirmação do usuário.
 
 ## Quando usar
 
-- Adoção do ciclo de vida em acervo pré-4.221 (retrofit do formato).
+- Migração do arquivo único `lessons.md` para um arquivo por lição (decisão 4.376) e
+  adoção do ciclo de vida em acervo pré-4.221 (retrofit do formato).
 - Sinais de ruído: lição contestada no ciclo, lição antiga suspeita de obsoleta,
   formato heterogêneo (times diferentes escreveram de jeitos diferentes).
 - Periodicamente, como higiene — o acervo só cresce se ninguém o auditar.
@@ -49,24 +52,31 @@ se aplica com confirmação do usuário.
 
 ## Etapa 0: pré-checks
 
-1. `guidelines/project/lessons.md` existe? Ausente → reportar "nada a auditar" e parar
-   (o arquivo nasce pelo ciclo, não por este comando).
+1. Há acervo? `lessons.sh . list --estado todas` vazio (nem `guidelines/project/lessons/`
+   nem `lessons.md`) → reportar "nada a auditar" e parar (o acervo nasce pelo ciclo, não
+   por este comando).
 2. Repositório git com histórico útil? Clone raso (`git rev-parse --is-shallow-repository`)
    ou arquivo fora do versionamento → proveniência degrada para `indeterminada`,
    declarada no report. Nunca estimar data.
-3. Listar os blocos `## [Área] …` da seção ativa (acima de `## Revogadas`, se existir).
-   Zero blocos → reportar e parar.
+3. Inventário pela saída do `list --estado todas`: coluna `origem` separa o que já mora
+   em `lessons/` do que ainda está no `lessons.md` legado (blocos `## [Área] …` e
+   tombstones de `## Revogadas`); `WARNING nao-parseavel` em stderr nomeia arquivo sem
+   frontmatter — candidato certo do retrofit da Etapa 2.
 
 ## Etapa 1: inventário mecânico (fatos por lição)
 
 Para cada bloco:
 
-1. **Origem e última atualização** — precedência: data escrita no próprio bloco vence;
-   senão, pickaxe pelo heading (`git log --reverse -S"<heading do bloco>" --format='%as %h' -- <arquivo>`):
-   primeiro commit = origem, último = atualização (o dedupe atualiza em vez de duplicar,
-   então "último touch do arquivo" superestima — por isso o pickaxe por bloco).
+1. **Origem e última atualização** — precedência: data escrita na própria lição vence;
+   senão, arquivo por lição: `git log --reverse --follow --format='%as %h' -- <arquivo>`
+   (primeiro = origem, último = atualização); bloco do `lessons.md` legado: pickaxe pelo
+   heading (`git log --reverse -S"<heading do bloco>" --format='%as %h' -- guidelines/project/lessons.md`
+   — o dedupe atualiza em vez de duplicar, então "último touch do arquivo" superestima).
    Indeterminável (squash agressivo, rename, shallow) → `indeterminada`.
-2. **Formato**: os campos de ciclo de vida (`Validade`/`Estado`/`Contadores`) existem?
+2. **Formato**: mora em `lessons/` com frontmatter (`estado`/`validade`/`confirmada`/
+   `contestada`)? Declara `paths`/`tags`? Lição cuja Solução cita arquivo **existente**
+   e que não declara `paths` é fato a favor de ganhar `paths` (proposta, nunca inferência
+   silenciosa — o glob errado esconde a lição do recorte).
 3. **Âncoras**: arquivos/caminhos citados em **Solução** ainda existem (`test -f`)?
    Padrões/símbolos citados ainda ocorrem (`grep`)? Âncora morta é fato, não veredito.
 4. **Validade testável**: a condição declarada é verificável agora (versão de lib em
@@ -75,22 +85,41 @@ Para cada bloco:
 5. **Pares suspeitos de duplicata**: mesma área + Erro/Solução substancialmente
    sobrepostos.
 
-## Etapa 2: retrofit de formato (mecânico — aplica direto, salvo `--dry-run`)
+## Etapa 2: migração e retrofit (mecânico — aplica direto, salvo `--dry-run`)
 
-Bloco sem os campos de ciclo de vida ganha, sem alterar Erro/Causa/Solução:
+Cada bloco do `lessons.md` legado vira `guidelines/project/lessons/<slug>.md` (slug do
+heading em minúsculas ASCII — regra de nome no dono; colisão com arquivo existente é
+duplicata: vai para o teste 5 da Etapa 3, nunca sobrescreve) com frontmatter derivado
+do bloco, sem alterar Erro/Causa/Solução:
 
 ```markdown
-**Validade:** indeterminada
-**Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+---
+area: <do [Área] do heading>
+estado: <do **Estado:**, ou ativa se ausente>
+validade: <do **Validade:**, ou indeterminada>
+confirmada: <dos **Contadores:**, ou 0>
+contestada: <dos **Contadores:**, ou 0>
+paths:               # só os arquivos citados na Solução que EXISTEM hoje (`test -f`), literais — glob nunca é inferido
+  - <caminho>
+---
+## [Área] Descrição curta
+…
 ```
 
-- `Estado: ativa` é o retrofit conservador: lição pré-escada não é rebaixada sem
+- `estado: ativa` é o retrofit conservador: lição pré-escada não é rebaixada sem
   evidência (quase todas nasceram de defeito real; rebaixar sem fato seria o
-  falso-positivo do princípio 1).
-- Arquivo sem o marcador `<!-- Adicionar lições abaixo desta linha -->` → acrescentar
-  após o título/preâmbulo.
-- O git preserva o antes — retrofit não precisa de backup.
+  falso-positivo do princípio 1). `tags` não se inventa: fica ausente até alguém
+  classificar. Lição sem arquivo citado fica **sem `paths`** — transversal, entra em
+  todo recorte; é o lado seguro.
+- Tombstone de `## Revogadas` vira arquivo com `estado: revogada` e corpo de 1 linha
+  (o motivo original); o histórico continua no git.
+- Arquivo já em `lessons/` mas sem frontmatter (`WARNING nao-parseavel`) ganha o
+  frontmatter pelo mesmo mapa, a partir dos campos `**Estado:**` etc. do corpo, se
+  existirem.
+- `lessons.md` sem bloco restante é removido (preâmbulo incluso — o git preserva); com
+  bloco que a migração não conseguiu parsear, fica, e o report nomeia o bloco.
+- O git preserva o antes — migração não precisa de backup. Migração é ato de escrita
+  do comando (o `lessons.sh` é read-only por contrato).
 
 ## Etapa 3: vereditos (juízo por lição)
 
@@ -103,9 +132,13 @@ ordem de força:
    repo → sedimento provável; combine com o teste 3 antes de propor revogação.
 3. **Sedimento** (juízo, régua 4.160): o mundo que a lição descreve ainda existe?
    Código reescrito, primitiva nova que elimina a classe do erro, processo que mudou.
-4. **No-op** (juízo, régua 4.160): a Solução ainda difere do default da stack/do time?
-   Lição que virou comportamento padrão (framework passou a fazer certo sozinho,
-   lint já bloqueia) → `revogar` (motivo: absorvida pelo default).
+4. **No-op / absorção** (juízo, régua 4.160): a Solução ainda difere do default da
+   stack/do time? Lição que virou comportamento padrão (framework passou a fazer certo
+   sozinho) → `revogar` (motivo: absorvida pelo default). Lição que ganhou **casa
+   mecânica nomeável** — check de lint, teste na suíte, regra do perfil ou do
+   `invariants.md` — → `revogar` com `absorvida_em: <âncora>` (decisão 4.376): a âncora
+   é o fato que sustenta o veredito; sem âncora verificável (`test -f`/`grep`) não é
+   absorção, é sedimento (teste 3).
 5. **Duplicata** (juízo): propor fusão na mais completa — a fundida soma os Contadores
    das duas e a outra vira tombstone (`motivo: fundida em <heading>`).
 
@@ -120,18 +153,21 @@ não pela auditoria — aqui ela é insumo, não gatilho.
   — a prova mecânica acompanha o report).
 - **Juízo pede confirmação**: apresentar os vereditos 3–5 em lote (lição, veredito,
   motivo, proposta) e aguardar o OK — sem OK, ficam `propostos` no report e nada muda.
-- Revogação: mover para `## Revogadas` (criar a seção no fim se não existir) como
-  `- [Área] título — <motivo> (revogada em <data>; histórico no git)`.
-- Reformulação confirmada: editar o bloco preservando Contadores e Estado.
+- Revogação: `estado: revogada` no frontmatter da lição (mais `absorvida_em` quando é
+  absorção) e corpo reduzido a `<motivo> (revogada em <data>; histórico no git)`. Bloco
+  ainda no `lessons.md` legado (migração simulada ou parcial): mover para `## Revogadas`
+  como `- [Área] título — <motivo> (revogada em <data>; histórico no git)`.
+- Reformulação confirmada: editar a lição preservando contadores e estado.
 
 ## Etapa 5: report
 
 ```markdown
-# Auditoria de lições: guidelines/project/lessons.md
+# Auditoria de lições: guidelines/project/lessons/
 
-- **Acervo**: <N> ativas · <N> em-observacao · <N> revogadas (tombstones)
+- **Acervo**: <N> ativas · <N> em-observacao · <N> revogadas (<destas, N absorvidas com âncora>) — `lessons.sh . list --estado todas`
 - **Proveniência**: <N> com origem medida (git) · <N> indeterminada (<motivo: shallow | squash | sem histórico>)
-- **Retrofit**: <N> blocos ganharam ciclo de vida | nenhum (formato já vigente) | simulado (--dry-run)
+- **Migração**: <N> blocos do `lessons.md` → arquivos (+ <N> tombstones) · legado <removido | mantido: N blocos não parseáveis> | nenhuma (acervo já migrado) | simulado (--dry-run)
+- **Recorte**: <N> lições com `paths` · <N> transversais (sem `paths`) · <N> com arquivo citado na Solução e sem `paths` (proposta)
 - **Vereditos**: manter <N> · reformular <N> · revogar <N> (<destes, N por fato — aplicados · N por juízo — propostos|confirmados>)
 - **Duplicatas**: <N> pares propostos para fusão | nenhuma
 - **Aplicado nesta rodada**: <lista 1 linha por mudança | nada (--dry-run | sem OK)>

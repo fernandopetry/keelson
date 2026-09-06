@@ -23,6 +23,60 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.158.0] — 2026-09-06
+
+Re-init: required
+
+Decision 4.376 — the project lessons archive scales: one file per lesson, a mechanical
+slice for every reader, and a way out for lessons that a check now enforces. A consumer
+had reached ~150 lessons in a single append-only file that every reader loaded whole;
+the relevant lesson stopped being found, every branch collided on the same marker line,
+and nothing ever left the file.
+
+### Added
+
+- **`scripts/lessons.sh`** — read-only slicer over the archive (bash 3.2 + awk, sibling of
+  `graph.sh`): `match --paths … [--tags …] [--paths-file -]`, `list`, `show <id|heading>`,
+  `index`. Dual read of `guidelines/project/lessons/*.md` and the legacy `lessons.md`. The
+  slice is inclusive by design: a lesson enters when its `paths` globs match, when a tag
+  matches, or when it declares no `paths` at all — an unreadable frontmatter degrades to
+  "always included" with `WARNING nao-parseavel`, never to absence. The header reports
+  the counts (`recorte=R (path=P tag=T sempre=S) excluidas=E legado=L`). Suite
+  `scripts/tests/lessons/run.sh` (31 cases) wired into the pre-commit and CI.
+- **`absorvida_em`** — a lesson that a lint check, a test or a profile rule now enforces is
+  revoked with an anchor to that mechanism; not a fourth state (the 4.221 enum stays
+  closed), revocation with provenance. `/keelson:lessons-audit` applies it only with a
+  verifiable anchor.
+
+### Changed
+
+- **`guidelines/core/WORKFLOW.md`** (format owner) — a lesson lives in
+  `guidelines/project/lessons/<slug>.md` (slug of the heading, never a sequence number:
+  two branches writing the same lesson collide on the same file, and resolving that *is*
+  the dedup) with a flat YAML frontmatter (`area`, `estado`, `validade`, `confirmada`,
+  `contestada`, `paths`, `tags`, `absorvida_em`). Revocation happens in place (state +
+  one-line body). The single `lessons.md` is legacy: still read, never written to.
+- **Readers get the slice, not the archive** — `/keelson:tasks` (inputs, mold check and the
+  Inclui cross-check) slices by the PLAN/MAP components and by each TASK's Inclui; gate 7
+  (`core/CODE-REVIEW.md`, `/keelson:implement` §3.3) receives
+  `git diff --name-only | lessons.sh match --paths-file -` in the wave context package;
+  the `developer` cites a contested lesson by id or heading. The reader set is unchanged
+  (the 4.275 deferral stands).
+- **Writers create a file** — closure of `/keelson:implement`, `/keelson:review` and
+  `/keelson:postmortem` dedup with `lessons.sh match` first, then write
+  `lessons/<slug>.md`; the contestation ladder edits the lesson's own frontmatter.
+- **`/keelson:lessons-audit`** — migrates the legacy file block by block (frontmatter
+  derived from the block; `paths` only from files the Solution cites that still exist,
+  globs never inferred; tombstones become revoked files; an emptied legacy file is
+  removed), measures provenance with `git log --follow` per file, and proposes absorption
+  with an anchor. Report gains Migração and Recorte lines.
+- **Injected CLAUDE block** (`templates/CLAUDE.keelson-block.md`) and
+  `report-contract.md` — the destination check of 4.333 becomes
+  `lessons.sh show <id>` exiting 0 instead of a `grep` on `lessons.md`. This is the
+  re-init: run `/keelson:init` after updating.
+- Wiki: `Conceitos.md`, `Perguntas-frequentes.md` (new question with a diagram of the
+  slice), `Solucao-de-problemas.md` (new entry for "lição sem destino").
+
 ## [0.157.1] — 2026-09-06
 
 Re-init: none

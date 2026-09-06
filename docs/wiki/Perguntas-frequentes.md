@@ -327,14 +327,38 @@ eventos acontecem — não de memória no fim. Gate sem evento registrado **não
 
 ### Uma lição aprendida antiga está atrapalhando mais do que ajudando. E agora?
 
-As lições de `guidelines/project/lessons.md` têm ciclo de vida (`Estado: ativa |
-em-observacao | revogada`) — só a `ativa` vira critério de TASK ou regra de gate. Quando
+As lições de `guidelines/project/lessons/` (um arquivo por lição) têm ciclo de vida
+(`estado: ativa | em-observacao | revogada`) — só a `ativa` vira critério de TASK ou
+regra de gate. Quando
 uma lição ativa bloqueia um caso legítimo, o developer a contorna **com razão declarada**
 (`licao_contestada` no report) e o fecho aplica a escada: 1ª contestação reformula a
-lição, 2ª revoga (o bloco vira uma linha na seção Revogadas; o conteúdo integral fica no
-histórico do git). Para limpar um acervo antigo ou fazer higiene periódica, rode
-`/keelson:lessons-audit` — ele mede o que expirou (fato) e propõe o que sedimentou
-(juízo, só com o seu OK); na dúvida, mantém.
+lição, 2ª revoga (o arquivo fica com `estado: revogada` e uma linha de motivo; o
+conteúdo integral fica no histórico do git). Para limpar um acervo antigo ou fazer
+higiene periódica, rode `/keelson:lessons-audit` — ele mede o que expirou (fato) e
+propõe o que sedimentou ou já virou check mecânico (juízo, só com o seu OK); na dúvida,
+mantém.
+
+### O arquivo de lições está ficando enorme. Vai pesar em toda leitura?
+
+Não. Cada lição mora no próprio arquivo e declara os caminhos (`paths`) e classes
+(`tags`) que ela nomeia; quem lê — a geração de TASKs, o gate de review, o developer —
+recebe só o **recorte** que toca os arquivos da mudança, calculado por
+`scripts/lessons.sh`. Lição que não nomeia arquivo ("prova de segurança nunca leva o
+grupo X") entra em todo recorte, de propósito: esconder lição é o pior erro dessa
+camada. Lição que virou lint, teste ou regra de perfil sai do recorte como
+**absorvida**, com a âncora de onde a regra vive agora. Ainda tem o `lessons.md` antigo?
+Ele continua sendo lido até você rodar `/keelson:lessons-audit`, que o migra.
+
+```mermaid
+flowchart LR
+  D['arquivos da mudança'] --> M['lessons.sh match']
+  A['guidelines/project/lessons/*.md'] --> M
+  L['lessons.md antigo'] --> M
+  M --> R['recorte: casam por path + casam por tag + sem paths']
+  R --> T['/keelson:tasks']
+  R --> G['gate 7 do review']
+  R --> V['developer']
+```
 
 ### E se ele errar?
 

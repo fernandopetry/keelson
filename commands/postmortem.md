@@ -98,8 +98,9 @@ mecanismo inclui "por que chegou a produção / por que a detecção demorou".
   compraria tempo — a alavanca é reestruturar a decomposição**, e é achado candidato
   da Etapa 2 (natureza `retrabalho de processo`); dep ignorada e ciclo saem contados/
   declarados na própria linha. Grandeza omitida na saída segue omitida, nunca se estima.
-- `<docsRoot>/_meta/learning-log.md` e `guidelines/project/lessons.md` — o que o ciclo
-  **já registrou** (não redescubra; cite).
+- `<docsRoot>/_meta/learning-log.md` e o acervo de lições do projeto
+  (`bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . match --paths <arquivos do slug>`,
+  decisão 4.376) — o que o ciclo **já registrou** (não redescubra; cite).
 - Quando um teste está implicado, **abra o teste** e cite a asserção literal — é a
   diferença entre "o teste era fraco" e a prova de que era.
 
@@ -131,7 +132,8 @@ ressalva, fornecer o dado, pedir o artefato).
 Classificar cada mecanismo pelo dono — e agir no que é daqui:
 
 - **Projeto** (padrão da stack, config, dado local): registrar em
-  `guidelines/project/lessons.md` (formato canônico do `core/WORKFLOW.md`, dedup) e/ou no
+  `guidelines/project/lessons/<slug>.md` (formato canônico, morada e dedup do
+  `core/WORKFLOW.md`, 4.376) e/ou no
   perfil do projeto — **aplicado nesta sessão**, citado no postmortem como contexto.
 - **Processo** (artefato do keelson induziu ou não preveniu): despachar o **`agile-coach`**
   — **uma invocação por causa-raiz, uma de cada vez** (o ledger aloca o `LRN` na escrita

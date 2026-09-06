@@ -204,8 +204,8 @@ notas: <observações>
 falhas:
   - descricao: <o que falhou>
     categoria: furo_no_plano | ambiente | teste | outra   # furo_no_plano = premissa errada do PLAN/SPEC (seção abaixo)
-licao_contestada:     # lição ATIVA de guidelines/project/lessons.md que bloqueou caso legítimo desta task e foi contornada com razão declarada — o mesmo sinal do furo no plano, aplicado à lição (4.221); null se não houve. Contornar SEM declarar é a violação da 4.38.
-  - licao: "<heading da lição contestada>"
+licao_contestada:     # lição ATIVA do acervo do projeto (guidelines/project/lessons/, ou lessons.md legado) que bloqueou caso legítimo desta task e foi contornada com razão declarada — o mesmo sinal do furo no plano, aplicado à lição (4.221); null se não houve. Contornar SEM declarar é a violação da 4.38.
+  - licao: "<id (nome do arquivo) ou heading da lição contestada>"
     razao: "<por que o caso é legítimo e onde a lição erra aqui>"
 ```
 
