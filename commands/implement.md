@@ -116,6 +116,8 @@ Se esses subagents não existirem, usar subagents genéricos com instruções in
 
 Revisão por agentes independentes (o developer **nunca** revisa o próprio trabalho), com os guidelines ativos em contexto. **Recorte** (dono: `core/CODE-REVIEW.md` §Orquestração): a rodada de revisão roda **uma vez por wave**, depois que todas as TASKs da wave retornam do developer — sobre o **diff acumulado da wave**, com o pacote de contexto (4.89) incluindo o **mapa TASK→arquivos**, os reports dos developers e o **recorte de lições** da wave (`git diff --name-only <base>..HEAD | bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . match --paths-file -` — decisão 4.376: o `code-reviewer` recebe o recorte, nunca o acervo). Cada TASK continua provada individualmente pelos próprios testes (gate 2, no report do developer). Achado é **roteado à TASK de origem**: o retry vai ao developer daquela TASK e o re-review é sobre o delta (4.88).
 
+**Marca do despacho** (régua: `core/CODE-REVIEW.md` §Orquestração — âncora parada, decisão 4.379): antes da rodada, `bash "${CLAUDE_PLUGIN_ROOT}/scripts/ledger.sh" <raiz> mark gate code-reviewer <slug>` (idem `security-engineer` quando roda); o `append` do veredito consome a marca, e o retry re-despachado sobre o delta marca de novo.
+
 **Sempre — via `code-reviewer` (1× por wave)**: gates **1–7** — 1 cobertura de ACs · 2 testes passando · 3 lint · 4 escopo respeitado · 5 DECs respeitadas · 6 aderência à ficha e ao perfil ativo (stack, naming, anti-padrões, decisões irreversíveis) · 7 review qualitativo. A régua de cada gate tem dono único em `guidelines/core/CODE-REVIEW.md` — não a replique aqui.
 
 **Proporcional ao risco — gates dedicados:**

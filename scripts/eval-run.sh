@@ -15,8 +15,9 @@
 #                 `regua_inicio:`/`regua_fim:` opcionais (prefixos literais de linha: da
 #                 linha que começa com o início até antes da que começa com o fim).
 #                 Sem `regua:` declarada, `git:` é recusado (exit 2): a régua de um caso
-#                 nunca é adivinhada (4.377); extração vazia é erro, nunca régua
-#                 inventada (4.156).
+#                 nunca é adivinhada (4.377); âncora declarada ausente ou fora de ordem é
+#                 erro antes de qualquer braço rodar (4.379); extração vazia é erro,
+#                 nunca régua inventada (4.156).
 #   file:<path> → o arquivo inteiro é a régua.
 #
 # Uso: eval-run.sh <case-dir> --arm NOME=FONTE --arm NOME=FONTE
@@ -95,7 +96,6 @@ TS="$(date +%Y%m%d-%H%M%S)"
 [ -n "$RESULTS" ] || RESULTS="$CASE/results"
 case "$RESULTS" in /*) ;; *) RESULTS="$PWD/$RESULTS" ;; esac  # subshells fazem cd — caminho relativo quebraria
 RES="$RESULTS/$TS"
-mkdir -p "$RES/agg" || die "não consegui criar $RES"
 
 # ---------- régua por fonte ----------
 regua_para() { # $1 fonte → imprime a régua no stdout
@@ -105,9 +105,23 @@ regua_para() { # $1 fonte → imprime a régua no stdout
       rp="$(fm regua)"
       [ -n "$rp" ] || die "fonte $1 exige 'regua:' no frontmatter de $CASE/prompt.md (caminho relativo à raiz do repo; regua_inicio:/regua_fim: opcionais) — a régua de um caso nunca é adivinhada (4.377)"
       ri="$(fm regua_inicio)"; rf="$(fm regua_fim)"
-      out="$(git show "$ref:$rp" 2>/dev/null \
+      conteudo="$(git show "$ref:$rp" 2>/dev/null)" || die "régua inexistente em $1 ($ref:$rp)"
+      [ -n "$conteudo" ] || die "régua vazia em $1 ($ref:$rp)"
+      # âncoras declaradas são validadas ANTES de qualquer braço rodar (4.379): início
+      # presente; fim presente e DEPOIS do início — fim ausente capturava o resto do
+      # arquivo em silêncio e o runner julgava a régua errada com exit 0
+      li=0
+      if [ -n "$ri" ]; then
+        li="$(printf '%s\n' "$conteudo" | awk -v a="$ri" 'index($0, a) == 1 { print NR; exit }')"
+        [ -n "$li" ] || die "âncora inicial '$ri' ausente em $ref:$rp (regua_inicio: do caso)"
+      fi
+      if [ -n "$rf" ]; then
+        lf="$(printf '%s\n' "$conteudo" | awk -v b="$rf" -v s="$li" 'NR > s && index($0, b) == 1 { print NR; exit }')"
+        [ -n "$lf" ] || die "âncora final '$rf' ausente ou antes da inicial em $ref:$rp (regua_fim: do caso)"
+      fi
+      out="$(printf '%s\n' "$conteudo" \
         | awk -v a="$ri" -v b="$rf" 'BEGIN { f = (a == "") } b != "" && index($0, b) == 1 { f = 0 } a != "" && index($0, a) == 1 { f = 1 } f')"
-      [ -n "$out" ] || die "extração vazia da régua em $1 ($rp: ref/caminho inexistente ou âncoras '$ri'/'$rf' ausentes)"
+      [ -n "$out" ] || die "extração vazia da régua em $1 ($rp entre '$ri' e '$rf')"
       printf '%s\n' "$out" ;;
     file:*)
       p="${1#file:}"
@@ -205,6 +219,8 @@ regua_para "$F1" > /dev/null   # falha cedo, antes de gastar execução
 regua_para "$F2" > /dev/null
 [ -z "$PLANT" ] || regua_para "$PLANT" > /dev/null
 
+# só depois das réguas validadas: rodada recusada não deixa diretório em results/ (4.379)
+mkdir -p "$RES/agg" || die "não consegui criar $RES"
 executa "$N1" "$F1"
 executa "$N2" "$F2"
 [ -z "$PLANT" ] || executa plant "$PLANT"

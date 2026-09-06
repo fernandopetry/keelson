@@ -11,7 +11,9 @@
 # movida muda · base que não resolve e repo sem HEAD degradam para `none` sem erro;
 # e o `--guard review|security` (4.378): lista filtrada pela ficha (codePaths ·
 # sensitiveGlobs + manifestos), untracked marcado, rename_src, modo worktree sem base,
-# `scope none` sem codePaths e identidade igual à do `--identity` sobre a mesma lista.
+# `scope none` sem codePaths e identidade igual à do `--identity` sobre a mesma lista;
+# 4.379: rename fora do escopo não muda a identidade (origem só de par que toca o
+# escopo) e o modo executável entra no manifesto.
 #
 # Uso: scripts/tests/diff-facts/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -294,6 +296,38 @@ ref	HEAD
 mode	worktree
 file	src/w.php	untracked
 identity	<hash>" "$got" "$st"
+
+# P2 (4.379): rename fora do escopo não muda a identidade; rename que ENTRA no escopo traz a origem
+R10="$(newrepo guard-rename-escopo)"
+mkdir -p "$R10/src" "$R10/docs" "$R10/lib"
+printf '{ "codePaths": { "backend": ["src"] } }\n' > "$R10/keelson.config.json"
+seq 1 40 | sed 's/^/l /' > "$R10/src/a.php"; printf 'doc\n' > "$R10/docs/a.md"; seq 1 40 | sed 's/^/x /' > "$R10/lib/x.php"
+git -C "$R10" add -A && git -C "$R10" commit -qm base && git -C "$R10" checkout -qb feat
+printf 'value = 1;\n' >> "$R10/src/a.php"
+g1="$(bash "$DF" --repo "$R10" --guard review 2>/dev/null | awk -F'\t' '$1 == "identity" { print $2 }')"
+git -C "$R10" mv docs/a.md docs/b.md
+g2="$(bash "$DF" --repo "$R10" --guard review 2>/dev/null | awk -F'\t' '$1 == "identity" { print $2 }')"
+same guard-rename-fora-do-escopo-nao-muda "$g1" "$g2"
+total=$((total + 1))
+if bash "$DF" --repo "$R10" --guard review 2>/dev/null | grep -q "^rename_src"; then echo "FAIL guard-rename-fora-sem-rename-src"; fail=$((fail + 1)); else echo "ok   guard-rename-fora-sem-rename-src"; fi
+git -C "$R10" mv lib/x.php src/x.php
+got="$(bash "$DF" --repo "$R10" --guard review 2>/dev/null | grep -E '^rename_src')"; st=$?
+assert guard-rename-entra-no-escopo 0 "rename_src	lib/x.php" "$got" "$st"
+
+# P3 (4.379): chmod +x com bytes iguais muda a identidade (o git registra 100644 → 100755)
+R11="$(newrepo guard-modo)"
+mkdir -p "$R11/src"
+printf '{ "codePaths": { "backend": ["src"] } }\n' > "$R11/keelson.config.json"
+seq 1 40 | sed 's/^/l /' > "$R11/src/a.php"
+git -C "$R11" add -A && git -C "$R11" commit -qm base && git -C "$R11" checkout -qb feat
+printf 'value = 1;\n' >> "$R11/src/a.php"
+m1="$(bash "$DF" --repo "$R11" --guard review 2>/dev/null | awk -F'\t' '$1 == "identity" { print $2 }')"
+chmod +x "$R11/src/a.php"
+m2="$(bash "$DF" --repo "$R11" --guard review 2>/dev/null | awk -F'\t' '$1 == "identity" { print $2 }')"
+difere guard-modo-executavel-muda "$m1" "$m2"
+chmod -x "$R11/src/a.php"
+m3="$(bash "$DF" --repo "$R11" --guard review 2>/dev/null | awk -F'\t' '$1 == "identity" { print $2 }')"
+same guard-modo-volta "$m1" "$m3"
 
 total=$((total + 1))
 bash "$DF" --repo "$R7" --guard outro >/dev/null 2>&1

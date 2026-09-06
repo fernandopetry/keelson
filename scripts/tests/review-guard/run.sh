@@ -27,7 +27,10 @@
 #      opção do checklist e com o revisor independente;
 #   23–25. `diff_id:` do veredito (4.378): identidade igual cala MESMO com arquivo mais
 #      novo que o evento (hash vence mtime) · identidade de outro estado cutuca mesmo com
-#      arquivo mais velho · evento legado sem `diff_id:` cai no fallback por mtime.
+#      arquivo mais velho · evento legado sem `diff_id:` cai no fallback por mtime;
+#   26–27. marca do despacho (4.379): parecer registrado depois de a árvore mudar carrega
+#      a identidade da MARCA (estado entregue ao revisor) e o guard cutuca · registro
+#      sem marca não ganha diff_id e cai no mtime.
 # Cada caso usa repo próprio (o anti-renudge de .git/ não vaza entre casos).
 #
 # Uso: scripts/tests/review-guard/run.sh
@@ -137,12 +140,14 @@ silencio "trivial-sem-head"
 # 6. Veredito do code-reviewer no ledger da sessão mais novo que os arquivos → silêncio (4.365)
 D6="$TMP/c6"; repo "$D6"
 touch -t 202601010000 "$D6/src/novo.php"
+KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D6" mark gate code-reviewer meu-slug >/dev/null 2>&1
 printf 'APROVADO — diff avulso\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D6" append gate code-reviewer meu-slug >/dev/null 2>&1
 roda "$D6" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 silencio "veredito-cobre-arvore"
 
 # 7. Conteúdo de código editado DEPOIS do veredito → identidade muda → cutuca de novo (4.378)
 D7="$TMP/c7"; repo "$D7"
+KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D7" mark gate code-reviewer meu-slug >/dev/null 2>&1
 printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D7" append gate code-reviewer meu-slug >/dev/null 2>&1
 seq 1 40 | sed 's/^/editada /' > "$D7/src/novo.php"
 roda "$D7" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
@@ -166,6 +171,7 @@ contem "sessao-alheia/decision" '"decision": "block"'
 D10="$TMP/c10"; repo "$D10"
 ( cd "$D10" && printf 'x;\n' > src/velho.php && git add src/velho.php \
   && git -c user.email=t@t -c user.name=t commit -q -m base )
+KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D10" mark gate code-reviewer meu-slug >/dev/null 2>&1
 printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D10" append gate code-reviewer meu-slug >/dev/null 2>&1
 ( cd "$D10" && git rm -q src/velho.php )
 roda "$D10" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
@@ -276,6 +282,7 @@ contem "mensagem/code-reviewer" 'code-reviewer'
 # ---- diff_id do veredito (decisão 4.378) — casos 23–25 ----
 # 23. Veredito com identidade igual cala MESMO com arquivo mais novo que o evento (hash vence mtime)
 D23="$TMP/c23"; repo "$D23"
+KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D23" mark gate code-reviewer meu-slug >/dev/null 2>&1
 ev="$(printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D23" append gate code-reviewer meu-slug 2>/dev/null)"
 touch -t 202601010000 "$ev"; touch "$D23/src/novo.php"
 roda "$D23" "$P"; silencio "diffid/hash-vence-mtime"
@@ -294,6 +301,22 @@ D25="$TMP/c25"; repo "$D25"
 touch -t 202601010000 "$D25/src/novo.php"
 printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D25" append gate code-reviewer meu-slug --diff-id none >/dev/null 2>&1
 roda "$D25" "$P"; silencio "diffid/legado-mtime-fallback"
+
+# 26. (P1, 4.379) marca em A, árvore vai a B antes do registro, parecer de A registrado →
+#     o evento carrega a identidade de A (da marca) e o guard cutuca sobre B
+D26="$TMP/c26"; repo "$D26"
+KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D26" mark gate code-reviewer meu-slug >/dev/null 2>&1
+seq 1 40 | sed 's/^/estado B /' > "$D26/src/novo.php"
+ev="$(printf 'APROVADO (parecer sobre A)\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D26" append gate code-reviewer meu-slug 2>/dev/null)"
+roda "$D26" "$P"; contem "diffid/marca-em-A-arvore-em-B-cutuca" '"decision": "block"'
+grep -q '^diff_id_nota:' "$ev" 2>/dev/null && { total=$((total + 1)); echo "ok   diffid/nota-arvore-mudou"; } \
+  || { total=$((total + 1)); echo "FAIL diffid/nota-arvore-mudou: sem nota em $ev"; fail=$((fail + 1)); }
+
+# 27. (P1) sem marca no despacho → sem diff_id → o guard cai no mtime (arquivo mais novo que o evento cutuca)
+D27="$TMP/c27"; repo "$D27"
+ev="$(printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D27" append gate code-reviewer meu-slug 2>/dev/null)"
+touch -t 202601010000 "$ev"; touch "$D27/src/novo.php"
+roda "$D27" "$P"; contem "diffid/sem-marca-mtime-cutuca" '"decision": "block"'
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

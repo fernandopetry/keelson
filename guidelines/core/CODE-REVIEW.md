@@ -339,7 +339,13 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   trata o SHA sob revisão como âncora parada: com veredito em voo, nenhum commit novo
   entra na working tree — a correção espera, ou o gate é re-despachado com a âncora
   nova **declarada**, nunca herdada em silêncio ("gerador ≠ avaliador" pressupõe
-  âncora parada).
+  âncora parada). **Marca do despacho (decisão 4.379)** — a mecanização dessa âncora do
+  lado do orquestrador: o invocador que registra o veredito no ledger da sessão marca o
+  estado entregue ao revisor **antes** do despacho (`ledger.sh <raiz> mark gate <origem>
+  <slug>`; re-despacho sobre o delta marca de novo) e o registro consome a marca — o
+  veredito carrega a identidade do que o revisor viu, nunca a da árvore no instante do
+  registro; sem marca, não carrega identidade nenhuma e a cutucada de encerramento não o
+  reconhece. Mecânica: `sdd-conventions.md`, *Ledger de sessão*.
 - **Pacote de contexto único.** O invocador monta **uma vez** e entrega o mesmo pacote
   a todos os revisores da rodada: diff resolvido + SHA · o artefato-âncora com os
   critérios literais (ACs da TASK, critério de aceite do brief) · as fatias da ficha

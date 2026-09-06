@@ -6,6 +6,7 @@
 #
 # Uso: ledger.sh <raiz-do-repo> append <tipo> <origem> <slug> [--ref <caminho>] [--ts <iso>]
 #                                                             [--diff-id <hash|none>]
+#      ledger.sh <raiz-do-repo> mark gate <origem> <slug> [--ts <iso>]
 #      ledger.sh <raiz-do-repo> list [--archived]
 #      ledger.sh <raiz-do-repo> count
 #      ledger.sh <raiz-do-repo> last <tipo> <origem>
@@ -22,14 +23,24 @@
 #            stdin é descartada (4.156: ts estimado de memória não entra no evento).
 #            Evento `gate` de code-reviewer (escopo review) ou security-engineer
 #            (escopo security) ganha a linha `diff_id: <hash>` — identidade do diff que
-#            o guard correspondente vigia, MEDIDA aqui no instante do registro por
-#            `diff-facts.sh --guard <escopo>` (decisão 4.378); é o que o stop-guard
-#            compara com a identidade atual para saber se o veredito cobre a árvore.
-#            --diff-id explícito substitui a medição (`none` suprime a linha — só para
-#            testes/legado). Sem ficha, sem git, sem escopo ou raiz que é worktree
-#            vinculado (a árvore medida tem de ser a principal, onde o guard roda) →
-#            sem linha, sem erro. Linha `diff_id:` vinda pelo stdin é descartada como a
-#            `ts:` — o hash é medido, nunca escrito de memória.
+#            o guard correspondente vigia, tomada da MARCA feita no despacho (`mark`,
+#            abaixo): o estado que o revisor recebeu, nunca a árvore do instante do
+#            registro (4.378/4.379 — medir a árvore no registro não prova que ela foi
+#            revisada). A marca é consumida; se a identidade atual difere da marca, o
+#            evento ganha `diff_id_nota:` (a árvore mudou entre despacho e registro — o
+#            parecer cobre a marca, o guard cutuca). SEM marca → sem linha (o guard cai
+#            no mtime). --diff-id explícito substitui (`none` suprime — testes/legado).
+#            Linha `diff_id:` vinda pelo stdin é descartada como a `ts:` — o hash é
+#            medido, nunca escrito de memória.
+#   mark     grava a marca do despacho: mede AGORA a identidade do escopo do guard da
+#            origem (code-reviewer → review; security-engineer → security) via
+#            `diff-facts.sh --guard`, só na árvore principal (worktree vinculado não
+#            marca), em `<ledger>/mark-gate-<origem>` (sem `.md`: invisível a list/
+#            count/last/archive) com `ts:`, `diff_id:`, `scope:` e `slug:`; ecoa o
+#            caminho. O append só consome marca do MESMO slug — marca órfã de outro
+#            fluxo é ignorada (veredito sem diff_id). A marca morre com a casa (gc).
+#            Chamada pelo comando ANTES de despachar o revisor. Sem ficha, git, escopo
+#            ou raiz principal → aviso em stderr, exit 0, nada gravado (nunca é gate).
 #            Colisão de segundo ganha sufixo -2, -3… Ecoa o caminho criado.
 #   list     eventos ativos (um por linha, ordenados); --archived lista os consumidos
 #   count    contagem de eventos ativos por tipo
@@ -72,6 +83,19 @@ shift
 # (legado primeiro quando as duas existem como conceitos distintos).
 SDS="$(cd "$(dirname "$0")" && pwd)/session-dir.sh"
 DF="$(cd "$(dirname "$0")" && pwd)/diff-facts.sh"
+# medir_identidade <review|security> → identidade do escopo do guard na ÁRVORE PRINCIPAL
+# (num worktree vinculado --git-dir ≠ --git-common-dir e a identidade nunca casaria com a
+# do guard, que roda na raiz do projeto); vazio quando não dá para medir.
+medir_identidade() {
+  gd="$(git -C "$ROOT" rev-parse --git-dir 2>/dev/null || true)"
+  gcd="$(git -C "$ROOT" rev-parse --git-common-dir 2>/dev/null || true)"
+  { [ -f "$DF" ] && [ -n "$gd" ] && [ "$gd" = "$gcd" ]; } || return 0
+  bash "$DF" --repo "$ROOT" --guard "$1" 2>/dev/null | awk -F'\t' '$1 == "identity" { print $2; exit }'
+  return 0
+}
+escopo_da_origem() { # code-reviewer → review · security-engineer → security · outro → vazio
+  case "$1" in code-reviewer) echo review ;; security-engineer) echo security ;; esac
+}
 LDIR_LEG="$ROOT/thoughts/local/session-ledger"
 LDIR="$LDIR_LEG"
 if [ -f "$SDS" ]; then
@@ -119,21 +143,6 @@ case "$ACTION" in
       esac
       shift
     done
-    # diff_id (4.378): veredito de gate com guard de Stop correspondente carrega a
-    # identidade do diff vigiado, medida AGORA pelo dono único do escopo — nunca
-    # estimada nem passada de memória pela doutrina (mesma régua do ts:, 4.156).
-    if [ "$TIPO" = "gate" ] && [ "$DIFFID_SET" -eq 0 ]; then
-      scope=""
-      case "$ORIGEM" in code-reviewer) scope="review" ;; security-engineer) scope="security" ;; esac
-      # só na árvore principal: num worktree vinculado --git-dir ≠ --git-common-dir, e a
-      # identidade medida lá nunca casaria com a do guard (que roda na raiz do projeto)
-      gd="$(git -C "$ROOT" rev-parse --git-dir 2>/dev/null || true)"
-      gcd="$(git -C "$ROOT" rev-parse --git-common-dir 2>/dev/null || true)"
-      if [ -n "$scope" ] && [ -f "$DF" ] && [ -n "$gd" ] && [ "$gd" = "$gcd" ]; then
-        DIFFID="$(bash "$DF" --repo "$ROOT" --guard "$scope" 2>/dev/null | awk -F'\t' '$1 == "identity" { print $2; exit }' || true)"
-      fi
-    fi
-    [ "$DIFFID" = "none" ] && DIFFID=""
     pair="$(stamp "$TS")" || exit 2
     compact="${pair%%	*}"; iso="${pair##*	}"
     # escrita é sempre na casa resolvida com --create (registra o slug no meta)
@@ -142,6 +151,31 @@ case "$ACTION" in
       [ -n "$d" ] && LDIR="$d"
     fi
     mkdir -p "$LDIR" || die2 "não consegui criar $LDIR"
+    # diff_id (4.378/4.379): o veredito carrega a identidade do estado ENTREGUE ao
+    # revisor — a marca gravada no despacho (`mark`) —, nunca a árvore do instante do
+    # registro; a marca é consumida aqui. Árvore diferente da marca → nota no evento
+    # (o guard cutuca, porque o estado revisado não é o da árvore). Sem marca → sem linha.
+    NOTA=""
+    if [ "$TIPO" = "gate" ] && [ "$DIFFID_SET" -eq 0 ]; then
+      scope="$(escopo_da_origem "$ORIGEM")"
+      markf="$LDIR/mark-gate-$ORIGEM"
+      if [ -n "$scope" ] && [ -f "$markf" ]; then
+        mslug="$(sed -n 's/^slug: //p' "$markf" 2>/dev/null | sed -n 1p)"
+        if [ "$mslug" = "$SLUG" ]; then
+          DIFFID="$(sed -n 's/^diff_id: //p' "$markf" 2>/dev/null | sed -n 1p)"
+          agora="$(medir_identidade "$scope")"
+          if [ -n "$DIFFID" ] && [ -n "$agora" ] && [ "$agora" != "$DIFFID" ]; then
+            NOTA="diff_id_nota: a arvore mudou entre o despacho e o registro — o parecer cobre o estado da marca, nao o atual"
+          fi
+          rm -f "$markf"
+        else
+          # marca órfã de OUTRO slug (fluxo que despachou e não registrou): nunca é consumida
+          # por veredito alheio — o evento sai sem diff_id (degradação segura, mtime)
+          echo "ledger: marca pendente de $ORIGEM pertence ao slug '$mslug', não a '$SLUG' — ignorada; veredito sem diff_id." >&2
+        fi
+      fi
+    fi
+    [ "$DIFFID" = "none" ] && DIFFID=""
     base="$LDIR/$compact-$TIPO-$ORIGEM"
     f="$base.md"; n=1
     while [ -e "$f" ]; do
@@ -158,10 +192,43 @@ case "$ACTION" in
     {
       printf 'ts: %s · tipo: %s · origem: %s · slug: %s\n' "$iso" "$TIPO" "$ORIGEM" "$SLUG"
       if [ -n "$corpo" ]; then printf '%s\n' "$corpo"; fi
+      if [ -n "$DIFFID" ] && [ -n "$NOTA" ]; then printf '%s\n' "$NOTA"; fi
       if [ -n "$REF" ]; then printf 'ref: %s\n' "$REF"; fi
       if [ -n "$DIFFID" ]; then printf 'diff_id: %s\n' "$DIFFID"; fi
     } > "$f" || die2 "não consegui escrever $f"
     printf '%s\n' "$f"
+    exit 0 ;;
+
+  mark)
+    TIPO="${1:-}"; ORIGEM="${2:-}"; SLUG="${3:-}"
+    [ "$TIPO" = "gate" ] || die2 "mark existe só para o tipo gate."
+    [ -n "$ORIGEM" ] && [ -n "$SLUG" ] || die2 "mark exige gate <origem> <slug>."
+    shift 3
+    TS=""
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --ts) shift; [ $# -gt 0 ] || die2 "--ts exige um ISO 8601."; TS="$1" ;;
+        *) die2 "opção desconhecida: $1" ;;
+      esac
+      shift
+    done
+    scope="$(escopo_da_origem "$ORIGEM")"
+    [ -n "$scope" ] || die2 "mark: origem sem guard correspondente: $ORIGEM (code-reviewer|security-engineer)"
+    pair="$(stamp "$TS")" || exit 2
+    iso="${pair##*	}"
+    id="$(medir_identidade "$scope")"
+    if [ -z "$id" ]; then
+      echo "ledger: marca não gravada (sem ficha, git, escopo ou raiz principal) — o veredito de $ORIGEM seguirá sem diff_id." >&2
+      exit 0
+    fi
+    if [ -f "$SDS" ]; then
+      d="$(bash "$SDS" "$ROOT" ledger-dir --create --slug "$SLUG" ${TS:+--ts "$TS"} 2>/dev/null)" || d=""
+      [ -n "$d" ] && LDIR="$d"
+    fi
+    mkdir -p "$LDIR" || die2 "não consegui criar $LDIR"
+    markf="$LDIR/mark-gate-$ORIGEM"
+    printf 'ts: %s\ndiff_id: %s\nscope: %s\nslug: %s\n' "$iso" "$id" "$scope" "$SLUG" > "$markf" || die2 "não consegui escrever $markf"
+    printf '%s\n' "$markf"
     exit 0 ;;
 
   last)
@@ -271,5 +338,5 @@ case "$ACTION" in
     em_cada_casa archive_casa
     exit 0 ;;
 
-  *) die2 "ação desconhecida: $ACTION (use append, last, list, count ou archive)" ;;
+  *) die2 "ação desconhecida: $ACTION (use append, mark, last, list, count ou archive)" ;;
 esac

@@ -39,8 +39,9 @@
 #                     pela ficha (review: codePaths; security: sensitiveGlobs + manifestos
 #                     de dependência, sempre) e a identidade desse conjunto. TSV:
 #                     `base <sha|none>` · `ref <ref-do-diff>` · `mode branch|worktree` ·
-#                     `file <path> tracked|untracked` · `rename_src <path>` · `dep <path>`
-#                     · `identity <hash>`; `scope none` quando a ficha não dá escopo
+#                     `file <path> tracked|untracked` · `rename_src <path>` (só de par que
+#                     toca o escopo, 4.379) · `dep <path>` · `identity <hash>`; `scope none`
+#                     quando a ficha não dá escopo
 #                     (review sem codePaths). DONO ÚNICO do escopo: review-guard,
 #                     security-guard e ledger.sh (`diff_id:`) consomem esta saída, nunca
 #                     re-derivam. --base é ignorado. Exit 0 · 2 uso incorreto.
@@ -104,6 +105,9 @@ DEP_MANIFESTS='composer\.json|composer\.lock|package\.json|package-lock\.json|pn
 # ---- identidade do diff (4.377): base + blob exato de cada arquivo → hash ----
 # $1 = ref da base (pode não resolver → none); stdin = caminhos (um por linha).
 # Conteúdo exato via hash-object, sem renderização de diff — imune à config de git.
+# O modo relevante ao git entra ao lado do blob (4.379): 100755/100644 pelo bit de
+# execução, symlink como `link <alvo>` — `chmod +x` com bytes iguais é mudança que o
+# git registra e a identidade tem de acompanhar.
 identidade() {
   base_id="$(git -C "$REPO" rev-parse --verify --quiet "${1}^{commit}" 2>/dev/null || true)"
   [ -n "$base_id" ] || base_id="none"
@@ -112,9 +116,12 @@ identidade() {
     printf 'base %s\n' "$base_id"
     while IFS= read -r p; do
       [ -n "$p" ] || continue
-      if [ -f "$REPO/$p" ]; then
+      if [ -L "$REPO/$p" ]; then
+        printf 'link %s %s\n' "$(readlink "$REPO/$p" 2>/dev/null || echo '?')" "$p"
+      elif [ -f "$REPO/$p" ]; then
         h="$(git -C "$REPO" hash-object --no-filters -- "$p" 2>/dev/null || true)"
-        printf '%s %s\n' "${h:-unreadable}" "$p"
+        if [ -x "$REPO/$p" ]; then m="100755"; else m="100644"; fi
+        printf '%s %s %s\n' "${h:-unreadable}" "$m" "$p"
       else
         printf 'absent %s\n' "$p"
       fi
@@ -201,12 +208,12 @@ if [ "$MODE" = "guard" ]; then
       [ -n "$gbase" ] && break
     fi
   done
-  rsrc=""
+  rpairs=""
   if [ -n "$gbase" ]; then
     # rename detection fixada (-M, 4.377): destino na lista, origem em rename_src
     ns="$(git -C "$REPO" -c core.quotePath=false diff --name-status -M "$gbase" 2>/dev/null || true)"
     changed="$(printf '%s\n' "$ns" | awk -F'\t' 'NF >= 2 { print $NF }')"
-    rsrc="$(printf '%s\n' "$ns" | awk -F'\t' '$1 ~ /^[RC]/ && NF >= 3 { print $2 }')"
+    rpairs="$(printf '%s\n' "$ns" | awk -F'\t' '$1 ~ /^[RC]/ && NF >= 3 { print $2 "\t" $3 }')"
     gref="$gbase"; gmode="branch"
   else
     changed="$(git -C "$REPO" -c core.quotePath=false status --porcelain -uall 2>/dev/null | sed -E 's/^.{2} //; s/^.* -> //' || true)"
@@ -223,6 +230,19 @@ if [ "$MODE" = "guard" ]; then
     esac
   done <<< "$changed"
   files="$(printf '%s' "$files" | sed '/^$/d')"
+  # origem de rename entra só quando o par toca o escopo — origem ou destino dentro dele
+  # (4.379): rename fora do escopo não é mudança do que o guard vigia
+  rsrc=""
+  while IFS='	' read -r rs rd; do
+    [ -n "$rs" ] || continue
+    inscope=1
+    case "$GUARD" in
+      review)   path_has_prefix "$CP" "$rs" || path_has_prefix "$CP" "$rd" || inscope=0 ;;
+      security) { [ -n "$SG" ] && { path_matches_any_glob "$SG" "$rs" || path_matches_any_glob "$SG" "$rd"; }; } || inscope=0 ;;
+    esac
+    [ "$inscope" -eq 1 ] && rsrc="${rsrc}${rs}"$'\n'
+  done <<< "$rpairs"
+  rsrc="$(printf '%s' "$rsrc" | sed '/^$/d')"
   deps=""
   [ "$GUARD" = "security" ] && deps="$(printf '%s\n' "$changed" | grep -E "(^|/)(${DEP_MANIFESTS})$" || true)"
   printf 'base\t%s\n' "${gbase:-none}"

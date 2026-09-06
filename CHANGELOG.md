@@ -23,6 +23,48 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.160.0] — 2026-09-06
+
+Re-init: none
+
+Decision 4.379 — the identity a ledger verdict carries is now the one of the state the
+reviewer actually received. An external re-review of 0.159.0 reproduced the gap: the
+`diff_id:` was measured when the verdict was recorded, so a tree edited between dispatch
+and record (another session, the human) handed the verdict of state A the identity of
+state B, and the stop guard fell silent over code nobody had reviewed. Three smaller
+findings from the same review ship alongside.
+
+### Added
+
+- **`ledger.sh mark gate <origem> <slug>`** — measures the matching guard's scope identity
+  now and stores it as a mark in the session ledger (no `.md`, invisible to `list`, `count`,
+  `last` and `archive`). The rule lives with the gate 7 owner — the "stopped anchor" bullet
+  of `guidelines/core/CODE-REVIEW.md` §Orquestração, which every invoker reads at runtime,
+  the on-demand mode included — and the commands that dispatch a reviewer and record its
+  verdict cite it with the call right before the dispatch: `/keelson:review` (step 3 and
+  the re-review), `/keelson:implement` (§3.3 and the retry), `/keelson:warroom close` and
+  `/keelson:auto` (gate run at the pre-check, closing convergence). `append gate
+  code-reviewer|security-engineer` consumes a mark of the same slug and writes its
+  identity; a tree that moved in between leaves a `diff_id_nota:` on the event and the
+  guard nudges; a stale mark from another flow is ignored. **No mark, no `diff_id:`** — the
+  record no longer measures the current tree, by the Director's choice; the guard falls
+  back to the mtime check.
+
+### Fixed
+
+- **`diff-facts.sh --guard`** — rename pairs enter the identity only when the source or the
+  destination is inside the guard's scope; renaming a file under `docs/` no longer reopens
+  the review reminder over unchanged code. The manifest now carries the file mode next to
+  the blob (`100755`/`100644`, symlink target): `chmod +x` with identical bytes is a change
+  git records and the identity follows it.
+- **`eval-run.sh`** — a `git:` rule whose declared `regua_inicio`/`regua_fim` anchors are
+  missing or out of order is refused (exit 2) before any arm runs; previously a missing end
+  anchor silently captured the rest of the file and the runner judged the wrong rule with
+  exit 0. The results directory is created only after the rules validate.
+- Suites: ledger 36 → 41, review-guard 37 → 40, security-guard 19 → 20, diff-facts 36 → 41,
+  eval-run +3 scenarios; the new guard suites run against the record-time ledger fail exactly
+  on the mark cases.
+
 ## [0.159.0] — 2026-09-06
 
 Re-init: none

@@ -7,7 +7,8 @@
 # `--runs 0` e fonte `git:` em caso sem `regua:` declarada (4.377); (5) --results relativo;
 # (6) juiz sem veredito → HOLD por falha de infra, rótulo distinto de variância (4.377);
 # (7) fonte `git:` com `regua:` + âncoras declaradas no caso, extraída de um repo git
-# temporário — cabeçalho e rodapé com marcas más/plant provam que o recorte não vaza.
+# temporário — cabeçalho e rodapé com marcas más/plant provam que o recorte não vaza;
+# (8) âncora declarada ausente ou fora de ordem → exit 2 antes de executar (4.379).
 # Saídas congeladas em expected/ (linha "resultados:" normalizada — carrega timestamp).
 set -u
 cd "$(dirname "$0")" || exit 1
@@ -101,6 +102,26 @@ got7="$(cat "$TMP"/r7/*/run/A-r1/REGUA.md 2>/dev/null)"
 if [ "$got7" = "## Regua
 Régua sintética boa vinda do git. MARCA-BOA" ]; then ok "cenário 7 recorte entre âncoras exato (sem cabeçalho/rodapé)"
 else bad "cenário 7: recorte divergente: [$got7]"; fi
+
+# --- cenário 8: âncoras declaradas ausentes ou fora de ordem → exit 2 ANTES de executar (4.379) ---
+GR8="$TMP/gitrepo-ancoras"; mkdir -p "$GR8"
+( cd "$GR8" && { git init -q -b main 2>/dev/null || { git init -q; git checkout -qb main; }; } )
+printf '## Regua\nRégua boa. MARCA-BOA\n## Outra secao sem a ancora Fim\nTrecho que vazaria. MARCA-MA\n' > "$GR8/regua-ancoras.md"
+( cd "$GR8" && git add -A && git -c user.email=t@t -c user.name=t commit -q -m regua )
+( cd "$GR8" && "$RUNNER_ABS" "$HERE/case-git" --arm A=git:HEAD --arm B="file:$HERE/reguas/regua-ma.md" \
+  --runs 1 --executor "$EXEC" --results "$TMP/r8a" >/dev/null 2>&1 ); rc=$?
+[ $rc -eq 2 ] && ok "cenário 8 regua_fim ausente → exit 2 (nunca régua maior)" || bad "cenário 8: regua_fim ausente saiu $rc (esperado 2)"
+[ -d "$TMP/r8a" ] && bad "cenário 8: executou braço com âncora ausente" || ok "cenário 8 nada executado com âncora ausente"
+printf '## Fim\n## Regua\nRégua boa. MARCA-BOA\n' > "$GR8/regua-ancoras.md"
+( cd "$GR8" && git add -A && git -c user.email=t@t -c user.name=t commit -q -m ordem )
+( cd "$GR8" && "$RUNNER_ABS" "$HERE/case-git" --arm A=git:HEAD --arm B="file:$HERE/reguas/regua-ma.md" \
+  --runs 1 --executor "$EXEC" --results "$TMP/r8b" >/dev/null 2>&1 ); rc=$?
+[ $rc -eq 2 ] && ok "cenário 8 regua_fim antes do início → exit 2" || bad "cenário 8: fim antes do início saiu $rc (esperado 2)"
+printf 'sem a ancora de inicio\n## Fim\n' > "$GR8/regua-ancoras.md"
+( cd "$GR8" && git add -A && git -c user.email=t@t -c user.name=t commit -q -m inicio )
+( cd "$GR8" && "$RUNNER_ABS" "$HERE/case-git" --arm A=git:HEAD --arm B="file:$HERE/reguas/regua-ma.md" \
+  --runs 1 --executor "$EXEC" --results "$TMP/r8c" >/dev/null 2>&1 ); rc=$?
+[ $rc -eq 2 ] && ok "cenário 8 regua_inicio ausente → exit 2" || bad "cenário 8: início ausente saiu $rc (esperado 2)"
 
 # --- cenário 4: usos inválidos → exit 2 ---
 "$RUNNER" nao-existe --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \

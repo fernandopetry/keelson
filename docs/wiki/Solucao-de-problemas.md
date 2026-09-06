@@ -76,9 +76,10 @@ A cutucada de encerramento (`review-guard`, e a irmã `security-guard` para muda
 sensível) olha o diff acumulado da branch — que cresce a cada correção quando o commit
 fica para o fim, como no modo sob demanda. Ela cala quando o veredito do revisor está no
 **ledger da sessão** (o Tech Lead anota o evento `gate` ao receber o report) e o diff de
-código é o mesmo que ele revisou — o registro guarda a identidade do diff naquele instante,
-e é ela que a cutucada compara, não a data dos arquivos. Se voltou, ou o conteúdo mudou
-depois do veredito (re-revise só o delta) ou o veredito não foi anotado — anote-o e encerre.
+código é o mesmo que ele revisou — a identidade do diff é marcada no despacho do revisor e
+gravada no veredito, e é ela que a cutucada compara, não a data dos arquivos. Se voltou, ou o
+conteúdo mudou depois do despacho (re-revise só o delta; o evento traz uma nota quando a
+mudança aconteceu antes do registro) ou o veredito não foi anotado — anote-o e encerre.
 
 Sem veredito anotado, o lembrete aparece **uma vez por estado do diff**: ele reconhece a
 mudança pelo conteúdo dos arquivos de código, não pelo tamanho — trocar um valor mantendo

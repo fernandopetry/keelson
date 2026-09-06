@@ -72,6 +72,8 @@ E o que é específico deste comando — **declare explicitamente**:
 
 ## Etapa 3: despachar os revisores (em paralelo)
 
+Antes de despachar, **marque o estado que os revisores vão receber** (régua: `guidelines/core/CODE-REVIEW.md`, *Orquestração da rodada* — âncora parada, decisão 4.379): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/ledger.sh" <raiz> mark gate code-reviewer <slug ou avulso>` (idem `security-engineer` quando roda); o `append` do item 5 da Etapa 4 consome a marca.
+
 - **`code-reviewer`** — sempre. Gates 1–7 sobre o diff, na régua degradada.
 - **`security-engineer`** — quando a área é sensível e `gates.security` está ativo (`--no-security` desliga; a decisão de desligar entra no output).
 - **`performance-engineer`** — quando o diff toca superfície de custo (gate 10, decisão 4.155; gabarito lido em runtime: `core/PERFORMANCE.md` + seção de performance do perfil).
@@ -95,7 +97,7 @@ Na dúvida entre as duas, é **estrutural** (princípio 1 do `/keelson:implement
 Achado de segurança crítica/alta cuja correção é estrutural **não** é adiado em silêncio: entra como bloqueio explícito no output, com a demanda proposta na Etapa 8.
 
 4. Imprimir o report consolidado (formato da Etapa 9), inclusive quando nada foi encontrado.
-5. **Anotar cada veredito no ledger da sessão no instante em que chega** — evento `gate`, origem `code-reviewer` (e `security-engineer` quando rodou): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/ledger.sh" <raiz> append gate code-reviewer <slug ou avulso>` (decisão 4.76). É esse evento que cala a cutucada de encerramento sobre o diff já revisado (4.365) — veredito sem evento no ledger é cutucada garantida no fim do turno.
+5. **Anotar cada veredito no ledger da sessão no instante em que chega** — evento `gate`, origem `code-reviewer` (e `security-engineer` quando rodou): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/ledger.sh" <raiz> append gate code-reviewer <slug ou avulso>` (decisão 4.76). É esse evento, com a identidade marcada no despacho da Etapa 3 (4.379), que cala a cutucada de encerramento sobre o diff já revisado (4.365) — veredito sem evento no ledger é cutucada garantida no fim do turno.
 
 ## Etapa 5: um OK, e depois não pare mais
 
@@ -116,7 +118,7 @@ TASK em disco, sem commit) com um briefing efêmero:
 
 ## Etapa 7: re-revisão (gate, não formalidade)
 
-1. Despache o **`code-reviewer` de novo** sobre o diff da correção. Report anterior não vale como aprovação do código novo — o que foi corrigido é código não revisado.
+1. Despache o **`code-reviewer` de novo** sobre o diff da correção (marca nova antes — Etapa 3). Report anterior não vale como aprovação do código novo — o que foi corrigido é código não revisado.
 2. Houve achado de segurança corrigido → o **`security-engineer`** também roda de novo.
 3. Houve achado de performance corrigido → o **`performance-engineer`** também roda de novo, sobre o delta (convergência 4.88).
 4. Houve achado de design corrigido → o **`product-designer`** também roda de novo, sobre o delta (convergência 4.88).

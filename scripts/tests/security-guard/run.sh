@@ -19,7 +19,9 @@
 #      `diff.renames=false` (rename detection fixada);
 #   13–15. `diff_id:` do veredito (4.378): identidade igual cala mesmo com arquivo mais
 #      novo que o evento · identidade de outro estado cutuca · evento sem `diff_id:` cai
-#      no fallback por mtime.
+#      no fallback por mtime;
+#   16. marca do despacho (4.379): parecer registrado após a árvore mudar carrega a
+#      identidade da marca e o guard cutuca.
 # Cada caso usa repo próprio (o anti-renudge de .git/ não vaza entre casos).
 #
 # Uso: scripts/tests/security-guard/run.sh
@@ -114,12 +116,14 @@ contem "alheio/decision" '"decision": "block"'
 # 5. Veredito do security-engineer no ledger da sessão mais novo que os arquivos → silêncio (4.365)
 D5="$TMP/c5"; repo "$D5"
 touch -t 202601010000 "$D5/src/auth.php"
+KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D5" mark gate security-engineer meu-slug >/dev/null 2>&1
 printf 'APROVADO — sem achado\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D5" append gate security-engineer meu-slug >/dev/null 2>&1
 roda "$D5" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 silencio "veredito-cobre-arvore"
 
 # 6. Conteúdo sensível editado DEPOIS do veredito → identidade muda → cutuca de novo (4.378)
 D6="$TMP/c6"; repo "$D6"
+KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D6" mark gate security-engineer meu-slug >/dev/null 2>&1
 printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D6" append gate security-engineer meu-slug >/dev/null 2>&1
 printf '<?php $senha = password_hash($outra, PASSWORD_ARGON2ID);\n' > "$D6/src/auth.php"
 roda "$D6" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
@@ -178,6 +182,7 @@ roda "$D12" "$P"; silencio "rename-puro/silencia"
 # ---- diff_id do veredito (decisão 4.378) — casos 13–15 ----
 # 13. Identidade igual cala MESMO com arquivo mais novo que o evento (hash vence mtime)
 D13="$TMP/c13"; repo "$D13"
+KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D13" mark gate security-engineer meu-slug >/dev/null 2>&1
 ev="$(printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D13" append gate security-engineer meu-slug 2>/dev/null)"
 touch -t 202601010000 "$ev"; touch "$D13/src/auth.php"
 roda "$D13" "$P"; silencio "diffid/hash-vence-mtime"
@@ -194,6 +199,13 @@ D15="$TMP/c15"; repo "$D15"
 touch -t 202601010000 "$D15/src/auth.php"
 printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D15" append gate security-engineer meu-slug --diff-id none >/dev/null 2>&1
 roda "$D15" "$P"; silencio "diffid/legado-mtime-fallback"
+
+# 16. (P1, 4.379) marca em A, árvore vai a B, parecer de A registrado → cutuca sobre B
+D16="$TMP/c16"; repo "$D16"
+KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D16" mark gate security-engineer meu-slug >/dev/null 2>&1
+printf '<?php $senha = password_hash($estadoB, PASSWORD_ARGON2ID);\n' > "$D16/src/auth.php"
+printf 'APROVADO (parecer sobre A)\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D16" append gate security-engineer meu-slug >/dev/null 2>&1
+roda "$D16" "$P"; contem "diffid/marca-em-A-arvore-em-B-cutuca" '"decision": "block"'
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

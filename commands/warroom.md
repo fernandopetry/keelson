@@ -109,7 +109,9 @@ Execute o contrato do `/keelson:review` com alvo `<base>..HEAD` (dono da rodada:
 1. Inventário **derivado do diff** (`git diff --name-only <base>..HEAD` + conteúdo), nunca de
    memória: superfície sensível? comportamento observável? superfície de custo? de
    interface? Linha com `sensivel: sim` no `DEBT.md` força o gate 8.
-2. Despacho em paralelo sobre pacote de contexto único: `code-reviewer` sempre (régua
+2. Marque antes o estado que os revisores vão receber (`ledger.sh <raiz> mark gate
+   code-reviewer <slug>`; idem `security-engineer` — régua em `core/CODE-REVIEW.md`
+   §Orquestração, 4.379). Despacho em paralelo sobre pacote de contexto único: `code-reviewer` sempre (régua
    avulsa, sem artefato SDD); `security-engineer`, `qa`, `performance-engineer`,
    `product-designer` pelos gatilhos do item 1. Modelo por papel: `ficha.sh --get
    models.<agent>`.
