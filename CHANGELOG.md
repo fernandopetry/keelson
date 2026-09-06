@@ -23,6 +23,49 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.158.1] — 2026-09-06
+
+Re-init: none
+
+Decision 4.377 — the two stop guards recognise a change by its content, and the eval runner
+refuses a round that runs nothing. An external review of 0.157.1 reproduced two defects: the
+review-guard's anti-renudge fingerprint hashed file names and line counts, so a second edit of
+the same size slipped through in silence; and `eval-run.sh --runs 0` returned 0 with every axis
+on HOLD, filed as "variance". The security-guard shared the first defect in a milder form (only
+the lines its heuristic matched entered the fingerprint). While closing the contract, the
+guards' counts turned out to depend on the user's git config: a pure rename counted the whole
+file as added, and twice with `diff.renames=false`.
+
+### Fixed
+
+- **`scripts/diff-facts.sh --identity`** — reads a file list from stdin and hashes the base
+  commit plus the exact working-tree content of every listed file (tracked, new or absent)
+  with `git hash-object`; no diff rendering is involved, so `diff.renames`, the diff
+  algorithm or an external diff cannot move it. A base that does not resolve degrades to
+  `none` (repo without a commit). Internal to the guards — no command invokes it. Contract
+  proved in `scripts/tests/diff-facts` (stable · content change · list order · untracked ·
+  absent · edit outside the list · base moved · unresolvable base · repo without HEAD · help).
+- **`hooks/review-guard.sh`** — the anti-renudge marker stores that identity, computed over the
+  files under `codePaths` only: the same state never nudges twice, a new state nudges again
+  even at the same size, an edit outside `codePaths` does not reopen it, and a moved base
+  (merging `main` into the branch) reopens it once. Rename detection is pinned (`-M`, rename
+  sources in the pathspec): a pure rename counts 1 file / 0 lines under any git config. The
+  message offers the `code-reviewer` or `/keelson:review` only — the author's checklist, a
+  leftover from 4.15 that 4.36 had already diagnosed, is gone. Suite: 12 → 33 checks.
+  Consumers keep one extra nudge on the first stop after updating (the marker still holds the
+  old scheme), then converge.
+- **`hooks/security-guard.sh`** — same identity over the sensitive files and dependency
+  manifests (a neutral line changed in a sensitive file now nudges again), same pinned rename
+  detection. Its checklist route stays: it is offered only outside the gate 8 triggers.
+  Suite: 7 → 16 checks.
+- **`scripts/eval-run.sh`** — `--runs 0` is refused (exit 2); below 4 runs the summary labels
+  the reading as a signal (the bench's empirical floor, obs. 4.304 — not a guarantee); a judge
+  with no parseable verdict yields `HOLD (sem veredito válido …)`, distinct from intra-arm
+  variance; and `git:<ref>` no longer extracts `commands/tasks.md` for every case — the case
+  declares its rule source in `prompt.md` (`regua:`, optional `regua_inicio:`/`regua_fim:`)
+  and the runner refuses `git:` without it. `evals/README.md` and the one case that used
+  `git:` (`decomposicao-comportamento`) updated; the runner suite now also runs in CI.
+
 ## [0.158.0] — 2026-09-06
 
 Re-init: required

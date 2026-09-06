@@ -55,8 +55,9 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   `/field-intake` (PR é insumo de campo com código junto); a face pública da rota para o
   contribuidor é o `CONTRIBUTING.md` ·
   **`evals/` + `scripts/eval-run.sh`** (camada de evals de comportamento, 4.304) → medir
-  o efeito de mudança de doutrina em caso controlado A/B (braços `git:<ref>`/`file:`,
-  n≥2, plant 4.186); veredito **consultivo** — HOLD em divergência, plant aprovado
+  o efeito de mudança de doutrina em caso controlado A/B (braços `file:` ou `git:<ref>` com `regua:` declarada no caso;
+  n≥2 é o mínimo do runner e comparação começa em 4 — piso empírico da 4.304, declarado
+  na 4.377; plant 4.186); veredito **consultivo** — HOLD em divergência, plant aprovado
   invalida a rodada; roda sob demanda do Diretor ou pré-leva de classe coberta, nunca em
   pre-commit/CI; casos no formato `claude plugin eval`, o runner só orquestra.
 - Adiado com gatilho (4.182): `doctrine-reviewer` (reincidência de defeito de conteúdo

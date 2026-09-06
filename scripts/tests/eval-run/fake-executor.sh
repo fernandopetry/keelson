@@ -31,6 +31,9 @@ if [ -f REGUA.md ]; then
     echo "TASK aparentemente boa (defeito camuflado)." > deck/TASK-001-001-camuflada.md
   elif grep -q "MARCA-PLANT" REGUA.md; then
     echo "TASK com CORTE-RUIM plantado." > deck/TASK-001-001-plant.md
+  elif grep -q "MARCA-JUIZ-MUDO" REGUA.md; then
+    # deck íntegro cujo juiz não conclui — simula falha de infra do juiz (4.377)
+    echo "TASK boa: comportamento fim-a-fim. JUIZ-MUDO" > deck/TASK-001-001-muda.md
   else
     echo "TASK boa: comportamento fim-a-fim." > deck/TASK-001-001-boa.md
   fi
@@ -38,7 +41,10 @@ if [ -f REGUA.md ]; then
 else
   # fase de juiz: reprova se a SEÇÃO DO DECK (após "DECK AVALIADO") traz o marcador —
   # nunca o prompt inteiro, que carrega a rubrica (juiz cego julga só o deck)
-  if printf '%s' "$PROMPT" | awk '/DECK AVALIADO/{f=1} f' | grep -q "CORTE-RUIM"; then
+  if printf '%s' "$PROMPT" | awk '/DECK AVALIADO/{f=1} f' | grep -q "JUIZ-MUDO"; then
+    # juiz sem linha VEREDITO parseável → o runner conta INVALIDO (4.377)
+    printf '%s\n' '{"result":"motivo: juiz sem conclusao (simulado)","total_cost_usd":0.001,"duration_ms":200}'
+  elif printf '%s' "$PROMPT" | awk '/DECK AVALIADO/{f=1} f' | grep -q "CORTE-RUIM"; then
     printf '%s\n' '{"result":"motivo: defeito presente\nVEREDITO: FAIL","total_cost_usd":0.001,"duration_ms":200}'
   else
     printf '%s\n' '{"result":"motivo: deck integro\nVEREDITO: PASS","total_cost_usd":0.001,"duration_ms":200}'

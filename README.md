@@ -420,14 +420,18 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.158.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.158.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the `tracker-sync` agent carries the Jira sync protocol's address
-itself (decision 4.375) — a consumer cycle lost ~11 minutes to `find /` because the
-briefing never passed the path; the agent now resolves `${CLAUDE_PLUGIN_ROOT}` with a
-declared fallback and never scans the filesystem. See `CHANGELOG.md`.
+New in this release: the `review-guard` and `security-guard` stop hooks recognise a change by
+its content (decision 4.377) — one shared identity (`diff-facts.sh --identity`: base commit plus
+the exact content of every watched file) replaces fingerprints built from file names and line
+counts, rename detection is pinned so a pure rename counts 0 lines under any git config, and the
+review-guard stops offering the author's own checklist as a way to close gate 7. The eval runner
+refuses a round with no executions, tells a mute judge apart from variance, and takes the rule
+source from the case instead of assuming `commands/tasks.md`. An external review of 0.157.1
+reproduced the two defects. See `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

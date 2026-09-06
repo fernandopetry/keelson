@@ -79,6 +79,12 @@ fica para o fim, como no modo sob demanda. Ela cala quando o veredito do revisor
 arquivo de código foi editado depois dele. Se voltou, ou algo mudou depois do veredito
 (re-revise só o delta) ou o veredito não foi anotado — anote-o e encerre.
 
+Sem veredito anotado, o lembrete aparece **uma vez por estado do diff**: ele reconhece a
+mudança pelo conteúdo dos arquivos de código, não pelo tamanho — trocar um valor mantendo
+o mesmo número de linhas conta como mudança nova e o lembrete volta; editar só
+documentação, fora dos `codePaths`, não o traz de volta; renomear um arquivo sem editá-lo
+não conta como mudança.
+
 ### A sessão não encerra: "dívida de verificação do warroom"
 
 Existe linha aberta no `DEBT.md` (raiz da sua pasta de documentação) e nenhuma janela de

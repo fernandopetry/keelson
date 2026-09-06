@@ -11,7 +11,12 @@
 #   4. run-state de OUTRA sessão (4.252) → NÃO silencia, block;
 #   5–7. veredito no ledger (4.365): evento `gate` do security-engineer mais novo que
 #      todo arquivo sensível → silêncio; arquivo editado depois do veredito e veredito
-#      de outro gate → cutuca.
+#      de outro gate → cutuca;
+#   8–12. contrato da identidade do diff (4.377 — marker = `diff-facts.sh --identity`):
+#      linha neutra alterada num arquivo sensível cutuca de novo mesmo com o mesmo
+#      tamanho · diff idêntico silencia · alteração fora dos sensitiveGlobs não reabre ·
+#      rename puro de arquivo com conteúdo sensível silencia, com e sem
+#      `diff.renames=false` (rename detection fixada).
 # Cada caso usa repo próprio (o anti-renudge de .git/ não vaza entre casos).
 #
 # Uso: scripts/tests/security-guard/run.sh
@@ -123,6 +128,49 @@ touch -t 202601010000 "$D7/src/auth.php"
 printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D7" append gate code-reviewer meu-slug >/dev/null 2>&1
 roda "$D7" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 contem "outro-gate/decision" '"decision": "block"'
+
+# ---- Contrato da identidade do diff (decisão 4.377) — casos 8–12 ----
+P='{"stop_hook_active": false, "session_id": "sessao-eu"}'
+repo_base() { # $1 dir — repo com main (commit base) e branch feature; sensitiveGlobs src/**
+  mkdir -p "$1/src/auth" "$1/src/core" "$1/docs"
+  ( cd "$1" && { git init -q -b main 2>/dev/null || { git init -q; git checkout -qb main; }; } )
+  printf '{ "sensitiveGlobs": ["src/**"] }\n' > "$1/keelson.config.json"
+  printf '<?php\n$x = 0;\n' > "$1/src/auth/login.php"
+  printf '<?php $password = "x";\n' > "$1/src/core/conf.php"
+  printf 'doc\n' > "$1/docs/leia.md"
+  ( cd "$1" && git add -A && git -c user.email=t@t -c user.name=t commit -q -m base && git checkout -qb feature )
+}
+
+# 8. (a) path sensível (auth/) com linha neutra: cutuca; conteúdo novo com o MESMO tamanho cutuca de novo
+D8="$TMP/c8"; repo_base "$D8"
+printf '<?php\n$x = 1;\n' > "$D8/src/auth/login.php"
+roda "$D8" "$P"; contem "conteudo/1a-cutucada" '"decision": "block"'
+printf '<?php\n$x = 2;\n' > "$D8/src/auth/login.php"
+roda "$D8" "$P"; contem "conteudo/mesmo-tamanho-cutuca-de-novo" '"decision": "block"'
+
+# 9. (b) diff idêntico → a 2ª execução silencia
+D9="$TMP/c9"; repo_base "$D9"
+printf '<?php\n$x = 1;\n' > "$D9/src/auth/login.php"
+roda "$D9" "$P"; contem "identico/1a-cutucada" '"decision": "block"'
+roda "$D9" "$P"; silencio "identico/2a-silencia"
+
+# 10. (f) alteração fora dos sensitiveGlobs não reabre
+D10="$TMP/c10"; repo_base "$D10"
+printf '<?php\n$x = 1;\n' > "$D10/src/auth/login.php"
+roda "$D10" "$P"; contem "escopo/1a-cutucada" '"decision": "block"'
+printf 'mais doc\n' >> "$D10/docs/leia.md"
+roda "$D10" "$P"; silencio "escopo/fora-nao-reabre"
+
+# 11. (d)+(h) rename puro de arquivo com conteúdo sensível, com diff.renames=false → silêncio
+#     (antes: a listagem virava D+A e o "+password" do arquivo inteiro cutucava)
+D11="$TMP/c11"; repo_base "$D11"
+( cd "$D11" && git config diff.renames false && git mv src/core/conf.php src/core/settings.php )
+roda "$D11" "$P"; silencio "rename-puro/config-renames-false-silencia"
+
+# 12. (d) rename puro com config default → silêncio igual
+D12="$TMP/c12"; repo_base "$D12"
+( cd "$D12" && git mv src/core/conf.php src/core/settings.php )
+roda "$D12" "$P"; silencio "rename-puro/silencia"
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

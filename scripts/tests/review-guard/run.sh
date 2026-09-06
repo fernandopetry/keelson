@@ -18,7 +18,13 @@
 #      de outro gate, veredito de outra sessão e arquivo alterado ausente do disco →
 #      cutuca (conservador);
 #   11–12. warroom (4.372): marcador `warroom.meta` DESTA sessão cala o gate 7 (a dívida
-#      vai ao DEBT.md); marcador de outra sessão não cala.
+#      vai ao DEBT.md); marcador de outra sessão não cala;
+#   13–22. contrato da identidade do diff (4.377 — marker = `diff-facts.sh --identity`):
+#      conteúdo diferente com a mesma contagem cutuca de novo · diff idêntico silencia ·
+#      untracked alterado cutuca (repo sem HEAD) · exclusão cutuca · rename puro silencia,
+#      com e sem `diff.renames=false` (rename detection fixada) · rename editado cutuca ·
+#      base movida reabre · alteração fora dos codePaths não reabre · mensagem sem a
+#      opção do checklist e com o revisor independente.
 # Cada caso usa repo próprio (o anti-renudge de .git/ não vaza entre casos).
 #
 # Uso: scripts/tests/review-guard/run.sh
@@ -177,6 +183,92 @@ printf 'inicio: 2026-09-03T10:00:00-0300\nmotivo: incidente\nbranch: main\nbase:
   > "$D12/thoughts/local/sessions/20260903-100000-sessoutr/warroom.meta"
 roda "$D12" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 contem "warroom-alheio/decision" '"decision": "block"'
+
+# ---- Contrato da identidade do diff (decisão 4.377) — casos 13–22 ----
+w40() { seq 1 40 | sed 's/^/linha /'; }
+repo_base() { # $1 dir · $2 files · $3 lines — repo com main (commit base) e branch feature
+  mkdir -p "$1/src" "$1/docs"
+  ( cd "$1" && { git init -q -b main 2>/dev/null || { git init -q; git checkout -qb main; }; } )
+  printf '{ "codePaths": { "backend": ["src"] }, "gates": { "reviewThreshold": { "files": %s, "lines": %s } } }\n' "$2" "$3" > "$1/keelson.config.json"
+  w40 > "$1/src/base.php"
+  printf 'doc\n' > "$1/docs/leia.md"
+  ( cd "$1" && git add -A && git -c user.email=t@t -c user.name=t commit -q -m base && git checkout -qb feature )
+}
+nao_contem() {
+  total=$((total + 1))
+  if grep -qF -- "$2" "$TMP/out"; then
+    echo "FAIL $1: saída contém [$2]"; sed 's/^/  out: /' "$TMP/out"; fail=$((fail + 1))
+  else echo "ok   $1"; fi
+}
+P='{"stop_hook_active": false, "session_id": "sessao-eu"}'
+
+# 13. (a) conteúdo diferente com a MESMA contagem → cutuca de novo (o fingerprint antigo calava)
+D13="$TMP/c13"; repo_base "$D13" 1 1
+{ w40; echo 'value = 1;'; } > "$D13/src/base.php"
+roda "$D13" "$P"; contem "conteudo/1a-cutucada" '"decision": "block"'
+{ w40; echo 'value = 2;'; } > "$D13/src/base.php"
+roda "$D13" "$P"; contem "conteudo/mesmo-tamanho-cutuca-de-novo" '"decision": "block"'
+
+# 14. (b) diff idêntico → a 2ª execução silencia (anti-renudge preservado)
+D14="$TMP/c14"; repo_base "$D14" 1 1
+{ w40; echo 'value = 1;'; } > "$D14/src/base.php"
+roda "$D14" "$P"; contem "identico/1a-cutucada" '"decision": "block"'
+roda "$D14" "$P"; silencio "identico/2a-silencia"
+
+# 15. (c)+(g) untracked em repo SEM HEAD: cutuca, silencia no mesmo estado, conteúdo novo
+#     com as mesmas 40 linhas cutuca de novo
+D15="$TMP/c15"; repo "$D15"
+roda "$D15" "$P"; contem "untracked/1a-cutucada" '"decision": "block"'
+roda "$D15" "$P"; silencio "untracked/sem-head-marker-silencia"
+seq 1 40 | sed 's/^/outra linha /' > "$D15/src/novo.php"
+roda "$D15" "$P"; contem "untracked/conteudo-novo-cutuca" '"decision": "block"'
+
+# 16. (d) exclusão de arquivo de código acima do limiar → cutuca
+D16="$TMP/c16"; repo_base "$D16" 1 1
+( cd "$D16" && git rm -q src/base.php )
+roda "$D16" "$P"; contem "exclusao/cutuca" '"decision": "block"'
+
+# 17. (d) rename puro com limiar default (2/30) → silêncio: 1 arquivo, 0 linhas
+D17="$TMP/c17"; repo_base "$D17" 2 30
+( cd "$D17" && git mv src/base.php src/renomeado.php )
+roda "$D17" "$P"; silencio "rename-puro/silencia"
+
+# 18. (d) rename + edição acima do limiar → cutuca (só as linhas editadas contam)
+D18="$TMP/c18"; repo_base "$D18" 2 30
+( cd "$D18" && git mv src/base.php src/renomeado.php )
+{ w40; seq 41 80 | sed 's/^/linha /'; } > "$D18/src/renomeado.php"
+roda "$D18" "$P"; contem "rename-editado/cutuca" '"decision": "block"'
+
+# 19. (h) rename puro com diff.renames=false na config do usuário → silêncio igual
+D19="$TMP/c19"; repo_base "$D19" 2 30
+( cd "$D19" && git config diff.renames false && git mv src/base.php src/renomeado.php )
+roda "$D19" "$P"; silencio "rename-puro/config-renames-false-silencia"
+
+# 20. (e) base movida: cutuca, silencia, main avança fora do escopo, feature mescla → reabre
+D20="$TMP/c20"; repo_base "$D20" 1 1
+{ w40; echo 'value = 1;'; } > "$D20/src/base.php"
+( cd "$D20" && git -c user.email=t@t -c user.name=t commit -q -am feat )
+roda "$D20" "$P"; contem "base/1a-cutucada" '"decision": "block"'
+roda "$D20" "$P"; silencio "base/2a-silencia"
+( cd "$D20" && git checkout -q main && printf 'mais doc\n' >> docs/leia.md \
+  && git -c user.email=t@t -c user.name=t commit -q -am docs && git checkout -q feature \
+  && git -c user.email=t@t -c user.name=t merge -q --no-edit main )
+roda "$D20" "$P"; contem "base/movida-reabre" '"decision": "block"'
+
+# 21. (f) alteração fora do escopo do guard não reabre a cutucada
+D21="$TMP/c21"; repo_base "$D21" 1 1
+{ w40; echo 'value = 1;'; } > "$D21/src/base.php"
+roda "$D21" "$P"; contem "escopo/1a-cutucada" '"decision": "block"'
+roda "$D21" "$P"; silencio "escopo/2a-silencia"
+printf 'mais doc\n' >> "$D21/docs/leia.md"
+roda "$D21" "$P"; silencio "escopo/fora-nao-reabre"
+
+# 22. Mensagem: sem a opção do checklist (sedimento da 4.15 que a 4.36 diagnosticou) e
+#     com o revisor independente
+D22="$TMP/c22"; repo "$D22"
+roda "$D22" "$P"
+nao_contem "mensagem/sem-checklist" 'aplique o checklist'
+contem "mensagem/code-reviewer" 'code-reviewer'
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

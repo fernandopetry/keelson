@@ -4,7 +4,7 @@
 # a âncora mecânica é `git diff --name-only <base>...HEAD` confrontado com os
 # codePaths da ficha e as árvores de teste — este script É essa âncora.
 #
-# Uso: diff-facts.sh --base <ref> ( --inert | --compose | --deploy-pending <INDEX.md> )
+# Uso: diff-facts.sh --base <ref> ( --inert | --compose | --deploy-pending <INDEX.md> | --identity )
 #                    [--repo <dir>] [--code-paths <p1,p2,…>] [--docs-root <dir>]
 #                    [--deploy-dirs <seg1,seg2,…>] [--plugin-root <dir>]
 #
@@ -23,6 +23,15 @@
 #   --deploy-pending  artefatos de deploy do diff vs o que o INDEX declara
 #                     (implement Etapa 4 item 8): `pendente|declarado<TAB>basename`.
 #                     Exit 1 se há pendente · 0 se tudo declarado.
+#   --identity        identidade do diff dos arquivos lidos do STDIN (um caminho por
+#                     linha, relativo à raiz do repo): hash de `base <sha|none>` + uma
+#                     linha `<blob|absent> <path>` por arquivo em ordem canônica, blob =
+#                     `git hash-object --no-filters` do working tree. Conteúdo exato,
+#                     sem renderização de diff — imune a `diff.renames`, algoritmo,
+#                     prefixos ou diff externo do usuário. Base que não resolve degrada
+#                     para `none` (repo sem commit), nunca erro. Leitores: os markers
+#                     anti-renudge do review-guard/security-guard (decisão 4.377).
+#                     Exit 0 · 2 uso incorreto. Ignora codePaths/ficha.
 #
 #   Buckets: documentacao (docsRoot/**, *.md, assets estáticos) · teste (árvores e
 #   sufixos de teste) · migracao (segmentos migrations/migrate/seeds/seeders, ou
@@ -44,7 +53,7 @@ LC_ALL=C
 export LC_ALL
 
 die2() { echo "ERRO: $*" >&2; exit 2; }
-usage() { sed -n '2,36p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,/^# Read-only/p' "$0" | sed 's/^# \{0,1\}//'; }
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
@@ -68,6 +77,8 @@ while [ $# -gt 0 ]; do
       [ -z "$MODE" ] || die2 "use apenas um modo."
       shift; [ $# -gt 0 ] || die2 "--deploy-pending exige o caminho do INDEX.md."
       MODE="deploy"; INDEXF="$1" ;;
+    --identity)
+      [ -z "$MODE" ] || die2 "use apenas um modo."; MODE="identity" ;;
     --code-paths)  shift; [ $# -gt 0 ] || die2 "--code-paths exige lista separada por vírgula."; CODEPATHS="$1" ;;
     --docs-root)   shift; [ $# -gt 0 ] || die2 "--docs-root exige um diretório."; DOCSROOT="$1" ;;
     --deploy-dirs) shift; [ $# -gt 0 ] || die2 "--deploy-dirs exige lista separada por vírgula."; DEPLOYDIRS="$1" ;;
@@ -82,6 +93,32 @@ done
 [ -d "$REPO" ] || die2 "repo não existe: $REPO"
 command -v git >/dev/null 2>&1 || die2 "git indisponível."
 git -C "$REPO" rev-parse --git-dir >/dev/null 2>&1 || die2 "não é repositório git: $REPO"
+
+# ---- --identity: identidade do diff dos arquivos do stdin (decisão 4.377) ----
+# Base que não resolve NÃO é erro neste modo: repo sem commit ou branch sem base
+# degrada para `none` — a identidade continua cobrindo o conteúdo dos arquivos.
+if [ "$MODE" = "identity" ]; then
+  base_id="$(git -C "$REPO" rev-parse --verify --quiet "${BASE}^{commit}" 2>/dev/null || true)"
+  [ -n "$base_id" ] || base_id="none"
+  TMPI="$(mktemp -d)" || die2 "mktemp falhou."
+  trap 'rm -rf "$TMPI"' EXIT
+  sed '/^[[:space:]]*$/d' | sort -u > "$TMPI/paths.txt"
+  {
+    printf 'base %s\n' "$base_id"
+    while IFS= read -r p; do
+      [ -n "$p" ] || continue
+      if [ -f "$REPO/$p" ]; then
+        h="$(git -C "$REPO" hash-object --no-filters -- "$p" 2>/dev/null || true)"
+        printf '%s %s\n' "${h:-unreadable}" "$p"
+      else
+        printf 'absent %s\n' "$p"
+      fi
+    done < "$TMPI/paths.txt"
+  } > "$TMPI/manifest.txt"
+  git -C "$REPO" hash-object --stdin < "$TMPI/manifest.txt" || die2 "hash-object falhou."
+  exit 0
+fi
+
 git -C "$REPO" rev-parse --verify --quiet "$BASE" >/dev/null 2>&1 || die2 "base não resolve: $BASE"
 if [ "$MODE" = "deploy" ]; then
   [ -f "$INDEXF" ] || die2 "INDEX não encontrado: $INDEXF"

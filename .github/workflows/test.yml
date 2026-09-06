@@ -59,6 +59,9 @@ jobs:
       - name: Suíte do diff-facts.sh (scripts/tests/diff-facts/run.sh)
         run: bash scripts/tests/diff-facts/run.sh
 
+      - name: Suíte do eval-run.sh (scripts/tests/eval-run/run.sh)
+        run: bash scripts/tests/eval-run/run.sh
+
       - name: Suíte do cycle-clock.sh (scripts/tests/cycle-clock/run.sh)
         run: bash scripts/tests/cycle-clock/run.sh
 

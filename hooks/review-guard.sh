@@ -7,11 +7,14 @@
 #   - codePaths.*           → onde vive o código deste projeto;
 #   - gates.reviewThreshold → limiar opcional { files, lines } (default: 2 / 30).
 # Detecta mudança de código NA BRANCH acima do limiar e bloqueia o encerramento
-# UMA vez, lembrando de aplicar o code review (/keelson:review, o agent
-# `code-reviewer` OU o checklist de `guidelines/core/CODE-REVIEW.md` + o perfil ativo).
+# UMA vez, lembrando de aplicar o code review — revisão INDEPENDENTE: /keelson:review
+# ou o agent `code-reviewer`. Checklist aplicado por quem escreveu não fecha o gate 7
+# (gerador ≠ avaliador, 4.36; a opção sobrevivera da 4.15 e saiu na 4.377).
 #
 # Limiar (Charter Art. 6 — rigor proporcional): mudança trivial passa sem cutucar.
 # Dispara quando arquivos de código alterados ≥ `files` OU linhas adicionadas ≥ `lines`.
+# Rename detection é FIXADA (-M, origem do rename no pathspec): rename puro conta 1
+# arquivo com 0 linhas em qualquer config de git do usuário (4.377).
 #
 # Como o security-guard: compara o diff da BRANCH contra a base (merge-base com
 # main/master) e filtra pelos `codePaths` da ficha; sem base determinável, cai no
@@ -19,8 +22,12 @@
 #
 # Fallback gracioso: sem `jq` ou sem a ficha, o hook NÃO trava o fluxo — emite
 # aviso em stderr e sai 0. `stop_hook_active` evita loop dentro do mesmo turno;
-# um marcador em .git/ evita re-cutucar em turnos seguintes enquanto o diff de
-# código for o mesmo. E veredito do code-reviewer já registrado no ledger da sessão
+# um marcador em .git/ evita re-cutucar em turnos seguintes enquanto a IDENTIDADE do
+# diff de código for a mesma — base + conteúdo exato de cada arquivo, via
+# `scripts/diff-facts.sh --identity` (4.377): tamanho igual com conteúdo diferente
+# cutuca de novo; mudança fora dos codePaths não reabre. O marker guarda o último estado
+# AVISADO; o ledger (abaixo) guarda o último estado REVISADO — cutucar nunca equivale a
+# registrar revisão. E veredito do code-reviewer já registrado no ledger da sessão
 # (evento `gate`, 4.76) mais novo que todo arquivo de código alterado cala o hook
 # (decisão 4.365): no modo sob demanda o commit é do Diretor e o diff cumulativo
 # cresce a cada correção — sem essa consulta, cada re-review genuíno re-disparava.
@@ -101,7 +108,10 @@ case "$th_lines" in ''|*[!0-9]*) th_lines=30 ;; esac
 
 # ledger.sh resolvido ANTES do cd (o $0 pode ser relativo); ausente → a consulta ao
 # veredito registrado (abaixo) é pulada e o hook se comporta como sempre.
-LEDGER="$(cd "$(dirname "$0")/../scripts" 2>/dev/null && pwd || true)/ledger.sh"
+SCRIPTS_DIR="$(cd "$(dirname "$0")/../scripts" 2>/dev/null && pwd || true)"
+LEDGER="$SCRIPTS_DIR/ledger.sh"
+# diff-facts.sh --identity (4.377): identidade do diff para o marker anti-renudge.
+DIFF_FACTS="$SCRIPTS_DIR/diff-facts.sh"
 
 cd "$proj" 2>/dev/null || exit 0
 
@@ -115,8 +125,15 @@ for b in main master origin/main origin/master; do
 done
 
 base_note=""
+rename_src=""
 if [ -n "$base" ]; then
-  changed="$(git diff --name-only "$base" 2>/dev/null || true)"
+  # Rename detection fixada (-M, 4.377): a lista traz o DESTINO do rename e `rename_src`
+  # guarda a origem — ela entra no pathspec do numstat para o git ver o rename (0 linhas
+  # num rename puro) em vez de um arquivo novo inteiro; sem isso a contagem dependia de
+  # `diff.renames` do usuário e do pathspec. quotePath=false: nome não-ASCII sai cru.
+  ns="$(git -c core.quotePath=false diff --name-status -M "$base" 2>/dev/null || true)"
+  changed="$(printf '%s\n' "$ns" | awk -F'\t' 'NF >= 2 { print $NF }')"
+  rename_src="$(printf '%s\n' "$ns" | awk -F'\t' '$1 ~ /^[RC]/ && NF >= 3 { print $2 }')"
   diff_ref="$base"
 else
   changed="$(git status --porcelain -uall 2>/dev/null | sed -E 's/^.{2} //; s/^.* -> //' || true)"
@@ -167,7 +184,12 @@ if [ "${#code_arr[@]}" -gt 0 ]; then
   # sob pipefail, git sem HEAD (repo sem commit) falha o pipeline e um `|| echo 0`
   # empilharia um segundo valor sobre o "0" que o awk já emitiu — added_lines
   # multiline quebrava o teste do limiar em silêncio
-  added_lines="$(git diff --numstat "$diff_ref" -- "${code_arr[@]}" 2>/dev/null \
+  spec_arr=("${code_arr[@]}")
+  while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    spec_arr+=("$f")
+  done <<< "$rename_src"
+  added_lines="$(git -c core.quotePath=false diff --numstat -M "$diff_ref" -- "${spec_arr[@]}" 2>/dev/null \
     | awk '$1 != "-" { s += $1 } END { print s + 0 }' || true)"
   case "$added_lines" in ''|*[!0-9]*) added_lines=0 ;; esac
 fi
@@ -209,7 +231,13 @@ git_dir="$(git rev-parse --absolute-git-dir 2>/dev/null || true)"
 marker="" fingerprint=""
 if [ -n "$git_dir" ]; then
   marker="$git_dir/keelson-review-guard.last"
-  fingerprint="$(printf '%s\n%s\n%s' "$code_files" "$file_count" "$added_lines" | git hash-object --stdin 2>/dev/null || true)"
+  # Identidade do diff (4.377): base + conteúdo exato dos arquivos de código (rastreados,
+  # novos ou ausentes) — o mesmo estado nunca cutuca duas vezes, estado novo cutuca de
+  # novo mesmo com tamanho igual. Script ausente → forma antiga (lista + contagens).
+  if [ -f "$DIFF_FACTS" ]; then
+    fingerprint="$(printf '%s\n' "$code_files" "$rename_src" | bash "$DIFF_FACTS" --identity --base "$diff_ref" --repo "$proj" 2>/dev/null || true)"
+  fi
+  [ -n "$fingerprint" ] || fingerprint="$(printf '%s\n%s\n%s' "$code_files" "$file_count" "$added_lines" | git hash-object --stdin 2>/dev/null || true)"
   if [ -n "$fingerprint" ] && [ -f "$marker" ] && [ "$(cat "$marker" 2>/dev/null)" = "$fingerprint" ]; then
     exit 0
   fi
@@ -218,9 +246,8 @@ fi
 reason="$(cat <<EOF
 Gate de Code Review (keelson, gate 7): há mudança de código acima do limiar (${file_count} arquivo(s) de código, ~${added_lines} linha(s) adicionada(s); limiar: ${th_files} arquivos ou ${th_lines} linhas) nos codePaths da ficha.
 
-Antes de encerrar, aplique o code review:
-- Rode /keelson:review (revisores independentes sobre este diff) OU o code-reviewer sobre o diff OU aplique o checklist de guidelines/core/CODE-REVIEW.md (e o perfil de linguagem ativo).
-- Confirme: limites/responsabilidade única respeitados; sem reimplementação de utilitário existente (DRY); nomes pela intenção; sem abstração especulativa; condicionais e assinaturas saudáveis; tratamento de erro presente; sem código morto.
+Antes de encerrar, aplique o code review — revisão INDEPENDENTE, nunca de quem escreveu o código (régua gerador ≠ avaliador de guidelines/core/CODE-REVIEW.md):
+- Despache o code-reviewer sobre o diff (rota que a sessão executa) OU peça ao Diretor o /keelson:review (revisores independentes; comando humano-only). Checklist aplicado por quem escreveu não fecha o gate 7.
 
 Se esta mudança JÁ passou por code review (ex.: fluxo /keelson:implement com reviewer), pode encerrar — este aviso não se repetirá para esta mesma mudança. Se o que mudou desde o último veredito é só o delta de uma correção de achados, a re-verificação é sobre o delta — e delta só de comentário/doc re-checa com o próprio revisor, sem rodada nova completa (régua de convergência: guidelines/core/CODE-REVIEW.md, decisão 4.88).${base_note}
 EOF

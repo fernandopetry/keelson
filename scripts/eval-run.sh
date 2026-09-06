@@ -10,9 +10,13 @@
 # aprovado invalida a rodada inteira (controle positivo, 4.186).
 #
 # Fonte de braço:
-#   git:<ref>   → régua extraída de `git show <ref>:commands/tasks.md`
-#                 (bloco "## Etapa 1:" até antes de "## Etapa 4:"); extração
-#                 vazia é erro, nunca régua inventada (4.156).
+#   git:<ref>   → régua extraída de `git show <ref>:<regua>` — o caminho vem de `regua:`
+#                 no frontmatter do prompt.md do CASO (relativo à raiz do repo), com
+#                 `regua_inicio:`/`regua_fim:` opcionais (prefixos literais de linha: da
+#                 linha que começa com o início até antes da que começa com o fim).
+#                 Sem `regua:` declarada, `git:` é recusado (exit 2): a régua de um caso
+#                 nunca é adivinhada (4.377); extração vazia é erro, nunca régua
+#                 inventada (4.156).
 #   file:<path> → o arquivo inteiro é a régua.
 #
 # Uso: eval-run.sh <case-dir> --arm NOME=FONTE --arm NOME=FONTE
@@ -21,7 +25,9 @@
 #
 #   --arm       exatamente 2 braços; o veredito compara o 1º contra o 2º.
 #   --plant     3º braço de controle; exige <caso>/plant/expect.txt.
-#   --runs      execuções por braço (default: frontmatter `runs:` do prompt.md, senão 2).
+#   --runs      execuções por braço (default: frontmatter `runs:` do prompt.md, senão 2);
+#               0 é recusado. Abaixo de 4, o sumário rotula a leitura como SINAL — piso
+#               empírico da bancada (obs. 4.304), não garantia de confiabilidade.
 #   --model     passa --model ao executor (default: frontmatter `model:`, senão o do executor).
 #   --executor  binário que roda o prompt (default: claude) — a suíte injeta um fake.
 #               Toda chamada leva --strict-mcp-config: sem os MCP servers do usuário
@@ -31,7 +37,9 @@
 # Graders suportados (frontmatter `type:`): llm (rubrica no corpo; juiz cego — vê só
 # o deck, nunca a régua ou o nome do braço; responde `VEREDITO: PASS|FAIL`),
 # file_exists (`path:` glob no workspace), regex (`pattern:` + `mode: contains|
-# not_contains` + `path:` glob, default deck/*.md).
+# not_contains` + `path:` glob, default deck/*.md). Juiz sem veredito parseável conta
+# INVALIDO e o eixo fica HOLD por falha de infra — rótulo distinto do HOLD por
+# variância intra-braço (4.377).
 #
 # Custo/duração: somados dos campos total_cost_usd/duration_ms do JSON do executor —
 # medidos ou declarados "nao medido", nunca estimados (4.239). O modelo usado é
@@ -71,9 +79,14 @@ if [ -n "$PLANT" ] && [ ! -f "$CASE/plant/expect.txt" ]; then
 fi
 
 # Frontmatter do prompt.md: defaults de runs/model; corpo = prompt do braço.
-fm() { awk -v k="$1:" '/^---$/{c++;next} c==1 && $1==k {sub(/^[^:]*: */,""); print; exit}' "$CASE/prompt.md"; }
+fm() { # $1 chave → valor do frontmatter do prompt.md, sem aspas envolventes
+  v="$(awk -v k="$1:" '/^---$/{c++;next} c==1 && $1==k {sub(/^[^:]*: */,""); print; exit}' "$CASE/prompt.md")"
+  q="'"; v="${v%\"}"; v="${v#\"}"; v="${v%"$q"}"; v="${v#"$q"}"
+  printf '%s' "$v"
+}
 [ -n "$RUNS" ] || RUNS="$(fm runs)"; [ -n "$RUNS" ] || RUNS=2
 case "$RUNS" in ''|*[!0-9]*) die "--runs inválido: $RUNS" ;; esac
+[ "$RUNS" -ge 1 ] || die "--runs inválido: $RUNS (mínimo 1 — rodada sem execução não é veredito, 4.377)"
 [ -n "$MODEL" ] || MODEL="$(fm model)"
 PROMPT_BODY="$(awk '/^---$/{c++;next} c>=2' "$CASE/prompt.md")"
 [ -n "$PROMPT_BODY" ] || die "prompt.md sem corpo após o frontmatter"
@@ -89,9 +102,12 @@ regua_para() { # $1 fonte → imprime a régua no stdout
   case "$1" in
     git:*)
       ref="${1#git:}"
-      out="$(git show "$ref:commands/tasks.md" 2>/dev/null \
-        | awk '/^## Etapa 1:/{f=1} /^## Etapa 4:/{f=0} f')"
-      [ -n "$out" ] || die "extração vazia da régua em $1 (ref ou âncoras '## Etapa 1/4' ausentes)"
+      rp="$(fm regua)"
+      [ -n "$rp" ] || die "fonte $1 exige 'regua:' no frontmatter de $CASE/prompt.md (caminho relativo à raiz do repo; regua_inicio:/regua_fim: opcionais) — a régua de um caso nunca é adivinhada (4.377)"
+      ri="$(fm regua_inicio)"; rf="$(fm regua_fim)"
+      out="$(git show "$ref:$rp" 2>/dev/null \
+        | awk -v a="$ri" -v b="$rf" 'BEGIN { f = (a == "") } b != "" && index($0, b) == 1 { f = 0 } a != "" && index($0, a) == 1 { f = 1 } f')"
+      [ -n "$out" ] || die "extração vazia da régua em $1 ($rp: ref/caminho inexistente ou âncoras '$ri'/'$rf' ausentes)"
       printf '%s\n' "$out" ;;
     file:*)
       p="${1#file:}"
@@ -195,19 +211,24 @@ executa "$N2" "$F2"
 
 # ---------- agregação ----------
 conta() { c="$(grep -c "^$2\$" "$RES/agg/$1" 2>/dev/null)"; echo "${c:-0}"; }
-status_braco() { # PASS | FAIL | VARIANCIA para $1=grader $2=braço
+status_braco() { # PASS | FAIL | VARIANCIA | INVALIDO para $1=grader $2=braço
   p="$(conta "$1.$2" PASS)"; f="$(conta "$1.$2" FAIL)"; i="$(conta "$1.$2" INVALIDO)"
-  if [ "$i" -gt 0 ] || { [ "$p" -gt 0 ] && [ "$f" -gt 0 ]; }; then echo "VARIANCIA"
+  # INVALIDO (juiz sem veredito, braço sem amostra) é falha de infra — nunca se
+  # confunde com variância de comportamento (4.377)
+  if [ "$i" -gt 0 ]; then echo "INVALIDO"
+  elif [ "$p" -gt 0 ] && [ "$f" -gt 0 ]; then echo "VARIANCIA"
   elif [ "$p" -gt 0 ]; then echo "PASS"
   elif [ "$f" -gt 0 ]; then echo "FAIL"
-  else echo "VARIANCIA"; fi
+  else echo "INVALIDO"; fi
 }
 
 SUM="$RES/summary.md"
 {
   echo "# eval-run — $(basename "$CASE")"
   echo "braços: $N1=$F1 · $N2=$F2${PLANT:+ · plant=$PLANT}"
-  echo "runs por braço: $RUNS · modelo: ${MODEL:-default do executor} · executor: $(basename "$EXECUTOR")"
+  runs_note=""
+  [ "$RUNS" -ge 4 ] || runs_note=" (abaixo do piso empírico da bancada, 4 — obs. 4.304: leitura como sinal, não como comparação)"
+  echo "runs por braço: $RUNS$runs_note · modelo: ${MODEL:-default do executor} · executor: $(basename "$EXECUTOR")"
   echo
   echo "## Veredito por eixo (consultivo — 4.304)"
 } > "$SUM"
@@ -215,7 +236,8 @@ SUM="$RES/summary.md"
 for g in "$CASE"/graders/*.md; do
   gname="$(basename "$g" .md)"
   s1="$(status_braco "$gname" "$N1")"; s2="$(status_braco "$gname" "$N2")"
-  if [ "$s1" = "VARIANCIA" ] || [ "$s2" = "VARIANCIA" ]; then vered="HOLD (variância intra-braço)"
+  if [ "$s1" = "INVALIDO" ] || [ "$s2" = "INVALIDO" ]; then vered="HOLD (sem veredito válido — falha de infra/juiz, não variância)"
+  elif [ "$s1" = "VARIANCIA" ] || [ "$s2" = "VARIANCIA" ]; then vered="HOLD (variância intra-braço)"
   elif [ "$s1" = "$s2" ]; then vered="empate ($s1 nos dois)"
   elif [ "$s1" = "PASS" ]; then vered="$N1"
   else vered="$N2"; fi

@@ -22,9 +22,12 @@
 #
 # Fallback gracioso: sem `jq` ou sem a ficha, o hook NÃO trava o fluxo — emite
 # aviso em stderr e sai 0. `stop_hook_active` evita loop dentro do mesmo turno;
-# um marcador em .git/ evita re-cutucar em turnos seguintes enquanto o diff
-# sensível for o mesmo (a comparação é da branch inteira — sem o marcador, uma
-# mudança sensível já commitada dispararia o bloqueio ao fim de todo turno).
+# um marcador em .git/ evita re-cutucar em turnos seguintes enquanto a IDENTIDADE do
+# diff sensível for a mesma — base + conteúdo exato dos arquivos sensíveis e manifestos,
+# via `scripts/diff-facts.sh --identity` (4.377; antes: listas + linhas casadas pela
+# heurística, cegas a linha neutra alterada). A comparação é da branch inteira — sem o
+# marcador, uma mudança sensível já commitada dispararia o bloqueio ao fim de todo turno.
+# Rename detection fixada (-M, origem no pathspec): rename puro não vira "+ arquivo inteiro".
 # E veredito do security-engineer já registrado no ledger da sessão (evento `gate`,
 # 4.76) mais novo que todo arquivo sensível alterado cala o hook (decisão 4.365 —
 # mesma forma do review-guard).
@@ -84,7 +87,10 @@ sensitive_globs="$(jq -r '.sensitiveGlobs[]?' "$config" 2>/dev/null || true)"
 
 # ledger.sh resolvido ANTES do cd (o $0 pode ser relativo); ausente → a consulta ao
 # veredito registrado (abaixo) é pulada e o hook se comporta como sempre.
-LEDGER="$(cd "$(dirname "$0")/../scripts" 2>/dev/null && pwd || true)/ledger.sh"
+SCRIPTS_DIR="$(cd "$(dirname "$0")/../scripts" 2>/dev/null && pwd || true)"
+LEDGER="$SCRIPTS_DIR/ledger.sh"
+# diff-facts.sh --identity (4.377): identidade do diff para o marker anti-renudge.
+DIFF_FACTS="$SCRIPTS_DIR/diff-facts.sh"
 
 cd "$proj" 2>/dev/null || exit 0
 
@@ -99,9 +105,16 @@ for b in main master origin/main origin/master; do
 done
 
 base_note=""
+rename_src=""
 if [ -n "$base" ]; then
   # Diff da branch: da base até o working tree (inclui commits da branch + não-commitado).
-  changed="$(git diff --name-only "$base" 2>/dev/null || true)"
+  # Rename detection fixada (-M, 4.377): a lista traz o DESTINO do rename e `rename_src`
+  # guarda a origem, que entra no pathspec do diff de conteúdo — rename puro não aparece
+  # como arquivo novo inteiro em nenhuma config de `diff.renames`. quotePath=false: nome
+  # não-ASCII sai cru.
+  ns="$(git -c core.quotePath=false diff --name-status -M "$base" 2>/dev/null || true)"
+  changed="$(printf '%s\n' "$ns" | awk -F'\t' 'NF >= 2 { print $NF }')"
+  rename_src="$(printf '%s\n' "$ns" | awk -F'\t' '$1 ~ /^[RC]/ && NF >= 3 { print $2 }')"
   diff_ref="$base"
 else
   # Sem base determinável → comportamento antigo (working tree), registrado na mensagem.
@@ -168,7 +181,12 @@ done <<< "$sensitive_files"
 # Conteúdo novo: linhas adicionadas (rastreadas) + conteúdo de arquivos novos.
 added=""
 if [ "${#sens_arr[@]}" -gt 0 ]; then
-  added="$(git diff "$diff_ref" -- "${sens_arr[@]}" 2>/dev/null | grep -E '^\+' | grep -vE '^\+\+\+' || true)"
+  spec_arr=("${sens_arr[@]}")
+  while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    spec_arr+=("$f")
+  done <<< "$rename_src"
+  added="$(git -c core.quotePath=false diff -M "$diff_ref" -- "${spec_arr[@]}" 2>/dev/null | grep -E '^\+' | grep -vE '^\+\+\+' || true)"
 fi
 unt_content=""
 while IFS= read -r f; do
@@ -207,7 +225,14 @@ if [ -n "$content_sensitive" ] || [ -n "$path_sensitive" ] || [ -n "$dep_changed
   marker="" fingerprint=""
   if [ -n "$git_dir" ]; then
     marker="$git_dir/keelson-security-guard.last"
-    fingerprint="$(printf '%s\n%s\n%s\n%s' "$sensitive_files" "$content_sensitive" "$path_sensitive" "$dep_changed" | git hash-object --stdin 2>/dev/null || true)"
+    # Identidade do diff sensível (4.377): base + conteúdo exato dos arquivos sensíveis e
+    # dos manifestos — linha neutra alterada num arquivo sensível cutuca de novo; o marker
+    # guarda o último estado AVISADO, o ledger (acima) o último REVISADO. Script ausente →
+    # forma antiga (listas + linhas casadas).
+    if [ -f "$DIFF_FACTS" ]; then
+      fingerprint="$(printf '%s\n' "$sensitive_files" "$dep_changed" "$rename_src" | bash "$DIFF_FACTS" --identity --base "$diff_ref" --repo "$proj" 2>/dev/null || true)"
+    fi
+    [ -n "$fingerprint" ] || fingerprint="$(printf '%s\n%s\n%s\n%s' "$sensitive_files" "$content_sensitive" "$path_sensitive" "$dep_changed" | git hash-object --stdin 2>/dev/null || true)"
     if [ -n "$fingerprint" ] && [ -f "$marker" ] && [ "$(cat "$marker" 2>/dev/null)" = "$fingerprint" ]; then
       exit 0
     fi

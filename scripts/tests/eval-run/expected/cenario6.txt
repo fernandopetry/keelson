@@ -1,11 +1,11 @@
 # eval-run — case
-braços: A=file:reguas/regua-varia.md · B=file:reguas/regua-boa.md
+braços: A=file:reguas/regua-juiz-mudo.md · B=file:reguas/regua-boa.md
 runs por braço: 2 (abaixo do piso empírico da bancada, 4 — obs. 4.304: leitura como sinal, não como comparação) · modelo: default do executor · executor: fake-executor.sh
 
 ## Veredito por eixo (consultivo — 4.304)
 - deck-presente: A=PASS · B=PASS → empate (PASS nos dois)
-- eixo-um: A=VARIANCIA · B=PASS → HOLD (variância intra-braço)
-- sem-defeito: A=VARIANCIA · B=PASS → HOLD (variância intra-braço)
+- eixo-um: A=INVALIDO · B=PASS → HOLD (sem veredito válido — falha de infra/juiz, não variância)
+- sem-defeito: A=PASS · B=PASS → empate (PASS nos dois)
 
 ## Telemetria
 - custo: US$0.0440 (8 chamadas)
