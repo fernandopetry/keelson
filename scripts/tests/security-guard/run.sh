@@ -9,14 +9,17 @@
 #   2. run-state LEGADO em andamento → silêncio;
 #   3. run-state na casa da sessão (thoughts/local/sessions/*/ — 4.314) → silêncio;
 #   4. run-state de OUTRA sessão (4.252) → NÃO silencia, block;
-#   5–7. veredito no ledger (4.365): evento `gate` do security-engineer mais novo que
-#      todo arquivo sensível → silêncio; arquivo editado depois do veredito e veredito
-#      de outro gate → cutuca;
+#   5–7. veredito no ledger (4.365/4.378): evento `gate` do security-engineer com
+#      `diff_id:` igual à identidade atual → silêncio; conteúdo editado depois do
+#      veredito e veredito de outro gate → cutuca;
 #   8–12. contrato da identidade do diff (4.377 — marker = `diff-facts.sh --identity`):
 #      linha neutra alterada num arquivo sensível cutuca de novo mesmo com o mesmo
 #      tamanho · diff idêntico silencia · alteração fora dos sensitiveGlobs não reabre ·
 #      rename puro de arquivo com conteúdo sensível silencia, com e sem
-#      `diff.renames=false` (rename detection fixada).
+#      `diff.renames=false` (rename detection fixada);
+#   13–15. `diff_id:` do veredito (4.378): identidade igual cala mesmo com arquivo mais
+#      novo que o evento · identidade de outro estado cutuca · evento sem `diff_id:` cai
+#      no fallback por mtime.
 # Cada caso usa repo próprio (o anti-renudge de .git/ não vaza entre casos).
 #
 # Uso: scripts/tests/security-guard/run.sh
@@ -115,10 +118,10 @@ printf 'APROVADO — sem achado\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D
 roda "$D5" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 silencio "veredito-cobre-arvore"
 
-# 6. Arquivo sensível editado DEPOIS do veredito → cutuca de novo
+# 6. Conteúdo sensível editado DEPOIS do veredito → identidade muda → cutuca de novo (4.378)
 D6="$TMP/c6"; repo "$D6"
-ev="$(printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D6" append gate security-engineer meu-slug 2>/dev/null)"
-touch -t 202601010000 "$ev"
+printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D6" append gate security-engineer meu-slug >/dev/null 2>&1
+printf '<?php $senha = password_hash($outra, PASSWORD_ARGON2ID);\n' > "$D6/src/auth.php"
 roda "$D6" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 contem "pos-veredito/decision" '"decision": "block"'
 
@@ -171,6 +174,26 @@ roda "$D11" "$P"; silencio "rename-puro/config-renames-false-silencia"
 D12="$TMP/c12"; repo_base "$D12"
 ( cd "$D12" && git mv src/core/conf.php src/core/settings.php )
 roda "$D12" "$P"; silencio "rename-puro/silencia"
+
+# ---- diff_id do veredito (decisão 4.378) — casos 13–15 ----
+# 13. Identidade igual cala MESMO com arquivo mais novo que o evento (hash vence mtime)
+D13="$TMP/c13"; repo "$D13"
+ev="$(printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D13" append gate security-engineer meu-slug 2>/dev/null)"
+touch -t 202601010000 "$ev"; touch "$D13/src/auth.php"
+roda "$D13" "$P"; silencio "diffid/hash-vence-mtime"
+
+# 14. Identidade de OUTRO estado cutuca mesmo com arquivo mais velho que o evento
+D14="$TMP/c14"; repo "$D14"
+touch -t 202601010000 "$D14/src/auth.php"
+printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D14" append gate security-engineer meu-slug \
+  --diff-id 0123456789abcdef0123456789abcdef01234567 >/dev/null 2>&1
+roda "$D14" "$P"; contem "diffid/estado-alheio-cutuca" '"decision": "block"'
+
+# 15. Evento legado sem diff_id → fallback por mtime: evento mais novo que os arquivos cala
+D15="$TMP/c15"; repo "$D15"
+touch -t 202601010000 "$D15/src/auth.php"
+printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D15" append gate security-engineer meu-slug --diff-id none >/dev/null 2>&1
+roda "$D15" "$P"; silencio "diffid/legado-mtime-fallback"
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

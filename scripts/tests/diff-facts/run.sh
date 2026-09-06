@@ -8,7 +8,10 @@
 # ficha (conservadora: não-doc → config, que não é inerte) e o contrato do
 # `--identity` (4.377): estável · muda com o conteúdo · ordem da lista indiferente ·
 # untracked entra e muda · ausente difere · edição fora da lista não muda · base
-# movida muda · base que não resolve e repo sem HEAD degradam para `none` sem erro.
+# movida muda · base que não resolve e repo sem HEAD degradam para `none` sem erro;
+# e o `--guard review|security` (4.378): lista filtrada pela ficha (codePaths ·
+# sensitiveGlobs + manifestos), untracked marcado, rename_src, modo worktree sem base,
+# `scope none` sem codePaths e identidade igual à do `--identity` sobre a mesma lista.
 #
 # Uso: scripts/tests/diff-facts/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -219,6 +222,84 @@ hex40 identity-sem-head-hash "$h8"
 printf 'y\n' > "$R6/src/x.txt"
 h9="$(printf 'src/x.txt\n' | bash "$DF" --repo "$R6" --base HEAD --identity 2>/dev/null)"
 difere identity-sem-head-conteudo-muda "$h8" "$h9"
+
+# ---- --guard review|security: escopo + identidade do guard (decisão 4.378) ----
+T="$(printf '\t')"
+norm_guard() { sed -E "s/^(base|ref)${T}[0-9a-f]{40}$/\1${T}<sha>/; s/^identity${T}[0-9a-f]{40}$/identity${T}<hash>/"; }
+R7="$(newrepo guard)"
+mkdir -p "$R7/src/auth" "$R7/lib" "$R7/docs"
+cat > "$R7/keelson.config.json" <<'EOF'
+{ "codePaths": { "backend": ["src"] }, "sensitiveGlobs": ["src/auth/**"] }
+EOF
+printf 'a\n' > "$R7/src/a.php"; printf 'l\n' > "$R7/src/auth/login.php"; printf 'x\n' > "$R7/lib/x.php"; printf '{}\n' > "$R7/composer.json"
+seq 1 40 | sed 's/^/linha /' > "$R7/src/c.php"   # candidato a rename puro (conteúdo intacto)
+git -C "$R7" add -A && git -C "$R7" commit -qm base
+git -C "$R7" checkout -qb feat
+printf 'a2\n' > "$R7/src/a.php"           # código rastreado modificado
+printf 'novo\n' > "$R7/src/novo.php"      # código untracked
+printf 'l2\n' > "$R7/src/auth/login.php"  # sensível
+printf 'x2\n' > "$R7/lib/x.php"           # fora dos codePaths
+printf 'd\n' > "$R7/docs/leia.md"         # docs
+printf '{"x":1}\n' > "$R7/composer.json"  # manifesto de dependência fora dos globs
+
+got="$(bash "$DF" --repo "$R7" --guard review 2>/dev/null | norm_guard)"; st=$?
+assert guard-review 0 "base	<sha>
+ref	<sha>
+mode	branch
+file	src/a.php	tracked
+file	src/auth/login.php	tracked
+file	src/novo.php	untracked
+identity	<hash>" "$got" "$st"
+
+got="$(bash "$DF" --repo "$R7" --guard security 2>/dev/null | norm_guard)"; st=$?
+assert guard-security 0 "base	<sha>
+ref	<sha>
+mode	branch
+file	src/auth/login.php	tracked
+dep	composer.json
+identity	<hash>" "$got" "$st"
+
+# identidade do --guard == --identity sobre a mesma lista e a mesma base
+gid="$(bash "$DF" --repo "$R7" --guard review 2>/dev/null | awk -F'\t' '$1 == "identity" { print $2 }')"
+iid="$(printf 'src/a.php\nsrc/auth/login.php\nsrc/novo.php\n' | bash "$DF" --repo "$R7" --base main --identity 2>/dev/null)"
+same guard-identity-igual-ao-identity "$gid" "$iid"
+
+# rename puro: destino na lista, origem em rename_src (arquivo modificado + movido não é
+# rename para o git — similaridade abaixo de 50% — e por isso c.php nasce intacto)
+git -C "$R7" mv src/c.php src/d.php
+got="$(bash "$DF" --repo "$R7" --guard review 2>/dev/null | norm_guard | grep -E '^(file|rename_src)')"; st=$?
+assert guard-rename 0 "file	src/a.php	tracked
+file	src/auth/login.php	tracked
+file	src/d.php	tracked
+file	src/novo.php	untracked
+rename_src	src/c.php" "$got" "$st"
+
+# sem codePaths → scope none (review); security sem globs ainda vigia manifestos
+R8="$(newrepo guard-sem-escopo)"
+printf '{ "docsRoot": "docs" }\n' > "$R8/keelson.config.json"
+printf '{}\n' > "$R8/package.json"
+got="$(bash "$DF" --repo "$R8" --guard review 2>/dev/null)"; st=$?
+assert guard-review-scope-none 0 "scope	none" "$got" "$st"
+got="$(bash "$DF" --repo "$R8" --guard security 2>/dev/null | norm_guard | grep -E '^(file|dep)')"; st=$?
+assert guard-security-so-manifesto 0 "dep	package.json" "$got" "$st"
+
+# sem base (repo sem commit): modo worktree, ref HEAD, untracked, identidade com base none
+R9="$TMP/guard-worktree"; mkdir -p "$R9/src"
+git -C "$R9" init -q
+printf '{ "codePaths": { "backend": ["src"] } }\n' > "$R9/keelson.config.json"
+printf 'w\n' > "$R9/src/w.php"
+got="$(bash "$DF" --repo "$R9" --guard review 2>/dev/null | norm_guard)"; st=$?
+assert guard-worktree 0 "base	none
+ref	HEAD
+mode	worktree
+file	src/w.php	untracked
+identity	<hash>" "$got" "$st"
+
+total=$((total + 1))
+bash "$DF" --repo "$R7" --guard outro >/dev/null 2>&1
+st=$?
+if [ "$st" -eq 2 ]; then echo "ok   guard-escopo-invalido-exit-2"
+else echo "FAIL guard-escopo-invalido-exit-2: exit $st"; fail=$((fail + 1)); fi
 
 # ---- uso incorreto ----
 total=$((total + 1))

@@ -5,6 +5,7 @@
 # codePaths da ficha e as árvores de teste — este script É essa âncora.
 #
 # Uso: diff-facts.sh --base <ref> ( --inert | --compose | --deploy-pending <INDEX.md> | --identity )
+#      diff-facts.sh --guard <review|security> [--repo <dir>]
 #                    [--repo <dir>] [--code-paths <p1,p2,…>] [--docs-root <dir>]
 #                    [--deploy-dirs <seg1,seg2,…>] [--plugin-root <dir>]
 #
@@ -32,6 +33,17 @@
 #                     para `none` (repo sem commit), nunca erro. Leitores: os markers
 #                     anti-renudge do review-guard/security-guard (decisão 4.377).
 #                     Exit 0 · 2 uso incorreto. Ignora codePaths/ficha.
+#   --guard <g>       escopo e identidade do guard de Stop <g> = review|security (4.378):
+#                     base como os hooks (merge-base com main/master/origin/*; sem base,
+#                     working tree via git status), arquivos alterados + novos filtrados
+#                     pela ficha (review: codePaths; security: sensitiveGlobs + manifestos
+#                     de dependência, sempre) e a identidade desse conjunto. TSV:
+#                     `base <sha|none>` · `ref <ref-do-diff>` · `mode branch|worktree` ·
+#                     `file <path> tracked|untracked` · `rename_src <path>` · `dep <path>`
+#                     · `identity <hash>`; `scope none` quando a ficha não dá escopo
+#                     (review sem codePaths). DONO ÚNICO do escopo: review-guard,
+#                     security-guard e ledger.sh (`diff_id:`) consomem esta saída, nunca
+#                     re-derivam. --base é ignorado. Exit 0 · 2 uso incorreto.
 #
 #   Buckets: documentacao (docsRoot/**, *.md, assets estáticos) · teste (árvores e
 #   sufixos de teste) · migracao (segmentos migrations/migrate/seeds/seeders, ou
@@ -56,10 +68,65 @@ die2() { echo "ERRO: $*" >&2; exit 2; }
 usage() { sed -n '2,/^# Read-only/p' "$0" | sed 's/^# \{0,1\}//'; }
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
+FICHA_SH="$HERE/ficha.sh"
+
+# ---- funções de escopo (dono único — os hooks consomem a saída de --guard, 4.378) ----
+# path_has_prefix <prefixos-multilinha> <arquivo>: arquivo igual ou sob algum prefixo.
+path_has_prefix() {
+  local prefixes="$1" file="$2" p
+  while IFS= read -r p; do
+    [ -z "$p" ] && continue
+    p="${p%/}"
+    [ "$file" = "$p" ] && return 0
+    case "$file" in
+      "$p"/*) return 0 ;;
+    esac
+  done <<< "$prefixes"
+  return 1
+}
+# path_matches_any_glob <globs-multilinha> <arquivo>: casa contra os globs da ficha
+# (ex.: "src/**"); em `case`, `*` já casa `/`, então "src/**" pega tudo sob src.
+path_matches_any_glob() {
+  local globs="$1" file="$2" glob
+  while IFS= read -r glob; do
+    [ -z "$glob" ] && continue
+    # shellcheck disable=SC2254  # o glob vem da ficha e deve expandir como padrão
+    case "$file" in
+      $glob) return 0 ;;
+    esac
+  done <<< "$globs"
+  return 1
+}
+# Manifesto/lockfile de dependência é sensível por definição (gate 8) — dono doutrinário:
+# guidelines/core/SECURITY.md ("mudança de dependência"); aqui vive só a lista literal.
+DEP_MANIFESTS='composer\.json|composer\.lock|package\.json|package-lock\.json|pnpm-lock\.yaml|yarn\.lock|requirements\.txt|poetry\.lock|uv\.lock|go\.mod|go\.sum|Cargo\.toml|Cargo\.lock|Gemfile|Gemfile\.lock'
+
+# ---- identidade do diff (4.377): base + blob exato de cada arquivo → hash ----
+# $1 = ref da base (pode não resolver → none); stdin = caminhos (um por linha).
+# Conteúdo exato via hash-object, sem renderização de diff — imune à config de git.
+identidade() {
+  base_id="$(git -C "$REPO" rev-parse --verify --quiet "${1}^{commit}" 2>/dev/null || true)"
+  [ -n "$base_id" ] || base_id="none"
+  sed '/^[[:space:]]*$/d' | sort -u > "$TMPI/paths.txt"
+  {
+    printf 'base %s\n' "$base_id"
+    while IFS= read -r p; do
+      [ -n "$p" ] || continue
+      if [ -f "$REPO/$p" ]; then
+        h="$(git -C "$REPO" hash-object --no-filters -- "$p" 2>/dev/null || true)"
+        printf '%s %s\n' "${h:-unreadable}" "$p"
+      else
+        printf 'absent %s\n' "$p"
+      fi
+    done < "$TMPI/paths.txt"
+  } > "$TMPI/manifest.txt"
+  git -C "$REPO" hash-object --stdin < "$TMPI/manifest.txt"
+}
 
 REPO="$PWD"
 BASE=""
 MODE=""
+GUARD=""
 INDEXF=""
 CODEPATHS=""
 DOCSROOT=""
@@ -79,6 +146,11 @@ while [ $# -gt 0 ]; do
       MODE="deploy"; INDEXF="$1" ;;
     --identity)
       [ -z "$MODE" ] || die2 "use apenas um modo."; MODE="identity" ;;
+    --guard)
+      [ -z "$MODE" ] || die2 "use apenas um modo."
+      shift; [ $# -gt 0 ] || die2 "--guard exige review|security."
+      MODE="guard"; GUARD="$1"
+      case "$GUARD" in review|security) ;; *) die2 "--guard: escopo desconhecido: $GUARD (review|security)" ;; esac ;;
     --code-paths)  shift; [ $# -gt 0 ] || die2 "--code-paths exige lista separada por vírgula."; CODEPATHS="$1" ;;
     --docs-root)   shift; [ $# -gt 0 ] || die2 "--docs-root exige um diretório."; DOCSROOT="$1" ;;
     --deploy-dirs) shift; [ $# -gt 0 ] || die2 "--deploy-dirs exige lista separada por vírgula."; DEPLOYDIRS="$1" ;;
@@ -89,7 +161,9 @@ while [ $# -gt 0 ]; do
 done
 
 [ -n "$MODE" ] || { usage >&2; exit 2; }
-[ -n "$BASE" ] || die2 "--base é obrigatório."
+if [ "$MODE" != "guard" ]; then
+  [ -n "$BASE" ] || die2 "--base é obrigatório."
+fi
 [ -d "$REPO" ] || die2 "repo não existe: $REPO"
 command -v git >/dev/null 2>&1 || die2 "git indisponível."
 git -C "$REPO" rev-parse --git-dir >/dev/null 2>&1 || die2 "não é repositório git: $REPO"
@@ -98,24 +172,71 @@ git -C "$REPO" rev-parse --git-dir >/dev/null 2>&1 || die2 "não é repositório
 # Base que não resolve NÃO é erro neste modo: repo sem commit ou branch sem base
 # degrada para `none` — a identidade continua cobrindo o conteúdo dos arquivos.
 if [ "$MODE" = "identity" ]; then
-  base_id="$(git -C "$REPO" rev-parse --verify --quiet "${BASE}^{commit}" 2>/dev/null || true)"
-  [ -n "$base_id" ] || base_id="none"
   TMPI="$(mktemp -d)" || die2 "mktemp falhou."
   trap 'rm -rf "$TMPI"' EXIT
-  sed '/^[[:space:]]*$/d' | sort -u > "$TMPI/paths.txt"
-  {
-    printf 'base %s\n' "$base_id"
-    while IFS= read -r p; do
-      [ -n "$p" ] || continue
-      if [ -f "$REPO/$p" ]; then
-        h="$(git -C "$REPO" hash-object --no-filters -- "$p" 2>/dev/null || true)"
-        printf '%s %s\n' "${h:-unreadable}" "$p"
-      else
-        printf 'absent %s\n' "$p"
-      fi
-    done < "$TMPI/paths.txt"
-  } > "$TMPI/manifest.txt"
-  git -C "$REPO" hash-object --stdin < "$TMPI/manifest.txt" || die2 "hash-object falhou."
+  identidade "$BASE" || die2 "hash-object falhou."
+  exit 0
+fi
+
+# ---- --guard: escopo + identidade do guard de Stop (decisão 4.378) ----
+if [ "$MODE" = "guard" ]; then
+  TMPI="$(mktemp -d)" || die2 "mktemp falhou."
+  trap 'rm -rf "$TMPI"' EXIT
+  CP=""; SG=""
+  if [ -f "$REPO/keelson.config.json" ] && [ -f "$FICHA_SH" ]; then
+    case "$GUARD" in
+      review)   CP="$( { bash "$FICHA_SH" "$REPO" --get codePaths.backend; bash "$FICHA_SH" "$REPO" --get codePaths.frontend; } 2>/dev/null | sed '/^[[:space:]]*$/d' )" ;;
+      security) SG="$(bash "$FICHA_SH" "$REPO" --get sensitiveGlobs 2>/dev/null | sed '/^[[:space:]]*$/d')" ;;
+    esac
+  fi
+  if [ "$GUARD" = "review" ] && [ -z "$CP" ]; then
+    printf 'scope\tnone\n'
+    exit 0
+  fi
+  # base: merge-base com o primeiro candidato existente; sem base → working tree
+  gbase=""
+  for b in main master origin/main origin/master; do
+    if git -C "$REPO" rev-parse --verify -q "$b" >/dev/null 2>&1; then
+      gbase="$(git -C "$REPO" merge-base HEAD "$b" 2>/dev/null || true)"
+      [ -n "$gbase" ] && break
+    fi
+  done
+  rsrc=""
+  if [ -n "$gbase" ]; then
+    # rename detection fixada (-M, 4.377): destino na lista, origem em rename_src
+    ns="$(git -C "$REPO" -c core.quotePath=false diff --name-status -M "$gbase" 2>/dev/null || true)"
+    changed="$(printf '%s\n' "$ns" | awk -F'\t' 'NF >= 2 { print $NF }')"
+    rsrc="$(printf '%s\n' "$ns" | awk -F'\t' '$1 ~ /^[RC]/ && NF >= 3 { print $2 }')"
+    gref="$gbase"; gmode="branch"
+  else
+    changed="$(git -C "$REPO" -c core.quotePath=false status --porcelain -uall 2>/dev/null | sed -E 's/^.{2} //; s/^.* -> //' || true)"
+    gref="HEAD"; gmode="worktree"
+  fi
+  untracked="$(git -C "$REPO" -c core.quotePath=false ls-files --others --exclude-standard 2>/dev/null || true)"
+  changed="$(printf '%s\n%s\n' "$changed" "$untracked" | sed '/^$/d' | sort -u)"
+  files=""
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    case "$GUARD" in
+      review)   path_has_prefix "$CP" "$f" && files="${files}${f}"$'\n' ;;
+      security) [ -n "$SG" ] && path_matches_any_glob "$SG" "$f" && files="${files}${f}"$'\n' ;;
+    esac
+  done <<< "$changed"
+  files="$(printf '%s' "$files" | sed '/^$/d')"
+  deps=""
+  [ "$GUARD" = "security" ] && deps="$(printf '%s\n' "$changed" | grep -E "(^|/)(${DEP_MANIFESTS})$" || true)"
+  printf 'base\t%s\n' "${gbase:-none}"
+  printf 'ref\t%s\n' "$gref"
+  printf 'mode\t%s\n' "$gmode"
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    if printf '%s\n' "$untracked" | grep -Fxq -- "$f" 2>/dev/null; then fst="untracked"; else fst="tracked"; fi
+    printf 'file\t%s\t%s\n' "$f" "$fst"
+  done <<< "$files"
+  while IFS= read -r f; do [ -n "$f" ] || continue; printf 'rename_src\t%s\n' "$f"; done <<< "$rsrc"
+  while IFS= read -r f; do [ -n "$f" ] || continue; printf 'dep\t%s\n' "$f"; done <<< "$deps"
+  ident="$(printf '%s\n' "$files" "$deps" "$rsrc" | identidade "$gref")" || die2 "hash-object falhou."
+  printf 'identity\t%s\n' "$ident"
   exit 0
 fi
 
@@ -125,7 +246,6 @@ if [ "$MODE" = "deploy" ]; then
 fi
 
 # ---- codePaths e docsRoot: flag > ficha > degradação conservadora ----
-FICHA_SH="$HERE/ficha.sh"
 if [ -z "$CODEPATHS" ] && [ -f "$REPO/keelson.config.json" ] && [ -f "$FICHA_SH" ]; then
   cp_all="$( { bash "$FICHA_SH" "$REPO" --get codePaths.backend 2>/dev/null; \
                bash "$FICHA_SH" "$REPO" --get codePaths.frontend 2>/dev/null; } | tr '\n' ',' )"

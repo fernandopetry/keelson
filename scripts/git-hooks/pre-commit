@@ -307,8 +307,8 @@ run_suite() {
   fi
 }
 for par in "ficha:ficha diff-facts" "next-id:next-id" "index-check:index" \
-           "diff-facts:diff-facts" "artifact-lint:artifact-lint" \
-           "run-state:run-state" "ledger:ledger" \
+           "diff-facts:diff-facts review-guard security-guard ledger" "artifact-lint:artifact-lint" \
+           "run-state:run-state" "ledger:ledger review-guard security-guard" \
            "init-selfcheck:init-selfcheck" "probe-env:probe-env" \
            "epic-state:epic-state" "handoff-scan:handoff-scan" \
            "legacy-move:legacy-move" "postmortem-facts:postmortem-facts" \

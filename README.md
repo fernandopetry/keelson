@@ -420,18 +420,17 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.158.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.159.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the `review-guard` and `security-guard` stop hooks recognise a change by
-its content (decision 4.377) — one shared identity (`diff-facts.sh --identity`: base commit plus
-the exact content of every watched file) replaces fingerprints built from file names and line
-counts, rename detection is pinned so a pure rename counts 0 lines under any git config, and the
-review-guard stops offering the author's own checklist as a way to close gate 7. The eval runner
-refuses a round with no executions, tells a mute judge apart from variance, and takes the rule
-source from the case instead of assuming `commands/tasks.md`. An external review of 0.157.1
-reproduced the two defects. See `CHANGELOG.md`.
+New in this release: a verdict recorded in the session ledger now carries the identity of
+the diff it covered (decision 4.378) — `ledger.sh` measures `diff_id:` at the instant the
+`code-reviewer`/`security-engineer` gate event is written, over the exact scope the matching
+stop hook watches (`diff-facts.sh --guard`, the single owner of that scope), and the hooks
+compare identities instead of file dates: a verdict silences the reminder only while the tree
+is the state that was reviewed. Legacy events without the field fall back to the old mtime
+check. See `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

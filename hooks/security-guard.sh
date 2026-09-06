@@ -24,13 +24,15 @@
 # aviso em stderr e sai 0. `stop_hook_active` evita loop dentro do mesmo turno;
 # um marcador em .git/ evita re-cutucar em turnos seguintes enquanto a IDENTIDADE do
 # diff sensível for a mesma — base + conteúdo exato dos arquivos sensíveis e manifestos,
-# via `scripts/diff-facts.sh --identity` (4.377; antes: listas + linhas casadas pela
-# heurística, cegas a linha neutra alterada). A comparação é da branch inteira — sem o
+# medida por `scripts/diff-facts.sh --guard security` (4.377/4.378 — dono único do
+# escopo: base, lista filtrada por sensitiveGlobs + manifestos e identidade vêm dele;
+# antes: listas + linhas casadas pela heurística, cegas a linha neutra alterada). A comparação é da branch inteira — sem o
 # marcador, uma mudança sensível já commitada dispararia o bloqueio ao fim de todo turno.
 # Rename detection fixada (-M, origem no pathspec): rename puro não vira "+ arquivo inteiro".
 # E veredito do security-engineer já registrado no ledger da sessão (evento `gate`,
-# 4.76) mais novo que todo arquivo sensível alterado cala o hook (decisão 4.365 —
-# mesma forma do review-guard).
+# 4.76) cujo `diff_id:` — identidade medida pelo ledger.sh no registro (4.378) — é igual
+# à identidade atual cala o hook; evento sem `diff_id:` cai no mtime (4.365 — mesma
+# forma do review-guard).
 #
 # Natureza: a DETECÇÃO é heurística (padrão de conteúdo + path). Não prova que a
 # revisão rodou — cutuca para forçá-la.
@@ -82,9 +84,6 @@ done
 sec_gate="$(jq -r 'if .gates.security == false then "off" else "on" end' "$config" 2>/dev/null || echo on)"
 [ "$sec_gate" = "off" ] && exit 0
 
-# Globs sensíveis vindos da ficha. Sem eles ainda vigiamos dependências (abaixo).
-sensitive_globs="$(jq -r '.sensitiveGlobs[]?' "$config" 2>/dev/null || true)"
-
 # ledger.sh resolvido ANTES do cd (o $0 pode ser relativo); ausente → a consulta ao
 # veredito registrado (abaixo) é pulada e o hook se comporta como sempre.
 SCRIPTS_DIR="$(cd "$(dirname "$0")/../scripts" 2>/dev/null && pwd || true)"
@@ -94,66 +93,28 @@ DIFF_FACTS="$SCRIPTS_DIR/diff-facts.sh"
 
 cd "$proj" 2>/dev/null || exit 0
 
-# --- Determina a base da branch (o coração da melhoria) ---
-# merge-base com o primeiro candidato existente; se nenhum, fica vazio (fallback).
-base=""
-for b in main master origin/main origin/master; do
-  if git rev-parse --verify -q "$b" >/dev/null 2>&1; then
-    base="$(git merge-base HEAD "$b" 2>/dev/null || true)"
-    [ -n "$base" ] && break
-  fi
-done
-
+# --- Escopo e identidade pelo dono único (decisão 4.378) ---
+# diff-facts.sh --guard security detecta a base (merge-base com main/master/origin/*; sem
+# base, working tree), lista os arquivos alterados + novos, filtra pelos sensitiveGlobs da
+# ficha e pelos manifestos de dependência (sensíveis por definição, gate 8; rename
+# detection fixada, 4.377) e mede a identidade do conjunto — a mesma que o ledger.sh grava
+# no veredito (diff_id:). Script ausente → guarda desativada nesta execução (aviso).
+if [ ! -f "$DIFF_FACTS" ]; then
+  echo "security-guard: diff-facts.sh não encontrado; guarda de segurança desativada nesta execução." >&2
+  exit 0
+fi
+facts="$(bash "$DIFF_FACTS" --repo "$proj" --guard security 2>/dev/null || true)"
+diff_ref="$(printf '%s\n' "$facts" | awk -F'\t' '$1 == "ref" { print $2; exit }')"
+[ -n "$diff_ref" ] || exit 0
 base_note=""
-rename_src=""
-if [ -n "$base" ]; then
-  # Diff da branch: da base até o working tree (inclui commits da branch + não-commitado).
-  # Rename detection fixada (-M, 4.377): a lista traz o DESTINO do rename e `rename_src`
-  # guarda a origem, que entra no pathspec do diff de conteúdo — rename puro não aparece
-  # como arquivo novo inteiro em nenhuma config de `diff.renames`. quotePath=false: nome
-  # não-ASCII sai cru.
-  ns="$(git -c core.quotePath=false diff --name-status -M "$base" 2>/dev/null || true)"
-  changed="$(printf '%s\n' "$ns" | awk -F'\t' 'NF >= 2 { print $NF }')"
-  rename_src="$(printf '%s\n' "$ns" | awk -F'\t' '$1 ~ /^[RC]/ && NF >= 3 { print $2 }')"
-  diff_ref="$base"
-else
-  # Sem base determinável → comportamento antigo (working tree), registrado na mensagem.
-  changed="$(git status --porcelain -uall 2>/dev/null | sed -E 's/^.{2} //; s/^.* -> //' || true)"
-  diff_ref="HEAD"
+if [ "$(printf '%s\n' "$facts" | awk -F'\t' '$1 == "mode" { print $2; exit }')" = "worktree" ]; then
   base_note=$'\n\n(Observação: não foi possível determinar a base da branch (main/master). A detecção caiu no comportamento antigo — working tree via git status — em vez do diff da branch.)'
 fi
-
-# Arquivos novos (não rastreados) entram na análise nos dois modos.
-untracked_all="$(git ls-files --others --exclude-standard 2>/dev/null || true)"
-changed="$(printf '%s\n%s\n' "$changed" "$untracked_all" | sed '/^$/d' | sort -u)"
-[ -z "$changed" ] && exit 0
-
-# Manifesto/lockfile de dependência mudou? Sensível por definição (gate 8),
-# independente dos sensitiveGlobs.
-DEP_MANIFESTS='composer\.json|composer\.lock|package\.json|package-lock\.json|pnpm-lock\.yaml|yarn\.lock|requirements\.txt|poetry\.lock|uv\.lock|go\.mod|go\.sum|Cargo\.toml|Cargo\.lock|Gemfile|Gemfile\.lock'
-dep_changed="$(printf '%s\n' "$changed" | grep -E "(^|/)(${DEP_MANIFESTS})$" || true)"
-
-# path_matches_any_glob <globs-multilinha> <arquivo> — casa o path contra os globs
-# da ficha (ex.: "src/**"). Em `case`, `*` já casa `/`, então "src/**" pega tudo sob src.
-path_matches_any_glob() {
-  local globs="$1" file="$2" glob
-  while IFS= read -r glob; do
-    [ -z "$glob" ] && continue
-    # shellcheck disable=SC2254  # o glob vem da ficha e deve expandir como padrão
-    case "$file" in
-      $glob) return 0 ;;
-    esac
-  done <<< "$globs"
-  return 1
-}
-
-# Filtra os arquivos alterados pelos sensitiveGlobs.
-sensitive_files=""
-while IFS= read -r f; do
-  [ -z "$f" ] && continue
-  path_matches_any_glob "$sensitive_globs" "$f" && sensitive_files="${sensitive_files}${f}"$'\n'
-done <<< "$changed"
-sensitive_files="$(printf '%s' "$sensitive_files" | sed '/^$/d')"
+sensitive_files="$(printf '%s\n' "$facts" | awk -F'\t' '$1 == "file" { print $2 }')"
+untracked_files="$(printf '%s\n' "$facts" | awk -F'\t' '$1 == "file" && $3 == "untracked" { print $2 }')"
+rename_src="$(printf '%s\n' "$facts" | awk -F'\t' '$1 == "rename_src" { print $2 }')"
+dep_changed="$(printf '%s\n' "$facts" | awk -F'\t' '$1 == "dep" { print $2 }')"
+identity="$(printf '%s\n' "$facts" | awk -F'\t' '$1 == "identity" { print $2; exit }')"
 [ -z "$sensitive_files" ] && [ -z "$dep_changed" ] && exit 0
 
 # Padrões sensíveis — heurística multi-linguagem derivada das categorias de
@@ -191,7 +152,7 @@ fi
 unt_content=""
 while IFS= read -r f; do
   [ -z "$f" ] && continue
-  if printf '%s\n' "$untracked_all" | grep -Fxq -- "$f" 2>/dev/null; then
+  if printf '%s\n' "$untracked_files" | grep -Fxq -- "$f" 2>/dev/null; then
     [ -f "$f" ] && unt_content="${unt_content}$(cat "$f" 2>/dev/null)"$'\n'
   fi
 done <<< "$sensitive_files"
@@ -201,23 +162,29 @@ content_sensitive="$(printf '%s\n%s\n' "$added" "$unt_content" | grep -nEi "$PAT
 path_sensitive="$(printf '%s\n' "$sensitive_files" | grep -iE '(auth|login|security|permiss|role|password|token|session|upload|payment|crypto|sql|query)' || true)"
 
 if [ -n "$content_sensitive" ] || [ -n "$path_sensitive" ] || [ -n "$dep_changed" ]; then
-  # Veredito já registrado cobre a árvore (decisão 4.365): o security-engineer que revisou
-  # ESTE estado do diff deixou evento `gate` no ledger da sessão (4.76 — escrito pelo
-  # Tech Lead ao receber o report). Se nenhum arquivo sensível alterado é mais novo que o
-  # veredito mais recente, a revisão cobre o que está na árvore → silêncio. No modo sob
-  # demanda não há commit para ancorar o marcador (4.91) e o diff cumulativo cresce a cada
-  # correção: sem esta consulta, cada rodada genuína de re-review re-disparava a cutucada.
-  # Arquivo alterado que não existe mais no disco conta como mais novo (conservador).
-  # Sem ledger, sem evento do agent ou sem o script → comportamento de sempre.
+  # Veredito já registrado cobre a árvore (decisões 4.365/4.378): o security-engineer
+  # que revisou ESTE estado do diff deixou evento `gate` no ledger da sessão (4.76 —
+  # escrito pelo Tech Lead ao receber o report), e o ledger.sh gravou nele a identidade
+  # do diff vigiado (`diff_id:`) no instante do registro. Identidade igual à atual →
+  # silêncio; diferente → o revisor viu outro estado → cutuca (delta). Evento legado sem
+  # `diff_id:` → fallback por mtime (arquivo ausente conta como mais novo — conservador).
+  # No modo sob demanda não há commit para ancorar o marcador (4.91) e o diff cumulativo
+  # cresce a cada correção: sem esta consulta, cada rodada genuína de re-review
+  # re-disparava a cutucada. Sem ledger ou sem evento → comportamento de sempre.
   if [ -f "$LEDGER" ]; then
     verdict="$(KEELSON_SESSAO="$session_id" bash "$LEDGER" "$proj" last gate security-engineer 2>/dev/null || true)"
     if [ -n "$verdict" ] && [ -f "$verdict" ]; then
-      newer=0
-      while IFS= read -r f; do
-        [ -z "$f" ] && continue
-        if [ ! -e "$f" ] || [ "$f" -nt "$verdict" ]; then newer=1; break; fi
-      done <<< "$sensitive_files"
-      [ "$newer" -eq 0 ] && exit 0
+      vid="$(sed -n 's/^diff_id:[ 	]*//p' "$verdict" 2>/dev/null | sed -n 1p)"
+      if [ -n "$vid" ] && [ -n "$identity" ]; then
+        [ "$vid" = "$identity" ] && exit 0
+      else
+        newer=0
+        while IFS= read -r f; do
+          [ -z "$f" ] && continue
+          if [ ! -e "$f" ] || [ "$f" -nt "$verdict" ]; then newer=1; break; fi
+        done <<< "$sensitive_files"
+        [ "$newer" -eq 0 ] && exit 0
+      fi
     fi
   fi
   # Anti-renudge entre turnos: stop_hook_active só cobre o turno atual.
@@ -225,13 +192,11 @@ if [ -n "$content_sensitive" ] || [ -n "$path_sensitive" ] || [ -n "$dep_changed
   marker="" fingerprint=""
   if [ -n "$git_dir" ]; then
     marker="$git_dir/keelson-security-guard.last"
-    # Identidade do diff sensível (4.377): base + conteúdo exato dos arquivos sensíveis e
-    # dos manifestos — linha neutra alterada num arquivo sensível cutuca de novo; o marker
-    # guarda o último estado AVISADO, o ledger (acima) o último REVISADO. Script ausente →
-    # forma antiga (listas + linhas casadas).
-    if [ -f "$DIFF_FACTS" ]; then
-      fingerprint="$(printf '%s\n' "$sensitive_files" "$dep_changed" "$rename_src" | bash "$DIFF_FACTS" --identity --base "$diff_ref" --repo "$proj" 2>/dev/null || true)"
-    fi
+    # Identidade do diff sensível (4.377/4.378): base + conteúdo exato dos arquivos
+    # sensíveis e dos manifestos, medida pelo --guard acima — linha neutra alterada num
+    # arquivo sensível cutuca de novo; o marker guarda o último estado AVISADO, o ledger
+    # (acima) o último REVISADO. Identidade vazia → forma antiga (listas + linhas casadas).
+    fingerprint="$identity"
     [ -n "$fingerprint" ] || fingerprint="$(printf '%s\n%s\n%s\n%s' "$sensitive_files" "$content_sensitive" "$path_sensitive" "$dep_changed" | git hash-object --stdin 2>/dev/null || true)"
     if [ -n "$fingerprint" ] && [ -f "$marker" ] && [ "$(cat "$marker" 2>/dev/null)" = "$fingerprint" ]; then
       exit 0

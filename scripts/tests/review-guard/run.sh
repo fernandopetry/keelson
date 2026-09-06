@@ -13,10 +13,10 @@
 #   4. run-state de OUTRA sessão (4.252) → NÃO silencia, block;
 #   5. mudança trivial (abaixo do limiar) em repo sem HEAD → silêncio — o
 #      added_lines malformado fazia o teste do limiar errar e cutucar à toa;
-#   6–10. veredito no ledger (4.365): evento `gate` do code-reviewer mais novo que
-#      todo arquivo de código → silêncio; arquivo editado depois do veredito, veredito
-#      de outro gate, veredito de outra sessão e arquivo alterado ausente do disco →
-#      cutuca (conservador);
+#   6–10. veredito no ledger (4.365/4.378): evento `gate` do code-reviewer com `diff_id:`
+#      igual à identidade atual → silêncio; conteúdo editado depois do veredito, veredito
+#      de outro gate, veredito de outra sessão e arquivo de código removido depois do
+#      veredito → cutuca;
 #   11–12. warroom (4.372): marcador `warroom.meta` DESTA sessão cala o gate 7 (a dívida
 #      vai ao DEBT.md); marcador de outra sessão não cala;
 #   13–22. contrato da identidade do diff (4.377 — marker = `diff-facts.sh --identity`):
@@ -24,7 +24,10 @@
 #      untracked alterado cutuca (repo sem HEAD) · exclusão cutuca · rename puro silencia,
 #      com e sem `diff.renames=false` (rename detection fixada) · rename editado cutuca ·
 #      base movida reabre · alteração fora dos codePaths não reabre · mensagem sem a
-#      opção do checklist e com o revisor independente.
+#      opção do checklist e com o revisor independente;
+#   23–25. `diff_id:` do veredito (4.378): identidade igual cala MESMO com arquivo mais
+#      novo que o evento (hash vence mtime) · identidade de outro estado cutuca mesmo com
+#      arquivo mais velho · evento legado sem `diff_id:` cai no fallback por mtime.
 # Cada caso usa repo próprio (o anti-renudge de .git/ não vaza entre casos).
 #
 # Uso: scripts/tests/review-guard/run.sh
@@ -138,10 +141,10 @@ printf 'APROVADO — diff avulso\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$
 roda "$D6" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 silencio "veredito-cobre-arvore"
 
-# 7. Arquivo de código editado DEPOIS do veredito → cutuca de novo
+# 7. Conteúdo de código editado DEPOIS do veredito → identidade muda → cutuca de novo (4.378)
 D7="$TMP/c7"; repo "$D7"
-ev="$(printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D7" append gate code-reviewer meu-slug 2>/dev/null)"
-touch -t 202601010000 "$ev"
+printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D7" append gate code-reviewer meu-slug >/dev/null 2>&1
+seq 1 40 | sed 's/^/editada /' > "$D7/src/novo.php"
 roda "$D7" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 contem "pos-veredito/decision" '"decision": "block"'
 
@@ -159,12 +162,12 @@ printf 'APROVADO\n' | KEELSON_SESSAO=sessao-outra bash "$LEDGER" "$D9" append ga
 roda "$D9" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 contem "sessao-alheia/decision" '"decision": "block"'
 
-# 10. Arquivo alterado que não existe mais no disco conta como mais novo (conservador)
+# 10. Arquivo de código removido DEPOIS do veredito → o estado revisado não é o da árvore → cutuca
 D10="$TMP/c10"; repo "$D10"
 ( cd "$D10" && printf 'x;\n' > src/velho.php && git add src/velho.php \
-  && git -c user.email=t@t -c user.name=t commit -q -m base && git rm -q src/velho.php )
-touch -t 202601010000 "$D10/src/novo.php"
+  && git -c user.email=t@t -c user.name=t commit -q -m base )
 printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D10" append gate code-reviewer meu-slug >/dev/null 2>&1
+( cd "$D10" && git rm -q src/velho.php )
 roda "$D10" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\"}"
 contem "ausente/decision" '"decision": "block"'
 
@@ -269,6 +272,28 @@ D22="$TMP/c22"; repo "$D22"
 roda "$D22" "$P"
 nao_contem "mensagem/sem-checklist" 'aplique o checklist'
 contem "mensagem/code-reviewer" 'code-reviewer'
+
+# ---- diff_id do veredito (decisão 4.378) — casos 23–25 ----
+# 23. Veredito com identidade igual cala MESMO com arquivo mais novo que o evento (hash vence mtime)
+D23="$TMP/c23"; repo "$D23"
+ev="$(printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D23" append gate code-reviewer meu-slug 2>/dev/null)"
+touch -t 202601010000 "$ev"; touch "$D23/src/novo.php"
+roda "$D23" "$P"; silencio "diffid/hash-vence-mtime"
+grep -q '^diff_id: [0-9a-f]\{40\}$' "$ev" && { total=$((total + 1)); echo "ok   diffid/evento-medido"; } \
+  || { total=$((total + 1)); echo "FAIL diffid/evento-medido: sem diff_id em $ev"; fail=$((fail + 1)); }
+
+# 24. Veredito com identidade de OUTRO estado cutuca mesmo com arquivo mais velho que o evento
+D24="$TMP/c24"; repo "$D24"
+touch -t 202601010000 "$D24/src/novo.php"
+printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D24" append gate code-reviewer meu-slug \
+  --diff-id 0123456789abcdef0123456789abcdef01234567 >/dev/null 2>&1
+roda "$D24" "$P"; contem "diffid/estado-alheio-cutuca" '"decision": "block"'
+
+# 25. Evento legado sem diff_id → fallback por mtime: evento mais novo que os arquivos cala
+D25="$TMP/c25"; repo "$D25"
+touch -t 202601010000 "$D25/src/novo.php"
+printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D25" append gate code-reviewer meu-slug --diff-id none >/dev/null 2>&1
+roda "$D25" "$P"; silencio "diffid/legado-mtime-fallback"
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

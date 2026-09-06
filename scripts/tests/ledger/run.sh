@@ -9,7 +9,12 @@
 # (<casa>/ledger/, slug registrado no meta), agregação legado+casa em list/count
 # e archive arquivando cada casa dentro de si mesma. `last` (4.365): evento mais
 # recente do par tipo/origem entre casas, ativos e arquivados; `wave_sequencial`
-# aceito no catálogo (4.301 — o script recusava o tipo que a convenção lista).
+# aceito no catálogo (4.301 — o script recusava o tipo que a convenção lista);
+# `diff_id:` (4.378): evento gate de code-reviewer/security-engineer carrega a
+# identidade medida por diff-facts.sh --guard no instante do append (igual à que o
+# guard mede), outro gate não ganha a linha, --diff-id explícito substitui, `none`
+# suprime, e a linha vem depois de `ref:` (o corpo congelado do append-corpo — raiz sem
+# git — prova o caso "sem escopo → sem linha").
 #
 # Uso: scripts/tests/ledger/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -209,6 +214,63 @@ lg "$SID4" "$R4" last gate >/dev/null 2>&1
 total=$((total + 1))
 fw="$(printf 'recurso compartilhado: mesma tabela\n' | lg "" "$R4" append wave_sequencial tech-lead s --ts "2026-08-30T14:00:00-0300" 2>/dev/null)"
 if [ -f "$fw" ] && [ "$(basename "$fw")" = "20260830-140000-wave_sequencial-tech-lead.md" ]; then ok append-wave-sequencial; else falha "append-wave-sequencial: [$fw]"; fi
+
+# --- diff_id (4.378): evento gate de code-reviewer/security-engineer carrega a identidade ---
+DF="$HERE/../../diff-facts.sh"
+R5="$TMP/repo-diffid"; mkdir -p "$R5/src"
+( cd "$R5" && { git init -q -b main 2>/dev/null || { git init -q; git checkout -qb main; }; } )
+printf '{ "codePaths": { "backend": ["src"] }, "sensitiveGlobs": ["src/**"] }\n' > "$R5/keelson.config.json"
+printf 'a\n' > "$R5/src/a.php"
+( cd "$R5" && git add -A && git -c user.email=t@t -c user.name=t commit -q -m base && git checkout -qb feat )
+printf 'b\n' > "$R5/src/a.php"
+total=$((total + 1))
+f5="$(printf 'APROVADO\n' | lg "" "$R5" append gate code-reviewer s --ts "2026-09-06T10:00:00-0300" 2>/dev/null)"
+did="$(sed -n 's/^diff_id: //p' "$f5" 2>/dev/null)"
+case "$did" in
+  *[!0-9a-f]*|'') falha "diff-id-auto: [$did]" ;;
+  *) if [ ${#did} -eq 40 ]; then ok diff-id-auto; else falha "diff-id-auto: tamanho ${#did}"; fi ;;
+esac
+total=$((total + 1))
+now="$(bash "$DF" --repo "$R5" --guard review 2>/dev/null | awk -F'\t' '$1 == "identity" { print $2 }')"
+if [ -n "$now" ] && [ "$now" = "$did" ]; then ok diff-id-igual-ao-guard-review; else falha "diff-id-igual-ao-guard-review: [$did] vs [$now]"; fi
+total=$((total + 1))
+f6="$(printf 'APROVADO\n' | lg "" "$R5" append gate security-engineer s --ts "2026-09-06T10:00:01-0300" 2>/dev/null)"
+sid="$(sed -n 's/^diff_id: //p' "$f6" 2>/dev/null)"
+sec="$(bash "$DF" --repo "$R5" --guard security 2>/dev/null | awk -F'\t' '$1 == "identity" { print $2 }')"
+if [ -n "$sid" ] && [ "$sid" = "$sec" ]; then ok diff-id-igual-ao-guard-security; else falha "diff-id-igual-ao-guard-security: [$sid] vs [$sec]"; fi
+total=$((total + 1))
+f7="$(printf 'PASSOU\n' | lg "" "$R5" append gate qa s --ts "2026-09-06T10:00:02-0300" 2>/dev/null)"
+if grep -q '^diff_id:' "$f7" 2>/dev/null; then falha "diff-id-qa: gate de outro papel não ganha diff_id"; else ok diff-id-outro-gate-ausente; fi
+total=$((total + 1))
+f8="$(printf 'x\n' | lg "" "$R5" append gate code-reviewer s --ts "2026-09-06T10:00:03-0300" --diff-id deadbeef 2>/dev/null)"
+if [ "$(sed -n 's/^diff_id: //p' "$f8" 2>/dev/null)" = "deadbeef" ]; then ok diff-id-explicito; else falha "diff-id-explicito: $(cat "$f8" 2>/dev/null)"; fi
+total=$((total + 1))
+f9="$(printf 'x\n' | lg "" "$R5" append gate code-reviewer s --ts "2026-09-06T10:00:04-0300" --diff-id none 2>/dev/null)"
+if grep -q '^diff_id:' "$f9" 2>/dev/null; then falha "diff-id-none: linha devia estar suprimida"; else ok diff-id-none-suprime; fi
+total=$((total + 1))
+f10="$(printf 'x\n' | lg "" "$R5" append gate code-reviewer s --ts "2026-09-06T10:00:05-0300" --ref docs/x.md 2>/dev/null)"
+if [ "$(tail -2 "$f10" 2>/dev/null | head -1)" = "ref: docs/x.md" ] && tail -1 "$f10" 2>/dev/null | grep -q '^diff_id: '; then ok diff-id-apos-ref; else falha "diff-id-apos-ref: $(cat "$f10" 2>/dev/null)"; fi
+
+# diff_id: escrita de memória no stdin é descartada (mesma classe do ts:, 4.156)
+total=$((total + 1))
+f11="$(printf 'diff_id: 1111111111111111111111111111111111111111\ncorpo real\n' | lg "" "$R5" append gate qa s --ts "2026-09-06T10:00:06-0300" 2>/dev/null)"
+if grep -q '^diff_id:' "$f11" 2>/dev/null; then falha "diff-id-stdin-descartado: $(cat "$f11")"; else ok diff-id-stdin-descartado; fi
+# GIT_DIR herdado de contexto de hook não desvia a medição (diff-facts desarma as variáveis)
+total=$((total + 1))
+f12="$(printf 'x\n' | GIT_DIR=/nao/existe/.git GIT_WORK_TREE=/nao/existe lg "" "$R5" append gate code-reviewer s --ts "2026-09-06T10:00:07-0300" 2>/dev/null)"
+if [ "$(sed -n 's/^diff_id: //p' "$f12" 2>/dev/null)" = "$did" ]; then ok diff-id-imune-a-git-dir-herdado; else falha "diff-id-imune-a-git-dir-herdado: [$(sed -n 's/^diff_id: //p' "$f12" 2>/dev/null)] vs [$did]"; fi
+# raiz que é worktree vinculado → sem linha (a árvore medida tem de ser a principal)
+total=$((total + 1))
+WT="$TMP/wt-ledger"
+if git -C "$R5" worktree add -q "$WT" -b wt-branch >/dev/null 2>&1; then
+  printf '{ "codePaths": { "backend": ["src"] } }\n' > "$WT/keelson.config.json"
+  printf 'w\n' > "$WT/src/a.php"
+  f13="$(printf 'x\n' | lg "" "$WT" append gate code-reviewer s --ts "2026-09-06T10:00:08-0300" 2>/dev/null)"
+  if grep -q '^diff_id:' "$f13" 2>/dev/null; then falha "diff-id-worktree-sem-linha: $(cat "$f13")"; else ok diff-id-worktree-sem-linha; fi
+  git -C "$R5" worktree remove --force "$WT" >/dev/null 2>&1 || true
+else
+  echo "ok   diff-id-worktree-sem-linha (git worktree indisponível — pulado)"
+fi
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

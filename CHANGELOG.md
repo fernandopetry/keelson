@@ -23,6 +23,52 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.159.0] — 2026-09-06
+
+Re-init: none
+
+Decision 4.378 — the "verdict covers the tree" check of the two stop guards moves from file
+dates to content. Since 0.153.0 a `gate` verdict in the session ledger silenced the
+`review-guard`/`security-guard` reminder when no watched file was newer than the event —
+a proxy that a checkout, a stash, a `touch`, or an edit made in the same second as the
+verdict could fool in either direction. The event now records the identity of the diff the
+verdict covered, measured by the ledger itself, and the guards compare identities.
+
+### Added
+
+- **`scripts/diff-facts.sh --guard review|security`** — the single owner of what each stop
+  guard watches: detects the branch base (merge-base with `main`/`master`/`origin/*`, or the
+  working tree without one), lists changed and new files, filters them by the ficha
+  (`codePaths` for review; `sensitiveGlobs` plus dependency manifests for security, both
+  matched exactly as the hooks did — prefix for paths, shell glob for `sensitiveGlobs`) and
+  prints the set with its identity. The hooks consume this output instead of deriving the
+  scope themselves; `doc-guard` and `warroom.sh` keep their own derivation by declared cut.
+- **`diff_id:` in ledger gate events** — `ledger.sh append gate code-reviewer|security-engineer`
+  measures the identity of the matching guard's scope at the instant of the record and
+  writes it as a header line, the way it already owns `ts:` and `ref:`. Nothing changes in
+  the commands that write the event. `--diff-id <hash|none>` overrides (tests, legacy). The
+  line is never written empty: no ficha, no git, no scope, or a root that is a linked
+  worktree (the identity must be measured in the main tree, where the guard runs) means no
+  line. A `diff_id:` arriving through stdin is discarded like a hand-written `ts:`.
+
+### Changed
+
+- **`hooks/review-guard.sh` and `hooks/security-guard.sh`** — the recorded verdict silences
+  the reminder when its `diff_id:` equals the current identity, and reopens it when the tree
+  is any other state. Consequence, declared: the 4.365 clause "a changed file missing from
+  disk counts as newer" no longer applies to events that carry an identity — a deletion the
+  verdict already covered stays silent, a deletion made after it reopens. Events without
+  `diff_id:` keep the mtime comparison with that conservative clause. Suites: review-guard
+  33 → 37 checks, security-guard 16 → 19, ledger 26 → 36, diff-facts 28 → 36; the new suites
+  run against the mtime-based hooks fail exactly on "hash beats mtime", "foreign state" and
+  the same-second edit the old check could not see.
+- **`docs/_meta/conventions/sdd-conventions.md`** — the ledger event example and the
+  "header is the script's" paragraph now include `diff_id:`.
+- **Pre-commit** — a change to `diff-facts.sh` or `ledger.sh` now also runs the two guard
+  suites locally (they are its direct consumers; CI already ran them).
+- Consumers may see one extra reminder on the first stop after updating while the last
+  verdict in their ledger still lacks the field; it converges at the next verdict.
+
 ## [0.158.1] — 2026-09-06
 
 Re-init: none

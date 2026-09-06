@@ -5,6 +5,7 @@
 # medido, arquivamento seletivo); O QUE anotar e QUANDO continua sendo da doutrina.
 #
 # Uso: ledger.sh <raiz-do-repo> append <tipo> <origem> <slug> [--ref <caminho>] [--ts <iso>]
+#                                                             [--diff-id <hash|none>]
 #      ledger.sh <raiz-do-repo> list [--archived]
 #      ledger.sh <raiz-do-repo> count
 #      ledger.sh <raiz-do-repo> last <tipo> <origem>
@@ -19,13 +20,24 @@
 #            Timestamp medido (TZ=America/Sao_Paulo); --ts <iso> só para testes.
 #            A linha `ts:` do cabeçalho é DESTE script — linha `ts:` no início do
 #            stdin é descartada (4.156: ts estimado de memória não entra no evento).
+#            Evento `gate` de code-reviewer (escopo review) ou security-engineer
+#            (escopo security) ganha a linha `diff_id: <hash>` — identidade do diff que
+#            o guard correspondente vigia, MEDIDA aqui no instante do registro por
+#            `diff-facts.sh --guard <escopo>` (decisão 4.378); é o que o stop-guard
+#            compara com a identidade atual para saber se o veredito cobre a árvore.
+#            --diff-id explícito substitui a medição (`none` suprime a linha — só para
+#            testes/legado). Sem ficha, sem git, sem escopo ou raiz que é worktree
+#            vinculado (a árvore medida tem de ser a principal, onde o guard roda) →
+#            sem linha, sem erro. Linha `diff_id:` vinda pelo stdin é descartada como a
+#            `ts:` — o hash é medido, nunca escrito de memória.
 #            Colisão de segundo ganha sufixo -2, -3… Ecoa o caminho criado.
 #   list     eventos ativos (um por linha, ordenados); --archived lista os consumidos
 #   count    contagem de eventos ativos por tipo
 #   last     caminho do evento MAIS RECENTE do par tipo/origem — ativos e arquivados
 #            (reported-*/), casa da sessão e legado; vazio + exit 0 sem evento.
-#            Leitor: os stop-guards (review-guard/security-guard, 4.365) comparam o
-#            mtime dele com o dos arquivos alterados — "o veredito cobre a árvore?".
+#            Leitor: os stop-guards (review-guard/security-guard) comparam o `diff_id:`
+#            dele com a identidade atual do diff — "o veredito cobre a árvore?" (4.378);
+#            evento sem `diff_id:` cai na comparação por mtime (4.365).
 #   archive  move os ativos para reported-<yyyymmdd-hhmmss>/, preservando os --keep
 #            (evento que continua pendente permanece na pasta ativa)
 #
@@ -37,11 +49,14 @@
 # Bash 3.2-compatível, sem dependências novas.
 
 set -u
+# git herdado de contexto de hook aponta para OUTRO repo — neutralizar antes de qualquer git
+# (a checagem de árvore principal do diff_id, 4.378, é a única chamada direta daqui)
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_PREFIX
 LC_ALL=C
 export LC_ALL
 
 die2() { echo "ERRO: $*" >&2; exit 2; }
-usage() { sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,/^# Bash 3.2-compat/p' "$0" | sed 's/^# \{0,1\}//'; }
 
 ROOT="${1:-}"
 [ -n "$ROOT" ] || { usage >&2; exit 2; }
@@ -56,6 +71,7 @@ shift
 # falhando, degrada para o caminho legado. LDIRS lista as casas de leitura
 # (legado primeiro quando as duas existem como conceitos distintos).
 SDS="$(cd "$(dirname "$0")" && pwd)/session-dir.sh"
+DF="$(cd "$(dirname "$0")" && pwd)/diff-facts.sh"
 LDIR_LEG="$ROOT/thoughts/local/session-ledger"
 LDIR="$LDIR_LEG"
 if [ -f "$SDS" ]; then
@@ -93,15 +109,31 @@ case "$ACTION" in
       *) die2 "tipo fora do catálogo fechado (4.76/4.244/4.301): $TIPO — use gate, decisao, intervencao, fora_de_escopo, pendencia, tracker, marco ou wave_sequencial" ;;
     esac
     case "$ORIGEM" in */*|*" "*) die2 "origem inválida (sem espaço/barra): $ORIGEM" ;; esac
-    REF=""; TS=""
+    REF=""; TS=""; DIFFID=""; DIFFID_SET=0
     while [ $# -gt 0 ]; do
       case "$1" in
         --ref) shift; [ $# -gt 0 ] || die2 "--ref exige um caminho."; REF="$1" ;;
         --ts)  shift; [ $# -gt 0 ] || die2 "--ts exige um ISO 8601."; TS="$1" ;;
+        --diff-id) shift; [ $# -gt 0 ] || die2 "--diff-id exige um hash (ou none)."; DIFFID="$1"; DIFFID_SET=1 ;;
         *) die2 "opção desconhecida: $1" ;;
       esac
       shift
     done
+    # diff_id (4.378): veredito de gate com guard de Stop correspondente carrega a
+    # identidade do diff vigiado, medida AGORA pelo dono único do escopo — nunca
+    # estimada nem passada de memória pela doutrina (mesma régua do ts:, 4.156).
+    if [ "$TIPO" = "gate" ] && [ "$DIFFID_SET" -eq 0 ]; then
+      scope=""
+      case "$ORIGEM" in code-reviewer) scope="review" ;; security-engineer) scope="security" ;; esac
+      # só na árvore principal: num worktree vinculado --git-dir ≠ --git-common-dir, e a
+      # identidade medida lá nunca casaria com a do guard (que roda na raiz do projeto)
+      gd="$(git -C "$ROOT" rev-parse --git-dir 2>/dev/null || true)"
+      gcd="$(git -C "$ROOT" rev-parse --git-common-dir 2>/dev/null || true)"
+      if [ -n "$scope" ] && [ -f "$DF" ] && [ -n "$gd" ] && [ "$gd" = "$gcd" ]; then
+        DIFFID="$(bash "$DF" --repo "$ROOT" --guard "$scope" 2>/dev/null | awk -F'\t' '$1 == "identity" { print $2; exit }' || true)"
+      fi
+    fi
+    [ "$DIFFID" = "none" ] && DIFFID=""
     pair="$(stamp "$TS")" || exit 2
     compact="${pair%%	*}"; iso="${pair##*	}"
     # escrita é sempre na casa resolvida com --create (registra o slug no meta)
@@ -117,14 +149,17 @@ case "$ACTION" in
       f="$base-$n.md"
     done
     corpo="$(cat)"
-    # cabeçalho é do script: linha ts: duplicada no stdin (formato pré-4.151) sai
+    # cabeçalho é do script: linha ts: duplicada no stdin (formato pré-4.151) sai, e
+    # diff_id: escrita de memória também (4.378 — o hash é medido, nunca declarado)
     case "$corpo" in
       "ts: "*|"ts:"*) corpo="$(printf '%s\n' "$corpo" | sed 1d)" ;;
     esac
+    corpo="$(printf '%s\n' "$corpo" | sed '/^diff_id:/d')"
     {
       printf 'ts: %s · tipo: %s · origem: %s · slug: %s\n' "$iso" "$TIPO" "$ORIGEM" "$SLUG"
       if [ -n "$corpo" ]; then printf '%s\n' "$corpo"; fi
       if [ -n "$REF" ]; then printf 'ref: %s\n' "$REF"; fi
+      if [ -n "$DIFFID" ]; then printf 'diff_id: %s\n' "$DIFFID"; fi
     } > "$f" || die2 "não consegui escrever $f"
     printf '%s\n' "$f"
     exit 0 ;;

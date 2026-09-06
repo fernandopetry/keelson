@@ -23,13 +23,15 @@
 # Fallback gracioso: sem `jq` ou sem a ficha, o hook NÃO trava o fluxo — emite
 # aviso em stderr e sai 0. `stop_hook_active` evita loop dentro do mesmo turno;
 # um marcador em .git/ evita re-cutucar em turnos seguintes enquanto a IDENTIDADE do
-# diff de código for a mesma — base + conteúdo exato de cada arquivo, via
-# `scripts/diff-facts.sh --identity` (4.377): tamanho igual com conteúdo diferente
+# diff de código for a mesma — base + conteúdo exato de cada arquivo, medida por
+# `scripts/diff-facts.sh --guard review` (4.377/4.378 — dono único do escopo: a base, a
+# lista de arquivos sob os codePaths e a identidade vêm dele): tamanho igual com conteúdo diferente
 # cutuca de novo; mudança fora dos codePaths não reabre. O marker guarda o último estado
 # AVISADO; o ledger (abaixo) guarda o último estado REVISADO — cutucar nunca equivale a
 # registrar revisão. E veredito do code-reviewer já registrado no ledger da sessão
-# (evento `gate`, 4.76) mais novo que todo arquivo de código alterado cala o hook
-# (decisão 4.365): no modo sob demanda o commit é do Diretor e o diff cumulativo
+# (evento `gate`, 4.76) cujo `diff_id:` — identidade do diff medida pelo ledger.sh no
+# registro (4.378) — é igual à identidade atual cala o hook; evento sem `diff_id:` cai
+# na comparação por mtime (decisão 4.365): no modo sob demanda o commit é do Diretor e o diff cumulativo
 # cresce a cada correção — sem essa consulta, cada re-review genuíno re-disparava.
 #
 # Natureza: a DETECÇÃO é determinística (diff acima do limiar). Não prova que a
@@ -115,59 +117,27 @@ DIFF_FACTS="$SCRIPTS_DIR/diff-facts.sh"
 
 cd "$proj" 2>/dev/null || exit 0
 
-# --- Determina a base da branch (mesmo mecanismo do security-guard) ---
-base=""
-for b in main master origin/main origin/master; do
-  if git rev-parse --verify -q "$b" >/dev/null 2>&1; then
-    base="$(git merge-base HEAD "$b" 2>/dev/null || true)"
-    [ -n "$base" ] && break
-  fi
-done
-
+# --- Escopo e identidade pelo dono único (decisão 4.378) ---
+# diff-facts.sh --guard review detecta a base (merge-base com main/master/origin/*; sem
+# base, working tree), lista os arquivos alterados + novos, filtra pelos codePaths da
+# ficha (rename detection fixada, 4.377) e mede a identidade do conjunto — a mesma que o
+# ledger.sh grava no veredito (diff_id:). Script ausente → guarda desativada nesta
+# execução (aviso), nunca trava o fluxo.
+if [ ! -f "$DIFF_FACTS" ]; then
+  echo "review-guard: diff-facts.sh não encontrado; guarda de code review desativada nesta execução." >&2
+  exit 0
+fi
+facts="$(bash "$DIFF_FACTS" --repo "$proj" --guard review 2>/dev/null || true)"
+diff_ref="$(printf '%s\n' "$facts" | awk -F'\t' '$1 == "ref" { print $2; exit }')"
+[ -n "$diff_ref" ] || exit 0
 base_note=""
-rename_src=""
-if [ -n "$base" ]; then
-  # Rename detection fixada (-M, 4.377): a lista traz o DESTINO do rename e `rename_src`
-  # guarda a origem — ela entra no pathspec do numstat para o git ver o rename (0 linhas
-  # num rename puro) em vez de um arquivo novo inteiro; sem isso a contagem dependia de
-  # `diff.renames` do usuário e do pathspec. quotePath=false: nome não-ASCII sai cru.
-  ns="$(git -c core.quotePath=false diff --name-status -M "$base" 2>/dev/null || true)"
-  changed="$(printf '%s\n' "$ns" | awk -F'\t' 'NF >= 2 { print $NF }')"
-  rename_src="$(printf '%s\n' "$ns" | awk -F'\t' '$1 ~ /^[RC]/ && NF >= 3 { print $2 }')"
-  diff_ref="$base"
-else
-  changed="$(git status --porcelain -uall 2>/dev/null | sed -E 's/^.{2} //; s/^.* -> //' || true)"
-  diff_ref="HEAD"
+if [ "$(printf '%s\n' "$facts" | awk -F'\t' '$1 == "mode" { print $2; exit }')" = "worktree" ]; then
   base_note=$'\n\n(Observação: não foi possível determinar a base da branch (main/master). A detecção caiu no working tree — git status — em vez do diff da branch.)'
 fi
-
-# Arquivos novos (não rastreados) entram na análise nos dois modos.
-untracked_all="$(git ls-files --others --exclude-standard 2>/dev/null || true)"
-changed="$(printf '%s\n%s\n' "$changed" "$untracked_all" | sed '/^$/d' | sort -u)"
-[ -z "$changed" ] && exit 0
-
-# path_has_prefix <lista-de-prefixos-multilinha> <arquivo> — true se o arquivo
-# está sob algum dos prefixos (igual a ele ou dentro dele).
-path_has_prefix() {
-  local prefixes="$1" file="$2" p
-  while IFS= read -r p; do
-    [ -z "$p" ] && continue
-    p="${p%/}"
-    [ "$file" = "$p" ] && return 0
-    case "$file" in
-      "$p"/*) return 0 ;;
-    esac
-  done <<< "$prefixes"
-  return 1
-}
-
-# Filtra os arquivos alterados pelos codePaths.
-code_files=""
-while IFS= read -r f; do
-  [ -z "$f" ] && continue
-  path_has_prefix "$code_paths" "$f" && code_files="${code_files}${f}"$'\n'
-done <<< "$changed"
-code_files="$(printf '%s' "$code_files" | sed '/^$/d')"
+code_files="$(printf '%s\n' "$facts" | awk -F'\t' '$1 == "file" { print $2 }')"
+untracked_files="$(printf '%s\n' "$facts" | awk -F'\t' '$1 == "file" && $3 == "untracked" { print $2 }')"
+rename_src="$(printf '%s\n' "$facts" | awk -F'\t' '$1 == "rename_src" { print $2 }')"
+identity="$(printf '%s\n' "$facts" | awk -F'\t' '$1 == "identity" { print $2; exit }')"
 [ -z "$code_files" ] && exit 0
 
 # --- Mede o tamanho da mudança (arquivos + linhas adicionadas) ---
@@ -196,7 +166,7 @@ fi
 # Arquivos novos (não rastreados) não aparecem no diff — conta as linhas deles.
 while IFS= read -r f; do
   [ -z "$f" ] && continue
-  if printf '%s\n' "$untracked_all" | grep -Fxq -- "$f" 2>/dev/null; then
+  if printf '%s\n' "$untracked_files" | grep -Fxq -- "$f" 2>/dev/null; then
     [ -f "$f" ] && added_lines=$(( added_lines + $(wc -l < "$f" 2>/dev/null || echo 0) ))
   fi
 done <<< "$code_files"
@@ -206,23 +176,30 @@ if [ "$file_count" -lt "$th_files" ] && [ "$added_lines" -lt "$th_lines" ]; then
   exit 0
 fi
 
-# Veredito já registrado cobre a árvore (decisão 4.365): o code-reviewer que revisou
-# ESTE estado do diff deixou evento `gate` no ledger da sessão (4.76 — escrito pelo
-# Tech Lead ao receber o report). Se nenhum arquivo de código alterado é mais novo que o
-# veredito mais recente, a revisão cobre o que está na árvore → silêncio. No modo sob
-# demanda não há commit para ancorar o marcador (4.91) e o diff cumulativo cresce a cada
-# correção: sem esta consulta, cada rodada genuína de re-review re-disparava a cutucada.
-# Arquivo alterado que não existe mais no disco conta como mais novo (conservador).
-# Sem ledger, sem evento do agent ou sem o script → comportamento de sempre.
+# Veredito já registrado cobre a árvore (decisões 4.365/4.378): o code-reviewer que
+# revisou ESTE estado do diff deixou evento `gate` no ledger da sessão (4.76 — escrito
+# pelo Tech Lead ao receber o report), e o ledger.sh gravou nele a identidade do diff
+# vigiado (`diff_id:`) no instante do registro. Identidade igual à atual → a revisão
+# cobre o que está na árvore → silêncio; diferente → o revisor viu outro estado → cutuca
+# (re-verificação sobre o delta). Evento legado sem `diff_id:` → fallback por mtime:
+# nenhum arquivo de código mais novo que o veredito, arquivo ausente conta como mais novo
+# (conservador). No modo sob demanda não há commit para ancorar o marcador (4.91) e o
+# diff cumulativo cresce a cada correção: sem esta consulta, cada rodada genuína de
+# re-review re-disparava a cutucada. Sem ledger ou sem evento → comportamento de sempre.
 if [ -f "$LEDGER" ]; then
   verdict="$(KEELSON_SESSAO="$session_id" bash "$LEDGER" "$proj" last gate code-reviewer 2>/dev/null || true)"
   if [ -n "$verdict" ] && [ -f "$verdict" ]; then
-    newer=0
-    while IFS= read -r f; do
-      [ -z "$f" ] && continue
-      if [ ! -e "$f" ] || [ "$f" -nt "$verdict" ]; then newer=1; break; fi
-    done <<< "$code_files"
-    [ "$newer" -eq 0 ] && exit 0
+    vid="$(sed -n 's/^diff_id:[ 	]*//p' "$verdict" 2>/dev/null | sed -n 1p)"
+    if [ -n "$vid" ] && [ -n "$identity" ]; then
+      [ "$vid" = "$identity" ] && exit 0
+    else
+      newer=0
+      while IFS= read -r f; do
+        [ -z "$f" ] && continue
+        if [ ! -e "$f" ] || [ "$f" -nt "$verdict" ]; then newer=1; break; fi
+      done <<< "$code_files"
+      [ "$newer" -eq 0 ] && exit 0
+    fi
   fi
 fi
 
@@ -231,12 +208,11 @@ git_dir="$(git rev-parse --absolute-git-dir 2>/dev/null || true)"
 marker="" fingerprint=""
 if [ -n "$git_dir" ]; then
   marker="$git_dir/keelson-review-guard.last"
-  # Identidade do diff (4.377): base + conteúdo exato dos arquivos de código (rastreados,
-  # novos ou ausentes) — o mesmo estado nunca cutuca duas vezes, estado novo cutuca de
-  # novo mesmo com tamanho igual. Script ausente → forma antiga (lista + contagens).
-  if [ -f "$DIFF_FACTS" ]; then
-    fingerprint="$(printf '%s\n' "$code_files" "$rename_src" | bash "$DIFF_FACTS" --identity --base "$diff_ref" --repo "$proj" 2>/dev/null || true)"
-  fi
+  # Identidade do diff (4.377/4.378): base + conteúdo exato dos arquivos de código
+  # (rastreados, novos ou ausentes), medida pelo --guard acima — o mesmo estado nunca
+  # cutuca duas vezes, estado novo cutuca de novo mesmo com tamanho igual. Identidade
+  # vazia → forma antiga (lista + contagens).
+  fingerprint="$identity"
   [ -n "$fingerprint" ] || fingerprint="$(printf '%s\n%s\n%s' "$code_files" "$file_count" "$added_lines" | git hash-object --stdin 2>/dev/null || true)"
   if [ -n "$fingerprint" ] && [ -f "$marker" ] && [ "$(cat "$marker" 2>/dev/null)" = "$fingerprint" ]; then
     exit 0
