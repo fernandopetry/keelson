@@ -198,13 +198,13 @@ O transitório do keelson vive sob `thoughts/local/`, na casa da sessão `though
 
 **Cobertura se verifica, não se infere** (decisão 4.51): não conclua que o `artifactsDir` está ignorado porque existe uma linha `thoughts/` — o projeto pode versionar parte de `thoughts/` de propósito (um consumidor real versiona `thoughts/shared/`). Prove com `git check-ignore -v <artifactsDir>/x.png`; sem cobertura, acrescente a linha do caminho exato.
 
-## Etapa 5.7 — Garantir um `AGENTS.md` apontando para o `CLAUDE.md` (decisão 4.374)
-
-Ferramentas de agente que não conhecem o `CLAUDE.md` — Codex CLI/GPT, Cursor, Amp e outras que seguem a convenção [agents.md](https://agents.md) — procuram um `AGENTS.md` na raiz. **Só se o arquivo estiver ausente**, crie-o a partir de `${CLAUDE_PLUGIN_ROOT}/templates/AGENTS.keelson.md`: um ponteiro puro para o `CLAUDE.md` do projeto, sem repetir nenhuma regra (mesmo princípio "um dono por regra" do `CLAUDE.md` do próprio keelson). **Se já existir** — de qualquer origem, inclusive conteúdo próprio de outra ferramenta —, **não toque**: este arquivo não tem marcadores como o bloco da Etapa 5, então não há como inserir sem risco de apagar instrução alheia. Registre no relatório que o projeto já tem `AGENTS.md` próprio e sugira, como nota, acrescentar à mão um ponteiro para o `CLAUDE.md` se ainda não houver um.
-
 Com `method: skill:screen-verify`, garanta **também** a linha `.playwright-mcp/`: é o diretório de saída **default** do servidor, usado sempre que o `--output-dir` estiver ausente ou divergente — e screenshot de sessão autenticada não pode ficar a um `git add .` de distância do repositório. **Atenção**: só o `keelson.local.json` fica de fora; o `keelson.local.example.json` **é versionado** (não o adicione ao `.gitignore`).
 
 Com `quality.e2e` preenchido (decisão 4.166), garanta a cobertura dos artefatos de execução do runner: no setup guiado (`/keelson:e2e-setup`) eles consolidam em `thoughts/e2e/` (decisão 4.168) — já sob a linha `thoughts/`, prove com `check-ignore`; config própria do projeto nos defaults do Playwright → linhas `test-results/` e `playwright-report/` (e o diretório do `storageState`, se houver). Os **specs** são código versionado; screenshot, trace e report de execução são transitórios e não entram no git.
+
+## Etapa 5.7 — Garantir um `AGENTS.md` apontando para o `CLAUDE.md` (decisão 4.374)
+
+Ferramentas de agente que não conhecem o `CLAUDE.md` — Codex CLI/GPT, Cursor, Amp e outras que seguem a convenção [agents.md](https://agents.md) — procuram um `AGENTS.md` na raiz. **Só se o arquivo estiver ausente**, crie-o a partir de `${CLAUDE_PLUGIN_ROOT}/templates/AGENTS.keelson.md`: um ponteiro puro para o `CLAUDE.md` do projeto, sem repetir nenhuma regra (mesmo princípio "um dono por regra" do `CLAUDE.md` do próprio keelson). **Se já existir** — de qualquer origem, inclusive conteúdo próprio de outra ferramenta —, **não toque**: este arquivo não tem marcadores como o bloco da Etapa 5, então não há como inserir sem risco de apagar instrução alheia. Registre no relatório que o projeto já tem `AGENTS.md` próprio e sugira, como nota, acrescentar à mão um ponteiro para o `CLAUDE.md` se ainda não houver um.
 
 ## Etapa 6 — Self-check (falsificável, não confie na configuração)
 
@@ -218,7 +218,8 @@ campos mínimos do Jira, validade do bloco `models` (chave existe no elenco de a
 do pacote, alias conhecido) e o bloco injetado do `CLAUDE.md` **byte-a-byte** contra o
 template do pacote (item `claude-block-sincronizado` — divergência, marcadores ausentes
 ou arquivo ausente são `falha`, nunca aviso: "o bloco existe" não é "o bloco está
-atualizado", decisão 4.373). Cada linha `falha`/`aviso` vira item do relatório. Exceção com
+atualizado", decisão 4.373) e a presença do `AGENTS.md` ponteiro (item `agents-presente`,
+ausente é `aviso`, decisão 4.374). Cada linha `falha`/`aviso` vira item do relatório. Exceção com
 reparo imediato: `falha` em `hooks-executaveis` (hook sem `+x` falha em **silêncio** a
 cada disparo — decisão 4.180) → aplique o `chmod +x` que a linha indica no cache do
 plugin, declare no relatório que o reparo local **evapora no próximo update** e
