@@ -64,6 +64,19 @@ refresh do marketplace falhar (seguir com cache velho reportaria "já atualizado
 > **O update não vale para a sessão corrente.** A CLI exige reiniciar a sessão do Claude
 > Code para carregar a versão nova.
 
+## Qual versão está rodando?
+
+```
+/keelson:version
+```
+
+Mostra a versão que **esta sessão** carregou e de onde ela veio, a versão que a CLI diz
+ter instalado (por scope) e a última versão conhecida no cache do marketplace — e termina
+dizendo o que fazer, se houver algo: reiniciar a sessão (você atualizou e ainda não
+reiniciou), rodar `/keelson:update` (há versão mais nova conhecida) ou atualizar pelo
+próprio app (a sessão carregou uma cópia que o update da CLI não alcança — é o caso do
+Claude Desktop, que tem loja de plugins própria). Não acessa a rede e não muda nada.
+
 ## Depois de atualizar: re-rodar o `init`
 
 Algumas versões mudam o bloco injetado no `CLAUDE.md` ou acrescentam campos na ficha.

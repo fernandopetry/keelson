@@ -21,6 +21,12 @@ Esperado: **o update não vale para a sessão corrente**. Reinicie a sessão.
 E lembre que são dois passos — atualizar o marketplace sozinho não atualiza o plugin
 instalado. `/keelson:update` faz os dois na ordem certa.
 
+Ainda antigo depois de reiniciar? Rode `/keelson:version`: ele mostra a versão que a
+sessão **realmente carregou** e de onde. Se a origem for a **loja própria do Claude
+Desktop**, o `/keelson:update` não alcança essa cópia — ele atualiza a loja da CLI
+(`~/.claude/plugins`), e o app carrega o plugin de outro lugar. Atualize pelo gerenciador
+de plugins do próprio app (re-sync do marketplace) e reabra a sessão.
+
 ### O comando reclama que não achou a ficha
 
 Você está fora da raiz do repositório, ou o projeto ainda não foi configurado. Rode

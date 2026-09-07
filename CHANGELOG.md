@@ -23,6 +23,30 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.161.0] — 2026-09-06
+
+Re-init: none
+
+Decision 4.381 — a session can be running a keelson that is not the one the CLI says is
+installed: an update applied without a restart, or a copy loaded from outside the CLI store
+(the Claude Desktop app keeps its own plugin store — a real case had it frozen at an old
+version for weeks while `/keelson:update` reported "already up to date"). Nothing told the
+two apart.
+
+### Added
+
+- **`/keelson:version`** — shows the keelson version this session actually loaded (read
+  from the `plugin.json` of the loaded root, with the Quality Charter version), classifies
+  where that tree came from (CLI cache · development checkout · Claude Desktop's own store ·
+  outside the CLI store), lists the CLI's install record per scope marking the one that
+  points at this tree, and compares with the marketplace's local cache — the last *known*
+  version, never "the latest published" (no network). Ends with a one-line verdict and the
+  action: restart the session, `/keelson:update`, or update through the app that loaded the
+  copy. A missing or unreadable source is named as such and the verdict degrades instead of
+  asserting. Model-invocable, read-only. Engine: `scripts/version.sh` (jq when available,
+  sed/awk fallback); suite `scripts/tests/version/run.sh` (51 assertions) wired into the
+  pre-commit and the CI.
+
 ## [0.160.1] — 2026-09-06
 
 Re-init: none

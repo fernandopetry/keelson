@@ -104,6 +104,9 @@ jobs:
       - name: Suíte da camada de release (scripts/tests/release/run.sh)
         run: bash scripts/tests/release/run.sh
 
+      - name: Suíte do version.sh (scripts/tests/version/run.sh)
+        run: bash scripts/tests/version/run.sh
+
       - name: Suíte do stale-background-guard (scripts/tests/stale-bg/run.sh)
         run: bash scripts/tests/stale-bg/run.sh
 

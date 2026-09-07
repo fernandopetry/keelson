@@ -325,6 +325,13 @@ Pelo relatório de fecho, que é montado a partir de um **ledger** escrito enqua
 eventos acontecem — não de memória no fim. Gate sem evento registrado **não** vira
 "aprovado": vira lacuna nomeada. Perdeu o relatório? `/keelson:report [slug]`.
 
+### Qual versão do keelson está rodando?
+
+`/keelson:version`. Ele lê a versão da árvore que a sessão **carregou** — não a que a CLI
+diz ter instalado; as duas divergem quando você atualizou sem reiniciar, ou quando o app
+carrega o plugin de uma loja própria, como o Claude Desktop — e diz o que fazer se houver
+diferença. Não acessa a rede: para buscar a última publicada, `/keelson:update`.
+
 ### Uma lição aprendida antiga está atrapalhando mais do que ajudando. E agora?
 
 As lições de `guidelines/project/lessons/` (um arquivo por lição) têm ciclo de vida

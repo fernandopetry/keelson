@@ -119,6 +119,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:mutation-setup` † | Guided setup of the mutation gate — detects the stack from the ficha, installs the canonical tool with confirmation, generates its config, proves the pipeline with a sample run and writes `quality.mutation` (diff-scoped, no threshold at first) |
 | `/keelson:e2e-setup` † | Guided setup of the E2E suite (Playwright) — installs with confirmation, generates the config and a smoke spec from the ficha (auth skeleton per realm, no committed secrets), proves the pipeline with `--list` and writes `quality.e2e` |
 | `/keelson:update` † | Update the installed plugin to the latest marketplace version via the Claude Code CLI (marketplace refresh + plugin update, in that order); the running session keeps the old version until restarted |
+| `/keelson:version` | Show the keelson version this session actually loaded and where the tree came from (CLI cache, development checkout, Claude Desktop's own store), compare it with the CLI's install record per scope and with the marketplace's local cache, and name the action — restart, `/keelson:update`, or update through the app; read-only, no network |
 | `/keelson:report` † | Rebuild the closing report from the session ledger — safety net for a resumed session or a report lost in the scroll; every change already closes with one automatically |
 
 † Human-only (`disable-model-invocation`): never triggered by the model — you invoke
@@ -407,7 +408,7 @@ keelson/
 │   ├── backend/       # php.md (8.5 exemplar) · php-{5.6,7.0,7.4,8.0}.md (legacy ladder) · none.md · _review/ (human-review backlogs)
 │   └── frontend/      # none.md (others generated on install)
 ├── templates/         # keelson.config.example.json · keelson.local.example.json · CLAUDE block
-├── scripts/           # update.sh · publish-wiki.sh · graph.sh (SDD graph facts, 4.82) · check-release.sh · tests/graph/ (regression suite) · git-hooks/ (main guard + quality guard, 4.83)
+├── scripts/           # update.sh · version.sh · publish-wiki.sh · graph.sh (SDD graph facts, 4.82) · check-release.sh · tests/graph/ (regression suite) · git-hooks/ (main guard + quality guard, 4.83)
 ├── docs/_meta/        # method guide · conventions/ (runtime contracts: SDD, INDEX, handoff, teams, commits, graph) · decisions · learning log
 └── docs/wiki/         # source of the user wiki (generated output: scripts/publish-wiki.sh)
 ```
@@ -420,16 +421,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.160.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.161.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a file renamed out of a guard's scope now counts as a deletion for that
-guard (decision 4.380) — the source enters the file list, the count and the identity, so moving
-code out of `codePaths` or a sensitive file out of `sensitiveGlobs` is no longer invisible; and
-the gate 7 rule states the reduced guarantee of a verdict recorded without a dispatch mark (it
-is recognised by file dates only). Closes the third round of the external review. See
-`CHANGELOG.md`.
+New in this release: `/keelson:version` shows the keelson version this session actually
+loaded and where the tree came from (CLI cache, development checkout, Claude Desktop's own
+store), compares it with the CLI's install record per scope and with the marketplace's local
+cache, and ends with the action — restart the session, `/keelson:update`, or update through
+the app that loaded the copy (decision 4.381). Read-only, no network; a session running a
+version the CLI no longer reports is no longer invisible. See `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

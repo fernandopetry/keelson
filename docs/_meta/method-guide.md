@@ -263,6 +263,20 @@ merge e deploy continuam humanos. Régua e contrato do `DEBT.md`:
 
 Detalhe completo: `commands/warroom.md`.
 
+### 3.28 `/keelson:version` — qual keelson esta sessão executa
+
+Mostra a versão **carregada nesta sessão** (lida do `plugin.json` da raiz do plugin, com a
+versão do Quality Charter) e de onde a árvore veio — cache da CLI, repositório de
+desenvolvimento, loja própria do Claude Desktop ou fora da loja da CLI —, lista a ficha de
+plugins da CLI por scope (marcando o que aponta para esta árvore) e a última versão
+**conhecida** no cache local do marketplace, e fecha com o veredito e a ação: reiniciar a
+sessão (update aplicado sem restart), `/keelson:update` (há versão mais nova conhecida) ou
+atualizar pelo app que carregou a cópia (o update da CLI não a alcança). Read-only, sem
+rede; fonte ausente vira linha nomeada, nunca afirmação. Motor: `scripts/version.sh`
+(decisão 4.381).
+
+Detalhe completo: `commands/version.md`.
+
 ---
 
 ## 4. Skills
