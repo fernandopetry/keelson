@@ -344,8 +344,10 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   estado entregue ao revisor **antes** do despacho (`ledger.sh <raiz> mark gate <origem>
   <slug>`; re-despacho sobre o delta marca de novo) e o registro consome a marca — o
   veredito carrega a identidade do que o revisor viu, nunca a da árvore no instante do
-  registro; sem marca, não carrega identidade nenhuma e a cutucada de encerramento não o
-  reconhece. Mecânica: `sdd-conventions.md`, *Ledger de sessão*.
+  registro; sem marca, o veredito nasce sem identidade e a cutucada de encerramento só o
+  reconhece pela comparação por data dos arquivos, mais fraca (edição posterior ao
+  registro cutuca; edição no mesmo segundo ou conteúdo restaurado não se distinguem —
+  4.380). Mecânica: `sdd-conventions.md`, *Ledger de sessão*.
 - **Pacote de contexto único.** O invocador monta **uma vez** e entrega o mesmo pacote
   a todos os revisores da rodada: diff resolvido + SHA · o artefato-âncora com os
   critérios literais (ACs da TASK, critério de aceite do brief) · as fatias da ficha

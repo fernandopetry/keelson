@@ -21,7 +21,8 @@
 #      novo que o evento · identidade de outro estado cutuca · evento sem `diff_id:` cai
 #      no fallback por mtime;
 #   16. marca do despacho (4.379): parecer registrado após a árvore mudar carrega a
-#      identidade da marca e o guard cutuca.
+#      identidade da marca e o guard cutuca;
+#   17. arquivo sensível que SAI dos sensitiveGlobs cutuca como exclusão (4.380).
 # Cada caso usa repo próprio (o anti-renudge de .git/ não vaza entre casos).
 #
 # Uso: scripts/tests/security-guard/run.sh
@@ -206,6 +207,12 @@ KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D16" mark gate security-engineer meu-s
 printf '<?php $senha = password_hash($estadoB, PASSWORD_ARGON2ID);\n' > "$D16/src/auth.php"
 printf 'APROVADO (parecer sobre A)\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D16" append gate security-engineer meu-slug >/dev/null 2>&1
 roda "$D16" "$P"; contem "diffid/marca-em-A-arvore-em-B-cutuca" '"decision": "block"'
+
+# 17. (4.380) arquivo sensível que SAI dos sensitiveGlobs é exclusão para o guard → cutuca
+#     (a origem passa pelo filtro de caminho: auth/login)
+D17="$TMP/c17"; repo_base "$D17"
+( cd "$D17" && git mv src/auth/login.php docs/login.php )
+roda "$D17" "$P"; contem "rename-sai-do-escopo/cutuca" '"decision": "block"'
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

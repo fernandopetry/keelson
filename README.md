@@ -420,18 +420,16 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.160.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.160.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the identity a ledger verdict carries is the one of the state the
-reviewer actually received (decision 4.379) — the dispatching command marks it with
-`ledger.sh mark gate <origem>` before spawning the reviewer, and the record consumes the mark
-instead of measuring the tree at record time; a tree that moved in between leaves a note on
-the event and the stop guard nudges. Also from the same external re-review: rename pairs
-outside a guard's scope no longer reopen it, the executable bit is part of the identity, and
-the eval runner refuses a `git:` rule whose declared anchors are missing or out of order
-before running any arm. See `CHANGELOG.md`.
+New in this release: a file renamed out of a guard's scope now counts as a deletion for that
+guard (decision 4.380) — the source enters the file list, the count and the identity, so moving
+code out of `codePaths` or a sensitive file out of `sensitiveGlobs` is no longer invisible; and
+the gate 7 rule states the reduced guarantee of a verdict recorded without a dispatch mark (it
+is recognised by file dates only). Closes the third round of the external review. See
+`CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

@@ -39,9 +39,11 @@
 #                     pela ficha (review: codePaths; security: sensitiveGlobs + manifestos
 #                     de dependência, sempre) e a identidade desse conjunto. TSV:
 #                     `base <sha|none>` · `ref <ref-do-diff>` · `mode branch|worktree` ·
-#                     `file <path> tracked|untracked` · `rename_src <path>` (só de par que
-#                     toca o escopo, 4.379) · `dep <path>` · `identity <hash>`; `scope none`
-#                     quando a ficha não dá escopo
+#                     `file <path> tracked|untracked|moved-out` (moved-out = origem de
+#                     rename que saiu do escopo, contada como exclusão — 4.380) ·
+#                     `rename_src <path>` (só de par que toca o escopo, 4.379) ·
+#                     `dep <path>` · `identity <hash>`; `scope none` quando a ficha não
+#                     dá escopo
 #                     (review sem codePaths). DONO ÚNICO do escopo: review-guard,
 #                     security-guard e ledger.sh (`diff_id:`) consomem esta saída, nunca
 #                     re-derivam. --base é ignorado. Exit 0 · 2 uso incorreto.
@@ -232,17 +234,23 @@ if [ "$MODE" = "guard" ]; then
   files="$(printf '%s' "$files" | sed '/^$/d')"
   # origem de rename entra só quando o par toca o escopo — origem ou destino dentro dele
   # (4.379): rename fora do escopo não é mudança do que o guard vigia
-  rsrc=""
+  # rename que SAI do escopo é, para o guard, uma exclusão (4.380): a origem entra na
+  # lista de arquivos como `moved-out` — conta, entra na identidade e no pathspec
+  rsrc=""; movedout=""
   while IFS='	' read -r rs rd; do
     [ -n "$rs" ] || continue
-    inscope=1
+    sin=0; din=0
     case "$GUARD" in
-      review)   path_has_prefix "$CP" "$rs" || path_has_prefix "$CP" "$rd" || inscope=0 ;;
-      security) { [ -n "$SG" ] && { path_matches_any_glob "$SG" "$rs" || path_matches_any_glob "$SG" "$rd"; }; } || inscope=0 ;;
+      review)   path_has_prefix "$CP" "$rs" && sin=1; path_has_prefix "$CP" "$rd" && din=1 ;;
+      security) [ -n "$SG" ] && path_matches_any_glob "$SG" "$rs" && sin=1
+                [ -n "$SG" ] && path_matches_any_glob "$SG" "$rd" && din=1 ;;
     esac
-    [ "$inscope" -eq 1 ] && rsrc="${rsrc}${rs}"$'\n'
+    [ "$sin" -eq 1 ] || [ "$din" -eq 1 ] || continue
+    rsrc="${rsrc}${rs}"$'\n'
+    [ "$sin" -eq 1 ] && [ "$din" -eq 0 ] && movedout="${movedout}${rs}"$'\n'
   done <<< "$rpairs"
   rsrc="$(printf '%s' "$rsrc" | sed '/^$/d')"
+  movedout="$(printf '%s' "$movedout" | sed '/^$/d')"
   deps=""
   [ "$GUARD" = "security" ] && deps="$(printf '%s\n' "$changed" | grep -E "(^|/)(${DEP_MANIFESTS})$" || true)"
   printf 'base\t%s\n' "${gbase:-none}"
@@ -253,6 +261,7 @@ if [ "$MODE" = "guard" ]; then
     if printf '%s\n' "$untracked" | grep -Fxq -- "$f" 2>/dev/null; then fst="untracked"; else fst="tracked"; fi
     printf 'file\t%s\t%s\n' "$f" "$fst"
   done <<< "$files"
+  while IFS= read -r f; do [ -n "$f" ] || continue; printf 'file\t%s\tmoved-out\n' "$f"; done <<< "$movedout"
   while IFS= read -r f; do [ -n "$f" ] || continue; printf 'rename_src\t%s\n' "$f"; done <<< "$rsrc"
   while IFS= read -r f; do [ -n "$f" ] || continue; printf 'dep\t%s\n' "$f"; done <<< "$deps"
   ident="$(printf '%s\n' "$files" "$deps" "$rsrc" | identidade "$gref")" || die2 "hash-object falhou."

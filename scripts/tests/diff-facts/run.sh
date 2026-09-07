@@ -13,7 +13,8 @@
 # sensitiveGlobs + manifestos), untracked marcado, rename_src, modo worktree sem base,
 # `scope none` sem codePaths e identidade igual à do `--identity` sobre a mesma lista;
 # 4.379: rename fora do escopo não muda a identidade (origem só de par que toca o
-# escopo) e o modo executável entra no manifesto.
+# escopo) e o modo executável entra no manifesto; 4.380: rename que SAI do escopo vira
+# `file … moved-out` (conta como exclusão).
 #
 # Uso: scripts/tests/diff-facts/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -302,6 +303,7 @@ R10="$(newrepo guard-rename-escopo)"
 mkdir -p "$R10/src" "$R10/docs" "$R10/lib"
 printf '{ "codePaths": { "backend": ["src"] } }\n' > "$R10/keelson.config.json"
 seq 1 40 | sed 's/^/l /' > "$R10/src/a.php"; printf 'doc\n' > "$R10/docs/a.md"; seq 1 40 | sed 's/^/x /' > "$R10/lib/x.php"
+seq 1 40 | sed 's/^/b /' > "$R10/src/b.php"   # candidato a sair do escopo (intacto)
 git -C "$R10" add -A && git -C "$R10" commit -qm base && git -C "$R10" checkout -qb feat
 printf 'value = 1;\n' >> "$R10/src/a.php"
 g1="$(bash "$DF" --repo "$R10" --guard review 2>/dev/null | awk -F'\t' '$1 == "identity" { print $2 }')"
@@ -313,6 +315,13 @@ if bash "$DF" --repo "$R10" --guard review 2>/dev/null | grep -q "^rename_src"; 
 git -C "$R10" mv lib/x.php src/x.php
 got="$(bash "$DF" --repo "$R10" --guard review 2>/dev/null | grep -E '^rename_src')"; st=$?
 assert guard-rename-entra-no-escopo 0 "rename_src	lib/x.php" "$got" "$st"
+# rename que SAI do escopo (4.380): a origem vira `file … moved-out` (conta como exclusão) e entra em rename_src
+git -C "$R10" mv src/b.php docs/b.php
+got="$(bash "$DF" --repo "$R10" --guard review 2>/dev/null | grep -E '^(file	src/b.php|rename_src	src/b.php)')"; st=$?
+assert guard-rename-sai-do-escopo 0 "file	src/b.php	moved-out
+rename_src	src/b.php" "$got" "$st"
+g3="$(bash "$DF" --repo "$R10" --guard review 2>/dev/null | awk -F'\t' '$1 == "identity" { print $2 }')"
+difere guard-rename-sai-muda-identidade "$g2" "$g3"
 
 # P3 (4.379): chmod +x com bytes iguais muda a identidade (o git registra 100644 → 100755)
 R11="$(newrepo guard-modo)"

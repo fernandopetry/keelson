@@ -23,6 +23,24 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.160.1] — 2026-09-06
+
+Re-init: none
+
+Decision 4.380 — two delimited follow-ups from the external review of 0.160.0.
+
+### Fixed
+
+- **`diff-facts.sh --guard`** — a rename whose source is inside the guard's scope and whose
+  destination is outside it is a deletion for that guard: the source is emitted as
+  `file <path> moved-out`, counted like a removed file, part of the identity and of the diff
+  pathspec. Before, `src/auth/a.py → docs/a.py` left the guards silent while deleting the
+  same file nudged. Same default threshold as a deletion (one lone move stays under 2
+  files / 30 lines). Fixtures in the three suites cover the direction that was missing.
+- **`guidelines/core/CODE-REVIEW.md`** — the dispatch-mark rule no longer claims that a
+  verdict recorded without a mark is not recognised by the reminder: it is recognised only
+  by the file-date comparison, the weaker fallback the Director chose to keep. Text only.
+
 ## [0.160.0] — 2026-09-06
 
 Re-init: none

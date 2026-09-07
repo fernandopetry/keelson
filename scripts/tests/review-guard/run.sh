@@ -30,7 +30,8 @@
 #      arquivo mais velho · evento legado sem `diff_id:` cai no fallback por mtime;
 #   26–27. marca do despacho (4.379): parecer registrado depois de a árvore mudar carrega
 #      a identidade da MARCA (estado entregue ao revisor) e o guard cutuca · registro
-#      sem marca não ganha diff_id e cai no mtime.
+#      sem marca não ganha diff_id e cai no mtime;
+#   28. rename que SAI dos codePaths cutuca como exclusão (4.380).
 # Cada caso usa repo próprio (o anti-renudge de .git/ não vaza entre casos).
 #
 # Uso: scripts/tests/review-guard/run.sh
@@ -317,6 +318,12 @@ D27="$TMP/c27"; repo "$D27"
 ev="$(printf 'APROVADO\n' | KEELSON_SESSAO=sessao-eu bash "$LEDGER" "$D27" append gate code-reviewer meu-slug 2>/dev/null)"
 touch -t 202601010000 "$ev"; touch "$D27/src/novo.php"
 roda "$D27" "$P"; contem "diffid/sem-marca-mtime-cutuca" '"decision": "block"'
+
+# 28. (4.380) rename que SAI dos codePaths é exclusão para o guard → cutuca (limiar 1/1),
+#     como a exclusão pura do mesmo arquivo já cutucava
+D28="$TMP/c28"; repo_base "$D28" 1 1
+( cd "$D28" && git mv src/base.php docs/base.php )
+roda "$D28" "$P"; contem "rename-sai-do-escopo/cutuca" '"decision": "block"'
 
 echo "---"
 if [ "$fail" -gt 0 ]; then
