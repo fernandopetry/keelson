@@ -23,6 +23,31 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.162.1] — 2026-09-07
+
+Re-init: none
+
+Decision 4.383 — from a field postmortem: the deploy-pending check flagged a migration the
+INDEX already declared, because the INDEX row named the file without its extension (the
+form most rows of that table used, with no convention fixing either form).
+
+### Fixed
+
+- **`diff-facts.sh --deploy-pending`** — a migration counts as `declarado` when the INDEX
+  names its basename **with or without the extension**: the literal basename matches as
+  before, and the stem (basename minus the last extension) matches as a whole word
+  (`grep -Fw`), so `add_col` matches `` `add_col` ``, `add_col.sql` and
+  `migrations/add_col.sql` but not `add_col_v2`. INDEX files that already cite the
+  extension see no change. Two fixtures cover the extension-less declaration and the
+  suffix boundary. No doctrine text and no `/keelson:init` question about the citation
+  form — after the fix either would be a no-op (same outcome as 4.367).
+- **Test suites under the pre-commit hook** (maintainer tooling) — eight suites
+  (`review-guard`, `security-guard`, `ledger`, `agent-guard`, `eval-run`, `lessons`, `pause`,
+  `warroom`) now neutralise the git environment a hook exports (`GIT_INDEX_FILE`, `GIT_DIR`,
+  `GIT_PREFIX`…) before touching their synthetic repos, as `diff-facts` already did. Under
+  `git commit` the review-guard suite failed three rename/absent cases that pass by hand.
+  No consumer effect.
+
 ## [0.162.0] — 2026-09-06
 
 Re-init: required

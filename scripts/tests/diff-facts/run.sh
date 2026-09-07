@@ -14,7 +14,8 @@
 # `scope none` sem codePaths e identidade igual à do `--identity` sobre a mesma lista;
 # 4.379: rename fora do escopo não muda a identidade (origem só de par que toca o
 # escopo) e o modo executável entra no manifesto; 4.380: rename que SAI do escopo vira
-# `file … moved-out` (conta como exclusão).
+# `file … moved-out` (conta como exclusão); 4.383: `--deploy-pending` casa o stem
+# (sem extensão) como palavra inteira — declarado sem `.sql`, pendente com sufixo.
 #
 # Uso: scripts/tests/diff-facts/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -138,6 +139,25 @@ EOF
 got="$(bash "$DF" --repo "$R" --base main --deploy-pending "$TMP/INDEX-completo.md" 2>/dev/null)"; st=$?
 assert deploy-completo 0 "declarado	2026_08_06_add_col.sql
 declarado	2026_08_07_add_index.sql" "$got" "$st"
+
+# deploy-pending 4.383: INDEX cita SEM extensão (stem) → declarado; com backtick e sem
+cat > "$TMP/INDEX-sem-ext.md" <<'EOF'
+## Riscos ativos
+| `2026_08_06_add_col` | pendente |
+Aplicar depois 2026_08_07_add_index.
+EOF
+got="$(bash "$DF" --repo "$R" --base main --deploy-pending "$TMP/INDEX-sem-ext.md" 2>/dev/null)"; st=$?
+assert deploy-stem-sem-extensao 0 "declarado	2026_08_06_add_col.sql
+declarado	2026_08_07_add_index.sql" "$got" "$st"
+
+# deploy-pending 4.383: stem é fronteira de palavra — sufixo `_v2`/`_old` NÃO declara
+cat > "$TMP/INDEX-sufixo.md" <<'EOF'
+## Riscos ativos
+Aplicar 2026_08_06_add_col_v2 e 2026_08_07_add_index_old.
+EOF
+got="$(bash "$DF" --repo "$R" --base main --deploy-pending "$TMP/INDEX-sufixo.md" 2>/dev/null)"; st=$?
+assert deploy-stem-sufixo-pendente 1 "pendente	2026_08_06_add_col.sql
+pendente	2026_08_07_add_index.sql" "$got" "$st"
 
 # ---- diff só de docs → inerte (exit 0) ----
 R2="$(newrepo so-docs)"

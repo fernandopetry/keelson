@@ -23,7 +23,11 @@
 #                     (producao · teste · documentacao · migracao · config). Exit 0.
 #   --deploy-pending  artefatos de deploy do diff vs o que o INDEX declara
 #                     (implement Etapa 4 item 8): `pendente|declarado<TAB>basename`.
-#                     Exit 1 se há pendente · 0 se tudo declarado.
+#                     Declarado = o INDEX cita o basename literal (com extensão) OU o
+#                     stem (basename sem a última extensão) como palavra inteira —
+#                     `add_col` casa `add_col`, `add_col.sql` e `dir/add_col.sql`,
+#                     nunca `add_col_v2` (4.383). Exit 1 se há pendente · 0 se tudo
+#                     declarado.
 #   --identity        identidade do diff dos arquivos lidos do STDIN (um caminho por
 #                     linha, relativo à raiz do repo): hash de `base <sha|none>` + uma
 #                     linha `<blob|absent> <path>` por arquivo em ordem canônica, blob =
@@ -387,7 +391,11 @@ case "$MODE" in
       [ -n "$p" ] || continue
       [ "$b" = "migracao" ] || continue
       base="$(basename "$p")"
-      if grep -Fq "$base" "$INDEXF" 2>/dev/null; then
+      stem="${base%.*}"
+      # basename literal (substring, como sempre) OU stem como palavra inteira — a
+      # forma sem extensão é a majoritária nos INDEX de campo, e sem a fronteira de
+      # palavra `add_col` casaria `add_col_v2` (4.383)
+      if grep -Fq "$base" "$INDEXF" 2>/dev/null || grep -Fqw "$stem" "$INDEXF" 2>/dev/null; then
         printf 'declarado\t%s\n' "$base"
       else
         printf 'pendente\t%s\n' "$base"

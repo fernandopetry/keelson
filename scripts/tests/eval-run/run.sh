@@ -11,6 +11,9 @@
 # (8) âncora declarada ausente ou fora de ordem → exit 2 antes de executar (4.379).
 # Saídas congeladas em expected/ (linha "resultados:" normalizada — carrega timestamp).
 set -u
+# git herdado de contexto de hook (pre-commit exporta GIT_INDEX_FILE etc.) aponta para
+# OUTRO repo — neutralizar antes de qualquer git nos repos sintéticos (4.383)
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_PREFIX
 cd "$(dirname "$0")" || exit 1
 
 RUNNER="../../eval-run.sh"

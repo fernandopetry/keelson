@@ -22,6 +22,9 @@
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
 
 set -u
+# git herdado de contexto de hook (pre-commit exporta GIT_INDEX_FILE etc.) aponta para
+# OUTRO repo — neutralizar antes de qualquer git nos repos sintéticos (4.383)
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_PREFIX
 LC_ALL=C
 export LC_ALL
 
