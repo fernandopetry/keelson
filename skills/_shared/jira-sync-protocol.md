@@ -822,7 +822,14 @@ fecho — publica também o worklog do trecho medido; rota sem marca de largada 
 - **Worklog** (`addWorklogToJiraIssue`): duração medida do **trecho que fechou**
   (`timeSpent`). Início do trecho = o mais recente entre a última marca do relógio do
   ciclo (Cronologia/largada) e o fim do último worklog de telemetria já publicado na
-  issue — vale igual para as closures por wave do gancho `implement`. **Rota com marcas
+  issue — vale igual para as closures por wave do gancho `implement`. **Pausa e retomada
+  (decisão 4.382)**: a linha `- retomada:` da Cronologia é marca do relógio e **abre**
+  trecho (o tempo parado fica fora do worklog); a `- pausa:` **fecha** o trecho anterior
+  e não abre nenhum — pausa sem retomada marcada (Diretor retomou fora do
+  `/keelson:continue`) deixa o tempo parado dentro do trecho seguinte, com o piso
+  declarado na linha `Duração` do report; o trecho `<marca anterior> → pausa` não ganha
+  worklog na pausa (o comando não publica) — entra na reconciliação de fecho como
+  qualquer trecho de gancho degradado. **Rota com marcas
   intermediárias → largada→fim nunca vira worklog (4.234)**: essa janela é a soma dos
   trechos já publicados, e publicá-la no fecho duplica a agregação de tempo do tracker;
   o total do ciclo já tem morada — o comentário de contadores do fecho e a linha

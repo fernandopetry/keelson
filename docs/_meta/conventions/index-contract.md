@@ -92,7 +92,15 @@ janelas paralelas medem do despacho ao último retorno; o condutor transcreve a 
 literal — sem medição, o campo não existe). Telemetria
 é sempre **cauda da linha da etapa, nunca linha própria** — o timestamp permanece
 o primeiro campo após a etapa — é a marca que a duração (4.56) e a janela do worklog
-(§17 do protocolo de sync) leem>
+(§17 do protocolo de sync) leem. **Exceção declarada (decisão 4.382)**: duas classes de
+linha própria, escritas só por `scripts/pause.sh` (nunca pelo condutor) —
+`- pausa: <ts> · sessão <sid8>@<host> · ponto: <closure commitada> · motivo: <…>`
+(gravada pelo `/keelson:pause`) e `- retomada: <ts> · sessão <sid8>@<host> · parado
+desde <ts> (marcada | piso: último commit <sha7>) · <H>h<MM>min` (gravada pelo
+`/keelson:continue`); a duração parada é medida pelo script, e `piso` rotula a retomada
+sem pausa marcada, contada do último commit da branch. Elas alimentam a cauda `pausas`
+da linha `Duração` do report e, no §17 do protocolo de sync, a retomada abre trecho de
+worklog e a pausa o fecha>
 ```
 
 **Seção opcional `## Estimativa` (decisões 4.223/4.224)**: a largada do
@@ -192,6 +200,11 @@ da Story `standalone` no tracker (protocolo Jira §7). Esqueleto literal:
 - **Revisado por**: <cada gate aplicável com estado declarado — régua simétrica (4.85)>
 - **Commit**: <SHA | pendente — commit é ato do Diretor>
 ```
+
+**`## Cronologia` no avulso (decisão 4.382)**: o brief avulso nasce sem a seção; a
+primeira pausa (`/keelson:pause`) a cria no fim do arquivo, aditiva, só para as linhas
+`pausa`/`retomada` — a `Largada` continua a fonte do worklog da rota (4.196) e o grafo
+ignora a seção (só heading, Status e critério entram no parser do brief avulso).
 
 Réguas (falsificáveis — na dúvida, promova): **avulso ou ciclo?** — muda o que o sistema
 promete, ou a decomposição exigiria escolher entre alternativas técnicas (haveria uma

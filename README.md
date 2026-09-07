@@ -98,6 +98,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:estimate` | Size a demand before the cycle — predicted waves/tasks and a time range per phase (interview, artifacts, implementation, gates) via the estimator agent, calibrated by the project's estimated-vs-actual history; refuses to guess ("not estimable" with the named gaps) and never decides routing |
 | `/keelson:specify-epic` | Decompose an epic-sized request into prioritized independent demands via the PM agent — you confirm the split and the branch strategy (default: one epic branch, synced with main at every slice boundary), the living queue tracks per-slice state, each demand then runs its own cycle |
 | `/keelson:continue` † | Resume a slug from wherever it stopped — derives the state from committed artifacts (epic queue, TASK closures, brief statuses), shows "you are here" and proposes the single next step with a default; after a weekend nobody needs to remember anything |
+| `/keelson:pause` † | Pause the running cycle at a safe point — waits for the in-flight closure, requires a clean tree, writes a `pausa` mark into the brief's Cronologia, commits and pushes the branch, then closes the run; `/keelson:continue` writes the matching `retomada` mark with the measured stopped time (floor from the last commit when nobody marked the pause), on any machine — the report's `Duração` line gains a `pausas` tail |
 
 **Support:**
 
@@ -408,7 +409,7 @@ keelson/
 │   ├── backend/       # php.md (8.5 exemplar) · php-{5.6,7.0,7.4,8.0}.md (legacy ladder) · none.md · _review/ (human-review backlogs)
 │   └── frontend/      # none.md (others generated on install)
 ├── templates/         # keelson.config.example.json · keelson.local.example.json · CLAUDE block
-├── scripts/           # update.sh · version.sh · publish-wiki.sh · graph.sh (SDD graph facts, 4.82) · check-release.sh · tests/graph/ (regression suite) · git-hooks/ (main guard + quality guard, 4.83)
+├── scripts/           # update.sh · version.sh · pause.sh (pause/resume marks, 4.382) · publish-wiki.sh · graph.sh (SDD graph facts, 4.82) · check-release.sh · tests/graph/ (regression suite) · git-hooks/ (main guard + quality guard, 4.83)
 ├── docs/_meta/        # method guide · conventions/ (runtime contracts: SDD, INDEX, handoff, teams, commits, graph) · decisions · learning log
 └── docs/wiki/         # source of the user wiki (generated output: scripts/publish-wiki.sh)
 ```
@@ -421,16 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.161.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.162.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: `/keelson:version` shows the keelson version this session actually
-loaded and where the tree came from (CLI cache, development checkout, Claude Desktop's own
-store), compares it with the CLI's install record per scope and with the marketplace's local
-cache, and ends with the action — restart the session, `/keelson:update`, or update through
-the app that loaded the copy (decision 4.381). Read-only, no network; a session running a
-version the CLI no longer reports is no longer invisible. See `CHANGELOG.md`.
+New in this release: `/keelson:pause` stops a running cycle at a safe point — the in-flight closure lands, the tree must be clean — and turns the pause into a committed, pushed mark in the brief's Cronologia; `/keelson:continue` writes the matching resume mark with the measured stopped time (a labelled floor from the last commit when nobody marked the pause), so a cycle that crosses sessions and machines reports how long it stood still (`pausas` tail on the `Duração` line). Details in `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

@@ -81,14 +81,16 @@ ciclos atualizam. Você nunca edita essa tabela na mão.
 
 | Situação encontrada | O que ele propõe |
 |---|---|
-| Fatia parou no meio (sessão caiu, fim de expediente) | Retomar a implementação **na wave onde parou** |
+| Fatia parou no meio (sessão caiu, fim de expediente) | Retomar a implementação **na wave onde parou** — e dizer desde quando está parada: pela marca do `/keelson:pause`, ou pelo último commit como piso |
 | Fatia anterior entregue | Disparar a próxima fatia (`/keelson:auto ...`), com a branch já atualizada da main |
 | Fatia esperando resposta de produto | Mostra a pendência e propõe a próxima fatia não bloqueada |
 | Fila toda entregue | Aponta o `/keelson:integrate` para abrir o PR |
 
 Você confirma (ou diz "outra coisa") — **nada roda sem a sua confirmação**, mas você
 nunca precisa lembrar em que ponto o épico estava nem como se escreve o comando da
-fatia 3.
+fatia 3. Confirmada a retomada, ele grava no brief da fatia a marca de retorno com o
+tempo parado medido. Para parar no fim do dia com a pausa registrada (e a branch
+enviada, para continuar noutra máquina), use `/keelson:pause`.
 
 ## Perguntas que vão aparecer
 

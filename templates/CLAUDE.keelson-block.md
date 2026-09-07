@@ -102,6 +102,13 @@
   nunca omitido. `/keelson:warroom close` roda os gates sobre o diff acumulado e cobra a
   dívida; linha aberta é pendência do Diretor, cutucada no encerramento. Régua:
   `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/warroom-contract.md`.
+- **Pausar é ato seu, e vira fato commitado** (decisão 4.382): `/keelson:pause [motivo]`
+  (humano-only) leva o ciclo ao ponto seguro — a closure em voo termina, a árvore fica
+  limpa — grava `- pausa:` na `Cronologia` do BRIEF, commita, pusha a branch e fecha o
+  run; `/keelson:continue` grava a `- retomada:` com o tempo parado **medido** (sem
+  pausa marcada, o piso pelo último commit, rotulado), e a linha `Duração` do relatório
+  ganha a cauda `pausas`. Fôlego continua não sendo gatilho: sem o comando ou o seu
+  pedido explícito nesta execução, o ciclo segue até a Entrega.
 - **Toda mudança fecha com relatório** (decisão 4.76): terminado o ajuste — sob demanda ou
   ciclo — o Tech Lead **exibe o fecho sem que você peça**, em 6–10 linhas: o que mudou
   (produção · teste · doc · migration/config) · **cada gate aplicável com estado
@@ -155,7 +162,10 @@ continuam humanos) ·
 `/keelson:warroom` (abrir/fechar janela sem gate bloqueante, dívida em `DEBT.md`) ·
 `/keelson:verify-handoff` (fechar gate de tela remoto) ·
 `/keelson:continue` (retomar um slug de onde parou — fila do épico, wave interrompida
-ou próxima fatia, derivado dos artefatos commitados) ·
+ou próxima fatia, derivado dos artefatos commitados; grava a marca de retomada com o
+tempo parado medido) ·
+`/keelson:pause` (parar o ciclo num ponto seguro — closure commitada, marca de pausa
+commitada e pushada no BRIEF, para o continue medir o tempo parado de qualquer máquina) ·
 `/keelson:mutation-setup` (instalar e configurar o mutation testing — grava
 `quality.mutation` na ficha após prova) ·
 `/keelson:e2e-setup` (instalar e configurar a suíte E2E Playwright — grava

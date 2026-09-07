@@ -214,6 +214,42 @@ flowchart TD
     F -- "não convergiu" --> H["Linha fica aberta:<br/>pendência sua (assumir é ato seu)"]
 ```
 
+## Pausar e retomar — a parada vira fato registrado
+
+Um ciclo raramente vai do começo ao fim numa sessão só: você para no fim do dia, volta
+no dia seguinte, às vezes noutra máquina. O relógio do relatório é de parede e inclui
+esse tempo parado — mas, sem marca, ninguém sabe quanto do total foi pausa e quanto foi
+trabalho. Por isso a pausa tem comando: **`/keelson:pause [motivo]`**, que só você
+invoca. O keelson nunca pausa por conta própria: duração, contexto ou "ponto limpo"
+não são motivo para parar.
+
+O comando não larga nada no meio. Ele espera o que está em voo terminar — a tarefa em
+execução passa pelos gates e fica commitada; um documento ainda em validação é commitado
+como rascunho — exige a árvore limpa e só então grava no brief a linha de pausa (quando,
+em que sessão e máquina, em que ponto), faz o commit, envia a branch para o remoto e
+encerra o estado da execução. É o envio que faz a marca valer noutra máquina.
+
+Na volta, `/keelson:continue <slug>` mostra desde quando está parado e, quando você
+confirma a retomada, grava a linha de retomada com o tempo parado **medido**. Se a
+sessão simplesmente caiu (sem `pause`), ele usa o último commit da branch como piso e
+diz que é piso — nunca inventa o instante da queda. No relatório final, a linha
+`Duração` ganha a cauda `pausas: N · parado ~Xh`, e o postmortem lê a mesma série.
+
+```mermaid
+flowchart TD
+    A["/keelson:pause 'motivo'"] --> B{"Algo em voo?"}
+    B -- "sim" --> C["Espera a closure<br/>(gates + commit)"]
+    C --> D
+    B -- "não" --> D{"Árvore limpa?"}
+    D -- "não" --> E["Para e lista os arquivos:<br/>decisão sua"]
+    D -- "sim" --> F["Marca 'pausa' no brief<br/>commit + push da branch"]
+    F --> G["Fecha o estado da execução"]
+    G --> H["/keelson:continue 'slug'<br/>(qualquer máquina)"]
+    H --> I["Marca 'retomada' com o tempo parado medido"]
+    J["Sessão caiu sem pause"] --> H
+    H -. "sem marca de pausa" .-> K["Piso pelo último commit,<br/>rotulado como piso"]
+```
+
 ## Charter e perfis de linguagem
 
 - O **[Quality Charter](Quality-Charter)** tem nove artigos agnósticos de linguagem. Cada

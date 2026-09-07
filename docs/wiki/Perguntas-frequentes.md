@@ -149,8 +149,15 @@ revisada, e o commit sai a seu pedido.
 
 ### Como eu paro no meio?
 
-Peça para parar. O estado da execução é encerrado com o motivo registrado, e o ciclo pode
-ser retomado depois — o INDEX e o índice de TASKs dizem onde ele estava.
+`/keelson:pause [motivo]`. Ele espera o que está em voo terminar (a tarefa em execução
+passa pelos gates e fica commitada), exige a árvore limpa, registra a pausa no brief —
+quando, em que máquina, em que ponto —, faz o commit, envia a branch para o remoto e
+encerra o estado da execução. Para retomar, em qualquer máquina, `/keelson:continue
+<slug>`: ele mostra desde quando está parado e grava a retomada com o tempo parado
+medido. Pedir para parar em linguagem natural continua funcionando, mas sem o comando a
+parada não fica registrada — na volta, o tempo parado sai como piso pelo último commit.
+O keelson nunca pausa sozinho por achar a sessão longa. Veja
+[Conceitos](Conceitos#pausar-e-retomar--a-parada-vira-fato-registrado).
 
 ### Ele pode mexer em arquivo que eu não quero?
 
@@ -241,7 +248,10 @@ mostra o "você está aqui" e propõe o próximo passo com o comando já montado
 a wave interrompida, disparar a próxima fatia ou abrir o PR. Se uma sessão anterior
 na mesma máquina deixou anotações de exploração, elas entram de carona no comando
 proposto (menos re-exploração); qualquer pista local aparece rotulada como sugestão —
-a decisão vem sempre do que está commitado. Com a estratégia
+a decisão vem sempre do que está commitado. Se a sessão anterior parou pelo
+`/keelson:pause`, o "você está aqui" diz desde quando está parado; se ela simplesmente
+caiu, ele usa o último commit da branch como piso, e diz que é piso — confirmada a
+retomada, a marca de retorno entra no brief com o tempo parado medido. Com a estratégia
 `por-fatia`, ele também verifica se a fatia da qual a próxima depende já mergeou na
 main — se não, mostra a pendência de merge em vez de propor. Nada roda sem a sua
 confirmação, mas nada depende da sua memória. O passo a passo completo está em

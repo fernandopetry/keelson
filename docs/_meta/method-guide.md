@@ -199,7 +199,7 @@ Detalhe completo (flags, fluxo, regras): `commands/mutation-setup.md`.
 
 ### 3.21 `/keelson:continue` — retomar um slug de onde parou (humano-only)
 
-A porta única de retomada: você aponta um slug e o comando deriva **dos artefatos commitados** onde o trabalho parou, mostra o "você está aqui" e propõe **um** próximo passo com default — executa só após a sua confirmação. Depois de um fim de semana, ninguém precisa lembrar de nada: `continue` + o slug. Na mesma máquina, se uma sessão anterior deixou casa em `thoughts/local/sessions/` (memo de exploração, estado de run), isso entra como **insumo e sugestão rotulada** — a decisão continua vindo só do que está commitado, e sugestão que diverge perde, com a divergência dita (4.315).
+A porta única de retomada: você aponta um slug e o comando deriva **dos artefatos commitados** onde o trabalho parou, mostra o "você está aqui" e propõe **um** próximo passo com default — executa só após a sua confirmação. Depois de um fim de semana, ninguém precisa lembrar de nada: `continue` + o slug. Na mesma máquina, se uma sessão anterior deixou casa em `thoughts/local/sessions/` (memo de exploração, estado de run), isso entra como **insumo e sugestão rotulada** — a decisão continua vindo só do que está commitado, e sugestão que diverge perde, com a divergência dita (4.315). Confirmada a retomada, o comando grava a marca `- retomada:` na `Cronologia` do BRIEF com o tempo parado **medido** — par da `- pausa:` do `/keelson:pause` ou, sem pausa marcada, o piso pelo último commit da branch, rotulado (4.382).
 
 Detalhe completo (flags, fluxo, regras): `commands/continue.md`.
 
@@ -278,6 +278,24 @@ rede; fonte ausente vira linha nomeada, nunca afirmação. Motor: `scripts/versi
 Detalhe completo: `commands/version.md`.
 
 ---
+
+### 3.29 `/keelson:pause` — parar num ponto seguro, com a pausa commitada (humano-only)
+
+A forma mecânica do "pare em um lugar seguro": só o Diretor invoca, e só com um run em
+andamento nesta sessão (sessão livre não tem o que pausar; warroom fecha pelo `close`).
+O comando espera o que está em voo fechar — TASK termina pelo rito do implement, com a
+closure commitada; artefato de forja que ainda não pode fechar é commitado como `Draft`
+— exige árvore limpa no escopo, grava a linha `- pausa: <ts> · sessão <sid8>@<host> ·
+ponto: <closure> · motivo: <…>` na `Cronologia` do BRIEF pelo `scripts/pause.sh`
+(timestamp medido, nunca de memória), commita por pathspec, pusha a branch da demanda
+(exceção declarada da Entrega como dona do push — o ato é do Diretor) e fecha o run com
+`close`, nunca `remove`. Na retomada, o `/keelson:continue` grava a `- retomada:` com o
+tempo parado medido; sem pausa marcada (sessão que caiu), o piso pelo último commit da
+branch, rotulado. A série alimenta a cauda `pausas` da linha `Duração` do relatório e o
+postmortem. Fôlego continua não sendo gatilho: o modelo nunca pausa por conta própria
+(decisão 4.382).
+
+Detalhe completo: `commands/pause.md`.
 
 ## 4. Skills
 

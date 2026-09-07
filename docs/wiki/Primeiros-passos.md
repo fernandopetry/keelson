@@ -78,6 +78,11 @@ Consulte o estado a qualquer momento:
 /keelson:status <slug>
 ```
 
+Precisa parar no meio? `/keelson:pause` leva o ciclo a um ponto seguro (a tarefa em
+andamento termina e fica commitada), registra a pausa no brief e envia a branch para o
+remoto. Quando voltar, em qualquer máquina, `/keelson:continue <slug>` mostra desde
+quando está parado e retoma — e o relatório final diz quanto do tempo total foi pausa.
+
 ## 4. Revisar e integrar
 
 **A autonomia termina nos commits.** Abrir PR, mergear para a branch principal e

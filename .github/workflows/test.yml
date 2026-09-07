@@ -65,6 +65,9 @@ jobs:
       - name: Suíte do cycle-clock.sh (scripts/tests/cycle-clock/run.sh)
         run: bash scripts/tests/cycle-clock/run.sh
 
+      - name: Suíte do pause.sh (scripts/tests/pause/run.sh)
+        run: bash scripts/tests/pause/run.sh
+
       - name: Suíte do artifact-lint.sh (scripts/tests/artifact-lint/run.sh)
         run: bash scripts/tests/artifact-lint/run.sh
 

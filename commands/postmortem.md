@@ -82,6 +82,9 @@ mecanismo inclui "por que chegou a produção / por que a detecção demorou".
 - O **BRIEF do slug** — `Cronologia` com as caudas de telemetria (`correções`, `classes`,
   `janelas` — 4.275/4.311) e a seção `Estimativa` (decisão 4.313): são os números
   **medidos** da forja, a única fonte deles quando o postmortem roda fora da sessão.
+  Mais as linhas `pausa`/`retomada`, agregadas por `bash "${CLAUDE_PLUGIN_ROOT}/scripts/pause.sh"
+  <raiz> report <BRIEF>` (decisão 4.382): quanto da parede foi parada — marcada pelo
+  `/keelson:pause` ou piso pelo último commit — e por isso não é custo do ciclo.
   Retrabalho de forja caro (voltas de correção, janela de scribe longa) é candidato a
   linha da Etapa 2, natureza `retrabalho de processo`; número ausente na cauda é
   telemetria omitida, nunca se estima.

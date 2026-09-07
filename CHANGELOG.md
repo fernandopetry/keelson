@@ -23,6 +23,55 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.162.0] — 2026-09-06
+
+Re-init: required
+
+Decision 4.382 — a cycle that stops and resumes across sessions and machines closed with
+no record of when it stopped, how long it stood still or when it came back: every time
+source was either per-clone or only left the pause inferable as a gap, indistinguishable
+from a slow gate. And "stop at a safe point" was a spoken request with no contract. This
+release turns both into committed facts. The injected CLAUDE block changed (new bullet and
+humans-only note), so consumers re-run `/keelson:init` after updating.
+
+### Added
+
+- **`/keelson:pause [motivo]`** (humans-only) — the mechanical form of "stop at a safe
+  point": requires a run in progress owned by this session (nothing to pause in a free
+  session; a warroom closes through its own `close`), never dispatches new work, waits for
+  the in-flight closure to land (a forge artifact that cannot close yet is committed as
+  `Draft`), requires a clean tree in scope, writes the `- pausa:` mark into the brief's
+  `## Cronologia`, commits by pathspec, **pushes the demand branch** (declared exception
+  to the delivery owning the push — the mark only travels committed and pushed, and the
+  act is the Director's) and closes the run (`close`, never `remove`). The model never
+  pauses on its own — session length, context or cost are still not a trigger.
+- **`scripts/pause.sh`** — single writer and reader of the `pausa`/`retomada` marks:
+  `mark-pause`, `mark-resume` (stopped time measured from the open pause, or a labelled
+  **floor** from the last reachable commit when nobody marked the pause — never the real
+  instant of a crash, which nobody measured), `report` (aggregation and the `pausas` tail)
+  and `resolve-brief`. Session/host identity degrades without aborting the mark; a
+  standalone brief without the section gains `## Cronologia` on its first pause. Suite
+  `scripts/tests/pause/run.sh` (51 assertions) wired into the pre-commit and CI.
+
+### Changed
+
+- **`/keelson:continue`** writes the `- retomada:` mark once the Director confirms the
+  resume (committed at once, no push) and shows "stopped since" in the "you are here" —
+  a declared refinement of its "never keeps state of its own" rule: the mark is measured
+  and lives in the committed artifact.
+- **Brief contract** (`index-contract.md`): the `Cronologia` gains two own-line classes,
+  `pausa` and `retomada`, written only by `pause.sh` (declared exception to "telemetry is
+  a tail of the stage line"); a standalone brief may gain the section additively.
+- **Report contract**: the `Duração` line gains the tail `pausas: N · parado ~Xh (k
+  marcadas, j piso)` — literal output of `pause.sh report`, measured or omitted; the
+  stopped time explains part of the wall clock and never enters the estimate comparison.
+  `/keelson:auto` transcribes it; `/keelson:postmortem` lists the series as a source.
+- **Jira telemetry (§17)**: a `retomada` mark opens a worklog stretch (stopped time stays
+  out of it) and a `pausa` mark closes the previous one without opening any.
+- Run-state conventions name `/keelson:pause` as the mechanical form of the legitimate
+  "explicit human request" stop; the injected CLAUDE block, README, method guide and wiki
+  (getting started, concepts with a diagram, FAQ, troubleshooting, epics flow) follow.
+
 ## [0.161.0] — 2026-09-06
 
 Re-init: none

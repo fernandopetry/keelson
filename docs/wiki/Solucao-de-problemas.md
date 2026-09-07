@@ -510,6 +510,18 @@ ranking mede só os papéis despachados como subagents — trabalho de teammates
 fora da medição por enquanto. O número é observação para a dieta de
 contexto — o ciclo nunca para nem encolhe por causa dele.
 
+### A linha `Duração` veio sem a cauda `pausas`, ou com `piso`
+
+A cauda existe desde a 0.162.0 e é telemetria: medida ou omitida. Ela só aparece quando
+o brief tem marca de pausa ou de retomada na `Cronologia` — a pausa é escrita pelo
+`/keelson:pause`, a retomada pelo `/keelson:continue` quando você confirma. Ciclo que
+nunca parou, ou que parou e voltou sem esses comandos, fecha sem a cauda: nada foi
+medido. `piso` na cauda quer dizer que a retomada foi marcada mas a parada não (a
+sessão caiu, ou você pediu para parar em linguagem natural): o tempo parado foi contado
+do último commit da branch, que é o instante mais tardio que se prova — o real pode ser
+maior. `sem retomada marcada` é o inverso: houve `pause`, mas o trabalho recomeçou sem
+passar pelo `continue`. Quer o número exato? Pare pelo `pause` e volte pelo `continue`.
+
 ### A entrega não trouxe a linha `Forja` (ou veio sem alguma etapa)
 
 A linha existe desde a 0.123.0 e é **telemetria**: medida ou omitida, nunca estimada —
