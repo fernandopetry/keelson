@@ -3971,6 +3971,14 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 **Aplicação**: `guidelines/core/TESTING.md` · `commands/mutation-setup.md` · `docs/wiki/Solucao-de-problemas.md` · `docs/_meta/proposal-inbox.md`. Doutrina embarcada mudou → CHANGELOG **0.163.2** (ajuste fino), `Re-init: none`. Nota: esta decisão nasceu numerada 4.392 e colidiu com a 4.392 de sessão paralela (gate 11 por tópico, `cb0f307`, mesma manhã) — caso real da 4.63 de novo; renumerada para 4.393 e a versão reposicionada de 0.163.1 (já tomada por aquela leva) para 0.163.2 na mesma sessão.
 
+### 4.394 — Pre-commit recusa número de decisão e versão de release já usados
+
+**Problema**: caso real da 4.63 de novo (2026-09-08): sessão paralela pushou uma leva numerada 4.392 com versão 0.163.1 **entre** os commits de outra sessão; esta puxou o commit alheio para a própria história e, sem conferir o topo, numerou a leva seguinte 4.392/0.163.1 — duas entradas `## [0.163.1]` no CHANGELOG, dois headings `### 4.392`, e o `check-release` verde (a entrada da versão corrente existia). A guarda do topo da main (Parte 1 do pre-commit) não vê isso: ela bloqueia `main` **atrás** de `origin/main`, e o commit alheio já estava na frente, integrado. O texto "confira o topo antes de numerar" existia e não foi seguido — regra que depende de lembrança, não de verificação.
+
+**Decisão**: Parte 2 do `scripts/git-hooks/pre-commit` ganha a guarda mecânica: heading `### 4.N` **adicionado** (`git diff --cached -U0`) ao `decisions.md` tem de aparecer exatamente uma vez no arquivo staged e ser **maior que todo número já existente em HEAD** (a mensagem nomeia o próximo livre; casamento por string fixa com espaço final — `4.100` não confunde com `4.10`; edição sem heading novo não dispara); entrada `## [X.Y.Z]` **adicionada** ao CHANGELOG tem de ser única no staged e inexistente em HEAD. Bloqueio nomeado com a receita; escape consciente `KEELSON_SKIP_TESTS=1` (reordenação deliberada de histórico é rara e declarada). Suíte `pre-commit` 14 → 22 casos (sequencial passa · duplicada bloqueia · menor que o máximo bloqueia · `4.100` vs `4.10` · edição sem heading passa · versão nova passa · duplicada bloqueia · já commitada bloqueia). `CLAUDE.md` (bullet da 4.63) aponta a guarda.
+
+**Aplicação**: `scripts/git-hooks/pre-commit` · `scripts/tests/pre-commit/run.sh` · `CLAUDE.md`. Tooling do mantenedor — sem bump, sem CHANGELOG; wiki: nada a mudar, declarado.
+
 ---
 
 ## 7. Roteamento de mudanças

@@ -11,6 +11,9 @@
 #
 # Doutrina dos hooks do repo: bash 3.2-compatível, fallback gracioso — indisponibilidade
 # (sem remoto, sem rede, suíte ausente) avisa e segue; só a violação REAL bloqueia.
+# Parte 2 inclui (4.394): número de decisão ou versão de release já usados — heading
+# `### 4.N` novo tem de ser único e maior que todos em HEAD; `## [X.Y.Z]` nova tem de ser
+# única e inédita (a colisão de sessão paralela que a Parte 1 não vê).
 # Escapes conscientes: KEELSON_SKIP_MAIN_CHECK=1 · KEELSON_SKIP_TESTS=1
 # Ativação (uma vez por clone): git config core.hooksPath scripts/git-hooks
 
@@ -75,6 +78,52 @@ for f in $staged; do
       fi ;;
   esac
 done
+
+# Número de decisão e versão de release já usados (4.394 — caso real da 4.63 de novo:
+# sessão paralela pushou "4.392"/0.163.1 ENTRE os commits desta sessão; a guarda do topo
+# não pega porque o commit alheio já estava na história local, e a leva nasceu com o mesmo
+# número e a mesma versão). Heading `### 4.N` ADICIONADO ao decisions.md tem de ser único
+# no arquivo staged e maior que todo número já existente em HEAD; entrada `## [X.Y.Z]`
+# ADICIONADA ao CHANGELOG tem de ser única no staged e inexistente em HEAD.
+if printf '%s\n' "$staged" | grep -q '^docs/_meta/decisions\.md$'; then
+  novos="$(git diff --cached -U0 -- docs/_meta/decisions.md 2>/dev/null \
+    | grep -E '^\+### 4\.[0-9]+ ' | sed -E 's/^\+### (4\.[0-9]+) .*/\1/' | sort -u)"
+  if [ -n "$novos" ]; then
+    max_head="$(git show HEAD:docs/_meta/decisions.md 2>/dev/null | grep -oE '^### 4\.[0-9]+ ' | sed -E 's/^### 4\.([0-9]+) $/\1/' | sort -n | tail -1)"
+    max_head="${max_head:-0}"
+    for n in $novos; do
+      c="$(git show :docs/_meta/decisions.md 2>/dev/null | grep -cF "### $n " || true)"
+      if [ "${c:-0}" -gt 1 ]; then
+        echo "[keelson pre-commit] BLOQUEADO: decisão $n aparece $c vezes no decisions.md staged — número já usado (4.394)." >&2
+        echo "  Confira o topo do arquivo (sessão paralela?) e renumere: o próximo livre é 4.$((max_head + 1))." >&2
+        exit 1
+      fi
+      num="${n#4.}"
+      if [ "$num" -le "$max_head" ] 2>/dev/null; then
+        echo "[keelson pre-commit] BLOQUEADO: decisão $n é menor ou igual à maior já commitada (4.$max_head) — número já usado (4.394)." >&2
+        echo "  O próximo livre é 4.$((max_head + 1)). Escape consciente: KEELSON_SKIP_TESTS=1" >&2
+        exit 1
+      fi
+    done
+  fi
+fi
+if printf '%s\n' "$staged" | grep -q '^CHANGELOG\.md$'; then
+  novas="$(git diff --cached -U0 -- CHANGELOG.md 2>/dev/null \
+    | grep -E '^\+## \[[0-9]+\.[0-9]+\.[0-9]+\]' | sed -E 's/^\+## \[([0-9.]+)\].*/\1/' | sort -u)"
+  for v in $novas; do
+    c="$(git show :CHANGELOG.md 2>/dev/null | grep -cF "## [$v]" || true)"
+    if [ "${c:-0}" -gt 1 ]; then
+      echo "[keelson pre-commit] BLOQUEADO: a entrada [$v] aparece $c vezes no CHANGELOG staged — versão já usada (4.394)." >&2
+      echo "  Confira o topo do CHANGELOG (sessão paralela?) e bumpe para a próxima versão livre." >&2
+      exit 1
+    fi
+    if git show HEAD:CHANGELOG.md 2>/dev/null | grep -qF "## [$v]"; then
+      echo "[keelson pre-commit] BLOQUEADO: a versão $v já tem entrada no CHANGELOG commitado — versão já usada (4.394)." >&2
+      echo "  Bumpe para a próxima versão livre. Escape consciente: KEELSON_SKIP_TESTS=1" >&2
+      exit 1
+    fi
+  done
+fi
 
 # Análise estática (shellcheck) nos scripts staged (4.208), além da sintaxe do bash -n.
 # Fallback gracioso: binário ausente → aviso e segue (o CI roda em todos os arquivos e

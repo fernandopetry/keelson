@@ -98,7 +98,10 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   e conta para o bump. `decisions.md`, `learning-log.md`, `proposal-inbox.md` e
   `method-guide.md` continuam registro do mantenedor, sem bump.
 - **Sessões paralelas colidem em §4.x e versão** (caso real: duas "4.60" no mesmo dia —
-  decisão 4.63): antes de numerar decisão ou bumpar, `git fetch` e confira o topo da main.
+  decisão 4.63): antes de numerar decisão ou bumpar, `git fetch` e confira o topo da main —
+  e o pre-commit **recusa número de decisão ou versão já usados** (4.394: heading `### 4.N`
+  novo duplicado ou ≤ o maior em HEAD; `## [X.Y.Z]` nova duplicada ou já commitada), a
+  colisão que a guarda do topo não vê quando o commit alheio já entrou na história local.
   O hook `scripts/git-hooks/pre-commit` bloqueia commit na `main` atrás do `origin/main`
   **e roda a guarda de qualidade** (4.83: `bash -n` nos scripts staged; suíte do grafo
   quando o motor muda; `check-release.sh` quando versão/CHANGELOG/wiki mudam;

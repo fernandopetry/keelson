@@ -11,6 +11,9 @@
 #     camada mecânica → nenhuma); suíte falhando → commit BLOQUEADO; suíte ausente
 #     → aviso e segue; KEELSON_SKIP_TESTS=1 → nada roda;
 #   sintaxe — .sh staged com bash -n quebrado → bloqueado;
+#   número/versão já usados (4.394) — heading `### 4.N` novo duplicado ou ≤ maior de HEAD
+#     → bloqueado (nomeia o próximo livre; 4.100 não confunde com 4.10; edição sem heading
+#     novo passa); entrada `## [X.Y.Z]` nova duplicada ou já commitada → bloqueado;
 #   guarda da main (4.63) — main atrás de origin/main → bloqueado, mensagem cita
 #     `git pull --rebase`; KEELSON_SKIP_MAIN_CHECK=1 passa; sem remoto passa;
 #     detached HEAD passa; branch que não é main passa.
@@ -127,6 +130,58 @@ tenta_commit; st=$?
 total=$((total + 1))
 if [ "$st" -ne 0 ] && grep -qi 'bit de execu' "$TMP/err"; then ok sem-exec-bit-bloqueia
 else falha "sem-exec-bit-bloqueia: exit=$st $(tail -2 "$TMP/err")"; fi
+
+# --- número de decisão e versão já usados (4.394) ---
+dec_repo() { # decisions.md com 4.10 e 4.11 commitados; CHANGELOG com [0.2.0] e [0.1.0]
+  novo_repo
+  mkdir -p "$R/docs/_meta"
+  printf '# Decisões\n\n### 4.10 — dez\n\ntexto\n\n### 4.11 — onze\n\ntexto\n' > "$R/docs/_meta/decisions.md"
+  printf '# Changelog\n\n## [Unreleased]\n\n## [0.2.0] — 2026-09-08\n\nRe-init: none\n\n## [0.1.0] — 2026-09-01\n\nRe-init: none\n' > "$R/CHANGELOG.md"
+  G add -A; setup_commit base-decisoes
+}
+dec_repo; printf '\n### 4.12 — doze\n\ntexto\n' >> "$R/docs/_meta/decisions.md"; G add -A
+tenta_commit; st=$?
+total=$((total + 1))
+if [ "$st" -eq 0 ]; then ok decisao-sequencial-passa; else falha "decisao-sequencial-passa: exit=$st $(tail -2 "$TMP/err")"; fi
+
+dec_repo; printf '\n### 4.11 — onze de novo\n\ntexto\n' >> "$R/docs/_meta/decisions.md"; G add -A
+tenta_commit; st=$?
+total=$((total + 1))
+if [ "$st" -ne 0 ] && grep -q 'decisão 4.11 aparece 2 vezes' "$TMP/err" && grep -q 'próximo livre é 4.12' "$TMP/err"; then ok decisao-duplicada-bloqueia
+else falha "decisao-duplicada-bloqueia: exit=$st $(tail -3 "$TMP/err")"; fi
+
+dec_repo; printf '\n### 4.9 — nove atrasada\n\ntexto\n' >> "$R/docs/_meta/decisions.md"; G add -A
+tenta_commit; st=$?
+total=$((total + 1))
+if [ "$st" -ne 0 ] && grep -q 'decisão 4.9 é menor ou igual à maior já commitada (4.11)' "$TMP/err"; then ok decisao-menor-que-max-bloqueia
+else falha "decisao-menor-que-max-bloqueia: exit=$st $(tail -3 "$TMP/err")"; fi
+
+dec_repo; printf '\n### 4.100 — cem\n\ntexto\n' >> "$R/docs/_meta/decisions.md"; G add -A
+tenta_commit; st=$?
+total=$((total + 1))
+if [ "$st" -eq 0 ]; then ok decisao-4-100-nao-confunde-com-4-10; else falha "decisao-4-100-nao-confunde-com-4-10: exit=$st $(tail -2 "$TMP/err")"; fi
+
+dec_repo; sed -i.bak 's/texto/texto editado/' "$R/docs/_meta/decisions.md"; rm -f "$R/docs/_meta/decisions.md.bak"; G add -A
+tenta_commit; st=$?
+total=$((total + 1))
+if [ "$st" -eq 0 ]; then ok decisions-editado-sem-heading-novo-passa; else falha "decisions-editado-sem-heading-novo-passa: exit=$st $(tail -2 "$TMP/err")"; fi
+
+dec_repo; sed -i.bak 's/^## \[Unreleased\]$/## [Unreleased]\n\n## [0.3.0] — 2026-09-08\n\nRe-init: none/' "$R/CHANGELOG.md"; rm -f "$R/CHANGELOG.md.bak"; G add -A
+tenta_commit; st=$?
+total=$((total + 1))
+if [ "$st" -eq 0 ]; then ok changelog-versao-nova-passa; else falha "changelog-versao-nova-passa: exit=$st $(tail -2 "$TMP/err")"; fi
+
+dec_repo; sed -i.bak 's/^## \[Unreleased\]$/## [Unreleased]\n\n## [0.2.0] — 2026-09-08\n\nRe-init: none/' "$R/CHANGELOG.md"; rm -f "$R/CHANGELOG.md.bak"; G add -A
+tenta_commit; st=$?
+total=$((total + 1))
+if [ "$st" -ne 0 ] && grep -q 'entrada \[0.2.0\] aparece 2 vezes' "$TMP/err"; then ok changelog-versao-duplicada-bloqueia
+else falha "changelog-versao-duplicada-bloqueia: exit=$st $(tail -3 "$TMP/err")"; fi
+
+dec_repo; printf '\n## [0.1.0] — 2026-09-08\n\nRe-init: none\n' > "$R/CHANGELOG.md"; G add -A   # reescreve: só a versão antiga, adicionada como linha nova
+tenta_commit; st=$?
+total=$((total + 1))
+if [ "$st" -ne 0 ] && grep -q 'versão 0.1.0 já tem entrada no CHANGELOG commitado' "$TMP/err"; then ok changelog-versao-ja-commitada-bloqueia
+else falha "changelog-versao-ja-commitada-bloqueia: exit=$st $(tail -3 "$TMP/err")"; fi
 
 # --- guarda da main (4.63) ---
 ORIGIN="$TMP/origin.git"; rm -rf "$ORIGIN"; git init -q --bare -b main "$ORIGIN" 2>/dev/null || git init -q --bare "$ORIGIN"
