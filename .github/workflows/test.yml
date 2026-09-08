@@ -1,10 +1,14 @@
 name: Test
 
-# Guarda mecânica do repositório (decisão 4.83): a suíte de regressão do grafo e os
-# checks de release rodam em todo push/PR — em Linux, o que também prova a
-# portabilidade (bash 3.2 + awk POSIX) que a máquina local macOS não prova.
-# O pre-commit local (scripts/git-hooks/pre-commit) roda o mesmo conjunto antes do
+# Guarda mecânica do repositório (decisão 4.83): as suítes de regressão e os checks de
+# release rodam em todo push/PR — em Linux (portabilidade bash 3.2 + awk POSIX além do
+# macOS local) e em macOS (o /bin/bash 3.2 real, que é o piso declarado — 4.389).
+# O pre-commit local (scripts/git-hooks/pre-commit) roda o subconjunto afetado antes do
 # commit; este workflow é a rede de segurança para o que escapar dele.
+#
+# As suítes NÃO são listadas aqui (4.389): scripts/tests/run-all.sh descobre toda
+# scripts/tests/*/run.sh, roda todas até o fim (uma vermelha não esconde as seguintes),
+# publica JUnit + logs como artefato — suíte nova entra sozinha no CI.
 
 on:
   push:
@@ -17,7 +21,12 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    name: suítes e checks (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
@@ -26,164 +35,31 @@ jobs:
           bad="$(git ls-files -s -- 'hooks/*.sh' 'scripts/*.sh' 'scripts/git-hooks/*' | grep -v '^100755' || true)"
           if [ -n "$bad" ]; then echo "script sem bit de execução:"; echo "$bad"; exit 1; fi
 
+      - name: Versão do bash (o piso declarado é 3.2 — o job macOS prova com o /bin/bash do sistema)
+        run: /bin/bash -c 'echo "$BASH_VERSION"'
+
       - name: Dependências das suítes (PyYAML antes da suíte do frontmatter — 4.385)
-        run: python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet pyyaml
+        run: python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet pyyaml || pip3 install --quiet --break-system-packages pyyaml
 
       - name: shellcheck em todos os scripts (4.208 — análise estática além do bash -n; hooks do mantenedor incluídos, 4.385)
-        run: shellcheck scripts/*.sh hooks/*.sh .claude/hooks/*.sh scripts/git-hooks/* scripts/tests/*/run.sh
+        if: matrix.os == 'ubuntu-latest'
+        run: shellcheck scripts/*.sh hooks/*.sh .claude/hooks/*.sh scripts/git-hooks/* scripts/tests/*/run.sh scripts/tests/run-all.sh
 
-      - name: Suíte do grafo (scripts/tests/graph/run.sh)
-        run: bash scripts/tests/graph/run.sh
+      - name: Todas as suítes mecânicas (scripts/tests/run-all.sh — descoberta automática, 4.389)
+        run: /bin/bash scripts/tests/run-all.sh --junit "junit-${{ matrix.os }}.xml" --logs "suite-logs-${{ matrix.os }}"
 
-      - name: Suíte do map (scripts/tests/map/run.sh)
-        run: bash scripts/tests/map/run.sh
-
-      - name: Suíte do lessons.sh (scripts/tests/lessons/run.sh)
-        run: bash scripts/tests/lessons/run.sh
-
-      - name: Suíte do check de agents (scripts/tests/agents-mcp/run.sh)
-        run: bash scripts/tests/agents-mcp/run.sh
+      - name: Publicar JUnit e logs das suítes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: suites-${{ matrix.os }}
+          path: |
+            junit-${{ matrix.os }}.xml
+            suite-logs-${{ matrix.os }}/
+          if-no-files-found: warn
 
       - name: Paridade MCP dos agents (scripts/check-agents.sh)
         run: bash scripts/check-agents.sh
-
-      - name: Suíte do check de sincronização (scripts/tests/sync/run.sh)
-        run: bash scripts/tests/sync/run.sh
-
-      - name: Suíte do ficha.sh (scripts/tests/ficha/run.sh)
-        run: bash scripts/tests/ficha/run.sh
-
-      - name: Suíte do next-id.sh (scripts/tests/next-id/run.sh)
-        run: bash scripts/tests/next-id/run.sh
-
-      - name: Suíte do index-check.sh (scripts/tests/index/run.sh)
-        run: bash scripts/tests/index/run.sh
-
-      - name: Suíte do diff-facts.sh (scripts/tests/diff-facts/run.sh)
-        run: bash scripts/tests/diff-facts/run.sh
-
-      - name: Suíte do eval-run.sh (scripts/tests/eval-run/run.sh)
-        run: bash scripts/tests/eval-run/run.sh
-
-      - name: Suíte do cycle-clock.sh (scripts/tests/cycle-clock/run.sh)
-        run: bash scripts/tests/cycle-clock/run.sh
-
-      - name: Suíte do pause.sh (scripts/tests/pause/run.sh)
-        run: bash scripts/tests/pause/run.sh
-
-      - name: Suíte do artifact-lint.sh (scripts/tests/artifact-lint/run.sh)
-        run: bash scripts/tests/artifact-lint/run.sh
-
-      - name: Corpus de regressão dos motores (scripts/tests/corpus/run.sh)
-        run: bash scripts/tests/corpus/run.sh
-
-      - name: Suíte do run-state.sh (scripts/tests/run-state/run.sh)
-        run: bash scripts/tests/run-state/run.sh
-
-      - name: Suíte do ledger.sh (scripts/tests/ledger/run.sh)
-        run: bash scripts/tests/ledger/run.sh
-
-      - name: Suíte do init-selfcheck.sh (scripts/tests/init-selfcheck/run.sh)
-        run: bash scripts/tests/init-selfcheck/run.sh
-
-      - name: Suíte do probe-env.sh (scripts/tests/probe-env/run.sh)
-        run: bash scripts/tests/probe-env/run.sh
-
-      - name: Suíte do epic-state.sh (scripts/tests/epic-state/run.sh)
-        run: bash scripts/tests/epic-state/run.sh
-
-      - name: Suíte do handoff-scan.sh (scripts/tests/handoff-scan/run.sh)
-        run: bash scripts/tests/handoff-scan/run.sh
-
-      - name: Suíte do legacy-move.sh (scripts/tests/legacy-move/run.sh)
-        run: bash scripts/tests/legacy-move/run.sh
-
-      - name: Suíte do postmortem-facts.sh (scripts/tests/postmortem-facts/run.sh)
-        run: bash scripts/tests/postmortem-facts/run.sh
-
-      - name: Suíte do edge-diff.sh (scripts/tests/edge-diff/run.sh)
-        run: bash scripts/tests/edge-diff/run.sh
-
-      - name: Suíte do e2e-coverage.sh (scripts/tests/e2e-coverage/run.sh)
-        run: bash scripts/tests/e2e-coverage/run.sh
-
-      - name: Suíte da camada de release (scripts/tests/release/run.sh)
-        run: bash scripts/tests/release/run.sh
-
-      - name: Suíte do version.sh (scripts/tests/version/run.sh)
-        run: bash scripts/tests/version/run.sh
-
-      - name: Suíte do stale-background-guard (scripts/tests/stale-bg/run.sh)
-        run: bash scripts/tests/stale-bg/run.sh
-
-      - name: Suíte do agent-guard (scripts/tests/agent-guard/run.sh)
-        run: bash scripts/tests/agent-guard/run.sh
-
-      - name: Suíte do wave-guard (scripts/tests/wave-guard/run.sh)
-        run: bash scripts/tests/wave-guard/run.sh
-
-      - name: Suíte do session-dir.sh (scripts/tests/session-dir/run.sh)
-        run: bash scripts/tests/session-dir/run.sh
-
-      - name: Suíte do window-marker (scripts/tests/window-marker/run.sh)
-        run: bash scripts/tests/window-marker/run.sh
-
-      - name: Suíte do compact-anchor (scripts/tests/compact-anchor/run.sh)
-        run: bash scripts/tests/compact-anchor/run.sh
-
-      - name: Suíte do review-guard (scripts/tests/review-guard/run.sh)
-        run: bash scripts/tests/review-guard/run.sh
-
-      - name: Suíte do security-guard (scripts/tests/security-guard/run.sh)
-        run: bash scripts/tests/security-guard/run.sh
-
-      - name: Suíte do warroom (scripts/tests/warroom/run.sh)
-        run: bash scripts/tests/warroom/run.sh
-
-      - name: Suíte do noverify-guard (scripts/tests/noverify/run.sh)
-        run: bash scripts/tests/noverify/run.sh
-
-      - name: Suíte do worktree-guard (scripts/tests/worktree-guard/run.sh)
-        run: bash scripts/tests/worktree-guard/run.sh
-
-      - name: Suíte do doc-guard (scripts/tests/doc-guard/run.sh)
-        run: bash scripts/tests/doc-guard/run.sh
-
-      - name: Suíte do desc-guard (scripts/tests/desc-guard/run.sh)
-        run: bash scripts/tests/desc-guard/run.sh
-
-      - name: Suíte do jira-guard (scripts/tests/jira-guard/run.sh)
-        run: bash scripts/tests/jira-guard/run.sh
-
-      - name: Registro dos hooks em hooks.json (scripts/tests/hooks-manifest/run.sh)
-        run: bash scripts/tests/hooks-manifest/run.sh
-
-      - name: Roteamento do pre-commit (scripts/tests/pre-commit/run.sh)
-        run: bash scripts/tests/pre-commit/run.sh
-
-      - name: Fluxo completo do update.sh com CLI falsa (scripts/tests/update/run.sh)
-        run: bash scripts/tests/update/run.sh
-
-      - name: publish-wiki.sh contra remoto local (scripts/tests/wiki/run.sh)
-        run: bash scripts/tests/wiki/run.sh
-
-      - name: Integração do ciclo de sessão (scripts/tests/session-cycle/run.sh)
-        run: bash scripts/tests/session-cycle/run.sh
-
-      - name: Propriedades dos parsers (scripts/tests/parser-props/run.sh)
-        run: bash scripts/tests/parser-props/run.sh
-
-      - name: Suíte do check-refs.sh (scripts/tests/refs/run.sh)
-        run: bash scripts/tests/refs/run.sh
-
-      - name: Suíte do check-frontmatter.sh (scripts/tests/frontmatter/run.sh)
-        run: bash scripts/tests/frontmatter/run.sh
-
-      - name: Suíte do context-cost.sh (scripts/tests/context-cost/run.sh)
-        run: bash scripts/tests/context-cost/run.sh
-
-      - name: Suíte do check-mermaid.sh (scripts/tests/mermaid/run.sh)
-        run: bash scripts/tests/mermaid/run.sh
 
       - name: Blocos mermaid da superfície da wiki (scripts/check-mermaid.sh)
         run: bash scripts/check-mermaid.sh

@@ -13,6 +13,12 @@ regra é a decisão **4.304** (`docs/_meta/decisions.md`); este arquivo é só p
 - `--runs` mínimo 1; abaixo de 4 o sumário rotula a leitura como sinal (piso empírico da
   bancada, obs. 4.304 — não garantia). HOLD distingue variância intra-braço de juiz sem
   veredito válido (falha de infra).
+- **Falha de infra nunca vira evidência** (4.389): executor com exit ≠ 0, estouro do
+  `--timeout` (default 900 s, frontmatter `timeout:`) ou execução sem `deck/` → amostra
+  INVALIDA — o juiz não roda sobre ela, o eixo fica HOLD por infra, o motivo fica em
+  `infra.txt` no workspace. Juiz com PASS e FAIL em linhas distintas é INVALIDO (eco da
+  instrução na mesma linha é descontado). Duas rodadas no mesmo segundo ganham
+  diretórios distintos; caminhos com espaço funcionam.
 - Veredito é **consultivo** (HOLD em divergência; plant aprovado invalida a rodada).
 - Roda **sob demanda do Diretor ou pré-leva** de classe coberta — nunca em pre-commit/CI.
 - Formato dos casos compatível com `claude plugin eval` (early access); o runner próprio

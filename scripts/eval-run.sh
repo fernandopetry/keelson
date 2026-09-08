@@ -34,6 +34,13 @@
 #               Toda chamada leva --strict-mcp-config: sem os MCP servers do usuário
 #               (hermeticidade e custo — o arranque de MCP dominava o tempo de rodada).
 #   --results   raiz das saídas (default: <case-dir>/results — gitignored, nunca versionar).
+#   --timeout   teto em segundos por chamada ao executor (default: frontmatter `timeout:`,
+#               senão 900); estouro mata o processo e a amostra é INVALIDA (4.389).
+#
+# Amostra INVALIDA (4.389): executor com exit ≠ 0, estouro do teto ou execução sem deck/
+# NÃO vai aos graders — cada eixo recebe INVALIDO (HOLD por infra), motivo em infra.txt.
+# Juiz com PASS e FAIL em linhas distintas (eco da instrução descontado) é INVALIDO.
+# Duas rodadas no mesmo segundo ganham diretórios distintos (-2, -3, …).
 #
 # Graders suportados (frontmatter `type:`): llm (rubrica no corpo; juiz cego — vê só
 # o deck, nunca a régua ou o nome do braço; responde `VEREDITO: PASS|FAIL`),
@@ -60,7 +67,7 @@ shift
 [ -f "$CASE/prompt.md" ] || die "caso sem prompt.md: $CASE"
 [ -d "$CASE/graders" ] || die "caso sem graders/: $CASE"
 
-ARM1=""; ARM2=""; PLANT=""; RUNS=""; MODEL=""; EXECUTOR="claude"; RESULTS=""
+ARM1=""; ARM2=""; PLANT=""; RUNS=""; MODEL=""; EXECUTOR="claude"; RESULTS=""; TIMEOUT=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --arm)      [ $# -ge 2 ] || die "--arm exige NOME=FONTE"
@@ -71,6 +78,7 @@ while [ $# -gt 0 ]; do
     --model)    [ $# -ge 2 ] || die "--model exige M"; MODEL="$2"; shift 2 ;;
     --executor) [ $# -ge 2 ] || die "--executor exige CMD"; EXECUTOR="$2"; shift 2 ;;
     --results)  [ $# -ge 2 ] || die "--results exige DIR"; RESULTS="$2"; shift 2 ;;
+    --timeout)  [ $# -ge 2 ] || die "--timeout exige segundos"; TIMEOUT="$2"; shift 2 ;;
     *) die "opção desconhecida: $1" ;;
   esac
 done
@@ -89,13 +97,35 @@ fm() { # $1 chave → valor do frontmatter do prompt.md, sem aspas envolventes
 case "$RUNS" in ''|*[!0-9]*) die "--runs inválido: $RUNS" ;; esac
 [ "$RUNS" -ge 1 ] || die "--runs inválido: $RUNS (mínimo 1 — rodada sem execução não é veredito, 4.377)"
 [ -n "$MODEL" ] || MODEL="$(fm model)"
+[ -n "$TIMEOUT" ] || TIMEOUT="$(fm timeout)"; [ -n "$TIMEOUT" ] || TIMEOUT=900
+case "$TIMEOUT" in ''|*[!0-9]*) die "--timeout inválido: $TIMEOUT (segundos inteiros)" ;; esac
+[ "$TIMEOUT" -ge 1 ] || die "--timeout inválido: $TIMEOUT (mínimo 1)"
 PROMPT_BODY="$(awk '/^---$/{c++;next} c>=2' "$CASE/prompt.md")"
 [ -n "$PROMPT_BODY" ] || die "prompt.md sem corpo após o frontmatter"
 
-TS="$(date +%Y%m%d-%H%M%S)"
+TS="${EVAL_RUN_TS:-$(date +%Y%m%d-%H%M%S)}"   # EVAL_RUN_TS: só para a suíte (colisão de segundo)
 [ -n "$RESULTS" ] || RESULTS="$CASE/results"
 case "$RESULTS" in /*) ;; *) RESULTS="$PWD/$RESULTS" ;; esac  # subshells fazem cd — caminho relativo quebraria
 RES="$RESULTS/$TS"
+
+# executor sob teto de tempo (4.389): sem `timeout(1)` garantido (macOS), o processo vai
+# para background e é morto ao estourar — a rodada nunca pendura por um executor travado.
+# Devolve o exit do comando, ou 124 no estouro (convenção do timeout(1)).
+exec_timeout() {
+  et_t="$1"; shift
+  "$@" &
+  et_pid=$!
+  et_n=0
+  while kill -0 "$et_pid" 2>/dev/null; do
+    if [ "$et_n" -ge "$et_t" ]; then
+      kill "$et_pid" 2>/dev/null; sleep 1; kill -9 "$et_pid" 2>/dev/null
+      wait "$et_pid" 2>/dev/null
+      return 124
+    fi
+    sleep 1; et_n=$((et_n + 1))
+  done
+  wait "$et_pid"
+}
 
 # ---------- régua por fonte ----------
 regua_para() { # $1 fonte → imprime a régua no stdout
@@ -140,13 +170,30 @@ executa() { # $1 nome  $2 fonte
     mkdir -p "$ws/deck"
     regua_para "$fonte" > "$ws/REGUA.md"
     if [ -d "$CASE/fixtures" ]; then cp -R "$CASE/fixtures/." "$ws/" || die "cópia de fixtures falhou"; fi
-    ( cd "$ws" && "$EXECUTOR" -p "$PROMPT_BODY" --output-format json \
+    ( cd "$ws" && exec_timeout "$TIMEOUT" "$EXECUTOR" -p "$PROMPT_BODY" --output-format json \
         --strict-mcp-config \
         --permission-mode acceptEdits --allowedTools "Read,Write,Edit,Glob,Grep" \
         ${MODEL:+--model "$MODEL"} > raw.json 2> stderr.log )
     rc=$?
-    [ $rc -eq 0 ] || echo "eval-run: aviso — executor saiu $rc em $nome-r$i (segue para os graders)" >&2
-    julga_workspace "$nome" "$ws"
+    # Amostra inválida (4.389): executor que falhou, estourou o tempo ou terminou sem
+    # deck NÃO vai aos graders — um juiz lendo deck vazio pode aprovar por acidente e
+    # transformar falha de infra em evidência favorável. Cada grader recebe INVALIDO
+    # (→ HOLD por infra, rótulo da 4.377) e o motivo fica em infra.txt no workspace.
+    motivo=""
+    if [ $rc -eq 124 ]; then motivo="executor estourou o teto de ${TIMEOUT}s"
+    elif [ $rc -ne 0 ]; then motivo="executor saiu $rc"
+    elif [ -z "$(find "$ws/deck" -name '*.md' 2>/dev/null | head -1)" ]; then motivo="executor terminou sem escrever deck/"
+    fi
+    if [ -n "$motivo" ]; then
+      echo "eval-run: aviso — $nome-r$i: $motivo — amostra INVALIDA, graders não rodam" >&2
+      printf '%s\n' "$motivo" > "$ws/infra.txt"
+      for g in "$CASE"/graders/*.md; do
+        [ -f "$g" ] || continue
+        printf 'INVALIDO\n' >> "$RES/agg/$(basename "$g" .md).$nome"
+      done
+    else
+      julga_workspace "$nome" "$ws"
+    fi
     i=$((i + 1))
   done
 }
@@ -175,20 +222,28 @@ julga_workspace() { # $1 braço  $2 workspace
         jd="$ws/judge-$gname"
         mkdir -p "$jd"
         jprompt="$(cat "$jp")"   # ler ANTES do cd do subshell — jp pode ser relativo
-        ( cd "$jd" && "$EXECUTOR" -p "$jprompt" --output-format json \
+        ( cd "$jd" && exec_timeout "$TIMEOUT" "$EXECUTOR" -p "$jprompt" --output-format json \
             --strict-mcp-config \
             --permission-mode acceptEdits --allowedTools "Read" \
             ${MODEL:+--model "$MODEL"} > raw.json 2> stderr.log ) || true
-        v="$(grep -oE 'VEREDITO: ?(PASS|FAIL)' "$jd/raw.json" 2>/dev/null | tail -1 | grep -oE 'PASS|FAIL')"
-        [ -n "$v" ] && verdict="$v"
+        # Veredito conflitante é INVALIDO (4.389): linha que cita PASS e FAIL juntos é eco
+        # da instrução e não conta; sobrando PASS e FAIL em linhas distintas, o juiz não
+        # concluiu — nunca "o último vence" em silêncio.
+        vs="$(tr -d '\r' < "$jd/raw.json" 2>/dev/null | sed 's/\\n/\
+/g' | grep 'VEREDITO' | grep -vE 'PASS.*FAIL|FAIL.*PASS' | grep -oE 'VEREDITO: ?(PASS|FAIL)' | grep -oE 'PASS|FAIL' | sort -u)"
+        case "$(printf '%s' "$vs" | tr '\n' ' ')" in
+          "PASS"|"PASS ") verdict="PASS" ;;
+          "FAIL"|"FAIL ") verdict="FAIL" ;;
+          *) verdict="INVALIDO" ;;
+        esac
         ;;
       file_exists)
         glob="$(awk '/^---$/{c++;next} c==1 && $1=="path:"{sub(/^[^:]*: */,""); print; exit}' "$g")"
         [ -n "$glob" ] || die "grader $gname (file_exists) sem path:"
-        # expansão de glob do grader é o próprio teste
+        # expansão de glob do grader é o próprio teste — relativa ao workspace, para que
+        # espaço no caminho de --results/caso não quebre a expansão (4.389)
         # shellcheck disable=SC2086
-        set -- $ws/$glob
-        if [ -e "$1" ]; then verdict="PASS"; else verdict="FAIL"; fi
+        if ( cd "$ws" && set -- $glob && [ -e "$1" ] ); then verdict="PASS"; else verdict="FAIL"; fi
         ;;
       regex)
         pat="$(awk '/^---$/{c++;next} c==1 && $1=="pattern:"{sub(/^[^:]*: */,""); print; exit}' "$g")"
@@ -197,10 +252,9 @@ julga_workspace() { # $1 braço  $2 workspace
         [ -n "$pat" ] || die "grader $gname (regex) sem pattern:"
         [ -n "$glob" ] || glob="deck/*.md"
         hit=1
-        # expansão de glob do grader é o próprio teste
+        # expansão de glob do grader é o próprio teste (relativa ao workspace — 4.389)
         # shellcheck disable=SC2086
-        set -- $ws/$glob
-        [ -e "$1" ] && grep -qE "$pat" "$@" 2>/dev/null && hit=0
+        ( cd "$ws" && set -- $glob && [ -e "$1" ] && grep -qE "$pat" "$@" 2>/dev/null ) && hit=0
         case "$modo" in
           not_contains) [ $hit -ne 0 ] && verdict="PASS" || verdict="FAIL" ;;
           *)            [ $hit -eq 0 ] && verdict="PASS" || verdict="FAIL" ;;
@@ -220,6 +274,12 @@ regua_para "$F2" > /dev/null
 [ -z "$PLANT" ] || regua_para "$PLANT" > /dev/null
 
 # só depois das réguas validadas: rodada recusada não deixa diretório em results/ (4.379)
+# Duas rodadas no mesmo segundo (ou EVAL_RUN_TS repetido) nunca compartilham agg/ —
+# os vereditos somariam e o sumário mentiria (4.389): sufixo -2, -3, … como o ledger.
+if [ -e "$RES" ]; then
+  n=2; while [ -e "$RESULTS/$TS-$n" ]; do n=$((n + 1)); done
+  RES="$RESULTS/$TS-$n"
+fi
 mkdir -p "$RES/agg" || die "não consegui criar $RES"
 executa "$N1" "$F1"
 executa "$N2" "$F2"
@@ -290,14 +350,14 @@ custo_l="custo: nao medido"; dur_l="duracao: nao medida"
 jsons="$(find "$RES/run" -name raw.json 2>/dev/null)"
 if [ -n "$jsons" ]; then
   tot="$(printf '%s\n' "$jsons" | wc -l | tr -d ' ')"
-  soma="$(printf '%s\n' "$jsons" | xargs grep -ho '"total_cost_usd":[0-9.]*' 2>/dev/null \
+  soma="$(find "$RES/run" -name raw.json -exec grep -ho '"total_cost_usd":[0-9.]*' {} + 2>/dev/null \
     | awk -F: '{s+=$2; n++} END{if(n>0) printf "%.4f %d", s, n}')"
   if [ -n "$soma" ]; then
     val="${soma% *}"; n="${soma#* }"
     if [ "$n" = "$tot" ]; then custo_l="custo: US\$$val ($n chamadas)"
     else custo_l="custo: nao medido ($n de $tot chamadas com campo)"; fi
   fi
-  dsoma="$(printf '%s\n' "$jsons" | xargs grep -ho '"duration_ms":[0-9]*' 2>/dev/null \
+  dsoma="$(find "$RES/run" -name raw.json -exec grep -ho '"duration_ms":[0-9]*' {} + 2>/dev/null \
     | awk -F: '{s+=$2; n++} END{if(n>0) printf "%d %d", s, n}')"
   if [ -n "$dsoma" ]; then
     dv="${dsoma% *}"; dn="${dsoma#* }"

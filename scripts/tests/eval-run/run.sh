@@ -8,7 +8,11 @@
 # (6) juiz sem veredito → HOLD por falha de infra, rótulo distinto de variância (4.377);
 # (7) fonte `git:` com `regua:` + âncoras declaradas no caso, extraída de um repo git
 # temporário — cabeçalho e rodapé com marcas más/plant provam que o recorte não vaza;
-# (8) âncora declarada ausente ou fora de ordem → exit 2 antes de executar (4.379).
+# (8) âncora declarada ausente ou fora de ordem → exit 2 antes de executar (4.379);
+# (9–15, 4.389) falha de infra nunca vira evidência: executor com exit≠0, sem deck ou
+# estourando --timeout → amostra INVALIDA (HOLD infra, juiz não roda); juiz conflitante →
+# INVALIDO (eco da instrução descontado); JSON inválido → veredito pelo deck, custo "nao
+# medido"; colisão de timestamp → sufixo; caminhos com espaço; isolamento entre braços.
 # Saídas congeladas em expected/ (linha "resultados:" normalizada — carrega timestamp).
 set -u
 # git herdado de contexto de hook (pre-commit exporta GIT_INDEX_FILE etc.) aponta para
@@ -125,6 +129,81 @@ printf 'sem a ancora de inicio\n## Fim\n' > "$GR8/regua-ancoras.md"
 ( cd "$GR8" && "$RUNNER_ABS" "$HERE/case-git" --arm A=git:HEAD --arm B="file:$HERE/reguas/regua-ma.md" \
   --runs 1 --executor "$EXEC" --results "$TMP/r8c" >/dev/null 2>&1 ); rc=$?
 [ $rc -eq 2 ] && ok "cenário 8 regua_inicio ausente → exit 2" || bad "cenário 8: início ausente saiu $rc (esperado 2)"
+
+# --- cenário 9 (4.389): executor que FALHA (exit 1) mesmo tendo escrito deck → amostra
+# --- INVALIDA, HOLD por infra — o juiz nunca vê o deck de uma execução falha ---
+export FAKE_STATE="$TMP/s9"; mkdir -p "$FAKE_STATE"
+out="$("$RUNNER" case --arm A=file:reguas/regua-crash.md --arm B=file:reguas/regua-boa.md \
+  --runs 1 --executor "$EXEC" --results "$TMP/r9" 2>&1)"
+rc=$?
+if [ $rc -eq 0 ] && printf '%s\n' "$out" | grep -q "eixo-um: A=INVALIDO · B=PASS → HOLD (sem veredito válido"; then ok "cenário 9 executor com exit≠0 → amostra INVALIDA (HOLD infra)"
+else bad "cenário 9: executor falho não virou INVALIDO (exit $rc)"; printf '%s\n' "$out" >&2; fi
+find "$TMP/r9" -path '*/run/A-r1/infra.txt' | grep -q . && ok "cenário 9 motivo em infra.txt" || bad "cenário 9 sem infra.txt"
+find "$TMP/r9" -path '*/run/A-r1/judge-eixo-um/raw.json' | grep -q . && bad "cenário 9: juiz rodou sobre execução falha" || ok "cenário 9 juiz não rodou sobre a amostra inválida"
+printf '%s\n' "$out" | grep -q "amostra INVALIDA" && ok "cenário 9 aviso em stderr" || bad "cenário 9 sem aviso"
+
+# --- cenário 10: executor "bem-sucedido" sem deck → INVALIDA (deck vazio nunca é PASS) ---
+export FAKE_STATE="$TMP/s10"; mkdir -p "$FAKE_STATE"
+out="$("$RUNNER" case --arm A=file:reguas/regua-vazia.md --arm B=file:reguas/regua-boa.md \
+  --runs 1 --executor "$EXEC" --results "$TMP/r10" 2>&1)"
+rc=$?
+if [ $rc -eq 0 ] && printf '%s\n' "$out" | grep -q "sem-defeito: A=INVALIDO · B=PASS → HOLD (sem veredito válido"; then ok "cenário 10 execução sem deck → INVALIDA (juiz não aprova o vazio)"
+else bad "cenário 10: execução sem deck não virou INVALIDO (exit $rc)"; printf '%s\n' "$out" >&2; fi
+
+# --- cenário 11: executor travado → --timeout mata e a amostra é INVALIDA; a rodada termina ---
+export FAKE_STATE="$TMP/s11"; mkdir -p "$FAKE_STATE"
+t0="$(date +%s)"
+out="$("$RUNNER" case --arm A=file:reguas/regua-lenta.md --arm B=file:reguas/regua-boa.md \
+  --runs 1 --timeout 2 --executor "$EXEC" --results "$TMP/r11" 2>&1)"
+rc=$?
+dt=$(( $(date +%s) - t0 ))
+if [ $rc -eq 0 ] && printf '%s\n' "$out" | grep -q "estourou o teto de 2s" && printf '%s\n' "$out" | grep -q "eixo-um: A=INVALIDO"; then ok "cenário 11 timeout mata o executor → INVALIDA"
+else bad "cenário 11: timeout não acusado (exit $rc)"; printf '%s\n' "$out" >&2; fi
+[ "$dt" -lt 20 ] && ok "cenário 11 rodada terminou em ${dt}s (executor dormia 30s)" || bad "cenário 11: rodada levou ${dt}s — o teto não matou o executor"
+"$RUNNER" case --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md --timeout 0 --executor "$EXEC" --results "$TMP/r11b" >/dev/null 2>&1
+[ $? -eq 2 ] && ok "cenário 11 --timeout 0 → exit 2" || bad "cenário 11: --timeout 0 aceito"
+
+# --- cenário 12: juiz conflitante (PASS e FAIL em linhas distintas) → INVALIDO; eco da instrução não conta ---
+export FAKE_STATE="$TMP/s12"; mkdir -p "$FAKE_STATE"
+out="$("$RUNNER" case --arm A=file:reguas/regua-juiz-conflito.md --arm B=file:reguas/regua-juiz-eco.md \
+  --runs 1 --executor "$EXEC" --results "$TMP/r12" 2>&1)"
+rc=$?
+if [ $rc -eq 0 ] && printf '%s\n' "$out" | grep -q "eixo-um: A=INVALIDO · B=PASS → HOLD (sem veredito válido"; then ok "cenário 12 juiz conflitante → INVALIDO; eco da instrução → conclusão vale"
+else bad "cenário 12: conflito/eco do juiz mal lidos (exit $rc)"; printf '%s\n' "$out" >&2; fi
+
+# --- cenário 13: JSON inválido do executor com deck íntegro → veredito segue, telemetria degrada ---
+export FAKE_STATE="$TMP/s13"; mkdir -p "$FAKE_STATE"
+out="$("$RUNNER" case --arm A=file:reguas/regua-json-quebrado.md --arm B=file:reguas/regua-ma.md \
+  --runs 1 --executor "$EXEC" --results "$TMP/r13" 2>&1)"
+rc=$?
+if [ $rc -eq 0 ] && printf '%s\n' "$out" | grep -q "eixo-um: A=PASS · B=FAIL → A" && printf '%s\n' "$out" | grep -q "custo: nao medido (3 de 4 chamadas com campo)"; then ok "cenário 13 JSON inválido: veredito pelo deck, custo declarado não medido"
+else bad "cenário 13: JSON inválido mal tratado (exit $rc)"; printf '%s\n' "$out" >&2; fi
+
+# --- cenário 14: mesmo timestamp duas vezes → diretórios distintos, agg nunca soma ---
+export FAKE_STATE="$TMP/s14"; mkdir -p "$FAKE_STATE"
+EVAL_RUN_TS=20260907-120000 "$RUNNER" case --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
+  --runs 1 --executor "$EXEC" --results "$TMP/r14" >/dev/null 2>&1
+out="$(EVAL_RUN_TS=20260907-120000 "$RUNNER" case --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
+  --runs 1 --executor "$EXEC" --results "$TMP/r14" 2>&1)"
+if [ -d "$TMP/r14/20260907-120000" ] && [ -d "$TMP/r14/20260907-120000-2" ] && [ "$(cat "$TMP/r14/20260907-120000-2/agg/eixo-um.A" | wc -l | tr -d ' ')" = "1" ] \
+   && printf '%s\n' "$out" | grep -q "resultados: $TMP/r14/20260907-120000-2"; then ok "cenário 14 colisão de timestamp → sufixo -2, agg isolado"
+else bad "cenário 14: rodadas no mesmo segundo se misturaram"; ls "$TMP/r14" >&2; fi
+
+# --- cenário 15: caminhos com espaço (caso e --results) e isolamento entre braços/runs ---
+CS="$TMP/caso com espaco"; cp -R case "$CS"
+export FAKE_STATE="$TMP/s15"; mkdir -p "$FAKE_STATE"
+out="$("$RUNNER" "$CS" --arm A=file:reguas/regua-lista-a.md --arm B=file:reguas/regua-lista-b.md \
+  --runs 2 --executor "$EXEC" --results "$TMP/saida com espaco" 2>&1)"
+rc=$?
+if [ $rc -eq 0 ] && printf '%s\n' "$out" | grep -q "deck-presente: A=PASS · B=PASS" && printf '%s\n' "$out" | grep -q "sem-defeito: A=PASS · B=PASS"; then ok "cenário 15 caminhos com espaço: graders file_exists/regex/llm funcionam"
+else bad "cenário 15: caminho com espaço quebrou a rodada (exit $rc)"; printf '%s\n' "$out" >&2; fi
+dA="$(cat "$TMP/saida com espaco"/*/run/A-r1/deck/TASK-001-001-MARCA-LISTA-ALFA.md 2>/dev/null)"
+dB2="$(cat "$TMP/saida com espaco"/*/run/B-r2/deck/TASK-001-001-MARCA-LISTA-BETA.md 2>/dev/null)"
+if printf '%s' "$dA" | grep -q "VISTO-DECK:  *$" || printf '%s' "$dA" | grep -qv "BETA"; then :; fi
+if ! printf '%s' "$dB2" | grep -q "ALFA" && ! printf '%s' "$dB2" | grep -q "rastro" && ! printf '%s' "$dA" | grep -q "BETA"; then ok "cenário 15 isolamento: braço/run não enxerga deck nem rastro de outro"
+else bad "cenário 15: vazamento entre workspaces"; printf 'A: %s\nB2: %s\n' "$dA" "$dB2" >&2; fi
+if [ "$(cat "$TMP/saida com espaco"/*/run/A-r1/REGUA.md)" != "$(cat "$TMP/saida com espaco"/*/run/B-r1/REGUA.md)" ]; then ok "cenário 15 cada braço recebe a própria régua"
+else bad "cenário 15: réguas iguais nos dois braços"; fi
 
 # --- cenário 4: usos inválidos → exit 2 ---
 "$RUNNER" nao-existe --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
