@@ -23,6 +23,38 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.162.2] — 2026-09-07
+
+Re-init: none
+
+Decision 4.384 — from an external audit of the test base: three defects and two live mutants
+reproduced under 39 green suites, each confirmed before being fixed.
+
+### Fixed
+
+- **`ledger.sh append` under concurrency** — the event file name is now reserved atomically
+  (`noclobber`), so two appends in the same second with the same type and origin get distinct
+  suffixes instead of the same path with one body lost. Naming and readers are unchanged; a
+  failed write releases the reservation. The suite gains a real race (fifo barrier) that the
+  previous script fails.
+- **`noverify-guard` false positive on quoted text** — a command that merely prints or searches
+  the literal (`printf`, `echo`, `grep`, `rg`, `sed`) is no longer denied. The absolution is
+  dropped whenever any simple command on the line is an interpreter (`bash`, `sh`, `zsh`,
+  `eval`, `xargs`, `source`, `.`), so `printf '…' | bash` and `bash -c "…"` stay denied. New
+  suite `scripts/tests/noverify/run.sh` (25 cases; the previous hook fails 6).
+- **`artifact-lint.sh` `spec-nfr-sem-numero` was unreachable** — it looked for digits on the
+  whole line, and the NFR id itself carries digits. It now measures the NFR text after the id
+  and the RFC marker, so an NFR with no number is finally reported (WARNING, as the contract
+  always said).
+
+### Changed
+
+- **Maintainer tooling** — the lint suite gains a fixture that demands each of seven
+  catalogue checks no expected output required before (suppressing any of them turns the
+  suite red); the release suite gains negative cases for divergent versions, missing
+  manifest, missing CHANGELOG entry, broken MIRRORS and broken `bash -n`; the pre-commit
+  hook and CI run the new noverify suite.
+
 ## [0.162.1] — 2026-09-07
 
 Re-init: none

@@ -137,6 +137,9 @@ jobs:
       - name: Suíte do warroom (scripts/tests/warroom/run.sh)
         run: bash scripts/tests/warroom/run.sh
 
+      - name: Suíte do noverify-guard (scripts/tests/noverify/run.sh)
+        run: bash scripts/tests/noverify/run.sh
+
       - name: Suíte do check-refs.sh (scripts/tests/refs/run.sh)
         run: bash scripts/tests/refs/run.sh
 

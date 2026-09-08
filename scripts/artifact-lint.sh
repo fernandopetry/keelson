@@ -158,7 +158,12 @@ sect == "6" && line ~ /^- \*\*NFR-[0-9]+/ {
   low = tolower(line)
   if (low ~ /r..?pido|seguro|user-friendly|intuitiv|escal..?vel/)
     emit("WARNING", "spec-nfr-vago", id ": NFR com termo vago (rapido/seguro/user-friendly/intuitivo/escalavel)")
-  if (line !~ /[0-9]/)
+  # o valor e medido no TEXTO do NFR, nunca na linha inteira: o proprio ID (NFR-001-001)
+  # carrega digitos e o check nunca disparava (4.384 — inalcancavel, achado por fixture)
+  ntxt = line
+  sub(/^- \*\*NFR-[0-9-]+\*\*[ \t]*/, "", ntxt)
+  sub(/^\[[A-Za-z]+\][ \t]*/, "", ntxt)
+  if (ntxt !~ /[0-9]/)
     emit("WARNING", "spec-nfr-sem-numero", id ": NFR sem valor numerico")
   next
 }

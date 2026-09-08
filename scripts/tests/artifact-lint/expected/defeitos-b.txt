@@ -1,0 +1,7 @@
+ERROR	plan-dod-vazia	Definition of Done (secao 9) sem itens (PLAN-001-login.md)
+ERROR	spec-fr-sem-rfc	FR-001-004: FR sem [MUST]/[SHOULD]/[MAY] (SPEC-001-login.md)
+ERROR	task-tipo-enum	Tipo "hotfix" fora de {feature, bugfix, refactor, chore} (TASK-001-001-autenticador.md)
+INFO	task-bugfix-forma-legada	AC violado na forma antiga dentro de Realiza (FRs) — nao reprova (TASK-001-002-fix-bloqueador.md)
+WARNING	plan-data-formato	Data fora do formato YYYY-MM-DD (PLAN-001-login.md)
+WARNING	spec-nfr-sem-numero	NFR-001-001: NFR sem valor numerico (SPEC-001-login.md)
+WARNING	spec-sem-premissa	nenhuma premissa listada na secao 8 (SPEC-001-login.md)

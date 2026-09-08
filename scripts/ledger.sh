@@ -13,6 +13,8 @@
 #      ledger.sh <raiz-do-repo> archive [--keep <arquivo>]… [--ts <iso>]
 #
 #   append   cria <yyyymmdd-hhmmss>-<tipo>-<origem>.md no ledger da CASA DA SESSÃO
+#            (nome reservado atomicamente — dois append no mesmo segundo ganham
+#            sufixos distintos, nunca o mesmo arquivo; 4.384)
 #            (decisão 4.314 — resolvida por session-dir.sh:
 #            thoughts/local/sessions/<ts>-<sid8>/ledger/; sem id de sessão, o
 #            caminho legado thoughts/local/session-ledger/) com o cabeçalho
@@ -178,8 +180,14 @@ case "$ACTION" in
     [ "$DIFFID" = "none" ] && DIFFID=""
     base="$LDIR/$compact-$TIPO-$ORIGEM"
     f="$base.md"; n=1
-    while [ -e "$f" ]; do
+    # Reserva ATÔMICA do nome (4.384): `set -C` (noclobber) faz o `>` falhar se o arquivo
+    # já existe — dois append concorrentes no mesmo segundo nunca escolhem o mesmo
+    # caminho (testar-existir-depois-escrever perdia um evento). A reserva precede a
+    # leitura do stdin; o sufixo de colisão continua o mesmo (-2, -3, …).
+    while ! ( set -C; : > "$f" ) 2>/dev/null; do
+      [ -d "$LDIR" ] || die2 "não consegui reservar $f"
       n=$((n + 1))
+      [ "$n" -le 9999 ] || die2 "não consegui reservar um nome livre a partir de $base"
       f="$base-$n.md"
     done
     corpo="$(cat)"
@@ -195,7 +203,7 @@ case "$ACTION" in
       if [ -n "$DIFFID" ] && [ -n "$NOTA" ]; then printf '%s\n' "$NOTA"; fi
       if [ -n "$REF" ]; then printf 'ref: %s\n' "$REF"; fi
       if [ -n "$DIFFID" ]; then printf 'diff_id: %s\n' "$DIFFID"; fi
-    } > "$f" || die2 "não consegui escrever $f"
+    } > "$f" || { rm -f "$f"; die2 "não consegui escrever $f"; }
     printf '%s\n' "$f"
     exit 0 ;;
 

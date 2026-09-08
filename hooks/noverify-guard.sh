@@ -26,7 +26,25 @@ cmd="$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null |
 
 # Só interessa git commit/push carregando --no-verify no mesmo comando simples
 # (sem atravessar | ; && — evita falso positivo de outro comando do pipeline).
-printf '%s' "$cmd" | grep -Eq 'git[^|;&]*\b(commit|push)\b[^|;&]*--no-verify' || exit 0
+RE='git[^|;&]*\b(commit|push)\b[^|;&]*--no-verify'
+printf '%s' "$cmd" | grep -Eq "$RE" || exit 0
+
+# Texto citado não é execução (4.384): o comando simples que casa começa por um
+# emissor de texto (printf/echo/grep/rg/sed) → o literal é dado, não git. A absolvição
+# cai se QUALQUER comando simples da linha é interpretador (bash/sh/zsh/eval/xargs/
+# source/.) — `printf '…' | bash` continua deny; `bash -c "git commit …"` também.
+exec_hit=0; interp=0
+while IFS= read -r seg; do
+  first="$(printf '%s' "$seg" \
+    | sed -E 's/^[[:space:]]*//; s/^([A-Za-z_][A-Za-z0-9_]*=[^[:space:]]*[[:space:]]+)*//' \
+    | awk '{print $1}')"
+  case "$first" in bash|sh|zsh|eval|xargs|source|.) interp=1 ;; esac
+  printf '%s' "$seg" | grep -Eq "$RE" || continue
+  case "$first" in printf|echo|grep|rg|sed) ;; *) exec_hit=1 ;; esac
+done <<EOF
+$(printf '%s' "$cmd" | tr '|;&' '\n')
+EOF
+[ "$exec_hit" -eq 1 ] || [ "$interp" -eq 1 ] || exit 0
 
 # Escape nomeado: o humano assumiu o pulo explicitamente.
 case "$cmd" in

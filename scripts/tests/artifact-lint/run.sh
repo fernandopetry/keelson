@@ -6,6 +6,10 @@
 # Regra da suíte: fixture válida sai limpa (zero achado espúrio) e todo defeito
 # plantado é acusado pelo check esperado. Check novo no catálogo → fixture nova.
 # "legado" prova o rebaixamento ERROR → WARNING [legacy] em artefato Done.
+# "defeitos-b" (4.384) planta, um por artefato, os checks do catálogo que nenhuma
+# fixture exigia (spec-fr-sem-rfc, spec-nfr-sem-numero, spec-sem-premissa,
+# plan-data-formato, plan-dod-vazia, task-tipo-enum, task-bugfix-forma-legada) —
+# suprimir qualquer um deles no motor deixa a suíte vermelha.
 #
 # Uso: scripts/tests/artifact-lint/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -52,6 +56,7 @@ echo "ok   bash -n artifact-lint.sh"
 runcase valido          valido   0 valido.txt
 runcase defeitos        defeitos 1 defeitos.txt
 runcase legado          legado   0 legado.txt
+runcase defeitos-b      defeitos-b 1 defeitos-b.txt
 runcase arquivo-valido  valido/specs/SPEC-001-login.md 0 arquivo-unico-valido.txt
 runcase arquivo-defeito defeitos/tasks/TASK-001-005-refactor-extrai.md 1 arquivo-unico-defeito.txt
 

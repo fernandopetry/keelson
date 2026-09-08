@@ -55,6 +55,8 @@ WARNING	spec-metrica-sem-fonte	metrica de sucesso (1.3) sem linha **Fonte de med
 WARNING	spec-metrica-sem-numero	metrica de sucesso (1.3) sem numero (SPEC-001-login-defeituosa.md)
 WARNING	spec-must-ratio	31 de 31 FRs sao MUST (>70% — sem priorizacao real) (SPEC-002-lote.md)
 WARNING	spec-must-ratio	4 de 5 FRs sao MUST (>70% — sem priorizacao real) (SPEC-001-login-defeituosa.md)
+WARNING	spec-nfr-sem-numero	NFR-001-001: NFR sem valor numerico (SPEC-001-login-defeituosa.md)
+WARNING	spec-nfr-sem-numero	NFR-001-002: NFR sem valor numerico (SPEC-001-login-defeituosa.md)
 WARNING	spec-nfr-vago	NFR-001-001: NFR com termo vago (rapido/seguro/user-friendly/intuitivo/escalavel) (SPEC-001-login-defeituosa.md)
 WARNING	spec-out-of-scope-curto	out-of-scope (4.2) com menos de 2 itens (SPEC-001-login-defeituosa.md)
 WARNING	spec-porte-epico	31 FRs na secao 5 (>30 — sugerir /keelson:specify-epic antes de Approved, 4.115) (SPEC-002-lote.md)

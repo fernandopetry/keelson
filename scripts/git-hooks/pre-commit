@@ -329,7 +329,7 @@ done
 # (o run_suite dedupa contra as rodadas acima).
 for par in "window-marker:window-marker" "compact-anchor:compact-anchor" \
            "review-guard:review-guard" "security-guard:security-guard" \
-           "warroom-guard:warroom"; do
+           "warroom-guard:warroom" "noverify-guard:noverify"; do
   hook="${par%%:*}"; suite="${par#*:}"
   if printf '%s\n' "$staged" | grep -qE "^(hooks/$hook\.sh\$|scripts/tests/$suite/)"; then
     run_suite "$suite"

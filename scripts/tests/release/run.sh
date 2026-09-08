@@ -166,6 +166,56 @@ R3="$TMP/repo-valor-invalido"; mkrepo "$R3" 0.12.0
 sed 's/^Re-init: none$/Re-init: talvez/' "$CL" > "$R3/CHANGELOG.md"
 checkrel marcador-invalido 1 "sem a linha \"Re-init: required\" ou \"Re-init: none\" (§4.189)" "$R3"
 
+# --- negativos das guardas de versão/CHANGELOG/MIRRORS (4.384) ---
+# A 4.83 provou cada camada por mutação à mão e nunca congelou: a suíte só criava
+# as três versões iguais, e a comparação trocada por `true` seguia verde.
+
+# versões divergentes entre os 3 lugares → falha nomeando os três valores
+R4="$TMP/repo-diverge"; mkrepo "$R4" 0.12.0
+printf '{\n  "metadata": { "version": "0.13.0" }\n}\n' > "$R4/.claude-plugin/marketplace.json"
+cp "$CL" "$R4/CHANGELOG.md"
+checkrel versoes-divergem 1 "versões divergem: plugin.json=0.12.0 marketplace.json=0.13.0 README=0.12.0" "$R4"
+
+# README atrasado (os dois manifests iguais) → falha
+R5="$TMP/repo-readme-atrasado"; mkrepo "$R5" 0.12.0
+printf '## Status\n\n`0.11.0`\n' > "$R5/README.md"
+cp "$CL" "$R5/CHANGELOG.md"
+checkrel readme-atrasado 1 "README=0.11.0" "$R5"
+
+# marketplace.json ausente → falha nomeando o arquivo
+R6="$TMP/repo-sem-marketplace"; mkrepo "$R6" 0.12.0
+rm -f "$R6/.claude-plugin/marketplace.json"
+cp "$CL" "$R6/CHANGELOG.md"
+checkrel marketplace-ausente 1 "não achei a versão em .claude-plugin/marketplace.json" "$R6"
+
+# versão bumpada sem entrada no CHANGELOG → falha citando §4.48
+R7="$TMP/repo-sem-entrada"; mkrepo "$R7" 0.14.0
+cp "$CL" "$R7/CHANGELOG.md"
+checkrel changelog-sem-entrada 1 'sem entrada "## [0.14.0]" — bump sem entrada é release incompleto (§4.48)' "$R7"
+
+# CHANGELOG ausente → falha (a entrada não pode existir)
+R8="$TMP/repo-sem-changelog"; mkrepo "$R8" 0.12.0
+checkrel changelog-ausente-falha 1 'sem entrada "## [0.12.0]"' "$R8"
+
+# MIRRORS apontando para arquivo inexistente → falha nomeando o espelho
+R9="$TMP/repo-mirror-quebrado"; mkrepo "$R9" 0.12.0
+cp "$CL" "$R9/CHANGELOG.md"
+printf "MIRRORS='docs/nao-existe.md|Pagina'\n" > "$R9/scripts/publish-wiki.sh"
+checkrel mirror-quebrado 1 "MIRRORS aponta para arquivo inexistente: docs/nao-existe.md" "$R9"
+
+# controle: MIRRORS apontando para arquivo existente → verde
+R10="$TMP/repo-mirror-ok"; mkrepo "$R10" 0.12.0
+cp "$CL" "$R10/CHANGELOG.md"
+mkdir -p "$R10/docs"; printf '# p\n' > "$R10/docs/existe.md"
+printf "MIRRORS='docs/existe.md|Pagina'\n" > "$R10/scripts/publish-wiki.sh"
+checkrel mirror-ok 0 "todos os espelhos do MIRRORS existem" "$R10"
+
+# bash -n: script com sintaxe quebrada no mini-repo → falha
+R11="$TMP/repo-bash-n"; mkrepo "$R11" 0.12.0
+cp "$CL" "$R11/CHANGELOG.md"
+printf 'if [ 1 ]; then\n' > "$R11/scripts/quebrado.sh"
+checkrel bash-n-quebrado 1 "bash -n falhou em scripts/quebrado.sh" "$R11"
+
 echo "---"
 if [ "$fail" -gt 0 ]; then
   echo "release: $fail de $total casos falharam"

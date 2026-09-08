@@ -18,6 +18,8 @@
 # descartado; imune a GIT_DIR herdado; worktree vinculado não marca (sem linha); mark
 # para origem sem guard → exit 2 (o corpo congelado do append-corpo — raiz sem git —
 # prova "sem escopo → sem linha").
+# Corrida (4.384): dois append simultâneos (barreira por fifo) ganham caminhos
+# distintos e preservam os dois corpos — a reserva do nome é atômica (noclobber).
 #
 # Uso: scripts/tests/ledger/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -317,6 +319,36 @@ if git -C "$R5" worktree add -q "$WT" -b wt-branch >/dev/null 2>&1; then
   git -C "$R5" worktree remove --force "$WT" >/dev/null 2>&1 || true
 else
   echo "ok   diff-id-worktree-sem-linha (git worktree indisponível — pulado)"
+fi
+
+# --- corrida (4.384): dois append SIMULTÂNEOS com mesmo ts/tipo/origem ---
+# Barreira por stdin: cada processo escolhe o nome antes de ler o corpo (fifo), então
+# os dois estão vivos no mesmo instante. Contrato: dois caminhos DISTINTOS e os dois
+# corpos preservados — testar-existir-depois-escrever devolvia o mesmo caminho e
+# perdia um evento (reproduzido pela auditoria externa de 2026-09-07).
+RR="$TMP/repo-race"; mkdir -p "$RR"
+mkfifo "$TMP/fifo-a" "$TMP/fifo-b" 2>/dev/null
+if [ -p "$TMP/fifo-a" ] && [ -p "$TMP/fifo-b" ]; then
+  ( lg "" "$RR" append gate qa slug-x --ts "$TS1" < "$TMP/fifo-a" > "$TMP/race-a" 2>/dev/null ) &
+  pa=$!
+  ( lg "" "$RR" append gate qa slug-x --ts "$TS1" < "$TMP/fifo-b" > "$TMP/race-b" 2>/dev/null ) &
+  pb=$!
+  # os dois abrem o fifo (bloqueiam no cat) só depois de reservar o nome
+  printf 'corpo A\n' > "$TMP/fifo-a"
+  printf 'corpo B\n' > "$TMP/fifo-b"
+  wait "$pa" "$pb"
+  fa="$(cat "$TMP/race-a")"; fb="$(cat "$TMP/race-b")"
+  total=$((total + 1))
+  if [ -n "$fa" ] && [ -n "$fb" ] && [ "$fa" != "$fb" ]; then ok race-caminhos-distintos
+  else falha "race-caminhos-distintos: [$fa] [$fb]"; fi
+  total=$((total + 1))
+  if grep -qx 'corpo A' "$fa" 2>/dev/null && grep -qx 'corpo B' "$fb" 2>/dev/null; then ok race-corpos-preservados
+  else falha "race-corpos-preservados"; fi
+  total=$((total + 1))
+  nrace="$(find "$RR" -name "*-gate-qa*.md" | wc -l | tr -d ' ')"
+  if [ "$nrace" = "2" ]; then ok race-dois-arquivos; else falha "race-dois-arquivos: $nrace"; fi
+else
+  echo "ok   race (mkfifo indisponível — pulado)"
 fi
 
 echo "---"
