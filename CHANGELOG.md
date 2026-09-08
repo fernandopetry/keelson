@@ -23,6 +23,29 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.162.5] — 2026-09-07
+
+Re-init: none
+
+Decision 4.387 — fourth batch from the external audit of the test base: the session
+state machinery is now proven end to end, in one session, with the real hooks.
+
+### Fixed
+
+- **`ledger.sh append` on an unwritable ledger directory** looped through 9999 name
+  candidates before dying with the wrong message ("no free name"): the atomic reservation
+  treated every failed create as a collision. A failed create with no file present is now
+  reported immediately as a write failure; only an existing file counts as a collision.
+
+### Changed
+
+- **Maintainer tooling** — new `session-cycle` suite chains session-dir, run-state and ledger
+  with the wave-guard, review-guard and compact-anchor hooks through open → promote → mark/
+  verdict → wave-done → compaction anchor → close → archive → mark-reported → gc, plus archive
+  racing an append and recovery after a write failure; wired into the pre-commit hook (any of
+  those writers or hooks routes to it) and CI. Declared boundary: `wave-done` has a single
+  writer by contract and is not exercised concurrently.
+
 ## [0.162.4] — 2026-09-07
 
 Re-init: none

@@ -167,6 +167,9 @@ jobs:
       - name: publish-wiki.sh contra remoto local (scripts/tests/wiki/run.sh)
         run: bash scripts/tests/wiki/run.sh
 
+      - name: Integração do ciclo de sessão (scripts/tests/session-cycle/run.sh)
+        run: bash scripts/tests/session-cycle/run.sh
+
       - name: Suíte do check-refs.sh (scripts/tests/refs/run.sh)
         run: bash scripts/tests/refs/run.sh
 

@@ -308,7 +308,7 @@ run_suite() {
 }
 for par in "ficha:ficha diff-facts" "next-id:next-id" "index-check:index" \
            "diff-facts:diff-facts review-guard security-guard ledger" "artifact-lint:artifact-lint" \
-           "run-state:run-state" "ledger:ledger review-guard security-guard" \
+           "run-state:run-state session-cycle" "ledger:ledger review-guard security-guard session-cycle" \
            "init-selfcheck:init-selfcheck" "probe-env:probe-env" \
            "epic-state:epic-state" "handoff-scan:handoff-scan" \
            "legacy-move:legacy-move" "postmortem-facts:postmortem-facts" \
@@ -318,7 +318,7 @@ for par in "ficha:ficha diff-facts" "next-id:next-id" "index-check:index" \
            "check-frontmatter:frontmatter" "context-cost:context-cost" \
            "check-mermaid:mermaid" "eval-run:eval-run" "cycle-clock:cycle-clock" \
            "warroom:warroom" "lessons:lessons" "version:version" "pause:pause" \
-           "session-dir:session-dir run-state ledger context-cost window-marker compact-anchor review-guard security-guard warroom"; do
+           "session-dir:session-dir run-state ledger context-cost window-marker compact-anchor review-guard security-guard warroom session-cycle"; do
   motor="${par%%:*}"; suites="${par#*:}"
   dirs_re="$(printf '%s' "$suites" | sed 's/ /|/g')"
   if printf '%s\n' "$staged" | grep -qE "^scripts/($motor\.sh\$|tests/($dirs_re)/)"; then
@@ -329,13 +329,15 @@ done
 # Hooks com suíte própria (4.314): hook ou fixtures no commit → a suíte roda
 # (o run_suite dedupa contra as rodadas acima).
 for par in "window-marker:window-marker" "compact-anchor:compact-anchor" \
-           "review-guard:review-guard" "security-guard:security-guard" \
+           "review-guard:review-guard session-cycle" "security-guard:security-guard" \
+           "wave-guard:wave-guard session-cycle" "compact-anchor:compact-anchor session-cycle" \
            "warroom-guard:warroom" "noverify-guard:noverify" \
            "worktree-guard:worktree-guard" "doc-guard:doc-guard" \
            "desc-guard:desc-guard" "jira-guard:jira-guard"; do
-  hook="${par%%:*}"; suite="${par#*:}"
-  if printf '%s\n' "$staged" | grep -qE "^(hooks/$hook\.sh\$|scripts/tests/$suite/)"; then
-    run_suite "$suite"
+  hook="${par%%:*}"; suites="${par#*:}"
+  dirs_re="$(printf '%s' "$suites" | sed 's/ /|/g')"
+  if printf '%s\n' "$staged" | grep -qE "^(hooks/$hook\.sh\$|scripts/tests/($dirs_re)/)"; then
+    for s in $suites; do run_suite "$s"; done
   fi
 done
 

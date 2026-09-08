@@ -185,7 +185,9 @@ case "$ACTION" in
     # caminho (testar-existir-depois-escrever perdia um evento). A reserva precede a
     # leitura do stdin; o sufixo de colisão continua o mesmo (-2, -3, …).
     while ! ( set -C; : > "$f" ) 2>/dev/null; do
-      [ -d "$LDIR" ] || die2 "não consegui reservar $f"
+      # falhou e o arquivo NÃO existe → não é colisão, é escrita impossível (permissão,
+      # disco): erro nomeado na hora, nunca 9999 tentativas (4.387)
+      [ -e "$f" ] || die2 "não consegui escrever em $LDIR (permissão? disco?)"
       n=$((n + 1))
       [ "$n" -le 9999 ] || die2 "não consegui reservar um nome livre a partir de $base"
       f="$base-$n.md"
