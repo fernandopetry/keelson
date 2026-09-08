@@ -23,6 +23,22 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.165.1] — 2026-09-08
+
+Re-init: none
+
+Decision 4.399 — fifth real-model smoke round: the amendment route (4.398) halved the cost of
+the promise-change scenario; the "mechanics in batches" convention (4.397) measured as a no-op
+and is removed.
+
+### Removed
+
+- **"Mechanics in batches" convention** (`sdd-conventions.md`, with its pointers in
+  `/keelson:implement` and `/keelson:auto`) — the premise was a measurement error: the Tech Lead
+  already chains keelson scripts inside one Bash call in about two thirds of the mechanical
+  turns, and the sentence changed nothing (18 → 15 single-script turns, within noise). Removed
+  under the doctrine's own no-op rule.
+
 ## [0.165.0] — 2026-09-08
 
 Re-init: none

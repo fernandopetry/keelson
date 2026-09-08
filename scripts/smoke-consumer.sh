@@ -23,8 +23,9 @@
 #           silêncio é o defeito da 4.66). A feature contraria o out-of-scope da SPEC-001:
 #           a rota esperada é a EMENDA (4.398) — SPEC-001 em versão nova, nenhuma SPEC
 #           nova, emenda no INDEX.
-# Cada cenário grava também o PERFIL DE CUSTO do Tech Lead (4.397): chamadas, contexto
-# somado/mediana/pico, chamadas com 2+ ferramentas e tokens por papel, lidos do transcript.
+# Cada cenário grava também o PERFIL DE CUSTO do Tech Lead (4.399): chamadas, contexto
+# somado/mediana/pico, Bash com 1 script × com 2+ encadeados, e tokens por papel, lidos do
+# transcript da sessão do consumidor.
 #
 # Uso: smoke-consumer.sh [--scenario init|cycle|pause|broken|all] [--results DIR]
 #                        [--model M] [--timeout S] [--plugin-dir DIR] [--consumer DIR]
@@ -131,7 +132,8 @@ PY
       perfil="$(python3 - "$tr" <<'PY' 2>/dev/null || echo "perfil: nao medido (transcript ilegivel)"
 import json, sys
 from collections import defaultdict
-ctx = {}; tools = 0; multi = 0; sub = defaultdict(lambda: [0, 0])
+import re
+ctx = {}; tools = 0; multi = 0; sub = defaultdict(lambda: [0, 0]); bash1 = 0; bashn = 0
 for line in open(sys.argv[1], encoding="utf-8", errors="replace"):
     try: e = json.loads(line)
     except Exception: continue
@@ -142,13 +144,18 @@ for line in open(sys.argv[1], encoding="utf-8", errors="replace"):
         n = sum(1 for b in m.get("content") or [] if isinstance(b, dict) and b.get("type") == "tool_use")
         if n: tools += n
         if n > 1: multi += 1
+        for b in m.get("content") or []:
+            if isinstance(b, dict) and b.get("type") == "tool_use" and b.get("name") == "Bash":
+                k = len(re.findall(r"scripts/[a-z-]+\.sh", b.get("input", {}).get("command", "")))
+                if k == 1: bash1 += 1
+                elif k >= 2: bashn += 1
     r = e.get("toolUseResult")
     if isinstance(r, dict) and "totalTokens" in r:
         sub[r.get("agentType", "?")][0] += 1; sub[r.get("agentType", "?")][1] += r["totalTokens"]
 s = sorted(ctx.values())
 if not s: print("perfil: nao medido (sem chamadas no transcript)"); sys.exit(0)
 papeis = " · ".join(f"{k.replace('keelson:', '')} {v[0]}x {v[1] // 1000}k" for k, v in sorted(sub.items(), key=lambda x: -x[1][1]))
-print(f"perfil: tech-lead {len(s)} chamadas · contexto {sum(s) // 1000000}M (mediana {s[len(s) // 2] // 1000}k · pico {s[-1] // 1000}k) · chamadas com 2+ ferramentas {multi} · subagents {sum(v[1] for v in sub.values()) // 1000}k [{papeis}]")
+print(f"perfil: tech-lead {len(s)} chamadas · contexto {sum(s) // 1000000}M (mediana {s[len(s) // 2] // 1000}k · pico {s[-1] // 1000}k) · bash com 1 script {bash1} / com 2+ {bashn} · subagents {sum(v[1] for v in sub.values()) // 1000}k [{papeis}]")
 PY
 )"
     fi

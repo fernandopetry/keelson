@@ -137,8 +137,6 @@ Falha em qualquer gate: motivo específico, 1 retry, depois escala humano. Vulne
 
 ### 3.4 Closure da task (OBRIGATÓRIA)
 
-Os registros mecânicos desta closure (eventos do ledger, `wave-done`, lint e `index-check`) saem **em lote, na mesma chamada** — convenção "Mecânica em lote" em `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md` (4.397); só o que depende do resultado anterior ganha turno próprio.
-
 #### 3.4.1 Report consolidado (montado pela main session a partir do report do developer + resultados dos gates de 3.3)
 
 ```yaml
