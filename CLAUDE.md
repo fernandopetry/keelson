@@ -54,6 +54,10 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   default é absorção com crédito (4.263). O registro da chegada continua com o
   `/field-intake` (PR é insumo de campo com código junto); a face pública da rota para o
   contribuidor é o `CONTRIBUTING.md` ·
+  **`scripts/smoke-consumer.sh`** (smoke operacional com modelo real, 4.390) → provar em
+  consumidor DESCARTÁVEL, por fatos do disco, que init/re-init, o ciclo formal do auto,
+  pause/continue e o baseline vermelho se comportam como a doutrina diz; roda sob demanda
+  do Diretor (custa ~US$20 e ~45 min por rodada completa), nunca em pre-commit/CI ·
   **`evals/` + `scripts/eval-run.sh`** (camada de evals de comportamento, 4.304) → medir
   o efeito de mudança de doutrina em caso controlado A/B (braços `file:` ou `git:<ref>` com `regua:` declarada no caso;
   n≥2 é o mínimo do runner e comparação começa em 4 — piso empírico da 4.304, declarado
