@@ -46,9 +46,9 @@ G() { git -C "$R" -c user.email=t@t -c user.name=t "$@"; }
 # commit de preparação: sem o hook (hooksPath inexistente), só o caso sob teste passa por ele
 setup_commit() { G -c core.hooksPath=/dev/null commit -q -m "$1"; }
 
-novo_repo() { # [branch]
+novo_repo() { # repo sintético na branch main (o caso que precisa de outra branch faz checkout depois)
   rm -rf "$R" "$MARK"; mkdir -p "$R/scripts/git-hooks" "$R/hooks" "$MARK"
-  git -C "$R" init -q -b "${1:-main}" 2>/dev/null || { git -C "$R" init -q; git -C "$R" checkout -q -b "${1:-main}"; }
+  git -C "$R" init -q -b main 2>/dev/null || { git -C "$R" init -q; git -C "$R" checkout -q -b main; }
   cp "$HOOK" "$R/scripts/git-hooks/pre-commit"; chmod +x "$R/scripts/git-hooks/pre-commit"
   G config core.hooksPath scripts/git-hooks
   for s in $SUITES; do

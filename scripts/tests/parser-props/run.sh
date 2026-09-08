@@ -82,7 +82,7 @@ idx_out()     { ( cd "$1" && bash "$IDX" "$2" 2>/dev/null ) | sed "s|	$2 sem IND
 
 # --- plantas de diagnóstico (aplicadas ANTES da transformação, na cópia) ---
 # invocadas por nome (plant_$pl) no laço abaixo
-# shellcheck disable=SC2329
+# shellcheck disable=SC2317,SC2329
 plant_cycle() { # TASK-x depende da última TASK: A -> ... -> A
   first="$(find "$1/tasks" -name 'TASK-*.md' ! -name '*INDEX*' 2>/dev/null | sort | head -1)"
   last="$(find "$1/tasks" -name 'TASK-*.md' ! -name '*INDEX*' 2>/dev/null | sort | tail -1)"
@@ -92,13 +92,13 @@ plant_cycle() { # TASK-x depende da última TASK: A -> ... -> A
   sed -E "s/^(- \*\*Depende de\*\*:).*/\1 $lid/" "$first" > "$first.n" && mv "$first.n" "$first"
   sed -E "s/^(- \*\*Depende de\*\*:).*/\1 $fid/" "$last" > "$last.n" && mv "$last.n" "$last"
 }
-# shellcheck disable=SC2329
+# shellcheck disable=SC2317,SC2329
 plant_broken_ref() { # 1º FR da SPEC some: quem o realiza/mapeia aponta para o nada
   spec="$(find "$1/specs" -name 'SPEC-*.md' 2>/dev/null | sort | head -1)"; [ -n "$spec" ] || return 1
   fr="$(grep -oE 'FR-[0-9]+-[0-9]+' "$spec" | head -1)"; [ -n "$fr" ] || return 1
   sed -E "/^- \*\*$fr\*\*/d" "$spec" > "$spec.n" && mv "$spec.n" "$spec"
 }
-# shellcheck disable=SC2329
+# shellcheck disable=SC2317,SC2329
 plant_prose() { # prosa num campo de aresta
   t="$(find "$1/tasks" -name 'TASK-*.md' ! -name '*INDEX*' 2>/dev/null | sort | head -1)"; [ -n "$t" ] || return 1
   sed -E 's/^(- \*\*Depende de\*\*:).*/\1 depende do que o time decidir na daily/' "$t" > "$t.n" && mv "$t.n" "$t"
