@@ -185,7 +185,7 @@ EVAL_RUN_TS=20260907-120000 "$RUNNER" case --arm A=file:reguas/regua-boa.md --ar
   --runs 1 --executor "$EXEC" --results "$TMP/r14" >/dev/null 2>&1
 out="$(EVAL_RUN_TS=20260907-120000 "$RUNNER" case --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
   --runs 1 --executor "$EXEC" --results "$TMP/r14" 2>&1)"
-if [ -d "$TMP/r14/20260907-120000" ] && [ -d "$TMP/r14/20260907-120000-2" ] && [ "$(cat "$TMP/r14/20260907-120000-2/agg/eixo-um.A" | wc -l | tr -d ' ')" = "1" ] \
+if [ -d "$TMP/r14/20260907-120000" ] && [ -d "$TMP/r14/20260907-120000-2" ] && [ "$(wc -l < "$TMP/r14/20260907-120000-2/agg/eixo-um.A" | tr -d ' ')" = "1" ] \
    && printf '%s\n' "$out" | grep -q "resultados: $TMP/r14/20260907-120000-2"; then ok "cenário 14 colisão de timestamp → sufixo -2, agg isolado"
 else bad "cenário 14: rodadas no mesmo segundo se misturaram"; ls "$TMP/r14" >&2; fi
 

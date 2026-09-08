@@ -44,7 +44,14 @@ PY
 )"
 ( cd "$TMP" && exec python3 -m http.server "$PORT" --bind 127.0.0.1 ) >/dev/null 2>&1 &
 SRV_PID=$!
-sleep 1
+# prontidão OBSERVÁVEL, não `sleep` fixo (4.389 — o runner macOS do CI levava mais de 1 s
+# para o http.server aceitar conexão e a suíte acusava a app como fora do ar)
+n=0
+until curl -s -o /dev/null "http://127.0.0.1:$PORT/" 2>/dev/null; do
+  n=$((n + 1))
+  [ "$n" -ge 100 ] && { echo "ERRO: servidor de teste não subiu em 20 s" >&2; exit 1; }
+  sleep 0.2
+done
 
 R="$(mkroot up)"
 cat > "$R/keelson.local.json" <<EOF
