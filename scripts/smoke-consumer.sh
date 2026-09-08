@@ -265,7 +265,7 @@ cen_pause() {
   else
     fato "pause/recusa-sem-ciclo-em-voo"  'grep -qiE "não há ciclo|nao ha ciclo|nada (em andamento|para pausar|a pausar)" "$RESULTS/pause.result.txt"'
     fato "pause/nenhuma-marca-inventada"  '! printf "%s" "$rep" | grep -qE "^(pausa|retomada)"'
-    fato "pause/continue-declara-nada-pendente" 'grep -qiE "nada pendente|não há nada pendente|nao ha nada pendente|nenhuma .*pendente" "$RESULTS/continue.result.txt"'
+    fato "pause/continue-declara-nada-pendente" 'grep -qiE "nada (está |esta |fica |há |ha )?pendente|não há nada pendente|nao ha nada pendente|nenhuma .*pendente" "$RESULTS/continue.result.txt"'
   fi
   fato "pause/sem-commit-novo-de-codigo" '[ "$(G rev-list --count HEAD -- src tests 2>/dev/null)" = "$antes_src" ]'
   fato "pause/sem-task-duplicada"    '[ "$(find "$SD/tasks" -name "TASK-*.md" | grep -vc INDEX | tr -d " ")" = "$ntask" ]'
