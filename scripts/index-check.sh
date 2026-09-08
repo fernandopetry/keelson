@@ -68,7 +68,7 @@ for f in "$dir"/plans/PLAN-*.md; do
   b="$(basename "$f")"
   n="$(printf '%s\n' "$b" | sed -n 's/^PLAN-\([0-9][0-9]*\)[-.].*/\1/p')"
   [ -n "$n" ] || continue
-  st="$(sed -n 's/^\*\*Status\*\*[ 	]*:[ 	]*//p' "$f" | sed -n 1p | sed 's/[ 	]*$//')"
+  st="$(sed -n 's/^\*\*Status\*\*[ 	]*:[ 	]*//p' "$f" | sed -n 1p | sed 's/\r$//; s/[ 	]*$//')"
   printf 'planfile\t%s\t%s\n' "$n" "$st" >> "$FACTS"
 done
 
@@ -78,7 +78,7 @@ for f in "$dir"/tasks/TASK-*.md; do
   case "$b" in *-INDEX.md) continue ;; esac
   pair="$(printf '%s\n' "$b" | sed -n 's/^TASK-\([0-9][0-9]*\)-[0-9][0-9]*[-.].*/\1/p')"
   [ -n "$pair" ] || continue
-  st="$(sed -n 's/^\*\*Status\*\*[ 	]*:[ 	]*//p' "$f" | sed -n 1p | sed 's/[ 	]*$//')"
+  st="$(sed -n 's/^\*\*Status\*\*[ 	]*:[ 	]*//p' "$f" | sed -n 1p | sed 's/\r$//; s/[ 	]*$//')"
   printf 'taskfile\t%s\t%s\n' "$pair" "$st" >> "$FACTS"
 done
 
@@ -98,6 +98,8 @@ awk '
     next
   }
   FNR == NR { next }
+  # fase 2 (INDEX.md): variação inócua de arquivo — CRLF e BOM — não é fato (graph-contract §1)
+  { sub(/\r$/, ""); if (FNR == 1 && index($0, "\357\273\277") == 1) $0 = substr($0, 4) }
 
   # ---------- fase 2: INDEX.md ----------
   /^## /  { sec = trim(substr($0, 4)); subsec = ""; seen[sec] = 1; next }

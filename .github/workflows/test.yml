@@ -170,6 +170,9 @@ jobs:
       - name: Integração do ciclo de sessão (scripts/tests/session-cycle/run.sh)
         run: bash scripts/tests/session-cycle/run.sh
 
+      - name: Propriedades dos parsers (scripts/tests/parser-props/run.sh)
+        run: bash scripts/tests/parser-props/run.sh
+
       - name: Suíte do check-refs.sh (scripts/tests/refs/run.sh)
         run: bash scripts/tests/refs/run.sh
 

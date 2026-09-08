@@ -359,6 +359,13 @@ if printf '%s\n' "$staged" | grep -qE '^scripts/(graph\.sh$|artifact-lint\.sh$|i
   run_suite corpus
 fi
 
+# Propriedades dos parsers (4.388): transformação inócua de arquivo nunca muda o grafo,
+# o lint ou o index-check, e nunca esconde diagnóstico — roda com os mesmos motores
+# do corpus, mais as fixtures do grafo que ela usa como base.
+if printf '%s\n' "$staged" | grep -qE '^scripts/(graph\.sh$|artifact-lint\.sh$|index-check\.sh$|tests/(corpus|graph)/fixtures/|tests/parser-props/)'; then
+  run_suite parser-props
+fi
+
 # Dono de formato de artefato no commit (4.261): linha ESTRUTURAL (heading ou campo
 # **X**:) no diff staged dos comandos que carregam o template inline → o corpus pode
 # ter ficado para trás; suíte verde com motores velhos não prova conformidade nova.

@@ -23,6 +23,30 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.162.6] — 2026-09-07
+
+Re-init: none
+
+Decision 4.388 — fifth batch from the external audit of the test base: the parsers are
+proven invariant under harmless file transformations, and one of them was not.
+
+### Fixed
+
+- **`index-check.sh` on a CRLF INDEX** reported seven false warnings (`index-secao-ausente`,
+  `index-plan-fora`) on a legitimate file and read `Status: Done` from artefacts as an unknown
+  status, because the carriage return stayed glued to headings and values. It now strips CR
+  and BOM on read, as `graph.sh` and `artifact-lint.sh` already did.
+
+### Changed
+
+- **Maintainer tooling** — new `parser-props` suite: four base slugs × seven harmless
+  transformations (CRLF, BOM, both, trailing whitespace, spacing/backticks/bold around edge
+  IDs, doubled blank lines, reversed file creation order) must yield identical graph, check,
+  lint and index-check output, and three planted defects (task cycle, missing FR, prose in
+  an edge field) must stay reported under every transformation. Declared boundary: `*`
+  bullets are not a tolerated variation of the contract's `- ` form. Wired into the
+  pre-commit hook (any of the three parsers or their fixtures) and CI.
+
 ## [0.162.5] — 2026-09-07
 
 Re-init: none
