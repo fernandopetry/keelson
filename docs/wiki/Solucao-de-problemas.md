@@ -316,8 +316,13 @@ encerre", ela instrui a **não tocar** no ciclo alheio (continuar entraria no tr
 da outra sessão; encerrar apagaria o checkpoint dela no meio de uma tarefa), fazer um
 inventário rápido e relatar o achado a você. É o comportamento esperado: nenhuma
 sessão continua nem encerra o ciclo de outra. Se a sessão dona realmente morreu e o
-arquivo ficou órfão, peça na sessão atual para assumir ou limpar o estado — a
-assunção é sempre um ato deliberado, nunca automático.
+arquivo ficou órfão, rode `/keelson:continue <slug>` na sessão atual: ele mede a
+evidência de morte com uma régua mecânica — a casa da sessão dona já foi reportada, ou
+nenhum arquivo dela foi tocado há 20 minutos ou mais, e nenhum processo vivo carrega o
+id dela — e só então assume o ciclo, movendo o estado para a sessão atual e anotando de
+quem era e por quê. Sem essa evidência (a dona escreveu há pouco, ou há processo vivo
+com o id dela), ele não assume: inventaria e pergunta a você, que pode mandar assumir
+mesmo assim.
 
 Uma exceção é reconhecida sozinha desde a 0.130.0: um **ajudante da própria sessão
 dona** (um subagent ou teammate que ela despachou) não é "outra sessão" — o guard

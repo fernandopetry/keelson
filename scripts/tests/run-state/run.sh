@@ -224,6 +224,70 @@ total=$((total + 1))
 rs sessao-a "$TMP/nao-existe" show meu-slug >/dev/null 2>&1
 [ $? -eq 2 ] && ok raiz-inexistente-exit-2 || falha raiz-inexistente-exit-2
 
+# --- claim (4.396): posse sob evidência de morte da dona ---
+RC="$TMP/repo-claim"; mkdir -p "$RC"
+DONA="$(env -u CLAUDE_CODE_SESSION_ID KEELSON_SESSAO=sessao-dona bash "$SD" "$RC" dir --create --ts "2026-09-08T10:00:00-0300" 2>/dev/null)"
+rs sessao-dona "$RC" init claim-slug PLAN-001 2 "wave 1" >/dev/null 2>&1
+FD="$DONA/run-state-claim-slug.md"
+# dona ATIVA (arquivos recém-tocados) → recusada, exit 3, nada escrito
+total=$((total + 1))
+out="$(rs sessao-nova "$RC" claim claim-slug 2>/dev/null)"; rc=$?
+if [ "$rc" -eq 3 ] && printf '%s' "$out" | grep -q '^posse: recusada' && printf '%s' "$out" | grep -q 'ativa há' && [ -f "$FD" ] && grep -q '^sessao: sessao-dona' "$FD"; then ok claim-dona-ativa-recusa
+else falha "claim-dona-ativa-recusa: rc=$rc [$out]"; fi
+# --stale-min 0 torna qualquer inatividade suficiente; --check só julga
+total=$((total + 1))
+out="$(rs sessao-nova "$RC" claim claim-slug --stale-min 0 --check 2>/dev/null)"; rc=$?
+if [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q '^posse: assumivel' && grep -q '^sessao: sessao-dona' "$FD"; then ok claim-check-nao-escreve
+else falha "claim-check-nao-escreve: rc=$rc [$out]"; fi
+# processo vivo carregando o id da dona → recusada mesmo com casa velha
+( exec -a "claude --keelson-teste sessao-dona" sleep 20 ) & PVIVO=$!
+total=$((total + 1))
+out="$(rs sessao-nova "$RC" claim claim-slug --stale-min 0 2>/dev/null)"; rc=$?
+kill "$PVIVO" 2>/dev/null; wait "$PVIVO" 2>/dev/null
+if [ "$rc" -eq 3 ] && printf '%s' "$out" | grep -q 'processo vivo'; then ok claim-processo-vivo-recusa
+else falha "claim-processo-vivo-recusa: rc=$rc [$out]"; fi
+# casa velha (mtimes antigos) → assumida: run MOVIDO para a casa da nova, sessao reescrita, origem registrada
+find "$DONA" -type f -exec touch -t 202601010000 {} +
+NOVA="$(env -u CLAUDE_CODE_SESSION_ID KEELSON_SESSAO=sessao-nova bash "$SD" "$RC" dir --create --ts "2026-09-08T11:00:00-0300" 2>/dev/null)"
+total=$((total + 1))
+out="$(rs sessao-nova "$RC" claim claim-slug 2>/dev/null)"; rc=$?
+FN="$NOVA/run-state-claim-slug.md"
+if [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q '^posse: assumida' && [ -f "$FN" ] && [ ! -f "$FD" ] \
+   && grep -q '^sessao: sessao-nova' "$FN" && grep -q '^posse_anterior: sessao-dona · assumida ' "$FN" && grep -q '^waves_concluidas: 0' "$FN" && grep -q '^plan: PLAN-001' "$FN"; then ok claim-inatividade-assume-e-move
+else falha "claim-inatividade-assume-e-move: rc=$rc [$out] $(cat "$FN" 2>/dev/null)"; fi
+# depois de assumir, a nova sessão opera o run normalmente; a dona (se voltasse) é recusada
+total=$((total + 1))
+if rs sessao-nova "$RC" wave-done claim-slug >/dev/null 2>&1 && ! rs sessao-dona "$RC" wave-done claim-slug >/dev/null 2>&1; then ok claim-posse-efetiva
+else falha claim-posse-efetiva; fi
+# run já meu → propria; sem run → nenhum-run
+total=$((total + 1))
+out="$(rs sessao-nova "$RC" claim claim-slug 2>/dev/null)"; rc=$?
+[ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q '^posse: propria' && ok claim-propria || falha "claim-propria: rc=$rc [$out]"
+total=$((total + 1))
+out="$(rs sessao-nova "$RC" claim outro-slug 2>/dev/null)"; rc=$?
+[ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q '^posse: nenhum-run' && ok claim-nenhum-run || falha "claim-nenhum-run: rc=$rc [$out]"
+# casa reportada → assumida mesmo recém-tocada
+RC2="$TMP/repo-claim2"; mkdir -p "$RC2"
+env -u CLAUDE_CODE_SESSION_ID KEELSON_SESSAO=sessao-dona2 bash "$SD" "$RC2" dir --create --ts "2026-09-08T10:00:00-0300" >/dev/null 2>&1
+rs sessao-dona2 "$RC2" open claim-slug "largada" >/dev/null 2>&1
+env -u CLAUDE_CODE_SESSION_ID KEELSON_SESSAO=sessao-dona2 bash "$SD" "$RC2" mark-reported --ts "2026-09-08T10:30:00-0300" >/dev/null 2>&1
+total=$((total + 1))
+out="$(rs sessao-nova "$RC2" claim claim-slug 2>/dev/null)"; rc=$?
+if [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q 'estado: reportada'; then ok claim-casa-reportada-assume
+else falha "claim-casa-reportada-assume: rc=$rc [$out]"; fi
+# sem identidade própria → recusada
+total=$((total + 1))
+out="$(rs "" "$RC2" claim claim-slug 2>/dev/null)"; rc=$?
+[ "$rc" -eq 3 ] && printf '%s' "$out" | grep -q 'não tem id' && ok claim-sem-identidade-recusa || falha "claim-sem-identidade-recusa: rc=$rc [$out]"
+# run legado (thoughts/local) de outra sessão, velho → assumida e movido para a casa da nova
+RC3="$TMP/repo-claim3"; mkdir -p "$RC3/thoughts/local"
+printf 'status: em_andamento\nslug: claim-slug\nplan: PLAN-001\nwaves_concluidas: 1\nwaves_total: 3\nretomada: wave 2\nsessao: sessao-legada\n' > "$RC3/thoughts/local/run-state-claim-slug.md"
+touch -t 202601010000 "$RC3/thoughts/local/run-state-claim-slug.md"
+total=$((total + 1))
+out="$(rs sessao-nova "$RC3" claim claim-slug 2>/dev/null)"; rc=$?
+if [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q '^posse: assumida' && [ ! -f "$RC3/thoughts/local/run-state-claim-slug.md" ] && grep -q '^sessao: sessao-nova' "$RC3"/thoughts/local/sessions/*/run-state-claim-slug.md; then ok claim-legado-assume
+else falha "claim-legado-assume: rc=$rc [$out]"; fi
+
 echo "---"
 if [ "$fail" -gt 0 ]; then
   echo "run-state: $fail de $total casos falharam"

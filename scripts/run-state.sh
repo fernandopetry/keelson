@@ -10,6 +10,7 @@
 #      run-state.sh <raiz-do-repo> close <slug> <motivo…>
 #      run-state.sh <raiz-do-repo> remove <slug>
 #      run-state.sh <raiz-do-repo> show <slug>
+#      run-state.sh <raiz-do-repo> claim <slug> [--stale-min N] [--check]
 #
 #   open       abre o run NA LARGADA do /keelson:auto (decisão 4.348), antes de
 #              existir PLAN: mesmas chaves canônicas com `plan: —` (lacuna
@@ -28,6 +29,19 @@
 #   close      status: encerrado — <motivo> (o wave-guard deixa de bloquear)
 #   remove     apaga o arquivo (idempotente; cobre casa da sessão E legado)
 #   show       imprime o arquivo (nada se ausente)
+#   claim      assume a POSSE de um run em_andamento de OUTRA sessão só sob EVIDÊNCIA DE
+#              MORTE da dona (decisão 4.396): (a) a casa da dona está `estado: reportada`,
+#              OU (b) nenhum arquivo da casa da dona (session.meta, window.log, ledger/,
+#              run-state) foi tocado há ≥ --stale-min minutos (default 20); E (c) nenhum
+#              processo vivo carrega o id da dona (`ps` — presença é prova de vida;
+#              ausência sozinha não é prova de morte, por isso (a)/(b) são obrigatórios).
+#              Assumido → o run é MOVIDO para a casa desta sessão com `sessao:` = esta e
+#              a linha `posse_anterior: <id> · assumida <iso> · inatividade <N>min`;
+#              stdout `posse: assumida · …`. Sem evidência → nada escrito, stdout
+#              `posse: recusada · <motivo>`, exit 3 (o chamador escala ao humano — a
+#              terceira saída da 4.251 continua sendo o default). Run já desta sessão →
+#              `posse: propria`, exit 0. Sem run em_andamento → `posse: nenhum-run`, exit 0.
+#              --check só julga, não escreve.
 #
 # Leitura dupla (carência 4.314): wave-done/close/show operam no arquivo da casa
 # da sessão quando ele existe, senão no caminho legado — um run iniciado antes do
@@ -39,7 +53,7 @@
 # OUTRA sessão quando ambos os ids são conhecidos — degradam ao comportamento antigo
 # quando algum lado é "desconhecida". FORCE=1 assume a posse de propósito.
 #
-# Exit: 0 ok · 2 uso incorreto/arquivo ausente onde obrigatório/run de terceiro.
+# Exit: 0 ok · 2 uso incorreto/arquivo ausente onde obrigatório/run de terceiro · 3 claim recusado.
 # Bash 3.2-compatível, sem dependências novas.
 
 set -u
@@ -92,7 +106,7 @@ recusa_se_alheio() { # $1 = arquivo (default: $F)
   [ "$SESSAO" = "desconhecida" ] && return 0
   [ "$dono" = "$SESSAO" ] && return 0
   [ "${FORCE:-}" = "1" ] && return 0
-  die2 "run em andamento de $SLUG pertence à sessão '$dono' (esta é '$SESSAO') — posse de terceiro (4.251). Não continue nem encerre o run alheio: inventarie (mtime, git status da worktree em 'retomada', sessões pares vivas) e escale ao humano. FORCE=1 assume a posse de propósito."
+  die2 "run em andamento de $SLUG pertence à sessão '$dono' (esta é '$SESSAO') — posse de terceiro (4.251). Não continue nem encerre o run alheio: inventarie (mtime, git status da worktree em 'retomada', sessões pares vivas) e escale ao humano. Sob evidência de morte da dona, \`run-state.sh <raiz> claim $SLUG\` assume a posse (4.396); FORCE=1 assume de propósito."
 }
 
 # escreve_run PLAN TOTAL RET — corpo comum de open (largada, 4.348) e init (1ª wave):
@@ -193,5 +207,68 @@ case "$ACTION" in
     [ -f "$F" ] && cat "$F"
     exit 0 ;;
 
-  *) die2 "ação desconhecida: $ACTION (use open, init, wave-done, close, remove ou show)" ;;
+  claim)
+    STALE=20; CHECK=0
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --stale-min) shift; [ $# -gt 0 ] || die2 "--stale-min exige N"; STALE="$1" ;;
+        --check) CHECK=1 ;;
+        *) die2 "opção desconhecida: $1" ;;
+      esac
+      shift
+    done
+    case "$STALE" in ''|*[!0-9]*) die2 "--stale-min inválido: $STALE" ;; esac
+    # localiza o run em_andamento do slug em QUALQUER casa (a dona não é esta sessão, logo
+    # resolve_leitura não o acha) — casa de sessão primeiro, legado por último
+    alvo=""
+    for c in "$DIR_LEG"/sessions/*/ "$DIR_LEG"; do
+      [ -f "$c/run-state-$SLUG.md" ] || continue
+      grep -q '^status: em_andamento' "$c/run-state-$SLUG.md" 2>/dev/null || continue
+      alvo="$c/run-state-$SLUG.md"; break
+    done
+    [ -n "$alvo" ] || { echo "posse: nenhum-run · sem run em_andamento de $SLUG em nenhuma casa"; exit 0; }
+    casa="$(dirname "$alvo")"
+    dono="$(sed -n 's/^sessao:[ 	]*//p' "$alvo" 2>/dev/null | sed -n 1p)"
+    [ -n "$dono" ] || dono="desconhecida"
+    if [ "$dono" = "$SESSAO" ]; then echo "posse: propria · $alvo"; exit 0; fi
+    [ "$SESSAO" != "desconhecida" ] || { echo "posse: recusada · esta sessão não tem id (RUN_STATE_SESSAO/CLAUDE_CODE_SESSION_ID) — sem identidade não há posse a assumir"; exit 3; }
+    # (c) processo vivo carregando o id da dona → prova de vida, recusa
+    if [ "$dono" != "desconhecida" ] && pgrep -f -- "$dono" >/dev/null 2>&1; then
+      echo "posse: recusada · processo vivo carrega o id da dona ($dono) — a sessão pode estar em execução"; exit 3
+    fi
+    # (a) casa reportada
+    motivo=""
+    if [ "$casa" != "$DIR_LEG" ] && grep -qx 'estado: reportada' "$casa/session.meta" 2>/dev/null; then
+      motivo="casa da dona em estado: reportada"
+    else
+      # (b) inatividade: arquivo mais recente da casa (legado: run-state + session-ledger + window.log)
+      # mtime mais recente (BSD `stat -f %m`, GNU `stat -c %Y`) — find -exec, nomes com espaço seguros
+      if [ "$casa" = "$DIR_LEG" ]; then set -- "$alvo" "$DIR_LEG/session-ledger" "$DIR_LEG/session-window.log"; else set -- "$casa"; fi
+      newest="$(find "$@" -type f -exec stat -f '%m' {} + 2>/dev/null | sort -n | tail -1)"
+      [ -n "$newest" ] || newest="$(find "$@" -type f -exec stat -c '%Y' {} + 2>/dev/null | sort -n | tail -1)"
+      [ -n "$newest" ] || { echo "posse: recusada · não consegui medir a atividade da casa da dona ($casa)"; exit 3; }
+      agora="$(date +%s)"
+      inat=$(( (agora - newest) / 60 ))
+      if [ "$inat" -lt "$STALE" ]; then
+        echo "posse: recusada · casa da dona ($dono) ativa há ${inat}min (limiar ${STALE}min) — sem evidência de morte, escale ao humano (4.251)"; exit 3
+      fi
+      motivo="inatividade ${inat}min (limiar ${STALE}min)"
+    fi
+    if [ "$CHECK" -eq 1 ]; then echo "posse: assumivel · dona $dono · $motivo · run $alvo"; exit 0; fi
+    # assume: move o run para a casa desta sessão, reescreve sessao: e registra a origem
+    destino_dir="$(sd dir --create --slug "$SLUG")" || destino_dir=""
+    [ -n "$destino_dir" ] || destino_dir="$DIR_LEG"
+    destino="$destino_dir/run-state-$SLUG.md"
+    iso="$(TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z)"
+    tmp="$destino.tmp.$$"
+    {
+      sed "s/^sessao:.*/sessao: $SESSAO/" "$alvo"
+      printf 'posse_anterior: %s · assumida %s · %s\n' "$dono" "$iso" "$motivo"
+    } > "$tmp" || die2 "não consegui escrever $tmp"
+    mv "$tmp" "$destino" || die2 "não consegui gravar $destino"
+    [ "$destino" != "$alvo" ] && rm -f "$alvo"
+    echo "posse: assumida · dona anterior $dono · $motivo · run agora em $destino"
+    exit 0 ;;
+
+  *) die2 "ação desconhecida: $ACTION (use open, init, wave-done, close, remove, show ou claim)" ;;
 esac

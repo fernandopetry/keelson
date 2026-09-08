@@ -23,6 +23,31 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.164.0] — 2026-09-08
+
+Re-init: none
+
+Decision 4.396 — from the third real-model smoke round: after the session running a cycle
+died, the session that continued it measured every sign of death and still stopped at the
+closure to ask for ownership, because the ownership rule only knew "another session".
+
+### Added
+
+- **`run-state.sh claim <slug>`** — takes over an in-progress run of another session only
+  under mechanical evidence that the owner is dead: its session home is already reported, or
+  no file of that home was touched for 20 minutes or more (`--stale-min`), and no live process
+  carries its id. The run is moved into the claiming session's home with `sessao:` rewritten
+  and a `posse_anterior:` line naming the former owner, the instant and the reason; without
+  evidence nothing is written and the command reports why (exit 3). `--check` only judges.
+
+### Changed
+
+- **`/keelson:continue`** runs `claim` before escalating a foreign in-progress run: assumed →
+  records the decision in the session ledger and resumes as owner through the closure and the
+  delivery; refused → escalates to the human with the printed reason, as before. The wave
+  guard's ownership message points at the rule; the conventions and the troubleshooting page
+  describe the exception.
+
 ## [0.163.3] — 2026-09-08
 
 Re-init: none

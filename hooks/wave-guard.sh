@@ -137,7 +137,7 @@ ${detalhes}
 Isto não é 'fôlego': a regra 'fôlego não é gatilho' veta parar o SEU run — ela não autoriza continuar nem encerrar o run dos outros, e nenhuma das duas saídas habituais é segura aqui (continuar entraria na worktree de uma sessão viva; marcar 'encerrado' apagaria o checkpoint dela no meio de uma TASK). Faça a TERCEIRA saída:
 1. NÃO edite o arquivo alheio, NÃO continue a wave dele, NÃO o marque 'encerrado' nem o remova.
 2. INVENTARIE: mtime do run-state, 'git status' da worktree apontada em 'retomada', sessões/processos pares vivos.
-3. ESCALE o achado ao humano na sua resposta, nomeando o run, o dono e o inventário.
+3. ESCALE o achado ao humano na sua resposta, nomeando o run, o dono e o inventário — ou, se a dona está provadamente morta (casa reportada, ou inativa há 20+ min sem processo vivo), assuma pela régua mecânica: /keelson:continue <slug> roda 'run-state.sh <raiz> claim <slug>' e só assume quando ela diz 'assumida' (decisão 4.396).
 Se algum run acima pertencer a ESTA sessão (campo 'sessao' igual à sua), esse continua normalmente. Só então encerre."
 else
   reason="Guarda de waves (decisão 4.23): há run do keelson com status EM ANDAMENTO — encerrar o turno agora deixaria o trabalho parado no meio, com o humano ausente.
