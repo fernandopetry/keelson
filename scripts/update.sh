@@ -26,9 +26,9 @@
 # update falho é erro nomeado (exit 1), nunca silêncio.
 #
 # Nota de implementação: `claude plugin update` SUBSTITUI este próprio arquivo
-# no meio da execução — toda a lógica pós-update vive em funções definidas
-# aqui no topo (parseadas antes da mutação) e o rodapé do script é uma única
-# linha de chamada.
+# no meio da execução — toda a lógica vive em funções parseadas antes da mutação
+# e o fluxo inteiro roda dentro de main() (4.386): a linha `main "$@"` é a última
+# coisa que o bash lê do disco antes de a CLI tocar no arquivo.
 
 set -u
 LC_ALL=C
@@ -179,6 +179,12 @@ if [ "${1:-}" = "--reinit-scan" ]; then
   exit 0
 fi
 
+# Fluxo inteiro numa função (4.386): o bash lê o script por demanda, e a linha que vem
+# DEPOIS de `claude plugin update` só seria lida quando o arquivo em disco já foi
+# substituído — com o arquivo novo mais curto, o bash chega ao fim e encerra sem o
+# relatório (reproduzido pela suíte com um `claude` falso que trunca o script). Dentro
+# de main() tudo já está parseado antes da primeira chamada à CLI.
+main() {
 SCOPE="user"
 if [ "${1:-}" = "--scope" ] && [ -n "${2:-}" ]; then
   SCOPE="$2"
@@ -221,3 +227,6 @@ if ! claude plugin update "$PLUGIN_ID" --scope "$SCOPE"; then
 fi
 
 final_report
+}
+
+main "$@"

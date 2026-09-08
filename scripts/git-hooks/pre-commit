@@ -313,7 +313,8 @@ for par in "ficha:ficha diff-facts" "next-id:next-id" "index-check:index" \
            "epic-state:epic-state" "handoff-scan:handoff-scan" \
            "legacy-move:legacy-move" "postmortem-facts:postmortem-facts" \
            "edge-diff:edge-diff" "e2e-coverage:e2e-coverage" \
-           "update:release" "check-release:release" "check-refs:refs" \
+           "update:release update" "check-release:release" "check-refs:refs" \
+           "publish-wiki:wiki" \
            "check-frontmatter:frontmatter" "context-cost:context-cost" \
            "check-mermaid:mermaid" "eval-run:eval-run" "cycle-clock:cycle-clock" \
            "warroom:warroom" "lessons:lessons" "version:version" "pause:pause" \

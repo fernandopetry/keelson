@@ -161,6 +161,12 @@ jobs:
       - name: Roteamento do pre-commit (scripts/tests/pre-commit/run.sh)
         run: bash scripts/tests/pre-commit/run.sh
 
+      - name: Fluxo completo do update.sh com CLI falsa (scripts/tests/update/run.sh)
+        run: bash scripts/tests/update/run.sh
+
+      - name: publish-wiki.sh contra remoto local (scripts/tests/wiki/run.sh)
+        run: bash scripts/tests/wiki/run.sh
+
       - name: Suíte do check-refs.sh (scripts/tests/refs/run.sh)
         run: bash scripts/tests/refs/run.sh
 

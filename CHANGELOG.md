@@ -23,6 +23,32 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.162.4] — 2026-09-07
+
+Re-init: none
+
+Decision 4.386 — third batch from the external audit of the test base: the update and
+wiki scripts run end to end under fakes, and each surfaced a defect on the first run.
+
+### Fixed
+
+- **`update.sh` lost its final report** when `claude plugin update` replaced the script on
+  disk mid-run: bash reads a script on demand, and the closing call sat past the end of the
+  shorter new file, so the run ended silently with no "updated X → Y", no re-init verdict
+  and no restart reminder. The whole flow now lives inside `main()`, parsed before the first
+  CLI call. Proven by a suite with a fake `claude` that truncates the script.
+- **`publish-wiki.sh` could publish stray files** left in the local wiki clone: `reset --hard`
+  keeps untracked files and the following `add -A` shipped them. The clone is now cleaned
+  after the reset. Proven against a local bare remote.
+
+### Changed
+
+- **Maintainer tooling** — new suites `update` (fake CLI: call order, marketplace failure
+  blocks the update, scope handling, version unchanged, CHANGELOG read from the new tree,
+  degraded verdicts, self-replacement) and `wiki` (local remote: check/dry-run never push,
+  mirrors and manifest, manual page preserved, link rewriting, idempotent republish, orphan
+  removal, UI edits overwritten, named errors); both wired into the pre-commit hook and CI.
+
 ## [0.162.3] — 2026-09-07
 
 Re-init: none

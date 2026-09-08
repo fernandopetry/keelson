@@ -96,6 +96,9 @@ if [ -d "$WIKI_DIR/.git" ]; then
   git -C "$WIKI_DIR" fetch --quiet origin || die "fetch do wiki falhou."
   BRANCH="$(git -C "$WIKI_DIR" rev-parse --abbrev-ref HEAD)"
   git -C "$WIKI_DIR" reset --quiet --hard "origin/$BRANCH" || die "reset do clone do wiki falhou."
+  # Arquivo solto no clone local (rascunho, resto de rodada anterior) NÃO é página:
+  # sem isto o `git add -A` abaixo o publicava (4.386 — achado pela suíte com remoto local).
+  git -C "$WIKI_DIR" clean --quiet -fdx || die "limpeza do clone do wiki falhou."
 else
   rm -rf "$WIKI_DIR"
   git clone --quiet "$WIKI_REMOTE" "$WIKI_DIR" \
