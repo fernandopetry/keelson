@@ -23,6 +23,9 @@
 
 set -u
 unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_PREFIX
+# identidade git para o commit que o PRÓPRIO publish-wiki.sh faz no clone da wiki: o
+# runner do CI não tem user.name/email (a Action de publicação configura os seus)
+export GIT_AUTHOR_NAME=keelson-test GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=keelson-test GIT_COMMITTER_EMAIL=t@t
 LC_ALL=C
 export LC_ALL
 
