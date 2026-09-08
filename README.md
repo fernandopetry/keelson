@@ -402,7 +402,7 @@ keelson/
 ├── commands/          # /keelson:* slash commands (the cycle)
 ├── agents/            # subagents (the team): po, pm, developer, code-reviewer, qa, security-engineer, performance-engineer, product-designer… + tools (not roles): code-scout, scribe, tracker-sync, estimator
 ├── skills/            # spec / plan / task validators + status + screen-verify
-├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard, jira-guard, noverify-guard, warroom-guard, compact-anchor, window-marker
+├── hooks/             # doc-guard, security-guard, review-guard, stale-background-guard, wave-guard, desc-guard, worktree-guard, agent-guard, jira-guard, noverify-guard, warroom-guard, largada-guard (4.391), compact-anchor, window-marker
 ├── guidelines/
 │   ├── _meta/         # QUALITY-CHARTER.md · PROFILE-OUTLINE.md
 │   ├── core/          # language-agnostic doctrine (always active)
@@ -422,7 +422,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.162.6` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.163.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 

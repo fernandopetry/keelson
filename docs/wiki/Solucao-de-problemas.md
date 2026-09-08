@@ -93,6 +93,19 @@ o mesmo número de linhas conta como mudança nova e o lembrete volta; editar s�
 documentação, fora dos `codePaths`, não o traz de volta; renomear um arquivo sem editá-lo
 não conta como mudança.
 
+### A sessão não encerra: "ciclo formal sem largada registrada"
+
+Você (ou o agente) criou ou alterou SPEC, PLAN ou TASK nesta branch, mas nesta sessão
+não existe run-state para o slug nem nenhum evento no ledger da sessão. É o sinal de um
+ciclo conduzido "por fora" da mecânica — sem a largada, a guarda de waves nunca arma, os
+lembretes de revisão não têm veredito para ler e o relatório final se reconstrói de
+memória. Caso real: o `/keelson:auto` decidiu que uma feature era pequena demais para
+"a mecânica pesada" e pulou ledger e run-state. Tamanho não dispensa a largada. Duas
+saídas: registre a largada agora (`run-state.sh open` + os vereditos já emitidos no
+ledger) e siga pelo protocolo; ou, se os artefatos não são de um ciclo (edição manual,
+migração de legado, `/keelson:rebuild-index`), diga isso em uma linha — o lembrete
+aparece uma vez por conjunto de arquivos e não volta para o mesmo conjunto.
+
 ### A sessão não encerra: "dívida de verificação do warroom"
 
 Existe linha aberta no `DEBT.md` (raiz da sua pasta de documentação) e nenhuma janela de

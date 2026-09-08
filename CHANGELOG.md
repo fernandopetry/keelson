@@ -23,6 +23,26 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.163.0] — 2026-09-08
+
+Re-init: none
+
+Decision 4.391 — from the first real-model smoke round (4.390): the `/keelson:auto` cycle
+shipped a correct feature while declaring it had "simplified" the session ledger and the
+run-state because the feature was small. Those are mandatory at kickoff, and without them
+the wave guard never arms and the review guards have no verdict to read.
+
+### Added
+
+- **`largada-guard`** (Stop hook) — blocks the end of the turn when a SPEC, PLAN or TASK was
+  created or changed on the current branch but this session has no run-state for the slug and
+  no ledger event mentioning it: a formal cycle with no recorded kickoff. It stays silent for
+  the inline route (code only), for a delivered cycle whose run-state was removed after the
+  push (the archived ledger proves the kickoff), for artefacts already on main, and for derived
+  files (indexes, briefs, handoffs). One nudge per set of artefacts; the message names the slug
+  and the files and offers the two ways out (record the kickoff now, or say in one line that
+  the artefacts are not a cycle). Reproduced live against the smoke consumer that triggered it.
+
 ## [0.162.6] — 2026-09-07
 
 Re-init: none

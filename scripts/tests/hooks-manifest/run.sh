@@ -81,6 +81,7 @@ Stop	-	stale-background-guard.sh
 Stop	-	wave-guard.sh
 Stop	-	desc-guard.sh
 Stop	-	jira-guard.sh
+Stop	-	largada-guard.sh
 Stop	-	window-marker.sh
 SessionStart	compact	compact-anchor.sh"
 got="$(printf '%s\n' "$regs" | awk -F'\t' '{ n=$4; sub(/.*\//, "", n); print $1 "\t" $2 "\t" n }')"

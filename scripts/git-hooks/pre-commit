@@ -333,7 +333,7 @@ for par in "window-marker:window-marker" "compact-anchor:compact-anchor" \
            "wave-guard:wave-guard session-cycle" "compact-anchor:compact-anchor session-cycle" \
            "warroom-guard:warroom" "noverify-guard:noverify" \
            "worktree-guard:worktree-guard" "doc-guard:doc-guard" \
-           "desc-guard:desc-guard" "jira-guard:jira-guard"; do
+           "desc-guard:desc-guard" "jira-guard:jira-guard" "largada-guard:largada-guard"; do
   hook="${par%%:*}"; suites="${par#*:}"
   dirs_re="$(printf '%s' "$suites" | sed 's/ /|/g')"
   if printf '%s\n' "$staged" | grep -qE "^(hooks/$hook\.sh\$|scripts/tests/($dirs_re)/)"; then
