@@ -27,6 +27,25 @@ merge-preserving and harmless — a wrong `none` is not).
 
 Re-init: none
 
+Decision 4.392 — two proposals raised by the disposable consumer of the second real-model
+smoke round (4.391), both about proving a mutant dead.
+
+### Changed
+
+- **`guidelines/core/TESTING.md`** (mutant chosen by the instrument's blind spot, 4.331) — the
+  kill proof runs under the **runner's real order** (the CI order), never a hand-picked one:
+  with state shared between tests, a mutant that only dies when the right case runs first is
+  alive; and the instrument must execute the **mutated source, not a cache of the previous
+  one** (bytecode, build artefacts, runner cache purged or disabled before each round).
+- **`/keelson:mutation-setup`** (step 4) — the composed command disables or purges caches
+  before each round; Python gets the concrete form (`PYTHONDONTWRITEBYTECODE=1` plus a
+  `__pycache__` purge, or the runner's `--no-cache`), other stacks name the cache they turned
+  off in the report.
+
+## [0.163.1] — 2026-09-08
+
+Re-init: none
+
 Decision 4.392 — a consumer ledger reported gate 11 (design/UX) skipped on three waves
 whose diffs changed server-side templates, because the orchestrator read "no frontend in
 the ficha" as "no UI surface". Same path-vs-topic confusion decision 4.219 fixed for gate 8.

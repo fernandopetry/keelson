@@ -137,6 +137,13 @@ dos testes apontados, ou recalibrar o threshold no comando da ficha (decisão su
 keelson não define score mínimo). Remover o campo desliga o gate por completo: ele é
 opt-in.
 
+Dois falsos que parecem mutante morto e não são: o instrumento leu um **cache do
+fonte anterior** (bytecode Python em `__pycache__`, cache do runner, artefato de build)
+e "matou" um mutante que nunca executou — desligue ou purgue o cache no próprio comando
+da ficha, como o `/keelson:mutation-setup` compõe; e o mutante que **só morre numa
+ordem de execução** escolhida à mão — em estado compartilhado entre testes, a prova
+vale na ordem real do runner, a mesma do CI.
+
 ### O validator acusou colisão de arquivo entre TASKs da mesma wave
 
 O lint achou o mesmo arquivo declarado no "Escopo > Inclui" de duas ou mais TASKs da

@@ -3963,6 +3963,14 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 **Aplicação**: `commands/implement.md` (§3.3 item 11, uma cláusula) · `docs/_meta/proposal-inbox.md` (3 linhas fechadas) · bump patch 0.163.1, `Re-init: none`. Wiki: nada a mudar (o que o consumidor faz não muda; o gate passa a disparar onde já devia).
 
+### 4.392 — Prova de mutante: sob a ordem real do runner e sem cache do fonte anterior
+
+**Problema**: duas `PROPOSTA` do consumidor descartável da 2ª rodada do smoke (4.391), ambas `causa_raiz: instrucao_ausente`, ambas expostas por controles que já existiam. (1) O gate de mutação improvisado no PLAN rodou o mutante Python com o bytecode em cache: `__pycache__` serviu o `.pyc` do fonte anterior, o mutante saiu como "morto" sem ter sido executado, e só o controle positivo da 4.186 desmentiu — a leva foi refeita. (2) A prova de um mutante em estado compartilhado (histórico global entre testes) rodou numa ordem escolhida à mão; sob a ordem real do discovery, o mutante que remove o `setUp` **sobrevive**, porque o `TestCase` alfabeticamente anterior limpa o estado — o re-gate do delta declarou a guarda "não auto-sustentável" como pendência com dono. Nenhuma das duas regras estava escrita: o bullet da 4.331 fala do **ponto cego do instrumento** (o que o instrumento não vê), não do instrumento executar o fonte errado nem da ordem em que a prova roda.
+
+**Decisão**: ato do Diretor sobre o default `adiada` da 4.371 — as duas entram, cada uma no seu dono. (1) `guidelines/core/TESTING.md`, bullet da 4.331, ganha duas frases: a **prova de morte roda sob a ordem real do runner** (a do CI; "morreu na ordem que eu escolhi" não conta como morto), e o **instrumento executa o fonte mutado, nunca cache do anterior** (bytecode, compilação, cache do runner purgados ou desligados antes de cada rodada — o falso é o mesmo que a 4.186 expõe). (2) `commands/mutation-setup.md`, Etapa 4, ganha o bullet de composição do comando com a forma concreta: Python `PYTHONDONTWRITEBYTECODE=1` + purga de `__pycache__` (ou `--no-cache` do runner); outras stacks nomeiam no report o cache desligado. `CODE-REVIEW.md` (gate 1) e `agents/developer.md` seguem ponteiros para o dono — nada duplicado. Wiki: `Solucao-de-problemas.md` ganha o parágrafo dos dois falsos na seção de mutantes sobreviventes. Origem: fila 4.111, linhas 2026-09-08 (LRN-001/LRN-002 do consumidor do smoke) → `aplicada`.
+
+**Aplicação**: `guidelines/core/TESTING.md` · `commands/mutation-setup.md` · `docs/wiki/Solucao-de-problemas.md` · `docs/_meta/proposal-inbox.md`. Doutrina embarcada mudou → CHANGELOG **0.163.1** (ajuste fino), `Re-init: none`.
+
 ---
 
 ## 7. Roteamento de mudanças

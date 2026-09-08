@@ -80,7 +80,14 @@ bloqueante no gate 1 — `./CODE-REVIEW.md`):
   que o tornaria incapaz de falhar: fixture de ordenação cuja ordem de inserção
   coincide com a esperada não distingue "ordenou" de "não ordenou" (o mutante que a
   neutraliza sobrevive à suíte inteira); contador de uma rota não vê o efeito novo
-  que nasce noutra rota (o mutante que o acrescenta sobrevive).
+  que nasce noutra rota (o mutante que o acrescenta sobrevive). A **prova de morte
+  roda sob a ordem real do runner** — a mesma do CI, nunca uma ordem escolhida à mão
+  (decisão 4.392): em estado compartilhado entre testes, o mutante que só morre quando
+  o caso certo roda primeiro está **vivo** na ordem do discovery, e "morreu na ordem
+  que eu escolhi" não conta como morto. E o **instrumento executa o fonte mutado, não
+  cache do fonte anterior**: bytecode, artefato de compilação ou cache do runner são
+  purgados ou desligados antes de cada rodada — mutante "morto" por um cache velho é
+  o mesmo falso que o controle positivo (4.186) existe para expor.
 - **Predicado correlacionado exige o agregado vizinho (decisão 4.175)**: predicado que
   vincula filho ao pai (escopo de tenant, correlação de subconsulta, junção por dono)
   tem **dois** modos de falha e por isso duas provas — apagar o **predicado** (morre com

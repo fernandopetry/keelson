@@ -56,6 +56,7 @@ Regras de composição (a régua é de `guidelines/core/TESTING.md` — o motor 
 - **Escopo de diff** quando a ferramenta suporta: Infection `--git-diff-base=<base>` · Stryker `--incremental` · cargo-mutants `--in-diff` · sem suporte nativo → restrinja pelos paths da config e diga isso no report. `<base>` vem de `--base` ou da branch default detectada; ambíguo → pergunte.
 - **Sem threshold na primeira adoção** (`--min-msi` e afins ficam de fora): o gate nasce informativo — sobreviventes aparecem no report da entrega sem bloquear. O report deste comando termina com a instrução de calibração: após 1–2 entregas, olhar o score real e travar o threshold **na ficha, pelo Diretor**.
 - Paralelismo/custo (`--threads`, workers) conforme o runner do projeto.
+- **O instrumento executa o fonte mutado, nunca cache do fonte anterior** (régua em `TESTING.md`, decisão 4.392): componha o comando de forma que o cache de bytecode/compilação/runner seja desligado ou purgado antes de cada rodada. Python: `PYTHONDONTWRITEBYTECODE=1` no comando e `find . -name __pycache__ -prune -exec rm -rf {} +` (ou `--no-cache` do runner) antes do mutante — o `.pyc` do fonte anterior serve o comportamento antigo e o mutante sai "morto" sem ter sido executado (caso real de mutação à mão num PLAN). Outras stacks: cache do runner de testes (Jest `--no-cache`, ts-jest), opcache em CLI, artefatos de build incrementais — nomeie no report o que foi desligado.
 
 ## Etapa 5: prova falsificável antes de gravar
 
