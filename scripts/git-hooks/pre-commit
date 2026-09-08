@@ -329,12 +329,25 @@ done
 # (o run_suite dedupa contra as rodadas acima).
 for par in "window-marker:window-marker" "compact-anchor:compact-anchor" \
            "review-guard:review-guard" "security-guard:security-guard" \
-           "warroom-guard:warroom" "noverify-guard:noverify"; do
+           "warroom-guard:warroom" "noverify-guard:noverify" \
+           "worktree-guard:worktree-guard" "doc-guard:doc-guard" \
+           "desc-guard:desc-guard" "jira-guard:jira-guard"; do
   hook="${par%%:*}"; suite="${par#*:}"
   if printf '%s\n' "$staged" | grep -qE "^(hooks/$hook\.sh\$|scripts/tests/$suite/)"; then
     run_suite "$suite"
   fi
 done
+
+# Registro dos hooks (4.385): qualquer hook ou o manifesto no commit → a suíte do
+# manifesto prova que todo hooks/*.sh está registrado no evento/matcher congelado.
+if printf '%s\n' "$staged" | grep -qE '^(hooks/[^/]+\.sh$|hooks/hooks\.json$|scripts/tests/hooks-manifest/)'; then
+  run_suite hooks-manifest
+fi
+
+# O próprio pre-commit (4.385): roteamento provado em repo temporário via hooksPath.
+if printf '%s\n' "$staged" | grep -qE '^(scripts/git-hooks/pre-commit$|scripts/tests/pre-commit/)'; then
+  run_suite pre-commit
+fi
 
 # Corpus de regressão dos motores read-only (4.260): slug sintético-realista com as
 # saídas de graph/artifact-lint/index-check congeladas — roda quando qualquer motor

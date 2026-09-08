@@ -23,6 +23,32 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.162.3] — 2026-09-07
+
+Re-init: none
+
+Decision 4.385 — second batch from the external audit of the test base (4.384): latent
+defect fixed, and the guards that had no guard get one.
+
+### Fixed
+
+- **`desc-guard` with multi-line descriptions** — a `description:` written as a folded (`>-`)
+  or literal (`|`) scalar, or continued on indented lines, is now measured by its interpreted
+  text (folded lines joined with a space, literal lines with a newline) instead of the marker
+  line alone, so a 251-character description can no longer slip under the 250 ceiling by
+  changing YAML style. Latent: no shipped artefact uses that form.
+
+### Changed
+
+- **Maintainer tooling** — four package hooks that had no suite (`worktree-guard`,
+  `doc-guard`, `desc-guard`, `jira-guard`) now run against synthetic repos (applicable,
+  legitimate, degraded and anti-renudge cases); a `hooks-manifest` suite reads
+  `hooks/hooks.json` and proves every hook is registered once, at its frozen event/matcher,
+  with an existing executable command; a `pre-commit` suite drives the real hook through
+  `core.hooksPath` in a temporary repo and proves suite routing, blocking, escapes and the
+  main-behind-origin guard. CI installs PyYAML before any suite and ShellCheck now covers
+  `.claude/hooks/*.sh`.
+
 ## [0.162.2] — 2026-09-07
 
 Re-init: none

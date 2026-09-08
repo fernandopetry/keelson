@@ -11,6 +11,8 @@
 # orçamento anti-reinchaço do plugin (auditoria de compressão, v0.17.0).
 # Este guard não depende do contexto do modelo: lê os .md do plugin em disco e
 # cutuca se algum passar do teto.
+# Mede o VALOR YAML (code points): escalar `>-`/`|` e continuação indentada contam
+# pelo texto interpretado, nunca pela linha do marcador (4.385).
 #
 # Escopo: só age no REPOSITÓRIO DE DESENVOLVIMENTO do keelson (onde os .md do plugin
 # são editados — marcado por .claude-plugin/plugin.json com name "keelson" + commands/).
@@ -56,15 +58,36 @@ def desc_len(path):
     lines = txt.split("\n")
     if not lines or lines[0].strip() != "---":
         return None
-    for line in lines[1:]:
+    i = 1
+    while i < len(lines):
+        line = lines[i]
         if line.strip() == "---":
             break
         m = re.match(r"description:\s*(.*)$", line)
         if m:
-            val = m.group(1)
+            val = m.group(1).strip()
+            # Escalar multilinha (4.385): `>-`/`|` e continuacao indentada — o valor e o
+            # TEXTO interpretado, nunca o marcador. Aproximacao declarada: folded junta
+            # as linhas com espaco, literal com quebra; ambos medem o mesmo que o YAML
+            # para a description de uma paragrafo (o caso real dos artefatos do plugin).
+            mm = re.match(r"^([>|])[-+]?\s*$", val)
+            cont = []
+            j = i + 1
+            while j < len(lines) and lines[j].strip() != "---" and (
+                lines[j].startswith((" ", "\t")) or (mm and lines[j].strip() == "")
+            ):
+                cont.append(lines[j].strip())
+                j += 1
+            while cont and cont[-1] == "":
+                cont.pop()
+            if mm:
+                val = (" " if mm.group(1) == ">" else "\n").join(cont)
+            elif cont:
+                val = " ".join([val] + [c for c in cont if c])
             if len(val) >= 2 and val[0] == val[-1] and val[0] in "\"'":
                 val = val[1:-1]
             return len(val)
+        i += 1
     return None
 
 

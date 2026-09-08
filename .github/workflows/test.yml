@@ -26,8 +26,11 @@ jobs:
           bad="$(git ls-files -s -- 'hooks/*.sh' 'scripts/*.sh' 'scripts/git-hooks/*' | grep -v '^100755' || true)"
           if [ -n "$bad" ]; then echo "script sem bit de execução:"; echo "$bad"; exit 1; fi
 
-      - name: shellcheck em todos os scripts (4.208 — análise estática além do bash -n)
-        run: shellcheck scripts/*.sh hooks/*.sh scripts/git-hooks/* scripts/tests/*/run.sh
+      - name: Dependências das suítes (PyYAML antes da suíte do frontmatter — 4.385)
+        run: python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet pyyaml
+
+      - name: shellcheck em todos os scripts (4.208 — análise estática além do bash -n; hooks do mantenedor incluídos, 4.385)
+        run: shellcheck scripts/*.sh hooks/*.sh .claude/hooks/*.sh scripts/git-hooks/* scripts/tests/*/run.sh
 
       - name: Suíte do grafo (scripts/tests/graph/run.sh)
         run: bash scripts/tests/graph/run.sh
@@ -140,6 +143,24 @@ jobs:
       - name: Suíte do noverify-guard (scripts/tests/noverify/run.sh)
         run: bash scripts/tests/noverify/run.sh
 
+      - name: Suíte do worktree-guard (scripts/tests/worktree-guard/run.sh)
+        run: bash scripts/tests/worktree-guard/run.sh
+
+      - name: Suíte do doc-guard (scripts/tests/doc-guard/run.sh)
+        run: bash scripts/tests/doc-guard/run.sh
+
+      - name: Suíte do desc-guard (scripts/tests/desc-guard/run.sh)
+        run: bash scripts/tests/desc-guard/run.sh
+
+      - name: Suíte do jira-guard (scripts/tests/jira-guard/run.sh)
+        run: bash scripts/tests/jira-guard/run.sh
+
+      - name: Registro dos hooks em hooks.json (scripts/tests/hooks-manifest/run.sh)
+        run: bash scripts/tests/hooks-manifest/run.sh
+
+      - name: Roteamento do pre-commit (scripts/tests/pre-commit/run.sh)
+        run: bash scripts/tests/pre-commit/run.sh
+
       - name: Suíte do check-refs.sh (scripts/tests/refs/run.sh)
         run: bash scripts/tests/refs/run.sh
 
@@ -156,9 +177,7 @@ jobs:
         run: bash scripts/check-mermaid.sh
 
       - name: Frontmatter YAML de todo .md (scripts/check-frontmatter.sh)
-        run: |
-          python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet pyyaml
-          bash scripts/check-frontmatter.sh
+        run: bash scripts/check-frontmatter.sh
 
       - name: Sincronização de comandos/agents (scripts/check-sync.sh)
         run: bash scripts/check-sync.sh
