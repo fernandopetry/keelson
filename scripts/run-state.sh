@@ -242,11 +242,13 @@ case "$ACTION" in
       motivo="casa da dona em estado: reportada"
     else
       # (b) inatividade: arquivo mais recente da casa (legado: run-state + session-ledger + window.log)
-      # mtime mais recente (BSD `stat -f %m`, GNU `stat -c %Y`) — find -exec, nomes com espaço seguros
+      # arquivo mais recente da casa — `find -exec ls -t` e `date -r` são BSD e GNU (o `stat`
+      # diverge: `-f` é formato no BSD e filesystem no GNU — a 1ª versão media lixo no Linux)
       if [ "$casa" = "$DIR_LEG" ]; then set -- "$alvo" "$DIR_LEG/session-ledger" "$DIR_LEG/session-window.log"; else set -- "$casa"; fi
-      newest="$(find "$@" -type f -exec stat -f '%m' {} + 2>/dev/null | sort -n | tail -1)"
-      [ -n "$newest" ] || newest="$(find "$@" -type f -exec stat -c '%Y' {} + 2>/dev/null | sort -n | tail -1)"
-      [ -n "$newest" ] || { echo "posse: recusada · não consegui medir a atividade da casa da dona ($casa)"; exit 3; }
+      recente="$(find "$@" -type f -exec ls -t {} + 2>/dev/null | head -1)"
+      [ -n "$recente" ] || { echo "posse: recusada · não consegui medir a atividade da casa da dona ($casa)"; exit 3; }
+      newest="$(date -r "$recente" +%s 2>/dev/null)"
+      [ -n "$newest" ] || { echo "posse: recusada · não consegui ler o mtime de $recente"; exit 3; }
       agora="$(date +%s)"
       inat=$(( (agora - newest) / 60 ))
       if [ "$inat" -lt "$STALE" ]; then
