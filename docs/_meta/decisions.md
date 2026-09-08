@@ -3953,6 +3953,14 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 **Aplicação**: `hooks/largada-guard.sh` (novo) · `hooks/hooks.json` (Stop, antes do `window-marker`) · `scripts/tests/largada-guard/run.sh` (nova) · `scripts/tests/hooks-manifest/run.sh` (tabela congelada) · `scripts/git-hooks/pre-commit` · `README.md` (comentário de `hooks/`) · `docs/wiki/Solucao-de-problemas.md` (falha reconhecível nova). CHANGELOG **0.163.0** (hook novo → minor), `Re-init: none` (nada que o init escreve mudou).
 
+### 4.392 — Gate 11 casa superfície de interface por TÓPICO no diff real: ficha sem frontend não isenta o gate
+
+**Problema**: ledger de consumidor de campo (LRN-003 do ledger de origem, `causa_raiz: instrucao_ausente`) — em 3 waves seguidas o Tech Lead não despachou o `product-designer` sobre diffs que alteravam templates de servidor (4 arquivos de template numa wave), porque inferiu da ficha (`profile.frontend.lang: none`, `codePaths.frontend: []`) que não havia superfície de UI. O item 11 do `/keelson:implement` §3.3 cita a lista canônica (que já inclui "markup"), mas nada dizia que a ficha é sinal de PATH e não decide o tópico. É a 2ª ocorrência da classe da 4.219 — lá o path presente (`sensitiveGlobs` amplo) disparou o gate 8 à toa (falso-positivo); aqui o path ausente calou o gate 11 (falso-negativo). A mesma confusão path×tópico, no gate irmão que ainda não tinha a âncora.
+
+**Decisão**: o item 11 declara que a lista canônica é casada por **TÓPICO** contra os arquivos do diff real da wave — template de servidor, partial e layout contam como markup — e que `profile.frontend.lang: none` ou arquivo fora de `codePaths.frontend` é sinal de PATH que **nunca decide ausência de superfície**. Passe da 4.371: reincidência de classe já na chegada (linha da 4.219 na inbox). O gate 10 não recebe a mesma frase: a ficha não carrega sinal de path para custo, e o ledger não traz evidência de falha lá. O bloco injetado segue intocado — o bullet "Mudança pontual" já manda partir do inventário do diff (4.335), e a falha foi no ciclo formal. As duas lições irmãs do mesmo ledger (LRN-001, dependência nova herdando bloco `require`/`require-dev` da vizinha; LRN-002, asserção que atravessa camada comum sem prova por mutação) ficam `adiada (gatilho: reincidência | eval)` pelo default da 4.371: só-texto, 1ª ocorrência, sem prova de efeito; precedentes mais próximos são a 4.229 (nome se verifica) e a família 4.107/4.139 (nove testes de fixação, mutação de escopo).
+
+**Aplicação**: `commands/implement.md` (§3.3 item 11, uma cláusula) · `docs/_meta/proposal-inbox.md` (3 linhas fechadas) · bump patch 0.163.1, `Re-init: none`. Wiki: nada a mudar (o que o consumidor faz não muda; o gate passa a disparar onde já devia).
+
 ---
 
 ## 7. Roteamento de mudanças

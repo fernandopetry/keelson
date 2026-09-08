@@ -23,6 +23,21 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.163.1] — 2026-09-08
+
+Re-init: none
+
+Decision 4.392 — a consumer ledger reported gate 11 (design/UX) skipped on three waves
+whose diffs changed server-side templates, because the orchestrator read "no frontend in
+the ficha" as "no UI surface". Same path-vs-topic confusion decision 4.219 fixed for gate 8.
+
+### Fixed
+
+- **Gate 11 matches the interface surface by topic against the real diff** of the wave:
+  server-side templates, partials and layouts count as markup. `profile.frontend.lang: none`
+  or a file outside `codePaths.frontend` is a path signal and never decides that there is no
+  interface surface (`commands/implement.md` §3.3 item 11).
+
 ## [0.163.0] — 2026-09-08
 
 Re-init: none
