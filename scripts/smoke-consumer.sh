@@ -134,7 +134,7 @@ import json, sys
 from collections import defaultdict
 import re
 ctx = {}; tools = 0; multi = 0; sub = defaultdict(lambda: [0, 0]); bash1 = 0; bashn = 0
-uses = {}; notified = set(); tout_total = 0; tout_redund = 0
+uses = {}; notified = set(); fetched = set(); tout_total = 0; tout_redund = 0; dup_notif = 0
 for line in open(sys.argv[1], encoding="utf-8", errors="replace"):
     try: e = json.loads(line)
     except Exception: continue
@@ -153,17 +153,20 @@ for line in open(sys.argv[1], encoding="utf-8", errors="replace"):
             if isinstance(b, dict) and b.get("type") == "tool_use" and b.get("name") == "TaskOutput":
                 tid = (b.get("input") or {}).get("task_id") or (b.get("input") or {}).get("taskId")
                 tout_total += 1
-                if tid in notified: tout_redund += 1
+                if tid in notified: tout_redund += 1      # releitura depois da notificação
+                fetched.add(tid)
     if e.get("type") == "attachment" and (e.get("attachment") or {}).get("type") == "queued_command":
         mt = re.search(r"<task-id>([^<]+)</task-id>", e["attachment"].get("prompt") or "")
-        if mt: notified.add(mt.group(1))
+        if mt:
+            if mt.group(1) in fetched: dup_notif += 1  # duplicata do harness depois de TaskOutput bloqueante
+            notified.add(mt.group(1))
     r = e.get("toolUseResult")
     if isinstance(r, dict) and "totalTokens" in r:
         sub[r.get("agentType", "?")][0] += 1; sub[r.get("agentType", "?")][1] += r["totalTokens"]
 s = sorted(ctx.values())
 if not s: print("perfil: nao medido (sem chamadas no transcript)"); sys.exit(0)
 papeis = " · ".join(f"{k.replace('keelson:', '')} {v[0]}x {v[1] // 1000}k" for k, v in sorted(sub.items(), key=lambda x: -x[1][1]))
-print(f"perfil: tech-lead {len(s)} chamadas · contexto {sum(s) // 1000000}M (mediana {s[len(s) // 2] // 1000}k · pico {s[-1] // 1000}k) · bash com 1 script {bash1} / com 2+ {bashn} · TaskOutput redundantes {tout_redund}/{tout_total} · subagents {sum(v[1] for v in sub.values()) // 1000}k [{papeis}]")
+print(f"perfil: tech-lead {len(s)} chamadas · contexto {sum(s) // 1000000}M (mediana {s[len(s) // 2] // 1000}k · pico {s[-1] // 1000}k) · bash com 1 script {bash1} / com 2+ {bashn} · TaskOutput {tout_total} (releitura pós-notificação {tout_redund} · notificação duplicada pós-TaskOutput {dup_notif}) · subagents {sum(v[1] for v in sub.values()) // 1000}k [{papeis}]")
 PY
 )"
     fi

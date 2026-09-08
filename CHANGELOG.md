@@ -33,11 +33,13 @@ re-reading background agent results.
 
 ### Changed
 
-- **The task notification is the return** (`sdd-conventions.md`, waiting rule 4.118) — a
-  background agent's completion notification already carries its whole report (95%+ of the
-  lines, measured on every task of a round); fetching it again with `TaskOutput` costs a full
-  turn of context and is reserved for a truncated or missing notification. Baseline: 8 of 8
-  fetches redundant, about 7% of the cycle's cost.
+- **A report is collected once** (`sdd-conventions.md`, waiting rule 4.118) — a background
+  agent's report reaches the orchestrator through one channel (a blocking `TaskOutput` or the
+  harness notification) and the other channel delivers the same text afterwards (95%+ of the
+  lines, measured on every task of a round). A report already collected makes the following
+  notification a duplicate to skip, not reprocess; a report collected from the notification is
+  not fetched again with `TaskOutput`, which costs a full turn of context. Baseline: every
+  background report entered the window twice, about 9% of the cycle's cost.
 
 ## [0.165.1] — 2026-09-08
 
