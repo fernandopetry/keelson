@@ -23,11 +23,11 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
-## [0.163.1] — 2026-09-08
+## [0.163.2] — 2026-09-08
 
 Re-init: none
 
-Decision 4.392 — two proposals raised by the disposable consumer of the second real-model
+Decision 4.393 — two proposals raised by the disposable consumer of the second real-model
 smoke round (4.391), both about proving a mutant dead.
 
 ### Changed
