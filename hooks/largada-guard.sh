@@ -13,10 +13,12 @@
 #   1. artefato SDD (specs/SPEC-*, plans/PLAN-*, tasks/TASK-* sob <docsRoot>/<slug>/) criado
 #      ou alterado NESTA BRANCH — working tree + diff contra a base (main/origin/main),
 #      nunca o passivo histórico já mergeado;
-#   2. NENHUM run-state para o slug na casa desta sessão nem no caminho legado — de
+#   2. NENHUM run-state para o slug em NENHUMA casa de sessão nem no caminho legado — de
 #      qualquer status: o auto abre na largada (open) e só remove depois do push;
-#   3. NENHUM evento no ledger desta sessão (ativo ou arquivado em reported-*/, casa ou
+#   3. NENHUM evento de ledger (ativo ou arquivado em reported-*/, qualquer casa ou
 #      legado) citando o slug — um ciclo conduzido de verdade deixa vereditos de gate.
+# Largada de OUTRA sessão conta (4.395 — smoke: a sessão que continuou um ciclo alheio
+# recebia a cutucada; posse é do wave-guard): o sinal é "houve largada", não "é minha".
 # Rota pontual (4.86/4.137) não produz artefato SDD → nunca dispara. Ciclo entregue com
 # run-state removido após o push → o ledger arquivado ainda prova a largada → silêncio.
 #
@@ -69,13 +71,20 @@ if [ -n "$sid" ] && [ -f "$SCRIPTS/session-dir.sh" ]; then
 fi
 legado="$cwd/thoughts/local"
 
-tem_run_state() { # slug → 0 se existe run-state (qualquer status) na casa ou no legado
+# A largada conta quando QUALQUER sessão a registrou (4.395): a casa desta sessão, a de
+# outra sessão (continuação de um ciclo que outra sessão largou — /keelson:continue, ou a
+# sessão anterior caiu) ou o legado. De quem é o run é pergunta do wave-guard (posse,
+# 4.251), não deste guard — aqui o sinal é "houve largada", nunca "a largada é minha".
+tem_run_state() { # slug → 0 se existe run-state (qualquer status, qualquer casa)
   [ -n "$home" ] && [ -f "$home/run-state-$1.md" ] && return 0
   [ -f "$legado/run-state-$1.md" ] && return 0
+  for d in "$legado"/sessions/*/; do
+    [ -f "$d/run-state-$1.md" ] && return 0
+  done
   return 1
 }
-tem_ledger() { # slug → 0 se algum evento (ativo ou arquivado) da casa/legado cita o slug
-  for d in "$home/ledger" "$legado/session-ledger"; do
+tem_ledger() { # slug → 0 se algum evento (ativo ou arquivado, qualquer casa) cita o slug
+  for d in "$home/ledger" "$legado/session-ledger" "$legado"/sessions/*/ledger; do
     [ -n "$d" ] && [ -d "$d" ] || continue
     if find "$d" -name '*.md' -type f -exec grep -l "· slug: $1\$" {} + 2>/dev/null | grep -q .; then return 0; fi
   done

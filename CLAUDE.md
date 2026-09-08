@@ -57,7 +57,8 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   **`scripts/smoke-consumer.sh`** (smoke operacional com modelo real, 4.390) → provar em
   consumidor DESCARTÁVEL, por fatos do disco, que init/re-init, o ciclo formal do auto,
   pause/continue e o baseline vermelho se comportam como a doutrina diz; roda sob demanda
-  do Diretor (custa ~US$20 e ~45 min por rodada completa), nunca em pre-commit/CI ·
+  do Diretor (rodada completa: ~US$20–60 e 1h30–2h de parede — o ciclo formal sozinho
+  passou de 60 min na 3ª rodada), nunca em pre-commit/CI ·
   **`evals/` + `scripts/eval-run.sh`** (camada de evals de comportamento, 4.304) → medir
   o efeito de mudança de doutrina em caso controlado A/B (braços `file:` ou `git:<ref>` com `regua:` declarada no caso;
   n≥2 é o mínimo do runner e comparação começa em 4 — piso empírico da 4.304, declarado

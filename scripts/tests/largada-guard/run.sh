@@ -10,8 +10,9 @@
 #           evento ATIVO no ledger da casa · evento ARQUIVADO (reported-*/) — ciclo entregue
 #           com run-state removido após o push · ledger LEGADO · artefato só no passivo
 #           histórico (já na main) · TASK-INDEX/INDEX/briefs/handoffs não são sinal ·
-#           arquivo fora de docsRoot · rota pontual (só código) · run-state de OUTRO slug
-#           não cobre este · sem ficha · sem git · stop_hook_active · anti-renudge (mesmo
+#           arquivo fora de docsRoot · rota pontual (só código) · run-state/ledger de OUTRA
+#           sessão contam (4.395 — posse é do wave-guard) · run-state de OUTRO slug não
+#           cobre este · sem ficha · sem git · stop_hook_active · anti-renudge (mesmo
 #           conjunto → silêncio; artefato novo → cutuca de novo) · JSON inválido.
 #
 # Uso: scripts/tests/largada-guard/run.sh
@@ -101,6 +102,13 @@ caso ledger-arquivado-apos-entrega-allow allow
 novo_repo; spec "$PROJ/docs/pagamentos/specs/SPEC-001-x.md"
 mkdir -p "$PROJ/thoughts/local/session-ledger"; printf 'ts: 2026-09-08T10:00:00-0300 · tipo: gate · origem: qa · slug: pagamentos\nok\n' > "$PROJ/thoughts/local/session-ledger/20260908-100000-gate-qa.md"
 caso ledger-legado-allow allow
+# largada registrada por OUTRA sessão conta (4.395): posse é do wave-guard, não deste guard
+novo_repo; spec "$PROJ/docs/pagamentos/specs/SPEC-001-x.md"
+env -u CLAUDE_CODE_SESSION_ID KEELSON_SESSAO="outra-sessao-9999" RUN_STATE_SESSAO="outra-sessao-9999" bash "$SC/run-state.sh" "$PROJ" open pagamentos "largada alheia" >/dev/null 2>&1
+caso run-state-de-outra-sessao-allow allow
+novo_repo; spec "$PROJ/docs/pagamentos/specs/SPEC-001-x.md"
+printf 'ok\n' | env -u CLAUDE_CODE_SESSION_ID KEELSON_SESSAO="outra-sessao-9999" bash "$SC/ledger.sh" "$PROJ" append gate qa pagamentos --ts "2026-09-08T10:00:00-0300" >/dev/null 2>&1
+caso ledger-de-outra-sessao-allow allow
 # run-state/ledger de OUTRO slug não cobre este
 novo_repo; spec "$PROJ/docs/pagamentos/specs/SPEC-001-x.md"
 S "$SC/run-state.sh" "$PROJ" open cobranca "largada de outro" >/dev/null 2>&1

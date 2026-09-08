@@ -23,6 +23,21 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.163.3] — 2026-09-08
+
+Re-init: none
+
+Decision 4.395 — third real-model smoke round, the first complete one, found a false
+positive in the guard shipped in 0.163.0.
+
+### Fixed
+
+- **`largada-guard` no longer nudges a session that continues another session's cycle.** A
+  recorded kickoff now counts wherever it lives: this session's home, any other session's home
+  under `thoughts/local/sessions/`, or the legacy layout. Whose run it is remains the wave
+  guard's question (ownership, 4.251); this guard only asks whether a kickoff happened. Proven
+  live against the consumer that triggered the false positive.
+
 ## [0.163.2] — 2026-09-08
 
 Re-init: none

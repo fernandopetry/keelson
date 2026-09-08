@@ -27,7 +27,8 @@
 #   --scenario   default all (a ordem é init → cycle → pause → broken; cada um assume o
 #                estado deixado pelo anterior; --consumer reaproveita um consumidor).
 #   --results    raiz das saídas (default: mktemp); raw.json/result.txt por cenário + summary.md.
-#   --timeout    teto por chamada ao modelo em segundos (default 3600).
+#   --timeout    teto por chamada ao modelo em segundos (default 7200 — o ciclo formal de
+#                2 waves passou de 60 min na 3ª rodada; 4.395).
 #   --plugin-dir raiz do plugin a carregar (default: este repositório).
 # Exit: 0 todos os fatos ok · 1 algum fato falhou · 2 uso incorreto / CLI ausente.
 # Bash 3.2-compatível.
@@ -40,7 +41,7 @@ unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_PREFIX
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN="$(cd "$HERE/.." && pwd)"
-SCEN="all"; RESULTS=""; MODEL=""; TIMEOUT=3600; CONSUMER=""
+SCEN="all"; RESULTS=""; MODEL=""; TIMEOUT=7200; CONSUMER=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --scenario) shift; SCEN="${1:-}" ;;
@@ -73,25 +74,46 @@ exec_timeout() { et_t="$1"; shift; "$@" & et_pid=$!; et_n=0
     sleep 1; et_n=$((et_n + 1)); done
   wait "$et_pid"; }
 
-# roda <nome> <prompt> → $RESULTS/<nome>.raw.json + <nome>.result.txt; custo/duração no summary
+# roda <nome> <prompt> → $RESULTS/<nome>.stream.jsonl (todos os eventos), <nome>.raw.json (o
+# evento result) e <nome>.result.txt (TODO o texto do assistente, não só o último turno —
+# 4.395: com `--output-format json` o `result` é a última mensagem, e um Stop hook que
+# cutuca no fim empurra a Entrega para trás dela); custo/duração no summary.
 roda() {
   nome="$1"; prompt="$2"
   t0="$(date +%s)"
-  ( cd "$CONSUMER" && exec_timeout "$TIMEOUT" claude -p "$prompt" --output-format json \
+  ( cd "$CONSUMER" && exec_timeout "$TIMEOUT" claude -p "$prompt" --output-format stream-json --verbose \
       --plugin-dir "$PLUGIN" --strict-mcp-config --dangerously-skip-permissions \
-      ${MODEL:+--model "$MODEL"} > "$RESULTS/$nome.raw.json" 2> "$RESULTS/$nome.stderr.log" )
+      ${MODEL:+--model "$MODEL"} > "$RESULTS/$nome.stream.jsonl" 2> "$RESULTS/$nome.stderr.log" )
   rc=$?
   dt=$(( $(date +%s) - t0 ))
-  python3 - "$RESULTS/$nome.raw.json" > "$RESULTS/$nome.result.txt" 2>/dev/null <<'PY' || true
+  python3 - "$RESULTS/$nome.stream.jsonl" "$RESULTS/$nome.raw.json" > "$RESULTS/$nome.result.txt" 2>/dev/null <<'PY' || true
 import json, sys
-try:
-    d = json.load(open(sys.argv[1]))
-    print(d.get("result", ""))
-except Exception as e:
-    print("(raw.json ilegível: %s)" % e)
+src, raw = sys.argv[1], sys.argv[2]
+last = None
+for line in open(src, encoding="utf-8", errors="replace"):
+    line = line.strip()
+    if not line:
+        continue
+    try:
+        ev = json.loads(line)
+    except Exception:
+        continue
+    t = ev.get("type")
+    if t == "assistant":
+        for blk in (ev.get("message") or {}).get("content") or []:
+            if isinstance(blk, dict) and blk.get("type") == "text" and blk.get("text"):
+                print(blk["text"]); print("\n---\n")
+    elif t == "result":
+        last = ev
+if last is not None:
+    json.dump(last, open(raw, "w"))
+    print(last.get("result", ""))
+else:
+    open(raw, "w").write("{}")
+    print("(sem evento result — executor interrompido?)")
 PY
-  custo="$(grep -o '"total_cost_usd":[0-9.]*' "$RESULTS/$nome.raw.json" 2>/dev/null | head -1 | cut -d: -f2)"
-  turnos="$(grep -o '"num_turns":[0-9]*' "$RESULTS/$nome.raw.json" 2>/dev/null | head -1 | cut -d: -f2)"
+  custo="$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); v=d.get("total_cost_usd"); print("" if v is None else "%.4f" % v)' "$RESULTS/$nome.raw.json" 2>/dev/null)"
+  turnos="$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); v=d.get("num_turns"); print("" if v is None else v)' "$RESULTS/$nome.raw.json" 2>/dev/null)"
   printf '\n## %s\n- exit: %s · parede: %ss · custo: US$%s · turnos: %s\n' "$nome" "$rc" "$dt" "${custo:-nao medido}" "${turnos:-?}" >> "$SUM"
   echo "[$nome] exit=$rc parede=${dt}s custo=US\$${custo:-?} turnos=${turnos:-?}"
   [ "$rc" -eq 124 ] && echo "[$nome] ESTOUROU o teto de ${TIMEOUT}s" >&2
@@ -225,14 +247,26 @@ cen_pause() {
   SD="$(slug_dir)"; slug="$(basename "${SD:-x}")"
   antes_src="$(G rev-list --count HEAD -- src tests 2>/dev/null)"
   ntask="$(find "$SD/tasks" -name 'TASK-*.md' 2>/dev/null | grep -vc INDEX | tr -d ' ')"
+  em_voo="$(grep -l '^status: em_andamento' "$CONSUMER"/thoughts/local/sessions/*/run-state-*.md "$CONSUMER"/thoughts/local/run-state-*.md 2>/dev/null | head -1)"
   roda pause "/keelson:pause $slug — motivo: fim do expediente (smoke). Esta sessão não tem humano interativo: execute o comando."
   roda continue "/keelson:continue $slug. Esta sessão não tem humano interativo: retome só o que estiver pendente; se nada estiver pendente, diga isso e não refaça trabalho."
   echo "### fatos: pause/continue" >> "$SUM"
   rep="$(bash "$PLUGIN/scripts/pause.sh" "$CONSUMER" report "$slug" 2>/dev/null)"
   printf -- '- pause.sh report: %s\n' "$(printf '%s' "$rep" | tr '\n' ' ' | cut -c1-200)" >> "$SUM"
-  fato "pause/recusa-sem-ciclo-em-voo"  'grep -qiE "não há ciclo|nao ha ciclo|nada (em andamento|para pausar|a pausar)" "$RESULTS/pause.result.txt"'
-  fato "pause/nenhuma-marca-inventada"  '! printf "%s" "$rep" | grep -qE "^(pausa|retomada)"'
-  fato "pause/continue-declara-nada-pendente" 'grep -qiE "nada pendente|não há nada pendente|nao ha nada pendente|nenhuma .*pendente" "$RESULTS/continue.result.txt"'
+  if [ -n "$em_voo" ]; then
+    # ciclo em voo de OUTRA sessão (a que rodou o cycle morreu/foi interrompida): posse 4.251 —
+    # o pause recusa nomeando o terceiro e não toca o run; o continue não refaz trabalho e
+    # escala a posse ao humano em vez de assumir (continue.md: sugestão rotulada, nunca fonte)
+    printf -- '- estado: run em_andamento de outra sessão em %s\n' "$em_voo" >> "$SUM"
+    fato "pause/recusa-run-de-terceiro"     'grep -qiE "terceiro|posse|outra sessão|outra sessao|não é (meu|desta sessão)" "$RESULTS/pause.result.txt"'
+    fato "pause/run-alheio-intocado"        'grep -q "^status: em_andamento" "$em_voo"'
+    fato "pause/nenhuma-pausa-inventada"    '! printf "%s" "$rep" | grep -qE "^pausa"'
+    fato "pause/continue-nao-assume-posse-em-silencio" 'grep -qiE "posse|terceiro|outra sessão|outra sessao" "$RESULTS/continue.result.txt"'
+  else
+    fato "pause/recusa-sem-ciclo-em-voo"  'grep -qiE "não há ciclo|nao ha ciclo|nada (em andamento|para pausar|a pausar)" "$RESULTS/pause.result.txt"'
+    fato "pause/nenhuma-marca-inventada"  '! printf "%s" "$rep" | grep -qE "^(pausa|retomada)"'
+    fato "pause/continue-declara-nada-pendente" 'grep -qiE "nada pendente|não há nada pendente|nao ha nada pendente|nenhuma .*pendente" "$RESULTS/continue.result.txt"'
+  fi
   fato "pause/sem-commit-novo-de-codigo" '[ "$(G rev-list --count HEAD -- src tests 2>/dev/null)" = "$antes_src" ]'
   fato "pause/sem-task-duplicada"    '[ "$(find "$SD/tasks" -name "TASK-*.md" | grep -vc INDEX | tr -d " ")" = "$ntask" ]'
   fato "pause/suite-continua-verde"  '( cd "$CONSUMER" && python3 -m unittest discover -s tests -t . >/dev/null 2>&1 )'
@@ -253,12 +287,13 @@ class TestLegado(unittest.TestCase):
 EOF
   G add -A; G commit -q -m "test: teste legado vermelho na base (planta do smoke)"
   planted="$(G rev-parse HEAD)"
+  touch "$RESULTS/.broken-plant-mark"
   roda broken "/keelson:auto adicionar a função multiply(a, b) em src/calc.py com testes unitários. Esta sessão não tem humano interativo: decisões de rotina são suas; em escalação, assuma o default que você mesmo declarar; não abra PR."
   echo "### fatos: broken" >> "$SUM"
   r="$RESULTS/broken.result.txt"
   fato "broken/teste-quebrado-intocado"   '[ -z "$(G diff "$planted" -- tests/test_legado_quebrado.py)" ] && [ -f "$CONSUMER/tests/test_legado_quebrado.py" ]'
   fato "broken/suite-segue-vermelha"      '! ( cd "$CONSUMER" && python3 -m unittest discover -s tests -t . >/dev/null 2>&1 )'
-  fato "broken/reporta-baseline-ou-blocked" 'grep -qiE "baseline|blocked|bloquead|pré-existente|pre-existente|furo" "$r"'
+  fato "broken/reporta-baseline-ou-blocked" 'grep -qiE "baseline|blocked|bloquead|pré-existente|pre-existente|furo" "$r" || find "$CONSUMER/thoughts" "$CONSUMER/docs" -type f -name "*.md" -newer "$RESULTS/.broken-plant-mark" -exec grep -liE "baseline|pré-existente|pre-existente|test_legado" {} + 2>/dev/null | grep -q .'
   fato "broken/nao-declara-sucesso-limpo"  '! grep -qiE "todos os gates (verdes|aprovados)|suíte verde|suite verde" "$r" || grep -qiE "baseline|blocked|bloquead" "$r"'
   fato "broken/nenhum-commit-toca-o-teste-quebrado" '[ -z "$(G log --oneline "$planted"..HEAD -- tests/test_legado_quebrado.py)" ]'
 }
