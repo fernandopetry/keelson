@@ -23,6 +23,32 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.165.0] — 2026-09-08
+
+Re-init: none
+
+Decisions 4.397 and 4.398 — from the cost profile of the real-model smoke rounds: the Tech
+Lead's own turns, not the subagents, dominate the cost of a formal cycle, and a one-line
+promise change was paying for a whole new SPEC, PLAN and TASKs.
+
+### Added
+
+- **Amendment route** (`/keelson:auto` step 0, `/keelson:triage` category 1b) — a demand that
+  changes **one** promise already written in a validated SPEC (an out-of-scope item that comes
+  in, an adjusted FR/AC, a changed default) with no new DEC or component no longer opens a new
+  SPEC, PLAN and TASKs: the PO validates the change against the brief, the scribe amends the
+  SPEC in place (minor version, INDEX history line) and the implementation follows the inline
+  protocol with the amended AC as its criterion. An amendment that needs a DEC or a new
+  component still promotes to the full cycle.
+
+### Changed
+
+- **Mechanics in batches** (`sdd-conventions.md`, pointed from `/keelson:implement` closure and
+  `/keelson:auto` kickoff) — independent mechanical commands of the cycle (ledger appends,
+  wave-done, lint, index-check) go in the same tool call instead of one per turn: measured on a
+  three-function feature, 42% of the Tech Lead's context cost was turns carrying a single
+  two-second script.
+
 ## [0.164.0] — 2026-09-08
 
 Re-init: none

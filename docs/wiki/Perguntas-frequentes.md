@@ -15,6 +15,17 @@ Não. O rigor é **proporcional**:
 
 Na dúvida: `/keelson:triage "<descrição>"` — ele classifica e devolve o comando pronto.
 
+### Preciso mudar uma linha da SPEC. Vou pagar um ciclo inteiro de novo?
+
+Não, se for **uma** promessa que muda numa SPEC que já existe — um item que estava fora
+do escopo e agora entra, um critério de aceite ajustado, um default que muda. Essa é a
+rota de **emenda**: o PO valida a mudança contra o seu brief, a SPEC é emendada no lugar
+(versão sobe, o histórico do slug registra), e a implementação segue pelo caminho curto,
+com o critério emendado como prova. Só volta ao ciclo completo se a mudança pedir uma
+decisão técnica nova ou um componente novo. A diferença medida no nosso próprio teste: a
+mesma função custou um ciclo inteiro quando o keelson a tratou como SPEC nova, e um
+quinto disso pelo caminho curto.
+
 ### Chegou bug de produção. E agora?
 
 Entre pelo `/keelson:triage` normalmente (cole o relato, ou `--from=<KEY>` se já virou

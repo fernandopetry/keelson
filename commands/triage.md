@@ -94,6 +94,7 @@ Classifique numa das categorias abaixo e componha você mesmo a mensagem de rote
 | Categoria | Critérios | Roteamento proposto |
 |---|---|---|
 | **1. Nova SPEC** | Muda FRs, ACs ou escopo; capacidade nova que não cabe em SPEC existente | `/keelson:specify` no slug do domínio, com sugestão de descrição inicial |
+| **1b. Emenda de SPEC existente** (decisão 4.398) | Muda **uma** promessa já escrita (item do out-of-scope entra, FR/AC ajustado, default muda) sem DEC nova nem componente novo | Rota emenda do `/keelson:auto` (Etapa 0): `po` valida a mudança contra o BRIEF → `scribe` emenda a SPEC (Versão minor + Histórico do INDEX) → protocolo inline com o AC emendado como critério; exigiu DEC/componente → categoria 1 |
 | **2. Novo PLAN da mesma SPEC** | Contrato não muda; estratégia técnica nova | `/keelson:plan <caminho da SPEC> --slice='...'` (caminho, não ID nu — 4.124), inferindo os FRs a cobrir |
 | **3. TASK de bugfix** | Implementação viola um AC; SPEC e PLAN estão certos. **Sem PLAN aplicável** (bug em área sem artefato SDD) → destino vira **brief avulso** | Com PLAN: TASK `TASK-MMM-XXX-fix-<descrição>.md` pré-preenchida apontando ao PLAN original, citando o AC violado. Sem PLAN: `briefs/BRIEF-MMM-<descrição>-avulso.md` (contrato no `index-contract.md`, decisão 4.86; MMM do alocador único), TASKs só se o trabalho reparte |
 | **4. TASK de refactor** | Comportamento observável não muda; objetivo é melhorar código. **Sem PLAN aplicável** → **brief avulso**, como na 3 | Com PLAN: TASK `TASK-MMM-XXX-refactor-<descrição>.md` pré-preenchida; alertar: testes verdes antes, verdes depois. Sem PLAN: brief avulso (idem 3) |
@@ -113,6 +114,8 @@ payload, default de API — roteia para o ciclo por menor que pareça, porque to
 consumidor quebra junto; mudança extensa mas mecânica, cujo diff é auto-evidentemente
 certo ou errado (codemod, rename em massa), não sobe de categoria por volume. Aparência
 de trivial não resiste a raio de dano: na dúvida sobre quem consome o que muda, promova.
+
+**Emenda não é SPEC nova (decisão 4.398)**: a régua da 4.137 manda promover ao ciclo a linha que muda a promessa — mas quando a promessa já vive numa SPEC validada e a mudança é **uma** (out-of-scope que entra, AC ajustado, default), o custo de estar errado já foi pago na SPEC original; o que falta pagar é a validação **da mudança** pelo PO contra o brief, não uma SPEC, um PLAN e TASKs novas (smoke 4.395: uma função contra o out-of-scope custou um ciclo inteiro — 5× a rota pontual — para produzir uma SPEC-003 de um FR). Categoria 1b; sobe para 1 se a emenda exigir DEC ou componente novo.
 
 **Bug de produção** (categorias 3/4 vindas de produção): o roteamento acima só acontece
 **depois** da Etapa 2.5 — severidade e impacto entram no artefato roteado (4.101).
