@@ -224,6 +224,15 @@ total=$((total + 1))
 sd "$NOVA" "$R2" ledger-dir --create >/dev/null 2>&1
 grep -qxF "estado: ativa" "$DN/session.meta" && ok ledger-dir-reabre || falha ledger-dir-reabre
 
+# mark-reported --dir marca OUTRA casa (4.403: report em sessão nova fecha a casa consumida);
+# fora de sessions/ → exit 2
+total=$((total + 1))
+sd "sessao-outra-77" "$R2" mark-reported --dir "$DN" --ts "2026-08-30T12:00:00-0300" 2>/dev/null
+grep -qxF "estado: reportada" "$DN/session.meta" && grep -qxF "reportada_em: 2026-08-30T12:00:00-0300" "$DN/session.meta" && ok mark-reported-dir-outra-casa || falha mark-reported-dir-outra-casa
+total=$((total + 1))
+sd "sessao-outra-77" "$R2" mark-reported --dir "$R2/thoughts/local" >/dev/null 2>&1; rc=$?
+[ "$rc" -eq 2 ] && ok mark-reported-dir-fora-de-sessions-exit-2 || falha "mark-reported-dir-fora-de-sessions-exit-2: rc=$rc"
+
 # mark-reported sem casa → no-op silencioso
 total=$((total + 1))
 got="$(sd "sessao-sem-casa-9" "$R2" mark-reported 2>&1)"; st=$?

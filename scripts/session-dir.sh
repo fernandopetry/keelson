@@ -11,7 +11,7 @@
 #      session-dir.sh <raiz-do-repo> latest-for <slug>
 #      session-dir.sh <raiz-do-repo> memo-find <slug> [--all]
 #      session-dir.sh <raiz-do-repo> adopt-memo <slug> [--ts <iso>]
-#      session-dir.sh <raiz-do-repo> mark-reported [--ts <iso>]
+#      session-dir.sh <raiz-do-repo> mark-reported [--dir <casa>] [--ts <iso>]
 #      session-dir.sh <raiz-do-repo> session-key [--create] [--slug <slug>] [--ts <iso>]
 #      session-dir.sh <raiz-do-repo> gc [--days <N>] [--apply] [--ts <iso>]
 #
@@ -40,7 +40,10 @@
 #               ecoa o caminho legado (comportamento antigo).
 #   mark-reported  marca `estado: reportada` + `reportada_em: <iso>` no manifest
 #               da casa corrente (fecho de report — 4.315); sem casa, no-op
-#               silencioso. Uma escrita posterior com --create reabre para
+#               silencioso. `--dir <casa>` marca OUTRA casa (4.403): a que o
+#               /keelson:report consumiu numa sessão nova — sem isso a casa de
+#               uma sessão que caiu ficava `ativa` para sempre e o gc só a via
+#               pela idade do nome. Uma escrita posterior com --create reabre para
 #               `estado: ativa` (a linha `reportada_em:` fica como histórico).
 #   session-key ecoa só o NOME da casa da sessão corrente (<yyyymmdd-hhmmss>-<sid8>) —
 #               a chave que agrupa por sessão os artefatos que moram FORA da casa
@@ -102,10 +105,11 @@ case "$ACTION" in
 esac
 case "$ARG_SLUG" in */*|*" "*) die2 "slug inválido: $ARG_SLUG" ;; esac
 
-CREATE=0; SLUG=""; TS=""; ALL=0; APPLY=0; DAYS=14
+CREATE=0; SLUG=""; TS=""; ALL=0; APPLY=0; DAYS=14; DIR=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --create) CREATE=1 ;;
+    --dir)  shift; [ $# -gt 0 ] || die2 "--dir exige a casa."; DIR="$1" ;;
     --all)   ALL=1 ;;
     --apply) APPLY=1 ;;
     --days) shift; [ $# -gt 0 ] || die2 "--days exige um número."; DAYS="$1"
@@ -334,9 +338,16 @@ case "$ACTION" in
     exit 0 ;;
 
   mark-reported)
-    [ -n "$SID" ] || exit 0
-    RESOLVED=""; resolve_dir
-    [ -n "$RESOLVED" ] || exit 0
+    # --dir <casa> (4.403): marca OUTRA casa — a cujo ledger o /keelson:report consumiu numa
+    # sessão nova (continue.md item 3); sem --dir, a casa corrente (sem casa → no-op)
+    if [ -n "$DIR" ]; then
+      case "$DIR" in "$SESSIONS"/*) ;; *) die2 "--dir precisa ser uma casa em $SESSIONS" ;; esac
+      RESOLVED="$DIR"
+    else
+      [ -n "$SID" ] || exit 0
+      RESOLVED=""; resolve_dir
+      [ -n "$RESOLVED" ] || exit 0
+    fi
     meta="$RESOLVED/session.meta"
     [ -f "$meta" ] || exit 0
     iso="$TS"

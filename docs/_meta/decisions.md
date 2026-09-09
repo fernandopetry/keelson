@@ -4045,6 +4045,14 @@ Mesmo com os gates de código aprovados, task não é Done sem closure: arquivo 
 
 **Aplicação**: `scripts/session-dir.sh` · `scripts/tests/session-dir/run.sh` · `scripts/smoke-consumer.sh` (fatos do `report` corrigidos). Runtime do consumidor → CHANGELOG **0.165.3**, `Re-init: none`. Wiki: nada a mudar, declarado.
 
+### 4.403 — `mark-reported --dir <casa>`: o report emitido numa sessão nova fecha a casa que trabalhou, não a que só leu
+
+**Problema**: 2ª execução do cenário `report` do smoke, já com a 4.402: o relatório saiu inteiro, o `mark-reported` rodou — e "não escreveu nada". Em `-p` cada comando é uma sessão nova: o `/keelson:report` leu o ledger das casas anteriores (`latest-for`, item 3 do `continue`), arquivou o que era seu (nada) e marcou a casa **corrente**, que ainda nem existia — só o `window-marker` a criou no Stop, `ativa` e vazia. A casa que trabalhou (o ciclo inteiro, 41 eventos arquivados) ficou `ativa` para sempre: o `gc` (4.316) só a alcançaria pela idade do nome, e o `latest-for` de uma retomada seguinte a apontaria como se ainda estivesse em voo. É o caso de uso documentado do report ("reconstrói o fecho da sessão anterior") sem a ação que o fecha.
+
+**Decisão**: `session-dir.sh mark-reported` ganha `--dir <casa>` (obrigatoriamente sob `thoughts/local/sessions/`; fora disso, exit 2): marca outra casa que não a corrente. `commands/report.md`, Etapa 3: relatório em sessão nova sobre ledger anterior marca **também cada casa consumida**. Suíte `session-dir` 60 → 62. Fato do harness: alguma casa com `estado: reportada` e `reportada_em:` depois do report. Fronteira: o report decide quais casas consumiu — a régua é "cada casa cujo ledger entrou neste relatório", não "todas as casas do slug".
+
+**Aplicação**: `scripts/session-dir.sh` · `scripts/tests/session-dir/run.sh` · `commands/report.md`. Runtime do consumidor → CHANGELOG **0.165.4**, `Re-init: none`. Wiki: nada a mudar, declarado.
+
 ---
 
 ## 7. Roteamento de mudanças

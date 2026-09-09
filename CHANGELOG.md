@@ -23,6 +23,21 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.165.4] — 2026-09-08
+
+Re-init: none
+
+Decision 4.403 — the second run of the `report` smoke scenario: a report issued from a fresh
+session left the session that had actually done the work marked active forever.
+
+### Added
+
+- **`session-dir.sh mark-reported --dir <home>`** marks a session home other than the current
+  one. `/keelson:report` issued from a new session over a previous session's ledger now marks
+  the consumed home(s) as reported too; before, only the reporting session's own home (often
+  empty, sometimes not yet created) was marked, and `gc` could only reach the working session's
+  home by age.
+
 ## [0.165.3] — 2026-09-08
 
 Re-init: none
