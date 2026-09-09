@@ -10,9 +10,6 @@
 
 ## Aderência a guidelines
 
-**Ficha/perfil de linguagem**: <backend/frontend ativos>
-**Stack vigente herdado**: <lista>
-**Padrão arquitetural seguido**: <padrão>
 **Decisões irreversíveis do slug tocadas**: nenhuma | listar
 **Decisões irreversíveis de outros slugs em conflito**: nenhuma | `{docsRoot}/<outro-slug>/INDEX.md` DEC-MMM-XXX — <justificativa: por que este PLAN não a quebra, ou por que a divergência é legítima>
 **Exceções aos guidelines**: nenhuma | listar com justificativa

@@ -103,7 +103,6 @@ aberta (`plan-status-vs-tasks` — 4.153) e closure preenchida com Status ≠ Do
 ### WARNING se:
 - Critério não-verificável ("usuário fica feliz")
 - Falta critério explícito de cobertura de teste
-- Falta critério explícito de aderência à ficha/perfil
 
 ## Etapa 4: checks de escopo
 
@@ -116,26 +115,13 @@ aberta (`plan-status-vs-tasks` — 4.153) e closure preenchida com Status ≠ Do
 - Inclui menciona conceitos não mapeados no PLAN
 - Não inclui menciona trivial/óbvio
 
-## Etapa 5: checks de convenções
-
-A fonte primária de convenções é a **ficha/perfil** (o que o `/keelson:tasks` usa para gerar); o CLAUDE.md só conta quando **declara** a convenção explicitamente.
-
-### ERROR se:
-- Padrão de commit declarado contradiz convenção **explícita** do perfil ou do CLAUDE.md (nenhuma declaração → vale o default do gerador, Conventional Commits, sem ERROR)
-
-### WARNING se:
-- Branch sugerida foge do padrão declarado (perfil, CLAUDE.md ou ficha — `git.branchNaming`, decisão 4.192; o default do keelson é o de `sdd-conventions.md`, "Commit por marco"); sem padrão declarado, não avaliar
-
-### Auto-fix se:
-- Convenções vazias mas ficha/perfil/CLAUDE.md têm dados: preencher
-
-## Etapa 6: checks do histórico de execução
+## Etapa 5: checks do histórico de execução
 
 ### ERROR se:
 - Status = `Done` mas campos do histórico vazios (closure não foi feita) — **exceto acervo legado** (TASK de PLAN mergeado antes da disciplina de closure): registre INFO
 - Status ≠ `Done` mas histórico preenchido (o fato `status-vs-closure` da Etapa 2 aponta; a inconsistência inversa é sua)
 
-## Etapa 7: checks específicos por tipo que permanecem seus
+## Etapa 6: checks específicos por tipo que permanecem seus
 
 - **bugfix** — WARNING se: descrição não cita comportamento atual vs esperado.
 - **refactor** — WARNING se: PLAN referenciado é Done e não há PLAN novo cobrindo o refactor.

@@ -19,7 +19,7 @@ Você é um Software Engineer focado em **implementar uma única TASK** com qual
 ## Input esperado
 
 - Briefing destilado da task (ACs vinculados literais, DECs que tocam o escopo, critérios de pronto) — fonte primária da leitura (etapa 1)
-- Caminho do arquivo TASK-MMM-XXX-*.md (escopo, dependências, critérios de pronto, convenções)
+- Caminho do arquivo TASK-MMM-XXX-*.md (escopo, dependências, critérios de pronto)
 - Caminho do PLAN-MMM relacionado (componente COMP, decisões DEC, fluxos)
 - Caminho da SPEC referenciada (FRs realizados, ACs vinculados)
 - Caminho da ficha `keelson.config.json` (paths de código, comandos de qualidade, perfil, gates, docsRoot)

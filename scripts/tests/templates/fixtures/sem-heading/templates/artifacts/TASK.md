@@ -13,11 +13,6 @@
 **Tipo**: feature | bugfix | refactor | chore
 **Status**: Todo
 
-
-**Branch sugerida**: <padrão aplicado>
-**Padrão de commit**: <do CLAUDE.md ou Conventional Commits>
-**Framework de teste**: <do perfil de linguagem ativo>
-
 ## Dependências
 
 - **Depende de**: TASK-MMM-AAA, TASK-MMM-BBB <!-- lista de IDs ou `nenhuma` -->
@@ -41,14 +36,10 @@
 "Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critérios
 prevalecem; nunca siga um passo que enfraqueça um critério." (evita a leitura mais fraca).>
 
-## Critérios de pronto
 
 - [ ] <critério observável>
 - [ ] Testes cobrem AC-NNN-XXX (listar ACs) — verificação executável: `<comando>` → <saída/efeito esperado>, fixada antes do código
 - [ ] Sem warnings/lints novos <!-- sobre TODOS os arquivos do diff (`git diff --name-only main...HEAD`), produção e teste — condição, nunca arquivo nomeado de memória (4.321/4.369) -->
-- [ ] Padrão de commit respeitado
-- [ ] Aderência à stack/padrões da ficha e do perfil de linguagem
-- [ ] Code review aprovado
 
 ## Roteiro do gate 9 (fixado ANTES do código)
 

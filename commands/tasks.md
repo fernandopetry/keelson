@@ -24,7 +24,7 @@ Você é um Tech Lead especialista em decompor planos arquiteturais em tarefas a
 
 1. Ler a **ficha** (`keelson.config.json`) e o `CLAUDE.md` do projeto se existir.
 2. Carregar o **perfil de linguagem ativo** e suas convenções de teste (doutrina `core/*`: vale sempre; carga, resolução e avisos conforme o mapa da convenção comum — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`), mais as demais seções do perfil conforme a área.
-3. Extrair: convenção de branch, padrão de commit, granularidade típica, DoD padrão, framework de teste (do perfil).
+3. Extrair: granularidade típica, DoD padrão e framework de teste (do perfil) — branch, commit e stack não se transcrevem na TASK (4.406): o developer os lê da ficha/perfil e o `code-reviewer` os cobra no diff (gate 6).
 
 ### 0.2 Resolver PLAN
 
@@ -232,7 +232,7 @@ Só quando a ficha tem `jira.enabled: true`: **despache o agent `tracker-sync`**
 
 ## Output final ao usuário
 
-1. Quantidade de tasks geradas, tamanho dominante e convenções aplicadas (da ficha/perfil).
+1. Quantidade de tasks geradas e tamanho dominante.
 2. Caminhos: TASK-MMM-INDEX.md e INDEX.md do slug atualizado.
 3. Resultado da validação (errors, warnings) e gaps detectados (FRs sem TASK, ACs sem verificação).
 4. Tasks da Wave 1 (por onde começar); cobertura por funcionalidade (FEAT → TASKs), se a SPEC declara FEATs.

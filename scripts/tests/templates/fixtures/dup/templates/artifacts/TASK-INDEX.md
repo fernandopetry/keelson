@@ -4,7 +4,6 @@
 
 **Total de tasks**: N
 **Tamanho dominante**: small | medium
-**Convenções aplicadas**: derivadas da ficha/perfil
 
 ## Status agregado
 

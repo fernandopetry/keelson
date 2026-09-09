@@ -508,7 +508,6 @@ sect == "" && line ~ /^\*\*[A-Z]/ {
 
 /^## / {
   h = trim(substr(line, 4))
-  if (h ~ /^Conven/)       { sConv = 1; sect = "conv"; next }
   if (h ~ /^Depend/)       { sDep = 1;  sect = "dep";  next }
   if (h ~ /^Contexto/)     { sCtx = 1;  sect = "ctx";  next }
   if (h ~ /^Escopo/)       { sEsc = 1;  sect = "esc";  next }
@@ -608,7 +607,6 @@ END {
   if (!hTipo) emit("WARNING", "task-tipo-ausente", "campo **Tipo**: ausente (auto-fix: feature)")
   else if (TIPO !~ /^(feature|bugfix|refactor|chore)$/)
     emit("ERROR", "task-tipo-enum", "Tipo \"" TIPO "\" fora de {feature, bugfix, refactor, chore}")
-  if (!sConv) emit("ERROR", "task-secao-ausente", "secao \"## Convencoes (do projeto)\" ausente")
   if (!sDep)  emit("ERROR", "task-secao-ausente", "secao \"## Dependencias\" ausente")
   if (!sCtx)  emit("ERROR", "task-secao-ausente", "secao \"## Contexto\" ausente")
   if (!sEsc)  emit("ERROR", "task-secao-ausente", "secao \"## Escopo\" ausente")

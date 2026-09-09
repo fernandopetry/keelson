@@ -23,6 +23,39 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.168.0] — 2026-09-09
+
+Re-init: none
+
+Decision 4.406 — second step of the artifact-diet series: what the project file and the
+language profile already declare no longer gets copied into every artifact.
+
+### Removed
+
+- `TASK` template: the "Convenções (do projeto)" section (branch, commit pattern, test
+  framework — 5 lines repeated in every TASK) and three boilerplate done-criteria
+  ("Padrão de commit respeitado", "Aderência à stack/padrões…", "Code review aprovado" —
+  the last one is already a closure checklist item). The developer reads the project file
+  and profile; the `code-reviewer` enforces adherence on the diff (gate 6).
+- `PLAN` template: the "Ficha/perfil", "Stack vigente herdado" and "Padrão arquitetural
+  seguido" fields of the *Aderência a guidelines* section — the section stays, with its
+  decision-bearing fields (irreversible decisions touched / in conflict with other slugs,
+  exceptions).
+- `TASK-INDEX` template: the "Convenções aplicadas" line (no script read it).
+- `task-validator`: the conventions step (commit ERROR, branch WARNING, auto-fill) and the
+  "missing adherence criterion" WARNING; later steps renumbered.
+
+### Changed
+
+- `artifact-lint.sh`: `task-secao-ausente` no longer requires "Convenções (do projeto)" —
+  the lint relaxes and never inverts, so artifacts already written with the section keep
+  passing unchanged. No check started failing what it approved before.
+
+### Kept, deliberately
+
+- The consolidated glossary in the slug `INDEX.md`: it is the canonical vocabulary across
+  the SPECs of a slug and what lets `/keelson:specify` skip re-reading earlier SPECs.
+
 ## [0.167.0] — 2026-09-09
 
 Re-init: none

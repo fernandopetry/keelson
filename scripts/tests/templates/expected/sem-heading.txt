@@ -1,2 +1,2 @@
 VIOLACAO: templates/artifacts/SPEC.md sem heading que o lint exige: ERROR	spec-secao-ausente	secao "## 8." ausente (SPEC-000-template.md)
-VIOLACAO: templates/artifacts/TASK.md sem heading que o lint exige: ERROR	task-secao-ausente	secao "## Convencoes (do projeto)" ausente (TASK-000-001-template.md)
+VIOLACAO: templates/artifacts/TASK.md sem heading que o lint exige: ERROR	task-secao-ausente	secao "## Criterios de pronto" ausente (TASK-000-001-template.md)

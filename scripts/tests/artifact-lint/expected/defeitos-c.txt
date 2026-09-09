@@ -19,7 +19,6 @@ ERROR	task-campo-ausente	campo **Slug**: ausente ou vazio (TASK-001-001-limpa.md
 ERROR	task-campo-ausente	campo **Status**: ausente (TASK-001-001-limpa.md)
 ERROR	task-campo-ausente	campo **Tamanho estimado**: ausente (TASK-001-001-limpa.md)
 ERROR	task-refactor-sem-identidade	Tipo refactor sem criterio "comportamento observavel identico" (TASK-001-001-limpa.md)
-ERROR	task-secao-ausente	secao "## Convencoes (do projeto)" ausente (TASK-001-001-limpa.md)
 ERROR	task-secao-ausente	secao "## Criterios de pronto" ausente (TASK-001-001-limpa.md)
 ERROR	task-secao-ausente	secao "## Dependencias" ausente (TASK-001-001-limpa.md)
 ERROR	task-secao-ausente	secao "## Escopo" ausente (TASK-001-001-limpa.md)
