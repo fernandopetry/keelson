@@ -511,7 +511,6 @@ sect == "" && line ~ /^\*\*[A-Z]/ {
   if (h ~ /^Depend/)       { sDep = 1;  sect = "dep";  next }
   if (h ~ /^Contexto/)     { sCtx = 1;  sect = "ctx";  next }
   if (h ~ /^Escopo/)       { sEsc = 1;  sect = "esc";  next }
-  if (h ~ /^Implementa/)   { sImpl = 1; sect = "impl"; next }
   if (h ~ /^Crit/)         { sCrit = 1; sect = "crit"; next }
   if (h ~ /^Roteiro do gate 9/) { sect = "gate9"; next }
   if (h ~ /^Riscos/)       { sRisc = 1; sect = "risc"; next }
@@ -614,7 +613,6 @@ END {
     if (!sInc)  emit("ERROR", "task-secao-ausente", "subsecao \"### Inclui\" ausente")
     if (!sNInc) emit("ERROR", "task-secao-ausente", "subsecao \"### Nao inclui\" ausente")
   }
-  if (!sImpl) emit("ERROR", "task-secao-ausente", "secao \"## Implementacao sugerida\" ausente")
   if (!sCrit) emit("ERROR", "task-secao-ausente", "secao \"## Criterios de pronto\" ausente")
   if (!sRisc) emit("ERROR", "task-secao-ausente", "secao \"## Riscos especificos\" ausente")
   if (!sHist) emit("ERROR", "task-secao-ausente", "secao \"## Historico de execucao\" ausente")

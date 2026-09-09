@@ -30,12 +30,6 @@
 ### Não inclui
 - <item adjacente>
 
-## Implementação sugerida
-
-<Passos curtos, sem prescrever solução além do PLAN. Abra a seção com a frase:
-"Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critérios
-prevalecem; nunca siga um passo que enfraqueça um critério." (evita a leitura mais fraca).>
-
 
 - [ ] <critério observável>
 - [ ] Testes cobrem AC-NNN-XXX (listar ACs) — verificação executável: `<comando>` → <saída/efeito esperado>, fixada antes do código

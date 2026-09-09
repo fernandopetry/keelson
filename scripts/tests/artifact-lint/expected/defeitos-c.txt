@@ -23,7 +23,6 @@ ERROR	task-secao-ausente	secao "## Criterios de pronto" ausente (TASK-001-001-li
 ERROR	task-secao-ausente	secao "## Dependencias" ausente (TASK-001-001-limpa.md)
 ERROR	task-secao-ausente	secao "## Escopo" ausente (TASK-001-001-limpa.md)
 ERROR	task-secao-ausente	secao "## Historico de execucao" ausente (TASK-001-001-limpa.md)
-ERROR	task-secao-ausente	secao "## Implementacao sugerida" ausente (TASK-001-001-limpa.md)
 ERROR	task-secao-ausente	secao "## Riscos especificos" ausente (TASK-001-001-limpa.md)
 ERROR	task-secao-ausente	subsecao "### Inclui" ausente (TASK-001-002-arruma.md)
 WARNING	spec-feat-unica	exatamente 1 FEAT declarada (sugerir colapso: a funcionalidade e a propria SPEC) (SPEC-001-esqueleto.md)

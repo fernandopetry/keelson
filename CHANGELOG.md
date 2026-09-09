@@ -23,6 +23,28 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.169.0] — 2026-09-09
+
+Re-init: none
+
+Decision 4.408 — third step of the artifact-diet series, and the first cut backed by an
+A/B eval (decision 4.407): with falsifiable done-criteria and an explicit scope, the
+developer produced the same result with or without implementation hints (7/7 runs per arm
+on both invariant axes, same noise on the third).
+
+### Removed
+
+- `TASK` template: the "Implementação sugerida" section and its non-binding preamble. The
+  *how* belongs to the developer at execution time; the PLAN's DEC and the slug memo/MAP
+  already carry the design.
+- `/keelson:tasks`: the ruler item forbidding a done-criterion derived from the same TASK's
+  implementation hints — the defect class disappears with the section.
+
+### Changed
+
+- `artifact-lint.sh`: `task-secao-ausente` no longer requires "Implementação sugerida"
+  (relaxes, never inverts — TASKs already written keep passing).
+
 ## [0.168.0] — 2026-09-09
 
 Re-init: none

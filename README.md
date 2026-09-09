@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.168.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.169.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the artifact diet reaches content — the TASK template drops its "Convenções (do projeto)" section and three boilerplate done-criteria, the PLAN template drops the fields that transcribed the project file, and the lint relaxes accordingly (artifacts already written keep passing). The skeletons live in `templates/artifacts/` since 0.167.0. Details in `CHANGELOG.md`.
+New in this release: the TASK template drops "Implementação sugerida" — an A/B eval showed the developer reaches the same result without hints when the done-criteria are falsifiable and the scope is explicit; the lint relaxes accordingly. Since 0.167.0 the artifact skeletons live in `templates/artifacts/`, and 0.168.0 removed what the project file already declares. Details in `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
