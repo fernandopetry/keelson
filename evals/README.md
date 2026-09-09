@@ -9,7 +9,9 @@ regra é a decisão **4.304** (`docs/_meta/decisions.md`); este arquivo é só p
   braços em `arms/` ou montados à mão) ou `git:<ref>`, que só vale para caso cujo
   `prompt.md` declara `regua:` (caminho no repo) e, opcionalmente, `regua_inicio:`/
   `regua_fim:` (prefixos de linha) — sem a declaração o runner recusa `git:` (4.377);
-  hoje só `decomposicao-comportamento` a declara.
+  `regua_anexos:` (lista por vírgula) anexa arquivos inteiros do mesmo ref depois da
+  régua — os templates canônicos de `templates/artifacts/` que a régua cita por caminho
+  (4.405). Declaram hoje: `decomposicao-comportamento` e `scribe-spec`.
 - `--runs` mínimo 1; abaixo de 4 o sumário rotula a leitura como sinal (piso empírico da
   bancada, obs. 4.304 — não garantia). HOLD distingue variância intra-braço de juiz sem
   veredito válido (falha de infra).
@@ -20,6 +22,10 @@ regra é a decisão **4.304** (`docs/_meta/decisions.md`); este arquivo é só p
   instrução na mesma linha é descontado). Duas rodadas no mesmo segundo ganham
   diretórios distintos; caminhos com espaço funcionam.
 - Veredito é **consultivo** (HOLD em divergência; plant aprovado invalida a rodada).
+- **Rode de uma cópia congelada do runner** (`cp scripts/eval-run.sh <scratch>/` e execute a
+  cópia): bash lê o script por offset e editar `eval-run.sh` com uma rodada em curso a mata
+  no meio (caso real, 4.407). Rodada longa também não cabe no timeout da ferramenta —
+  `nohup … &` com log em arquivo.
 - Roda **sob demanda do Diretor ou pré-leva** de classe coberta — nunca em pre-commit/CI.
 - Formato dos casos compatível com `claude plugin eval` (early access); o runner próprio
   orquestra até o portão abrir.

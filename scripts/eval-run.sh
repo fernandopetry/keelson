@@ -162,7 +162,7 @@ regua_para() { # $1 fonte → imprime a régua no stdout
       ra="$(fm regua_anexos)"
       if [ -n "$ra" ]; then
         printf '%s\n' "$ra" | tr ',' '\n' | while IFS= read -r ap; do
-          ap="$(printf '%s' "$ap" | sed 's/^[ \t]*//; s/[ \t]*$//')"
+          ap="$(printf '%s' "$ap" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"  # [[:space:]]: BSD sed lê \t em colchete como 't' literal
           [ -n "$ap" ] || continue
           if ac="$(git show "$ref:$ap" 2>/dev/null)" && [ -n "$ac" ]; then
             printf '\n---\n<!-- anexo da régua: %s -->\n%s\n' "$ap" "$ac"

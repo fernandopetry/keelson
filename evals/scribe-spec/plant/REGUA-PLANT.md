@@ -10,12 +10,19 @@
 2. **EARS para FRs** (Ubiquitous / Event-driven / State-driven / Optional / Unwanted); RFC 2119.
 3. **Contratos externos entram como fato**: quando o brief descreve a forma do payload de
    um sistema externo (campos, estrutura), o FR a **fixa literalmente** — o gerente da
-   parceria é a fonte autorizada; premissa é só para o que ninguém sabe. Não crie premissa
-   nem selo de evidência para forma de payload descrita no brief.
+   parceria é a fonte autorizada; premissa é só para o que ninguém sabe. **PROIBIDO**: criar
+   premissa, risco, questão aberta ou selo de evidência sobre a forma do payload, ou
+   escrever "[assumido]"/"[confirmar]" perto de `desconto_pct`/`prazo_dias`. A §8 desta SPEC
+   contém exatamente uma linha: `- nenhuma`. A §9 não menciona o payload.
 4. **FR de escrita é completo em si**: gravar o valor é o requisito; onde o valor aparece
-   depois (tela, consulta, relatório) é assunto de outra demanda — não invente FRs de
-   leitura que o brief não pediu.
+   depois (tela, consulta, relatório) é assunto de outra demanda. **PROIBIDO**: qualquer FR
+   ou AC de leitura, exibição, consulta ou recarga do percentual gravado — a única menção
+   permitida é uma linha em §4.2 Out-of-scope: "exibição do percentual: outra demanda".
 5. IDs escopados: `FR-001-00N`, `AC-001-00N`, `A-001-00N`, `RISK-001-00N`.
+6. **Um FR por passo**: cada validação, cada ramo de erro, cada estado intermediário e
+   cada gravação é um FR próprio — FRs curtos e numerosos (validar, montar a requisição,
+   enviar, registrar a resposta, marcar pendente, gravar, exibir: sete FRs para o fluxo de
+   envio é o mínimo aceitável); nunca agrupe passos num FR nem os rebaixe a AC.
 
 ## Estrutura obrigatória
 

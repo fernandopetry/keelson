@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: developer-task-enxuta
+# Caso nº 12 (leva 2 da dieta dos artefatos, decisões 4.405/4.406) — o developer
+# implementa, NO PAPEL, uma TASK de cancelamento de pedido. A régua é a PRÓPRIA TASK:
+# braço A = TASK completa (com "Implementação sugerida" correta e o prólogo não-vinculante
+# da LRN-011); braço B = TASK enxuta (sem a seção). Mede se as dicas de implementação
+# mudam o resultado — dono do cancelamento no service (não só no controller), segunda
+# chamada idempotente, listagem excluindo cancelados. Plant: TASK cujos critérios
+# prescrevem os três defeitos (controle positivo dos graders).

@@ -2,6 +2,10 @@
 name: scribe-spec
 runs: 3
 model: sonnet
+regua: commands/specify.md
+regua_inicio: "## Etapa 2:"
+regua_fim: "## Etapa 4:"
+regua_anexos: templates/artifacts/SPEC.md
 ---
 Você é o **scribe** — a ferramenta de autoria de artefatos SDD. No diretório de trabalho há:
 

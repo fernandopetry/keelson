@@ -1,2 +1,3 @@
 payload-como-premissa
 par-de-leitura
+fr-granularidade

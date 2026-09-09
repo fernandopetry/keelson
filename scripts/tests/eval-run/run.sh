@@ -110,11 +110,12 @@ if [ "$got7" = "## Regua
 Régua sintética boa vinda do git. MARCA-BOA" ]; then ok "cenário 7 recorte entre âncoras exato (sem cabeçalho/rodapé)"
 else bad "cenário 7: recorte divergente: [$got7]"; fi
 
-# --- cenário 7b: regua_anexos (4.405) — anexo do mesmo ref entra depois da régua; ausente é AVISO ---
+# --- cenário 7b: regua_anexos (4.405) — anexo do mesmo ref entra depois da régua; ausente é AVISO;
+# nome começando por 't' + espaço após a vírgula: BSD sed com [ \t] comia o 't' (caso real, 4.407) ---
 GRA="$TMP/gitrepo-anexo"; mkdir -p "$GRA"
 ( cd "$GRA" && { git init -q -b main 2>/dev/null || { git init -q; git checkout -qb main; }; } )
 cp "$GR/regua-ancoras.md" "$GRA/regua-ancoras.md"
-printf '# Anexo canonico\nEsqueleto vindo do anexo. MARCA-BOA\n' > "$GRA/anexo.md"
+printf '# Anexo canonico\nEsqueleto vindo do anexo. MARCA-BOA\n' > "$GRA/tpl-anexo.md"
 ( cd "$GRA" && git add -A && git -c user.email=t@t -c user.name=t commit -q -m regua )
 export FAKE_STATE="$TMP/s7b"; mkdir -p "$FAKE_STATE"
 out="$( cd "$GRA" && "$RUNNER_ABS" "$HERE/case-git-anexo" --arm A=git:HEAD --arm B="file:$HERE/reguas/regua-ma.md" \
@@ -125,7 +126,7 @@ if [ $rc -eq 0 ] && [ "$got7b" = "## Regua
 Régua sintética boa vinda do git. MARCA-BOA
 
 ---
-<!-- anexo da régua: anexo.md -->
+<!-- anexo da régua: tpl-anexo.md -->
 # Anexo canonico
 Esqueleto vindo do anexo. MARCA-BOA" ]; then ok "cenário 7b regua_anexos: anexo do mesmo ref concatenado após a régua"
 else bad "cenário 7b: anexo não concatenado (exit $rc): [$got7b]"; printf '%s\n' "$out" >&2; fi
