@@ -391,10 +391,13 @@ cen_report() {
   roda report "/keelson:report $slug. Esta sessão não tem humano interativo: emita o relatório pelo contrato e feche o ciclo do ledger."
   echo "### fatos: report" >> "$SUM"
   fato "report/secao-cobertura-obrigatoria" 'grep -qiE "Cobertura deste relat" "$RESULTS/report.result.txt"'
-  fato "report/linha-de-duracao"            'grep -qiE "Dura[cç][aã]o" "$RESULTS/report.result.txt"'
+  fato "report/linha-de-duracao"            'grep -qiE "dura(ç|c)(ã|a)o" "$RESULTS/report.result.txt"'
   fato "report/gates-ou-entrega-narrados"   'grep -qiE "gate|entrega|closure" "$RESULTS/report.result.txt"'
-  fato "report/ledger-consumido-arquivado"  '[ "$(find "$CONSUMER/thoughts" -type d -name "reported-*" | wc -l | tr -d " ")" -gt "$reported_antes" ] || [ "$ativos_antes" = "0" ]'
-  fato "report/casa-marcada-reportada"      'grep -rqs "^estado: reportada" "$CONSUMER"/thoughts/local/sessions/*/session.meta'
+  # em -p cada cenário é uma sessão nova: o report lê as casas anteriores (latest-for) e só
+  # arquiva a própria; o que se exige é que NENHUM evento consumível (≠ pendencia) fique ativo
+  # em casa alguma — pendência aberta permanece ativa por contrato (report.md, Etapa 3)
+  fato "report/ledger-consumido-arquivado"  '[ "$(find "$CONSUMER/thoughts" -path "*ledger*" -name "*.md" ! -path "*reported*" ! -name "*-pendencia-*" 2>/dev/null | wc -l | tr -d " ")" = "0" ]'
+  fato "report/casa-marcada-reportada"      'grep -rqs "^reportada_em: " "$CONSUMER"/thoughts/local/sessions/*/session.meta && grep -rqs "^estado: reportada" "$CONSUMER"/thoughts/local/sessions/*/session.meta'
   fato "report/codigo-intocado"             '[ -z "$(G status --porcelain -- src tests 2>/dev/null)" ]'
 }
 

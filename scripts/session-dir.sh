@@ -176,8 +176,11 @@ session_home() { # ecoa a pasta da sessão (cria sob --create); vazio = use o le
   resolve_dir
   if [ -n "$RESOLVED" ]; then
     # escrita sobre casa já reportada reabre o estado (4.315): a sessão voltou
-    # a trabalhar, e um próximo fecho re-marcará
-    if [ "$CREATE" -eq 1 ] && grep -qx 'estado: reportada' "$RESOLVED/session.meta" 2>/dev/null; then
+    # a trabalhar, e um próximo fecho re-marcará. Só escrita de TRABALHO reabre —
+    # `dir`/`ledger-dir`; o log de janela (`window-log`, telemetria do Stop) não é
+    # trabalho: o window-marker rodava no Stop logo depois do /keelson:report e desfazia
+    # o mark-reported recém-gravado (4.402 — smoke do report, casa reportada por 1 s)
+    if [ "$CREATE" -eq 1 ] && [ "$ACTION" != "window-log" ] && grep -qx 'estado: reportada' "$RESOLVED/session.meta" 2>/dev/null; then
       tmp="$RESOLVED/session.meta.tmp.$$"
       sed 's/^estado:.*/estado: ativa/' "$RESOLVED/session.meta" > "$tmp" 2>/dev/null \
         && mv "$tmp" "$RESOLVED/session.meta" 2>/dev/null || rm -f "$tmp" 2>/dev/null

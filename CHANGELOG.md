@@ -23,6 +23,22 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.165.3] — 2026-09-08
+
+Re-init: none
+
+Decision 4.402 — found by the new `report` smoke scenario: the session home was marked
+reported and reopened one second later.
+
+### Fixed
+
+- **Telemetry no longer reopens a reported session home** — the `window-marker` Stop hook
+  writes the window log through `session-dir.sh` with `--create`, and that write counted as
+  "the session went back to work", undoing the `mark-reported` that `/keelson:report` had just
+  recorded. Only work writes (`dir` and `ledger-dir`) reopen a home now; the window log does
+  not. Without this, no home stayed reported while the reporting session was alive, and `gc`
+  could only see it by age.
+
 ## [0.165.2] — 2026-09-08
 
 Re-init: none

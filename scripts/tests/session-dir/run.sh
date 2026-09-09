@@ -215,6 +215,14 @@ grep -qxF "estado: reportada" "$DN/session.meta" && ok mark-reported || falha ma
 total=$((total + 1))
 sd "$NOVA" "$R2" dir --create >/dev/null 2>&1
 grep -qxF "estado: ativa" "$DN/session.meta" && ok reabertura-no-create || falha reabertura-no-create
+# telemetria não reabre (4.402): mark-reported → window-log --create (o que o window-marker faz no Stop) → segue reportada
+total=$((total + 1))
+sd "$NOVA" "$R2" mark-reported 2>/dev/null
+sd "$NOVA" "$R2" window-log --create >/dev/null 2>&1
+grep -qxF "estado: reportada" "$DN/session.meta" && ok window-log-nao-reabre || falha window-log-nao-reabre
+total=$((total + 1))
+sd "$NOVA" "$R2" ledger-dir --create >/dev/null 2>&1
+grep -qxF "estado: ativa" "$DN/session.meta" && ok ledger-dir-reabre || falha ledger-dir-reabre
 
 # mark-reported sem casa → no-op silencioso
 total=$((total + 1))
