@@ -3,8 +3,9 @@
 > Fonte única (decisão 4.82) da **sintaxe canônica das arestas**, do **catálogo de
 > arestas e checks** e do **contrato de invocação/saída** de `scripts/graph.sh`.
 > Formatos de ID e árvore de artefatos têm dono próprio — `index-contract.md` — e são
-> referenciados aqui, nunca redefinidos. Os templates geradores (`/keelson:specify`,
-> `/keelson:plan`, `/keelson:tasks`) e os validators (`plan-validator`,
+> referenciados aqui, nunca redefinidos. Os comandos geradores (`/keelson:specify`,
+> `/keelson:plan`, `/keelson:tasks`), os templates canônicos (`templates/artifacts/`,
+> 4.405) e os validators (`plan-validator`,
 > `task-validator`) apontam para cá; nenhum deles recopia esta régua.
 >
 > Princípio (§4.81 aplicado ao grafo): **o markdown é a fonte; o grafo é derivado** —

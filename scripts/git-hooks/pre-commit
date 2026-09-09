@@ -366,6 +366,7 @@ for par in "ficha:ficha diff-facts" "next-id:next-id" "index-check:index" \
            "publish-wiki:wiki" \
            "check-frontmatter:frontmatter" "context-cost:context-cost" \
            "check-mermaid:mermaid" "eval-run:eval-run" "cycle-clock:cycle-clock" \
+           "check-templates:templates" \
            "warroom:warroom" "lessons:lessons" "version:version" "pause:pause" \
            "session-dir:session-dir run-state ledger context-cost window-marker compact-anchor review-guard security-guard warroom session-cycle"; do
   motor="${par%%:*}"; suites="${par#*:}"
@@ -415,12 +416,26 @@ if printf '%s\n' "$staged" | grep -qE '^scripts/(graph\.sh$|artifact-lint\.sh$|i
   run_suite parser-props
 fi
 
+# Templates canônicos dos artefatos SDD (4.405): dono único da forma + headings do lint.
+if printf '%s\n' "$staged" | grep -qE '^(commands/(specify|plan|tasks)\.md$|templates/artifacts/|scripts/check-templates\.sh$|scripts/artifact-lint\.sh$|scripts/tests/templates/)'; then
+  if [ -f scripts/check-templates.sh ]; then
+    if ! out="$(bash scripts/check-templates.sh 2>&1)"; then
+      printf '%s\n' "$out" | sed 's/^/    /' >&2
+      echo "[keelson pre-commit] BLOQUEADO: templates canônicos dessincronizados (4.405)." >&2
+      echo "  Escape consciente: KEELSON_SKIP_TESTS=1" >&2
+      exit 1
+    fi
+  else
+    echo "[keelson pre-commit] aviso: scripts/check-templates.sh ausente — templates não conferidos." >&2
+  fi
+fi
+
 # Dono de formato de artefato no commit (4.261): linha ESTRUTURAL (heading ou campo
-# **X**:) no diff staged dos comandos que carregam o template inline → o corpus pode
-# ter ficado para trás; suíte verde com motores velhos não prova conformidade nova.
+# **X**:) no diff staged dos templates canônicos (4.405) ou dos comandos geradores → o
+# corpus pode ter ficado para trás; suíte verde com motores velhos não prova conformidade nova.
 # Heading do corpo do comando também casa (falso-positivo aceito: custo = 1 suíte + 1 aviso).
-if printf '%s\n' "$staged" | grep -qE '^commands/(specify|plan|tasks)\.md$'; then
-  if git diff --cached -U0 -- commands/specify.md commands/plan.md commands/tasks.md 2>/dev/null \
+if printf '%s\n' "$staged" | grep -qE '^(commands/(specify|plan|tasks)\.md$|templates/artifacts/)'; then
+  if git diff --cached -U0 -- commands/specify.md commands/plan.md commands/tasks.md templates/artifacts 2>/dev/null \
      | grep -qE '^[+-](#{1,3} |\*\*[A-Za-z][^*]*\*\*[ \t]*:)'; then
     run_suite corpus
     echo "[keelson pre-commit] AVISO: linha estrutural mudou em dono de formato de artefato (4.261) — se o formato/template mudou, lint e corpus acompanham na MESMA leva; corpus verde aqui não prova conformidade com o formato novo." >&2

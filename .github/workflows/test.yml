@@ -70,5 +70,8 @@ jobs:
       - name: Sincronização de comandos/agents (scripts/check-sync.sh)
         run: bash scripts/check-sync.sh
 
+      - name: Templates canônicos dos artefatos SDD (scripts/check-templates.sh)
+        run: bash scripts/check-templates.sh
+
       - name: Checks de release (versões · CHANGELOG · MIRRORS · bash -n)
         run: bash scripts/check-release.sh

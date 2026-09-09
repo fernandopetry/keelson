@@ -23,6 +23,38 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.167.0] — 2026-09-09
+
+Re-init: none
+
+Decision 4.405 — first step of the artifact-diet series. A consumer's `docs/` had grown to
+1082 files (751 TASKs); a one-field feature produced 2,763 lines of SPEC+PLAN+TASKs. Before
+any section can be cut with proof, the skeleton has to exist as a file: until now it lived
+as a fenced block inside the generating command, with no guard tying it to the lint.
+
+### Added
+
+- `templates/artifacts/SPEC.md`, `PLAN.md`, `TASK.md`, `TASK-INDEX.md`: the canonical
+  skeleton of each SDD artifact, moved **verbatim** out of `commands/specify.md`, `plan.md`
+  and `tasks.md`. The command keeps the principles and points at the template; the `scribe`
+  reads the template as part of the form contract. HTML comments in a template are
+  instructions to the scribe, never content of the generated artifact.
+- `scripts/check-templates.sh` (pre-commit + CI): the four templates exist; no command
+  carries a second copy of the skeleton; each generating command points at its template;
+  and every template passes `artifact-lint.sh` with zero `*-secao-ausente` — the skeleton
+  the scribe reproduces has every heading the lint demands. Suite `scripts/tests/templates/`.
+- `scripts/eval-run.sh`: `regua_anexos:` in a case's frontmatter appends whole files from the
+  same `git:<ref>` after the extracted ruler (comma-separated list); a missing attachment in
+  that ref is a warning, not an error, so A/B runs across this refactor stay valid. The
+  `decomposicao-comportamento` case declares `templates/artifacts/TASK.md`.
+
+### Changed
+
+- No heading, field, comment or section order changed in any artifact; no lint check or
+  graph edge changed; artifacts already written in a consumer are untouched. The 4.261
+  pre-commit guard (structural line → corpus suite) now also watches `templates/artifacts/`;
+  `check-refs.sh` scans `templates/**/*.md`.
+
 ## [0.166.0] — 2026-09-09
 
 Re-init: required

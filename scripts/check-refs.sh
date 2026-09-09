@@ -8,7 +8,7 @@
 # Superfícies varridas (via `git ls-files` — nunca `find .`, que enxergaria
 # cópias untracked como .claude/worktrees/):
 #   CLAUDE.md · commands/*.md · agents/*.md · skills/**/*.md · guidelines/**/*.md
-#   docs/_meta/conventions/*.md · templates/*.md
+#   docs/_meta/conventions/*.md · templates/*.md · templates/**/*.md (artifacts/, 4.405)
 #
 # Régua de precisão (falso-positivo em artefato legítimo é o pior defeito desta
 # camada — mesmo princípio do graph.sh, 4.82): só é candidato o caminho que
@@ -55,7 +55,7 @@ fi
 surfaces="$(git -C "$ROOT" ls-files -- \
   'CLAUDE.md' 'commands/*.md' 'agents/*.md' 'skills/*.md' 'skills/**/*.md' \
   'guidelines/*.md' 'guidelines/**/*.md' 'docs/_meta/conventions/*.md' \
-  'templates/*.md' 2>/dev/null)"
+  'templates/*.md' 'templates/**/*.md' 2>/dev/null)"
 [ -n "$surfaces" ] || { echo "ERRO: nenhuma superfície encontrada em $ROOT" >&2; exit 2; }
 
 # Extrai candidatos: "arquivo<TAB>linha<TAB>caminho", um por linha.

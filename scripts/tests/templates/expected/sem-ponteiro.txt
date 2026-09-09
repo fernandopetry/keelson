@@ -1,0 +1,2 @@
+VIOLACAO: commands/plan.md não aponta templates/artifacts/PLAN.md
+VIOLACAO: template ausente ou vazio: templates/artifacts/TASK-INDEX.md

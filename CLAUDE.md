@@ -140,7 +140,12 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   `production-intake-protocol.md` (entrada de bug/incidente de produção — decisão 4.101),
   `value-test-protocol.md` (menor teste de valor — decisão 4.100), `agent-teams.md`
   (especificidades do modo teams — decisão 4.292) e `warroom-contract.md` (janela sem
-  gate bloqueante + contrato do `DEBT.md` — decisão 4.372);
+  gate bloqueante + contrato do `DEBT.md` — decisão 4.372). O **esqueleto** de cada
+  artefato SDD (SPEC, PLAN, TASK, TASK-INDEX) mora em `templates/artifacts/*.md`
+  (decisão 4.405): o comando gerador é dono dos *princípios*, o template é dono da
+  *forma*, e `scripts/check-templates.sh` (pre-commit + CI) prova que nenhum comando
+  carrega segunda cópia do esqueleto e que todo heading que o `artifact-lint` exige
+  existe no template — mudou a forma, mude no template e no lint na mesma leva;
   o `method-guide.md`
   segue guia humano, com os headings §3.0/§6/§8 preservados como ponteiros. A moldura dos
   validators vive em `skills/_shared/validator-protocol.md`; a **régua dos gates 1–7**

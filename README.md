@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.166.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.167.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the init self-check now fails (not warns) a Playwright MCP server configured without `--isolated` in any realm count — a persistent profile is exclusive to one process, and a second session (Codex, another Claude window) dies with `Browser is already in use`; the injected CLAUDE.md block tells the main session how to resolve the plugin root when `${CLAUDE_PLUGIN_ROOT}` arrives empty in Bash (`/keelson:version`, never `find`). Details in `CHANGELOG.md`.
+New in this release: the canonical skeleton of each SDD artifact (SPEC, PLAN, TASK, TASK-INDEX) now lives as a file in `templates/artifacts/`, moved verbatim out of the generating commands, with `scripts/check-templates.sh` proving single ownership and that every heading the lint demands is in the template — the first step of the artifact-diet series (no content changed yet). Details in `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

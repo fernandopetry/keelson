@@ -1,0 +1,1 @@
+VIOLACAO: segunda cópia do esqueleto num comando (dono é templates/artifacts/): commands/tasks.md:6:# TASK-MMM-XXX: <Título>

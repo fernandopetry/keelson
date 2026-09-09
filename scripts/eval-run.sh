@@ -17,7 +17,10 @@
 #                 Sem `regua:` declarada, `git:` é recusado (exit 2): a régua de um caso
 #                 nunca é adivinhada (4.377); âncora declarada ausente ou fora de ordem é
 #                 erro antes de qualquer braço rodar (4.379); extração vazia é erro,
-#                 nunca régua inventada (4.156).
+#                 nunca régua inventada (4.156). `regua_anexos:` (lista separada por
+#                 vírgula, 4.405) anexa arquivos inteiros do MESMO ref depois da régua —
+#                 os templates canônicos que a régua referencia por caminho; anexo
+#                 ausente no ref é AVISO (ref anterior à extração o tem inline).
 #   file:<path> → o arquivo inteiro é a régua.
 #
 # Uso: eval-run.sh <case-dir> --arm NOME=FONTE --arm NOME=FONTE
@@ -152,7 +155,22 @@ regua_para() { # $1 fonte → imprime a régua no stdout
       out="$(printf '%s\n' "$conteudo" \
         | awk -v a="$ri" -v b="$rf" 'BEGIN { f = (a == "") } b != "" && index($0, b) == 1 { f = 0 } a != "" && index($0, a) == 1 { f = 1 } f')"
       [ -n "$out" ] || die "extração vazia da régua em $1 ($rp entre '$ri' e '$rf')"
-      printf '%s\n' "$out" ;;
+      printf '%s\n' "$out"
+      # anexos (4.405): arquivos que a régua passou a referenciar fora do próprio corpo
+      # (templates canônicos) entram inteiros depois dela, na ordem declarada; ausente
+      # NESTE ref é aviso, nunca erro — o ref anterior à extração ainda o carrega inline
+      ra="$(fm regua_anexos)"
+      if [ -n "$ra" ]; then
+        printf '%s\n' "$ra" | tr ',' '\n' | while IFS= read -r ap; do
+          ap="$(printf '%s' "$ap" | sed 's/^[ \t]*//; s/[ \t]*$//')"
+          [ -n "$ap" ] || continue
+          if ac="$(git show "$ref:$ap" 2>/dev/null)" && [ -n "$ac" ]; then
+            printf '\n---\n<!-- anexo da régua: %s -->\n%s\n' "$ap" "$ac"
+          else
+            echo "AVISO: anexo da régua ausente em $ref: $ap — braço $1 segue só com a régua principal (regua_anexos: do caso)" >&2
+          fi
+        done
+      fi ;;
     file:*)
       p="${1#file:}"
       [ -f "$p" ] || die "régua inexistente: $p"

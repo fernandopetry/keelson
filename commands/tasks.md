@@ -52,7 +52,9 @@ pouco: as duas rotas produzem os mesmos arquivos e passam pelas mesmas provas da
 **Rota única (previsão ≤8 TASKs)** — despache **um** `scribe` com o pacote:
 
 - **Contrato**: este arquivo (`${CLAUDE_PLUGIN_ROOT}/commands/tasks.md`), Etapas 1 a 4 — princípios
-  de decomposição, ordenação, template da TASK **e** o `TASK-MMM-INDEX.md` (parte da autoria).
+  de decomposição, ordenação, template da TASK **e** o `TASK-MMM-INDEX.md` (parte da autoria) —
+  mais os templates canônicos (`${CLAUDE_PLUGIN_ROOT}/templates/artifacts/TASK.md` e
+  `TASK-INDEX.md`, 4.405).
 - **Alvo resolvido**: slug, MMM, próximo XXX, caminhos (Etapa 0.4); flags `--max-size`/`--only`.
 - **Insumos** (caminhos): PLAN, SPEC (ACs e mapa FR→FEAT da 0.2), convenções extraídas na
   0.1 (resumo inline), memo de exploração e/ou `MAP.md` do slug, e o **recorte** do acervo de lições — `bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . match --paths <arquivos dos componentes do PLAN/MAP>` (leitura dupla de `guidelines/project/lessons/` e do `lessons.md` legado; lição sem `paths` entra sempre — decisão 4.376), nunca o acervo inteiro (cruzamento da Etapa 3).
@@ -68,7 +70,7 @@ agent** (briefings distintos do `scribe`, nunca agents novos):
    aplicáveis. O manifesto é o produto intelectual da decomposição: ID e aresta ficam
    decididos aqui, e só aqui.
 2. **Redatores**: 2–3 `scribe`s **em paralelo**, cada um com o manifesto + o contrato
-   (Etapas 1 a 3, template da Etapa 3) + os insumos e uma **lista literal de arquivos**
+   (Etapas 1 a 3, template canônico da Etapa 3) + os insumos e uma **lista literal de arquivos**
    a redigir (fatia por wave; nunca "as TASKs da wave 2", que se sobrepõe). Redator
    **não cria nem renomeia ID e não toca aresta** — divergência com o manifesto volta
    em `duvidas`, nunca se corrige localmente (mesmo mecanismo da 4.114).
@@ -152,96 +154,9 @@ com os fatos da anterior (decisão 4.301 — o rito é do `/keelson:implement`, 
 
 Um arquivo por task: `{docsRoot}/<slug>/tasks/TASK-MMM-XXX-<titulo-kebab>.md`.
 
-```markdown
-# TASK-MMM-XXX: <Título imperativo>
-
-**Slug**: <slug>
-**Pertence a**: PLAN-MMM
-**Realiza (FRs)**: FR-NNN-XXX, FR-NNN-YYY <!-- lista de IDs ou `nenhuma` (chore sem FR) -->
-**AC violado**: AC-NNN-XXX <!-- só Tipo=bugfix: o AC que o bug viola; omitir a linha nos demais tipos -->
-**Funcionalidade**: FEAT-NNN-XXX (primária)[, FEAT-NNN-YYY]
-**Componente**: COMP-MMM-XXX (principal)[, COMP-MMM-YYY] <!-- os COMPs que a fatia atravessa; principal = onde vive o núcleo da mudança -->
-**Wave**: <número>
-**Tamanho estimado**: small | medium
-**Tipo**: feature | bugfix | refactor | chore
-**Status**: Todo
-
-## Convenções (do projeto)
-
-**Branch sugerida**: <padrão aplicado>
-**Padrão de commit**: <do CLAUDE.md ou Conventional Commits>
-**Framework de teste**: <do perfil de linguagem ativo>
-
-## Dependências
-
-- **Depende de**: TASK-MMM-AAA, TASK-MMM-BBB <!-- lista de IDs ou `nenhuma` -->
-- **Bloqueia**: TASK-MMM-CCC <!-- lista de IDs ou `nenhuma`; preencher após gerar todas -->
-
-## Contexto
-
-<3 a 5 linhas.>
-
-## Escopo
-
-### Inclui
-- <item>
-
-### Não inclui
-- <item adjacente>
-
-## Implementação sugerida
-
-<Passos curtos, sem prescrever solução além do PLAN. Abra a seção com a frase:
-"Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critérios
-prevalecem; nunca siga um passo que enfraqueça um critério." (evita a leitura mais fraca).>
-
-## Critérios de pronto
-
-- [ ] <critério observável>
-- [ ] Testes cobrem AC-NNN-XXX (listar ACs) — verificação executável: `<comando>` → <saída/efeito esperado>, fixada antes do código
-- [ ] Sem warnings/lints novos <!-- sobre TODOS os arquivos do diff (`git diff --name-only main...HEAD`), produção e teste — condição, nunca arquivo nomeado de memória (4.321/4.369) -->
-- [ ] Padrão de commit respeitado
-- [ ] Aderência à stack/padrões da ficha e do perfil de linguagem
-- [ ] Code review aprovado
-
-## Roteiro do gate 9 (fixado ANTES do código)
-
-<!-- Só com gates.screenVerify ativo e AC atribuído ao gate 9 — régua na seção "Roteiro do gate 9" abaixo; sem gate 9, omitir. Ambiente (URLs digitáveis + realm) · sujeito concreto (identidade + credencial) · pré-condição com receita (montar + restaurar) · um passo por AC. -->
-
-## Riscos específicos
-
-- <opcional>
-
----
-
-## Histórico de execução (preenchido pelo /keelson:implement)
-
-<!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
-
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
-**Jira**: 
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
-**Arquivos modificados**:
-  - 
-
-**Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
-
-**Notas**: 
-```
+Template canônico: `${CLAUDE_PLUGIN_ROOT}/templates/artifacts/TASK.md` — o scribe o lê na
+fonte e reproduz a estrutura à risca; comentários `<!-- -->` são régua, nunca conteúdo
+(decisão 4.405).
 
 ### Campos de aresta — sintaxe canônica do grafo
 
@@ -285,49 +200,7 @@ Com `gates.screenVerify` ativo e algum AC atribuído ao gate 9, a TASK carrega a
 
 Criar/atualizar `{docsRoot}/<slug>/tasks/TASK-MMM-INDEX.md`:
 
-```markdown
-# Índice de tarefas do PLAN-MMM
-
-**Total de tasks**: N
-**Tamanho dominante**: small | medium
-**Convenções aplicadas**: derivadas da ficha/perfil
-
-## Status agregado
-
-- Todo: N
-- In Progress: 0
-- Done: 0
-- Blocked: 0
-
-## Ordem de execução (waves)
-
-### Wave 1 (paralelizável)
-- [ ] TASK-MMM-001 ⏸ Todo
-- [ ] TASK-MMM-002 ⏸ Todo
-
-### Wave 2 (depende de Wave 1)
-- [ ] TASK-MMM-003 ⏸ Todo
-
-## Cobertura de FRs
-
-| FR | TASKs |
-|----|-------|
-| FR-NNN-001 | TASK-MMM-001, TASK-MMM-003 |
-
-## Cobertura de ACs
-
-| AC | TASKs |
-|----|-------|
-| AC-NNN-001 | TASK-MMM-003 |
-
-## Cobertura por funcionalidade
-
-<!-- Só quando a SPEC declara FEATs; omitir a seção no colapso. P = primária. -->
-
-| FEAT | TASKs (P = primária) | Done |
-|------|----------------------|------|
-| FEAT-NNN-001 | TASK-MMM-001 (P), TASK-MMM-004 | 0/2 |
-```
+Template canônico: `${CLAUDE_PLUGIN_ROOT}/templates/artifacts/TASK-INDEX.md` (decisão 4.405).
 
 ## Etapa 5: gate de validação
 

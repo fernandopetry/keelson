@@ -1,0 +1,3 @@
+# /keelson:plan
+
+sem ponteiro

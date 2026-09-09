@@ -48,7 +48,7 @@ inventário fechado do que o script computa. Prefixos: `spec-` (spec-validator),
 | Grupo | Checks |
 |---|---|
 | Cabeçalho e enums | `spec/plan/task-campo-ausente` · `spec/plan-status-enum` (Draft/Review/Approved/Done) · `task-status-enum` (Todo/In Progress/Done/Blocked) · `task-tamanho-enum` · `task-tipo-enum` · `task-tipo-ausente` · `spec-autor-preencher` · `spec/plan-data-formato` |
-| Seções do template | `spec-secao-ausente` (§1–§10 + 1.1/1.2/1.3/4.1/4.2) · `plan-secao-ausente` (Aderência, Cobertura, §1–§10) · `task-secao-ausente` (8 seções + Inclui/Não inclui) |
+| Seções do template | `spec-secao-ausente` (§1–§10 + 1.1/1.2/1.3/4.1/4.2) · `plan-secao-ausente` (Aderência, Cobertura, §1–§10) · `task-secao-ausente` (8 seções + Inclui/Não inclui) — o esqueleto exigido é o de `templates/artifacts/{SPEC,PLAN,TASK}.md`; `scripts/check-templates.sh` prova que o template passa sem `*-secao-ausente` (4.405) |
 | IDs | `spec/plan-id-fora-do-numero` (NNN/MMM ≠ arquivo) · `spec/plan-id-zero-pad` |
 | SPEC §5–§7 | `spec-fr-sem-rfc` · `spec-rfc-forma` · `spec-fr-sem-deve` · `spec-ears-nao-casa` (W) · `spec-fr-palavras` (>30) · `spec-must-ratio` (>70%, 3+ FRs) · `spec-sem-should-may` · `spec-porte-epico` (>30 FRs) · `spec-nfr-vago` (W) · `spec-nfr-sem-numero` (W — mede o texto do NFR após o ID e o marcador RFC, nunca a linha inteira: o próprio ID carrega dígitos; 4.384) · `spec-ac-fora-gwt` (W) · `spec-tecnologia` (W, wordlist da Etapa 5 do SKILL) |
 | SPEC FEATs | `spec-feat-particao` · `spec-feat-vazia` · `spec-feat-fora-da-5` · `spec-feat-unica` (W) · `spec-feat-sem-descricao` (W) |

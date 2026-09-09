@@ -5,6 +5,7 @@ model: sonnet
 regua: commands/tasks.md
 regua_inicio: "## Etapa 1:"
 regua_fim: "## Etapa 4:"
+regua_anexos: templates/artifacts/TASK.md
 ---
 Você é um scribe de decomposição de trabalho. No diretório de trabalho há dois arquivos:
 

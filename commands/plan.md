@@ -75,7 +75,8 @@ Antes de gerar o PLAN: **stack proposto autorizado** pela ficha e pelo perfil de
 
 A redação do PLAN **não acontece nesta janela**. Despache o agent `scribe` com o pacote:
 
-- **Contrato**: este arquivo (`${CLAUDE_PLUGIN_ROOT}/commands/plan.md`), Etapas 4 e 5.
+- **Contrato**: este arquivo (`${CLAUDE_PLUGIN_ROOT}/commands/plan.md`), Etapas 4 e 5, mais
+  o template canônico (`${CLAUDE_PLUGIN_ROOT}/templates/artifacts/PLAN.md`, 4.405).
 - **Alvo resolvido**: slug, MMM e caminho (Etapa 0.4).
 - **Insumos** (caminhos): SPEC alvo, INDEX.md, perfil de linguagem (as **seções** da carga
   da 0.1 — o scribe lê por seção, não o arquivo inteiro), memo de exploração e/ou `MAP.md`
@@ -110,98 +111,9 @@ indisponível → executar as Etapas 4–5 inline é o fallback, declarado no ou
 
 ## Etapa 5: estrutura obrigatória do arquivo PLAN (contrato de forma — executado pelo `scribe`)
 
-```markdown
-# PLAN-MMM: <Título>
-
-**Slug**: <slug>
-**Status**: Draft | Review | Approved | Done
-**Versão**: 0.1
-**Autor**: <preencher>
-**Data**: <YYYY-MM-DD>
-
-## Aderência a guidelines
-
-**Ficha/perfil de linguagem**: <backend/frontend ativos>
-**Stack vigente herdado**: <lista>
-**Padrão arquitetural seguido**: <padrão>
-**Decisões irreversíveis do slug tocadas**: nenhuma | listar
-**Decisões irreversíveis de outros slugs em conflito**: nenhuma | `{docsRoot}/<outro-slug>/INDEX.md` DEC-MMM-XXX — <justificativa: por que este PLAN não a quebra, ou por que a divergência é legítima>
-**Exceções aos guidelines**: nenhuma | listar com justificativa
-
-## Cobertura
-
-**SPEC referenciada**: SPEC-NNN
-**Slice declarado**: <descrição ou "cobertura total restante">
-
-**FRs cobertos**:
-- FR-NNN-XXX
-
-**NFRs cobertos**:
-- NFR-NNN-XXX
-
-**Cobertura agregada do slug**:
-- Total na SPEC: X
-- Cobertos por planos anteriores: Y
-- Cobertos por este: Z
-- Gap restante: W
-- Funcionalidades cobertas: FEAT-NNN-XXX (total), FEAT-NNN-YYY (parcial) <!-- só quando a SPEC declara FEATs; informativo, para orientar o slicing — o PLAN não ganha estrutura FEAT -->
-
-
-## 1. Visão técnica
-
-## 2. Stack e dependências
-
-## 3. Componentes
-
-### COMP-MMM-001: <nome>
-**Responsabilidade**: ...
-**Realiza**: FR-NNN-XXX
-**Interface pública**: ...
-**Dependências**: COMP-MMM-YYY, COMP-MMM-ZZZ <!-- lista de IDs ou `nenhuma` -->
-<!-- Campo de aresta do grafo (graph-contract.md §1): só IDs de COMP do slug (PLAN
-anterior vale); dependência externa (lib, serviço) vai para a §2 ou para a prosa do
-componente, nunca para este campo. -->
-
-
-## 4. Fluxos principais
-
-## 5. Modelo de dados
-
-## 6. Decisões arquiteturais
-
-### DEC-MMM-001: <decisão>
-**Contexto**: ...
-**Decisão**: ...
-**Alternativas consideradas**:
-- <alt>, descartada porque <custo concreto: o que se perde ou quebra ao escolhê-la>
-**Consequências**: ...
-**Reabrir se**: <condição observável que invalida esta decisão | nunca — <motivo>>
-**Irreversível**: sim | não
-**Aderência à ficha/perfil**: herdada | nova | exceção
-
-## 7. Mapeamento FR -> componente
-
-| FR | Componente | AC cobertos |
-|----|------------|-------------|
-| FR-NNN-001 | COMP-MMM-001 | AC-NNN-001 |
-
-## 8. Riscos técnicos
-
-- **TRISK-MMM-001** <risco> (mitigação: ...)
-
-## 9. Definition of Done deste PLAN
-
-- [ ] Todos os FRs cobertos têm implementação satisfazendo os ACs
-- [ ] Todos os NFRs cobertos têm verificação
-- [ ] Decisões DEC refletidas no código
-- [ ] Aderência à ficha/perfil validada
-- [ ] Todos os ACs cobertos por teste (gate 1 dos quality gates)
-- [ ] Métrica da SPEC operacional (só quando a §1.3 declara `Fonte de medição` — 4.99): instrumentação entregue e provada (gate 9 exibe o evento/número existindo) | fonte externa + dono registrados no INDEX
-
-## 10. Não coberto por este PLAN
-
-- Lista de FRs/NFRs que ficam para PLANs futuros.
-```
+Template canônico: `${CLAUDE_PLUGIN_ROOT}/templates/artifacts/PLAN.md` — o scribe o lê na
+fonte e reproduz a estrutura à risca; comentários `<!-- -->` são régua, nunca conteúdo
+(decisão 4.405).
 
 ## Etapa 6: gate de validação
 

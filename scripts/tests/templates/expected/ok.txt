@@ -1,0 +1,1 @@
+check-templates: ok (4 templates · dono único · ponteiros · headings do lint)

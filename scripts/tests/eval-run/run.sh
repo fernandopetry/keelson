@@ -110,6 +110,29 @@ if [ "$got7" = "## Regua
 Régua sintética boa vinda do git. MARCA-BOA" ]; then ok "cenário 7 recorte entre âncoras exato (sem cabeçalho/rodapé)"
 else bad "cenário 7: recorte divergente: [$got7]"; fi
 
+# --- cenário 7b: regua_anexos (4.405) — anexo do mesmo ref entra depois da régua; ausente é AVISO ---
+GRA="$TMP/gitrepo-anexo"; mkdir -p "$GRA"
+( cd "$GRA" && { git init -q -b main 2>/dev/null || { git init -q; git checkout -qb main; }; } )
+cp "$GR/regua-ancoras.md" "$GRA/regua-ancoras.md"
+printf '# Anexo canonico\nEsqueleto vindo do anexo. MARCA-BOA\n' > "$GRA/anexo.md"
+( cd "$GRA" && git add -A && git -c user.email=t@t -c user.name=t commit -q -m regua )
+export FAKE_STATE="$TMP/s7b"; mkdir -p "$FAKE_STATE"
+out="$( cd "$GRA" && "$RUNNER_ABS" "$HERE/case-git-anexo" --arm A=git:HEAD --arm B="file:$HERE/reguas/regua-ma.md" \
+  --runs 1 --executor "$EXEC" --results "$TMP/r7b" 2>&1 )"
+rc=$?
+got7b="$(cat "$TMP"/r7b/*/run/A-r1/REGUA.md 2>/dev/null)"
+if [ $rc -eq 0 ] && [ "$got7b" = "## Regua
+Régua sintética boa vinda do git. MARCA-BOA
+
+---
+<!-- anexo da régua: anexo.md -->
+# Anexo canonico
+Esqueleto vindo do anexo. MARCA-BOA" ]; then ok "cenário 7b regua_anexos: anexo do mesmo ref concatenado após a régua"
+else bad "cenário 7b: anexo não concatenado (exit $rc): [$got7b]"; printf '%s\n' "$out" >&2; fi
+if printf '%s\n' "$out" | grep -q "AVISO: anexo da régua ausente em HEAD: nao-existe.md"; then
+  ok "cenário 7b anexo ausente no ref → AVISO, braço segue"
+else bad "cenário 7b: anexo ausente não avisou"; printf '%s\n' "$out" >&2; fi
+
 # --- cenário 8: âncoras declaradas ausentes ou fora de ordem → exit 2 ANTES de executar (4.379) ---
 GR8="$TMP/gitrepo-ancoras"; mkdir -p "$GR8"
 ( cd "$GR8" && { git init -q -b main 2>/dev/null || { git init -q; git checkout -qb main; }; } )
