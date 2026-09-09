@@ -230,8 +230,14 @@ total=$((total + 1))
 sd "sessao-outra-77" "$R2" mark-reported --dir "$DN" --ts "2026-08-30T12:00:00-0300" 2>/dev/null
 grep -qxF "estado: reportada" "$DN/session.meta" && grep -qxF "reportada_em: 2026-08-30T12:00:00-0300" "$DN/session.meta" && ok mark-reported-dir-outra-casa || falha mark-reported-dir-outra-casa
 total=$((total + 1))
+sd "sessao-outra-77" "$R2" mark-reported --dir "thoughts/local/sessions/$(basename "$DN")/" --ts "2026-08-30T12:30:00-0300" 2>/dev/null
+grep -qxF "reportada_em: 2026-08-30T12:30:00-0300" "$DN/session.meta" && ok mark-reported-dir-relativo-a-raiz || falha mark-reported-dir-relativo-a-raiz
+total=$((total + 1))
 sd "sessao-outra-77" "$R2" mark-reported --dir "$R2/thoughts/local" >/dev/null 2>&1; rc=$?
 [ "$rc" -eq 2 ] && ok mark-reported-dir-fora-de-sessions-exit-2 || falha "mark-reported-dir-fora-de-sessions-exit-2: rc=$rc"
+total=$((total + 1))
+sd "sessao-outra-77" "$R2" mark-reported --dir "thoughts/local/sessions/nao-existe" >/dev/null 2>&1; rc=$?
+[ "$rc" -eq 2 ] && ok mark-reported-dir-inexistente-exit-2 || falha "mark-reported-dir-inexistente-exit-2: rc=$rc"
 
 # mark-reported sem casa → no-op silencioso
 total=$((total + 1))

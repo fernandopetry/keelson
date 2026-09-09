@@ -341,7 +341,11 @@ case "$ACTION" in
     # --dir <casa> (4.403): marca OUTRA casa — a cujo ledger o /keelson:report consumiu numa
     # sessão nova (continue.md item 3); sem --dir, a casa corrente (sem casa → no-op)
     if [ -n "$DIR" ]; then
+      # relativo é relativo à raiz do repo (o report escreve `thoughts/local/sessions/…`)
+      case "$DIR" in /*) ;; *) DIR="$ROOT/${DIR#./}" ;; esac
+      DIR="${DIR%/}"
       case "$DIR" in "$SESSIONS"/*) ;; *) die2 "--dir precisa ser uma casa em $SESSIONS" ;; esac
+      [ -d "$DIR" ] || die2 "--dir: casa inexistente: $DIR"
       RESOLVED="$DIR"
     else
       [ -n "$SID" ] || exit 0
