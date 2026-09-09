@@ -134,7 +134,10 @@ fica registrada aqui; o `/keelson:init` anota no relatório o desvio que o human
 Atalho aceito: `screenVerify` booleano (`true`/`false`) equivale a `{ "enabled": <valor>, "method": null }` —
 o `/keelson:init` migra fichas antigas para o formato objeto preservando o valor. O modo do
 browser (headless ou não) **não** vive na ficha: é flag do servidor Playwright MCP, que é quem
-de fato controla — duas fontes de verdade divergiriam em silêncio.
+de fato controla — duas fontes de verdade divergiriam em silêncio. Uma flag o init exige em qualquer
+configuração: `--isolated` — sem ela o perfil do browser é exclusivo de um processo e a
+segunda sessão morre com `Browser is already in use` (veja a
+[solução de problemas](Solucao-de-problemas#a-verificação-de-tela-morreu-com-browser-is-already-in-use)).
 
 ### `docsRoot`
 

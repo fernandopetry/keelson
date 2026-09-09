@@ -196,12 +196,34 @@ O keelson **não finge** que verificou. A pendência vem com a causa nomeada:
 |---|---|
 | Runtime de browser ausente | `npx playwright install chromium` (Linux: `--with-deps`) |
 | Servidor MCP não configurado | Configure o `@playwright/mcp` e **reinicie a sessão** |
+| `Browser is already in use for …, use --isolated` | Outra sessão está segurando o perfil do browser — veja [abaixo](#a-verificação-de-tela-morreu-com-browser-is-already-in-use) |
 | Credencial ausente | Preencha o `keelson.local.json` (realm, `baseUrl`, login de dev) |
 | App fora do ar | Suba a aplicação, ou preencha `quality.boot` para que o gate saiba subir |
 | Ambiente sem tela (worktree, nuvem) | O ciclo gera um [handoff de verificação](Handoff-de-verificacao); feche-o com `/keelson:verify-handoff` numa sessão com tela |
 
 Uma entrega com handoff aberto é **parcial** até o handoff ser fechado — isso é
 intencional.
+
+### A verificação de tela morreu com "Browser is already in use"
+
+O erro completo é `Browser is already in use for <pasta do perfil>, use --isolated to run
+multiple instances of the same browser`. Ele não significa que o browser não está
+instalado: o servidor Playwright MCP está de pé, mas foi configurado **sem `--isolated`**,
+e sem essa flag o perfil do browser é uma pasta no disco que só um processo pode abrir.
+A primeira sessão que a abriu (outra janela do Claude, o Codex, um gate rodando em
+paralelo) segura o perfil até fechar; todas as outras recebem esse erro, e repetir a
+chamada não ajuda.
+
+O reparo é acrescentar `--isolated` ao servidor e **reiniciar a sessão**:
+
+- no `.mcp.json` do projeto, na lista `args` do servidor `playwright`;
+- ou, se o servidor está no seu escopo pessoal, `claude mcp remove playwright -s user` e
+  o `add` de novo com a flag (o comando completo está na
+  [instalação](Instalacao)).
+
+Com `--isolated` o perfil vive em memória e cada sessão tem o seu. Desde a 0.166.0 o
+`/keelson:init` reprova o servidor sem a flag em qualquer configuração, então rodar o
+init de novo mostra o item exato a corrigir.
 
 ### A verificação de tela parou com "trabalho concorrente"
 

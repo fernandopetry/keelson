@@ -12,6 +12,10 @@
   despacho de agent, `ficha.sh --get models.<agent>` vai em `model:` do spawn, vazio →
   frontmatter do agent (régua em `sdd-conventions.md`). **Antes de qualquer tarefa, leia a
   ficha** e use os valores dela; nunca assuma caminhos ou comandos fixos.
+- **Raiz do plugin:** os caminhos `${CLAUDE_PLUGIN_ROOT}/…` deste bloco só expandem
+  dentro de comando/agent/skill do keelson — no Bash desta sessão a variável pode chegar
+  **vazia**. Vazia → invoque `/keelson:version` (ele expande e imprime `raiz:`) e use esse
+  caminho; nunca `find` nem uma versão escolhida no cache (decisão 4.404).
 - **Constituição de qualidade:** o `QUALITY-CHARTER` do plugin — artigos agnósticos
   de linguagem.
 - **Perfil de linguagem ativo:** conforme `profile` da ficha — o backend e (se houver)

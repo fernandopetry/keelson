@@ -106,6 +106,36 @@ ok	sensitive-globs	todos os candidatos em disco casam com sensitiveGlobs"
 if [ "$st" -eq 0 ] && [ "$got" = "$want" ]; then echo "ok   valido"
 else echo "FAIL valido (exit $st)"; printf 'esperado:\n%s\nobtido:\n%s\n' "$want" "$got" | sed 's/^/  /'; fail=$((fail + 1)); fi
 
+# ---- servidor sem --isolated → falha em QUALQUER contagem de realm (4.404): o perfil ----
+# persistente é exclusivo de um processo; outra sessão o trava ("Browser is already in use") ----
+cat > "$R/.mcp.json" <<'EOF'
+{ "mcpServers": { "playwright": { "command": "npx", "args": ["@playwright/mcp@latest", "--headless", "--output-dir", "thoughts/screen-verify"] } } }
+EOF
+total=$((total + 1))
+got="$(bash "$SC" "$R" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
+case "$got" in
+  *"falha	playwright-flags	escopo=projeto modo=headless — 2 realms sem --isolated"*"Browser is already in use"*)
+    [ "$st" -eq 1 ] && echo "ok   sem-isolated-multi-realm" || { echo "FAIL sem-isolated-multi-realm: exit $st"; fail=$((fail + 1)); } ;;
+  *) echo "FAIL sem-isolated-multi-realm:"; printf '%s\n' "$got" | grep playwright-flags | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+cp "$R/keelson.local.json" "$TMP/local.bak"
+cat > "$R/keelson.local.json" <<'EOF'
+{ "screenVerify": { "defaultRealm": "admin", "realms": {
+  "admin":  { "baseUrl": "http://localhost:8080", "login": { "path": "/login", "username": "dev", "password": "x" } } } } }
+EOF
+total=$((total + 1))
+got="$(bash "$SC" "$R" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
+case "$got" in
+  *"aviso	playwright-flags"*) echo "FAIL sem-isolated-realm-unico: ainda é aviso (era o defeito da 4.51)"; fail=$((fail + 1)) ;;
+  *"falha	playwright-flags	escopo=projeto modo=headless — sem --isolated (perfil persistente"*"reinicie a sessao"*)
+    [ "$st" -eq 1 ] && echo "ok   sem-isolated-realm-unico" || { echo "FAIL sem-isolated-realm-unico: exit $st"; fail=$((fail + 1)); } ;;
+  *) echo "FAIL sem-isolated-realm-unico:"; printf '%s\n' "$got" | grep playwright-flags | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+cp "$TMP/local.bak" "$R/keelson.local.json"
+cat > "$R/.mcp.json" <<'EOF'
+{ "mcpServers": { "playwright": { "command": "npx", "args": ["@playwright/mcp@latest", "--headless", "--output-dir", "thoughts/screen-verify", "--isolated"] } } }
+EOF
+
 # ---- bloco CLAUDE.md desatualizado (caso real: init reportou "tudo íntegro" com o ----
 # bloco divergindo do template — falha, não aviso, e independe do resto da ficha) ----
 sed -i.bak 's/Conteúdo canônico do bloco\./Conteúdo canônico do bloco. Falta um parágrafo novo./' "$R/CLAUDE.md"

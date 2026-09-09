@@ -242,19 +242,15 @@ if local:
     svl = local.get("screenVerify", {}) or {}
     realms = svl.get("realms")
     nrealms = len(realms) if isinstance(realms, dict) else (1 if svl.get("baseUrl") else 0)
-if nrealms >= 2 and "--isolated" not in args:
-    findings.append("%d realms sem --isolated (sessao de um realm vaza no outro)" % nrealms)
-elif "--isolated" not in args:
-    findings.append("sem --isolated (aviso: perfil persistente)")
+if "--isolated" not in args:
+    if nrealms >= 2:
+        findings.append("%d realms sem --isolated (sessao de um realm vaza no outro; e o perfil persistente e exclusivo de um processo — outra sessao o trava com 'Browser is already in use')" % nrealms)
+    else:
+        findings.append("sem --isolated (perfil persistente: outra sessao — Codex, outra janela do Claude — trava o browser com 'Browser is already in use'; reparo: acrescente --isolated ao servidor e reinicie a sessao)")
 
 detail = "escopo=%s modo=%s" % (scope, modo)
 if findings:
-    hard = [f for f in findings if not f.startswith("sem --isolated (aviso")]
-    soft = [f for f in findings if f.startswith("sem --isolated (aviso")]
-    if hard:
-        print("falha\tplaywright-flags\t%s — %s" % (detail, "; ".join(hard + soft)))
-    else:
-        print("aviso\tplaywright-flags\t%s — %s" % (detail, "; ".join(soft)))
+    print("falha\tplaywright-flags\t%s — %s" % (detail, "; ".join(findings)))
 else:
     print("ok\tplaywright-flags\t%s — flags conferem" % detail)
 PY

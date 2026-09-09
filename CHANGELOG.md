@@ -23,6 +23,37 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.166.0] — 2026-09-09
+
+Re-init: required
+
+Decision 4.404 — a one-line CSS change took 21 minutes: half of it before the first line of
+code, fighting a Playwright profile locked by another session and hunting the plugin's own
+scripts with `find /`. Re-init applies the new block bullet; until then the init self-check
+reports the block as out of date.
+
+### Changed
+
+- `/keelson:init` self-check: a Playwright MCP server configured without `--isolated` now
+  **fails** (`✗`) in any realm count — it used to warn on a single realm. Without the flag the
+  browser profile is a folder only one process can open; a second session (another Claude
+  window, Codex, a gate running in parallel) dies with `Browser is already in use for …, use
+  --isolated` and retrying never helps. The finding carries the repair (add the flag, restart
+  the session); a personal-scope server stays a pending item for the human, as before.
+- Injected CLAUDE.md block: new bullet under *Fonte da verdade* — `${CLAUDE_PLUGIN_ROOT}` only
+  expands inside the plugin's commands/agents/skills; when it arrives empty in the main
+  session's Bash, run `/keelson:version` and use the `raiz:` it prints. Never `find`, never a
+  version picked from the cache (the session read scripts from three different versions).
+- `handoff-protocol.md` §8.1: `Browser is already in use` is `runtime_browser` with its own
+  repair — not a missing browser, not a retry.
+
+### Added
+
+- Wiki: *Solução de problemas* entry for `Browser is already in use`, plus a row in the
+  gate-9 table and a sentence in *Ficha do projeto*.
+- `scripts/tests/init-selfcheck/run.sh`: two cases for the server without `--isolated`
+  (multi-realm and single realm) — the old warning branch had no fixture.
+
 ## [0.165.4] — 2026-09-08
 
 Re-init: none

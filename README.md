@@ -200,7 +200,7 @@ versioned, so the whole team inherits the same configuration:
 { "mcpServers": { "playwright": { "command": "npx", "args": [
     "@playwright/mcp@latest", "--headless",
     "--output-dir", "thoughts/screen-verify",   // = gates.screenVerify.artifactsDir
-    "--isolated"                                 // in-memory profile: every run starts clean
+    "--isolated"                                 // required: in-memory profile — without it the first session locks the profile ("Browser is already in use")
 ] } } }
 ```
 
@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.165.4` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.166.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: `/keelson:pause` stops a running cycle at a safe point — the in-flight closure lands, the tree must be clean — and turns the pause into a committed, pushed mark in the brief's Cronologia; `/keelson:continue` writes the matching resume mark with the measured stopped time (a labelled floor from the last commit when nobody marked the pause), so a cycle that crosses sessions and machines reports how long it stood still (`pausas` tail on the `Duração` line). Details in `CHANGELOG.md`.
+New in this release: the init self-check now fails (not warns) a Playwright MCP server configured without `--isolated` in any realm count — a persistent profile is exclusive to one process, and a second session (Codex, another Claude window) dies with `Browser is already in use`; the injected CLAUDE.md block tells the main session how to resolve the plugin root when `${CLAUDE_PLUGIN_ROOT}` arrives empty in Bash (`/keelson:version`, never `find`). Details in `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
