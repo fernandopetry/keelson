@@ -1,0 +1,1 @@
+WARNING	index-secao-ausente	secao "## Historico recente" ausente do INDEX (template no index-contract.md)

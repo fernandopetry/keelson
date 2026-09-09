@@ -23,13 +23,19 @@
 #           silêncio é o defeito da 4.66). A feature contraria o out-of-scope da SPEC-001:
 #           a rota esperada é a EMENDA (4.398) — SPEC-001 em versão nova, nenhuma SPEC
 #           nova, emenda no INDEX.
+#   triage  /keelson:triage de uma demanda nova DEPOIS do ciclo: o comando classifica e
+#           roteia sem executar — linha de triagem no Histórico do INDEX, categoria e
+#           comando proposto na resposta, nenhum arquivo de código/artefato tocado (4.401).
+#   report  /keelson:report do slug: relatório reconstruído do ledger e do repositório,
+#           com a seção obrigatória "Cobertura deste relatório" e a linha de duração;
+#           eventos consumidos arquivados em reported-*/ e a casa marcada reportada (4.401).
 # Cada cenário grava também o PERFIL DE CUSTO do Tech Lead (4.399): chamadas, contexto
 # somado/mediana/pico, Bash com 1 script × com 2+ encadeados, e tokens por papel, lidos do
 # transcript da sessão do consumidor.
 #
-# Uso: smoke-consumer.sh [--scenario init|cycle|pause|broken|all] [--results DIR]
+# Uso: smoke-consumer.sh [--scenario init|cycle|pause|triage|report|broken|all] [--results DIR]
 #                        [--model M] [--timeout S] [--plugin-dir DIR] [--consumer DIR]
-#   --scenario   default all (a ordem é init → cycle → pause → broken; cada um assume o
+#   --scenario   default all (ordem: init → cycle → pause → triage → report → broken; cada um assume o
 #                estado deixado pelo anterior; --consumer reaproveita um consumidor).
 #   --results    raiz das saídas (default: mktemp); raw.json/result.txt por cenário + summary.md.
 #   --timeout    teto por chamada ao modelo em segundos (default 7200 — o ciclo formal de
@@ -363,12 +369,43 @@ EOF
   fato "broken/emenda-registrada-no-index" 'grep -rqiE "emenda" "$CONSUMER"/docs/*/INDEX.md'
 }
 
+# ------------------------------------------------------------ triage
+cen_triage() {
+  SD="$(slug_dir)"; slug="$(basename "${SD:-x}")"
+  antes="$(G rev-parse HEAD)"
+  roda triage "/keelson:triage \"permitir que history() receba um filtro opcional por operação (ex.: history(op='add')) e devolva só as entradas daquela operação\". Esta sessão não tem humano interativo: classifique, proponha a rota e pare — não execute o comando proposto."
+  echo "### fatos: triage" >> "$SUM"
+  fato "triage/linha-no-index"          'grep -qiE "/keelson:triage classificou" "$SD/INDEX.md"'
+  fato "triage/resposta-nomeia-categoria" 'grep -qiE "categoria|classific" "$RESULTS/triage.result.txt"'
+  fato "triage/resposta-propoe-rota"    'grep -qE "/keelson:(specify|plan|tasks|auto|brief|specify-epic)|emenda|trivial" "$RESULTS/triage.result.txt"'
+  fato "triage/nao-executa"             '[ "$(G rev-parse HEAD)" = "$antes" ] && [ -z "$(G status --porcelain -- src tests "$SD/specs" "$SD/plans" "$SD/tasks" 2>/dev/null)" ]'
+  fato "triage/nao-cria-artefato"       '[ -z "$(G status --porcelain --untracked-files=all -- "$SD/specs" "$SD/plans" "$SD/tasks" 2>/dev/null)" ]'
+  G add -A >/dev/null 2>&1; G commit -q -m "docs: triagem registrada (smoke)" >/dev/null 2>&1 || true
+}
+
+# ------------------------------------------------------------ report
+cen_report() {
+  SD="$(slug_dir)"; slug="$(basename "${SD:-x}")"
+  ativos_antes="$(find "$CONSUMER/thoughts" -path "*ledger*" -name "*.md" ! -path "*reported*" 2>/dev/null | wc -l | tr -d " ")"
+  reported_antes="$(find "$CONSUMER/thoughts" -type d -name "reported-*" 2>/dev/null | wc -l | tr -d " ")"
+  roda report "/keelson:report $slug. Esta sessão não tem humano interativo: emita o relatório pelo contrato e feche o ciclo do ledger."
+  echo "### fatos: report" >> "$SUM"
+  fato "report/secao-cobertura-obrigatoria" 'grep -qiE "Cobertura deste relat" "$RESULTS/report.result.txt"'
+  fato "report/linha-de-duracao"            'grep -qiE "Dura[cç][aã]o" "$RESULTS/report.result.txt"'
+  fato "report/gates-ou-entrega-narrados"   'grep -qiE "gate|entrega|closure" "$RESULTS/report.result.txt"'
+  fato "report/ledger-consumido-arquivado"  '[ "$(find "$CONSUMER/thoughts" -type d -name "reported-*" | wc -l | tr -d " ")" -gt "$reported_antes" ] || [ "$ativos_antes" = "0" ]'
+  fato "report/casa-marcada-reportada"      'grep -rqs "^estado: reportada" "$CONSUMER"/thoughts/local/sessions/*/session.meta'
+  fato "report/codigo-intocado"             '[ -z "$(G status --porcelain -- src tests 2>/dev/null)" ]'
+}
+
 case "$SCEN" in
   init)   cen_init ;;
   cycle)  cen_cycle ;;
   pause)  cen_pause ;;
   broken) cen_broken ;;
-  all)    cen_init; cen_cycle; cen_pause; cen_broken ;;
+  triage) cen_triage ;;
+  report) cen_report ;;
+  all)    cen_init; cen_cycle; cen_pause; cen_triage; cen_report; cen_broken ;;
   *) echo "ERRO: --scenario inválido: $SCEN" >&2; exit 2 ;;
 esac
 
