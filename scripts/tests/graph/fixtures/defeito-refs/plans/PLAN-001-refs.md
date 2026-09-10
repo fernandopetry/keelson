@@ -15,7 +15,7 @@
 
 ### COMP-001-001: Nucleo
 **Responsabilidade**: fixture.
-**Realiza**: FR-001-001
+**Realiza**: FR-001-001, FR-001-096
 **Dependências**: nenhuma
 
 ## 7. Mapeamento FR -> componente

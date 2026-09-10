@@ -1,9 +1,7 @@
-graph ac-sem-task@820
-graph feat-divergente@859
-graph fr-mapeado-fora-cobertura@951
-graph fr-sem-comp@936
-graph fr-sem-comp@937
-graph index-desatualizado@900
-graph index-desatualizado@922
-graph pertence-vs-arquivo@888
-graph realiza-fora-cobertura@835
+graph ac-sem-task@916
+graph comp-realiza-fora-cobertura@1028
+graph feat-divergente@955
+graph fr-sem-comp@1013
+graph index-desatualizado@996
+graph pertence-vs-arquivo@984
+graph realiza-fora-cobertura@931

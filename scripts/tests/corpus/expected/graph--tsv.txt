@@ -55,17 +55,6 @@ edge	implements	TASK-001-005	COMP-001-002	tasks/TASK-001-005-limite-e-aviso.md:7
 edge	implements	TASK-001-005	COMP-001-003	tasks/TASK-001-005-limite-e-aviso.md:7
 edge	implements	TASK-001-006	COMP-001-002	tasks/TASK-001-006-chore-limpeza-temporarios.md:5
 edge	implements	TASK-001-007	COMP-001-003	tasks/TASK-001-007-reenvio-aviso.md:7
-edge	maps	FR-001-001	COMP-001-001	plans/PLAN-001-exportacao-pedidos.md:108
-edge	maps	FR-001-002	COMP-001-001	plans/PLAN-001-exportacao-pedidos.md:109
-edge	maps	FR-001-003	COMP-001-002	plans/PLAN-001-exportacao-pedidos.md:110
-edge	maps	FR-001-004	COMP-001-003	plans/PLAN-001-exportacao-pedidos.md:111
-edge	maps	FR-001-005	COMP-001-003	plans/PLAN-001-exportacao-pedidos.md:112
-edge	maps	FR-001-006	COMP-001-003	plans/PLAN-001-exportacao-pedidos.md:113
-edge	maps-ac	FR-001-001	AC-001-001	plans/PLAN-001-exportacao-pedidos.md:108
-edge	maps-ac	FR-001-002	AC-001-002	plans/PLAN-001-exportacao-pedidos.md:109
-edge	maps-ac	FR-001-004	AC-001-003	plans/PLAN-001-exportacao-pedidos.md:111
-edge	maps-ac	FR-001-005	AC-001-005	plans/PLAN-001-exportacao-pedidos.md:112
-edge	maps-ac	FR-001-006	AC-001-004	plans/PLAN-001-exportacao-pedidos.md:113
 edge	plan-covers	PLAN-001	FR-001-001	plans/PLAN-001-exportacao-pedidos.md:23
 edge	plan-covers	PLAN-001	FR-001-002	plans/PLAN-001-exportacao-pedidos.md:24
 edge	plan-covers	PLAN-001	FR-001-003	plans/PLAN-001-exportacao-pedidos.md:25

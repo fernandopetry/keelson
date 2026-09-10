@@ -27,7 +27,7 @@ Você é um Arquiteto de Software especialista em desenvolvimento assistido por 
 ### 0.3 Ler INDEX.md do slug
 
 Ler `{docsRoot}/<slug>/INDEX.md`:
-1. Extrair PLANs anteriores e cobertura agregada.
+1. Extrair PLANs anteriores; a **cobertura agregada** vem de `bash "${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh" {docsRoot}/<slug> --format=tables` (derivada de `FRs cobertos` + `Realiza`, 4.409) — nunca de prosa do INDEX.
 2. Extrair **decisões irreversíveis do slug** (DEC marcadas como irreversíveis em PLANs anteriores).
 3. Extrair glossário consolidado.
 4. Identificar capacidades já implementadas, em desenvolvimento e especificadas-mas-não-planejadas.
@@ -48,7 +48,7 @@ Próximo MMM pelo alocador único (4.86): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/n
    - **Caso B** `--slice="..."`: interpretar contra FRs, confirmar antes de gerar.
    - **Caso C** ambos: `--covers` precede, `--slice` vira contexto documental.
    - **Caso D** nenhum: cobrir FRs/NFRs ainda não cobertos.
-4. Reportar cobertura agregada antes de gerar.
+4. Reportar cobertura agregada antes de gerar (a saída do `--format=tables` da 0.3; o PLAN não a transcreve).
 
 ## Etapa 2: triagem técnica
 
@@ -103,7 +103,7 @@ indisponível → executar as Etapas 4–5 inline é o fallback, declarado no ou
    escolhê-la —, nunca só um adjetivo ("mais complexa", "menos performática"): é esse
    custo que permite re-julgar a decisão sem refazer a análise (decisão 4.136).
 4. **Stack vigente herdado** da ficha/perfil sem reescolher.
-5. **Mapeamento FR → componente**.
+5. **Mapeamento FR → componente é derivado** (4.409): cada COMP declara `**Realiza**:` — obrigatório (`plan-comp-sem-realiza`), única fonte da aresta; a tabela sai de `graph.sh --format=tables` e não se escreve.
 6. **Definition of Done do PLAN** — SPEC com `**Fonte de medição**:` na §1.3 → a DoD inclui o item de métrica operacional (template §9; decisão 4.99). Sabor `instrumentação` → o trabalho de instrumentar entra nos componentes deste PLAN (sem componente que emita o evento, o item da DoD é insatisfazível).
 7. **IDs escopados**: `DEC-MMM-XXX`, `COMP-MMM-XXX`, `TRISK-MMM-XXX`.
 8. **DEC marcada como irreversível ou não**: cada DEC tem campo `Irreversível: sim | não` — valor **literal** do enum, sem prosa; a justificativa mora em Contexto/Consequências da própria DEC (valor fora do enum é ERROR do lint, `plan-dec-irreversivel-enum` — decisão 4.367). Se sim, será propagada ao INDEX.
@@ -134,7 +134,7 @@ Aplicar a **receita de atualização do INDEX** (`${CLAUDE_PLUGIN_ROOT}/docs/_me
 
 1. Caminho do PLAN criado.
 2. Caminho do INDEX atualizado.
-3. Resumo de cobertura agregada (antes vs depois).
+3. Resumo de cobertura agregada (antes vs depois — de `graph.sh --format=tables`, depois do PLAN gravado).
 4. DEC novas marcadas como irreversíveis.
 5. Resultado da validação: errors, warnings.
 6. Alertas: overlap, gap, conflito de guideline, DEC de outro slug citada em conflito (4.241).

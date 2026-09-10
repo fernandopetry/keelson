@@ -293,6 +293,12 @@ a cada rodada. Três coisas úteis de saber:
   das tasks e ele devolve o diagrama (Mermaid) — tasks por wave, com status, ou o mapa
   FR→componente. Pendência reapresentada vem conferida na fonte — ou marcada
   `não medido`, nunca apresentada como corrente.
+- **O artefato afirma; o grafo calcula.** Desde a 0.170.0 o PLAN não escreve mais a
+  cobertura agregada nem a tabela FR → componente, e o índice de tasks não escreve
+  status agregado nem tabelas de cobertura — cada COMP diz o que realiza, cada TASK diz
+  o que realiza e cobre, e `graph.sh --format=tables` monta as tabelas na hora, sempre
+  atualizadas. O que fica escrito é só o que alguém decidiu (o que o PLAN cobre, quem
+  realiza o quê, a ordem das waves).
 - A régua completa (sintaxe dos campos, catálogo de checks) está no
   [Contrato do grafo](Contrato-do-grafo).
 

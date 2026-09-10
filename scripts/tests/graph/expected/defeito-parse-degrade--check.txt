@@ -1,3 +1,6 @@
+WARNING	comp-sem-fr	COMP-001-002 sem **Realiza** preenchido (nenhum FR/NFR realizado)
+WARNING	fr-sem-comp	FR-001-002 coberto por PLAN-001 sem COMP que o realize (**Realiza** de nenhum COMP do PLAN) [parse]
 WARNING	fr-sem-task	FR-001-001 coberto por PLAN-001 sem TASK que o realize [parse]
 WARNING	fr-sem-task	FR-001-002 coberto por PLAN-001 sem TASK que o realize [parse]
+WARNING	nao-parseavel	plans/PLAN-001-parse.md campo "Realiza": realiza o segundo fluxo descrito acima
 WARNING	nao-parseavel	tasks/TASK-001-001-prosa.md campo "Realiza (FRs)": implementa o fluxo de login descrito acima

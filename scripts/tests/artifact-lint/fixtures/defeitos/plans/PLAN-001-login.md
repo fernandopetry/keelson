@@ -29,8 +29,7 @@ Sem dependência nova.
 
 ### COMP-002-001: Componente com número errado
 
-**Responsabilidade**: validar credencial
-**Realiza**: FR-001-001
+**Responsabilidade**: validar credencial (sem **Realiza** — planta plan-comp-sem-realiza, 4.409)
 **Interface pública**: autenticar(identificador, senha)
 **Dependências**: nenhuma
 

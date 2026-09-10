@@ -26,9 +26,9 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/artifact-lint.sh" <caminho-do-PLAN>
 
 Chega como fato (`plan-*` do lint-contract §3): cabeçalho/enum de Status, seções
 obrigatórias (Aderência, Cobertura, §1–§10), IDs fora do MMM e sem zero-padding,
-Cobertura sem SPEC referenciada/FRs cobertos vazios/agregada ausente, anatomia dos
+Cobertura sem SPEC referenciada/FRs cobertos vazios, COMP sem `Realiza` (4.409), anatomia dos
 blocos DEC (campos obrigatórios, zero ou uma alternativa, enum e forma do
-`Irreversível`, `Reabrir se` ausente — 4.97 — ou `nunca` sem motivo), §7 sem linhas,
+`Irreversível`, `Reabrir se` ausente — 4.97 — ou `nunca` sem motivo),
 DoD vazia/com placeholder/sem menção a teste ou ficha/perfil. Invocado com o
 **diretório do slug**, acrescenta `plan-overlap-fr` (FR coberto por 2+ PLANs).
 Auto-fixes que continuam seus (protocolo §3): `Irreversível: SIM` → `sim` ·
@@ -45,8 +45,7 @@ por resultado e cobertura mista seguem o §5 do graph-contract.md.
 
 ### WARNING se:
 - Overlap de FR apontado pelo fato sem justificativa no texto (o script mede; o "não justificado" é seu)
-- Gap restante listado sem comentário sobre quando será coberto
-- "Cobertura agregada do slug" presente porém **inconsistente** com o INDEX
+- Gap restante (linha `Gap restante` de `graph.sh {docsRoot}/<slug> --format=tables --plan MMM` — a cobertura agregada é derivada, 4.409) sem comentário no PLAN sobre quando será coberto
 
 ## Etapa 3: checks de decisões arquiteturais (DEC) que permanecem seus
 
@@ -67,9 +66,9 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh" {docsRoot}/<slug> --check --stage=
 ```
 
 Chega como fato: SPEC referenciada ou FR/NFR coberto inexistente (`ref-quebrada` em
-`spec-ref`/`plan-covers`), FR coberto sem linha na §7 (`fr-sem-comp`), §7 referenciando
-COMP ou AC inexistente (`ref-quebrada`), FR mapeado fora da cobertura, COMP sem FR
-(`comp-sem-fr`), divergência entre o `Realiza` dos COMPs e a §7, ciclo COMP → COMP,
+`spec-ref`/`plan-covers`), FR coberto sem COMP que o realize (`fr-sem-comp`), `Realiza`
+citando FR/NFR inexistente (`ref-quebrada`) ou fora da cobertura
+(`comp-realiza-fora-cobertura`), COMP sem `Realiza` (`comp-sem-fr`), ciclo COMP → COMP,
 ID duplicado e FR da SPEC sem AC (`fr-sem-ac` — 4.153). Cada achado entra no relatório
 como `**[graph.sh]** SEVERIDADE check — detalhe`; a calibração final é sua (protocolo
 §1/§3). **Degradação por resultado** e **cobertura mista**: réguas do §5 do

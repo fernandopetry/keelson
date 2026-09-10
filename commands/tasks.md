@@ -75,8 +75,9 @@ agent** (briefings distintos do `scribe`, nunca agents novos):
    **não cria nem renomeia ID e não toca aresta** — divergência com o manifesto volta
    em `duvidas`, nunca se corrige localmente (mesmo mecanismo da 4.114).
 3. **`TASK-MMM-INDEX.md` é da main session nesta rota** (dono único — nenhum redator tem
-   o todo): derive-o do manifesto (waves e tabelas de cobertura são projeção mecânica
-   dele) **após o retorno de todos** os redatores; o commit do marco só então, por
+   o todo): derive-o do manifesto (o checklist de waves é projeção dele; cobertura e
+   status **não se escrevem** — `graph.sh --format=tables --plan MMM`, 4.409) **após o
+   retorno de todos** os redatores; o commit do marco só então, por
    pathspec (4.163).
 
 A consistência global não depende de disciplina dos redatores: o `graph.sh --check`

@@ -38,12 +38,6 @@ edge	implements	TASK-001-003	COMP-001-002	tasks/TASK-001-003-relatorio.md:7
 edge	implements	TASK-001-004	COMP-001-001	tasks/TASK-001-004-fix-sessao.md:8
 edge	implements	TASK-001-005	COMP-001-001	tasks/TASK-001-005-transversal.md:7
 edge	implements	TASK-001-005	COMP-001-002	tasks/TASK-001-005-transversal.md:7
-edge	maps	FR-001-001	COMP-001-001	plans/PLAN-001-demo-auth.md:50
-edge	maps	FR-001-002	COMP-001-001	plans/PLAN-001-demo-auth.md:51
-edge	maps	FR-001-003	COMP-001-002	plans/PLAN-001-demo-auth.md:52
-edge	maps-ac	FR-001-001	AC-001-001	plans/PLAN-001-demo-auth.md:50
-edge	maps-ac	FR-001-002	AC-001-002	plans/PLAN-001-demo-auth.md:51
-edge	maps-ac	FR-001-003	AC-001-003	plans/PLAN-001-demo-auth.md:52
 edge	plan-covers	PLAN-001	FR-001-001	plans/PLAN-001-demo-auth.md:15
 edge	plan-covers	PLAN-001	FR-001-002	plans/PLAN-001-demo-auth.md:16
 edge	plan-covers	PLAN-001	FR-001-003	plans/PLAN-001-demo-auth.md:17

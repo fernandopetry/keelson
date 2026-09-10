@@ -1,0 +1,45 @@
+## PLAN-001 — cobertura derivada (graph.sh --format=tables)
+
+**SPEC referenciada**: SPEC-001
+
+**Cobertura agregada do slug** (derivada):
+- Total na SPEC: 3 FRs + 0 NFRs
+- Cobertos por PLANs anteriores (MMM menor): 0
+- Cobertos por este: 2
+- Gap restante: 1
+
+### Mapeamento FR -> componente (derivado de **Realiza**)
+
+| FR | Componente | AC cobertos |
+|----|------------|-------------|
+| FR-001-001 | COMP-001-001 | AC-001-001 |
+| FR-001-002 | — | AC-001-002 |
+
+### Cobertura de FRs por TASK
+
+| FR | TASKs |
+|----|-------|
+| FR-001-001 | TASK-001-001 |
+| FR-001-002 | — |
+
+### Cobertura de ACs por TASK
+
+| AC | TASKs |
+|----|-------|
+| AC-001-001 | TASK-001-001 |
+| AC-001-002 | — |
+
+### Cobertura por funcionalidade
+
+| FEAT | TASKs (P = primária) | Done |
+|------|----------------------|------|
+| FEAT-001-001 | — | 0/0 |
+| FEAT-001-002 | TASK-001-001 (P), TASK-001-002 (P) | 0/2 |
+
+### Status agregado
+
+- Todo: 2
+- In Progress: 0
+- Done: 0
+- Blocked: 0
+

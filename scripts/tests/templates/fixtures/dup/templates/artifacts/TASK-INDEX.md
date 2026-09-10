@@ -5,13 +5,6 @@
 **Total de tasks**: N
 **Tamanho dominante**: small | medium
 
-## Status agregado
-
-- Todo: N
-- In Progress: 0
-- Done: 0
-- Blocked: 0
-
 ## Ordem de execução (waves)
 
 ### Wave 1 (paralelizável)
@@ -20,23 +13,6 @@
 
 ### Wave 2 (depende de Wave 1)
 - [ ] TASK-MMM-003 ⏸ Todo
-
-## Cobertura de FRs
-
-| FR | TASKs |
-|----|-------|
-| FR-NNN-001 | TASK-MMM-001, TASK-MMM-003 |
-
-## Cobertura de ACs
-
-| AC | TASKs |
-|----|-------|
-| AC-NNN-001 | TASK-MMM-003 |
-
-## Cobertura por funcionalidade
-
-<!-- Só quando a SPEC declara FEATs; omitir a seção no colapso. P = primária. -->
-
-| FEAT | TASKs (P = primária) | Done |
-|------|----------------------|------|
-| FEAT-NNN-001 | TASK-MMM-001 (P), TASK-MMM-004 | 0/2 |
+<!-- Status agregado e as tabelas de cobertura (FR, AC, funcionalidade) NÃO se escrevem
+(4.409): `graph.sh <slug> --format=tables --plan MMM` as deriva das TASKs. O checklist
+de waves acima é afirmação de despacho e inventário do fecho de wave (4.92) — fica. -->

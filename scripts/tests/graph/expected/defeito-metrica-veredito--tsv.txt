@@ -8,10 +8,6 @@ edge	covers-ac	TASK-001-001	AC-001-001	tasks/TASK-001-001-coisa-a.md:18
 edge	covers-ac	TASK-002-001	AC-002-001	tasks/TASK-002-001-coisa-b.md:18
 edge	implements	TASK-001-001	COMP-001-001	tasks/TASK-001-001-coisa-a.md:6
 edge	implements	TASK-002-001	COMP-002-001	tasks/TASK-002-001-coisa-b.md:6
-edge	maps	FR-001-001	COMP-001-001	plans/PLAN-001-entrega-a.md:24
-edge	maps	FR-002-001	COMP-002-001	plans/PLAN-002-entrega-b.md:24
-edge	maps-ac	FR-001-001	AC-001-001	plans/PLAN-001-entrega-a.md:24
-edge	maps-ac	FR-002-001	AC-002-001	plans/PLAN-002-entrega-b.md:24
 edge	plan-covers	PLAN-001	FR-001-001	plans/PLAN-001-entrega-a.md:11
 edge	plan-covers	PLAN-002	FR-002-001	plans/PLAN-002-entrega-b.md:11
 edge	realiza	TASK-001-001	FR-001-001	tasks/TASK-001-001-coisa-a.md:5

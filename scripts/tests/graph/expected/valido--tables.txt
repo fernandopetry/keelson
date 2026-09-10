@@ -1,0 +1,48 @@
+## PLAN-001 — cobertura derivada (graph.sh --format=tables)
+
+**SPEC referenciada**: SPEC-001
+
+**Cobertura agregada do slug** (derivada):
+- Total na SPEC: 3 FRs + 1 NFRs
+- Cobertos por PLANs anteriores (MMM menor): 0
+- Cobertos por este: 4
+- Gap restante: 0
+
+### Mapeamento FR -> componente (derivado de **Realiza**)
+
+| FR | Componente | AC cobertos |
+|----|------------|-------------|
+| FR-001-001 | COMP-001-001 | AC-001-001 |
+| FR-001-002 | COMP-001-001 | AC-001-002 |
+| FR-001-003 | COMP-001-002 | AC-001-003 |
+
+### Cobertura de FRs por TASK
+
+| FR | TASKs |
+|----|-------|
+| FR-001-001 | TASK-001-001, TASK-001-004 |
+| FR-001-002 | TASK-001-002, TASK-001-005 |
+| FR-001-003 | TASK-001-003, TASK-001-005 |
+
+### Cobertura de ACs por TASK
+
+| AC | TASKs |
+|----|-------|
+| AC-001-001 | TASK-001-001, TASK-001-004 |
+| AC-001-002 | TASK-001-002, TASK-001-005 |
+| AC-001-003 | TASK-001-003 |
+
+### Cobertura por funcionalidade
+
+| FEAT | TASKs (P = primária) | Done |
+|------|----------------------|------|
+| FEAT-001-001 | TASK-001-001 (P), TASK-001-002 (P), TASK-001-004 (P), TASK-001-005 | 0/4 |
+| FEAT-001-002 | TASK-001-003 (P), TASK-001-005 | 0/2 |
+
+### Status agregado
+
+- Todo: 5
+- In Progress: 0
+- Done: 0
+- Blocked: 0
+

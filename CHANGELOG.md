@@ -23,6 +23,52 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.170.0] — 2026-09-10
+
+Re-init: none
+
+Decision 4.409 — fourth step of the artifact-diet series: what can be computed from the
+IDs is no longer written by hand. The PLAN and the task index stop carrying tables that
+`graph.sh` already knows how to derive, and the TASK closure keeps only the fields a
+script reads.
+
+### Added
+
+- `scripts/graph.sh --format=tables`: derived markdown per PLAN — aggregate coverage of
+  the slug (total in the SPEC, covered by earlier PLANs, by this one, gap), FR → component
+  mapping (from each COMP's `Realiza`, with the ACs from `(cobre …)`), FR/AC coverage per
+  TASK, coverage per feature, aggregate status. `--plan MMM` narrows to one PLAN. Prints,
+  never writes — there is no copy left to drift.
+- `artifact-lint.sh`: `plan-comp-sem-realiza` (ERROR) — every COMP must declare
+  `**Realiza**:`, now the single source of the FR ↔ component edge.
+
+### Removed
+
+- `PLAN` template: the "Cobertura agregada do slug" block and §7 "Mapeamento FR ->
+  componente" (numbering keeps its gap on purpose; §8–§10 do not shift). The lint no
+  longer demands either; a PLAN that still carries them keeps passing.
+- `TASK-INDEX` template: "Status agregado", "Cobertura de FRs", "Cobertura de ACs" and
+  "Cobertura por funcionalidade". The wave checklist stays — it is a dispatch statement
+  and the wave-close inventory, not a computation.
+- `TASK` template, "Histórico de execução": `Branch`, `Implementado por`, `Revisado por`,
+  `Tentativas`, `Cobertura final`, `Arquivos modificados` and `Notas` — no script read
+  them; the ledger and the closure commit already hold that story. `Data início`,
+  `Data conclusão`, `Commit SHA`, `Jira` and the quality-gates checklist stay.
+- Graph check `realiza-vs-mapeamento`: it only existed to catch the two copies drifting
+  apart; with one source there is nothing to compare.
+
+### Changed
+
+- Graph: `fr-sem-comp` and `comp-sem-fr` now read `Realiza`; `fr-mapeado-fora-cobertura`
+  becomes `comp-realiza-fora-cobertura`; `[parse]` degradation of the mapping comes from an
+  unparseable `Realiza`; `--format=mermaid-comp` draws FR → COMP from `Realiza` (identical
+  output on the suite fixture); `index-desatualizado` keeps only the wave leg.
+- `/keelson:plan`, `/keelson:tasks`, `/keelson:implement`, `plan-validator` and
+  `task-validator` read the derived tables instead of prose in the artifacts.
+- `check-templates.sh` now flags any `*-ausente` finding on a template, not only missing
+  sections — a field removed from the template but still demanded by the lint used to
+  pass unnoticed.
+
 ## [0.169.0] — 2026-09-09
 
 Re-init: none

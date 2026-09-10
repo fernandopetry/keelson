@@ -10,8 +10,10 @@
 #      tasks → TASK e TASK-INDEX);
 #   4. template ⇄ lint: cada template de SPEC/PLAN/TASK, copiado com nome de artefato
 #      real, passa por scripts/artifact-lint.sh SEM nenhum `*-secao-ausente` — o
-#      esqueleto que o scribe reproduz tem todo heading que o lint exige. Os demais
-#      achados do lint (placeholders de enum/data) são esperados e ignorados.
+#      esqueleto que o scribe reproduz tem todo heading que o lint exige — e, desde a
+#      4.409, também nenhum `*-ausente` de campo/seção nem `plan-comp-sem-realiza`
+#      (campo removido só do template passava batido). Placeholders de enum/data são
+#      esperados e ignorados.
 #
 # Limite honesto: prova headings, não conteúdo — a régua de cada seção segue humana
 # (validators) e comportamental (evals).
@@ -80,7 +82,7 @@ lintcheck() { # $1 template  $2 destino relativo
   [ -s "$src" ] || return 0
   cp "$src" "$TMP/$2"
   out="$(bash "$LINT" "$TMP/$2" 2>&1 || true)"
-  miss="$(printf '%s\n' "$out" | grep -- '-secao-ausente' || true)"
+  miss="$(printf '%s\n' "$out" | grep -E -- '\-ausente|plan-comp-sem-realiza' || true)"
   if [ -n "$miss" ]; then
     printf '%s\n' "$miss" | while IFS= read -r l; do
       viol "templates/artifacts/$1.md sem heading que o lint exige: $l"

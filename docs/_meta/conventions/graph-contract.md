@@ -41,8 +41,7 @@ separados por vírgula** ou a palavra **`nenhuma`**:
 |---|---|---|
 | `spec-ref` | PLAN → SPEC | `**SPEC referenciada**:` |
 | `plan-covers` | PLAN → FR\|NFR | bullets de `FRs cobertos` / `NFRs cobertos` |
-| `maps` | FR → COMP | tabela §7 do PLAN (ACs da linha viram `maps-ac`; a célula Componente aceita lista — um FR entregue por 2+ COMPs) |
-| `comp-realiza` | COMP → FR | `**Realiza**:` do bloco COMP |
+| `comp-realiza` | COMP → FR\|NFR | `**Realiza**:` do bloco COMP — **única** fonte do mapeamento FR ↔ componente (4.409: a tabela §7 deixou de existir; quando presente no acervo, é ignorada) |
 | `comp-dep` | COMP → COMP | `**Dependências**:` do bloco COMP |
 | `belongs-to` | TASK → PLAN | `**Pertence a**:` |
 | `realiza` | TASK → FR | `**Realiza (FRs)**:` |
@@ -80,7 +79,7 @@ foram ERROR nos validators.
 
 **Degradação `[parse]`**: campo não-parseável (aviso `nao-parseavel`) que alimenta um
 check de **ausência** — `FRs/NFRs cobertos` → cobertura; `Realiza (FRs)` → cobertura;
-`Mapeamento §7` → mapeamento — rebaixa os achados de ausência daquele PLAN para
+`Realiza` do COMP → mapeamento — rebaixa os achados de ausência daquele PLAN para
 `WARNING` com sufixo `[parse]`: a promessa "irreconhecível nunca vira ERROR" vale de
 ponta a ponta, e o validator decide com os próprios olhos (cobertura mista, §5).
 
@@ -98,12 +97,11 @@ ponta a ponta, e o validator decide com os próprios olhos (cobertura mista, §5
 | `ac-sem-task` | AC de FR coberto sem `covers-ac` de TASK do PLAN | ERROR · carência |
 | `realiza-fora-cobertura` | TASK realiza FR que o PLAN dela não cobre | ERROR |
 | `feat-divergente` | `declares-feat` ≠ conjunto derivado (`realiza` × `feat-of`), ou primária fora dele — só roda quando o conjunto derivado é não-vazio (campo presente com SPEC sem FEATs é matéria do validator, WARNING+auto-fix) | ERROR |
-| `fr-mapeado-fora-cobertura` | §7 mapeia FR fora de `plan-covers` | ERROR |
-| `fr-sem-comp` | FR coberto pelo PLAN sem linha na §7 dele | ERROR · carência |
-| `comp-sem-fr` | COMP sem linha na §7 | WARNING |
-| `realiza-vs-mapeamento` | `comp-realiza` divergente da §7 (a §7 é a fonte de cobertura) | WARNING |
+| `comp-realiza-fora-cobertura` | COMP realiza FR/NFR que o PLAN dele não cobre (`comp-realiza` fora de `plan-covers`) — ex-`fr-mapeado-fora-cobertura`, reescrito sobre `Realiza` (4.409) | ERROR |
+| `fr-sem-comp` | FR coberto pelo PLAN sem nenhum COMP dele que o realize (`Realiza`) | ERROR · carência |
+| `comp-sem-fr` | COMP sem `**Realiza**` preenchido (nenhuma aresta `comp-realiza`) | WARNING |
 | `dep-bloqueia-assimetrica` | A depende de B sem B bloquear A (ou vice-versa) — suprimido quando quem deveria declarar é TASK `Done` de outro PLAN (reeditar artefato entregue seria pior que a assimetria) | WARNING |
-| `index-desatualizado` | `TASK-MMM-INDEX.md` diverge do computado (waves, tabelas FR/AC) — best-effort | WARNING |
+| `index-desatualizado` | checklist `### Wave N` do `TASK-MMM-INDEX.md` diverge do computado (TASK inexistente ou wave divergente) — best-effort; as tabelas de cobertura deixaram de ser escritas (4.409) e saem de `--format=tables` | WARNING |
 | `brief-sem-criterio` | brief avulso sem heading `## Critério de aceite` (forma do esqueleto — decisão 4.86) | WARNING |
 | `task-ancora-dupla` | TASK com `Pertence a` **e** `Brief` preenchidos (âncora é exclusiva) | ERROR |
 | `feat-sem-verificacao` | FEAT com 1+ TASK declarante, **todas Done**, sem linha `**Verificação (gate 9)**:` sob o heading na SPEC (recorte do gate 9 por FEAT — decisão 4.90). A linha é livre no conteúdo (data e como, ou `n/a — motivo`); a **presença** é o declarado. SPEC `Status: Done` (ciclo fechado antes da 4.90) → `WARNING [legacy]`. TASK não-parseável sem status derruba o "todas Done" e o check silencia — degrada na direção segura, nunca inventa ERROR | ERROR · carência |
@@ -117,7 +115,7 @@ nenhuma âncora continua matéria do `task-validator` (tolerância ao acervo leg
 ## §4. Invocação e saída
 
 ```
-scripts/graph.sh <dir-do-slug> [--check] [--stage=plan|tasks] [--format=tsv|mermaid|mermaid-comp] [--plan MMM]
+scripts/graph.sh <dir-do-slug> [--check] [--stage=plan|tasks] [--format=tsv|mermaid|mermaid-comp|tables] [--plan MMM]
 ```
 
 - `<dir-do-slug>` é o diretório **já resolvido** (`{docsRoot}/<slug>` — quem resolve
@@ -126,8 +124,8 @@ scripts/graph.sh <dir-do-slug> [--check] [--stage=plan|tasks] [--format=tsv|merm
   executor (decisão 4.42), a raiz do plugin deriva do caminho do SKILL.md citado no
   briefing (prefixo antes de `/skills/`).
 - `--stage=plan` roda só o computável sem TASKs (`ciclo-comp`, `ref-quebrada` do lado
-  PLAN/SPEC, `id-duplicado`, `fr-mapeado-fora-cobertura`, `fr-sem-comp`, `comp-sem-fr`,
-  `realiza-vs-mapeamento`, `fr-sem-ac`) — PLAN recém-criado sem `tasks/` sai 0. `--stage=tasks`
+  PLAN/SPEC, `id-duplicado`, `comp-realiza-fora-cobertura`, `fr-sem-comp`, `comp-sem-fr`,
+  `fr-sem-ac`) — PLAN recém-criado sem `tasks/` sai 0. `--stage=tasks`
   (ou sem flag) roda tudo. `--plan MMM` restringe ao PLAN indicado — MMM numérico
   (com ou sem zero-padding); PLAN inexistente no slug é uso incorreto (exit 2),
   nunca "verde em silêncio".
@@ -139,7 +137,16 @@ scripts/graph.sh <dir-do-slug> [--check] [--stage=plan|tasks] [--format=tsv|merm
   `{ERROR, WARNING, INFO}`).
 - `--format=mermaid` — flowchart das TASKs por wave (subgraph por wave, status no
   rótulo: ✅ Done · 🔵 In Progress · ⏸ Todo · 🚫 Blocked); `mermaid-comp` — FR → COMP
-  (`maps`) + COMP → COMP (`comp-dep`).
+  (`comp-realiza`) + COMP → COMP (`comp-dep`).
+- `--format=tables` (4.409) — markdown **derivado** por PLAN, do mesmo grafo: cobertura
+  agregada do slug (total na SPEC · cobertos por PLANs anteriores · por este · gap),
+  mapeamento FR → componente (de `Realiza`, com os ACs de `(cobre …)`), cobertura de
+  FRs e ACs por TASK, cobertura por funcionalidade (só com FEATs) e status agregado.
+  É o que PLAN e TASK-MMM-INDEX **deixaram de escrever** — o artefato afirma
+  (`FRs cobertos`, `Realiza`, `Wave`), o grafo calcula. Convenção de "PLAN anterior":
+  MMM menor sobre a mesma SPEC. `--plan MMM` restringe a um PLAN. Determinístico
+  (IDs ordenados); imprime, nunca escreve — não existe cópia a divergir, logo não
+  existe check sobre a saída.
 - Exit: `0` sem ERROR · `1` com ERROR · `2` uso incorreto. Read-only sobre o slug.
 - Bash 3.2+ (macOS `/bin/bash`, Linux, Git Bash), awk POSIX, sem dependências novas.
 

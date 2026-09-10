@@ -51,15 +51,8 @@
 
 **Data início**: 
 **Data conclusão**: 
-**Branch**: 
 **Commit SHA**: 
 **Jira**: 
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
-**Arquivos modificados**:
-  - 
 
 **Quality gates**:
 - [ ] Implementação completa
@@ -70,5 +63,5 @@
 - [ ] ACs verificados
 - [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
 - [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
-
-**Notas**: 
+<!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
+ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->

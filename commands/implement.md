@@ -170,8 +170,8 @@ Report incompleto ou inválido: rejeitar, refazer.
 
 #### 3.4.2 Closure executada pela main session
 
-1. **Atualizar TASK-MMM-XXX-*.md**: preencher "Histórico de execução", Status: Done — por **Edit ancorado nos marcadores literais do template** (o heading da seção e os campos dela), nunca substituição do intervalo entre dois marcadores distantes. Confira a edição antes de prosseguir: `git diff -- <arquivo da TASK>` sem linha removida começando com `#` — cabeçalho da versão commitada que some é defeito da edição (reverter e reeditar ancorado), nunca efeito da closure (decisão 4.259).
-2. **Atualizar TASK-MMM-INDEX.md**: marcar task concluída, atualizar agregados. Se a SPEC declara FEATs: atualizar a coluna `Done` da seção "Cobertura por funcionalidade".
+1. **Atualizar TASK-MMM-XXX-*.md**: preencher "Histórico de execução" — os campos são **só** `Data início`, `Data conclusão`, `Commit SHA`, `Jira` e o checklist `Quality gates` (4.409: branch, tentativas, arquivos, revisores e narrativa vivem no ledger e no commit da closure, 4.76) —, Status: Done — por **Edit ancorado nos marcadores literais do template** (o heading da seção e os campos dela), nunca substituição do intervalo entre dois marcadores distantes. Confira a edição antes de prosseguir: `git diff -- <arquivo da TASK>` sem linha removida começando com `#` — cabeçalho da versão commitada que some é defeito da edição (reverter e reeditar ancorado), nunca efeito da closure (decisão 4.259).
+2. **Atualizar TASK-MMM-INDEX.md**: marcar a task concluída no checklist da wave (`- [x] TASK-MMM-XXX ✅ Done`). Status agregado e cobertura por funcionalidade **não se escrevem** (4.409) — `graph.sh --format=tables --plan MMM` os deriva quando alguém precisar ler.
 3. **Atualizar INDEX.md do slug**:
    - Atualizar coluna `Tasks` na linha do PLAN-MMM: de `X/Y` para `(X+1)/Y`, com o marcador do contrato do INDEX (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/index-contract.md`): `🟡` enquanto parcial, `✅` quando todas Done.
    - Atualizar campo `Última atualização`.

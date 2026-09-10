@@ -23,7 +23,7 @@ critério o referencia. Âncora dupla, referência quebrada e MMM divergente che
 fato (`task-ancora-dupla`, `ref-quebrada`, `pertence-vs-arquivo` — Etapa 2). O resto da
 régua (escopo, verificação executável, closure, convenções, tipo) vale **idêntico**.
 
-**Batch com FEATs**: validar também a seção "Cobertura por funcionalidade" do TASK-MMM-INDEX — ERROR se divergente dos campos `Funcionalidade` das TASKs; WARNING se alguma FEAT da SPEC com FR coberto pelo PLAN não tem nenhuma TASK que a liste. (As divergências de **waves** e das tabelas de **FR/AC** do TASK-MMM-INDEX já chegam como fato — check `index-desatualizado` da Etapa 2; a seção de funcionalidade permanece sua.)
+**Batch com FEATs**: a coerência `Funcionalidade` × derivado é fato do grafo (`feat-divergente`); o que fica seu é o WARNING quando alguma FEAT da SPEC com FR coberto pelo PLAN não tem nenhuma TASK que a liste — leia-o da tabela "Cobertura por funcionalidade" de `graph.sh {docsRoot}/<slug> --format=tables --plan MMM` (derivada, 4.409; o TASK-MMM-INDEX não a escreve mais). (As divergências de **waves** e das tabelas de **FR/AC** do TASK-MMM-INDEX já chegam como fato — check `index-desatualizado` da Etapa 2; a seção de funcionalidade permanece sua.)
 
 ## Etapa 1: fato mecânico primeiro — forma
 

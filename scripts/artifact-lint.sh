@@ -365,7 +365,7 @@ sect == "" && line ~ /^\*\*[A-Z]/ {
 }
 
 /^## / {
-  flushdec()
+  flushdec(); flushcomp()
   h = trim(substr(line, 4))
   cur_comp = ""
   if (h ~ /^Ader/)      { sAder = 1; sect = "ader"; next }
@@ -378,7 +378,7 @@ sect == "" && line ~ /^\*\*[A-Z]/ {
   sect = "x"; next
 }
 /^### / {
-  flushdec()
+  flushdec(); flushcomp()
   h = trim(substr(line, 5))
   cur_comp = ""
   if (h ~ /^DEC-/ && match(h, /DEC-[0-9]+-[0-9]+/)) {
@@ -388,10 +388,13 @@ sect == "" && line ~ /^\*\*[A-Z]/ {
     checkid(cur_dec)
     next
   }
-  if (h ~ /^COMP-/ && match(h, /COMP-[0-9]+-[0-9]+/)) { checkid(substr(h, RSTART, RLENGTH)); next }
+  if (h ~ /^COMP-/ && match(h, /COMP-[0-9]+-[0-9]+/)) { flushcomp(); cur_comp = substr(h, RSTART, RLENGTH); compRealiza = 0; checkid(cur_comp); next }
   if (h ~ /^TRISK-/ && match(h, /TRISK-[0-9]+-[0-9]+/)) { checkid(substr(h, RSTART, RLENGTH)); next }
   next
 }
+
+# bloco COMP: **Realiza** e obrigatorio (4.409 — unica fonte da aresta FR<->COMP)
+cur_comp != "" && line ~ /^\*\*Realiza\*\*[ \t]*:/ { compRealiza = 1; next }
 
 # bloco DEC
 cur_dec != "" {
@@ -421,16 +424,8 @@ sect == "cob" {
     frmode = 1
     next
   }
-  if (line ~ /^\*\*Cobertura agregada/) { temAgg = 1; frmode = 0; next }
   if (line ~ /^\*\*/) { frmode = 0; next }
   if (frmode && line ~ /^- /) temFR = 1
-  next
-}
-
-# secao 7: mapeamento
-sect == 7 && line ~ /^\|/ {
-  n = split(line, c, "|")
-  if (n >= 3 && trim(c[2]) ~ /^(FR|NFR)-[0-9]+-[0-9]+$/) nmap++
   next
 }
 
@@ -442,6 +437,11 @@ sect == 9 {
   next
 }
 
+function flushcomp() {
+  if (cur_comp != "" && !compRealiza)
+    emit("ERROR", "plan-comp-sem-realiza", cur_comp " sem **Realiza**: (unica fonte do mapeamento FR -> componente, 4.409)")
+  cur_comp = ""
+}
 function checkid(id,   parts, n, mmm, xxx) {
   n = split(id, parts, "-")
   mmm = parts[n-1]; xxx = parts[n]
@@ -452,7 +452,7 @@ function checkid(id,   parts, n, mmm, xxx) {
 }
 
 END {
-  flushdec()
+  flushdec(); flushcomp()
   if (!hSlug)   emit("ERROR", "plan-campo-ausente", "campo **Slug**: ausente ou vazio")
   if (!hStatus) emit("ERROR", "plan-campo-ausente", "campo **Status**: ausente")
   else if (STATUS !~ /^(Draft|Review|Approved|Done)$/)
@@ -463,14 +463,15 @@ END {
   else if (dataFmt) emit("WARNING", "plan-data-formato", "Data fora do formato YYYY-MM-DD")
   if (!sAder) emit("ERROR", "plan-secao-ausente", "secao \"## Aderencia a guidelines\" ausente")
   if (!sCob)  emit("ERROR", "plan-secao-ausente", "secao \"## Cobertura\" ausente")
-  for (i = 1; i <= 10; i++)
-    if (!(i in sec)) emit("ERROR", "plan-secao-ausente", "secao \"## " i ".\" ausente")
+  # §7 (Mapeamento FR -> componente) deixou de existir na 4.409: buraco de numeracao
+  # intencional — a lista e explicita, nunca renumerada
+  nreq = split("1 2 3 4 5 6 8 9 10", req, " ")
+  for (r = 1; r <= nreq; r++) { i = req[r] + 0
+    if (!(i in sec)) emit("ERROR", "plan-secao-ausente", "secao \"## " i ".\" ausente") }
   if (sCob) {
     if (!temSpecRef) emit("ERROR", "plan-cobertura-sem-spec", "Cobertura sem **SPEC referenciada**:")
     if (!temFR)      emit("ERROR", "plan-frs-cobertos-vazio", "lista **FRs cobertos**: vazia")
-    if (!temAgg)     emit("ERROR", "plan-cobertura-agregada-ausente", "**Cobertura agregada do slug**: ausente")
   }
-  if ((7 in sec) && nmap == 0) emit("ERROR", "plan-mapeamento-vazio", "secao 7 sem nenhuma linha FR -> componente")
   if (9 in sec) {
     if (ndod == 0)  emit("ERROR", "plan-dod-vazia", "Definition of Done (secao 9) sem itens")
     if (dodPre)     emit("ERROR", "plan-dod-placeholder", "Definition of Done com <preencher>")

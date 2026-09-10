@@ -25,13 +25,9 @@
 **NFRs cobertos**:
 - NFR-NNN-XXX
 
-**Cobertura agregada do slug**:
-- Total na SPEC: X
-- Cobertos por planos anteriores: Y
-- Cobertos por este: Z
-- Gap restante: W
-- Funcionalidades cobertas: FEAT-NNN-XXX (total), FEAT-NNN-YYY (parcial) <!-- só quando a SPEC declara FEATs; informativo, para orientar o slicing — o PLAN não ganha estrutura FEAT -->
-
+<!-- Cobertura agregada do slug (total, anteriores, este, gap) e o mapeamento FR -> COMP
+NÃO se escrevem (4.409): são derivados de `graph.sh <slug> --format=tables` a partir de
+FRs cobertos + **Realiza** dos COMPs. -->
 
 ## 1. Visão técnica
 
@@ -41,7 +37,7 @@
 
 ### COMP-MMM-001: <nome>
 **Responsabilidade**: ...
-**Realiza**: FR-NNN-XXX
+**Realiza**: FR-NNN-XXX <!-- obrigatório: única fonte da aresta FR -> COMP (lint plan-comp-sem-realiza) -->
 **Interface pública**: ...
 **Dependências**: COMP-MMM-YYY, COMP-MMM-ZZZ <!-- lista de IDs ou `nenhuma` -->
 <!-- Campo de aresta do grafo (graph-contract.md §1): só IDs de COMP do slug (PLAN
@@ -64,12 +60,6 @@ componente, nunca para este campo. -->
 **Reabrir se**: <condição observável que invalida esta decisão | nunca — <motivo>>
 **Irreversível**: sim | não
 **Aderência à ficha/perfil**: herdada | nova | exceção
-
-## 7. Mapeamento FR -> componente
-
-| FR | Componente | AC cobertos |
-|----|------------|-------------|
-| FR-NNN-001 | COMP-MMM-001 | AC-NNN-001 |
 
 ## 8. Riscos técnicos
 

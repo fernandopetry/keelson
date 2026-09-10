@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # graph.sh — extrai, verifica e desenha o grafo dos artefatos SDD de um slug (decisão 4.82).
 #
-# Uso: graph.sh <dir-do-slug> ( --check | --format=tsv|mermaid|mermaid-comp )
+# Uso: graph.sh <dir-do-slug> ( --check | --format=tsv|mermaid|mermaid-comp|tables )
 #               [--stage=plan|tasks] [--plan MMM]
 #
 #   <dir-do-slug>  diretório já resolvido ({docsRoot}/<slug> — quem resolve docsRoot
@@ -12,7 +12,9 @@
 #   --plan MMM     restringe os achados ao PLAN-MMM e suas TASKs (ex.: --plan 001)
 #   --format=tsv   emite o grafo (node/edge/warn) em TSV determinístico
 #   --format=mermaid       flowchart das TASKs por wave (status no rótulo)
-#   --format=mermaid-comp  flowchart FR → COMP + dependências COMP → COMP
+#   --format=mermaid-comp  flowchart FR → COMP (de **Realiza**) + dependências COMP → COMP
+#   --format=tables        markdown derivado por PLAN: cobertura agregada, mapeamento
+#                          FR → COMP, cobertura de FR/AC/FEAT por TASK, status (4.409)
 #
 # Contrato (dono único — sintaxe canônica, catálogo de arestas/checks, severidades):
 # docs/_meta/conventions/graph-contract.md. O grafo é DERIVADO: este script é
@@ -39,12 +41,12 @@ while [ $# -gt 0 ]; do
     --check)
       [ -z "$MODE" ] || die2 "use apenas um modo (--check ou --format)."
       MODE="check" ;;
-    --format=tsv|--format=mermaid|--format=mermaid-comp)
+    --format=tsv|--format=mermaid|--format=mermaid-comp|--format=tables)
       [ -z "$MODE" ] || die2 "use apenas um modo (--check ou --format)."
       MODE="${1#--format=}" ;;
     --format)
-      shift; [ $# -gt 0 ] || die2 "--format exige um valor (tsv|mermaid|mermaid-comp)."
-      case "$1" in tsv|mermaid|mermaid-comp) ;; *) die2 "formato desconhecido: $1" ;; esac
+      shift; [ $# -gt 0 ] || die2 "--format exige um valor (tsv|mermaid|mermaid-comp|tables)."
+      case "$1" in tsv|mermaid|mermaid-comp|tables) ;; *) die2 "formato desconhecido: $1" ;; esac
       [ -z "$MODE" ] || die2 "use apenas um modo (--check ou --format)."
       MODE="$1" ;;
     --stage=plan|--stage=tasks) STAGE="${1#--stage=}" ;;
@@ -79,7 +81,7 @@ trap 'rm -rf "$TMP"' EXIT
 #   node <TIPO> <ID> <arquivo> <attrs>
 #   edge <tipo> <DE> <PARA> <arquivo:linha>
 #   warn nao-parseavel <arquivo> <campo> <trecho>
-#   index-wave / index-frcov / index-accov  (do TASK-MMM-INDEX, só p/ index-desatualizado)
+#   index-wave  (do TASK-MMM-INDEX, só p/ index-desatualizado — 4.409: tabelas de cobertura são derivadas)
 cat > "$TMP/extract.awk" <<'AWK'
 function warnout(field, snippet) {
   gsub(/\t/, " ", snippet)
@@ -235,8 +237,9 @@ ftype == "P" && line ~ /^# PLAN-[0-9]+/ {
 }
 ftype == "P" && line ~ /^## / {
   cur_comp = ""; covermode = ""
-  if (line ~ /Mapeamento FR/) sect = "map7"
-  else if (line ~ /^## Cobertura/) sect = "cob"
+  # §7 "Mapeamento FR -> componente" deixou de ser fonte (4.409): a aresta FR<->COMP
+  # vem só de **Realiza** do COMP; a tabela, quando presente no acervo, é ignorada
+  if (line ~ /^## Cobertura/) sect = "cob"
   else sect = ""
   next
 }
@@ -297,32 +300,6 @@ ftype == "P" && cur_comp != "" && line ~ /^\*\*Depend/ && index(line, "ncias**")
   listedges("comp-dep", cur_comp, fieldrest(line), "^COMP-[0-9]+-[0-9]+$", "Dependências")
   next
 }
-ftype == "P" && sect == "map7" && line ~ /^\|/ {
-  n = split(line, c, "|")
-  if (n < 4) next
-  fr = trimtok(c[2])
-  if (fr !~ /^(FR|NFR)-[0-9]+-[0-9]+$/) {
-    # header ("FR") e separador ("---") caem em silêncio; conteúdo irreconhecível
-    # (célula com dígito ou prefixo de ID) degrada declaradamente (§1 do contrato)
-    if (fr ~ /[0-9]/ || fr ~ /(FR|NFR)-/) warnout("Mapeamento §7", line)
-    next
-  }
-  # a célula Componente aceita lista (um FR entregue por 2+ COMPs)
-  cn = split(c[3], cc, ",")
-  for (i = 1; i <= cn; i++) {
-    comp = trimtok(cc[i])
-    if (comp == "") continue
-    if (comp ~ /^COMP-[0-9]+-[0-9]+$/) edge("maps", fr, comp)
-    else warnout("Mapeamento §7", line)
-  }
-  s = c[4]
-  while (match(s, /AC-[0-9]+-[0-9]+/)) {
-    edge("maps-ac", fr, substr(s, RSTART, RLENGTH))
-    s = substr(s, RSTART + RLENGTH)
-  }
-  next
-}
-
 # ---------- BRIEF avulso (só briefs/BRIEF-*-avulso.md entram no SRC — 4.86) ----------
 ftype == "B" && line ~ /^# BRIEF-[0-9]+/ {
   id = grabid(line, "BRIEF-[0-9]+")
@@ -443,26 +420,10 @@ ftype == "T" && cur_task != "" && sect == "gate9" { allac(line, cur_task); next 
 ftype == "I" && line ~ /^### Wave [0-9]+/ {
   curwave = grabid(line, "[0-9]+"); sect = "wave"; next
 }
-ftype == "I" && line ~ /^## Cobertura de FRs/ { sect = "frcov"; curwave = ""; next }
-ftype == "I" && line ~ /^## Cobertura de ACs/ { sect = "accov"; curwave = ""; next }
 ftype == "I" && line ~ /^## / { sect = ""; curwave = ""; next }
 ftype == "I" && sect == "wave" && curwave != "" && line ~ /TASK-[0-9]+-[0-9]+/ && line ~ /^- / {
   id = grabid(line, "TASK-[0-9]+-[0-9]+")
   if (id != "") print "index-wave\t" fmmm "\t" id "\t" curwave "\t" FILENAME
-  next
-}
-(ftype == "I") && (sect == "frcov" || sect == "accov") && line ~ /^\|/ {
-  n = split(line, c, "|")
-  if (n < 3) next
-  key = trimtok(c[2])
-  if (sect == "frcov" && key !~ /^FR-[0-9]+-[0-9]+$/) next
-  if (sect == "accov" && key !~ /^AC-[0-9]+-[0-9]+$/) next
-  tn = 0; s = c[3]
-  while (match(s, /TASK-[0-9]+-[0-9]+/)) {
-    tn++; tl[tn] = substr(s, RSTART, RLENGTH)
-    s = substr(s, RSTART + RLENGTH)
-  }
-  print (sect == "frcov" ? "index-frcov" : "index-accov") "\t" fmmm "\t" key "\t" sortjoin(tl, tn) "\t" FILENAME
   next
 }
 
@@ -526,7 +487,7 @@ $1 == "node" && $2 == "TASK" && M == "task" {
 }
 $1 == "edge" && $2 == "task-dep" && M == "task" { EN++; EF[EN] = $3; ET[EN] = $4 }
 $1 == "node" && ($2 == "FR" || $2 == "COMP") && M == "comp" { CN++; CT[CN] = $2; CI[CN] = $3 }
-$1 == "edge" && $2 == "maps" && M == "comp"     { EN++; EF[EN] = $3; ET[EN] = $4 }
+$1 == "edge" && $2 == "comp-realiza" && M == "comp" { EN++; EF[EN] = $4; ET[EN] = $3 }
 $1 == "edge" && $2 == "comp-dep" && M == "comp" { DN++; DF[DN] = $3; DT[DN] = $4 }
 END {
   print "flowchart TD"
@@ -556,6 +517,144 @@ AWK
   exit 0
 fi
 
+if [ "$MODE" = "tables" ]; then
+  # Tabelas derivadas (4.409): o que o PLAN e o TASK-MMM-INDEX deixaram de escrever —
+  # cobertura agregada, mapeamento FR -> COMP (de **Realiza**), cobertura por TASK,
+  # por funcionalidade e status agregado. Fonte = o mesmo graph.tsv; nada se relê do
+  # markdown. "PLAN anterior" = MMM menor sobre a mesma SPEC (convencao do contrato).
+  cat > "$TMP/tables.awk" <<'AWK'
+BEGIN { FS = "\t" }
+function mmm(id,   a, n) { n = split(id, a, "-"); return a[2] }
+function nnn(id,   a, n) { n = split(id, a, "-"); return a[2] }
+function ssort(arr, n,   i, j, t) {
+  for (i = 2; i <= n; i++)
+    for (j = i; j > 1 && arr[j] < arr[j-1]; j--) { t = arr[j]; arr[j] = arr[j-1]; arr[j-1] = t }
+}
+function joinl(arr, n, sep,   i, o) { o = ""; for (i = 1; i <= n; i++) o = (o == "" ? arr[i] : o sep arr[i]); return o }
+$1 == "node" {
+  ty = $2; id = $3
+  if (ty == "PLAN") { PN++; PL[PN] = id; pst[id] = $5 }
+  if (ty == "FR")   { FRN++; FRL[FRN] = id }
+  if (ty == "NFR")  { NFN++; NFL[NFN] = id }
+  if (ty == "AC")   { acn[id] = 1 }
+  if (ty == "FEAT") { FTN++; FTL[FTN] = id }
+  if (ty == "TASK") {
+    TKN++; TKL[TKN] = id
+    st = ""
+    if (index($5, "status=") > 0) { st = substr($5, index($5, "status=") + 7); sub(/ (tipo|crit|verif|metrica|verd)=.*$/, "", st) }
+    tstat[id] = st
+  }
+  next
+}
+$1 == "edge" {
+  if ($2 == "spec-ref")      specof[$3] = $4
+  if ($2 == "plan-covers")   { pcov[$3 SUBSEP $4] = 1; cov[$4] = cov[$4] " " $3 }
+  if ($2 == "comp-realiza")  { CRN++; CRF[CRN] = $3; CRT[CRN] = $4 }
+  if ($2 == "ac-covers")     { ACN++; ACF[ACN] = $3; ACT[ACN] = $4 }
+  if ($2 == "belongs-to")    belongs[$3] = $4
+  if ($2 == "realiza")       { RZN++; RZF[RZN] = $3; RZT[RZN] = $4 }
+  if ($2 == "covers-ac")     { CAN++; CAF[CAN] = $3; CAT[CAN] = $4 }
+  if ($2 == "declares-feat") { DFN++; DFF[DFN] = $3; DFT[DFN] = $4 }
+  if ($2 == "feat-primaria") fprim[$3 SUBSEP $4] = 1
+  if ($2 == "feat-of")       featof[$3] = $4
+  next
+}
+END {
+  ssort(PL, PN); ssort(FRL, FRN); ssort(NFL, NFN); ssort(FTL, FTN); ssort(TKL, TKN)
+  for (x = 1; x <= PN; x++) {
+    p = PL[x]; pm = mmm(p)
+    if (PLANF != "" && pm + 0 != PLANF + 0) continue
+    sp = (p in specof) ? specof[p] : ""
+    sn = (sp != "") ? nnn(sp) : ""
+    print "## " p " — cobertura derivada (graph.sh --format=tables)"
+    print ""
+    print "**SPEC referenciada**: " (sp != "" ? sp : "(sem spec-ref)")
+    # ---- cobertura agregada ----
+    tf = 0; tn = 0; ce = 0; ca = 0; cg = 0
+    for (i = 1; i <= FRN; i++) if (sn != "" && nnn(FRL[i]) == sn) { tf++; k = FRL[i]
+      this = ((p SUBSEP k) in pcov); prev = 0
+      n2 = split(cov[k], cc, " "); for (j = 1; j <= n2; j++) if (cc[j] != "" && mmm(cc[j]) + 0 < pm + 0) prev = 1
+      if (this) ce++; else if (prev) ca++; else cg++ }
+    for (i = 1; i <= NFN; i++) if (sn != "" && nnn(NFL[i]) == sn) { tn++; k = NFL[i]
+      this = ((p SUBSEP k) in pcov); prev = 0
+      n2 = split(cov[k], cc, " "); for (j = 1; j <= n2; j++) if (cc[j] != "" && mmm(cc[j]) + 0 < pm + 0) prev = 1
+      if (this) ce++; else if (prev) ca++; else cg++ }
+    print ""
+    print "**Cobertura agregada do slug** (derivada):"
+    print "- Total na SPEC: " tf " FRs + " tn " NFRs"
+    print "- Cobertos por PLANs anteriores (MMM menor): " ca
+    print "- Cobertos por este: " ce
+    print "- Gap restante: " cg
+    # ---- mapeamento FR -> COMP ----
+    print ""
+    print "### Mapeamento FR -> componente (derivado de **Realiza**)"
+    print ""
+    print "| FR | Componente | AC cobertos |"
+    print "|----|------------|-------------|"
+    for (i = 1; i <= FRN; i++) { k = FRL[i]; if (!((p SUBSEP k) in pcov)) continue
+      cn = 0; delete cl; for (j = 1; j <= CRN; j++) if (CRT[j] == k && mmm(CRF[j]) == pm) { cn++; cl[cn] = CRF[j] }
+      an = 0; delete al; for (j = 1; j <= ACN; j++) if (ACT[j] == k) { an++; al[an] = ACF[j] }
+      ssort(cl, cn); ssort(al, an)
+      print "| " k " | " (cn ? joinl(cl, cn, ", ") : "—") " | " (an ? joinl(al, an, ", ") : "—") " |" }
+    # ---- cobertura de FRs por TASK ----
+    print ""
+    print "### Cobertura de FRs por TASK"
+    print ""
+    print "| FR | TASKs |"
+    print "|----|-------|"
+    for (i = 1; i <= FRN; i++) { k = FRL[i]; if (!((p SUBSEP k) in pcov)) continue
+      cn = 0; delete cl
+      for (j = 1; j <= RZN; j++) if (RZT[j] == k) { t = RZF[j]; tp = (t in belongs) ? belongs[t] : ""; if ((tp == p) || (tp == "" && mmm(t) == pm)) { cn++; cl[cn] = t } }
+      ssort(cl, cn)
+      print "| " k " | " (cn ? joinl(cl, cn, ", ") : "—") " |" }
+    # ---- cobertura de ACs por TASK ----
+    print ""
+    print "### Cobertura de ACs por TASK"
+    print ""
+    print "| AC | TASKs |"
+    print "|----|-------|"
+    delete seenac; asn = 0; delete asl
+    for (j = 1; j <= ACN; j++) { k = ACT[j]; a = ACF[j]; if (!((p SUBSEP k) in pcov)) continue; if (a in seenac) continue; seenac[a] = 1; asn++; asl[asn] = a }
+    ssort(asl, asn)
+    for (i = 1; i <= asn; i++) { a = asl[i]
+      cn = 0; delete cl
+      for (j = 1; j <= CAN; j++) if (CAT[j] == a) { t = CAF[j]; tp = (t in belongs) ? belongs[t] : ""; if ((tp == p) || (tp == "" && mmm(t) == pm)) { cn++; cl[cn] = t } }
+      ssort(cl, cn)
+      print "| " a " | " (cn ? joinl(cl, cn, ", ") : "—") " |" }
+    # ---- cobertura por funcionalidade (so com FEATs na SPEC) ----
+    fn = 0
+    for (i = 1; i <= FTN; i++) if (sn != "" && nnn(FTL[i]) == sn) fn++
+    if (fn > 0) {
+      print ""
+      print "### Cobertura por funcionalidade"
+      print ""
+      print "| FEAT | TASKs (P = primária) | Done |"
+      print "|------|----------------------|------|"
+      for (i = 1; i <= FTN; i++) { ft = FTL[i]; if (sn == "" || nnn(ft) != sn) continue
+        cn = 0; delete cl; dn = 0
+        for (j = 1; j <= DFN; j++) if (DFT[j] == ft) { t = DFF[j]; tp = (t in belongs) ? belongs[t] : ""; if ((tp == p) || (tp == "" && mmm(t) == pm)) { cn++; cl[cn] = t ((t SUBSEP ft) in fprim ? " (P)" : ""); if (tstat[t] == "Done") dn++ } }
+        ssort(cl, cn)
+        print "| " ft " | " (cn ? joinl(cl, cn, ", ") : "—") " | " dn "/" cn " |" }
+    }
+    # ---- status agregado ----
+    todo = 0; inp = 0; done = 0; blk = 0
+    for (i = 1; i <= TKN; i++) { t = TKL[i]; tp = (t in belongs) ? belongs[t] : ""; if (!((tp == p) || (tp == "" && mmm(t) == pm))) continue
+      if (tstat[t] == "Done") done++; else if (tstat[t] == "In Progress") inp++; else if (tstat[t] == "Blocked") blk++; else todo++ }
+    print ""
+    print "### Status agregado"
+    print ""
+    print "- Todo: " todo
+    print "- In Progress: " inp
+    print "- Done: " done
+    print "- Blocked: " blk
+    print ""
+  }
+}
+AWK
+  awk -v PLANF="$PLANF" -f "$TMP/tables.awk" "$TMP/graph.tsv"
+  exit 0
+fi
+
 # ============================ CHECKER ============================
 cat > "$TMP/check.awk" <<'AWK'
 BEGIN { FS = "\t" }
@@ -576,7 +675,7 @@ function inplan(f,   s) {
 function sev_abs(base, p, kind,   m) {
   m = mmm(p) + 0
   if (kind == "cov"  && ((m in pdeg) || (m in rdeg))) return "parse"
-  if (kind == "map7" && ((m in pdeg) || (m in mdeg))) return "parse"
+  if (kind == "comp" && ((m in pdeg) || (m in cdeg))) return "parse"
   return base
 }
 function ssortidx(arr, n,   i, j, t) {
@@ -590,7 +689,7 @@ $1 == "warn" {
   if (m != "") {
     if ($4 == "FRs cobertos" || $4 == "NFRs cobertos") pdeg[m + 0] = 1
     if ($4 == "Realiza (FRs)")                         rdeg[m + 0] = 1
-    if ($4 == "Mapeamento §7")                         mdeg[m + 0] = 1
+    if ($4 == "Realiza")                               cdeg[m + 0] = 1
   }
   next
 }
@@ -631,7 +730,6 @@ $1 == "edge" {
   if ($2 == "task-brief")    { tbrief[$3] = $4 }
   if ($2 == "plan-covers")   { pcov[$3 SUBSEP $4] = 1 }
   if ($2 == "realiza")       { RZN++; RZF[RZN] = $3; RZT[RZN] = $4 }
-  if ($2 == "maps")          { mapped_to[$4] = 1; MPN++; MPF[MPN] = $3; MPT[MPN] = $4; MPL[MPN] = $5 }
   if ($2 == "comp-realiza")  { CRN++; CRF[CRN] = $3; CRT[CRN] = $4 }
   if ($2 == "ac-covers")     { ACN++; ACF[ACN] = $3; ACT[ACN] = $4 }
   if ($2 == "covers-ac")     { covac[$3 SUBSEP $4] = 1 }
@@ -641,12 +739,10 @@ $1 == "edge" {
   next
 }
 $1 == "index-wave"  { IWN++; IWM[IWN] = $2; IWT[IWN] = $3; IWW[IWN] = $4; IWF[IWN] = $5; idxseen[$2] = 1; next }
-$1 == "index-frcov" { IFN++; IFM[IFN] = $2; IFK[IFN] = $3; IFL[IFN] = $4; idxfr[$2] = 1; next }
-$1 == "index-accov" { IAN++; IAM[IAN] = $2; IAK[IAN] = $3; IAL[IAN] = $4; idxac[$2] = 1; next }
 
 END {
-  planside["spec-ref"] = 1;  planside["plan-covers"] = 1; planside["maps"] = 1
-  planside["maps-ac"] = 1;   planside["comp-realiza"] = 1; planside["comp-dep"] = 1
+  planside["spec-ref"] = 1;  planside["plan-covers"] = 1
+  planside["comp-realiza"] = 1; planside["comp-dep"] = 1
   planside["ac-covers"] = 1; planside["feat-of"] = 1
 
   # planof(task): belongs-to quando existe, senão MMM do ID
@@ -901,78 +997,44 @@ END {
       else if ((t in wave) && wave[t] != IWW[i])
         finding("WARNING", "index-desatualizado", IWF[i] ": " t " em Wave " IWW[i] " mas o arquivo declara wave " wave[t])
     }
-    for (i = 1; i <= IFN; i++) {
-      if (PLANF != "" && IFM[i] + 0 != PLANF + 0) continue
-      cn2 = 0; delete cl
-      for (j = 1; j <= RZN; j++) if (RZT[j] == IFK[i] && mmm(RZF[j]) == IFM[i]) { cn2++; cl[cn2] = RZF[j] }
-      ssortidx(cl, cn2)
-      comp2 = ""
-      for (j = 1; j <= cn2; j++) comp2 = (comp2 == "" ? cl[j] : comp2 " " cl[j])
-      if (comp2 != IFL[i])
-        finding("WARNING", "index-desatualizado", "Cobertura de FRs (" IFK[i] "): INDEX lista \"" IFL[i] "\", computado \"" comp2 "\"")
-    }
-    for (i = 1; i <= IAN; i++) {
-      if (PLANF != "" && IAM[i] + 0 != PLANF + 0) continue
-      cn2 = 0; delete cl
-      for (t in planof) if (mmm(t) == IAM[i] && ((t SUBSEP IAK[i]) in covac)) { cn2++; cl[cn2] = t }
-      ssortidx(cl, cn2)
-      comp2 = ""
-      for (j = 1; j <= cn2; j++) comp2 = (comp2 == "" ? cl[j] : comp2 " " cl[j])
-      if (comp2 != IAL[i])
-        finding("WARNING", "index-desatualizado", "Cobertura de ACs (" IAK[i] "): INDEX lista \"" IAL[i] "\", computado \"" comp2 "\"")
-    }
   }
 
-  # ---- fr-sem-comp (FR coberto sem linha na §7 do seu PLAN) ----
+  # ---- fr-sem-comp (FR coberto pelo PLAN sem COMP dele que o realize — 4.409) ----
+  # A aresta FR<->COMP vem de **Realiza** do COMP; §7 deixou de existir como fonte.
   for (k in pcov) {
     split(k, kk, SUBSEP); p = kk[1]; fr = kk[2]
     if (fr !~ /^FR-/) continue
     if (!(fr in exist)) continue
     if (PLANF != "" && mmm(p) + 0 != PLANF + 0) continue
     hit = 0
-    for (i = 1; i <= MPN; i++) if (MPF[i] == fr && mmm(MPT[i]) == mmm(p)) { hit = 1; break }
+    for (i = 1; i <= CRN; i++) if (CRT[i] == fr && mmm(CRF[i]) == mmm(p)) { hit = 1; break }
     if (!hit) {
-      det = fr " coberto por " p " sem linha no Mapeamento FR -> componente (§7)"
+      det = fr " coberto por " p " sem COMP que o realize (**Realiza** de nenhum COMP do PLAN)"
       if (status[p] == "Done") finding("WARNING", "fr-sem-comp", det " [legacy]")
-      else if (sev_abs("ERROR", p, "map7") == "parse") finding("WARNING", "fr-sem-comp", det " [parse]")
+      else if (sev_abs("ERROR", p, "comp") == "parse") finding("WARNING", "fr-sem-comp", det " [parse]")
       else finding("ERROR", "fr-sem-comp", det)
     }
   }
 
-  # ---- fr-mapeado-fora-cobertura / comp-sem-fr / realiza-vs-mapeamento (todo stage) ----
-  for (i = 1; i <= MPN; i++) {
-    fr = MPF[i]; comp = MPT[i]
-    if (!inplan(MPL[i])) continue
+  # ---- comp-realiza-fora-cobertura / comp-sem-fr (todo stage — 4.409) ----
+  for (i = 1; i <= CRN; i++) {
+    comp = CRF[i]; fr = CRT[i]
+    if (!inplan(nodefile[comp])) continue
     if (!(fr in exist)) continue
     p = (mmm(comp) in planbymmm) ? planbymmm[mmm(comp)] : ""
     if (p == "") continue
     if (!((p SUBSEP fr) in pcov)) {
-      det = "§7 mapeia " fr " -> " comp " mas " p " nao o cobre"
-      if (sev_abs("ERROR", p, "cov") == "parse") finding("WARNING", "fr-mapeado-fora-cobertura", det " [parse]")
-      else finding("ERROR", "fr-mapeado-fora-cobertura", det)
+      det = comp " realiza " fr " mas " p " nao o cobre"
+      if (sev_abs("ERROR", p, "cov") == "parse") finding("WARNING", "comp-realiza-fora-cobertura", det " [parse]")
+      else finding("ERROR", "comp-realiza-fora-cobertura", det)
     }
   }
   for (i = 1; i <= CPN; i++) {
     if (!inplan(nodefile[CP[i]])) continue
-    if (!(CP[i] in mapped_to))
-      finding("WARNING", "comp-sem-fr", CP[i] " sem linha no Mapeamento FR -> componente (§7)")
-  }
-  for (i = 1; i <= CPN; i++) {
-    comp = CP[i]
-    if (!inplan(nodefile[comp])) continue
-    diff = ""
-    for (j = 1; j <= CRN; j++) if (CRF[j] == comp) {
-      hit = 0
-      for (x = 1; x <= MPN; x++) if (MPT[x] == comp && MPF[x] == CRT[j]) { hit = 1; break }
-      if (!hit) diff = diff (diff == "" ? "" : ", ") CRT[j] " (so no Realiza)"
-    }
-    for (x = 1; x <= MPN; x++) if (MPT[x] == comp) {
-      hit = 0
-      for (j = 1; j <= CRN; j++) if (CRF[j] == comp && CRT[j] == MPF[x]) { hit = 1; break }
-      if (!hit) diff = diff (diff == "" ? "" : ", ") MPF[x] " (so na §7)"
-    }
-    if (diff != "")
-      finding("WARNING", "realiza-vs-mapeamento", comp ": Realiza e §7 divergem — " diff)
+    hit = 0
+    for (j = 1; j <= CRN; j++) if (CRF[j] == CP[i]) { hit = 1; break }
+    if (!hit)
+      finding("WARNING", "comp-sem-fr", CP[i] " sem **Realiza** preenchido (nenhum FR/NFR realizado)")
   }
 }
 

@@ -6,10 +6,6 @@ edge	comp-realiza	COMP-001-001	FR-001-002	plans/PLAN-001-lista.md:20
 edge	covers-ac	TASK-001-001	AC-001-001	tasks/TASK-001-001-nucleo.md:18
 edge	covers-ac	TASK-001-001	AC-001-002	tasks/TASK-001-001-nucleo.md:19
 edge	implements	TASK-001-001	COMP-001-001	tasks/TASK-001-001-nucleo.md:6
-edge	maps	FR-001-001	COMP-001-001	plans/PLAN-001-lista.md:27
-edge	maps	FR-001-002	COMP-001-001	plans/PLAN-001-lista.md:28
-edge	maps-ac	FR-001-001	AC-001-001	plans/PLAN-001-lista.md:27
-edge	maps-ac	FR-001-002	AC-001-002	plans/PLAN-001-lista.md:28
 edge	plan-covers	PLAN-001	FR-001-001	plans/PLAN-001-lista.md:11
 edge	plan-covers	PLAN-001	FR-001-002	plans/PLAN-001-lista.md:11
 edge	realiza	TASK-001-001	FR-001-001	tasks/TASK-001-001-nucleo.md:5

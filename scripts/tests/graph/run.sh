@@ -51,6 +51,7 @@ runcase valido-check             valido             0 valido--check.txt         
 runcase valido-tsv               valido             0 valido--tsv.txt                 --format=tsv
 runcase valido-mermaid           valido             0 valido--mermaid.txt             --format=mermaid
 runcase valido-mermaid-comp      valido             0 valido--mermaid-comp.txt        --format=mermaid-comp
+runcase valido-tables            valido             0 valido--tables.txt              --format=tables
 runcase valido-legado-check      valido-legado      0 valido-legado--check.txt        --check
 runcase valido-legado-tsv        valido-legado      0 valido-legado--tsv.txt          --format=tsv
 runcase ciclo-task-check         defeito-ciclo-task 1 defeito-ciclo-task--check.txt   --check
@@ -69,6 +70,7 @@ runcase bullet-lista-check       tolerancia-bullet-lista 0 tolerancia-bullet-lis
 runcase bullet-lista-tsv         tolerancia-bullet-lista 0 tolerancia-bullet-lista--tsv.txt   --format=tsv
 # --plan aceita MMM sem zero-padding (mesmo resultado do padded)
 runcase cobertura-plan-1         defeito-cobertura  1 defeito-cobertura--check-plan.txt --check --plan 1
+runcase cobertura-tables-plan-1  defeito-cobertura  0 defeito-cobertura--tables-plan.txt --format=tables --plan 1
 # brief avulso (decisão 4.86): nó BRIEF + âncora task-brief; defeitos plantados
 # cobrem brief-sem-criterio, task-ancora-dupla, ref-quebrada e pertence-vs-arquivo
 runcase valido-avulso-check      valido-avulso      0 valido-avulso--check.txt        --check
