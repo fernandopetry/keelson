@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.170.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.171.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the artifact affirms, the graph computes — the PLAN no longer writes its aggregate coverage or the FR → component table, the task index no longer writes status and coverage tables, and the TASK closure keeps only the fields a script reads; `graph.sh --format=tables` derives all of it on demand, always current. Fourth step of the artifact-diet series started in 0.167.0. Details in `CHANGELOG.md`.
+New in this release: the TASK context shrinks to 1–2 lines that point at the slug memo/MAP (an A/B eval showed the developer performs identically with the memo at hand), closing the artifact-diet series started in 0.167.0 — since 0.170.0 the PLAN and task index no longer carry tables that `graph.sh --format=tables` derives on demand. Details in `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

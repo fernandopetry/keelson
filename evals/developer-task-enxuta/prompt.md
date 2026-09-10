@@ -7,7 +7,9 @@ Você é o **developer** do time implementando uma TASK **no papel** (não há s
 diretório de trabalho há:
 
 - `REGUA.md` — a TASK a implementar; é o seu único contrato de trabalho, siga-a e só ela;
-- `CODE.md` — o código de produção existente (trechos) e o schema.
+- `CODE.md` — o código de produção existente (trechos) e o schema;
+- `MEMO.md` — memo de exploração do slug (reconhecimento do território e decisões vigentes),
+  quando a TASK o citar.
 
 Escreva `deck/IMPLEMENTACAO.md` com: (1) o código novo/alterado, **por arquivo**, em
 blocos completos (métodos inteiros, não reticências); (2) os testes que provam cada

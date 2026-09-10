@@ -23,6 +23,27 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.171.0] — 2026-09-10
+
+Re-init: none
+
+Decision 4.410 — last judgment step of the artifact-diet series, backed by an A/B eval:
+with the slug memo/MAP available, a one-line TASK context performed exactly like the
+long one (4/4 on every axis), so the template stops asking for prose that the memo
+already holds.
+
+### Changed
+
+- `TASK` template, "Contexto": 1–2 lines describing the behavior as a transition/effect,
+  citing the exploration memo and the slug MAP for territory and standing decisions —
+  never copying them.
+
+### Not changed, deliberately
+
+- SPEC "Personas" and the rule against premises that restate the brief stay as they are:
+  two eval rounds gave a consistent signal but no valid proof (the judge for the
+  "generic actor" defect proved too lenient), and the series does not cut on signal.
+
 ## [0.170.0] — 2026-09-10
 
 Re-init: none

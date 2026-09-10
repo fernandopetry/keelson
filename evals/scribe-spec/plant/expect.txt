@@ -1,3 +1,5 @@
 payload-como-premissa
 par-de-leitura
 fr-granularidade
+persona-preservada
+premissa-sem-eco

@@ -8,6 +8,11 @@ frete e guardar o percentual de desconto de frete que o parceiro aplicou. O gere
 parceria disse que a resposta deles vem como `{status, prazo_dias, itens[]}` e que o
 percentual vem em `itens[].desconto_pct`."
 
+## Personas
+- **Operador de pedidos** (atendimento): confirma pedidos no painel; hoje liga para o parceiro para combinar o frete.
+- **Gerente da parceria** (comercial): dono do relacionamento com o parceiro; recebe o relatório de descontos no fim do mês. Não usa o painel.
+- Anti-persona: cliente final — não vê nem escolhe frete nesta demanda.
+
 ## Interpretação do PO
 - **Contexto**: hoje o frete é combinado por telefone; o parceiro tem API.
 - **Pedido**: enviar o pedido confirmado ao parceiro e persistir o percentual de desconto de frete devolvido.

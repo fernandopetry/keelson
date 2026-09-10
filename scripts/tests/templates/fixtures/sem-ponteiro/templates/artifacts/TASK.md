@@ -20,7 +20,9 @@
 
 ## Contexto
 
-<3 a 5 linhas.>
+<1–2 linhas: o comportamento como transição/efeito no domínio. Território, código
+existente e decisões vigentes vivem no memo de exploração e no MAP do slug — cite-os,
+nunca os copie (4.410).>
 
 ## Escopo
 
