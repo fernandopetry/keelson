@@ -23,6 +23,33 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.172.0] — 2026-09-11
+
+Re-init: none
+
+Decision 4.411 — field report: consumers found the closing report hard to read and kept
+asking for a summary afterwards. The report served two readers with one shape (the
+project's Director and the plugin maintainer) and was built for the second; an A/B eval
+proved a three-line headline fixes the first reader's problem without costing the
+skeleton.
+
+### Added
+
+- Closing report headline (`report-contract.md` §1/§2): the three lines right after the
+  title are `**Feito**:` (what you got, in product language, no artifact IDs),
+  `**Depende de você**:` (the one act only you can do) and `**Atenção**:` (partial close,
+  gate not run, blocking pending item — or `nada`). One line each; they count in the
+  countable self-check, and the full skeleton still follows.
+- `evals/tech-lead-fecho-legivel/`: new eval case (same scenario as `tech-lead-fecho`)
+  with a lay-reader judge, a headline judge, a decision-number regex and the skeleton
+  regression axis; plant included.
+
+### Changed
+
+- The closing report no longer quotes maintainer decision numbers (`decisão 4.x`) to the
+  reader — those comments in the skeleton are the maintainer's ruler, not report text.
+- Wiki "Primeiros passos", "Ler a entrega": the headline is the first row of the table.
+
 ## [0.171.0] — 2026-09-10
 
 Re-init: none

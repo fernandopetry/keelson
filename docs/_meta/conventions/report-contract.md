@@ -17,6 +17,16 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 
 ## §1. Regras de preenchimento
 
+- **Manchete antes do esqueleto** (o resumo que o leitor pediria em seguida, já na
+  primeira tela — decisão 4.411): as três primeiras linhas depois do título são
+  `**Feito**:` (o que o Diretor ganhou, em linguagem de produto — sem ID de artefato),
+  `**Depende de você**:` (o ato que só ele faz: revisar a branch, responder a pergunta
+  estacionada, nada) e `**Atenção**:` (fecho parcial, gate não rodado, pendência que
+  bloqueia — ou `nada`). Uma linha cada. O esqueleto abaixo detalha, nunca substitui: a
+  manchete não dispensa linha nenhuma dele, e as três contam no autocheck contável.
+- **Número de decisão fica fora do texto ao Diretor** (decisão 4.411): os `# decisão 4.x`
+  do esqueleto são régua do mantenedor do plugin; a linha emitida não os cita — o leitor
+  não tem o `decisions.md` (mesma régua da página própria da wiki, 4.247).
 - **Linha obrigatória nunca é omitida**: insumo ausente (marca de relógio, ledger,
   sync degradado) → a linha sai com a **lacuna nomeada** em meia linha.
 - **Seção condicional existe ou não existe**: sem gatilho, não aparece; com gatilho, o
@@ -45,6 +55,10 @@ ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto
 
 ```markdown
 # Entrega: <slug — demanda>          # no /keelson:report: "Fecho de sessão: <slug | branch | sessão livre>"
+
+- **Feito**: <1 linha — o que o Diretor ganhou, em linguagem de produto>
+- **Depende de você**: <1 linha — revisar a branch <nome> · responder <pergunta> · nada>
+- **Atenção**: <1 linha — parcial (<motivo>) · gate <n> não rodado · pendência que bloqueia · nada>
 
 - **Mudanças**: <resumo em 1–3 linhas do que foi feito>
 - **Branch**: <nome — pushada | commit local sem push | sem remoto>

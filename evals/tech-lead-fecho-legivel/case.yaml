@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: tech-lead-fecho-legivel
+# Caso nº 12 — legibilidade do relatório de fecho para o Diretor do consumidor (relato
+# de campo na proposal-inbox, linha 2026-09-11). Mesmo cenário sintético do caso
+# tech-lead-fecho (fixtures e prompt idênticos); o que muda é a pergunta: o leitor que
+# encomendou o trabalho consegue, na primeira tela, dizer o que foi feito e o que lhe
+# cabe fazer? Braços (file:): A = fatia de convenções + report-contract.md do HEAD ·
+# B = a mesma fatia + report-contract.md com a manchete (Feito · Depende de você ·
+# Atenção) antes do esqueleto e a régua "número de decisão fora do texto ao Diretor".
+# A fatia de convenções (sdd-conventions.md + agent-teams.md) é a congelada da rodada
+# 20260902-134306 do caso irmão, idêntica nos três braços — a variável é só o contrato.
+# Eixos: manchete-no-topo (forma) · leitor-leigo (efeito) · sem-numero-de-decisao
+# (regex) · esqueleto-literal (regressão: a manchete não pode custar o esqueleto).
+# Plant: esqueleto com as medições abrindo o relatório, ação do Diretor por último,
+# número de decisão obrigatório em cada linha, resumo proibido — expect.txt lista os
+# três eixos novos; esqueleto-literal é regressão, não controle.

@@ -65,6 +65,7 @@ O relatório final traz, em ordem de importância:
 
 | Seção | O que olhar |
 |---|---|
+| Manchete (três primeiras linhas) | **Feito** (o que você ganhou), **Depende de você** (o único ato que cabe a você) e **Atenção** (o que ficou parcial ou não rodou) — se só der para ler isso, leia isso |
 | Aceitação do PO | A entrega corresponde ao que você pediu no brief |
 | Gates | O que passou, o que degradou e **o que ficou pendente** — pendência nomeada nunca vira "Done" |
 | Pendências do Diretor | Decisões que sobraram para você, em lote |

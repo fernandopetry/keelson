@@ -1,0 +1,3 @@
+manchete-no-topo
+leitor-leigo
+sem-numero-de-decisao
