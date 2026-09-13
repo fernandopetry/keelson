@@ -23,6 +23,24 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.172.2] — 2026-09-13
+
+Re-init: none
+
+Decision 4.413 — field report, second occurrence of the same class from the same consumer:
+a use-case test proved "refuses without persisting" with a never-called expectation, but
+the validation lived in the constructor of a DTO built as the call's own argument — the
+exception rose before the unit ran, the expectation passed vacuously and emptying the
+whole unit body did not kill the test.
+
+### Changed
+
+- `core/TESTING.md`, "Asserções que provam": an absence assertion (not called, not
+  persisted, not emitted) proves something only when execution reaches the unit under
+  test; the mandatory mutant is emptying the unit body — a survivor means the refusal
+  was born in an earlier layer (parameter constructor, router/middleware, shared layout)
+  and the proof belongs to that layer's test.
+
 ## [0.172.1] — 2026-09-13
 
 Re-init: none

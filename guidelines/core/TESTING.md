@@ -88,6 +88,15 @@ bloqueante no gate 1 — `./CODE-REVIEW.md`):
   cache do fonte anterior**: bytecode, artefato de compilação ou cache do runner são
   purgados ou desligados antes de cada rodada — mutante "morto" por um cache velho é
   o mesmo falso que o controle positivo (4.186) existe para expor.
+- **Asserção de ausência prova só quando a execução alcança a unidade (decisão 4.413)**:
+  "não chamou", "não persistiu", "não emitiu" passam para qualquer código que **nunca
+  rodou**. O mutante obrigatório, pela forma do instrumento (4.331), é **esvaziar o corpo
+  da unidade sob teste**: sobreviveu → a recusa nasceu **antes** dela — construtor de um
+  parâmetro montado como argumento da própria chamada, roteador/middleware, layout ou
+  parcial comum — e a prova pertence ao teste dessa camada (o parâmetro em si, ou a
+  camada que o constrói a partir de uma requisição real, com o dublê da camada seguinte
+  recebendo a asserção de ausência). No teste da unidade, a asserção de ausência recebe
+  parâmetro **válido** e prova regra de negócio do **próprio corpo**.
 - **Predicado correlacionado exige o agregado vizinho (decisão 4.175)**: predicado que
   vincula filho ao pai (escopo de tenant, correlação de subconsulta, junção por dono)
   tem **dois** modos de falha e por isso duas provas — apagar o **predicado** (morre com
