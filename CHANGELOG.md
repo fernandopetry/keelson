@@ -23,6 +23,23 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.172.1] — 2026-09-13
+
+Re-init: none
+
+Decision 4.412 — field report: on the SPEC amendment route a revoked scenario survived in
+two ACs and two gate-9 lines that the PO's correction table did not list; the scribe
+followed the table to the letter and a second review round was needed. The route was
+added after the condition-not-address ruler and never cited it.
+
+### Changed
+
+- `/keelson:auto` amendment route (step 2): the correction package is derived by sweeping
+  the whole SPEC for the condition that changes (every occurrence classified), with the
+  PO's table as a non-exhaustive illustration; gate-9 verification lines of a FEAT whose
+  AC changed are reopened or re-dated; the mechanical revalidation branch (`artifact-lint`
+  + `graph.sh --check`) closes the ID-anchored orphans.
+
 ## [0.172.0] — 2026-09-11
 
 Re-init: none
