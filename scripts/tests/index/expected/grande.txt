@@ -1,0 +1,1 @@
+INFO	index-tamanho-teto	INDEX.md com 66 KB (teto 64 KB - index-contract.md): rotacione o historico e feche riscos

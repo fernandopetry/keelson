@@ -320,6 +320,7 @@ Todo comando que **cria** um INDEX (`/keelson:specify` na 1ª SPEC, `/keelson:re
 **Slug**: <slug>
 **Última atualização**: <ISO 8601 com timezone>
 **Mapa do território**: MAP.md <!-- linha opcional — só quando {docsRoot}/<slug>/MAP.md existe (decisão 4.104; contrato: map-contract.md); quem cria o MAP acrescenta a linha -->
+**Histórico arquivado**: HISTORY.md <!-- linha opcional — só quando {docsRoot}/<slug>/HISTORY.md existe (decisão 4.414; contrato abaixo); quem faz a primeira rotação acrescenta a linha -->
 
 ## Resumo
 <2 a 3 linhas derivadas dos outcomes das SPECs — ou do legado, na migração>
@@ -387,8 +388,33 @@ Todo comando que **atualiza** um INDEX existente aplica — mesclando, nunca sob
 
 1. Atualizar `Última atualização`.
 2. Refletir o artefato na tabela correspondente (SPECs/PLANs — contrato acima) e nas seções que ele afeta: capacidades (movendo entre "Especificadas" → "Em desenvolvimento" → "Implementadas" conforme o ciclo; por FEAT quando a SPEC as declara), glossário (termo já existente com definição diferente → **parar e reportar conflito**), decisões irreversíveis, riscos ativos.
-3. Adicionar entrada ao "Histórico recente" com timestamp e ação — **máximo 10 entradas**. O timestamp é **medido no momento do evento** (`TZ=America/Sao_Paulo date +%Y-%m-%d\ %H:%M` ao escrever a entrada, ou a marca já medida da `Cronologia`/ledger desta execução — régua da 4.200/4.216); entrada reconstruída de memória sai **sem hora** (`YYYY-MM-DD`), nunca com hora inventada.
-4. **Conferir com o checker** (decisão 4.151): `${CLAUDE_PLUGIN_ROOT}/scripts/index-check.sh <dir-do-slug>` — irmão do `map-check.sh`, saída no formato do `graph.sh`, catálogo sem ERROR (o INDEX é derivado; divergência se corrige regenerando). Checks: `index-ausente` · `index-secao-ausente` · `index-spec-fantasma`/`-fora` · `index-plan-fantasma`/`-fora` · `index-tasks-cell` (célula `X/Y M` vs TASKs reais) · `index-status-verbatim` (coluna vs arquivo, exceção `Done (sugerido)`) · `index-capacidade-adiantada` (capacidade em "Implementadas" com TASK aberta) · `index-historico-teto` (INFO, >10). Achado é fato a corrigir na mesma edição; suíte em `scripts/tests/index/`.
+3. Adicionar entrada ao "Histórico recente" com timestamp e ação — **máximo 10 entradas**: a entrada que excede o teto **sai do INDEX** e é anexada ao `HISTORY.md` do slug (rotação — contrato abaixo, decisão 4.414); o INDEX **nunca** carrega seção de arquivo do histórico (`## Arquivo do histórico` ou similar) — quem encontra uma move o conteúdo para o `HISTORY.md` na mesma edição (`index-historico-arquivo-interno` acusa). O timestamp é **medido no momento do evento** (`TZ=America/Sao_Paulo date +%Y-%m-%d\ %H:%M` ao escrever a entrada, ou a marca já medida da `Cronologia`/ledger desta execução — régua da 4.200/4.216); entrada reconstruída de memória sai **sem hora** (`YYYY-MM-DD`), nunca com hora inventada.
+4. **Conferir com o checker** (decisão 4.151): `${CLAUDE_PLUGIN_ROOT}/scripts/index-check.sh <dir-do-slug>` — irmão do `map-check.sh`, saída no formato do `graph.sh`, catálogo sem ERROR (o INDEX é derivado; divergência se corrige regenerando). Checks: `index-ausente` · `index-secao-ausente` · `index-spec-fantasma`/`-fora` · `index-plan-fantasma`/`-fora` · `index-tasks-cell` (célula `X/Y M` vs TASKs reais) · `index-status-verbatim` (coluna vs arquivo, exceção `Done (sugerido)`) · `index-capacidade-adiantada` (capacidade em "Implementadas" com TASK aberta) · `index-historico-teto` (INFO, >10) · `index-historico-arquivo-interno` (INFO, seção de arquivo dentro do INDEX) · `index-riscos-teto` (INFO, >20 linhas de risco — risco fechado sai da seção, com a linha de fecho no histórico) · `index-tamanho-teto` (INFO, >64 KB — decisão 4.414: comandos leem o INDEX inteiro, e tamanho é custo de janela em toda sessão do slug). Achado é fato a corrigir na mesma edição; suíte em `scripts/tests/index/`.
+
+### HISTORY.md — arquivo do histórico do slug (decisão 4.414)
+
+`{docsRoot}/<slug>/HISTORY.md` recebe o que sai do "Histórico recente" pela rotação do item 3.
+**Natureza**: registro (log), nunca fonte de regra — a régua da 4.179 continua: pendência,
+risco ou decisão cuja única morada seja o histórico (recente ou arquivado) não existe; o
+artefato-fonte carrega o registro e o histórico só narra. Por isso o arquivo **não é derivado
+nem derivável**: o `/keelson:rebuild-index` não o lê, não o reescreve e não o apaga.
+
+Esqueleto (criado na primeira rotação por quem rotaciona):
+
+```markdown
+# Histórico — <slug>
+
+> Arquivo do "Histórico recente" do INDEX.md (rotação do index-contract.md). Append-only,
+> sem teto; mais antigo primeiro. Não é fonte de regra — o que importa mora no artefato.
+
+- <YYYY-MM-DD HH:MM>: <ação> via /keelson:<comando>
+```
+
+Regras: a entrada rotacionada é **anexada ao fim, verbatim** (formato idêntico ao do INDEX);
+nunca se edita, reordena ou resume entrada arquivada; a primeira rotação cria o arquivo e a
+linha `**Histórico arquivado**: HISTORY.md` no cabeçalho do INDEX. Quem precisa do histórico
+antigo (`/keelson:report`, `/keelson:status`, auditoria) lê o `HISTORY.md` sob demanda — os
+comandos do ciclo leem só o INDEX.
 
 ### Pendência e veredito de métrica (decisão 4.99)
 

@@ -261,6 +261,8 @@ PLAN sem SPEC), pergunta antes de prosseguir.
 
 > Achados de migração legada vêm do `legacy/TRIAGE-*.md`. **O que não estiver no TRIAGE se
 > perde no rebuild** — se você anotou algo direto no INDEX, mova para o TRIAGE antes.
+> O `HISTORY.md` do slug fica de fora: o rebuild não o lê nem o apaga, e se o INDEX antigo
+> tinha uma seção de arquivo do histórico, as entradas migram para lá antes da reconstrução.
 
 ### Um slug antigo não é reconhecido pelos comandos
 

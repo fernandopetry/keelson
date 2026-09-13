@@ -395,7 +395,10 @@ case "$MODE" in
       # basename literal (substring, como sempre) OU stem como palavra inteira — a
       # forma sem extensão é a majoritária nos INDEX de campo, e sem a fronteira de
       # palavra `add_col` casaria `add_col_v2` (4.383)
-      if grep -Fq "$base" "$INDEXF" 2>/dev/null || grep -Fqw "$stem" "$INDEXF" 2>/dev/null; then
+      # o HISTORY.md irmao do INDEX entra na prova: declaracao feita numa linha do
+      # historico que rotacionou para fora do INDEX continua declarada (4.414)
+      histf="$(dirname "$INDEXF")/HISTORY.md"
+      if grep -Fq "$base" "$INDEXF" "$histf" 2>/dev/null || grep -Fqw "$stem" "$INDEXF" "$histf" 2>/dev/null; then
         printf 'declarado\t%s\n' "$base"
       else
         printf 'pendente\t%s\n' "$base"

@@ -23,6 +23,38 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.173.0] — 2026-09-13
+
+Re-init: none
+
+Decision 4.414 — a Director's measurement: a `/keelson:auto` session opened at ~174k
+tokens before any work, and a quarter of what the plugin controls was the slug's
+`INDEX.md` (234 KB: a 74 KB history archive invented inside the file, 125 lines of
+"active" risks). The contract capped the recent history at 10 entries but never said
+where the 11th goes, and every cycle command reads the INDEX whole.
+
+### Added
+
+- `HISTORY.md` per slug (`index-contract.md`): the entry that exceeds the 10-entry cap of
+  "Histórico recente" leaves the INDEX and is appended verbatim to
+  `{docsRoot}/<slug>/HISTORY.md` — append-only, no cap, oldest first, created on the first
+  rotation together with the optional `**Histórico arquivado**: HISTORY.md` header line.
+  It is a log, never a rule source (4.179 still holds); `/keelson:rebuild-index` never
+  reads, rewrites or deletes it.
+- `index-check.sh`: three new INFO checks with fixtures — `index-historico-arquivo-interno`
+  (a history archive section inside the INDEX), `index-riscos-teto` ("Riscos ativos"
+  above 20 risk lines) and `index-tamanho-teto` (INDEX above 64 KB).
+
+### Changed
+
+- `/keelson:rebuild-index`: an archive section found in the old INDEX is appended to
+  `HISTORY.md` before regeneration and never recreated; the header line points at the
+  file when it exists.
+- `diff-facts --deploy-pending` also greps the sibling `HISTORY.md`: a deploy declaration
+  that rotated out of the INDEX is still declared.
+- Wiki: slug tree lists `HISTORY.md`; "Can I edit INDEX.md?" explains the rotation and the
+  three size signals; troubleshooting says the rebuild leaves `HISTORY.md` alone.
+
 ## [0.172.2] — 2026-09-13
 
 Re-init: none

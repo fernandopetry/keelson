@@ -343,7 +343,7 @@ Você não gerencia o MAP: o time o semeia, atualiza e consome sozinho. Se quise
 
 | Peça | Lugar |
 |---|---|
-| Artefatos da demanda | `<docsRoot>/<slug>/` — `briefs/`, `specs/`, `plans/`, `tasks/`, `INDEX.md`, `MAP.md` (opcional) |
+| Artefatos da demanda | `<docsRoot>/<slug>/` — `briefs/`, `specs/`, `plans/`, `tasks/`, `INDEX.md`, `MAP.md` (opcional), `HISTORY.md` (aparece quando o histórico do INDEX passa de 10 entradas) |
 | Configuração do projeto | `keelson.config.json` (versionado) |
 | Credenciais de ambiente local | `keelson.local.json` (**fora** do git) |
 | Rascunho de sessão, evidência efêmera | `thoughts/` (fora do git) |

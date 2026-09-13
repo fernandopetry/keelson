@@ -55,6 +55,12 @@ técnico. Tecnologia entra no PLAN — que é justamente onde alternativas são 
 
 Não. Ele é gerado pelos comandos e sobrescrito. Errado? `/keelson:rebuild-index <slug>`.
 
+O INDEX guarda só as 10 entradas mais recentes do histórico; as mais antigas vão para o
+`HISTORY.md` do mesmo slug, que é um registro append-only — o rebuild não o toca. Um INDEX
+grande custa contexto em toda sessão do slug: o `index-check.sh` avisa quando ele passa de
+64 KB, quando "Riscos ativos" passa de 20 linhas ou quando alguém arquivou o histórico dentro
+do próprio INDEX.
+
 ### O que é um "slug"?
 
 A área de demanda — o agrupador dos artefatos de um mesmo assunto, em

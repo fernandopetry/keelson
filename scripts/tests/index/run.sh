@@ -53,6 +53,7 @@ runcase valido    valido    0 valido.txt
 runcase defeitos  defeitos  0 defeitos.txt
 runcase sem-index sem-index 0 sem-index.txt
 runcase sem-historico sem-historico 0 sem-historico.txt
+runcase grande    grande    0 grande.txt
 
 # read-only: nenhuma fixture modificada pela execução
 total=$((total + 1))

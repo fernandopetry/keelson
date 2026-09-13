@@ -16,6 +16,9 @@
 #   index-status-verbatim  WARNING  coluna Status ≠ Status do PLAN (exceção: "Done (sugerido)")
 #   index-capacidade-adiantada WARNING  capacidade em "Implementadas" com TASKs abertas
 #   index-historico-teto   INFO     "Histórico recente" com mais de 10 entradas
+#   index-historico-arquivo-interno INFO  seção de arquivo do histórico dentro do INDEX (morada é HISTORY.md)
+#   index-riscos-teto      INFO     "Riscos ativos" com mais de 20 linhas de risco
+#   index-tamanho-teto     INFO     INDEX.md acima de 64 KB (o INDEX é lido inteiro pelos comandos)
 # Exit: 0 normal · 2 uso incorreto.
 #
 # Princípios (irmãos do graph.sh/map-check.sh, 4.82/4.104): read-only; bash 3.2 +
@@ -83,7 +86,8 @@ for f in "$dir"/tasks/TASK-*.md; do
 done
 
 # ---- INDEX (awk extrai) + fatos → achados ----
-awk '
+idxsize="$(wc -c < "$idx" | tr -d ' ')"
+awk -v idxsize="$idxsize" '
   function trim(s) { sub(/^[ \t]+/, "", s); sub(/[ \t]+$/, "", s); return s }
   function cell(line, i,   n, c) { n = split(line, c, "|"); if (i + 1 > n) return ""; return trim(c[i + 1]) }
   function finding(sev, chk, det) { print sev "\t" chk "\t" det }
@@ -102,7 +106,12 @@ awk '
   { sub(/\r$/, ""); if (FNR == 1 && index($0, "\357\273\277") == 1) $0 = substr($0, 4) }
 
   # ---------- fase 2: INDEX.md ----------
-  /^## /  { sec = trim(substr($0, 4)); subsec = ""; seen[sec] = 1; next }
+  /^## /  {
+    sec = trim(substr($0, 4)); subsec = ""; seen[sec] = 1
+    # arquivo do historico dentro do INDEX: a morada e o HISTORY.md (index-contract.md)
+    if (sec ~ /^Arquivo do [Hh]ist/ || (sec ~ /[Aa]rquiv/ && sec ~ /[Hh]ist/)) arqint = FNR
+    next
+  }
   /^### / { subsec = trim(substr($0, 5)); next }
 
   sec == "SPECs" && /^\|/ {
@@ -129,6 +138,12 @@ awk '
   }
   sec == "Historico recente" || sec ~ /^Hist/ {
     if ($0 ~ /^- /) hist++
+    next
+  }
+  sec == "Riscos ativos" {
+    # linha de risco = bullet ou linha de corpo da tabela (header e separador nao contam)
+    if ($0 ~ /^- /) risc++
+    else if ($0 ~ /^\|/ && $0 !~ /^\|[ \t:|-]*$/) { rrows++; if (rrows > 1) risc++ }
     next
   }
 
@@ -194,6 +209,12 @@ awk '
 
     if (hist > 10)
       finding("INFO", "index-historico-teto", "\"Historico recente\" com " hist " entradas (teto 10 - index-contract.md)")
+    if (arqint)
+      finding("INFO", "index-historico-arquivo-interno", "linha " arqint ": secao de arquivo do historico dentro do INDEX - mova as entradas para HISTORY.md (index-contract.md)")
+    if (risc > 20)
+      finding("INFO", "index-riscos-teto", "\"Riscos ativos\" com " risc " linhas (teto 20 - index-contract.md): risco fechado sai da secao")
+    if (idxsize + 0 > 65536)
+      finding("INFO", "index-tamanho-teto", "INDEX.md com " int((idxsize + 0) / 1024) " KB (teto 64 KB - index-contract.md): rotacione o historico e feche riscos")
   }
 ' "$FACTS" "$idx" | sort
 

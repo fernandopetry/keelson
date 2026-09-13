@@ -150,6 +150,19 @@ got="$(bash "$DF" --repo "$R" --base main --deploy-pending "$TMP/INDEX-sem-ext.m
 assert deploy-stem-sem-extensao 0 "declarado	2026_08_06_add_col.sql
 declarado	2026_08_07_add_index.sql" "$got" "$st"
 
+# deploy-pending 4.414: declaração que rotacionou para o HISTORY.md irmão do INDEX continua declarada
+mkdir -p "$TMP/slug-hist"
+cat > "$TMP/slug-hist/INDEX.md" <<'EOF2'
+## Riscos ativos
+Aplicar 2026_08_07_add_index.sql.
+EOF2
+cat > "$TMP/slug-hist/HISTORY.md" <<'EOF2'
+- 2026-08-06 10:00: migração 2026_08_06_add_col.sql aplicada em staging via /keelson:implement
+EOF2
+got="$(bash "$DF" --repo "$R" --base main --deploy-pending "$TMP/slug-hist/INDEX.md" 2>/dev/null)"; st=$?
+assert deploy-history-irmao 0 "declarado	2026_08_06_add_col.sql
+declarado	2026_08_07_add_index.sql" "$got" "$st"
+
 # deploy-pending 4.383: stem é fronteira de palavra — sufixo `_v2`/`_old` NÃO declara
 cat > "$TMP/INDEX-sufixo.md" <<'EOF'
 ## Riscos ativos

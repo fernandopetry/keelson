@@ -366,7 +366,7 @@ EOF
   # sobe), nenhuma SPEC nova, INDEX registra a emenda; a rota formal (SPEC-003) é o que se mede como custo
   fato "broken/emenda-sem-spec-nova"   '[ "$(find "$CONSUMER/docs" -path "*/specs/SPEC-*.md" | sort | tr "\n" " ")" = "$specs_antes" ]'
   fato "broken/emenda-versao-da-spec-subiu" '[ -n "$spec1" ] && [ "$(grep -m1 "^\*\*Versão\*\*" "$spec1")" != "$versao_antes" ]'
-  fato "broken/emenda-registrada-no-index" 'grep -rqiE "emenda" "$CONSUMER"/docs/*/INDEX.md'
+  fato "broken/emenda-registrada-no-index" 'grep -rqiE "emenda" "$CONSUMER"/docs/*/INDEX.md "$CONSUMER"/docs/*/HISTORY.md 2>/dev/null'
 }
 
 # ------------------------------------------------------------ triage
@@ -375,7 +375,7 @@ cen_triage() {
   antes="$(G rev-parse HEAD)"
   roda triage "/keelson:triage \"permitir que history() receba um filtro opcional por operação (ex.: history(op='add')) e devolva só as entradas daquela operação\". Esta sessão não tem humano interativo: classifique, proponha a rota e pare — não execute o comando proposto."
   echo "### fatos: triage" >> "$SUM"
-  fato "triage/linha-no-index"          'grep -qiE "/keelson:triage classificou" "$SD/INDEX.md"'
+  fato "triage/linha-no-index"          'grep -qiE "/keelson:triage classificou" "$SD/INDEX.md" "$SD/HISTORY.md" 2>/dev/null'
   fato "triage/resposta-nomeia-categoria" 'grep -qiE "categoria|classific" "$RESULTS/triage.result.txt"'
   fato "triage/resposta-propoe-rota"    'grep -qE "/keelson:(specify|plan|tasks|auto|brief|specify-epic)|emenda|trivial" "$RESULTS/triage.result.txt"'
   fato "triage/nao-executa"             '[ "$(G rev-parse HEAD)" = "$antes" ] && [ -z "$(G status --porcelain -- src tests "$SD/specs" "$SD/plans" "$SD/tasks" 2>/dev/null)" ]'
