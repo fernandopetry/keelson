@@ -4195,3 +4195,19 @@ Estas decisões nasceram na afinação do fluxo spec-driven do projeto que deu o
 
 **Aplicação**: `hooks/largada-guard.sh` (negação de refs + filtro da mensagem) · `scripts/tests/largada-guard/run.sh` (5 fixtures: empilhada silencia com largada, empilhada acusa só esta branch, mensagem só do slug acusado, ref descendente e tracking próprio não silenciam — 3 vermelhas com o hook anterior) · `commands/tasks.md` (Etapa 3, uma frase). Fila: LRN-018 e LRN-020 → aplicada; demais fechadas na mesma leva. Pouso das adiadas na própria linha da fila.
 
+### 4.416 — O developer não edita o Status da TASK: o despacho marcado no ledger é o sinal de "em voo" (LRN-021 da fila)
+
+**Problema**: `agents/developer.md` se contradizia — o passo 3 mandava escrever `**Status**: In Progress` no arquivo da TASK e o passo 7 (4.120) proibia commitar esse arquivo em qualquer estado. A edição ficava órfã no working tree compartilhado; em wave sequencial na mesma árvore o Tech Lead a descartou à mão duas vezes, e no retry o developer a refez. A closure da main session escreve `Done` direto (implement.md, closure item 1), então o `In Progress` nunca chegou a um commit. Leitores enumerados por grep: reconciliação Jira (`jira-sync.md`, §9 do protocolo — lê o artefato, que nunca carrega o valor), inventário do `/keelson:pause` (a Tech Lead tem a lista de despachos) e o alerta da retomada do `/keelson:implement` 0.5 ("In Progress sem retomada") — sinal que o run-state (4.348) e a marca do despacho no ledger (4.379) já carregam mecanicamente. Nenhum leitor depende da edição.
+
+**Decisão**: o passo 3 do developer vira **só a medição do instante** (`data_inicio`, 4.200/4.347); o developer **não edita o arquivo da TASK** em estado nenhum. O enum `In Progress` continua válido no lint e no grafo (artefato legado, edição humana) e a prosa dos gates ("devolve a task para In Progress") segue como estado lógico do retry. Poda com prova (régua do Diretor: instrução no-op não existe, mas corte só com verificação) — a prova é a enumeração dos leitores acima, não eval.
+
+**Aplicação**: `agents/developer.md` (passo 3 renomeado; nota do modo revisão avulsa). Fila: LRN-021 → aplicada.
+
+### 4.417 — A base da branch da demanda é decisão do Diretor quando o HEAD da largada não está na default (achado de contrato do PM 0.172.2)
+
+**Problema**: o auto cria `feat/<slug>-…` na largada (4.119) a partir de onde o HEAD estiver, sem perguntar. Num consumidor, a largada aconteceu sobre a branch de um ciclo anterior ainda não mesclado; o empilhamento não era fatia de épico com estratégia `unica` (4.126), foi acidente de posição. Custo medido no postmortem: âncora do diff de não-regressão furada (merge-base anterior à criação do arquivo — LRN-015, adiada), falso positivo do `largada-guard` (LRN-020, corrigido na 4.415) e base manual em diff-facts, convergência e composição do diff.
+
+**Decisão**: a base da branch da demanda é a branch default. HEAD noutra branch de trabalho **sem** estratégia `unica` declarada → o auto **pergunta** ao Diretor antes de criar a branch (proposta: partir da `main`; alternativa: empilhar, com o custo nomeado) e registra a escolha no report. É exceção legítima ao "segue sem esperar": ação com efeito estrutural na branch, irreversível sem retrabalho, no único momento em que o Diretor ainda está presente (mesma janela do sync de largada da 4.126).
+
+**Aplicação**: `commands/auto.md` (Etapa 0.5, item 7). Fila: achado de contrato → aplicada.
+

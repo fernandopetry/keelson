@@ -23,6 +23,29 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.173.2] — 2026-09-14
+
+Re-init: none
+
+Decisions 4.416 and 4.417 — the two cheap follow-ups of the same consumer postmortem
+(0.172.2), applied on the Director's order: the developer agent contradicted itself
+(step 3 wrote `In Progress` into the TASK file, step 7 forbade committing it — the edit
+sat orphaned in the shared tree and was discarded by hand twice), and the demand branch
+had been created on top of an unmerged previous cycle without anyone being asked.
+
+### Changed
+
+- `agents/developer.md`: step 3 only measures the start instant — the developer never
+  edits the TASK file, in any state; the dispatch mark in the ledger and the run-state
+  already say what is in flight, and closure writes `Done` directly. No reader depended
+  on the working-tree `In Progress` (Jira reconciliation reads the artifact, pause has
+  the dispatch list, implement's resume alert is carried by the run-state).
+- `commands/auto.md`, start item 7: the demand branch is based on the default branch;
+  when HEAD is on another working branch and no `unica` epic strategy is declared, the
+  auto asks the Director for the base before creating the branch (proposal: start from
+  `main`; alternative: stack, with the named cost) and records the choice in the report.
+
+
 ## [0.173.1] — 2026-09-14
 
 Re-init: none

@@ -29,7 +29,7 @@ Você é um Software Engineer focado em **implementar uma única TASK** com qual
 
 **Modo revisão avulsa** (`/keelson:review`): o briefing traz **achados de revisão** em vez de
 TASK/PLAN/SPEC — cada achado é um critério de pronto (deixa de existir sem quebrar teste).
-Não há arquivo de TASK: **pule a etapa 3** (não há Status a atualizar) e **pule a etapa 7**
+Não há arquivo de TASK: **pule a etapa 3** (não há `data_inicio` a reportar) e **pule a etapa 7**
 (**nenhum commit** — o commit é do humano). A etapa 2 (baseline) **não se pula**: o
 briefing de correção nasce de uma base que já rodou testes — capture o estado antes de
 mexer. "Escopo > Inclui" = exatamente os arquivos dos
@@ -70,15 +70,14 @@ exercita"`). Manifesto, fixture ou config de runtime **não** são inertes; na d
 o teste vermelho, flag de "passa sem testes", skip/deleção do teste, ou entregar sem
 rodar — cada um é a mesma violação de gate do furo silencioso (decisão 4.38).
 
-### 3. Atualizar Status para In Progress
+### 3. Medir o instante de início
 
-Antes de codar, atualizar o arquivo da TASK — só o Status:
+**Não edite o arquivo da TASK** — nem o Status (decisão 4.416): a marca do despacho no
+ledger (4.379) e o run-state já dizem o que está em voo, e o `.md` nunca entra no seu
+commit (passo 7) — um `In Progress` no working tree só vira sujeira que o Tech Lead
+descarta à mão antes do próximo despacho na mesma árvore. A closure escreve `Done` direto.
 
-```markdown
-**Status**: In Progress
-```
-
-E **medir o instante** (`TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z`) para o campo
+**Medir o instante** (`TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z`) para o campo
 `data_inicio` do report (passo 8) — **nunca escrever `Data início` no cabeçalho** (decisão
 4.347): o campo tem dono único no "## Histórico de execução" do template, preenchido pela
 main session na closure com a marca do despacho (4.308); linha no cabeçalho duplica o campo
