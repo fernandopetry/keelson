@@ -12,8 +12,10 @@
 #           histórico (já na main) · TASK-INDEX/INDEX/briefs/handoffs não são sinal ·
 #           arquivo fora de docsRoot · rota pontual (só código) · run-state/ledger de OUTRA
 #           sessão contam (4.395 — posse é do wave-guard) · run-state de OUTRO slug não
-#           cobre este · sem ficha · sem git · stop_hook_active · anti-renudge (mesmo
-#           conjunto → silêncio; artefato novo → cutuca de novo) · JSON inválido.
+#           cobre este · branch EMPILHADA sobre ciclo-pai não mesclado (4.415: nega as
+#           demais refs; ref descendente e tracking próprio não silenciam; a mensagem lista
+#           só os artefatos do slug acusado) · sem ficha · sem git · stop_hook_active ·
+#           anti-renudge (mesmo conjunto → silêncio; artefato novo → cutuca de novo) · JSON inválido.
 #
 # Uso: scripts/tests/largada-guard/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -123,6 +125,43 @@ caso derivados-e-briefs-nao-sao-sinal-allow allow
 novo_repo; mkdir -p "$PROJ/outro/pagamentos/specs"; spec "$PROJ/outro/pagamentos/specs/SPEC-001-x.md"; caso fora-de-docsroot-allow allow
 novo_repo; printf 'b\n' >> "$PROJ/src/a.py"; caso rota-pontual-so-codigo-allow allow
 novo_repo; caso arvore-limpa-allow allow
+
+# --- branch empilhada (4.415): o ciclo-pai não mesclado não é "desta branch" ---
+# feat/pai carrega a SPEC de `identidade` sem largada em casa nenhuma; feat/pagamentos
+# nasce sobre feat/pai com run-state aberto só para pagamentos → silêncio.
+novo_repo; git -C "$PROJ" checkout -q -b feat/pai; mkdir -p "$PROJ/docs/identidade/specs"
+printf '# SPEC\n\n**Slug**: identidade\n' > "$PROJ/docs/identidade/specs/SPEC-001-id.md"; commit spec-do-pai
+git -C "$PROJ" checkout -q -B feat/pagamentos; spec "$PROJ/docs/pagamentos/specs/SPEC-001-x.md"; commit spec-filha
+S "$SC/run-state.sh" "$PROJ" open pagamentos "largada" >/dev/null 2>&1
+caso branch-empilhada-nao-herda-ciclo-pai-allow allow
+# sem largada nenhuma, a acusação nomeia SÓ o slug desta branch e SÓ os artefatos dele
+novo_repo; git -C "$PROJ" checkout -q -b feat/pai; mkdir -p "$PROJ/docs/identidade/specs"
+printf '# SPEC\n\n**Slug**: identidade\n' > "$PROJ/docs/identidade/specs/SPEC-001-id.md"; commit spec-do-pai
+git -C "$PROJ" checkout -q -B feat/pagamentos; spec "$PROJ/docs/pagamentos/specs/SPEC-001-x.md"; commit spec-filha
+total=$((total + 1))
+r="$(bash "$HOOK" 2>/dev/null <<< "$(payload)" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("reason",""))' 2>/dev/null)"
+case "$r" in
+  *"— pagamentos"*"docs/pagamentos/specs/SPEC-001-x.md"*) case "$r" in *identidade*) echo "FAIL branch-empilhada-acusa-so-esta-branch: cita identidade: $r"; fail=$((fail + 1)) ;; *) echo "ok   branch-empilhada-acusa-so-esta-branch" ;; esac ;;
+  *) echo "FAIL branch-empilhada-acusa-so-esta-branch: $r"; fail=$((fail + 1)) ;;
+esac
+# mensagem lista só os artefatos do slug acusado (dois slugs na branch, um com largada)
+novo_repo; spec "$PROJ/docs/pagamentos/specs/SPEC-001-x.md"; spec "$PROJ/docs/cobranca/tasks/TASK-001-001-y.md"
+S "$SC/run-state.sh" "$PROJ" open cobranca "largada" >/dev/null 2>&1
+total=$((total + 1))
+r="$(bash "$HOOK" 2>/dev/null <<< "$(payload)" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("reason",""))' 2>/dev/null)"
+case "$r" in
+  *"docs/cobranca/"*) echo "FAIL artefatos-so-do-slug-acusado: lista cobranca: $r"; fail=$((fail + 1)) ;;
+  *"— pagamentos"*"docs/pagamentos/specs/SPEC-001-x.md"*) echo "ok   artefatos-so-do-slug-acusado" ;;
+  *) echo "FAIL artefatos-so-do-slug-acusado: $r"; fail=$((fail + 1)) ;;
+esac
+# ref que DESCENDE de HEAD (worktree de wave, 4.334) e tracking remoto da própria branch não
+# apagam o universo: a SPEC commitada nesta branch continua acusada
+novo_repo; spec "$PROJ/docs/pagamentos/specs/SPEC-001-x.md"; commit spec-na-branch
+git -C "$PROJ" branch -q feat/pagamentos-wave-1; git -C "$PROJ" checkout -q feat/pagamentos-wave-1; printf 'w\n' >> "$PROJ/src/a.py"; commit wave; git -C "$PROJ" checkout -q feat/pagamentos
+caso ref-descendente-nao-silencia-block block
+novo_repo; spec "$PROJ/docs/pagamentos/specs/SPEC-001-x.md"; commit spec-na-branch
+git -C "$PROJ" update-ref refs/remotes/origin/feat/pagamentos HEAD
+caso tracking-remoto-proprio-nao-silencia-block block
 
 # --- anti-renudge ---
 novo_repo; spec "$PROJ/docs/pagamentos/specs/SPEC-001-x.md"

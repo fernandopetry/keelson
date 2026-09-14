@@ -11,8 +11,9 @@
 #
 # Sinal (todos ao mesmo tempo):
 #   1. artefato SDD (specs/SPEC-*, plans/PLAN-*, tasks/TASK-* sob <docsRoot>/<slug>/) criado
-#      ou alterado NESTA BRANCH — working tree + diff contra a base (main/origin/main),
-#      nunca o passivo histórico já mergeado;
+#      ou alterado NESTA BRANCH — working tree + commits que só esta branch tem (nega as
+#      demais refs; fallback merge-base com main), nunca o passivo histórico já mergeado
+#      nem o ciclo-pai de uma branch empilhada (4.415);
 #   2. NENHUM run-state para o slug em NENHUMA casa de sessão nem no caminho legado — de
 #      qualquer status: o auto abre na largada (open) e só remove depois do push;
 #   3. NENHUM evento de ledger (ativo ou arquivado em reported-*/, qualquer casa ou
@@ -49,12 +50,38 @@ fi
 docs_root="${docs_root%/}"
 
 # --- 1. artefatos SDD tocados nesta branch ---
-base="$(git -C "$cwd" merge-base HEAD origin/main 2>/dev/null || git -C "$cwd" merge-base HEAD main 2>/dev/null || true)"
+# "Nesta branch" = o que SÓ esta branch tem: negam-se as demais refs locais e remotas
+# (4.415 — branch empilhada sobre a de um ciclo anterior ainda não mesclado herdava, via
+# merge-base com a main, os artefatos do ciclo-pai e acusava o slug alheio). Ficam fora da
+# negação a própria branch (local e tracking) e toda ref que DESCENDE de HEAD (worktree de
+# wave, 4.334) — negá-la apagaria o universo inteiro. Sem outra
+# ref, cai no merge-base com main.
+cur="$(git -C "$cwd" symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+head_sha="$(git -C "$cwd" rev-parse HEAD 2>/dev/null || true)"
+outras=""
+for ref in $(git -C "$cwd" for-each-ref --format='%(refname)' refs/heads refs/remotes 2>/dev/null); do
+  case "$ref" in refs/remotes/*/HEAD) continue ;; esac
+  if [ -n "$cur" ]; then
+    [ "$ref" = "refs/heads/$cur" ] && continue
+    case "$ref" in refs/remotes/*/"$cur") continue ;; esac
+  fi
+  # descendente ESTRITO de HEAD fica fora; ref no mesmo commit (branch recém-criada da
+  # main) entra — nada aqui é só desta branch ainda
+  if [ "$(git -C "$cwd" rev-parse "$ref" 2>/dev/null)" != "$head_sha" ] \
+     && git -C "$cwd" merge-base --is-ancestor HEAD "$ref" 2>/dev/null; then continue; fi
+  outras="$outras $ref"
+done
 tocados="$(
   {
     git -C "$cwd" status --porcelain -uall 2>/dev/null | sed 's/^...//; s/^.* -> //' || true
-    if [ -n "$base" ]; then git -C "$cwd" diff --name-only "$base"...HEAD 2>/dev/null || true; fi
-  } | sed 's/^"//; s/"$//' | sort -u \
+    if [ -n "$outras" ]; then
+      # shellcheck disable=SC2086
+      git -C "$cwd" log --name-only --pretty=format: HEAD --not $outras -- 2>/dev/null || true
+    else
+      base="$(git -C "$cwd" merge-base HEAD origin/main 2>/dev/null || git -C "$cwd" merge-base HEAD main 2>/dev/null || true)"
+      if [ -n "$base" ]; then git -C "$cwd" diff --name-only "$base"...HEAD 2>/dev/null || true; fi
+    fi
+  } | sed '/^$/d; s/^"//; s/"$//' | sort -u \
     | grep -E "^$docs_root/[^/]+/(specs/SPEC-|plans/PLAN-|tasks/TASK-)[^/]*\.md$" \
     | grep -v -- '-INDEX\.md$' || true
 )"
@@ -114,7 +141,17 @@ if [ -n "$git_dir" ]; then
 fi
 
 lista="$(printf '%s' "$sem_largada" | sed '/^$/d; s/^/    — /')"
-arqs="$(printf '%s\n' "$tocados" | sed 's/^/    — /' | head -12)"
+# só os artefatos dos slugs acusados (4.415 — a lista inteira induzia a registrar largada
+# para slug que a sessão nunca conduziu)
+arqs="$(
+  while IFS= read -r s; do
+    [ -n "$s" ] || continue
+    printf '%s\n' "$tocados" | grep "^$docs_root/$s/" || true
+  done <<EOF2
+$sem_largada
+EOF2
+)"
+arqs="$(printf '%s\n' "$arqs" | sed '/^$/d; s/^/    — /' | head -12)"
 reason="largada-guard (keelson, decisão 4.391): há artefato SDD criado/alterado NESTA branch, mas nenhuma largada registrada nesta sessão para o slug — sem run-state (run-state.sh open, decisão 4.348) e sem nenhum evento no ledger da sessão (decisão 4.76).
 
 Slug(s) sem largada:

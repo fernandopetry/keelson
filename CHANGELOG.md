@@ -23,6 +23,31 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.173.1] — 2026-09-14
+
+Re-init: none
+
+Decision 4.415 — field report (consumer postmortem, plugin 0.172.2): the demand branch was
+stacked on a previous cycle's branch not yet merged into main, and the Stop guard for
+"formal cycle without a recorded start" accused the *parent* cycle's slug while listing
+the current slug's files under it; in the same cycle a mutation criterion was written
+against the real file, the harness blocked the destructive edit and the proof degraded
+to a fixture.
+
+### Fixed
+
+- `hooks/largada-guard.sh`: "touched in this branch" now means what only this branch
+  has (`git log HEAD --not <every other local/remote ref>`, excluding the branch's own
+  refs and strict descendants of HEAD such as wave worktrees; falls back to the
+  merge-base with main when no other ref exists) — a stacked branch no longer inherits
+  the parent cycle's artifacts; the block message lists only the artifacts of the
+  accused slug(s). Five new fixtures in `scripts/tests/largada-guard/run.sh`, three of
+  them red against the previous hook.
+- `commands/tasks.md`, "resiste a contorno": a mutant the criterion applies to the real
+  file is written pointing at `git worktree add` (decision 4.134 at the point of use) —
+  the main working tree is never edited destructively.
+
+
 ## [0.173.0] — 2026-09-13
 
 Re-init: none
