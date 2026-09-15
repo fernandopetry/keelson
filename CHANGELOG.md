@@ -23,6 +23,32 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.174.0] — 2026-09-14
+
+Re-init: none
+
+Decision 4.418 — the Director read a consumer's `git log` and could not tell which TASK
+each commit belonged to: the `Implementa TASK-…` reference lived only in the commit body
+(invisible in `--oneline`), and no rule at all shaped the message of a post-gate
+correction commit — the round's story lived in the session ledger, which is not
+versioned. Forged with `/idea-forge`; 4.119/4.120/4.416 stay untouched (the developer
+still never edits or commits the TASK file; closure stays its own commit).
+
+### Changed
+
+- `docs/_meta/conventions/commit-convention.md` (owner): in the formal cycle the TASK id
+  opens the commit description, right after the tracker keys (broadest → most specific):
+  `feat(<slug>): [PROJ-12 …] TASK-MMM-XXX <description>`. `type(scope):` keeps the first
+  position; FR/AC stay in the body. The closure commit already carried the id
+  (`chore(<slug>): close TASK-MMM-XXX`) — the developer's commit is now symmetric, so
+  `git log --oneline` reads per TASK without a script.
+- Same owner: a post-gate correction commit keeps the same header (type still derived by
+  the `fix` × `refactor` rule, never prescribed by the retry) and its body names the gate
+  and the finding it closes (`Corrige gate N (<name>): <finding in one line>`), taken from
+  the retry dispatch. No round number — the developer does not have it.
+- `agents/developer.md` §7 (literal blocks + retry pointer), `skills/_shared/jira-sync-protocol.md`
+  §15 (id after the keys), `commands/implement.md` §3.3 (retry points at the owner).
+
 ## [0.173.2] — 2026-09-14
 
 Re-init: none

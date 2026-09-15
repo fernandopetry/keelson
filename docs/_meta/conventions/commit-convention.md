@@ -8,7 +8,7 @@
 ## Forma
 
 ```
-<tipo>(<escopo>): <keys do tracker, se houver> <descrição>
+<tipo>(<escopo>): <keys do tracker, se houver> <ID da TASK, no ciclo> <descrição>
 
 <corpo opcional — o porquê, não o quê>
 
@@ -22,6 +22,12 @@ esta régua vale quando o projeto não declara outro.
 - **`<escopo>`** — a parte do sistema tocada (slug da demanda, módulo, app). Opcional, mas
   preferido quando o repo tem mais de uma área.
 - **keys do tracker** — abrem a descrição quando `jira.enabled` (§15 do protocolo de sync).
+- **ID da TASK** — no ciclo formal, o commit do developer carrega `TASK-MMM-XXX` na descrição,
+  logo depois das keys (do mais amplo ao mais específico — a TASK é o mais específico;
+  decisão 4.418): é o que faz `git log --oneline` dizer de qual TASK é cada commit, sem
+  abrir corpo nem artefato. O commit de closure já traz o ID (`chore(<slug>): close
+  TASK-MMM-XXX`, 4.119); o do developer passa a ser simétrico. Fora do ciclo (sem TASK)
+  não há ID a citar.
 - **`<descrição>`** — imperativa, minúscula, sem ponto final.
 
 ## Tipos (lista fechada)
@@ -99,4 +105,11 @@ decisão de engenharia do consumidor.
 - **Corpo**: o *porquê* e o que foi descartado no caminho. O *quê* já está no diff.
 - **Rodapés**: `BREAKING CHANGE:`, `Refs:`, `Co-Authored-By:`. Um por linha.
 - Referência a artefato SDD (`Implementa TASK-MMM-XXX, cobre FR-NNN-XXX, AC-NNN-XXX`) vive no
-  corpo — nunca na primeira linha, que pertence à descrição.
+  corpo; na primeira linha só o ID da TASK, no slot da descrição (acima) — FR e AC nunca.
+- **Commit de correção pós-gate** (decisão 4.418): mesmo cabeçalho (tipo derivado pela régua
+  `fix` × `refactor`, nunca prescrito pelo retry); o corpo cita **o gate e o achado** que a
+  correção fecha — `Corrige gate N (<nome>): <achado em uma linha>` — lidos do despacho do
+  retry, nunca reconstruídos de memória. É o único rastro durável da rodada: o ledger não é
+  versionado e a narrativa da correção fica no report (4.88), então quem lê o git depois só
+  sabe por que o commit existe se ele mesmo disser. Número da rodada não entra — o developer
+  não o possui (4.409).

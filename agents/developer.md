@@ -147,10 +147,15 @@ Padrão de commit do projeto (ver `CLAUDE.md`/ficha); na ausência de um declara
 (lista fechada), do escopo e da marca de quebra. **Commit por pathspec** (decisão 4.163 — dono: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`, "Commit por pathspec"): `git commit -m "<msg>" -- <arquivos da task>`, nunca `git add` seguido de `git commit` sem `--` (e nunca `git add -A`/`git add .`/`git add <diretório inteiro>`) — exceção única e estreita: hunks de duas TASKs no **mesmo arquivo**, onde a pathspec desfaz a seleção do `git add -p`; ali o commit sai **sem** pathspec com a dupla conferência do índice registrada no report (contrato no dono, decisão 4.283): o working tree **e o índice** são compartilhados com outras waves/tasks — o `--` garante que trabalho staged de outro agente não entre no seu commit nem polua o snapshot do reviewer. **Seu commit contém só o código e os testes que você autorou** — artefato SDD (`{docsRoot}/**`) **nunca** entra, em nenhum estado (untracked ou modificado), nem o `.md` da sua própria TASK (decisão 4.120): commits de artefato pertencem aos marcos do ciclo e à closure da main session (4.119) — o `.md` da sua TASK untracked no working tree é sintoma de marco não commitado, nunca convite para varrê-lo.
 
 ```
-feat(<slug>): <descrição curta>
+feat(<slug>): TASK-MMM-XXX <descrição curta>
 
 Implementa TASK-MMM-XXX, cobre FR-NNN-XXX, AC-NNN-XXX.
 ```
+
+O ID da TASK abre a descrição (decisão 4.418): é o que torna o `git log --oneline` legível
+por TASK. **No retry pós-gate**, o corpo cita o gate e o achado que o despacho lhe entregou
+(`Corrige gate N (<nome>): <achado em uma linha>`) — forma e motivo no dono acima
+("Commit de correção pós-gate").
 
 Tipo, escopo, marca de quebra e os efeitos de `commit.releaseAutomation` seguem o dono
 acima — não os re-derive. Na dúvida entre `feat` e `fix`, é o sinal **furo no plano**:
@@ -160,7 +165,7 @@ reporte ao Tech Lead em vez de escolher no escuro.
 específico — Epic, Story, sub-task —, **depois** do `tipo(escopo):` (decisão 4.79):
 
 ```
-feat(<slug>): PROJ-12 PROJ-34 PROJ-56 <descrição curta>
+feat(<slug>): PROJ-12 PROJ-34 PROJ-56 TASK-MMM-XXX <descrição curta>
 ```
 
 De onde tirar cada key, o fallback de ausência (nunca invente key, nunca espere o Jira

@@ -745,8 +745,11 @@ espaço — **depois** do prefixo do padrão de commit do projeto, que permanece
 posição:
 
 ```
-feat(<slug>): PROJ-12 PROJ-34 PROJ-56 <descrição curta>
+feat(<slug>): PROJ-12 PROJ-34 PROJ-56 TASK-MMM-XXX <descrição curta>
 ```
+
+O ID da TASK vem **depois** das keys, fechando a sequência do mais amplo ao mais específico
+(decisão 4.418 — dono: `commit-convention.md`, "ID da TASK").
 
 **Por que não antes do `feat(...)`** (revisão da 4.79 na mesma leva): o tracker casa a key em
 **qualquer posição** da mensagem — Smart Commits e o painel de desenvolvimento varrem o texto
