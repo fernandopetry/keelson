@@ -1,0 +1,3 @@
+transicoes-cobertas
+proibicoes-cobertas
+transicao-inventada

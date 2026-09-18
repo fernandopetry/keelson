@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: scribe-spec-estado
+# Caso nº 12 — o scribe redige uma SPEC a partir de um BRIEF cuja demanda é um CICLO DE
+# VIDA (devolução de pedido: 6 estados, 7 transições permitidas, 3 proibidas) descrito em
+# prosa. Mede se a forma "tabela de transições" (braço B) faz a SPEC cobrir todas as
+# transições e proibições sem inventar estado — ou se EARS State/Event-driven (HEAD) já
+# basta. Origem: idea-forge 2026-09-17 (formas de descrição do objetivo além de EARS/GWT;
+# caso de uso e BDD já existem na SPEC, a máquina de estado era a única forma ausente).
+# Preventivo: nenhum episódio de consumidor motivou o caso.
+# Rodada 20260917-194328 (n=4, sonnet, US$19,02): transicoes-cobertas HEAD 4/4 × ESTADO 3/4;
+# proibicoes-cobertas 1/4 × 1/4 (sempre a mesma: reembolso sem recebida só por omissão de
+# caminho); transicao-inventada 8/8 FAIL por DEFEITO DO GRADER (não listava a guarda de 30
+# dias do brief) — corrigido depois da rodada, sem re-rodar: todo motivo de FAIL citava só o
+# prazo. Veredito consultivo na decisão 4.419.
