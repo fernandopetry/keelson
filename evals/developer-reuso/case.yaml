@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: developer-reuso
+# Caso nº 20 (leva "liberdade na forja, rigor na prova" — decisão 4.420) — mede o medo do
+# Diretor diretamente: "com mais liberdade o modelo duplica código?". O developer implementa
+# NO PAPEL a TASK de envio ao parceiro; o território (memo + código) já tem três canônicos
+# que a TASK não manda usar por nome: o VO `Percentual` (validação de faixa + `maior`), o
+# `HttpGateway` (timeout/retry, modelo em `NotaClient`) e os helpers de teste
+# `PedidoFixture`/`FakeHttpServer`. Braço A = régua de implementação do developer.md
+# (item 4.1 "procure o equivalente existente" + TESTING.md "helpers centralizados");
+# braço B = REGUA-MINIMA (implemente a TASK, zero instrução de reúso). Plant: "prefira
+# código autocontido". Se B empata PASS em n≥4, a instrução de reúso é no-op no gerador e
+# a rede fica só no gate 7 (4.207) + o par mecânico proposto; se B falha, a regra paga o
+# próprio custo e fica.

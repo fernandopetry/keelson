@@ -1,0 +1,4 @@
+condicao-nao-instancia
+sink-com-assercao
+sem-contradicao-com-plan
+licao-no-comando

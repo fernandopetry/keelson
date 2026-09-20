@@ -1,0 +1,12 @@
+schema_version: "1.1"
+name: tech-lead-brief
+# Caso nº 15 (leva "liberdade na forja, rigor na prova" — decisão 4.420) — o Tech Lead
+# forja um BRIEF NO PAPEL a partir de um documento de produto, do memo do code-scout e do
+# INDEX, sem o Diretor na sala: pergunta que exigiria o Diretor vai para uma lista, nunca
+# se inventa. Primeiro instrumento sobre commands/brief.md (não havia). Mede os princípios
+# em prosa que o lint não cobre: "código responde antes de humano" (princípio 3 · 4.73),
+# métrica sem fonte vira pergunta obrigatória (4.99), pergunta que muda o resultado marcada
+# `[bloqueia-núcleo]` (4.100) e premissa com selo (4.96 — o único eixo mecânico).
+# Braços: HEAD (Etapas 1–4 do brief.md) × REGUA-MINIMA (só o formato do BRIEF, zero princípio).
+# Limite declarado: a forja real é entrevista interativa; o papel mede só o passe de
+# inventário + ancoragem + classificação das perguntas.

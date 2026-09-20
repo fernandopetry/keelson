@@ -11,7 +11,11 @@ regra é a decisão **4.304** (`docs/_meta/decisions.md`); este arquivo é só p
   `regua_fim:` (prefixos de linha) — sem a declaração o runner recusa `git:` (4.377);
   `regua_anexos:` (lista por vírgula) anexa arquivos inteiros do mesmo ref depois da
   régua — os templates canônicos de `templates/artifacts/` que a régua cita por caminho
-  (4.405). Declaram hoje: `decomposicao-comportamento` e `scribe-spec`.
+  (4.405). Declaram hoje: `decomposicao-comportamento`, `scribe-spec`, `scribe-spec-estado`,
+  `tech-lead-brief`, `scribe-plan`, `scribe-tasks-criterios`, `developer-comentarios` e
+  `developer-reuso` (os cinco últimos: leva 4.420 — a cadeia brief → SPEC → PLAN → TASK →
+  código no mesmo domínio de fixtures, `pedidos`/frete do parceiro, para que uma rodada
+  possa encadear a saída de um caso como insumo do seguinte).
 - `--runs` mínimo 1; abaixo de 4 o sumário rotula a leitura como sinal (piso empírico da
   bancada, obs. 4.304 — não garantia). HOLD distingue variância intra-braço de juiz sem
   veredito válido (falha de infra).

@@ -1,0 +1,12 @@
+schema_version: "1.1"
+name: scribe-plan-heranca
+# Caso nº 17 (leva "liberdade na forja, rigor na prova" — decisão 4.420) — teste
+# falsificável da HERANÇA brief → SPEC (reabre o HOLD de Personas/premissas da 4.410 pelo
+# lado do CONSUMIDOR): o scribe redige um PLAN e a "régua" é a PRÓPRIA SPEC. Braço A =
+# SPEC-COMPLETA (§2 Personas e §8 Premissas reescritas por extenso); braço B = SPEC-HERDADA
+# (§2 e §8 são ponteiro ao BRIEF-001 + só o delta). O contrato de forma do PLAN é fixture
+# fixa (CONTRATO.md). Mede se o PLAN a jusante preserva o que só o brief carrega — o ator
+# nos fluxos/interfaces, a confirmação síncrona (premissa decidida) e o percentual por
+# pedido (Q1 respondida). Plant: SPEC que contradiz o brief (ator genérico, confirmação
+# assíncrona em fila, percentual por item). Se B empata PASS com A em n≥4, a herança por
+# ponteiro não perde informação e o corte da 4.410b/c ganha prova.

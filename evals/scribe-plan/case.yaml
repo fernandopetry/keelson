@@ -1,0 +1,11 @@
+schema_version: "1.1"
+name: scribe-plan
+# Caso nº 16 (leva "liberdade na forja, rigor na prova" — decisão 4.420) — o scribe redige
+# um PLAN a partir de uma SPEC aprovada, do memo do code-scout e do recorte da ficha.
+# Primeiro instrumento sobre commands/plan.md (não havia). Mede os princípios em prosa
+# que o lint não computa: alternativa descartada com CUSTO CONCRETO e a alternativa mais
+# simples considerada (4.136 — o lint só vê se há alternativa e `Reabrir se`), invariante
+# de construção verificada antes de listar a API (4.108: `Anexo` exige `arquivo_id` e não
+# há rota que o produza a partir de integração) e tipo de coluna lido do schema real
+# (4.108: percentuais da base são NUMERIC(5,2)). Braços: HEAD (Etapa 4 do plan.md +
+# template) × REGUA-MINIMA (só o template, zero princípio).

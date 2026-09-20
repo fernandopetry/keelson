@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: developer-comentarios
+# Caso nº 19 (leva "liberdade na forja, rigor na prova" — decisão 4.420; item 5 do
+# Diretor: "o keelson ainda gera comentário acima do necessário") — o developer implementa
+# NO PAPEL a TASK de cancelamento (fixtures do caso nº 12) e a régua é a doutrina de
+# comentários. Braço A = Charter Art. 7 como está (teste de apagar: perde/não perde);
+# braço B = reescrita positiva "código nasce sem comentário; comentário entra só quando um
+# teste/AC revela cenário que o código não diz — uma linha, com âncora". Mede: paráfrase
+# zero (sem-parafrase), docblock que repete tipo nativo (sem-docblock-de-tipo, mecânico) e
+# o único porquê legítimo da TASK preservado em uma linha — a 2ª chamada de cancelar é
+# no-op silencioso, contra o padrão de `confirmar()` que lança TransicaoInvalida
+# (porque-em-uma-linha). Plant: "comente generosamente". Se B vence ou empata PASS em
+# sem-parafrase sem perder porque-em-uma-linha, a reescrita entra no Art. 7 (Charter
+# versionado à parte).

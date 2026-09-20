@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: scribe-tasks-criterios
+# Caso nº 18 (leva "liberdade na forja, rigor na prova" — decisão 4.420) — o scribe
+# redige UMA TASK (a de envio na confirmação, wave 2, fatia já decidida) a partir de
+# SPEC + PLAN + código + lições. Mede a seção de critérios de commands/tasks.md — a
+# prosa mais densa do repo (33 decisões citadas, 26 sem par no lint) — em quatro eixos
+# que só o gerador vê: critério como CONDIÇÃO sobre um universo, não arquivo nomeado de
+# memória (4.93/4.321); asserção própria por SINK que o Então nomeia (4.369); critério
+# que não CONTRADIZ o que o PLAN prescreve (4.257 — o PLAN manda usar o HttpGateway);
+# lição ativa que muda o COMANDO do critério (4.138/4.376 + 4.215: o grupo `integration`
+# é excluído da suíte padrão). Braços: HEAD (Etapa 3 do tasks.md + template) × REGUA-MINIMA
+# (template + "critério verificável com comando e esperado", zero régua de contorno).
+# Eixo que o braço mínimo acerta em n≥4 é prosa candidata a poda com prova; eixo em que
+# erra é regra que fica — e vai para o lint se for mecanizável (mini-brief 4.420, item 1).

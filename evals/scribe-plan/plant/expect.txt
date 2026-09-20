@@ -1,0 +1,3 @@
+dec-custo-concreto
+invariante-de-construcao
+schema-lido-da-fonte
