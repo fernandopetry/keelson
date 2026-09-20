@@ -34,7 +34,7 @@ não-trivial atravessa quatro etapas, cada uma com seu artefato durável:
 | Artefato | Responde | Regra inegociável |
 |---|---|---|
 | **SPEC** | O **quê** — requisitos em EARS, critérios de aceite em Given-When-Then, glossário | **Não fala de tecnologia.** Linguagem, framework, banco e protocolo só entram no PLAN |
-| **PLAN** | O **como** — componentes (COMP), decisões arquiteturais (DEC) com alternativas, mapa FR→componente | Herda stack e padrões da ficha e do perfil ativo; não reescolhe |
+| **PLAN** | O **como** — componentes (COMP), decisões arquiteturais (DEC) — as novas com alternativas, as herdadas em uma linha com a fonte —, mapa FR→componente | Herda stack e padrões da ficha e do perfil ativo; não reescolhe |
 | **TASK** | O **pedaço** — cada tarefa entrega um comportamento verificável de ponta a ponta, ordenadas em *waves* por dependência | Tarefas da mesma wave rodam em paralelo |
 | **INDEX** | O **estado** do slug | **É gerado** — nunca edite à mão |
 
@@ -58,7 +58,7 @@ vem sempre declarada com motivo.
 premissa carrega um **selo de evidência** (`crença · anedota · entrevistas · medido`) —
 o selo nunca bloqueia; ele expõe a aposta para a crítica de mérito (aposta de **valor**
 no núcleo da demanda → o PO devolve pergunta formal à área de produto, com o menor
-teste que a falsifica anexo — o ciclo não faz discovery). Cada DEC do PLAN
+teste que a falsifica anexo — o ciclo não faz discovery). Cada DEC **nova** do PLAN
 declara **`Reabrir se:`** — a condição observável que pede revisão da decisão (a que
 aparece em diff é vigiada pelo reviewer; a de mundo viaja ao INDEX). E a **métrica de
 sucesso** declara a **fonte de medição**; entregue o PLAN, a pendência de **veredito**

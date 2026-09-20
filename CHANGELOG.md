@@ -23,6 +23,40 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.175.0] — 2026-09-20
+
+Re-init: none
+
+Decision 4.422 — measured on real consumer corpora, a PLAN averages 502 lines and a third
+of it is architectural decisions: 7 DECs per PLAN, 18 lines each, 60% of them marked as
+inherited from the ficha/profile and only 5% irreversible. The full form was being paid —
+and its "alternatives considered" fabricated — for choices nobody made in that PLAN.
+Proven on both sides with A/B evals before shipping (generator and consumer, valid positive
+control); a real side effect found in round 2 was fixed and re-proven before applying.
+
+### Changed
+
+- `commands/plan.md` (Step 4, principles 2–3) and `templates/artifacts/PLAN.md` (§6):
+  **two DEC levels**. A **new** decision (one the inputs do not dictate), an **irreversible**
+  one or an **exception** keeps the full form, unchanged. An **inherited** choice — already
+  dictated by the ficha, the profile, a standing INDEX DEC or the SPEC itself (decided
+  premise, NFR) — is one line under `### Decisões herdadas`:
+  `- **DEC-MMM-00N** [herdada] <statement> — fonte: <ficha | perfil § | INDEX DEC | SPEC A-/NFR->`.
+  The id stays citable by COMP, TASK and anchor comments. Two guards in the rule: the
+  inherited line covers **only what the source dictates** (the choice left over when
+  applying it is a new DEC), and **when in doubt, it is new**.
+- The `Aderência à ficha/perfil` field of the full DEC block drops the `herdada` value
+  (`nova | exceção`) — nothing in the plugin ever read it, and the `[herdada]` marker
+  replaces it.
+- `skills/plan-validator`: new judgment check — a real decision demoted to a `[herdada]`
+  line (no source that actually dictates it, a source that dictates only part, or an
+  irreversible/exception choice); a one-line inherited DEC is the correct form, not a defect.
+- Existing PLANs keep passing: the lint only recognises a DEC from a `### DEC-…` heading,
+  so nothing was inverted (`lint-contract.md` now says so; the inherited line is outside
+  the `plan-dec-*` checks and the graph's node inventory, declared).
+- Docs: `index-contract.md` (DEC id definition), `graph-contract.md`, method guide §3,
+  README commands table, wiki *Conceitos*.
+
 ## [0.174.1] — 2026-09-20
 
 Re-init: none

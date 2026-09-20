@@ -30,7 +30,7 @@
 | `RISK-NNN-XXX` / `A-NNN-XXX` / `Q-NNN-XXX` | Risco / premissa / questão aberta | NNN = nº da SPEC |
 | `FEAT-NNN-XXX` | Funcionalidade — fluxo entregável, unidade de teste do QA (camada opcional: só com 2+ fluxos na SPEC; decisão 4.27) | NNN = nº da SPEC |
 | `COMP-MMM-XXX` | Componente | MMM = nº do PLAN |
-| `DEC-MMM-XXX` | Decisão arquitetural (com alternativas e flag `Irreversível`) | MMM = nº do PLAN |
+| `DEC-MMM-XXX` | Decisão arquitetural — nova/irreversível/exceção em forma completa (alternativas e flag `Irreversível`); herdada de ficha/perfil/INDEX/SPEC em uma linha com a fonte (4.422) | MMM = nº do PLAN |
 | `TRISK-MMM-XXX` | Risco técnico | MMM = nº do PLAN |
 | `TASK-MMM-XXX` | Tarefa | MMM = âncora à qual pertence: PLAN (campo `**Pertence a**:`) **ou** brief avulso (campo `**Brief**:` — decisão 4.86); nunca os dois |
 

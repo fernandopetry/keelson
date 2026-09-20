@@ -67,7 +67,7 @@ restrição anterior a itens `- [ ]` deixava o AC da 2ª linha sem dono e o índ
 mentindo). Menção a AC **fora** dessas duas seções continua não sendo cobertura
 (menção de realocação em Contexto/Escopo não é cobertura).
 Cross-PLAN: aresta para nó de outro PLAN/SPEC do **mesmo slug** é válida — a
-existência resolve no slug inteiro.
+existência resolve no slug inteiro. Nó `DEC` nasce só de heading `### DEC-…`: a DEC herdada em linha (4.422) não entra no inventário — nenhum check do catálogo consome DEC.
 
 ## §3. Catálogo de checks
 

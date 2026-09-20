@@ -75,7 +75,7 @@ Detalhe completo (flags, fluxo, regras): `commands/specify.md`.
 
 ### 3.2 `/keelson:plan` — criar PLAN
 
-Transforma uma SPEC aprovada em plano técnico — componentes (COMP), decisões (DEC) com alternativas, mapeamento FR → componente, riscos (TRISK) — herdando stack e padrões da ficha e do perfil ativo, sem reescolher. Uma SPEC pode ter vários PLANs (cobertura incremental via `--covers`/`--slice`). Gate: `plan-validator`; próximo passo: `/keelson:tasks PLAN-MMM`.
+Transforma uma SPEC aprovada em plano técnico — componentes (COMP), decisões (DEC) em dois níveis — nova/irreversível em forma completa com alternativas, herdada de ficha/perfil/INDEX/SPEC em uma linha com a fonte (4.422) —, mapeamento FR → componente, riscos (TRISK) — herdando stack e padrões da ficha e do perfil ativo, sem reescolher. Uma SPEC pode ter vários PLANs (cobertura incremental via `--covers`/`--slice`). Gate: `plan-validator`; próximo passo: `/keelson:tasks PLAN-MMM`.
 
 Detalhe completo (flags, fluxo, regras): `commands/plan.md`.
 

@@ -94,8 +94,8 @@ indisponível → executar as Etapas 4–5 inline é o fallback, declarado no ou
 ## Etapa 4: princípios obrigatórios (contrato de forma — executado pelo `scribe`)
 
 1. **Não revisar a SPEC**.
-2. **Decisões técnicas explícitas**: cada escolha vira `DEC-MMM-XXX` rastreável.
-3. **Trade-offs documentados**: cada DEC lista alternativas — incluindo a alternativa
+2. **Decisões técnicas explícitas, em dois níveis — a forma é proporcional ao que a DEC decide**: cada escolha vira `DEC-MMM-XXX` rastreável. **DEC nova** — escolha que este PLAN faz e que ficha, perfil, INDEX ou memo **não ditam** — e toda DEC **irreversível** ou **exceção** ganham a forma completa (princípio 3). **DEC herdada** — escolha que já vem decidida da ficha, do perfil, de DEC vigente do INDEX **ou da própria SPEC** (premissa decidida, NFR), e que este PLAN apenas aplica — é **uma linha** na lista `### Decisões herdadas` da §6: o enunciado + a fonte; sem Contexto, Alternativas nem Reabrir se (quem decidiu já os registrou na fonte). A linha herdada cobre **só o que a fonte dita**: a escolha que **sobra** ao aplicá-la — *como* cumprir um requisito diante do que o território impõe (ex.: um teto de tempo sobre um cliente que já faz retry por conta própria) — é DEC nova, em forma completa. Na dúvida entre os dois níveis, é nova: alternativa inventada para justificar o que a ficha manda é ruído, mas decisão real rebaixada a uma linha perde o trade-off.
+3. **Trade-offs documentados**: cada DEC **nova** lista alternativas — incluindo a alternativa
    mais simples (sem o padrão/abstração), com o motivo do descarte — e declara **em que
    condição deve ser reaberta** (`Reabrir se:`, condição observável; `nunca` exige
    motivo — decisão 4.97). A condição é a outra metade do trade-off. O motivo do

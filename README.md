@@ -82,7 +82,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | Command | What it does |
 |---------|--------------|
 | `/keelson:specify` | Capture a functional SPEC (EARS requirements, Given-When-Then ACs), tech-agnostic |
-| `/keelson:plan` | Turn an approved SPEC into a technical PLAN (components, DEC decisions with alternatives) |
+| `/keelson:plan` | Turn an approved SPEC into a technical PLAN (components, DEC decisions with alternatives — inherited choices as sourced one-liners) |
 | `/keelson:tasks` | Break a PLAN into atomic TASKs ordered in waves, closure fields prepared |
 | `/keelson:implement` | Execute the PLAN wave by wave via subagents (developer → code-reviewer + dedicated gates) |
 
@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.174.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.175.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: two generator rules proven to be no-ops against the model's default were removed — the PLAN contract no longer spells out "verify API surface and column types against the real source" and the TASK contract no longer repeats the criterion-vs-PLAN contradiction check that the task validator already owns (A/B evals against a minimal-rule arm: 4/4 and 8/8 without the text). Details in `CHANGELOG.md`.
+New in this release: PLAN decisions are now proportional to what they decide — a new, irreversible or exception decision keeps the full DEC form (alternatives with concrete cost, reopen condition), while a choice the ficha, profile, INDEX or the SPEC already dictates becomes a single sourced line (`- **DEC-001-004** [herdada] … — fonte: …`), still citable by id. Measured on real projects, 60% of DECs were inherited choices paying the full form; A/B evals showed the developer follows the one-line DEC exactly as the long one and the PLAN stops fabricating alternatives for choices nobody made. Details in `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

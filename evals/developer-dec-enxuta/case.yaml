@@ -1,0 +1,11 @@
+schema_version: "1.1"
+name: developer-dec-enxuta
+# Caso nº 23 (decisão 4.422 — "DEC proporcional ao que decide") — lado do CONSUMIDOR. O
+# developer implementa NO PAPEL a TASK de reenvio e a "régua" é o PRÓPRIO PLAN: braço A =
+# PLAN-COMPLETO (as duas DECs herdadas em forma completa, 9 linhas cada); braço B =
+# PLAN-DEC-ENXUTA (as mesmas duas em UMA linha com a fonte). A TASK cita as DECs pelo ID e
+# não repete a regra — o que o developer sabe sobre camada da autorização e sobre quem fala
+# com o parceiro vem do PLAN. Mede se a DEC curta é respeitada igual (autorizacao-no-service,
+# so-o-cliente-fala-com-o-parceiro) e, como controle, a DEC nova em forma completa nos dois
+# braços (falha-mantem-pendente). Plant: as três decisões invertidas.
+# Rodada 20260920-153219 (n=4, sonnet, US$11,25): 4/4 × 4/4 nos três eixos, plant 0/4 — VÁLIDA (4.422).

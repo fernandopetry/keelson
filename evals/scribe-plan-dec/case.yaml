@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: scribe-plan-dec
+# Caso nº 22 (decisão 4.422 — "DEC proporcional ao que decide") — lado do GERADOR. No
+# acervo real 60% das DECs são `Aderência: herdada`, 5% irreversíveis, 18 linhas cada, 7
+# por PLAN: a forma completa é paga por escolhas que a ficha já dita. Braço A = git:HEAD
+# (toda DEC em forma completa); braço B = arms/DEC-PROPORCIONAL.md (DEC nova/irreversível/
+# exceção em forma completa; DEC herdada em UMA linha com a fonte). Mede: a decisão real
+# (síncrono × fila; onde guardar o comprovante; cliente dedicado) mantém trade-off com
+# custo concreto (dec-nova-completa); o que a ficha dita (stack, controller→service→
+# repository, HttpGateway, migrations) NÃO vira DEC de forma completa com alternativa
+# inventada (herdada-nao-inflada); e os dois eixos de não-regressão do caso nº 16. O
+# tamanho do PLAN é medido fora do runner (linhas do deck). Plant: inverte os níveis.
+# Rodadas 2026-09-20 (n=4, sonnet): r1 20260920-153219 (grader com premissa falsa + regra sem SPEC como
+# fonte — corrigidos) · r2 20260920-160232 (PLAN −24%, inflação 4/4×3/4, MAS decisão adjacente retry×teto
+# sumiu 0/4 — achado lendo os decks; regra ganhou "cobre só o que a fonte dita") · r3 20260920-163219 VÁLIDA:
+# decisao-adjacente 4/4×2/4 · herdada-nao-inflada 4/4×3/4 · dec-nova-completa 3/4×3/4 · invariante/schema
+# 4/4×4/4 · PLAN 211→183 linhas. US$40,60 as três. Braço = texto aplicado na 4.422 (congelado).

@@ -1,0 +1,3 @@
+autorizacao-no-service
+so-o-cliente-fala-com-o-parceiro
+falha-mantem-pendente

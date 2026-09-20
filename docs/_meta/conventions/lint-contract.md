@@ -59,6 +59,8 @@ inventário fechado do que o script computa. Prefixos: `spec-` (spec-validator),
 
 (`(W)` = nasce WARNING por ser padrão/heurística — §1.)
 
+**DEC herdada fica fora dos `plan-dec-*`** (decisão 4.422): o motor só reconhece DEC em heading `### DEC-…`; a linha `- **DEC-MMM-00N** [herdada] … — fonte: …` da lista `### Decisões herdadas` (template do PLAN, §6) não é bloco DEC — nenhum `plan-dec-*` nem a checagem de número do ID a alcançam, por desenho (o lint relaxa, nunca inverte: DEC herdada escrita em forma completa num PLAN antigo segue passando). A classificação herdada × nova é julgamento do `plan-validator`. O sub-heading é de nível `###` — é ele que fecha o bloco DEC anterior.
+
 **Bug corrigido nasce com fixture que o reproduz** (4.260, irmã do "check novo → fixture
 nova"): correção de defeito no motor entra com fixture do caso **e controle positivo** —
 o motor anterior à correção, rodado sobre ela, tem de falhar (4.186); a suíte congelada

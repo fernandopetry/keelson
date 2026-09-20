@@ -28,7 +28,7 @@ Chega como fato (`plan-*` do lint-contract §3): cabeçalho/enum de Status, seç
 obrigatórias (Aderência, Cobertura, §1–§10), IDs fora do MMM e sem zero-padding,
 Cobertura sem SPEC referenciada/FRs cobertos vazios, COMP sem `Realiza` (4.409), anatomia dos
 blocos DEC (campos obrigatórios, zero ou uma alternativa, enum e forma do
-`Irreversível`, `Reabrir se` ausente — 4.97 — ou `nunca` sem motivo),
+`Irreversível`, `Reabrir se` ausente — 4.97 — ou `nunca` sem motivo — só dos blocos em heading: a linha `[herdada]` da lista `### Decisões herdadas` não é bloco DEC, 4.422),
 DoD vazia/com placeholder/sem menção a teste ou ficha/perfil. Invocado com o
 **diretório do slug**, acrescenta `plan-overlap-fr` (FR coberto por 2+ PLANs).
 Auto-fixes que continuam seus (protocolo §3): `Irreversível: SIM` → `sim` ·
@@ -51,6 +51,7 @@ por resultado e cobertura mista seguem o §5 do graph-contract.md.
 
 ### WARNING se:
 - DEC `Irreversível: sim` sem justificativa em "Consequências"
+- **Decisão real rebaixada a linha `[herdada]`** (decisão 4.422): a linha não cita fonte que de fato dite a escolha (campo da ficha, § do perfil, DEC do INDEX, premissa/NFR da SPEC), ou a fonte dita só parte e a linha engole a escolha que **sobra** ao aplicá-la (ex.: teto de tempo herdado sobre um cliente que já faz retry), ou a escolha é irreversível/exceção — essas pedem a forma completa. A inversa **não** é defeito: DEC herdada em uma linha, sem alternativas nem `Reabrir se`, é a forma correta; DEC completa que só aplica padrão vigente com alternativa fabricada é INFO de inflação
 - Descarte de alternativa sem custo concreto — só adjetivo ("mais complexa", "pior"), sem nomear o que se perde ou quebra ao escolhê-la (decisão 4.136) — **só em PLAN `Draft`/`Review`**, mesma carência da régua do `Reabrir se`
 
 ## Etapa 4: checks do grafo de componentes (FR → COMP e COMP → COMP)

@@ -1,3 +1,28 @@
+## Etapa 4: princípios obrigatórios (contrato de forma — executado pelo `scribe`)
+
+1. **Não revisar a SPEC**.
+2. **Decisões técnicas explícitas, em dois níveis — a forma é proporcional ao que a DEC decide**: cada escolha vira `DEC-MMM-XXX` rastreável. **DEC nova** — escolha que este PLAN faz e que ficha, perfil, INDEX ou memo **não ditam** — e toda DEC **irreversível** ou **exceção** ganham a forma completa (princípio 3). **DEC herdada** — escolha que já vem decidida da ficha, do perfil, de DEC vigente do INDEX **ou da própria SPEC** (premissa decidida, NFR), e que este PLAN apenas aplica — é **uma linha** na lista `### Decisões herdadas` da §6: o enunciado + a fonte; sem Contexto, Alternativas nem Reabrir se (quem decidiu já os registrou na fonte). A linha herdada cobre **só o que a fonte dita**: a escolha que **sobra** ao aplicá-la — *como* cumprir um requisito diante do que o território impõe (ex.: um teto de tempo sobre um cliente que já faz retry por conta própria) — é DEC nova, em forma completa. Na dúvida entre os dois níveis, é nova: alternativa inventada para justificar o que a ficha manda é ruído, mas decisão real rebaixada a uma linha perde o trade-off.
+3. **Trade-offs documentados**: cada DEC **nova** lista alternativas — incluindo a alternativa
+   mais simples (sem o padrão/abstração), com o motivo do descarte — e declara **em que
+   condição deve ser reaberta** (`Reabrir se:`, condição observável; `nunca` exige
+   motivo — decisão 4.97). A condição é a outra metade do trade-off. O motivo do
+   descarte nomeia o **custo concreto** da alternativa — o que se perde ou quebra ao
+   escolhê-la —, nunca só um adjetivo ("mais complexa", "menos performática"): é esse
+   custo que permite re-julgar a decisão sem refazer a análise (decisão 4.136).
+4. **Stack vigente herdado** da ficha/perfil sem reescolher.
+5. **Mapeamento FR → componente é derivado** (4.409): cada COMP declara `**Realiza**:` — obrigatório (`plan-comp-sem-realiza`), única fonte da aresta; a tabela sai de `graph.sh --format=tables` e não se escreve.
+6. **Definition of Done do PLAN** — SPEC com `**Fonte de medição**:` na §1.3 → a DoD inclui o item de métrica operacional (template §9; decisão 4.99). Sabor `instrumentação` → o trabalho de instrumentar entra nos componentes deste PLAN (sem componente que emita o evento, o item da DoD é insatisfazível).
+7. **IDs escopados**: `DEC-MMM-XXX`, `COMP-MMM-XXX`, `TRISK-MMM-XXX`.
+8. **DEC marcada como irreversível ou não**: cada DEC tem campo `Irreversível: sim | não` — valor **literal** do enum, sem prosa; a justificativa mora em Contexto/Consequências da própria DEC (valor fora do enum é ERROR do lint, `plan-dec-irreversivel-enum` — decisão 4.367). Se sim, será propagada ao INDEX.
+
+## Etapa 5: estrutura obrigatória do arquivo PLAN (contrato de forma — executado pelo `scribe`)
+
+Template canônico: `${CLAUDE_PLUGIN_ROOT}/templates/artifacts/PLAN.md` — o scribe o lê na
+fonte e reproduz a estrutura à risca; comentários `<!-- -->` são régua, nunca conteúdo
+(decisão 4.405).
+
+---
+<!-- anexo da régua: templates/artifacts/PLAN.md -->
 <!-- Template canônico do PLAN (decisão 4.405). Dono da régua de forma: commands/plan.md, Etapa 4. Comentários <!-- --> são instrução ao scribe, nunca conteúdo do artefato gerado. -->
 
 # PLAN-MMM: <Título>
