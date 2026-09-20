@@ -364,12 +364,14 @@ if [ -n "$PLANT" ]; then
 fi
 
 # ---------- custo (medido ou omitido, nunca estimado — 4.239) ----------
+# LC_ALL=C no somatório (4.420): sob LC_NUMERIC com vírgula decimal (pt_BR) o awk lê
+# "0.57" como 0 e o sumário imprimia US$0,0000 — custo falso com cara de medido.
 custo_l="custo: nao medido"; dur_l="duracao: nao medida"
 jsons="$(find "$RES/run" -name raw.json 2>/dev/null)"
 if [ -n "$jsons" ]; then
   tot="$(printf '%s\n' "$jsons" | wc -l | tr -d ' ')"
   soma="$(find "$RES/run" -name raw.json -exec grep -ho '"total_cost_usd":[0-9.]*' {} + 2>/dev/null \
-    | awk -F: '{s+=$2; n++} END{if(n>0) printf "%.4f %d", s, n}')"
+    | LC_ALL=C awk -F: '{s+=$2; n++} END{if(n>0) printf "%.4f %d", s, n}')"
   if [ -n "$soma" ]; then
     val="${soma% *}"; n="${soma#* }"
     if [ "$n" = "$tot" ]; then custo_l="custo: US\$$val ($n chamadas)"

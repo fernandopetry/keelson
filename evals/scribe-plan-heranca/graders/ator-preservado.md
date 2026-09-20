@@ -18,6 +18,9 @@ Critério (responda só sobre isto):
   autorizada ao operador, ou o ator nomeado no passo do fluxo), e nenhum componente ou
   fluxo dá ao gerente da parceria uma ação no painel nem ao cliente final visibilidade
   do frete.
+- Um **tipo em assinatura** (`Operador $op`, `User $u`) herdado do código existente **não
+  conta** como ator nomeado: o papel precisa aparecer em linguagem de fluxo ou de
+  autorização ("o operador confirma", "rota restrita ao operador de pedidos").
 - **FAIL** se os fluxos/interfaces usam só "o usuário"/"o sistema" sem distinguir o
   ator, ou atribuem ação de painel ao gerente da parceria ou visibilidade ao cliente
   final, ou se o ator não aparece em lugar nenhum do PLAN.

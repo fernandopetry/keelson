@@ -58,10 +58,9 @@ final class PedidoController
         return Response::json(['ok' => true]);
     }
 
-    // rota existente: POST /pedidos/{id}/confirmar
-    // rota a criar:   POST /pedidos/{id}/cancelar  → cancelar()
 }
 
+// Rotas: existe `POST /pedidos/{id}/confirmar`; a TASK cria `POST /pedidos/{id}/cancelar`.
 // Operador: value object com tenantId e id (int) — $this->auth->operador() devolve o logado.
 // Clock::now(): string ISO 8601.
 ```

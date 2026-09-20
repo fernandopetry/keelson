@@ -12,7 +12,9 @@ decidida pelo Tech Lead: a wave 1 tem a TASK-001-001 (schema — COMP-001-001, j
 a wave 2 tem a **TASK-001-002: Enviar o pedido ao parceiro na confirmação e registrar o
 resultado** (COMP-001-002 e COMP-001-003 do PLAN; realiza FR-001-001, FR-001-002,
 FR-001-003, FR-001-006, FR-001-007; cobre AC-001-001, AC-001-002 e AC-001-005; depende da
-TASK-001-001). Tela e reenvio ficam em outras TASKs. No diretório de trabalho há:
+TASK-001-001). Tela e reenvio ficam em outras TASKs. Além dos ACs, o Tech Lead pediu que a TASK
+carregue um critério de pronto que **fixe a DEC-001-001** (só o cliente dedicado fala com o
+parceiro, e só via `HttpGateway`). No diretório de trabalho há:
 
 - `REGUA.md` — o contrato de forma de uma TASK (estrutura, campos de aresta, mapeamento de
   cada AC e o template canônico); siga-o estritamente e só ele;
