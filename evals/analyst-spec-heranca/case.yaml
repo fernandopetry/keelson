@@ -1,0 +1,11 @@
+schema_version: "1.1"
+name: analyst-spec-heranca
+# Caso nº 21 (decisão 4.420, 3ª rodada) — SEGUNDO CONSUMIDOR da herança brief → SPEC: o
+# product-analyst, que é quem lê §2 Personas e §8 Premissas direto na SPEC (eixos 4 e 6).
+# A régua é a SPEC: COMPLETA (§2/§8 por extenso) × HERDADA (ponteiro ao BRIEF + delta),
+# ambas com dois conflitos plantados que só se enxergam com o conteúdo herdado em mãos:
+# NFR de confirmação em 2 s × premissa decidida de esperar o parceiro até 5 s; FR que dá
+# ao gerente da parceria uma ação no painel × persona "não usa o painel". Eixo de
+# controle: o selo `crença` do payload (delta presente nos dois braços). Plant: SPEC sem
+# os conflitos. Achado do mapa: o Input do product-analyst HOJE não inclui o BRIEF — o
+# caso mede o desenho aplicado (BRIEF no pacote), que é pré-condição da herança.
