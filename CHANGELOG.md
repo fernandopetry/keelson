@@ -23,6 +23,27 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.174.1] — 2026-09-20
+
+Re-init: none
+
+Decision 4.421 — first cuts under the 4.420 rule "every generator rule lives where it is
+verifiable". Two prose rules tied 4/4 (and 8/8) against a minimal-rule arm in A/B evals
+with a valid positive control, so they were doing nothing the model does not already do;
+the Director accepted single-scenario proof. Nothing changes in how you use keelson.
+
+### Removed
+
+- `commands/plan.md`, Step 4: principle 9 ("API surface and schema verified against the
+  real source, never deduced"). With the code-scout's recon in hand the scribe already
+  plans the step that satisfies a construction invariant and reads column types from the
+  existing schema (`evals/scribe-plan`, 4/4 without the rule). No validator ever computed
+  this rule, so only the instruction goes.
+- `commands/tasks.md`, Step 3, test (e) of the eight bypass tests: the clause about a
+  criterion prohibiting what the parent PLAN prescribes. The generator does not do that by
+  default (`evals/scribe-tasks-criterios`, 8/8 without the clause) and the check keeps its
+  owner — the `task-validator` still confronts prohibitions with the PLAN.
+
 ## [0.174.0] — 2026-09-14
 
 Re-init: none

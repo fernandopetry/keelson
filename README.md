@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.174.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.174.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the closing report opens with a three-line headline — what was done, what depends on you, what stayed partial — before the audit skeleton, and no longer quotes maintainer decision numbers to the reader (an A/B eval showed a lay reader answers "what was delivered / what do I do now" 4/4 with the headline, 0/4 without). Details in `CHANGELOG.md`.
+New in this release: two generator rules proven to be no-ops against the model's default were removed — the PLAN contract no longer spells out "verify API surface and column types against the real source" and the TASK contract no longer repeats the criterion-vs-PLAN contradiction check that the task validator already owns (A/B evals against a minimal-rule arm: 4/4 and 8/8 without the text). Details in `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
