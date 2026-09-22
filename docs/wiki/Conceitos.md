@@ -114,6 +114,24 @@ metáfora**: são ferramentas do time, não pessoas.
 - A entrega fecha com **relatório de aceitação** (bate com o brief?) — que é diferente do
   QA (funciona?).
 
+**Se você vem do playbook AI-Native SDLC da Anthropic (21/08/2026):** o brief é o
+`intent.md` do keelson. Mesmo papel (a intenção registrada antes de qualquer design ou
+código, lida por quem planeja), mesma separação (quem pede rascunha com o Claude, o PO
+valida) e mesma pasta por demanda (`briefs/` em vez de `intent/`). Cada seção do
+`intent.md` tem um lugar no brief forjado:
+
+| `intent.md` | No brief do keelson |
+|---|---|
+| Problem | "Pedido como dito" + o inventário da forja |
+| Proposed outcome | Interpretação + métrica com fonte de medição |
+| Affected users and systems | Personas/anti-persona + "Fatos do código" |
+| Constraints | Premissas com selo + "Fora de escopo" |
+| Open questions | "Perguntas" com Q-ID e o estado `aguardando-produto` |
+| Status | `rascunho → aguardando-produto → pronto → Emitido → Aceito` |
+
+O brief carrega ainda o que o `intent.md` não tem: largada e cronologia medidas,
+estimativa e o par 1:1 com a SPEC, que é a trilha de auditoria da aceitação.
+
 **A autonomia termina nos commits.** PR, merge para a branch principal e deploy são
 seus. A única exceção é o comando `/keelson:merge`, que você mesmo invoca: ele traz
 branches para dentro da sua branch de trabalho atual — nunca para a principal.
