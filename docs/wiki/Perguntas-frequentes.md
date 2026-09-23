@@ -352,6 +352,22 @@ Pelo relatório de fecho, que é montado a partir de um **ledger** escrito enqua
 eventos acontecem — não de memória no fim. Gate sem evento registrado **não** vira
 "aprovado": vira lacuna nomeada. Perdeu o relatório? `/keelson:report [slug]`.
 
+### Um checklist de segurança pede OWASP, NIST, MITRE, PTES… O keelson cobre?
+
+Depende do que o item pede. O keelson governa a **escrita e a revisão do código**, então
+cobre a parte desses frameworks que acontece durante o desenvolvimento:
+
+| Pedido do checklist | O que o keelson faz |
+|---|---|
+| **OWASP Top 10** | É o checklist do gate de segurança (`guidelines/core/SECURITY.md`), na união de todas as edições — toda mudança em área sensível passa por ele. |
+| **CWE** (MITRE) | Cada categoria do checklist carrega o CWE correspondente, e cada achado do gate cita o dele — é a chave para cruzar com ASVS, NIST e checklists de conformidade. |
+| **CVE / NVD** (NIST) | Dependências são auditadas pela ferramenta do ecossistema sempre que o lockfile muda e na entrega; `/keelson:audit` roda a qualquer momento. |
+| **Testes de invasão** (OWASP WSTG/MASTG, PTES, NIST SP 800-115) | **Não.** São metodologias para atacar o sistema pronto, de fora; o keelson não substitui pentest — ele entrega o código com menos para o pentest achar. |
+| **MITRE ATT&CK** | **Não.** Cataloga táticas de adversário para red team e detecção — fase de operação, não de desenvolvimento. |
+
+Na resposta a um checklist, a linha honesta é: *cobertura de desenvolvimento seguro (OWASP
+Top 10 + CWE + CVE), com pentest e detecção a cargo de outro processo*.
+
 ### Qual versão do keelson está rodando?
 
 `/keelson:version`. Ele lê a versão da árvore que a sessão **carregou** — não a que a CLI

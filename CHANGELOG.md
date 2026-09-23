@@ -23,6 +23,27 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.175.1] — 2026-09-23
+
+Re-init: none
+
+Decision 4.424 — the security gate's findings were classified by OWASP category only.
+CWE is the identifier every other security framework (ASVS, NIST, compliance checklists)
+uses as the common key, so a gate report could not be cross-referenced with an external
+checklist without manual, opinion-based mapping. Traceability only: nothing changes in
+what the gate rejects.
+
+### Added
+
+- `guidelines/core/SECURITY.md`: a **CWE** column on both tables (the multi-edition OWASP
+  superset and *Other vulnerabilities*), one to three canonical IDs per row, with a usage
+  note: the gate cites CWE **from these tables**, never from memory.
+- `agents/security-engineer.md`: each finding carries `cwe:` read from the table; a category
+  with no CWE there ships without the field (same rule as CVE — tool/table output only).
+- Wiki FAQ: "a security checklist asks for OWASP, NIST, MITRE, PTES… does keelson cover
+  them?" — secure-development coverage (OWASP Top 10 + CWE + CVE) is in; penetration-testing
+  methodologies (WSTG, MASTG, PTES, SP 800-115) and ATT&CK are out, by design.
+
 ## [0.175.0] — 2026-09-20
 
 Re-init: none

@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.175.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.175.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: PLAN decisions are now proportional to what they decide — a new, irreversible or exception decision keeps the full DEC form (alternatives with concrete cost, reopen condition), while a choice the ficha, profile, INDEX or the SPEC already dictates becomes a single sourced line (`- **DEC-001-004** [herdada] … — fonte: …`), still citable by id. Measured on real projects, 60% of DECs were inherited choices paying the full form; A/B evals showed the developer follows the one-line DEC exactly as the long one and the PLAN stops fabricating alternatives for choices nobody made. Details in `CHANGELOG.md`.
+New in this release: security-gate findings are now traceable by **CWE** — both checklist tables in `guidelines/core/SECURITY.md` carry the canonical CWE IDs per category and the `security-engineer` cites them from the table (never from memory), so a gate report can be cross-referenced with ASVS, NIST or a compliance checklist without manual mapping. What the gate rejects is unchanged. Details in `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

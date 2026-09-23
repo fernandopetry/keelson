@@ -16,38 +16,44 @@
 Esta tabela é a **união** das edições (2003→2025) — os ataques não morrem quando a
 categoria muda de nome/posição. Texto integral de cada edição: <https://github.com/OWASP/Top10>.
 
-| Categoria | Prevenção (agnóstica) |
-|-----------|-----------------------|
-| **Broken Access Control** | Verificar autorização em **toda** ação; **negar por padrão** |
-| **Cryptographic Failures** | Hash de senha com algoritmo dedicado, com sal e custo (ex.: Argon2/bcrypt/scrypt); TLS em trânsito; nunca logar dado sensível |
-| **Injection** (inclui XSS) | Consultas/comandos **parametrizados**; escapar a saída no destino; validar a entrada |
-| **Insecure Design** | Validar sempre no servidor; **nunca** confiar no cliente |
-| **Security Misconfiguration** (inclui XXE) | Debug desligado em produção; cabeçalhos de segurança; parser XML sem entidades externas |
-| **Software Supply Chain Failures** (amplia Vulnerable Components) | Lockfile commitado; auditar dependências contra o advisory database do ecossistema (ver seção *Dependências & CVE* abaixo); conferir a procedência do pacote (typosquatting) |
-| **Authentication Failures** | Rate limiting; MFA; sessões seguras |
-| **Software/Data Integrity Failures** (inclui deserialização insegura) | Verificar integridade de uploads e artefatos; CSP; nunca deserializar entrada não confiável |
-| **Security Logging & Alerting Failures** | Logar tentativas de acesso; **nunca** logar senhas/tokens/PII — e saída de agente/ferramenta que tocou credencial (retorno de subagent, evento de ledger, closure, report) **é log** para esta regra: material sensível, mesma classe da saída E2E autenticada (`core/TESTING.md`) |
-| **SSRF** | Validar/allowlist de URLs externas; recusar IPs internos |
-| **Mishandling of Exceptional Conditions** | Erro trata **fail-closed** — exceção nunca deixa recurso em estado permissivo; detalhe interno não chega à resposta |
-| **CSRF** | Token anti-CSRF em mutações autenticadas por cookie; `samesite` no cookie de sessão |
+A coluna **CWE** dá a cada categoria o identificador estável do catálogo MITRE
+(<https://cwe.mitre.org/>) — é o que qualquer outro framework de segurança (ASVS, NIST,
+checklists de conformidade) usa como chave comum. O achado do gate 8 cita o CWE **desta
+tabela** (ou da tabela *Outras vulnerabilidades*), nunca de memória; categoria sem
+correspondência aqui sai sem CWE.
+
+| Categoria | CWE | Prevenção (agnóstica) |
+|-----------|-----|-----------------------|
+| **Broken Access Control** | CWE-284, CWE-862 | Verificar autorização em **toda** ação; **negar por padrão** |
+| **Cryptographic Failures** | CWE-327, CWE-916, CWE-319 | Hash de senha com algoritmo dedicado, com sal e custo (ex.: Argon2/bcrypt/scrypt); TLS em trânsito; nunca logar dado sensível |
+| **Injection** (inclui XSS) | CWE-89, CWE-79, CWE-78 | Consultas/comandos **parametrizados**; escapar a saída no destino; validar a entrada |
+| **Insecure Design** | CWE-602 | Validar sempre no servidor; **nunca** confiar no cliente |
+| **Security Misconfiguration** (inclui XXE) | CWE-16, CWE-611, CWE-489 | Debug desligado em produção; cabeçalhos de segurança; parser XML sem entidades externas |
+| **Software Supply Chain Failures** (amplia Vulnerable Components) | CWE-1104, CWE-1357, CWE-829 | Lockfile commitado; auditar dependências contra o advisory database do ecossistema (ver seção *Dependências & CVE* abaixo); conferir a procedência do pacote (typosquatting) |
+| **Authentication Failures** | CWE-287, CWE-307, CWE-384 | Rate limiting; MFA; sessões seguras |
+| **Software/Data Integrity Failures** (inclui deserialização insegura) | CWE-502, CWE-345, CWE-494 | Verificar integridade de uploads e artefatos; CSP; nunca deserializar entrada não confiável |
+| **Security Logging & Alerting Failures** | CWE-778, CWE-532 | Logar tentativas de acesso; **nunca** logar senhas/tokens/PII — e saída de agente/ferramenta que tocou credencial (retorno de subagent, evento de ledger, closure, report) **é log** para esta regra: material sensível, mesma classe da saída E2E autenticada (`core/TESTING.md`) |
+| **SSRF** | CWE-918 | Validar/allowlist de URLs externas; recusar IPs internos |
+| **Mishandling of Exceptional Conditions** | CWE-755, CWE-636, CWE-209 | Erro trata **fail-closed** — exceção nunca deixa recurso em estado permissivo; detalhe interno não chega à resposta |
+| **CSRF** | CWE-352 | Token anti-CSRF em mutações autenticadas por cookie; `samesite` no cookie de sessão |
 
 ---
 
 ## Outras vulnerabilidades
 
-| Vulnerabilidade | ❌ Errado | ✅ Correto |
-|-----------------|-----------|------------|
-| **Path Traversal** | Abrir caminho vindo cru da entrada | Validar/normalizar; restringir à raiz permitida |
-| **Command Injection** | Interpolar entrada num comando de shell | Evitar shell; passar argumentos escapados/separados |
-| **Mass Assignment** | Preencher a entidade com todo o payload | Allowlist explícita de campos |
-| **IDOR** | Aceitar um id de recurso sem checar acesso | Verificar que o solicitante pode acessar **aquele** registro |
-| **Race Condition** | *Check-then-act* sem exclusão | Transação/lock; operação atômica |
-| **Corrida de limite/unicidade** (decisão 4.177) | Fechar com lock de **leitura** sobre a decisão (contagem/CASE lido antes de gravar — em subconsulta, o lock nem alcança a leitura) | Fechar **na escrita**: escrita condicional (o INSERT/UPDATE carrega o predicado; zero linhas afetadas **é** a recusa) ou constraint única. Prova **conta linhas** no fim, N concorrentes contra o motor real — cronometrar espera de lock já aprovou limite furado |
-| **Information Disclosure** | Stack trace em produção; erro interno devolvido cru na resposta | Mensagem genérica; sanear o **mesmo** valor no sink de resposta, não só no de log |
-| **Clickjacking** | Sem proteção de enquadramento | Negar enquadramento (frame-ancestors/`X-Frame-Options`) |
-| **File Upload** | Aceitar qualquer arquivo | Allowlist de tipo/extensão; validar o conteúdo real |
-| **Open Redirect** | Redirecionar para destino vindo da entrada | Allowlist de destinos permitidos |
-| **Credencial via shell** (decisão 4.236) | Carregar arquivo de ambiente com `source`/`export` — o arquivo vira script: substituição de comando executa e a falha de parse **ecoa o segredo** na mensagem de erro (caso real: senha em texto plano no transcript) | Parser de chave=valor que não interpreta o conteúdo (dotenv/equivalente); a mensagem de erro do parser nunca é repassada |
+| Vulnerabilidade | CWE | ❌ Errado | ✅ Correto |
+|-----------------|-----|-----------|------------|
+| **Path Traversal** | CWE-22 | Abrir caminho vindo cru da entrada | Validar/normalizar; restringir à raiz permitida |
+| **Command Injection** | CWE-78 | Interpolar entrada num comando de shell | Evitar shell; passar argumentos escapados/separados |
+| **Mass Assignment** | CWE-915 | Preencher a entidade com todo o payload | Allowlist explícita de campos |
+| **IDOR** | CWE-639 | Aceitar um id de recurso sem checar acesso | Verificar que o solicitante pode acessar **aquele** registro |
+| **Race Condition** | CWE-367 | *Check-then-act* sem exclusão | Transação/lock; operação atômica |
+| **Corrida de limite/unicidade** (decisão 4.177) | CWE-362 | Fechar com lock de **leitura** sobre a decisão (contagem/CASE lido antes de gravar — em subconsulta, o lock nem alcança a leitura) | Fechar **na escrita**: escrita condicional (o INSERT/UPDATE carrega o predicado; zero linhas afetadas **é** a recusa) ou constraint única. Prova **conta linhas** no fim, N concorrentes contra o motor real — cronometrar espera de lock já aprovou limite furado |
+| **Information Disclosure** | CWE-209 | Stack trace em produção; erro interno devolvido cru na resposta | Mensagem genérica; sanear o **mesmo** valor no sink de resposta, não só no de log |
+| **Clickjacking** | CWE-1021 | Sem proteção de enquadramento | Negar enquadramento (frame-ancestors/`X-Frame-Options`) |
+| **File Upload** | CWE-434 | Aceitar qualquer arquivo | Allowlist de tipo/extensão; validar o conteúdo real |
+| **Open Redirect** | CWE-601 | Redirecionar para destino vindo da entrada | Allowlist de destinos permitidos |
+| **Credencial via shell** (decisão 4.236) | CWE-532 | Carregar arquivo de ambiente com `source`/`export` — o arquivo vira script: substituição de comando executa e a falha de parse **ecoa o segredo** na mensagem de erro (caso real: senha em texto plano no transcript) | Parser de chave=valor que não interpreta o conteúdo (dotenv/equivalente); a mensagem de erro do parser nunca é repassada |
 
 ---
 
