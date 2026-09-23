@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.177.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.178.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: `/keelson:init` now measures the security tooling on the machine (`gitleaks` for secrets, the ecosystem's CVE auditor, optional SAST) and, for each missing tool, asks — with what the gate loses without it and the exact install command — whether to install it now, later or not at all; nothing is required and nothing blocks, the gate keeps declaring the gap. The lockfile → auditor table now has a single mechanical owner (`scripts/security-tools.sh`). Details in `CHANGELOG.md`.
+New in this release: a SPEC that touches a sensitive area (login, permission, personal data, payment, upload, session) without a security NFR or a denial acceptance criterion now gets a lint WARNING (`spec-area-sensivel-sem-negacao`, term list measured on 140 real SPECs — 3.6% fire rate, no noise), the product-analyst asks for the abuse case, and the SPEC generator now writes the negative case by rule — proven by A/B eval (2/4 → 4/4). Details in `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

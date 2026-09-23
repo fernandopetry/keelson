@@ -23,6 +23,36 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.178.0] — 2026-09-23
+
+Re-init: none
+
+Decision 4.427 — a demand in a sensitive area (login, permission, personal data, payment,
+upload, session) could cross SPEC → PLAN → TASK without a single written security
+requirement; the security gate then rejected what the SPEC never asked for. The rule is
+born where it is verifiable (4.420): a lint check first, the product-analyst's judgment
+second, the generator only with eval evidence.
+
+### Added
+
+- `scripts/artifact-lint.sh`: **`spec-area-sensivel-sem-negacao`** (WARNING, never ERROR) —
+  §5–§7 mention a gate 8 topic (login, senha, autoriz, permiss, sessão, upload, pagamento,
+  cartão, dados pessoais, cpf, lgpd, criptograf, chave de api, redirecion) and the SPEC has
+  neither a security NFR nor a denial AC (recusa/nega/não autorizado/sem permissão/403/401/
+  bloqueio/rejeita/inválido). The term list was measured on 140 real SPECs before shipping:
+  "authenticated user", token and cookie were noise and are out; the final list fires on
+  3.6%, all real security topics. Fixture `defeitos-d`; contract row in `lint-contract.md`.
+- `agents/product-analyst.md`: **abuse** axis in the scenario-coverage item — when the SPEC
+  touches a sensitive area, is there an AC where the actor without the right is refused?
+  The lint flags the absence; the analyst judges whether the missing negative case matters.
+- `commands/specify.md` (step 2, principle 11): **a sensitive area requires the negative
+  case** — at least one denial AC (the actor without the right, or the hostile input, is
+  observably refused) and, with personal data or money, a verifiable security/audit NFR.
+  Proven before shipping with the new A/B eval `evals/scribe-spec-seguranca` (personal-data
+  export, brief that does not ask for it): without the principle the scribe wrote the denial
+  AC and the security NFR in 2 of 4 SPECs, with it in 4 of 4; the plant failed 4/4. The lint
+  alone caught only one of the two misses — it stays as the safety net.
+
 ## [0.177.0] — 2026-09-23
 
 Re-init: none

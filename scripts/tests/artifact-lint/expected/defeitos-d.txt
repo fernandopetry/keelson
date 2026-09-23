@@ -1,0 +1,1 @@
+WARNING	spec-area-sensivel-sem-negacao	secoes 5-7 tocam area sensivel ("sessão") sem NFR de seguranca nem AC de negacao (SPEC-001-login.md)

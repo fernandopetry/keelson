@@ -124,6 +124,9 @@ sect == "5" || sect == "6" || sect == "7" {
       emit("WARNING", "spec-tecnologia", "\"" tech[ti] "\" citado na secao " sect " (dominio, nao tecnologia — pode ser falso positivo)")
     }
   if (index(line, "[confirmar]") > 0) nconf++
+  # area sensivel (4.427): primeiro termo do gate 8 visto nas secoes 5-7 — so PADRAO,
+  # e o check final so dispara sem contraprova (NFR de seguranca / AC de negacao)
+  if (sens == "" && match(tolower(line), SENS)) sens = substr(tolower(line), RSTART, RLENGTH)
 }
 sub14 == "in"  && /^- / { nin++;  inod[nin] = tolower(trim(substr(line, 3))); next }
 sub14 == "out" && /^- / { nout++; outod[nout] = tolower(trim(substr(line, 3))); next }
@@ -165,6 +168,7 @@ sect == "6" && line ~ /^- \*\*NFR-[0-9]+/ {
   sub(/^\[[A-Za-z]+\][ \t]*/, "", ntxt)
   if (ntxt !~ /[0-9]/)
     emit("WARNING", "spec-nfr-sem-numero", id ": NFR sem valor numerico")
+  if (low ~ /segur|autoriz|autentic|permiss|criptograf|lgpd|dados pessoais|acesso/) nfrSeg++
   next
 }
 
@@ -258,6 +262,7 @@ function flushac() {
   if (acid == "") return
   if (!(index(acbuf, "dado") > 0 && index(acbuf, "quando") > 0 && (index(acbuf, "ent\303\243o") > 0 || index(acbuf, "entao") > 0)))
     emit("WARNING", "spec-ac-fora-gwt", acid ": AC fora de Dado-Quando-Entao")
+  if (acbuf ~ /recus|nega|n(a|ão)o autorizad|sem permiss|403|401|bloque|rejeit|inv(a|á)lid/) acNeg++
   acid = ""; acbuf = ""
 }
 
@@ -284,6 +289,10 @@ END {
     if (nmust * 100 > nfr * 70) emit("WARNING", "spec-must-ratio", nmust " de " nfr " FRs sao MUST (>70% — sem priorizacao real)")
     if (nsm == 0) emit("WARNING", "spec-sem-should-may", "nenhum FR SHOULD ou MAY")
   }
+  # area sensivel sem caso negativo (4.427) — padrao, WARNING; a contraprova e qualquer
+  # NFR de seguranca ou AC de negacao (recusa/bloqueio/invalido) na propria SPEC
+  if (sens != "" && nfrSeg == 0 && acNeg == 0)
+    emit("WARNING", "spec-area-sensivel-sem-negacao", "secoes 5-7 tocam area sensivel (\"" sens "\") sem NFR de seguranca nem AC de negacao")
   if (nfr > 30) emit("WARNING", "spec-porte-epico", nfr " FRs na secao 5 (>30 — sugerir /keelson:specify-epic antes de Approved, 4.115)")
   # FEATs
   if (NF9 > 0) {
@@ -704,6 +713,10 @@ AWK
 
 # lista de tecnologia da Etapa 5 do spec-validator (dono da lista: o SKILL.md)
 TECH='PHP|Python|Java|JavaScript|TypeScript|Ruby|Go|Rust|Node.js|.NET|Vue|React|Angular|Laravel|Symfony|Django|Flask|Spring|Rails|Express|FastAPI|MySQL|PostgreSQL|MongoDB|Redis|Elasticsearch|DynamoDB|BigQuery|REST|GraphQL|gRPC|WebSocket|microservice|monolith|event-sourcing|CQRS|AWS|GCP|Azure|Lambda|S3|EC2|Cloud Run|Kubernetes|Docker|jQuery|Axios|Lodash|Pinia|Vuex|Redux'
+# termos de area sensivel (lista canonica do gate 8 em portugues — 4.427); so padrao.
+# Medido no acervo real (140 SPECs): "autenticado" (estado do ator), token e cookie
+# (tecnica) eram 5 de 8 disparos e nenhum era demanda de seguranca — fora da lista.
+SENS="login|senha|autoriz|permiss|sess(a|ã)o|upload|pagamento|cart(a|ã)o|dados pessoais|cpf|lgpd|criptograf|chave de api|redirecion"
 
 lint_file() { # $1 = caminho
   f="$1"
@@ -711,7 +724,7 @@ lint_file() { # $1 = caminho
   case "$b" in
     SPEC-*.md)
       n="$(printf '%s\n' "$b" | sed -n 's/^SPEC-\([0-9][0-9]*\)[-.].*/\1/p')"
-      awk -v FILE="$b" -v SPECN="$n" -v TECH="$TECH" -f "$TMP/spec.awk" "$f" >> "$OUT" ;;
+      awk -v FILE="$b" -v SPECN="$n" -v TECH="$TECH" -v SENS="$SENS" -f "$TMP/spec.awk" "$f" >> "$OUT" ;;
     PLAN-*.md)
       n="$(printf '%s\n' "$b" | sed -n 's/^PLAN-\([0-9][0-9]*\)[-.].*/\1/p')"
       awk -v FILE="$b" -v PLANM="$n" -f "$TMP/plan.awk" "$f" >> "$OUT" ;;

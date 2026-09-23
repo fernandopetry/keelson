@@ -1,0 +1,11 @@
+schema_version: "1.1"
+name: scribe-spec-seguranca
+# Caso da leva 4.427 (camada de evals, 4.304) — o scribe redige a SPEC de uma demanda em
+# área sensível (exportação de dados pessoais com CPF, tela visível a dois papéis, sem
+# auditoria) a partir de um BRIEF que NÃO pede o caso negativo. Mede se o princípio
+# "área sensível exige o caso negativo" muda a SPEC gerada: AC em que o ator sem direito
+# (operador) é recusado, e/ou NFR de segurança/auditoria. Braços: fatia Etapas 2–3 de
+# commands/specify.md sem (A) e com (B) o princípio, montadas em arms/ com o template
+# anexado; plant inverte o princípio (caso negativo é detalhe de implementação).
+# Se A já escreve o caso negativo em 4/4, o princípio é no-op (4.160) e NÃO entra no
+# gerador — o lint spec-area-sensivel-sem-negacao fica como rede.

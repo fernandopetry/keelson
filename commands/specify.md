@@ -115,6 +115,14 @@ Agent indisponível → executar as Etapas 2–3 inline é o fallback, declarado
     mesma SPEC nomeia onde o valor salvo **reaparece** (recarga da tela, payload de
     consulta, exibição). AC de leitura no próprio FR satisfaz; não é preciso FR novo.
 
+11. **Área sensível exige o caso negativo** (decisão 4.427): quando a demanda toca
+    autenticação, permissão/papel, dados pessoais, pagamento, upload, sessão ou segredo,
+    a SPEC carrega **ao menos um AC de negação** — o ator sem o direito, ou a entrada
+    hostil, aciona a ação e o "Então" descreve a **recusa observável** — e, quando há
+    dado pessoal ou dinheiro, um NFR de segurança/auditoria verificável (quem fez o quê,
+    quando). Sucesso sem o par negativo é a SPEC que o gate 8 reprova depois; o lint
+    acusa a ausência (`spec-area-sensivel-sem-negacao`).
+
 ## Etapa 3: estrutura obrigatória do arquivo SPEC (contrato de forma — executado pelo `scribe`)
 
 Template canônico: `${CLAUDE_PLUGIN_ROOT}/templates/artifacts/SPEC.md` — o scribe o lê na
