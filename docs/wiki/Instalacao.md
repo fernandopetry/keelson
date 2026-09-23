@@ -11,6 +11,13 @@
 Nada além disso é obrigatório. O keelson **não instala runtime nem dependência** no seu
 projeto: o que falta é reportado como pendência nomeada, nunca contornado em silêncio.
 
+**Recomendado, não obrigatório**: `gitleaks` (varredura de segredos) e o auditor de
+vulnerabilidades do seu ecossistema (`composer audit` vem com o Composer 2.4+, `npm audit`
+com o Node, `pip-audit`, `govulncheck`, `cargo audit`, `bundler-audit`). O gate de segurança
+funciona sem eles, mas só por leitura — e escreve a lacuna no relatório de toda rodada. O
+`/keelson:init` mede o que está instalado e **oferece instalar** o que falta; você pode
+recusar e seguir.
+
 ## Instalar
 
 No Claude Code:

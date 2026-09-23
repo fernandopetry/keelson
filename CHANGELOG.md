@@ -23,6 +23,32 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.177.0] — 2026-09-23
+
+Re-init: none
+
+Decision 4.426 — since 0.176.0 the security gate leans on tools (`gitleaks`, the
+ecosystem's CVE auditor, optional SAST) and declares the gap on every run when one is
+missing; adoption did not measure any of it, so consumers met the gap in their first gate
+report without knowing what they lost or how to close it. Nothing is required: this
+release makes the choice explicit at setup time. Re-running `/keelson:init` is how an
+existing project gets the check — no written artifact changed, so no re-init is forced.
+
+### Added
+
+- `scripts/security-tools.sh <root>`: inventory of the security tooling — one line per
+  tool with state (`ok` + version · `ausente` · `opcional-ausente`), role (secrets · cve ·
+  sast), scope and the install command for the platform. Single owner of the
+  lockfile → CVE-auditor table (`--table` prints it); `/keelson:audit` now points at it.
+- `/keelson:init` step 4.8: runs the inventory and, for each missing tool, asks — *install
+  now · I'll install later · go on without* — stating what the gate loses without it, why it
+  is strongly recommended, that it is **not required**, and the exact command. "Install now"
+  runs it and re-measures (an unproven install is a declared gap, never `ok`); "go on
+  without" is recorded and the gate keeps declaring the gap. Optional tools get one
+  informative line, no question. Nothing is written to the ficha.
+- Maturity snapshot gains a *Security tooling* line; wiki *Instalação* lists the
+  recommended tools under prerequisites.
+
 ## [0.176.0] — 2026-09-23
 
 Re-init: none

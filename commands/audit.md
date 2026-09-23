@@ -26,17 +26,7 @@ Você é um auditor de dependências. Sua função é rodar, **em momento oportu
 ## Etapa 0: resolver ecossistemas
 
 1. Ler a ficha `keelson.config.json`. Para cada papel com perfil real (`profile.backend`, `profile.frontend`), ler a **seção 8 (Dependências)** do perfil: ela nomeia a ferramenta de auditoria.
-2. Sem perfil real ou sem ferramenta nomeada → detectar pelo lockfile presente na raiz do projeto:
-
-| Lockfile | Ferramenta | Vem com | Se ausente, sugerir |
-|---|---|---|---|
-| `composer.lock` | `composer audit` | Composer 2.4+ | atualizar o Composer |
-| `package-lock.json` / `pnpm-lock.yaml` / `yarn.lock` | `npm audit` / `pnpm audit` / `yarn npm audit` | o gerenciador | — |
-| `requirements.txt` / `poetry.lock` / `uv.lock` | `pip-audit` | — | `pip install pip-audit` |
-| `go.mod` / `go.sum` | `govulncheck ./...` | — | `go install golang.org/x/vuln/cmd/govulncheck@latest` |
-| `Cargo.lock` | `cargo audit` | — | `cargo install cargo-audit` |
-| `Gemfile.lock` | `bundler-audit` | — | `gem install bundler-audit` |
-| qualquer um | `osv-scanner` — escape hatch: **só quando o ecossistema não tem ferramenta nativa na tabela** | — | binário do projeto OSV |
+2. Sem perfil real ou sem ferramenta nomeada → detectar pelo lockfile presente na raiz do projeto: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/security-tools.sh" <raiz>` (dono único da tabela lockfile → ferramenta → instalação — `--table` imprime a referência; decisão 4.426). Use as linhas de papel `cve`; `osv-scanner` é escape hatch **só quando o ecossistema não tem ferramenta nativa**.
 
 3. Projeto pode ter **mais de um** ecossistema (ex.: `composer.lock` + `package-lock.json`) → auditar **todos**.
 4. Nenhum lockfile encontrado → reportar "nenhum ecossistema de dependências detectado" e encerrar.
@@ -45,7 +35,7 @@ Você é um auditor de dependências. Sua função é rodar, **em momento oportu
 
 1. Rodar a ferramenta de cada ecossistema (a consulta ao advisory database é online — sem rede, reportar como indisponível).
 2. Parsear a saída: cada vulnerabilidade vira uma linha com **CVE/advisory ID**, pacote, versão instalada, versão corrigida e severidade — tudo **da saída da ferramenta**.
-3. Ferramenta ausente → **não instalar por conta própria**: registrar o ecossistema como `INDISPONÍVEL` com o comando de instalação sugerido (tabela acima). A lacuna aparece no report — nunca em silêncio.
+3. Ferramenta ausente → **não instalar por conta própria**: registrar o ecossistema como `INDISPONÍVEL` com o comando de instalação da linha do `security-tools.sh` (o `/keelson:init` é quem oferece instalar). A lacuna aparece no report — nunca em silêncio.
 
 ## Etapa 2: higiene (só com `full`)
 

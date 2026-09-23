@@ -188,6 +188,39 @@ você **descobre e grava**; a régua da mensagem tem dono único em
 Merge-preserving (Regra de merge): bloco `commit` já presente → preserva (só acrescenta chave
 faltante); ficha antiga sem o bloco → acrescenta com o detectado.
 
+## Etapa 4.8 — Ferramentas de segurança: verificar, e oferecer instalar (decisão 4.426)
+
+O gate de segurança do keelson funciona sem ferramenta nenhuma — mas funciona **pior**, e
+diz isso em toda rodada (`ferramentas_indisponiveis` no report do gate 8; dono da regra:
+`${CLAUDE_PLUGIN_ROOT}/guidelines/core/SECURITY.md`, *Ferramenta ausente*). Esta etapa
+mede o que está instalado e, para cada ausência, **pergunta** — nunca instala por conta
+própria, nunca bloqueia a adoção.
+
+1. **Fato de disco**: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/security-tools.sh" <raiz>` — uma
+   linha por ferramenta (`estado | ferramenta | papel | escopo | instalar`): varredura de
+   segredos (`gitleaks`, sempre), auditor de CVE por lockfile presente na raiz, SAST do
+   ecossistema (`opcional-ausente`, opt-in do perfil). Linha `ok` → nada a fazer.
+2. **Cada linha `ausente`** vira **uma pergunta** (AskUserQuestion), com as opções
+   *instalar agora* · *instalo eu depois* · *seguir sem*. A pergunta é **persuasiva e
+   honesta**, nesta ordem: (a) **o que o gate perde sem ela**, concreto — sem `gitleaks`,
+   segredo commitado só é pego se um revisor ler a linha certa, e o report passa a declarar
+   a lacuna em toda rodada; sem o auditor de CVE, dependência vulnerável entra sem
+   aviso e só um scan externo pega; (b) **por que é muito indicada**: é o único ponto do ciclo
+   em que a checagem é mecânica e não depende de atenção; custa um comando e roda em
+   segundos; (c) **não é obrigatória** — o keelson segue, declara a lacuna e nada trava;
+   (d) o comando exato de instalação da linha do script. Linha `opcional-ausente` (SAST,
+   escape hatch) → **uma frase informativa** no relatório, sem pergunta: é opt-in do
+   perfil, não lacuna.
+3. **Escolheu instalar agora** → rode o comando da linha (é instalação de ferramenta de
+   desenvolvimento na máquina de quem respondeu — a permissão veio da resposta), depois
+   **re-rode o script** e mostre a linha `ok`: instalação não provada é lacuna declarada,
+   não `ok`. Falhou → reporte a saída e a linha continua `ausente`. **Instalo eu depois** →
+   o comando vai para o relatório como ação. **Seguir sem** → registre a escolha no
+   relatório; o gate continuará declarando a lacuna — decisão do Diretor, não silêncio.
+4. Nada aqui é gravado na ficha (não há campo `quality.secrets`/`quality.sast`): a fonte
+   da verdade é o binário no PATH, medido de novo a cada rodada do gate. Escopo `jira` não
+   executa esta etapa.
+
 ## Etapa 5 — Injetar o bloco no `CLAUDE.md`
 
 Insira o conteúdo de `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.keelson-block.md` no `CLAUDE.md` do projeto (crie o arquivo se não existir). Se um bloco keelson já existir (entre os marcadores `<!-- ... keelson ... -->`), **substitua-o** — não duplique. Este bloco **não** entra na Regra de merge do topo do comando: ele é gerado, não personalizado pelo humano, então "já existe" nunca é motivo para preservá-lo — a única prova de que está correto é o conteúdo bater com o template atual (Etapa 6 confere mecanicamente; caso real, 4.373: um `/keelson:init` confirmou só a existência do bloco e reportou "tudo íntegro" com uma decisão inteira faltando).
@@ -257,6 +290,7 @@ Retrato de maturidade — o que sustenta a autonomia dos agentes neste projeto
 - **E2E**: <quality.e2e provado | ausente → gate 9 prova executando, mas sem regressão re-executável (opt-in: /keelson:e2e-setup)>
 - **Mutação**: <quality.mutation provado | ausente → suíte verde é evidência mais fraca (opt-in: /keelson:mutation-setup)>
 - **Invariantes do projeto**: <guidelines/project/invariants.md presente | ausente → gate 6 declara n/a (opt-in — 4.242)>
+- **Ferramentas de segurança**: <gitleaks + auditor de CVE do ecossistema `ok` (security-tools.sh) | ausente → gate 8 revisa por leitura e declara `ferramentas_indisponiveis` em toda rodada (Etapa 4.8 — recomendado, não obrigatório)>
 ```
 
 Feche com uma nota informativa de observabilidade (decisão 4.239 — **só informa, nunca grava config**): o report de fecho do ciclo já mede janela de contexto e custo por papel em tokens aproximados — e, desde a 0.152.0, minutos de janela e chamadas de ferramenta por papel e a espera entre turnos (hook `window-marker` + `scripts/context-cost.sh`, decisão 4.354); quem quiser número exato de tokens/custo por modelo tem a **exportação OTEL do Claude Code** — opt-in do harness via `CLAUDE_CODE_ENABLE_TELEMETRY=1` + endpoint OTLP próprio (métrica `claude_code.token.usage`). Configurar é ato do Diretor, fora do keelson: env de telemetria exporta dados de uso para o coletor que ele escolher (a régua "sem dado sensível em telemetria" de `core/SECURITY.md` vale para o destino).

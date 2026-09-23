@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Keelson — spec-driven development and a portable quality standard for Claude Code.",
-    "version": "0.176.0"
+    "version": "0.177.0"
   },
   "plugins": [
     {

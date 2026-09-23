@@ -104,7 +104,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 
 | Command | What it does |
 |---------|--------------|
-| `/keelson:init` | Interactive setup — detects the stack, writes the ficha, the `CLAUDE.md` block and an `AGENTS.md` pointer (created only if absent); `init jira` scopes the run to the Jira integration (enable it late, re-measure a changed board) |
+| `/keelson:init` | Interactive setup — detects the stack, writes the ficha, the `CLAUDE.md` block and an `AGENTS.md` pointer (created only if absent), checks the security tooling (`gitleaks`, the ecosystem's CVE auditor) and offers to install what is missing — recommended, never required; `init jira` scopes the run to the Jira integration (enable it late, re-measure a changed board) |
 | `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
 | `/keelson:merge` † | Merge one or more branches into the current working branch, one at a time — one merge commit per branch; a clean branch (no conflict, no semantic-reconciliation finding, green suite) commits directly with no agent dispatched, otherwise the developer resolves only the triggered files and the code-reviewer audits only that resolution's diff (push, remote merge, PR and deploy stay human) |
 | `/keelson:jira-sync` | Reconcile a slug — or a single SPEC subtree — with Jira via the Atlassian MCP connector; `--phase start-dev\|finish-dev` walks the tree across the board — idempotent, best-effort (optional) |
@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.176.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.177.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the security gate now scans the files of every run with a secrets scanner (redacted output, `CWE-798` on a match, the value never reaches the report) and the whole branch again at delivery; SAST is opt-in per language profile; a tool that is missing is declared in its own report field instead of silently skipped — and never changes the verdict. Proven with a new A/B eval before shipping. Details in `CHANGELOG.md`.
+New in this release: `/keelson:init` now measures the security tooling on the machine (`gitleaks` for secrets, the ecosystem's CVE auditor, optional SAST) and, for each missing tool, asks — with what the gate loses without it and the exact install command — whether to install it now, later or not at all; nothing is required and nothing blocks, the gate keeps declaring the gap. The lockfile → auditor table now has a single mechanical owner (`scripts/security-tools.sh`). Details in `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
