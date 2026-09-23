@@ -188,6 +188,18 @@ inertes). Correção típica: remover o grupo do teste-prova ou movê-lo para um
 a suíte default seleciona; a evidência pedida é a rodada default listando o teste
 executado.
 
+### O relatório do gate de segurança diz `ferramentas_indisponiveis: gitleaks`
+
+Não é reprovação. O gate de segurança varre os arquivos de cada rodada com uma
+ferramenta de segredos (`gitleaks`) e, quando o perfil da linguagem nomeia, com uma de
+análise estática; se a ferramenta não está instalada na máquina, o relatório declara a
+lacuna nesse campo em vez de fingir que varreu — o resultado do gate continua sendo
+decidido só por vulnerabilidade real. Para fechar a lacuna, instale a ferramenta
+(`brew install gitleaks`, ou o pacote do seu sistema) e a próxima rodada passa a
+varrer de verdade. Casamento em fixture ou exemplo legítimo? Uma allowlist no
+`.gitleaks.toml` do projeto resolve — o revisor lê a allowlist como fato, não ignora
+o achado por conta própria.
+
 ### O gate de comportamento (9) ficou pendente
 
 O keelson **não finge** que verificou. A pendência vem com a causa nomeada:

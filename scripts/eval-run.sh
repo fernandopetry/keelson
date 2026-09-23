@@ -33,6 +33,8 @@
 #               0 é recusado. Abaixo de 4, o sumário rotula a leitura como SINAL — piso
 #               empírico da bancada (obs. 4.304), não garantia de confiabilidade.
 #   --model     passa --model ao executor (default: frontmatter `model:`, senão o do executor).
+#   (frontmatter `tools:` do caso: lista de --allowedTools do executor; default
+#   Read,Write,Edit,Glob,Grep — inclua Bash só quando o papel medido roda ferramenta.)
 #   --executor  binário que roda o prompt (default: claude) — a suíte injeta um fake.
 #               Toda chamada leva --strict-mcp-config: sem os MCP servers do usuário
 #               (hermeticidade e custo — o arranque de MCP dominava o tempo de rodada).
@@ -100,6 +102,7 @@ fm() { # $1 chave → valor do frontmatter do prompt.md, sem aspas envolventes
 case "$RUNS" in ''|*[!0-9]*) die "--runs inválido: $RUNS" ;; esac
 [ "$RUNS" -ge 1 ] || die "--runs inválido: $RUNS (mínimo 1 — rodada sem execução não é veredito, 4.377)"
 [ -n "$MODEL" ] || MODEL="$(fm model)"
+TOOLS="$(fm tools)"; [ -n "$TOOLS" ] || TOOLS="Read,Write,Edit,Glob,Grep"   # frontmatter `tools:` — só quando o papel medido precisa executar (ex.: gate que roda ferramenta)
 [ -n "$TIMEOUT" ] || TIMEOUT="$(fm timeout)"; [ -n "$TIMEOUT" ] || TIMEOUT=900
 case "$TIMEOUT" in ''|*[!0-9]*) die "--timeout inválido: $TIMEOUT (segundos inteiros)" ;; esac
 [ "$TIMEOUT" -ge 1 ] || die "--timeout inválido: $TIMEOUT (mínimo 1)"
@@ -190,7 +193,7 @@ executa() { # $1 nome  $2 fonte
     if [ -d "$CASE/fixtures" ]; then cp -R "$CASE/fixtures/." "$ws/" || die "cópia de fixtures falhou"; fi
     ( cd "$ws" && exec_timeout "$TIMEOUT" "$EXECUTOR" -p "$PROMPT_BODY" --output-format json \
         --strict-mcp-config \
-        --permission-mode acceptEdits --allowedTools "Read,Write,Edit,Glob,Grep" \
+        --permission-mode acceptEdits --allowedTools "$TOOLS" \
         ${MODEL:+--model "$MODEL"} > raw.json 2> stderr.log )
     rc=$?
     # Amostra inválida (4.389): executor que falhou, estourou o tempo ou terminou sem

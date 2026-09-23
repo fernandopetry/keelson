@@ -5,6 +5,9 @@
 # Emite o JSON mínimo que o runner parseia (total_cost_usd/duration_ms fixos).
 set -u
 
+# FAKE_ARGLOG: quando definido, registra a linha de argumentos (a suíte confere flags
+# repassadas pelo runner — ex.: --allowedTools do frontmatter `tools:`)
+[ -n "${FAKE_ARGLOG:-}" ] && printf '%s\n' "$*" >> "$FAKE_ARGLOG"
 PROMPT=""
 prev=""
 for a in "$@"; do

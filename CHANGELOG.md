@@ -23,6 +23,39 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.176.0] — 2026-09-23
+
+Re-init: none
+
+Decision 4.425 — the security gate's weak spot was never taxonomy, it was *false absence*:
+a committed secret in a fixture or in a config file outside the sensitive globs is the
+class a human read misses most, and the gate had no tool-backed check for it (only CVE
+had one). Proven with a new A/B eval before shipping (planted secret, arms with and
+without the policy, positive control).
+
+### Added
+
+- `guidelines/core/SECURITY.md`: **Secrets & SAST** policy — every gate 8 run scans the
+  files of the diff *on disk* with a secrets scanner (generic: `gitleaks`, redacted
+  output); a real match is *Hardcoded credential* (**CWE-798**, new row in the tables) and
+  rejects; the finding cites `file:line` + rule id, **never the value** (the report is a
+  log). SAST is **opt-in per profile** (named in §8, one line in §6 — the gate reads only
+  §6). A **Tool missing** subsection now owns the fail-visible rule for CVE, secrets and
+  SAST alike: the gap is declared in its own report field (`ferramentas_indisponiveis`),
+  is never a finding and never changes the verdict; "0 matches" needs proof the tool ran.
+- `agents/security-engineer.md`: step 3b (secrets scan always; SAST when the profile names
+  it), `ferramentas_indisponiveis` and `regra:` fields, `conferido` example with execution
+  proof. Trigger list unchanged.
+- Delivery scan of the **whole branch** in `/keelson:integrate` (step 2.4) and in the
+  pre-check of `/keelson:auto` step 5 — the only pass that covers files outside the gate 8
+  triggers; a match stops the PR/push, a missing tool is declared, never silent.
+- `guidelines/_meta/PROFILE-OUTLINE.md`: §6 lists the gate's tools (audit, SAST) in one
+  line each; §8 gains an optional SAST item. `guidelines/backend/php.md` names
+  `psalm --taint-analysis` / `semgrep` (profile is human-reviewed — re-review flagged).
+- Wiki: FAQ row for secrets/SAST; troubleshooting entry for `ferramentas_indisponiveis`.
+- Maintainer tooling (no consumer effect): `scripts/eval-run.sh` accepts a `tools:`
+  frontmatter (default unchanged); new eval case `evals/security-gate-segredos`.
+
 ## [0.175.1] — 2026-09-23
 
 Re-init: none

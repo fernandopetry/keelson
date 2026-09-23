@@ -95,6 +95,9 @@ Cobrir, no mínimo:
 - **Segredos & config**: de onde vêm; como garantir que não vazam em log/erro;
 - **Sessão/estado de autenticação** (se aplicável): cookies seguros, onde **não**
   guardar token, expiração.
+- **Ferramentas do gate** (uma linha cada, apontando à §8): a auditoria de dependência
+  e, se houver, o SAST — o gate 8 lê **só esta seção** do perfil; ferramenta nomeada
+  apenas na §8 é invisível para ele.
 
 > ⚠️ Perfil gerado por IA para linguagem que o autor não domina: cada afirmação de
 > segurança não verificada **DEVE** carregar a tag inline `⚠️ não confirmado`; o roteiro
@@ -119,6 +122,10 @@ Responde: *como se adiciona e audita dependência?*
 - gerenciador de pacotes e arquivo de lock;
 - política de versão; como auditar vulnerabilidade conhecida: **nomear a ferramenta de
   auditoria** e o advisory database que ela consulta (sincronizado com o CVE/NVD);
+- SAST `[opcional]`: a ferramenta de análise estática de **segurança** da linguagem
+  (fluxo de dado contaminado), como rodá-la sobre um subconjunto de arquivos — ou
+  "não se aplica porque…"; a varredura de **segredos** é agnóstica e mora no core
+  (`core/SECURITY.md`, *Segredos & SAST*), o perfil não a repete;
 - o que evitar (dependência abandonada, licença incompatível).
 
 ## 9. Reúso: o que já existe `[obrigatória]`  → Charter Art. 3

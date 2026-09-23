@@ -333,6 +333,7 @@ setcookie('session', $value, [
 - **Upload:** whitelist de extensão **e** validação de MIME real; nunca confie no nome/tipo
   enviado pelo cliente.
 - **Auditar dependência:** `composer audit` (ver §8).
+- **SAST:** `psalm --taint-analysis` ou `semgrep` (ver §8) — opcional; segredos: política do core (`gitleaks`).
 
 ---
 
@@ -427,6 +428,10 @@ middlewares de produção.
 - **Auditar vulnerabilidade conhecida:** `composer audit` no pipeline (consulta o advisory
   database do ecossistema PHP, sincronizado com o CVE/NVD) — reprovar em vulnerabilidade de
   severidade relevante, **citando o CVE/advisory ID** reportado.
+- **SAST (opcional, recomendado):** `vendor/bin/psalm --taint-analysis` (fluxo de dado
+  contaminado — injeção, XSS, path traversal; aceita a lista de arquivos do diff como
+  argumento) ou `semgrep --config p/php <arquivos>`. Achado cita a regra da ferramenta
+  como evidência da categoria do `core/SECURITY.md` que instancia.
 - **Higiene:** `composer outdated` para atrasos; evite pacote **abandonado** (o Packagist
   marca `abandoned`) e confira **licença** compatível antes de adicionar.
 - **Autoload PSR-4:** classe nova exige `composer dump-autoload` (ou `-o` em produção) para

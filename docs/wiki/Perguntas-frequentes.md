@@ -361,12 +361,14 @@ cobre a parte desses frameworks que acontece durante o desenvolvimento:
 |---|---|
 | **OWASP Top 10** | É o checklist do gate de segurança (`guidelines/core/SECURITY.md`), na união de todas as edições — toda mudança em área sensível passa por ele. |
 | **CWE** (MITRE) | Cada categoria do checklist carrega o CWE correspondente, e cada achado do gate cita o dele — é a chave para cruzar com ASVS, NIST e checklists de conformidade. |
+| **Segredos no código** (CWE-798) e **SAST** | Os arquivos de cada rodada do gate passam por varredura de segredos (ferramenta, saída redigida — o valor nunca vai ao relatório), e a branch inteira passa de novo na entrega; SAST roda quando o perfil da linguagem nomeia a ferramenta. Ferramenta que falta aparece declarada no relatório, nunca some. |
 | **CVE / NVD** (NIST) | Dependências são auditadas pela ferramenta do ecossistema sempre que o lockfile muda e na entrega; `/keelson:audit` roda a qualquer momento. |
 | **Testes de invasão** (OWASP WSTG/MASTG, PTES, NIST SP 800-115) | **Não.** São metodologias para atacar o sistema pronto, de fora; o keelson não substitui pentest — ele entrega o código com menos para o pentest achar. |
 | **MITRE ATT&CK** | **Não.** Cataloga táticas de adversário para red team e detecção — fase de operação, não de desenvolvimento. |
 
 Na resposta a um checklist, a linha honesta é: *cobertura de desenvolvimento seguro (OWASP
-Top 10 + CWE + CVE), com pentest e detecção a cargo de outro processo*.
+Top 10 + CWE, varredura de segredos, SAST por perfil e CVE de dependências), com pentest e
+detecção a cargo de outro processo*.
 
 ### Qual versão do keelson está rodando?
 

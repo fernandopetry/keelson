@@ -29,8 +29,9 @@ Você é um Application Security Engineer focado em **revisar segurança** do c�
 
 1. Ler o briefing da main session (na falta dele, TASK/PLAN), o **gabarito** acima e os arquivos modificados (`git diff` ou report).
 2. Rodar o checklist do gabarito contra o diff.
-3. Mudança tocando dependências/manifesto/lockfile → rodar a ferramenta de auditoria que o gabarito nomeia para o ecossistema e aplicar a política *Dependências & CVE* do `SECURITY.md`; ferramenta indisponível → achado `severidade: media` "auditoria de dependências indisponível para <ecossistema>" (**fail-visible** — não bloqueia sozinho).
-4. Cada achado: categoria OWASP, **CWE lido da tabela do gabarito** (nunca de memória; sem correspondência na tabela → omitir o campo), `arquivo:linha`, severidade, correção objetiva (e `cve` quando vindo da auditoria).
+3. Mudança tocando dependências/manifesto/lockfile → rodar a ferramenta de auditoria que o gabarito nomeia para o ecossistema e aplicar a política *Dependências & CVE* do `SECURITY.md`.
+3b. **Sempre**: varredura de segredos sobre os **arquivos do diff no disco** (política *Segredos & SAST* do `SECURITY.md` — modo diretório/arquivo, saída redigida) e, se a §6 do perfil nomeia SAST, a ferramenta sobre os mesmos arquivos. Ferramenta exigida e ausente (aqui ou no passo 3) → entra em `ferramentas_indisponiveis`, **nunca** em `achados` e nunca muda o resultado; "0 casamentos" só com prova de execução no `conferido`.
+4. Cada achado: categoria OWASP, **CWE lido da tabela do gabarito** (nunca de memória; sem correspondência na tabela → omitir o campo), `arquivo:linha`, severidade, correção objetiva (e `cve` quando vindo da auditoria). Achado de credencial: o **valor** do segredo não entra em **campo nenhum** do report (nem `descricao`, nem `superficie`) — cite o nome da chave/variável e `arquivo:linha`.
 5. Decisão: **qualquer** vulnerabilidade real → REPROVADO. APROVADO exige o campo `conferido` preenchido — a régua é a seção *Veredito de aprovação (gate 8)* do `SECURITY.md`; aprovação sem inventário é report inválido.
 
 ## Output: report de revisão de segurança
@@ -50,6 +51,12 @@ escopo_sensivel: [auth | injecao | upload | dados_pessoais | crypto | endpoint |
 conferido:
   - categoria: "<categoria do checklist aplicável ao diff>"
     superficie: "<arquivo:linha ou contagem no diff>"
+  - categoria: "Credencial hardcoded (varredura)"
+    superficie: "<ferramenta + versão · N arquivos varridos · 0 casamentos>"   # prova de execução; sem ela a linha não existe
+
+# Ferramenta que a política exige e não está instalada — lacuna declarada, nunca achado,
+# nunca muda o resultado (SECURITY.md, "Ferramenta ausente"). Vazio → `[]`.
+ferramentas_indisponiveis: []   # ex.: ["gitleaks — varredura de segredos do diff", "composer audit — CVE do ecossistema PHP"]
 
 achados:
   - categoria: "Injection"          # nome canônico do superset de core/SECURITY.md
@@ -59,6 +66,7 @@ achados:
     descricao: <o que está vulnerável>
     correcao: <como corrigir, citando o padrão do core/SECURITY.md ou do perfil ativo>
     cve: <CVE/advisory ID vindo da saída da ferramenta de auditoria; senão omitir>
+    regra: <id da regra da ferramenta de segredos/SAST que casou; senão omitir — o VALOR do segredo nunca entra no report>
 
 # Preencher SOMENTE quando o defeito tem causa-raiz GENERALIZÁVEL; senão null.
 # A main session roteia na closure (ver /keelson:implement, etapa 3.4.2).

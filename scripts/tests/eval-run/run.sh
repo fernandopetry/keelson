@@ -229,6 +229,22 @@ else bad "cenário 15: vazamento entre workspaces"; printf 'A: %s\nB2: %s\n' "$d
 if [ "$(cat "$TMP/saida com espaco"/*/run/A-r1/REGUA.md)" != "$(cat "$TMP/saida com espaco"/*/run/B-r1/REGUA.md)" ]; then ok "cenário 15 cada braço recebe a própria régua"
 else bad "cenário 15: réguas iguais nos dois braços"; fi
 
+# --- cenário 16: frontmatter `tools:` → --allowedTools do executor; ausente → default ---
+export FAKE_STATE="$TMP/s16"; mkdir -p "$FAKE_STATE"
+CS16="$TMP/case-tools"; cp -R case "$CS16"
+awk 'NR==1{print; print "tools: Read,Bash"; next} {print}' case/prompt.md > "$CS16/prompt.md"
+export FAKE_ARGLOG="$TMP/args16.log"; : > "$FAKE_ARGLOG"
+"$RUNNER" "$CS16" --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
+  --runs 1 --executor "$EXEC" --results "$TMP/r16" >/dev/null 2>&1
+if grep -q -- "--allowedTools Read,Bash" "$FAKE_ARGLOG"; then ok "cenário 16 tools: do frontmatter chega ao executor"
+else bad "cenário 16: --allowedTools Read,Bash não repassado"; cat "$FAKE_ARGLOG" >&2; fi
+: > "$FAKE_ARGLOG"
+"$RUNNER" case --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
+  --runs 1 --executor "$EXEC" --results "$TMP/r16b" >/dev/null 2>&1
+if grep -q -- "--allowedTools Read,Write,Edit,Glob,Grep" "$FAKE_ARGLOG"; then ok "cenário 16 sem tools: default Read,Write,Edit,Glob,Grep"
+else bad "cenário 16: default de --allowedTools mudou"; cat "$FAKE_ARGLOG" >&2; fi
+unset FAKE_ARGLOG
+
 # --- cenário 4: usos inválidos → exit 2 ---
 "$RUNNER" nao-existe --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
   >/dev/null 2>&1

@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.175.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.176.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: security-gate findings are now traceable by **CWE** — both checklist tables in `guidelines/core/SECURITY.md` carry the canonical CWE IDs per category and the `security-engineer` cites them from the table (never from memory), so a gate report can be cross-referenced with ASVS, NIST or a compliance checklist without manual mapping. What the gate rejects is unchanged. Details in `CHANGELOG.md`.
+New in this release: the security gate now scans the files of every run with a secrets scanner (redacted output, `CWE-798` on a match, the value never reaches the report) and the whole branch again at delivery; SAST is opt-in per language profile; a tool that is missing is declared in its own report field instead of silently skipped — and never changes the verdict. Proven with a new A/B eval before shipping. Details in `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
