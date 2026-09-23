@@ -167,6 +167,28 @@ típico), ou a proibição, se ela não se aplica a este contexto. Nasce como WA
 `task-validator` escala para ERROR quando a proibição é uma lição real do projeto que o
 comando viola (decisão 4.215).
 
+### O validator acusou "filtro sem filiação real" numa TASK
+
+O comando de verificação do critério isola um alvo com `--group <tag>` ou
+`--testsuite <nome>`, mas o arquivo de teste nomeado não carrega essa anotação `@group`
+(ou mora fora do diretório daquela suíte). O comando roda zero testes, ou os testes de
+outro arquivo, e o "N > 0" fica verde sem provar o alvo. O conserto é no critério, antes
+de implementar: abra o arquivo de teste real, confira a anotação e o diretório, e ajuste o
+valor do filtro — arquivos com filiações diferentes precisam de um comando cada. Nasce
+como WARNING e só vale para arquivo que já existe; arquivo que a própria TASK vai criar
+não entra na conta.
+
+### O validator acusou "AC visível sem carregador" numa TASK
+
+Um critério de aceitação promete algo que o usuário vê (um nome legível num painel, uma
+mensagem na tela), mas todos os critérios de pronto que o citam param num objeto de
+domínio ou num mock — provam que o campo existe, não que ele chega à tela. Só aparece
+quando a ficha tem `gates.screenVerify` ou `quality.e2e` ativos. Dois consertos, os dois
+no critério: o teste de gate 1 passa a exercitar o leitor real que monta o que a tela
+mostra (o caso de uso ou o controller), e a parte de renderização ganha um carregador
+nomeado — um teste E2E, ou um passo no Roteiro do gate 9 da TASK de tela — com a nota
+inline de cobertura parcial na forma que o `/keelson:tasks` já usa.
+
 ### O fecho diz "lição sem destino" mas eu vi a lição ser escrita
 
 O fecho só aceita "roteada" quando `scripts/lessons.sh <raiz> show <id>` encontra a

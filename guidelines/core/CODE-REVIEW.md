@@ -39,7 +39,10 @@ Cada AC dos critérios de pronto tem ≥ 1 teste que o verifica, e o teste é **
   (4.161/4.215 — fixação com conjunto não-vazio); aqui é o momento do gate;
 - fechamento de prova por **mutação** sem o eixo declarado por mutante, ou com todos
   os mutantes no eixo que o AC já motivava — nenhum no ponto cego do próprio
-  instrumento (decisão 4.331; régua no mesmo dono, `./TESTING.md`).
+  instrumento (decisão 4.331; régua no mesmo dono, `./TESTING.md`) — ou sem
+  `mutacao_protocolo` no report do developer nomeando a worktree quando a task provou
+  por mutação (decisão 4.428): mutante revertido na árvore de implementação é a
+  violação da 4.134, não prova.
 
 Cada um é **achado bloqueante**: o teste existe e passa, mas não é capaz de falhar junto
 com o comportamento — o AC conta como **sem teste**.

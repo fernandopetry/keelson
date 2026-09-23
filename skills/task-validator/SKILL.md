@@ -11,7 +11,7 @@ Você é um Quality Engineer: valide a TASK contra os checks abaixo.
 
 ## Input e contexto
 
-Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara validação batch de todas as tasks daquele PLAN). Contexto a ler (protocolo §2): a TASK, o PLAN (`Pertence a`), a SPEC referenciada pelo PLAN (incluindo o mapa FR→FEAT quando a §5 declara FEATs) e as outras TASKs do mesmo PLAN.
+Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara validação batch de todas as tasks daquele PLAN). Contexto a ler (protocolo §2): a TASK, o PLAN (`Pertence a`), a SPEC referenciada pelo PLAN (incluindo o mapa FR→FEAT quando a §5 declara FEATs) e as outras TASKs do mesmo PLAN — e, **sob demanda** (só para os dois checks de filiação/profundidade da Etapa 3, decisão 4.428), o arquivo de teste **já existente** que um critério nomeia junto de `--group`/`--testsuite` e a config do runner com o mapa de suítes; arquivo que a própria TASK vai criar é n/a (ou o molde, 4.342).
 
 **Modo avulso (decisão 4.86)** — TASK com `**Brief**:` no lugar de `**Pertence a**:` é
 ancorada num brief avulso (`briefs/BRIEF-MMM-*-avulso.md`), fora do ciclo SPEC/PLAN.
@@ -103,6 +103,8 @@ aberta (`plan-status-vs-tasks` — 4.153) e closure preenchida com Status ≠ Do
 ### WARNING se:
 - Critério não-verificável ("usuário fica feliz")
 - Falta critério explícito de cobertura de teste
+- **Filtro sem filiação real** (decisão 4.428 — 3ª reincidência da 4.93/4.368, por leitura: o lint é artefato-only e não abre código): comando do critério com `--group <tag>` cujo arquivo-alvo nomeado **existe** no repo e não carrega a anotação `@group <tag>` — roda zero ou outro arquivo com "N > 0" verde. Para `--testsuite <nome>`, o fato do lint `task-criterio-alvo-nao-isolado` já dispara (ele não absolve `--testsuite`): **complemente** o fato, não emita W paralelo — escale quando o diretório do arquivo não bate com a suíte no mapa da config. Alvos de filiação heterogênea sob um comando único são o mesmo achado. Arquivo que a TASK vai criar é n/a.
+- **AC visível sem carregador** (decisão 4.428 — 2ª reincidência da 4.162, eixo profundidade; só com `gates.screenVerify` ou `quality.e2e` ativos na ficha, senão n/a declarado; modo avulso n/a): AC cujo Então na SPEC promete efeito que o usuário vê (painel, tela, exibe, visível, legível — leia o AC, não case palavra: "lista" de endpoint não é tela) citado só em critérios de gate 1 que param num objeto de domínio/mock, sem que nenhuma TASK do PLAN o cite num passo do Roteiro do gate 9 nem num critério de spec E2E, e sem a qualificação inline de cobertura parcial nomeando o carregador. O conserto é do gerador: o critério alcança o leitor real e a faceta de renderização ganha carregador.
 
 ## Etapa 4: checks de escopo
 

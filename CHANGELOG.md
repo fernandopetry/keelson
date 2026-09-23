@@ -23,6 +23,59 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.179.0] — 2026-09-23
+
+Re-init: none
+
+Decision 4.428 — field intake (6 proposals from one consumer ledger, plugin 0.175.0):
+four applied (three recurrences with a designed check, one family recurrence), two
+deferred by the 4.371 default; one finding raised to the Director without being applied.
+
+### Added
+
+- `skills/task-validator`: two WARNING checks by reading (the lint is artifact-only and
+  never opens code). **Filter without real membership** — a criterion command with
+  `--group <tag>` whose named test file exists and does not carry `@group <tag>` runs zero
+  or another file's tests behind a green "N > 0"; `--testsuite` complements the existing
+  lint fact instead of a parallel warning. **Visible AC without carrier** — only with
+  `gates.screenVerify` or `quality.e2e` on: an AC whose Then promises something the user
+  sees, proven only by gate 1 criteria that stop at a domain object or mock, with no gate 9
+  step, no E2E spec criterion and no inline partial-coverage note naming the carrier.
+  The validator may now read, on demand, the existing test file and the runner's suite map.
+- `agents/developer.md`: report field **`mutacao_protocolo`** (`worktree <path> — <command>`
+  or `n/a`) and the executable protocol for mutating code that is not committed yet —
+  `git add` the task's new files, `git stash create`, `git worktree add --detach` on that
+  snapshot under the session home, mutate and run there, remove. Never the tree you
+  implement in, even if reverted; a directory copy is not a valid value (4.336).
+- `guidelines/core/CODE-REVIEW.md`: gate 1 rejects a mutation-based closure whose report
+  does not name the worktree in `mutacao_protocolo`.
+- `docs/wiki/Solucao-de-problemas.md`: one entry per new validator warning.
+
+### Changed
+
+- `commands/tasks.md`: the **value** of a suite filter (`--group`, `--testsuite`,
+  `--filter`) is checked by Grep against the target file's real annotation/directory (and
+  the runner's suite map) before it is fixed — never presumed from the file name; targets
+  with heterogeneous membership get one command per membership. An AC that promises a
+  visible effect has its gate 1 criterion reach the real reader that builds what the screen
+  shows (use case, controller), never a mock that only proves the field exists; only the
+  rendering facet is partial, in the existing inline form, naming its carrier (E2E spec or
+  the gate 9 step of the screen TASK).
+- `agents/developer.md`: when a retry inverts or replaces a named mechanism, the comment
+  autocheck greps the **old term across the whole file**, not only the touched block.
+
+### Deferred (4.371 default, first occurrence, text only)
+
+- Behaviour test doubles born twice in one PLAN (grep by behaviour signature before
+  creating one); E2E spec title citing the AC without the `@` the coverage script counts.
+  Both stay in the consumer ledger with a trigger (recurrence or eval).
+
+### Finding raised to the Director (not applied)
+
+- Since the `scribe` writes TASKs (4.103) it has no shell (4.114), so the 4.93 rule "the
+  command is executed at fixation and the non-empty evidence enters the criterion" has no
+  executor: real TASKs carry the placeholder `N`. Proposal + default recorded in 4.428.
+
 ## [0.178.0] — 2026-09-23
 
 Re-init: none
