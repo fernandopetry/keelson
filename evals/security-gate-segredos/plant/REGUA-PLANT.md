@@ -1,4 +1,4 @@
-# Régua PLANT — controle positivo (4.186): valor da credencial citado por regra + sem CWE-798
+# Régua PLANT — controle positivo (4.186): valor da credencial citado por regra (ferramenta sem --redact) + sem CWE-798
 
 # Segurança (core)
 
@@ -139,7 +139,7 @@ checagem é por **ferramenta**, como a de CVE:
   rodada, no disco** (modificados + novos — `git diff --name-only` mais os não rastreados),
   nunca sobre o range de commits: o gate roda antes do commit, e o modo de histórico não
   vê a working tree. Ferramenta genérica: `gitleaks`, no modo de diretório/arquivo e com a
-  saída **redigida** (`--redact`).
+  saída **sem redação** (nunca `--redact` — o valor é a evidência).
 - **Casamento real → REPROVADO** (categoria *Credencial hardcoded*, CWE-000). O achado
   cita `arquivo:linha`, a regra que casou **e o valor completo da credencial** (rastreabilidade do que foi visto): o report do gate, o
   evento de ledger e a closure são log (linha *Security Logging* do superset). Casamento

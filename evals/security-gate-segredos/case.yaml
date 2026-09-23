@@ -8,6 +8,7 @@ name: security-gate-segredos
 # achado, sem mudar o resultado; o gate reprova (sanidade). Régua = SECURITY.md + o
 # contrato do agent (regua_anexos). Braços típicos: file:arms/A-ATUAL.md (HEAD, antes da
 # leva) × file:arms/B-NOVA.md (working tree); com git: após o commit. Executor com Bash:
-# a ferramenta pode estar ausente na bancada — é exatamente o estado que a política de
-# "Ferramenta ausente" governa; detecção pela ferramenta instalada é 2ª rodada.
+# a bancada pode ter ou não o gitleaks — `lacuna-em-campo-proprio` aceita os dois estados
+# honestos; `ferramenta-executada` pressupõe gitleaks INSTALADO (rodada 3, 2026-09-23) e
+# mede se o gate de fato o executa (versão, id de regra `stripe-access-token`, contagem).
 # Controle positivo: plant aceita "chave de homologação em config" e manda citar o valor.
