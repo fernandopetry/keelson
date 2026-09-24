@@ -23,6 +23,63 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.180.0] — 2026-09-24
+
+Re-init: none
+
+Decision 4.429 — field intake (10 proposals from one consumer ledger, plugin 0.179.0):
+four applied (one broken verifier turned into a script, one script fix, two recurrences),
+six deferred by the 4.371 default.
+
+### Added
+
+- `scripts/suite-filter-check.sh` (+ `scripts/tests/suite-filter/`): mechanical fact for
+  the **membership of suite-filter targets** cited in TASK criteria. It opens the real
+  test files and the PHPUnit config and warns when `--group <tag>` targets a file without
+  that annotation (own or inherited one level), when a file in a group the config excludes
+  by default is cited by a command without `--group`, and when `--testsuite` names a suite
+  that does not exist or does not contain the file. Only the annotation anchored at the
+  start of a line counts (`@group` quoted in comment prose was a real false positive in the
+  first corpus measured); homonymous classes are judged by union; files the TASK will
+  create are n/a. PHPUnit only — another runner is silence, never a finding. The 4.428
+  check by reading ran in the field with 0.179.0 loaded and did not catch the fourth
+  occurrence in a month; the script reproduces that exact finding and measured 45 real
+  warnings across the consumer's five slugs.
+- `docs/wiki/Solucao-de-problemas.md`: entries for the mechanical filter check and for a
+  resume mark that landed on the wrong brief.
+
+### Changed
+
+- `commands/tasks.md` (step 5) runs the script on the generated TASK index before the
+  validator and sends every warning to the scribe's correction delta; the
+  `task-validator` (step 3) cites its output as `[suite-filter-check]` fact and keeps
+  reading only for what the script declares out of reach.
+- `scripts/pause.sh`: `mark-resume` and `report` by slug now prefer the brief that has an
+  **open pause** (epic included, active Status only; several → the most recent, with a
+  warning naming them) and fall back to the highest-numbered active brief only when no
+  pause is open; `resolve-brief` warns when more than one brief is active (a delivered
+  brief whose Status was never promoted made the mark land on the wrong file).
+  `mark-pause` is unchanged.
+- `agents/scribe.md`: a correction package whose `modo` is missing or outside
+  `edits | reescrita` is not a silent third mode — the scribe stops before reading any
+  input and returns the received value in `duvidas` (the same invented value reached the
+  scribe twice, in two slugs).
+- `agents/developer.md` / `guidelines/core/CODE-REVIEW.md`: `mutacao_protocolo: n/a` is
+  only honest when no criterion of the TASK prescribes a mutant; gate 1 crosses the value
+  with the criterion's mutant list before accepting `n/a`.
+
+### Deferred (4.371 default, first occurrence, text only)
+
+- Wave dispatch notes about an inherited mechanism (DI wiring) anchored in file:line;
+  FR/AC IDs used as edges checked against the SPEC table (the graph's `feat-divergente`
+  already caught the three cases before code); retry with alternative paths and a
+  condition as a checklist, never prose; "same mechanism as X" in a TASK scope naming
+  extract vs. duplicate; a dedicated E2E spec declaring whether it covers the AC or the
+  whole journey; tracker-sync publishing §17 telemetry in the `tasks` hook from the
+  briefing's start mark (§17 already says so — pointer kept for recurrence). The rule for
+  who writes `Status: Concluído` on a standalone brief stays deferred with the script fix
+  covering the operational effect.
+
 ## [0.179.0] — 2026-09-23
 
 Re-init: none

@@ -167,16 +167,22 @@ típico), ou a proibição, se ela não se aplica a este contexto. Nasce como WA
 `task-validator` escala para ERROR quando a proibição é uma lição real do projeto que o
 comando viola (decisão 4.215).
 
-### O validator acusou "filtro sem filiação real" numa TASK
+### A geração de TASKs (ou o validator) acusou um filtro de suíte sem filiação real
 
-O comando de verificação do critério isola um alvo com `--group <tag>` ou
-`--testsuite <nome>`, mas o arquivo de teste nomeado não carrega essa anotação `@group`
-(ou mora fora do diretório daquela suíte). O comando roda zero testes, ou os testes de
-outro arquivo, e o "N > 0" fica verde sem provar o alvo. O conserto é no critério, antes
-de implementar: abra o arquivo de teste real, confira a anotação e o diretório, e ajuste o
-valor do filtro — arquivos com filiações diferentes precisam de um comando cada. Nasce
-como WARNING e só vale para arquivo que já existe; arquivo que a própria TASK vai criar
-não entra na conta.
+O comando de verificação do critério nomeia um arquivo de teste e um filtro que não
+batem: `--group <tag>` num arquivo que não carrega a anotação `@group <tag>`; um arquivo
+que carrega um grupo excluído por padrão na configuração do PHPUnit, citado por um
+comando sem `--group` desse grupo; ou `--testsuite <nome>` numa suíte que não existe ou
+que não contém o arquivo. Em qualquer um deles o comando roda zero testes daquele
+arquivo e o "N > 0" fica verde sem provar o alvo. Desde a 0.180.0 a conferência é
+mecânica: o script `suite-filter-check.sh` abre o arquivo real e a configuração do
+runner, e o `/keelson:tasks` o roda antes do validator — o achado nasce como WARNING
+com a TASK e a linha. O conserto é no critério, antes de implementar: ajuste o valor do
+filtro à filiação real, e dê um comando a cada filiação quando o critério cobre arquivos
+de grupos ou suítes diferentes. Só arquivo que já existe entra na conta; arquivo que a
+própria TASK vai criar é n/a. Só o PHPUnit é coberto; noutro runner o script cala e a
+conferência segue por leitura. Se o achado parecer errado (grupo herdado de uma classe
+avó, grupo vindo de trait), confira o arquivo e siga: é WARNING, nunca bloqueio.
 
 ### O validator acusou "AC visível sem carregador" numa TASK
 
@@ -604,6 +610,17 @@ sessão caiu, ou você pediu para parar em linguagem natural): o tempo parado fo
 do último commit da branch, que é o instante mais tardio que se prova — o real pode ser
 maior. `sem retomada marcada` é o inverso: houve `pause`, mas o trabalho recomeçou sem
 passar pelo `continue`. Quer o número exato? Pare pelo `pause` e volte pelo `continue`.
+
+### A marca de retomada foi parar no brief errado
+
+Até a 0.179.0 a retomada sem brief explícito ia para o brief ativo de maior número do
+slug — e um brief já entregue cujo `Status` nunca foi promovido continua "ativo" para
+essa regra, então a marca podia cair nele em vez de no brief que estava em pausa. Desde
+a 0.180.0 a retomada procura primeiro o brief com pausa aberta (o do épico inclusive) e
+só sem nenhum cai na regra antiga; quando há mais de um candidato, o comando avisa e
+nomeia os briefs. Se ainda assim o alvo não for o certo, passe `--brief <caminho>` ao
+script de pausa. Brief entregue com `Status` velho é sinal de fecho incompleto: promova
+o campo ao fechar (`Aceito` no brief formal, `Concluído` no avulso).
 
 ### A entrega não trouxe a linha `Forja` (ou veio sem alguma etapa)
 

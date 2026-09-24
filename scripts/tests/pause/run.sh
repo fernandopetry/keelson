@@ -104,7 +104,8 @@ printf '# BRIEF-002: b\n**Status**: Emitido\n' > "$R4/docs/gamma/briefs/BRIEF-00
 printf '# BRIEF-004: c\n**Status**: Emitido\n' > "$R4/docs/gamma/briefs/BRIEF-004-c.md"
 printf '# BRIEF-005: d\n**Status**: Concluído\n' > "$R4/docs/gamma/briefs/BRIEF-005-d-avulso.md"
 printf '# BRIEF épico\n**Status**: em execução\n' > "$R4/docs/gamma/briefs/BRIEF-2026-09-01-x-epic.md"
-eq "4. maior número ativo, épico/Aceito/Concluído fora" "docs/gamma/briefs/BRIEF-004-c.md" "$(pz s4 "$R4" resolve-brief gamma)"
+eq "4. maior número ativo, épico/Aceito/Concluído fora" "docs/gamma/briefs/BRIEF-004-c.md" "$(pz s4 "$R4" resolve-brief gamma 2>"$TMP/err")"
+contem "4. vários ativos → aviso nomeando os candidatos (4.429)" "$(cat "$TMP/err")" "2 BRIEFs ativos em gamma (BRIEF-002-b.md BRIEF-004-c.md)"
 printf '{ "docsRoot": "documentacao" }\n' > "$R4/keelson.config.json"
 mkdir -p "$R4/documentacao/gamma/briefs"; printf '# BRIEF-009: e\n**Status**: Aberto\n' > "$R4/documentacao/gamma/briefs/BRIEF-009-e-avulso.md"
 eq "4. docsRoot da ficha" "documentacao/gamma/briefs/BRIEF-009-e-avulso.md" "$(pz s4 "$R4" resolve-brief gamma)"
@@ -183,6 +184,37 @@ printf '## Cronologia\n- pausa: 2026-09-01T18:00:00-0300 · ponto: p\n- retomada
 out="$(pz s8 "$R8" report "$R8/c.md" 2>"$TMP/err")"
 contem "6. janela negativa no report → WARNING" "$(cat "$TMP/err")" "WARNING janela-negativa"
 contem "6. janela negativa fora da soma" "$out" "pausas: 1 · parado —"
+
+# ---------- 8. retomada fecha a pausa que existe (4.429) ----------
+# BRIEF-002 (Emitido, pausa aberta T1) · BRIEF-005 (Emitido, entregue sem Status promovido,
+# sem pausa) · épico (em execução, pausa aberta T2 > T1) · BRIEF-006 (Concluído, pausa
+# aberta esquecida — nunca escolhido)
+R10="$TMP/r10"; mkdir -p "$R10/docs/delta/briefs"
+printf '# BRIEF-002: a\n**Status**: Emitido\n\n## Cronologia\n- pausa: 2026-09-22T18:00:00-0300 · ponto: p1\n' > "$R10/docs/delta/briefs/BRIEF-002-a.md"
+printf '# BRIEF-005: b\n**Status**: Emitido\n\n## Cronologia\n- plan: 2026-09-23T10:00:00-0300\n' > "$R10/docs/delta/briefs/BRIEF-005-b.md"
+printf '# BRIEF épico\n**Status**: em execução\n\n## Cronologia\n- pausa: 2026-09-23T19:00:00-03:00 · ponto: fatia 6\n' > "$R10/docs/delta/briefs/BRIEF-2026-09-21-x-epic.md"
+printf '# BRIEF-006: c\n**Status**: Concluído\n\n## Cronologia\n- pausa: 2026-09-24T08:00:00-0300 · ponto: esquecida\n' > "$R10/docs/delta/briefs/BRIEF-006-c.md"
+out="$(pz r10 "$R10" mark-resume delta --ts 2026-09-23T20:00:00-0300 --host h 2>"$TMP/err")"; st=$?
+exitis "8. resume exit 0" 0 "$st"
+contem "8. escolhe a pausa aberta mais recente — o épico, não o maior número" "$out" "brief	docs/delta/briefs/BRIEF-2026-09-21-x-epic.md"
+contem "8. mede a pausa do épico" "$out" "parado desde 2026-09-23T19:00:00-0300 (marcada) · 1h00min"
+contem "8. várias abertas → aviso nomeando" "$(cat "$TMP/err")" "2 BRIEFs com pausa aberta em delta (BRIEF-002-a.md BRIEF-2026-09-21-x-epic.md); escolhido o da pausa mais recente (BRIEF-2026-09-21-x-epic.md)"
+naocontem "8. Concluído com pausa esquecida fica fora" "$(cat "$TMP/err")" "BRIEF-006"
+out="$(pz r10 "$R10" mark-resume delta --ts 2026-09-23T21:00:00-0300 --host h 2>"$TMP/err")"
+contem "8. próxima retomada fecha a única pausa aberta restante (BRIEF-002)" "$out" "brief	docs/delta/briefs/BRIEF-002-a.md"
+naocontem "8. uma só aberta → sem aviso de pausa" "$(cat "$TMP/err")" "pausa aberta"
+out="$(pz r10 "$R10" mark-resume delta --ts 2026-09-23T22:00:00-0300 --host h --since 2026-09-23T21:30:00-0300 2>"$TMP/err")"
+contem "8. sem pausa aberta → cai no ativo de maior número (BRIEF-005)" "$out" "brief	docs/delta/briefs/BRIEF-005-b.md"
+contem "8. …e avisa a ambiguidade dos ativos" "$(cat "$TMP/err")" "2 BRIEFs ativos em delta (BRIEF-002-a.md BRIEF-005-b.md)"
+out="$(pz r10 "$R10" mark-resume delta --brief docs/delta/briefs/BRIEF-002-a.md --ts 2026-09-23T23:00:00-0300 --host h --since 2026-09-23T22:30:00-0300 2>"$TMP/err")"
+contem "8. --brief explícito vence" "$out" "brief	docs/delta/briefs/BRIEF-002-a.md"
+[ -s "$TMP/err" ] && bad "8. --brief explícito não consulta nem avisa" "$(cat "$TMP/err")" || ok "8. --brief explícito não consulta nem avisa"
+# report por slug segue a mesma regra: pausa aberta primeiro
+printf '# BRIEF-007: d\n**Status**: Emitido\n\n## Cronologia\n- pausa: 2026-09-24T09:00:00-0300 · ponto: q\n' > "$R10/docs/delta/briefs/BRIEF-007-d.md"
+contem "8. report por slug lê o BRIEF da pausa aberta" "$(pz r10 "$R10" report delta 2>/dev/null)" "pausa	2026-09-24T09:00:00-0300	sem-retomada	-	aberta"
+# mark-pause não muda: sem --brief nunca grava no épico
+out="$(pz r10 "$R10" mark-pause delta --ponto z --ts 2026-09-24T10:00:00-0300 --host h 2>/dev/null)"
+contem "8. mark-pause segue o ativo de maior número (BRIEF-007), nunca o épico" "$out" "brief	docs/delta/briefs/BRIEF-007-d.md"
 
 # ---------- 7. uso incorreto ----------
 pz s9 "$R1" nada alpha >/dev/null 2>&1; exitis "7. ação desconhecida → 2" 2 "$?"

@@ -368,6 +368,7 @@ for par in "ficha:ficha diff-facts" "next-id:next-id" "index-check:index" \
            "check-mermaid:mermaid" "eval-run:eval-run" "cycle-clock:cycle-clock" \
            "check-templates:templates" \
            "warroom:warroom" "lessons:lessons" "version:version" "pause:pause" \
+           "suite-filter-check:suite-filter" \
            "session-dir:session-dir run-state ledger context-cost window-marker compact-anchor review-guard security-guard warroom session-cycle"; do
   motor="${par%%:*}"; suites="${par#*:}"
   dirs_re="$(printf '%s' "$suites" | sed 's/ /|/g')"

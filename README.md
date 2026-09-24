@@ -409,7 +409,7 @@ keelson/
 │   ├── backend/       # php.md (8.5 exemplar) · php-{5.6,7.0,7.4,8.0}.md (legacy ladder) · none.md · _review/ (human-review backlogs)
 │   └── frontend/      # none.md (others generated on install)
 ├── templates/         # keelson.config.example.json · keelson.local.example.json · CLAUDE block
-├── scripts/           # update.sh · version.sh · pause.sh (pause/resume marks, 4.382) · publish-wiki.sh · graph.sh (SDD graph facts, 4.82) · check-release.sh · tests/graph/ (regression suite) · git-hooks/ (main guard + quality guard, 4.83)
+├── scripts/           # update.sh · version.sh · pause.sh (pause/resume marks, 4.382) · publish-wiki.sh · graph.sh (SDD graph facts, 4.82) · suite-filter-check.sh (suite-filter membership facts, 4.429) · check-release.sh · tests/graph/ (regression suite) · git-hooks/ (main guard + quality guard, 4.83)
 ├── docs/_meta/        # method guide · conventions/ (runtime contracts: SDD, INDEX, handoff, teams, commits, graph) · decisions · learning log
 └── docs/wiki/         # source of the user wiki (generated output: scripts/publish-wiki.sh)
 ```
@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.179.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.180.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the task-validator warns when a criterion's `--group`/`--testsuite` value does not match the target test file's real membership, and when an AC that promises a visible effect is proven only down to a domain object with no gate 9 step or E2E spec carrying the rendering facet; the developer's report declares where the mutant ran (`mutacao_protocolo`) with an executable worktree protocol for uncommitted code, and a retry that replaces a named mechanism greps the old term across the whole file. Details in `CHANGELOG.md`.
+New in this release: the membership of suite-filter targets cited in TASK criteria is a mechanical fact — `scripts/suite-filter-check.sh` opens the real test files and the PHPUnit config and warns on `--group` without the annotation, excluded group without `--group`, and `--testsuite` outside the suite (run by `/keelson:tasks` before the validator); a resume mark goes to the brief with the open pause, never to a delivered brief with a stale Status; the scribe refuses a correction `modo` outside its enum; `mutacao_protocolo: n/a` is rejected when the TASK prescribes a mutant. Details in `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

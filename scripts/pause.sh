@@ -27,8 +27,14 @@
 #                 --since explícito (testes) ou o último commit alcançável de HEAD
 #                 (`git log -1 --format=%cI`), rotulado — nunca o instante real da queda
 #                 da sessão, que ninguém mediu. Sem git legível → `parado desde —` e
-#                 sem duração (lacuna declarada). Ecoa `brief` e `linha`.
-#   report        lê a Cronologia e agrega (TSV, uma pausa por linha, ordenadas):
+#                 sem duração (lacuna declarada). Ecoa `brief` e `linha`. Sem --brief, o
+#                 alvo é o BRIEF do slug com PAUSA ABERTA (épico incluído; só Status ativo;
+#                 várias → a pausa mais recente, aviso em stderr) — a retomada fecha a
+#                 pausa que existe; só sem pausa aberta cai no BRIEF ativo de resolve-brief
+#                 (4.429: brief entregue sem Status promovido levava a marca ao brief
+#                 errado). O mark-pause não muda: sem --brief nunca grava no épico.
+#   report        lê a Cronologia e agrega (TSV, uma pausa por linha, ordenadas); por slug,
+#                 o BRIEF é o da pausa aberta, senão o ativo (mesma regra do mark-resume):
 #                   pausa   <ts-desde|—>  <ts-retomada|sem-retomada>  <min|-> <marcada|piso|aberta>
 #                   pausas  <N>  parado  <min>  <H>h<MM>min  <k> marcadas  <j> piso  <a> abertas
 #                   cauda   pausas: <N> · parado ~<H>h<MM>min (<k> marcadas, <j> piso)[ · <a> sem retomada marcada]
@@ -40,7 +46,8 @@
 #                 comparação com a faixa do estimator (4.325/4.346).
 #   resolve-brief ecoa o BRIEF ATIVO do slug: em <docsRoot>/<slug>/briefs/, o BRIEF-*.md
 #                 (épico excluído) de maior número cujo `**Status**:` é `Emitido` (formal)
-#                 ou `Aberto` (avulso); docsRoot via ficha.sh (sem ficha: `docs`).
+#                 ou `Aberto` (avulso); docsRoot via ficha.sh (sem ficha: `docs`). Mais de
+#                 um ativo → aviso em stderr nomeando os candidatos (o maior número vence).
 #
 #   --ts     timestamp ISO da marca (testes); sem ele, medido com TZ=America/Sao_Paulo.
 #   --host   nome da máquina (testes); sem ele, `hostname -s`. Identidade da sessão:
@@ -129,14 +136,38 @@ docs_root() {
 resolve_brief() { # $1 = slug
   dir="$ROOT/$(docs_root)/$1/briefs"
   [ -d "$dir" ] || return 0
-  found=""
+  found=""; n=0; lista=""
   for f in "$dir"/BRIEF-*.md; do   # glob já vem ordenado; épico (id por data) fica fora
     [ -f "$f" ] || continue
     case "$f" in *-epic.md) continue ;; esac
     st="$(sed -n 's/^\*\*Status\*\*:[ 	]*//p' "$f" | sed -n 1p | sed 's/[ 	]*$//')"
-    case "$st" in Emitido|Aberto) found="$f" ;; esac
+    case "$st" in Emitido|Aberto) found="$f"; n=$((n + 1)); lista="$lista ${f##*/}" ;; esac
   done
+  # 4.429: vários ativos é ambiguidade que o chamador precisa ver — BRIEF entregue sem
+  # Status promovido (caso real) faz o "maior número" cair no brief morto
+  [ "$n" -gt 1 ] && echo "pause: aviso — $n BRIEFs ativos em $1 (${lista# }); escolhido o de maior número — passe --brief se não for este." >&2
   [ -n "$found" ] && printf '%s' "${found#"$ROOT"/}"
+}
+
+# BRIEF do slug com pausa ABERTA (4.429) — épico incluído, só Status ativo (Emitido |
+# Aberto | em execução); várias → a pausa mais recente, aviso em stderr. Vazio se nenhum.
+# É o alvo natural da retomada: a marca de retomada fecha a pausa que existe, não o
+# brief que por acaso tem o maior número.
+brief_pausa_aberta() { # $1 = slug
+  dir="$ROOT/$(docs_root)/$1/briefs"
+  [ -d "$dir" ] || return 0
+  best=""; best_e=0; n=0; lista=""
+  for f in "$dir"/BRIEF-*.md; do
+    [ -f "$f" ] || continue
+    st="$(sed -n 's/^\*\*Status\*\*:[ 	]*//p' "$f" | sed -n 1p | sed 's/[ 	]*$//')"
+    case "$st" in Emitido|Aberto|"em execução") ;; *) continue ;; esac
+    ab="$(pausa_aberta "$f")"; [ -n "$ab" ] || continue
+    n=$((n + 1)); lista="$lista ${f##*/}"
+    e="$(epoch "$(norma "$ab")")"
+    if [ -z "$best" ] || [ "$e" -gt "$best_e" ]; then best="$f"; best_e="$e"; fi
+  done
+  [ "$n" -gt 1 ] && echo "pause: aviso — $n BRIEFs com pausa aberta em $1 (${lista# }); escolhido o da pausa mais recente (${best##*/}) — passe --brief se não for este." >&2
+  [ -n "$best" ] && printf '%s' "${best#"$ROOT"/}"
 }
 
 # última linha `- pausa:` sem `- retomada:` posterior na Cronologia → ISO da pausa aberta
@@ -228,6 +259,7 @@ case "$ACTION" in
     printf 'brief\t%s\nlinha\t%s\n' "$BRIEF" "$linha"; exit 0 ;;
 
   mark-resume)
+    [ -n "$BRIEF" ] || BRIEF="$(brief_pausa_aberta "$SLUG")"   # 4.429: a retomada fecha a pausa que existe
     alvo_brief
     [ -n "$TS" ] || TS="$(agora)"
     desde="$(pausa_aberta "$BF")"
@@ -266,7 +298,8 @@ case "$ACTION" in
   report)
     case "$ALVO" in
       */*|*.md) case "$ALVO" in /*) BF="$ALVO" ;; *) BF="$ROOT/$ALVO" ;; esac ;;
-      *) b="$(resolve_brief "$ALVO")"; [ -n "$b" ] || die3 "nenhum BRIEF ativo em $(docs_root)/$ALVO/briefs/."; BF="$ROOT/$b" ;;
+      *) b="$(brief_pausa_aberta "$ALVO")"; [ -n "$b" ] || b="$(resolve_brief "$ALVO")"
+         [ -n "$b" ] || die3 "nenhum BRIEF ativo em $(docs_root)/$ALVO/briefs/."; BF="$ROOT/$b" ;;
     esac
     [ -f "$BF" ] || die3 "BRIEF ilegível: $ALVO"
     # extração: uma linha TSV por marca — tipo · ts · desde(retomada) · rótulo

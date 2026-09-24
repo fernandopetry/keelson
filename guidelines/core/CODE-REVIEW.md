@@ -42,7 +42,11 @@ Cada AC dos critérios de pronto tem ≥ 1 teste que o verifica, e o teste é **
   instrumento (decisão 4.331; régua no mesmo dono, `./TESTING.md`) — ou sem
   `mutacao_protocolo` no report do developer nomeando a worktree quando a task provou
   por mutação (decisão 4.428): mutante revertido na árvore de implementação é a
-  violação da 4.134, não prova.
+  violação da 4.134, não prova — e `mutacao_protocolo: n/a` numa TASK cujo Critério de
+  pronto **prescreve mutante** (prova por mutação de código, não a mutação de dados do
+  predicado de escopo) é o mesmo achado: cruze o valor com a lista de mutantes do
+  Critério antes de aceitar o `n/a` (decisão 4.429 — caso real: mutantes prescritos,
+  `n/a` declarado e não corrigido até o gate).
 
 Cada um é **achado bloqueante**: o teste existe e passa, mas não é capaz de falhar junto
 com o comportamento — o AC conta como **sem teste**.

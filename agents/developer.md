@@ -125,9 +125,10 @@ leva o diff junto (decisão 4.428): `git add -- <arquivos novos da task>` (só o
 commit continua por pathspec) → `sha=$(git stash create)` (fotografa índice + árvore sem
 tocá-los; vazio → use `HEAD`) → `git worktree add --detach <casa da sessão>/tools/mut-<TASK> "$sha"`
 (sem branch, para não calar o `largada-guard`) → mutar e rodar a suíte **lá** →
-`git worktree remove --force`. Declare no report `mutacao_protocolo` (worktree + comando,
-ou `n/a` sem mutação); cópia do diretório de trabalho não é protocolo válido (4.336 —
-leva `.env` e segredo junto).
+`git worktree remove --force`. Declare no report `mutacao_protocolo` (worktree + comando;
+`n/a` **só** quando nenhum Critério de pronto da TASK prescreve mutante — mutante
+prescrito e `n/a` no report é a mesma violação que o campo ausente, decisão 4.429);
+cópia do diretório de trabalho não é protocolo válido (4.336 — leva `.env` e segredo junto).
 
 **Teste novo roda onde o time olha** (decisão 4.226): antes de reportar, confronte o
 grupo/tag/marcador de cada teste que você criou com as exclusões da config default do
@@ -210,7 +211,7 @@ verificacao:
 cobertura_final: <% ou n/a>
 lint_warnings: <N ou 0>
 autocheck_comentarios: "<N introduzidos · M removidos no autocheck>"  # teste do Art. 7 por comentário (4.185/4.245/4.250); "0 · 0" é estado válido
-mutacao_protocolo: "<worktree <caminho> — <comando>> | n/a"  # onde o mutante rodou (4.428) — nunca a árvore onde você implementa; n/a é estado válido, omissão não é
+mutacao_protocolo: "<worktree <caminho> — <comando>> | n/a"  # onde o mutante rodou (4.428) — nunca a árvore onde você implementa; n/a só sem mutante prescrito no Critério (4.429), omissão não é estado
 acs_realizados:
   - AC-NNN-XXX
 escoteiro:            # limpezas do trecho tocado (Charter Art. 6); null se não houve
