@@ -51,12 +51,14 @@ principal.
 ## Etapa 1: chegar ao ponto seguro
 
 1. **Inventário do que está em voo**: agents em background (lista de tasks do harness),
-   TASK `In Progress`, wave com closure pendente; ciclo em modo teams → confira também a
+   TASK `In Progress`, wave com closure pendente, worktrees de wave paralela ainda não
+   integradas (`git worktree list`, branches `wt/<slug>/*` — decisão 4.433); ciclo em modo teams → confira também a
    mesa de processos (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/agent-teams.md`,
    4.303b). **Nada novo é despachado** depois do pedido — nem TASK, nem wave, nem gate
    além dos que a closure em curso exige.
 2. **Espere o que está em voo fechar**: TASK em execução termina pelo rito do
-   `/keelson:implement` (gates, closure §3.4.1, commit da closure); etapa de forja
+   `/keelson:implement` (gates, closure §3.4.1, commit da closure) — wave paralela termina na
+   integração das worktrees (§3.2.5) antes de qualquer pausa; etapa de forja
    termina no commit do marco. Artefato de forja que ainda não pode fechar (validação
    pendente) é commitado **no Status em que está** — `Draft` é Status legal e o continue
    deriva dele: `git commit -m "docs(<slug>): <artefato> draft (pause)" -- <arquivo>`.

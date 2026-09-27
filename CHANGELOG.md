@@ -23,6 +23,47 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.184.0] — 2026-09-27
+
+Re-init: none
+
+Decision 4.433 — parallel waves with a worktree per task in SUBAGENTS mode (lever L1 of the
+transcript reading). Opt-in: nothing changes until the ficha declares
+`quality.worktreeBootstrap`.
+
+### Added
+
+- **`quality.worktreeBootstrap`** (ficha, optional, manual): the command that leaves a freshly
+  created worktree able to run `quality.test`/`lint` on its own (dependencies, test `.env`,
+  own services). Declaring it is the consumer's statement that the suite does not share a
+  database or ports between trees. With it, a wave with no SEQUENTIAL_FORCED condition runs
+  its developers **at the same time, one worktree and one `wt/<slug>/<TASK>` branch each**,
+  under `thoughts/local/worktrees/` (outside the session home). Without it, or when the
+  bootstrap fails, the wave runs sequentially as before, declared in the plan and in the
+  `wave_sequencial` event — copying `.env` or skipping hooks stays forbidden. Measured
+  trigger: 433 of 535 implement minutes were serial developer time in one real slice.
+- **`/keelson:implement` §3.2.5 — worktree integration**, before any gate: dry-run per branch
+  (4.74), `git merge --no-ff` in TASK order (keeps the developer's `commit_sha`; never rebase
+  or squash), semantic reconciliation when two scopes touch, worktrees and `wt/*` branches
+  removed before the reviewer's dispatch mark. Any conflict integrates nothing and leaves the
+  worktrees for the Director. Retries stay sequential on the main tree. Teams mode now points
+  at the same owner (its merge used to sit after the gates).
+
+### Changed
+
+- `agents/developer.md`: in a task worktree every edit uses an absolute path under it, every
+  command runs with `cd <raiz_de_trabalho> &&`, and the first write is preceded by a
+  `show-toplevel` self-check (the `worktree-guard` hook does not reach subagents); SDD
+  artifacts and the ficha are read from the main root.
+- `sdd-conventions.md` and `commit-convention.md`: the intra-wave merge is a declared
+  exception to "no command merges", same design as `/keelson:merge` (into the working branch,
+  never into the base). `pause` and `continue` inventory live worktrees and unmerged `wt/*`
+  branches.
+- Wiki: `Ficha-do-projeto` documents the key; `Solucao-de-problemas` gains "conflict while
+  integrating the worktrees" and "developer Blocked by environment right after the wave
+  started". Field proof pending: `smoke-consumer.sh` with a parallel wave, on the Director's
+  order.
+
 ## [0.183.0] — 2026-09-27
 
 Re-init: none

@@ -86,7 +86,15 @@ retoma a TASK depois.
 
 ### 4. Implementar
 
-1. Criar/modificar arquivos no working tree (ou worktree em Agent Teams). Helper/validação/
+1. Criar/modificar arquivos no working tree — ou na **worktree da task** quando o despacho
+   traz `raiz_de_trabalho` (wave paralela em SUBAGENTS, decisão 4.433, ou Agent Teams): toda
+   edição usa caminho absoluto sob ela e todo comando roda com `cd <raiz_de_trabalho> &&`
+   (o cwd do Bash volta à raiz principal a cada chamada, e o `worktree-guard` não alcança
+   subagent); autocheck antes da 1ª escrita: `git -C <raiz_de_trabalho> rev-parse
+   --show-toplevel` é a worktree, nunca a raiz principal. Artefatos SDD, ficha e casa da
+   sessão são lidos pelos caminhos da raiz principal que o despacho passou — a worktree nasce
+   de HEAD e não carrega edição não commitada. O commit (passo 7) sai na branch
+   `wt/<slug>/<TASK>` da worktree; a integração é do Tech Lead. Helper/validação/
    conversão nova só depois de procurar o equivalente existente — inclusive de **wave anterior
    do mesmo PLAN**, no acumulado da branch: reimplementar reprova no gate 7 (`CODE-REVIEW.md` Art. 3, 4.207).
 2. Respeitar:
@@ -123,7 +131,7 @@ tempo todo, e o classificador de ações destrutivas do harness bloqueia a ediç
 Worktree criada de `HEAD` **não carrega o que você ainda não commitou** — o protocolo que
 leva o diff junto (decisão 4.428): `git add -- <arquivos novos da task>` (só os seus; o
 commit continua por pathspec) → `sha=$(git stash create)` (fotografa índice + árvore sem
-tocá-los; vazio → use `HEAD`) → `git worktree add --detach <casa da sessão>/tools/mut-<TASK> "$sha"`
+tocá-los; vazio → use `HEAD`) → `git worktree add --detach <casa da sessão>/tools/mut-<TASK> "$sha"` (casa = caminho absoluto do despacho, nunca resolvida a partir da worktree da task)
 (sem branch, para não calar o `largada-guard`) → mutar e rodar a suíte **lá** →
 `git worktree remove --force`. Declare no report `mutacao_protocolo` (worktree + comando;
 `n/a` **só** quando nenhum Critério de pronto da TASK prescreve mutante — mutante

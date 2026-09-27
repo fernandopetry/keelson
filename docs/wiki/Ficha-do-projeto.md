@@ -24,7 +24,8 @@ fixo nunca é assumido: se não está na ficha, o keelson pergunta ou reporta pe
     "build": null,
     "boot": null,
     "mutation": null,
-    "e2e": null
+    "e2e": null,
+    "worktreeBootstrap": null
   },
   "models": {},
   "gates": {
@@ -84,6 +85,8 @@ Os comandos reais do projeto. **Este é o campo que mais causa falha boba:** se 
 | `boot` | Como subir a aplicação localmente | A verificação de tela não sabe levantar o app |
 | `mutation` | Mutation testing — prova que a **suíte** falharia se o comportamento regredisse. Opt-in; roda na entrega (fecho do `/keelson:auto` e `/keelson:integrate`), depois da suíte verde — rodada verde não se repete enquanto o código não mudar | Linha `mutação: não configurada (opt-in)` no report da entrega — nada bloqueia |
 | `e2e` | Suíte E2E versionada (ex.: `npx playwright test`) — a memória do gate de tela: comportamento já verificado vira spec commitado, re-executável sem browser dirigido. Opt-in; recorte por task via tags `@<slug>`/`@AC-NNN-XXX` (`--grep`), regressão completa no `/keelson:integrate` | Linha `e2e: não configurado (opt-in)` — a verificação de tela segue só exploratória |
+
+| `worktreeBootstrap` | Comando que deixa uma **worktree recém-criada** pronta para rodar `test`/`lint` sozinha (instalar dependências, gerar o `.env` de teste, subir serviços próprios). É o opt-in das **waves paralelas com árvore por task**: com ele, os developers de uma wave rodam ao mesmo tempo, cada um na sua árvore, e o Tech Lead integra no fim. Só declare se a suíte roda isolada por árvore (banco e portas próprios) — suíte que compartilha banco ou container não paraleliza | Waves rodam sequenciais, uma TASK por vez |
 
 > **Não sabe montar a suíte E2E?** Rode `/keelson:e2e-setup`: ele instala o Playwright
 > (com a sua confirmação), gera a config e um smoke spec a partir da ficha — com

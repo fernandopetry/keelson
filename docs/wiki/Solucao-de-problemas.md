@@ -658,3 +658,21 @@ lacuna de ledger não é lacuna, é o sintoma se perpetuando.
   gera a mensagem pronta para o mantenedor do plugin.
 - Bug ou lacuna no próprio keelson: abra uma
   [issue](https://github.com/fernandopetry/keelson/issues).
+
+### A wave parou com "conflito ao integrar as worktrees"
+
+Nas waves paralelas (ficha com `quality.worktreeBootstrap`), cada TASK é implementada numa
+árvore própria e o Tech Lead integra tudo na branch de trabalho antes dos gates. Quando duas
+TASKs tocaram as mesmas linhas, o ensaio de merge acusa conflito e **nada é integrado**: a
+branch de trabalho fica limpa, e as worktrees e as branches `wt/<slug>/TASK-…` ficam vivas
+para você. Resolva o conflito à mão (merge de cada `wt/*` na ordem das TASKs) ou apague as
+branches e redespache as TASKs em sequência; depois, `/keelson:continue` retoma pela integração.
+
+### O developer voltou `Blocked` por ambiente logo depois de a wave começar
+
+Numa wave paralela, a worktree nova não tem dependências instaladas nem `.env` — é o comando
+`quality.worktreeBootstrap` da ficha que a prepara. Se ele falhou (ou falta algo que só existe
+no seu checkout principal), o keelson desfaz as worktrees e roda a wave sequencial, declarando o
+motivo. Ajuste o comando para deixar a árvore pronta sozinha (instalação, `.env` de teste,
+serviços próprios); copiar o `.env` real ou pular hooks não é solução aceita.
+

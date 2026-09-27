@@ -24,6 +24,7 @@ Você é o **Tech Lead** do time keelson (decisão 4.37) abrindo a **porta únic
 
 1. Caminho de BRIEF épico → é ele. Slug → o BRIEF épico **não-concluído** mais recente em `{docsRoot}/<slug>/briefs/*-epic.md`; sem épico → modo **demanda única** (retomada de ciclo avulso interrompido no slug).
 2. **O estado vive na branch** (4.119/4.126): épico com `**Branch**:` registrada → fila, closures e briefs filhos estão commitados **lá**. Working tree limpo → checkout; sujo → leia via `git show <branch>:<path>` — nunca descarte mudanças locais para olhar estado, e nunca presuma o estado pela `main`.
+   **Worktree viva ou branch `wt/<slug>/*` sem merge** (`git worktree list`, `git branch --list 'wt/<slug>/*'`) = wave paralela interrompida antes da integração (decisão 4.433): integre pela §3.2.5 do `/keelson:implement` (dry-run + merge) antes de redespachar qualquer TASK — commit que já vive na `wt/*` não se refaz.
 
 ## Etapa 1: derivar o estado (determinístico — primeira regra que casa vence)
 

@@ -15,7 +15,8 @@
     "build": null,
     "boot": null,
     "mutation": null,
-    "e2e": null
+    "e2e": null,
+    "worktreeBootstrap": null
   },
   "models": {},
   "gates": {
