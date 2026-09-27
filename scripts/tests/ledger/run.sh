@@ -20,6 +20,10 @@
 # prova "sem escopo → sem linha").
 # Corrida (4.384): dois append simultâneos (barreira por fifo) ganham caminhos
 # distintos e preservam os dois corpos — a reserva do nome é atômica (noclobber).
+# Marca de início da TASK (4.430): `mark despacho <agent> <slug> <task-id>` grava sem git,
+# a primeira vence, chave por slug, invisível a list/count; `mark-read despacho` ecoa só o
+# ISO mais antigo entre casas (sessão corrente, outras sessões, legado), vazio + exit 0 sem
+# marca, `--consume` apaga; `mark gate` intacto.
 #
 # Uso: scripts/tests/ledger/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -350,6 +354,54 @@ if [ -p "$TMP/fifo-a" ] && [ -p "$TMP/fifo-b" ]; then
 else
   echo "ok   race (mkfifo indisponível — pulado)"
 fi
+
+# --- mark despacho / mark-read (decisão 4.430: marca de início da TASK escrita por script) ---
+R9="$TMP/repo9"; mkdir -p "$R9"
+LD9="$R9/thoughts/local/session-ledger"
+total=$((total + 1))
+m1="$(lg "" "$R9" mark despacho developer slug-a TASK-001-001 --ts "2026-09-27T10:00:00-0300" 2>/dev/null)"
+if [ -f "$m1" ] && [ "$(basename "$m1")" = "mark-despacho-developer-slug-a-TASK-001-001" ] && grep -q '^ts: 2026-09-27T10:00:00-0300$' "$m1" && grep -q '^task: TASK-001-001$' "$m1"; then ok despacho-grava-marca; else falha "despacho-grava-marca: [$m1] $(cat "$m1" 2>/dev/null)"; fi
+# invisível a list/count (sem .md) — nunca vira evento nem é arquivada
+total=$((total + 1))
+if lg "" "$R9" list 2>/dev/null | grep -q mark-despacho || [ -n "$(lg "" "$R9" count 2>/dev/null)" ]; then falha despacho-invisivel-ao-ledger; else ok despacho-invisivel-ao-ledger; fi
+# a primeira vence: redespacho com ts posterior não regrava (4.308: retry não recaptura)
+total=$((total + 1))
+lg "" "$R9" mark despacho developer slug-a TASK-001-001 --ts "2026-09-27T11:00:00-0300" >/dev/null 2>&1
+if grep -q '^ts: 2026-09-27T10:00:00-0300$' "$m1"; then ok despacho-primeira-vence; else falha "despacho-primeira-vence: $(cat "$m1")"; fi
+# mark-read ecoa só o ISO, uma linha
+total=$((total + 1))
+r1="$(lg "" "$R9" mark-read despacho developer slug-a TASK-001-001 2>/dev/null)"
+[ "$r1" = "2026-09-27T10:00:00-0300" ] && ok mark-read-eco-iso || falha "mark-read-eco-iso: [$r1]"
+# chave por slug: o mesmo task-id noutro slug não colide (4.124)
+total=$((total + 1))
+lg "" "$R9" mark despacho developer slug-b TASK-001-001 --ts "2026-09-27T12:00:00-0300" >/dev/null 2>&1
+r2="$(lg "" "$R9" mark-read despacho developer slug-b TASK-001-001 2>/dev/null)"
+r1b="$(lg "" "$R9" mark-read despacho developer slug-a TASK-001-001 2>/dev/null)"
+if [ "$r2" = "2026-09-27T12:00:00-0300" ] && [ "$r1b" = "2026-09-27T10:00:00-0300" ]; then ok despacho-chave-por-slug; else falha "despacho-chave-por-slug: [$r1b] [$r2]"; fi
+# sem marca → stdout vazio, exit 0 (a lacuna "—" é da closure, 4.337)
+total=$((total + 1))
+r3="$(lg "" "$R9" mark-read despacho developer slug-a TASK-009-009 2>/dev/null)"; rc=$?
+if [ -z "$r3" ] && [ $rc -eq 0 ]; then ok mark-read-sem-marca-vazio-exit-0; else falha "mark-read-sem-marca-vazio-exit-0: [$r3] rc=$rc"; fi
+# --consume apaga a marca; segunda leitura vazia (TASK reaberta não herda início velho)
+total=$((total + 1))
+r4="$(lg "" "$R9" mark-read despacho developer slug-b TASK-001-001 --consume 2>/dev/null)"
+r5="$(lg "" "$R9" mark-read despacho developer slug-b TASK-001-001 2>/dev/null)"
+if [ "$r4" = "2026-09-27T12:00:00-0300" ] && [ -z "$r5" ] && [ ! -f "$LD9/mark-despacho-developer-slug-b-TASK-001-001" ]; then ok mark-read-consume; else falha "mark-read-consume: [$r4] [$r5]"; fi
+# marca gravada na casa de OUTRA sessão é lida (closure noutra sessão) — a mais antiga vence
+total=$((total + 1))
+lg "sess-um" "$R9" mark despacho developer slug-c TASK-002-002 --ts "2026-09-27T08:00:00-0300" >/dev/null 2>&1
+lg "sess-dois" "$R9" mark despacho developer slug-c TASK-002-002 --ts "2026-09-27T09:00:00-0300" >/dev/null 2>&1
+r6="$(lg "sess-tres" "$R9" mark-read despacho developer slug-c TASK-002-002 2>/dev/null)"
+[ "$r6" = "2026-09-27T08:00:00-0300" ] && ok mark-read-entre-casas-mais-antiga || falha "mark-read-entre-casas-mais-antiga: [$r6] casas=$(find "$R9/thoughts/local/sessions" -mindepth 1 -maxdepth 1 2>/dev/null | tr '\n' ' ')"
+# task-id fora da forma → exit 2; agent com barra → exit 2
+total=$((total + 1))
+lg "" "$R9" mark despacho developer slug-a T-1 >/dev/null 2>&1; a=$?
+lg "" "$R9" mark despacho dev/x slug-a TASK-001-002 >/dev/null 2>&1; b=$?
+[ $a -eq 2 ] && [ $b -eq 2 ] && ok despacho-forma-exit-2 || falha "despacho-forma-exit-2: $a $b"
+# mark gate segue intacto: origem sem guard continua exit 2
+total=$((total + 1))
+lg "" "$R9" mark gate qa slug-a >/dev/null 2>&1
+[ $? -eq 2 ] && ok despacho-nao-toca-mark-gate || falha despacho-nao-toca-mark-gate
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

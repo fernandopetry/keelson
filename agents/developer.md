@@ -72,15 +72,15 @@ rodar — cada um é a mesma violação de gate do furo silencioso (decisão 4.3
 
 ### 3. Medir o instante de início
 
-**Não edite o arquivo da TASK** — nem o Status (decisão 4.416): a marca do despacho no
-ledger (4.379) e o run-state já dizem o que está em voo, e o `.md` nunca entra no seu
+**Não edite o arquivo da TASK** — nem o Status (decisão 4.416): a marca de início da TASK no
+ledger (4.430) e o run-state já dizem o que está em voo, e o `.md` nunca entra no seu
 commit (passo 7) — um `In Progress` no working tree só vira sujeira que o Tech Lead
 descarta à mão antes do próximo despacho na mesma árvore. A closure escreve `Done` direto.
 
 **Medir o instante** (`TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z`) para o campo
 `data_inicio` do report (passo 8) — **nunca escrever `Data início` no cabeçalho** (decisão
 4.347): o campo tem dono único no "## Histórico de execução" do template, preenchido pela
-main session na closure com a marca do despacho (4.308); linha no cabeçalho duplica o campo
+main session na closure com a marca de início lida do ledger (4.430); linha no cabeçalho duplica o campo
 com valor divergente, e como o relógio do ciclo lê a última ocorrência ela só engana quem
 retoma a TASK depois.
 

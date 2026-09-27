@@ -7,6 +7,8 @@
 # Uso: ledger.sh <raiz-do-repo> append <tipo> <origem> <slug> [--ref <caminho>] [--ts <iso>]
 #                                                             [--diff-id <hash|none>]
 #      ledger.sh <raiz-do-repo> mark gate <origem> <slug> [--ts <iso>]
+#      ledger.sh <raiz-do-repo> mark despacho <agent> <slug> <task-id> [--ts <iso>]
+#      ledger.sh <raiz-do-repo> mark-read despacho <agent> <slug> <task-id> [--consume]
 #      ledger.sh <raiz-do-repo> list [--archived]
 #      ledger.sh <raiz-do-repo> count
 #      ledger.sh <raiz-do-repo> last <tipo> <origem>
@@ -44,6 +46,18 @@
 #            Chamada pelo comando ANTES de despachar o revisor. Sem ficha, git, escopo
 #            ou raiz principal → aviso em stderr, exit 0, nada gravado (nunca é gate).
 #            Colisão de segundo ganha sufixo -2, -3… Ecoa o caminho criado.
+#            `mark despacho <agent> <slug> <task-id>` (decisão 4.430) é a OUTRA marca: o
+#            instante em que a TASK foi despachada ao agent (developer) — gravada em
+#            `<ledger>/mark-despacho-<agent>-<slug>-<task-id>` (sem `.md`), sem git nem
+#            identidade; a PRIMEIRA vence (redespacho/retry é no-op com aviso — instante
+#            perdido não se recria, 4.308). Chave por slug: o mesmo id de TASK em dois
+#            slugs nunca colide (4.124). Ecoa o caminho.
+#   mark-read `mark-read despacho <agent> <slug> <task-id>` ecoa o `ts:` MAIS ANTIGO entre
+#            a casa da sessão, as demais casas em thoughts/local/sessions/*/ledger e o
+#            legado (a closure pode rodar noutra sessão): só o ISO no stdout, uma linha —
+#            é o que a closure transcreve em `data_inicio`. Sem marca → stdout vazio,
+#            aviso em stderr, exit 0 (a lacuna canônica "—" é da closure, 4.337).
+#            --consume apaga as marcas lidas (fecho da closure; TASK reaberta não herda).
 #   list     eventos ativos (um por linha, ordenados); --archived lista os consumidos
 #   count    contagem de eventos ativos por tipo
 #   last     caminho do evento MAIS RECENTE do par tipo/origem — ativos e arquivados
@@ -211,7 +225,37 @@ case "$ACTION" in
 
   mark)
     TIPO="${1:-}"; ORIGEM="${2:-}"; SLUG="${3:-}"
-    [ "$TIPO" = "gate" ] || die2 "mark existe só para o tipo gate."
+    if [ "$TIPO" = "despacho" ]; then
+      # marca de início da TASK (4.430): sem git nem identidade — só o instante do despacho
+      AGENT="$ORIGEM"; TASKID="${4:-}"
+      [ -n "$AGENT" ] && [ -n "$SLUG" ] && [ -n "$TASKID" ] || die2 "mark despacho exige <agent> <slug> <task-id>."
+      case "$AGENT$SLUG" in */*|*" "*) die2 "agent/slug inválido (sem espaço/barra): $AGENT $SLUG" ;; esac
+      case "$TASKID" in TASK-[0-9][0-9][0-9]-[0-9][0-9][0-9]) ;; *) die2 "task-id fora da forma TASK-MMM-XXX: $TASKID" ;; esac
+      shift 4
+      TS=""
+      while [ $# -gt 0 ]; do
+        case "$1" in
+          --ts) shift; [ $# -gt 0 ] || die2 "--ts exige um ISO 8601."; TS="$1" ;;
+          *) die2 "opção desconhecida: $1" ;;
+        esac
+        shift
+      done
+      pair="$(stamp "$TS")" || exit 2
+      iso="${pair##*	}"
+      if [ -f "$SDS" ]; then
+        d="$(bash "$SDS" "$ROOT" ledger-dir --create --slug "$SLUG" ${TS:+--ts "$TS"} 2>/dev/null)" || d=""
+        [ -n "$d" ] && LDIR="$d"
+      fi
+      mkdir -p "$LDIR" || die2 "não consegui criar $LDIR"
+      markf="$LDIR/mark-despacho-$AGENT-$SLUG-$TASKID"
+      # a PRIMEIRA marca vence (4.308: retry não recaptura) — reserva atômica por noclobber
+      if ! ( set -C; printf 'ts: %s\nagent: %s\nslug: %s\ntask: %s\n' "$iso" "$AGENT" "$SLUG" "$TASKID" > "$markf" ) 2>/dev/null; then
+        echo "ledger: marca de despacho já existe para $TASKID ($(sed -n 's/^ts: //p' "$markf" 2>/dev/null)) — a primeira vence, nada regravado." >&2
+      fi
+      printf '%s\n' "$markf"
+      exit 0
+    fi
+    [ "$TIPO" = "gate" ] || die2 "mark existe só para os tipos gate e despacho."
     [ -n "$ORIGEM" ] && [ -n "$SLUG" ] || die2 "mark exige gate <origem> <slug>."
     shift 3
     TS=""
@@ -239,6 +283,46 @@ case "$ACTION" in
     markf="$LDIR/mark-gate-$ORIGEM"
     printf 'ts: %s\ndiff_id: %s\nscope: %s\nslug: %s\n' "$iso" "$id" "$scope" "$SLUG" > "$markf" || die2 "não consegui escrever $markf"
     printf '%s\n' "$markf"
+    exit 0 ;;
+
+  mark-read)
+    TIPO="${1:-}"; AGENT="${2:-}"; SLUG="${3:-}"; TASKID="${4:-}"
+    [ "$TIPO" = "despacho" ] || die2 "mark-read existe só para o tipo despacho."
+    [ -n "$AGENT" ] && [ -n "$SLUG" ] && [ -n "$TASKID" ] || die2 "mark-read despacho exige <agent> <slug> <task-id>."
+    shift 4
+    CONSUME=0
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --consume) CONSUME=1 ;;
+        *) die2 "opção desconhecida: $1" ;;
+      esac
+      shift
+    done
+    name="mark-despacho-$AGENT-$SLUG-$TASKID"
+    # casas lidas: a corrente, TODAS as de thoughts/local/sessions/*/ledger (a closure pode
+    # rodar noutra sessão — a 4.325 valoriza o ciclo que atravessa sessões) e o legado
+    found=""
+    for f in "$LDIR/$name" "$ROOT"/thoughts/local/sessions/*/ledger/"$name" "$LDIR_LEG/$name"; do
+      [ -f "$f" ] || continue
+      case " $found " in *" $f "*) continue ;; esac
+      found="$found $f"
+    done
+    if [ -z "$found" ]; then
+      echo "ledger: sem marca de despacho para $AGENT/$SLUG/$TASKID — data_inicio fica como lacuna (—)." >&2
+      exit 0
+    fi
+    best=""; bestc=""
+    for f in $found; do
+      iso="$(sed -n 's/^ts: //p' "$f" | sed -n 1p)"
+      [ -n "$iso" ] || continue
+      pair="$(stamp "$iso" 2>/dev/null)" || continue
+      c="${pair%%	*}"
+      if [ -z "$bestc" ] || [ "$c" \< "$bestc" ]; then best="$iso"; bestc="$c"; fi
+    done
+    [ -n "$best" ] && printf '%s\n' "$best"
+    if [ "$CONSUME" = 1 ]; then
+      for f in $found; do rm -f "$f"; done
+    fi
     exit 0 ;;
 
   last)
@@ -348,5 +432,5 @@ case "$ACTION" in
     em_cada_casa archive_casa
     exit 0 ;;
 
-  *) die2 "ação desconhecida: $ACTION (use append, mark, last, list, count ou archive)" ;;
+  *) die2 "ação desconhecida: $ACTION (use append, mark, mark-read, last, list, count ou archive)" ;;
 esac

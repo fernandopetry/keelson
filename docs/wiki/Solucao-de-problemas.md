@@ -324,7 +324,8 @@ O aviso aparece quando o campo foi preenchido com outra coisa: uma explicação 
 inutiliza a medição — o [relógio do ciclo](Conceitos) não consegue derivar a duração e
 descarta a TASK da conta.
 
-Como resolver: se a marca real existe em algum lugar (o commit da TASK, por exemplo),
+Como resolver: se a marca real existe em algum lugar (a marca de despacho que o
+`ledger.sh` grava na casa da sessão e a closure lê, ou o commit da TASK),
 grave-a no formato completo; se o instante se perdeu de vez, deixe o campo **vazio** ou
 com um `—` — a lacuna honesta é a ausência, nunca uma frase no lugar do valor.
 

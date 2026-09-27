@@ -23,6 +23,37 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.181.0] — 2026-09-27
+
+Re-init: none
+
+Decision 4.430 — field intake (LRN-089, third occurrence in one consumer ledger): the
+TASK start mark is written by a script at dispatch and read by the closure.
+
+### Added
+
+- `scripts/ledger.sh mark despacho <agent> <slug> <task-id>` and
+  `mark-read despacho … [--consume]`: the Tech Lead no longer captures `data_inicio` from
+  memory. The mark is a file next to the reviewer's dispatch mark (invisible to
+  `list`/`count`/`archive`, never a ledger event), the **first mark wins** (a retry never
+  moves the start), it is keyed by slug (the same TASK id in two slugs never collides), and
+  the read scans every session home plus the legacy ledger and prints the earliest ISO on
+  stdout — nothing when no mark exists, so the closure transcribes a value or the canonical
+  gap, never prose. `--consume` deletes the marks once transcribed, so a reopened TASK
+  starts fresh. Suite: 10 new cases in `scripts/tests/ledger/` (56 green).
+
+### Changed
+
+- `/keelson:implement` §3.2 dispatches with the mark (`ledger.sh mark despacho developer
+  <slug> TASK-MMM-XXX` before the spawn) and §3.4.1 fills `data_inicio` from
+  `mark-read … --consume`; the developer's own `data_inicio` stays a declared backup. The
+  4.308 text ("capture it yourself") was installed and still failed three times in the
+  field — the instant is now measured by the script, not remembered.
+- `agents/developer.md` and `sdd-conventions.md` name the new mark distinctly from the
+  reviewer's dispatch mark (4.379), so "marca do despacho" no longer means two things.
+  Next rung (a PreToolUse hook writing the mark on the developer spawn) is escalated to
+  the Director, not applied.
+
 ## [0.180.0] — 2026-09-24
 
 Re-init: none
