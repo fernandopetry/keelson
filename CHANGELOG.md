@@ -61,8 +61,10 @@ transcript reading). Opt-in: nothing changes until the ficha declares
   branches.
 - Wiki: `Ficha-do-projeto` documents the key; `Solucao-de-problemas` gains "conflict while
   integrating the worktrees" and "developer Blocked by environment right after the wave
-  started". Field proof pending: `smoke-consumer.sh` with a parallel wave, on the Director's
-  order.
+  started". Field proof: `smoke-consumer.sh --scenario parallel` (new scenario) ran on
+  2026-09-27 with the real model — two developers with overlapping windows, two `--no-ff`
+  merge commits in TASK order, sequential retries, no worktree or `wt/*` branch left, suite
+  green (13/14 facts; the 14th was the smoke's own regex, fixed).
 
 ## [0.183.0] — 2026-09-27
 

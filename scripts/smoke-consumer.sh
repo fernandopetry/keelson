@@ -11,6 +11,13 @@
 #   cycle   /keelson:auto com uma feature de uma função: SPEC/PLAN/TASK/INDEX no slug,
 #           grafo e lint sem ERROR, código escrito, suíte do consumidor verde, trabalho
 #           em branch com commits, TASK Done, ledger da sessão com eventos.
+#   parallel ficha com `quality.worktreeBootstrap` (4.433) + /keelson:auto de uma feature com
+#           dois módulos independentes: a wave sai PARALELA — dois developers com janelas
+#           sobrepostas no transcript (subagents/*.jsonl), commits de merge `--no-ff` das
+#           branches wt/<slug>/<TASK> na branch de trabalho, nenhuma worktree nem branch
+#           `wt/*` sobrando, thoughts/local/worktrees/ vazio, suíte verde, TASKs Done,
+#           nenhum `wave_sequencial` por "sem worktree" no ledger. É a ÚNICA prova do fluxo
+#           da §3.2.5 — nenhuma suíte cobre o merge (4.433).
 #   pause   /keelson:pause + /keelson:continue DEPOIS do ciclo entregue: o pause recusa
 #           (não há ciclo em voo — nenhuma marca inventada na Cronologia), o continue
 #           declara "nada pendente", nenhum commit novo de código, nenhuma TASK
@@ -33,9 +40,9 @@
 # somado/mediana/pico, Bash com 1 script × com 2+ encadeados, e tokens por papel, lidos do
 # transcript da sessão do consumidor.
 #
-# Uso: smoke-consumer.sh [--scenario init|cycle|pause|triage|report|broken|all] [--results DIR]
+# Uso: smoke-consumer.sh [--scenario init|cycle|parallel|pause|triage|report|broken|all] [--results DIR]
 #                        [--model M] [--timeout S] [--plugin-dir DIR] [--consumer DIR]
-#   --scenario   default all (ordem: init → cycle → pause → triage → report → broken; cada um assume o
+#   --scenario   default all (ordem: init → cycle → parallel → pause → triage → report → broken; cada um assume o
 #                estado deixado pelo anterior; --consumer reaproveita um consumidor).
 #   --results    raiz das saídas (default: mktemp); raw.json/result.txt por cenário + summary.md.
 #   --timeout    teto por chamada ao modelo em segundos (default 7200 — o ciclo formal de
@@ -305,6 +312,68 @@ cen_cycle() {
   fato "cycle/arvore-limpa-apos-entrega" '[ -z "$(G status --porcelain | grep -v "^?? thoughts/")" ]'
 }
 
+
+# ------------------------------------------------------------ parallel (4.433)
+# Duas janelas de developer se sobrepõem? Lê os subagents da sessão do consumidor (meta +
+# primeiro/último timestamp do jsonl) — o mesmo método da leitura de transcripts (4.431).
+developers_sobrepostos() {
+  sid="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("session_id",""))' "$RESULTS/parallel.raw.json" 2>/dev/null)"
+  [ -n "$sid" ] || return 1
+  d="$(find "$HOME/.claude/projects" -type d -name "$sid" 2>/dev/null | head -1)"
+  [ -n "$d" ] && [ -d "$d/subagents" ] || return 1
+  python3 - "$d/subagents" <<'PY2'
+import json, sys, glob, os
+from datetime import datetime
+iv = []
+for m in glob.glob(os.path.join(sys.argv[1], "agent-*.meta.json")):
+    try:
+        if json.load(open(m)).get("agentType") != "keelson:developer": continue
+    except Exception: continue
+    j = m[:-len(".meta.json")] + ".jsonl"
+    if not os.path.isfile(j): continue
+    lines = open(j, encoding="utf-8", errors="replace").read().splitlines()
+    ts = []
+    for l in (lines[:1] + lines[-1:]):
+        try: ts.append(json.loads(l).get("timestamp"))
+        except Exception: pass
+    ts = [t for t in ts if t]
+    if len(ts) < 2: continue
+    f = lambda x: datetime.fromisoformat(x.replace("Z", "+00:00"))
+    iv.append((f(ts[0]), f(ts[1])))
+iv.sort()
+ok = any(iv[i][1] > iv[j][0] for i in range(len(iv)) for j in range(i + 1, len(iv)))
+print(f"developers={len(iv)} sobrepostos={'sim' if ok else 'nao'}")
+sys.exit(0 if ok else 1)
+PY2
+}
+cen_parallel() {
+  # opt-in da 4.433: projeto Python sem dependências — a worktree nova já roda a suíte
+  python3 - "$CONSUMER/keelson.config.json" <<'PY2'
+import json, sys
+p = sys.argv[1]; d = json.load(open(p))
+d.setdefault("quality", {})["worktreeBootstrap"] = "true"
+json.dump(d, open(p, "w"), indent=2, ensure_ascii=False); open(p, "a").write("\n")
+PY2
+  G add -A -- keelson.config.json; G commit -q -m "chore(keelson): declare worktreeBootstrap for the smoke" -- keelson.config.json
+  roda parallel "/keelson:auto feature 'utilitários de texto e números' em DOIS módulos NOVOS e independentes: (1) src/slugify.py com slugify(s) — minúsculas, espaços e pontuação viram um único hífen, sem hífen nas pontas — e tests/test_slugify.py; (2) src/roman.py com to_roman(n) para 1..3999 e tests/test_roman.py. Os dois módulos não se tocam nem tocam src/calc.py; cada TASK mexe só no seu módulo e no seu teste. Trate como feature com o ciclo SDD completo (SPEC → PLAN → TASKs → implementação) e decomponha numa wave com as duas TASKs de implementação INDEPENDENTES na mesma wave. Esta sessão não tem humano interativo: decisões de rotina são suas; em escalação, assuma o default que você mesmo declarar e siga até a Entrega; não abra PR."
+  echo "### fatos: parallel" >> "$SUM"
+  SD="$(slug_dir)"; printf -- '- slug: %s\n' "${SD:-nenhum}" >> "$SUM"
+  fato "parallel/ficha-bootstrap-declarado"  'grep -q "worktreeBootstrap" "$CONSUMER/keelson.config.json"'
+  fato "parallel/slugify-escrita"            '[ -f "$CONSUMER/src/slugify.py" ] && grep -q "def slugify" "$CONSUMER/src/slugify.py"'
+  fato "parallel/roman-escrita"              '[ -f "$CONSUMER/src/roman.py" ] && grep -q "def to_roman" "$CONSUMER/src/roman.py"'
+  fato "parallel/suite-verde"                '( cd "$CONSUMER" && python3 -m unittest discover -s tests -t . >/dev/null 2>&1 )'
+  fato "parallel/tasks-done-2+"              '[ -n "$SD" ] && [ "$(grep -l "^\*\*Status\*\*: Done" "$SD"/tasks/TASK-*.md 2>/dev/null | grep -vc INDEX)" -ge 2 ]'
+  fato "parallel/plano-declarou-paralelismo" 'grep -qiE "wave paralela|worktree por task|paralelismo m[aá]x[^0-9]*[2-9]" "$RESULTS/parallel.result.txt"'
+  fato "parallel/developers-sobrepostos"     'developers_sobrepostos >> "$SUM" 2>/dev/null'
+  fato "parallel/merge-commits-no-ff"        '[ "$(G log --merges --format=%s main..HEAD 2>/dev/null | grep -c "merge TASK-")" -ge 2 ]'
+  fato "parallel/sem-worktree-sobrando"      '[ "$(G worktree list 2>/dev/null | wc -l | tr -d " ")" -eq 1 ]'
+  fato "parallel/sem-branch-wt"              '[ -z "$(G branch --list "wt/*" 2>/dev/null)" ]'
+  fato "parallel/worktrees-dir-vazio"        '[ ! -d "$CONSUMER/thoughts/local/worktrees" ] || [ -z "$(find "$CONSUMER/thoughts/local/worktrees" -mindepth 2 -maxdepth 2 2>/dev/null)" ]'
+  fato "parallel/sem-wave-sequencial-por-arvore" '! grep -rqs "sem worktree" "$CONSUMER"/thoughts/local/sessions/*/ledger/ "$CONSUMER"/thoughts/local/session-ledger/ 2>/dev/null'
+  fato "parallel/grafo-sem-error"            '[ -n "$SD" ] && bash "$PLUGIN/scripts/graph.sh" "$SD" --check >/dev/null 2>&1'
+  fato "parallel/arvore-limpa-apos-entrega"  '[ -z "$(G status --porcelain | grep -v "^?? thoughts/")" ]'
+}
+
 # ------------------------------------------------------------ pause
 cen_pause() {
   SD="$(slug_dir)"; slug="$(basename "${SD:-x}")"
@@ -404,11 +473,12 @@ cen_report() {
 case "$SCEN" in
   init)   cen_init ;;
   cycle)  cen_cycle ;;
+  parallel) cen_parallel ;;
   pause)  cen_pause ;;
   broken) cen_broken ;;
   triage) cen_triage ;;
   report) cen_report ;;
-  all)    cen_init; cen_cycle; cen_pause; cen_triage; cen_report; cen_broken ;;
+  all)    cen_init; cen_cycle; cen_parallel; cen_pause; cen_triage; cen_report; cen_broken ;;
   *) echo "ERRO: --scenario inválido: $SCEN" >&2; exit 2 ;;
 esac
 
