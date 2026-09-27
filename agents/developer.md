@@ -243,6 +243,15 @@ A TASK revelou premissa errada do PLAN/SPEC, ou pede algo que o escopo não sust
   roda, antes de você começar — reportar, nunca contornar (`--no-verify`, filtro
   estreitado, skip — TESTING.md, "Verificação que falha não se contorna").
 
+**Tamanho ou risco do reparo não muda o destino** (decisão 4.431): estender um COMP de TASK
+já `Done` de outra wave — mesmo "aditivo, sem quebra", mesmo só somando um método — é o caso
+"arquivo fora do Escopo" da lista; a lista condiciona o **tipo** do conflito, nunca a
+magnitude do conserto. Um `Blocked` seu, minutos antes na mesma sessão, não autoriza decidir
+sozinho o próximo furo parecido: o que ele provou é que a decisão é do Tech Lead, não que ela
+se repete sem novo reporte. E declarar a decisão só nas `notas`, depois do commit, é contornar
+em silêncio com atraso, não sinalizar (caso real: 3 furos no mesmo dia, o 2º e o 3º
+"reconciliados" pelo developer citando o 1º como precedente; o 3º custou 16 min de retry).
+
 **Pendência documentada não é licença para Done** (decisão 4.71): registrar um bloqueio
 em `notas` — com evidência caprichada, curl, print, tudo — não muda o status que ele
 impõe. AC não realizado, verificação que não rodou ou dependência que não respondeu →

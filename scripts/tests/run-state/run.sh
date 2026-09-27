@@ -288,6 +288,18 @@ out="$(rs sessao-nova "$RC3" claim claim-slug 2>/dev/null)"; rc=$?
 if [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q '^posse: assumida' && [ ! -f "$RC3/thoughts/local/run-state-claim-slug.md" ] && grep -q '^sessao: sessao-nova' "$RC3"/thoughts/local/sessions/*/run-state-claim-slug.md; then ok claim-legado-assume
 else falha "claim-legado-assume: rc=$rc [$out]"; fi
 
+# FORCE=1 (4.431): processo vivo carregando o id da dona E casa recente → assumida de propósito
+RC4="$TMP/repo-claim4"; mkdir -p "$RC4"
+rs sessao-dona "$RC4" init claim-slug PLAN-001 2 "wave 1" >/dev/null 2>&1
+( exec -a "claude --keelson-teste sessao-dona" sleep 20 ) & PVIVO4=$!
+total=$((total + 1))
+out="$(rs sessao-nova "$RC4" claim claim-slug 2>/dev/null)"; rc=$?
+# o wrapper rs() apaga FORCE de propósito — aqui a variável entra DEPOIS dele
+out2="$(env -u CLAUDE_CODE_SESSION_ID -u KEELSON_SESSAO RUN_STATE_SESSAO=sessao-nova FORCE=1 bash "$RS" "$RC4" claim claim-slug 2>/dev/null)"; rc2=$?
+kill "$PVIVO4" 2>/dev/null; wait "$PVIVO4" 2>/dev/null
+if [ "$rc" -eq 3 ] && [ "$rc2" -eq 0 ] && printf '%s' "$out2" | grep -q '^posse: assumida' && grep -q '^sessao: sessao-nova' "$RC4"/thoughts/local/sessions/*/run-state-claim-slug.md && grep -q 'FORCE=1' "$RC4"/thoughts/local/sessions/*/run-state-claim-slug.md; then ok claim-force-assume-com-processo-vivo
+else falha "claim-force-assume-com-processo-vivo: rc=$rc rc2=$rc2 [$out2]"; fi
+
 echo "---"
 if [ "$fail" -gt 0 ]; then
   echo "run-state: $fail de $total casos falharam"

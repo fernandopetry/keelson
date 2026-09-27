@@ -32,8 +32,12 @@ projeto · §4 idempotência · §5 modos create/link · §6 issue da SPEC (§6.
   disponível na largada** que cai no meio faz cada gancho seguinte falhar sozinho, e cada falha
   isolada é engolida como "best-effort". Trate a disponibilidade como **estado da execução**,
   simétrico nos dois sentidos: qualquer chamada MCP que falhe por indisponibilidade do conector
-  (conexão fechada, não autorizado, servidor ausente) **marca o conector como caído** para o
-  resto da execução — os ganchos seguintes não reprovam um a um, apenas acumulam o que ficou
+  (conexão fechada, não autorizado, servidor ausente — e **timeout repetido**: 3 chamadas
+  consecutivas expiradas valem queda, decisão 4.431; caso real: 58 timeouts em 31 min, um por
+  minuto, com a main esperando) **marca o conector como caído** para o resto da execução.
+  Timeout é resposta **perdida**, não negativa: antes de recriar o que "falhou", consulte por
+  JQL o que já existe — a execução que expirou pode ter criado a issue (duplicata e key
+  gravada em duas TASKs foram o custo real). Isso — os ganchos seguintes não reprovam um a um, apenas acumulam o que ficou
   para trás. O estado é evento `tracker` no ledger de sessão (`sdd-conventions.md`), com o
   gancho onde caiu e **a devolutiva literal da chamada**, e desagua na §14. Falha de **uma
   operação** (campo obrigatório, transição inexistente, permissão da issue) com o conector

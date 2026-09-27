@@ -41,7 +41,10 @@
 #              `posse: recusada · <motivo>`, exit 3 (o chamador escala ao humano — a
 #              terceira saída da 4.251 continua sendo o default). Run já desta sessão →
 #              `posse: propria`, exit 0. Sem run em_andamento → `posse: nenhum-run`, exit 0.
-#              --check só julga, não escreve.
+#              --check só julga, não escreve. FORCE=1 (4.431) assume DE PROPÓSITO: pula
+#              (a)/(b)/(c) e registra `posse_anterior … FORCE=1` — é a resposta "essa
+#              sessão está morta, force" do humano, que antes era recusada porque um
+#              `--resume` da IDE mantinha o id da dona num processo vivo.
 #
 # Leitura dupla (carência 4.314): wave-done/close/show operam no arquivo da casa
 # da sessão quando ele existe, senão no caminho legado — um run iniciado antes do
@@ -232,12 +235,18 @@ case "$ACTION" in
     [ -n "$dono" ] || dono="desconhecida"
     if [ "$dono" = "$SESSAO" ]; then echo "posse: propria · $alvo"; exit 0; fi
     [ "$SESSAO" != "desconhecida" ] || { echo "posse: recusada · esta sessão não tem id (RUN_STATE_SESSAO/CLAUDE_CODE_SESSION_ID) — sem identidade não há posse a assumir"; exit 3; }
+    motivo=""
+    # FORCE=1 (decisão 4.431): assunção DELIBERADA do humano — pula a prova de vida (c) e a
+    # evidência (a)/(b). Caso real: processo `--resume` da IDE carregava o id da dona 12 h
+    # depois da morte da sessão; o Diretor mandou forçar e o script recusava mesmo assim.
+    if [ "${FORCE:-}" = "1" ]; then
+      motivo="FORCE=1 (assunção deliberada do humano)"
+    else
     # (c) processo vivo carregando o id da dona → prova de vida, recusa
     if [ "$dono" != "desconhecida" ] && pgrep -f -- "$dono" >/dev/null 2>&1; then
-      echo "posse: recusada · processo vivo carrega o id da dona ($dono) — a sessão pode estar em execução"; exit 3
+      echo "posse: recusada · processo vivo carrega o id da dona ($dono) — a sessão pode estar em execução. Morta de verdade? FORCE=1 assume de propósito (4.431)."; exit 3
     fi
     # (a) casa reportada
-    motivo=""
     if [ "$casa" != "$DIR_LEG" ] && grep -qx 'estado: reportada' "$casa/session.meta" 2>/dev/null; then
       motivo="casa da dona em estado: reportada"
     else
@@ -255,6 +264,7 @@ case "$ACTION" in
         echo "posse: recusada · casa da dona ($dono) ativa há ${inat}min (limiar ${STALE}min) — sem evidência de morte, escale ao humano (4.251)"; exit 3
       fi
       motivo="inatividade ${inat}min (limiar ${STALE}min)"
+    fi
     fi
     if [ "$CHECK" -eq 1 ]; then echo "posse: assumivel · dona $dono · $motivo · run $alvo"; exit 0; fi
     # assume: move o run para a casa desta sessão, reescreve sessao: e registra a origem

@@ -23,6 +23,40 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.182.0] — 2026-09-27
+
+Re-init: none
+
+Decision 4.431 — the maintainer read 12 sessions (697 subagents, 61 h) of one consumer epic;
+five proven fixes applied, nine larger levers proposed to the Director.
+
+### Fixed
+
+- **`run-state.sh claim` honors `FORCE=1`.** The documented escape never reached the
+  liveness check: a `--resume` process of the IDE kept the dead owner's id alive for 12 h,
+  the Director answered "that session is dead, force it" and the script still refused.
+  `FORCE=1` is now the human's deliberate takeover — it skips liveness and inactivity
+  evidence and records the reason in `posse_anterior`. New suite case (45 green).
+- **Jira connector: repeated timeouts count as a fall.** Three consecutive timeouts mark
+  the connector down for the execution (58 timeouts in 31 min with the main session
+  waiting), and a timeout is a *lost* answer, not a negative one: the protocol now says
+  to query by JQL before re-creating anything the expired call may already have created
+  (the case produced a duplicate and one key written into two TASKs).
+- **`lessons.sh match --paths` placeholders say "comma-separated"** in the four command
+  sites: with spaces the script silently honors only the first path (13 paths → `path=0`).
+
+### Changed
+
+- **`agents/developer.md`, plan gap:** size or risk of the repair never changes the
+  destination — extending a `Done` component of another wave is the "file outside Scope"
+  case even when additive; an earlier `Blocked` in the same session does not authorize
+  deciding the next gap alone; declaring the decision in `notas` after the commit is a
+  delayed silent workaround (LRN-144, recurrence 2 read in the transcripts).
+- **`agents/security-engineer.md`:** proofs that write to the tree (mutants, fault
+  injection) run in their own worktree — the 4.361 rule now reaches gate 8 through its
+  own agent file (LRN-045 recurrence 4: a mutant applied on the main tree while a
+  developer edited it).
+
 ## [0.181.0] — 2026-09-27
 
 Re-init: none
