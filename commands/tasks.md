@@ -65,9 +65,12 @@ agent** (briefings distintos do `scribe`, nunca agents novos):
 
 1. **Decompositor**: um `scribe` com o pacote acima, Etapas 1 a 3 como régua de decisão,
    e a instrução de **não escrever arquivo nenhum**: o retorno é um **manifesto
-   congelado** — por TASK: ID, título, tipo, tamanho, wave, `Depende de`/`Bloqueia`,
-   FRs/FEATs/COMPs, distribuição AC×gate, bullets de Inclui/Não inclui e lições ativas
-   aplicáveis. O manifesto é o produto intelectual da decomposição: ID e aresta ficam
+   congelado** — por TASK: ID, título, tipo, tamanho, wave, `Depende de`/`Bloqueia`
+   (**as duas pontas de cada aresta escritas nos dois IDs** — o redator de uma fatia não vê
+   a outra, e a assimetria `dep-bloqueia-assimetrica` nasce daí; decisão 4.432), os
+   símbolos/campos que a TASK **declara** e que outra TASK poderá citar ("declarado na
+   TASK-X" sem dono no manifesto é referência inventada), FRs/FEATs/COMPs, distribuição
+   AC×gate, bullets de Inclui/Não inclui e lições ativas aplicáveis. O manifesto é o produto intelectual da decomposição: ID e aresta ficam
    decididos aqui, e só aqui.
 2. **Redatores**: 2–3 `scribe`s **em paralelo**, cada um com o manifesto + o contrato
    (Etapas 1 a 3, template canônico da Etapa 3) + os insumos e uma **lista literal de arquivos**
@@ -218,11 +221,24 @@ WARNING — `--group` sobre arquivo sem a anotação, arquivo em grupo excluído
 citado sem `--group`, `--testsuite` fora da suíte ou inexistente — entra no mesmo delta
 ao `scribe`, com a linha da TASK como âncora: é o comando executado no lugar da leitura
 que a 4.428 pedia e que não preveniu no campo. Script indisponível → declare, como no grafo.
+**E a forma das TASKs passa pelo lint antes de gastar a rodada** (decisão 4.432):
+`bash "${CLAUDE_PLUGIN_ROOT}/scripts/artifact-lint.sh" {docsRoot}/<slug>` em modo diretório
+(os checks cruzados só existem nele; catálogo e severidades: `lint-contract.md`). Entram no
+mesmo delta ao `scribe`: todo achado que **não** é `(W)` no catálogo (fato — `task-tipo-enum`,
+seção ou campo ausente, id divergente) e os WARNING do grafo que atravessam fatias
+(`dep-bloqueia-assimetrica`, `wave-incoerente`); os `(W)` de padrão desta classe
+(`task-nome-tipo`, `task-criterio-grep-nao-ancorado`, `task-wave-overlap-arquivo`) vão como
+"corrija ou justifique em `duvidas`" — `task-overlap-fr` fica fora (saturado: 101 avisos em
+162 TASKs de um acervo real). **Um ajuste por (check × TASK)**, nunca por ocorrência, para o
+pacote caber no `modo: edits`; a volta conta em `correções` da telemetria da forja e `classes`
+transcreve os ids do lint. Caso real: fase TASKs de 45–61 min por fatia, em que a rodada única
+(4.116) de validator + `qa` + PO se gastava em `Tipo` com anotação, aresta assimétrica e grep
+sem âncora, e a correção voltava com 3–4 scribes e revalidação — o lint leva segundos.
 
 **Correção** (decisão 4.114): delta ao `scribe`, **aguardado**, com a lista literal de
 ERRORs e âncora por ajuste — com `modo:` declarado pela régua do pacote (4.309/4.349, `graph-contract.md` §4.1) e revalidação pela régua do protocolo (`validator-protocol.md` §4.5, 4.350); buraco de numeração não é defeito, arquivo existente nunca se renumera — protocolo do invocador: `graph-contract.md` §4.1.
 
-Com o grafo limpo (e o scribe encerrado), invocar a skill `task-validator` em modo batch
+Com o grafo e o lint limpos (e o scribe encerrado), invocar a skill `task-validator` em modo batch
 (apontando para o TASK-MMM-INDEX) — em paralelo com o `tracker-sync` da Etapa 7 quando o
 sync está ativo (4.113: o validator só lê; o sync só escreve linhas `Jira:`) e, no ciclo
 formal, com o `qa` pré-código na mesma rodada (Etapa 3.5 do auto — 4.116): **errors == 0**

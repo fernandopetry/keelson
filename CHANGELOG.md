@@ -23,6 +23,32 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.183.0] — 2026-09-27
+
+Re-init: none
+
+Decision 4.432 — the form lint runs before the validator round (lever L8 of the transcript
+reading).
+
+### Changed
+
+- **`/keelson:tasks` Etapa 5 runs `artifact-lint.sh` in directory mode** right after the
+  graph check and the suite-filter check, before spending the single validator + pre-code
+  `qa` + tracker round. Facts (non-`(W)` checks) and the cross-slice graph warnings
+  (`dep-bloqueia-assimetrica`, `wave-incoerente`) go into the same scribe delta; pattern
+  warnings of this class go as "fix or justify"; `task-overlap-fr` stays out (101 warnings in
+  162 real TASKs). One adjustment per check × TASK so the package fits `modo: edits`. The
+  Tech Lead never ran the lint anywhere in the forge — measured: the TASKs phase cost 45–61
+  min per slice, 3–4× specify+plan, mostly on mechanical scribe defects corrected by 3–4
+  scribes and a revalidation.
+- **Fan-out manifest writes both ends of every edge on both IDs** and the symbols/fields each
+  TASK declares: a redactor sees only its slice, which is where the asymmetric
+  `Depende/Bloqueia` (×5) and the "field declared in TASK-001" that TASK-001 did not have
+  came from.
+- "With the graph clean" became "graph and lint clean" in `tasks.md` and `auto.md` 3.5.
+  Giving the scribe a shell to self-check was mapped and refused (4.103/4.114, no guard on
+  `tools:`, cross-slice findings out of a redactor's reach).
+
 ## [0.182.0] — 2026-09-27
 
 Re-init: none
