@@ -242,6 +242,8 @@ O keelson **não finge** que verificou. A pendência vem com a causa nomeada:
 | Credencial ausente | Preencha o `keelson.local.json` (realm, `baseUrl`, login de dev) |
 | App fora do ar | Suba a aplicação, ou preencha `quality.boot` para que o gate saiba subir |
 | Ambiente sem tela (worktree, nuvem) | O ciclo gera um [handoff de verificação](Handoff-de-verificacao); feche-o com `/keelson:verify-handoff` numa sessão com tela |
+| Sessão sem Playwright MCP (o app Desktop expõe outro painel de browser, que o keelson não usa) | Rode o gate 9 numa sessão da CLI com o `@playwright/mcp` configurado — a sonda no painel errado não prova nada, e o `qa` re-sonda |
+| Permissão de ambiente (a plataforma negou a ação, ex.: preencher a senha) | A negativa literal vai no handoff; execute ou autorize a ação na sua máquina — repetir não converge |
 
 Uma entrega com handoff aberto é **parcial** até o handoff ser fechado — isso é
 intencional.

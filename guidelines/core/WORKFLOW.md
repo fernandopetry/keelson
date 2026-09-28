@@ -240,7 +240,12 @@ absorvida_em: <âncora do check/regra/perfil que passou a garantir a lição>   
 as dadas e **toda lição sem `paths`** — recorte que esconde lição é o pior defeito desta
 camada, por isso `paths` é opt-in de precisão, nunca filtro de exclusão; frontmatter
 ilegível degrada para "sempre incluída" com `WARNING`. O cabeçalho da saída declara a
-contagem (`recorte=R (path=P tag=T sempre=S) excluidas=E`); `list`/`index` dão os títulos
+contagem (`recorte=R (path=P tag=T sempre=S) excluidas=E`) e a saída vem na ordem path →
+tag → sempre. **O recorte tem de caber numa leitura** (decisão 4.435 — caso real: 482 KB e
+219 lições `sempre` que ninguém abriu): quem passa o recorte a um leitor usa `--max-bytes N`
+(corte na fronteira de lição, na ordem acima; as omitidas ficam **enumeradas por id** na
+linha final — enumerar não é esconder) ou `--compact` (uma linha por lição: id, via, origem,
+título, paths, tags — nenhuma some), e o leitor pede o texto por `show <id>`; `list`/`index` dão os títulos
 (o índice é derivado — imprime-se, nunca se commita como fonte); `show <id|heading>` traz
 uma lição inteira. Quem escreve lição declara `paths`/`tags` quando o arquivo ou a classe
 é nomeável — é o que torna a lição encontrável sem carregar o acervo.

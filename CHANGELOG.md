@@ -23,6 +23,39 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.186.0] — 2026-09-27
+
+Re-init: none
+
+Decision 4.435 — levers L6 (screen gate 9 in autonomous mode) and L4 (lesson excerpt that
+fits one read) of the transcript reading.
+
+### Changed
+
+- **A gate 9 probe only counts when it is the literal `mcp__playwright__*` call and its
+  return.** Probing another browser panel (the Desktop app's `mcp__Claude_Browser__*`,
+  `claude-in-chrome`) proves nothing about the keelson runtime; inherited probe evidence
+  (4.364, kept) is valid only for that call, otherwise the `qa` re-probes. A proven-absent
+  runtime narrows only the browser-driven part: the `qa` is still dispatched, proves what
+  needs no browser through the API and `quality.e2e --grep @AC`, and seeds the handoff for
+  the rest. Measured: a wrong-panel probe cost a 3-hour partial delivery and three
+  Director interventions; the same day another session logged in without any block.
+- **`lessons.sh match --compact` and `--max-bytes N`.** Compact prints one line per lesson
+  (id, state, via, origin, title, paths, tags) and no lesson disappears; `--max-bytes`
+  cuts strictly at a lesson boundary in the new emission order path → tag → sempre and
+  ends with the omitted ids enumerated — `show <id>` brings the text. The wave review pack
+  and the `/keelson:tasks` input use `--max-bytes 120000`. Measured: a 482 KB excerpt
+  (219 "always" lessons) that no reader opened. A cap on the "always" tier was mapped and
+  **not** adopted: it would revoke 4.376's "an excerpt that hides a lesson is the worst
+  defect of this layer"; the way down from 69% is retrofitting `paths` with
+  `/keelson:lessons-audit`.
+- Troubleshooting wiki: gate-9 causes "permission of environment" and "session without
+  Playwright MCP (Desktop)"; FAQ: the developer no longer appears as an excerpt reader (it
+  never was, by design).
+- Not adopted, escalated with defaults: reusing the E2E storageState inside the Playwright
+  MCP (no documented mechanism), a `qa`-owned Playwright script (4.49 and, as an exit after
+  a classifier denial, 4.133).
+
 ## [0.185.0] — 2026-09-27
 
 Re-init: none

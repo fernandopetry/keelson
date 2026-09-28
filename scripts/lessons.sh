@@ -6,6 +6,7 @@
 # Uso: lessons.sh <raiz-do-projeto> list  [--estado <e1,e2|todas>]
 #      lessons.sh <raiz-do-projeto> match [--paths <p1,p2,...>] [--paths-file <arquivo|->]
 #                                          [--tags <t1,t2,...>] [--estado <e1,e2|todas>]
+#                                          [--compact] [--max-bytes <N>]
 #      lessons.sh <raiz-do-projeto> show  <id | heading | trecho do heading>
 #      lessons.sh <raiz-do-projeto> index
 #
@@ -20,7 +21,16 @@
 # Saída:
 #   list  → 1 linha por lição: id<TAB>estado<TAB>area<TAB>heading<TAB>origem<TAB>absorvida_em
 #   match → cabeçalho `# lessons.sh match: acervo=N recorte=R (path=P tag=T sempre=S) excluidas=E legado=L`
-#           e depois cada lição do recorte, integral, separada por `---8<---`
+#           e depois cada lição do recorte, integral, separada por `---8<---`, na ordem
+#           path → tag → sempre (a que casa o arquivo dado vem primeiro — decisão 4.435).
+#           `--compact`: uma linha por lição em vez do texto
+#           (`--- id=… estado=… via=… origem=… | <heading> | paths=<a;b> | tags=<x;y>`) —
+#           nenhuma lição some, o texto vem por `show <id>`.
+#           `--max-bytes N`: corta na FRONTEIRA de lição quando o total passa de N bytes e
+#           encerra com `# lessons.sh match: omitidas=K por --max-bytes N: id1,id2,…` — as
+#           omitidas ficam enumeradas por id (recorte que esconde lição é o pior defeito;
+#           enumerar não é esconder). Caso real: recorte de 482 KB / 219 lições `sempre`
+#           que nenhum leitor abriu (o Read para em 256 KB).
 #   show  → a lição integral (exit 1 se não encontrada)
 #   index → tabela markdown (derivada — imprimir, nunca commitar como fonte)
 #   Diagnósticos em stderr: `WARNING nao-parseavel <arquivo>` (a lição entra no recorte
@@ -208,6 +218,8 @@ estados="ativa,em-observacao"
 paths=""
 tags=""
 query=""
+compact=0
+maxbytes=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --estado) estados="${2:-}"; shift 2 ;;
@@ -217,6 +229,10 @@ while [ $# -gt 0 ]; do
       if [ "$pf" = "-" ]; then lst="$(cat)"; else lst="$(cat "$pf" 2>/dev/null || true)"; fi
       paths="$paths,$(printf '%s\n' "$lst" | tr '\n' ',')" ;;
     --tags) tags="$tags,${2:-}"; shift 2 ;;
+    --compact) compact=1; shift ;;
+    --max-bytes)
+      maxbytes="${2:-}"; shift 2
+      case "$maxbytes" in ''|*[!0-9]*) echo "lessons: --max-bytes exige um inteiro" >&2; exit 2 ;; esac ;;
     --*) echo "lessons: opção desconhecida: $1" >&2; exit 2 ;;
     *) query="$query $1"; shift ;;
   esac
@@ -330,14 +346,35 @@ case "$cmd" in
       elif tag_hit "$rtags"; then motivo="tag"; nt=$((nt + 1))
       else ne=$((ne + 1)); continue
       fi
-      printf '%s%s%s%s%s%s%s%s%s\n' "$rn" "$SEP" "$rid" "$SEP" "$restado" "$SEP" "$motivo" "$SEP" "$rorigem" >> "$sel"
+      case "$motivo" in path) prio=0 ;; tag) prio=1 ;; *) prio=2 ;; esac
+      printf '%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n' "$prio" "$SEP" "$rn" "$SEP" "$rid" "$SEP" "$restado" "$SEP" "$motivo" "$SEP" "$rorigem" "$SEP" "$rheading" "$SEP" "$rpaths" "$SEP" "$rtags" >> "$sel"
     done < "$REC"
     rec=$((np + nt + ns))
     echo "# lessons.sh match: acervo=$total recorte=$rec (path=$np tag=$nt sempre=$ns) excluidas=$ne legado=$legado"
-    while IFS="$SEP" read -r rn rid restado motivo rorigem; do
-      echo "---8<--- id=$rid estado=$restado via=$motivo origem=$rorigem"
+    # ordem: path → tag → sempre (4.435), estável dentro de cada tier
+    sort -s -t "$SEP" -k1,1n "$sel" > "$sel.ord" 2>/dev/null || cp "$sel" "$sel.ord"
+    usados=0; omitidas=""; nomit=0
+    while IFS="$SEP" read -r prio rn rid restado motivo rorigem rheading rpaths rtags; do
+      if [ "$compact" = 1 ]; then
+        echo "--- id=$rid estado=$restado via=$motivo origem=$rorigem | $rheading | paths=$rpaths | tags=$rtags"
+        continue
+      fi
+      cab="---8<--- id=$rid estado=$restado via=$motivo origem=$rorigem"
+      if [ "$maxbytes" -gt 0 ]; then
+        # corte estrito na ordem de prioridade: estourou → esta e as seguintes ficam de fora
+        # (uma `sempre` menor nunca passa na frente de uma `path` maior)
+        tam=$(( $(wc -c < "$BLK/$rn.md") + ${#cab} + 1 ))
+        if [ "$nomit" -gt 0 ] || [ $((usados + tam)) -gt "$maxbytes" ]; then
+          omitidas="$omitidas,$rid"; nomit=$((nomit + 1)); continue
+        fi
+        usados=$((usados + tam))
+      fi
+      echo "$cab"
       cat "$BLK/$rn.md"
-    done < "$sel"
+    done < "$sel.ord"
+    if [ "$nomit" -gt 0 ]; then
+      echo "# lessons.sh match: omitidas=$nomit por --max-bytes $maxbytes: ${omitidas#,} — \`show <id>\` traz o texto"
+    fi
     ;;
   *) usage ;;
 esac

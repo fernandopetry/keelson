@@ -393,9 +393,10 @@ mantém.
 ### O arquivo de lições está ficando enorme. Vai pesar em toda leitura?
 
 Não. Cada lição mora no próprio arquivo e declara os caminhos (`paths`) e classes
-(`tags`) que ela nomeia; quem lê — a geração de TASKs, o gate de review, o developer —
-recebe só o **recorte** que toca os arquivos da mudança, calculado por
-`scripts/lessons.sh`. Lição que não nomeia arquivo ("prova de segurança nunca leva o
+(`tags`) que ela nomeia; quem lê — a geração de TASKs e o gate de review — recebe só o
+**recorte** que toca os arquivos da mudança, calculado por `scripts/lessons.sh`, e o
+recorte é cortado num tamanho que cabe numa leitura: as lições que ficaram de fora são
+listadas por id no fim, nunca escondidas. Lição que não nomeia arquivo ("prova de segurança nunca leva o
 grupo X") entra em todo recorte, de propósito: esconder lição é o pior erro dessa
 camada. Lição que virou lint, teste ou regra de perfil sai do recorte como
 **absorvida**, com a âncora de onde a regra vive agora. Ainda tem o `lessons.md` antigo?
@@ -409,7 +410,6 @@ flowchart LR
   M --> R['recorte: casam por path + casam por tag + sem paths']
   R --> T['/keelson:tasks']
   R --> G['gate 7 do review']
-  R --> V['developer']
 ```
 
 ### E se ele errar?

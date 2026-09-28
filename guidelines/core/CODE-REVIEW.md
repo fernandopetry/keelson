@@ -205,9 +205,9 @@ ofício do revisor — aplique-o sem checklist. Os pontos com régua keelson pr�
 - **Erros já cometidos no projeto**: as lições do projeto com `estado: ativa` valem como
   regra (`em-observacao` é contexto, nunca reprova; `revogada` não vale — ciclo de vida:
   `core/WORKFLOW.md`, decisão 4.221). O revisor lê o **recorte** da mudança, nunca o
-  acervo inteiro: `git diff --name-only <base>..HEAD | bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . match --paths-file -`
+  acervo inteiro: `git diff --name-only <base>..HEAD | bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . match --paths-file - --max-bytes 120000`
   (vem no pacote de contexto da wave; lição sem `paths` entra sempre; `show <id>` traz
-  qualquer título do `list` — decisão 4.376). Lição ativa que bloquearia caso legítimo
+  qualquer título do `list` e o texto das omitidas pelo corte — decisões 4.376/4.435). Lição ativa que bloquearia caso legítimo
   não é licença para reprovar em silêncio: o contorno fundamentado vira `licao_contestada`
   no report do developer.
 - **Calibração por exemplares**: antes de reprovar por estilo/padrão, compare com código
@@ -365,7 +365,8 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   na largada da rodada e viaja com a evidência (a chamada da ferramenta e o que
   devolveu, causa nomeada pelo §8.1 do `handoff-protocol.md`; processo do SO de pé não
   prova toolset). Gate que recebe o estado no pacote não re-sonda: degrada declarando,
-  com a evidência herdada. Cada revisor
+  com a evidência herdada — desde que a chamada citada seja a de `mcp__playwright__*`;
+  sonda de outro painel não é evidência e o gate re-sonda (4.435, §8.1 do protocolo). Cada revisor
   redescobrindo o mesmo contexto por conta própria é o maior custo silencioso da
   rodada — e redescobrir um mecanismo morto é a forma mais cara dela.
 - **O pacote é factual, nunca avaliativo.** Ele carrega o *quê* (diff, âncoras, fatias),

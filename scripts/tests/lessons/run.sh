@@ -65,6 +65,23 @@ if printf '%s\n' "$err" | grep -q "^WARNING nao-parseavel guidelines/project/les
 caso; if printf '%s\n' "$out" | grep -q "^sem-frontmatter	ativa	Infra	"; then
   ok "sem frontmatter → incluída como ativa"; else falha "sem frontmatter incluída"; fi
 
+# --- --compact e --max-bytes (4.435) ---
+caso; c="$(bash "$LS" "$A" match --paths src/Domain/User.php --compact 2>/dev/null)"
+if [ "$(printf '%s\n' "$c" | head -1)" = "# lessons.sh match: acervo=8 recorte=5 (path=1 tag=0 sempre=4) excluidas=3 legado=3" ]; then
+  ok "compact: cabeçalho idêntico ao integral"; else falha "compact cabeçalho"; fi
+caso; if printf '%s\n' "$c" | sed -n 2p | grep -q "^--- id=repositorio-sem-escopo-de-tenant estado=ativa via=path origem=guidelines/project/lessons/repositorio-sem-escopo-de-tenant.md | \[Backend\] Repositório sem escopo de tenant | paths=src/Domain/\*\*;src/Infra/Repository/\*.php | tags=seguranca;persistencia$"; then
+  ok "compact: linha com id/via/origem/heading/paths/tags e path primeiro"; else falha "compact linha: [$(printf '%s\n' "$c" | sed -n 2p)]"; fi
+caso; if [ "$(printf '%s\n' "$c" | grep -c '^--- id=')" = "5" ] && ! printf '%s\n' "$c" | grep -q '^---8<---'; then
+  ok "compact: 5 linhas, nenhum texto integral"; else falha "compact contagem"; fi
+caso; b="$(bash "$LS" "$A" match --paths src/Domain/User.php --max-bytes 1200 2>/dev/null)"
+if printf '%s\n' "$b" | sed -n 2p | grep -q '^---8<--- id=repositorio-sem-escopo-de-tenant .*via=path' && printf '%s\n' "$b" | tail -1 | grep -q '^# lessons.sh match: omitidas=[1-9] por --max-bytes 1200: .*`show <id>` traz o texto$'; then
+  ok "max-bytes: path primeiro, corte na fronteira, omitidas enumeradas por id"; else falha "max-bytes: [$(printf '%s\n' "$b" | tail -1)]"; fi
+caso; n_int="$(printf '%s\n' "$b" | grep -c '^---8<---')"; n_om="$(printf '%s\n' "$b" | tail -1 | sed -n 's/.*omitidas=\([0-9]*\).*/\1/p')"
+if [ $((n_int + n_om)) -eq 5 ]; then ok "max-bytes: integrais + omitidas = recorte"; else falha "max-bytes soma: $n_int + $n_om"; fi
+caso; g="$(bash "$LS" "$A" match --paths src/Domain/User.php --max-bytes 999999 2>/dev/null)"
+if ! printf '%s\n' "$g" | grep -q '^# lessons.sh match: omitidas='; then ok "max-bytes folgado: sem linha de omitidas"; else falha "max-bytes folgado"; fi
+caso; bash "$LS" "$A" match --max-bytes abc >/dev/null 2>&1; [ $? -eq 2 ] && ok "max-bytes inválido → exit 2" || falha "max-bytes inválido"
+
 # --- match ---
 caso; m="$(bash "$LS" "$A" match --paths src/Domain/User.php 2>/dev/null)"
 h="$(printf '%s\n' "$m" | head -1)"

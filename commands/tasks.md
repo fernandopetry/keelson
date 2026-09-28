@@ -57,7 +57,7 @@ pouco: as duas rotas produzem os mesmos arquivos e passam pelas mesmas provas da
   `TASK-INDEX.md`, 4.405).
 - **Alvo resolvido**: slug, MMM, próximo XXX, caminhos (Etapa 0.4); flags `--max-size`/`--only`.
 - **Insumos** (caminhos): PLAN, SPEC (ACs e mapa FR→FEAT da 0.2), convenções extraídas na
-  0.1 (resumo inline), memo de exploração e/ou `MAP.md` do slug, e o **recorte** do acervo de lições — `bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . match --paths <arquivos dos componentes do PLAN/MAP, separados por vírgula>` (leitura dupla de `guidelines/project/lessons/` e do `lessons.md` legado; lição sem `paths` entra sempre — decisão 4.376), nunca o acervo inteiro (cruzamento da Etapa 3).
+  0.1 (resumo inline), memo de exploração e/ou `MAP.md` do slug, e o **recorte** do acervo de lições — `bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . match --paths <arquivos dos componentes do PLAN/MAP, separados por vírgula> --max-bytes 120000` (leitura dupla de `guidelines/project/lessons/` e do `lessons.md` legado; lição sem `paths` entra sempre — decisão 4.376), nunca o acervo inteiro (cruzamento da Etapa 3).
 
 **Rota fan-out (previsão >8 TASKs — decisão 4.310)**: uma janela serial que decide E
 redige 12+ arquivos é o gargalo medido da forja; a rota divide em duas fases do **mesmo
