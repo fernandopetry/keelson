@@ -23,6 +23,28 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.188.1] — 2026-09-28
+
+Re-init: none
+
+Decision 4.438 — full operational smoke of 0.188.0 (7 scenarios, 4h40, US$61; 9 of 68
+facts red, all explained).
+
+### Fixed
+
+- **A blocking dispatch says `run_in_background: false`.** The harness launches subagents in
+  the background by default, and `init.md` said "blocking" without the flag: the Tech Lead
+  dispatched the `staff-engineer`, ended the turn "waiting for the return", and the
+  non-interactive run ended before the ficha was written. `sdd-conventions.md` now states
+  both facts — the explicit flag, and that a session without an interactive human ends when a
+  turn ends with an agent in flight (nobody re-wakes it), so waiting means working on in the
+  same turn. Proven by re-running the init scenario: 13/13 facts, spawn with the flag.
+- Smoke: the `parallel` scenario runs last (it opens its own slug and branch — running it
+  mid-chain broke the pause and triage premises), with its own 3-hour cap (the real run
+  exceeded 2 h at the closing report), and the session is found from the stream when no
+  result event exists. The "unquoted glob in `lessons.sh`" lead the field Tech Lead chased
+  at the end does not reproduce.
+
 ## [0.188.0] — 2026-09-27
 
 Re-init: none

@@ -42,7 +42,8 @@
 #
 # Uso: smoke-consumer.sh [--scenario init|cycle|parallel|pause|triage|report|broken|all] [--results DIR]
 #                        [--model M] [--timeout S] [--plugin-dir DIR] [--consumer DIR]
-#   --scenario   default all (ordem: init → cycle → parallel → pause → triage → report → broken; cada um assume o
+#   --scenario   default all (ordem: init → cycle → pause → triage → report → broken → parallel; o parallel vai por
+#                último porque abre slug e branch próprios — e tem teto próprio de 3 h (rodada real: 2h+); cada um assume o
 #                estado deixado pelo anterior; --consumer reaproveita um consumidor).
 #   --results    raiz das saídas (default: mktemp); raw.json/result.txt por cenário + summary.md.
 #   --timeout    teto por chamada ao modelo em segundos (default 7200 — o ciclo formal de
@@ -138,6 +139,7 @@ PY
   # do transcript da sessão do consumidor (~/.claude/projects/<cwd codificado>/<sid>.jsonl) —
   # é aí que o custo mora, não no relatório; sem transcript legível, a linha declara "nao medido".
   sid="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("session_id",""))' "$RESULTS/$nome.raw.json" 2>/dev/null)"
+  [ -n "$sid" ] || sid="$(grep -m1 -o '"session_id":"[^"]*"' "$RESULTS/$nome.stream.jsonl" 2>/dev/null | head -1 | cut -d'"' -f4)"
   perfil="perfil: nao medido (transcript ausente)"
   if [ -n "$sid" ]; then
     tr="$(find "$HOME/.claude/projects" -name "$sid.jsonl" 2>/dev/null | head -1)"
@@ -318,6 +320,8 @@ cen_cycle() {
 # primeiro/último timestamp do jsonl) — o mesmo método da leitura de transcripts (4.431).
 developers_sobrepostos() {
   sid="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("session_id",""))' "$RESULTS/parallel.raw.json" 2>/dev/null)"
+  # sem evento result (teto estourado), a sessão vem do evento init do stream
+  [ -n "$sid" ] || sid="$(grep -m1 -o '"session_id":"[^"]*"' "$RESULTS/parallel.stream.jsonl" 2>/dev/null | head -1 | cut -d'"' -f4)"
   [ -n "$sid" ] || return 1
   d="$(find "$HOME/.claude/projects" -type d -name "$sid" 2>/dev/null | head -1)"
   [ -n "$d" ] && [ -d "$d/subagents" ] || return 1
@@ -355,7 +359,10 @@ d.setdefault("quality", {})["worktreeBootstrap"] = "true"
 json.dump(d, open(p, "w"), indent=2, ensure_ascii=False); open(p, "a").write("\n")
 PY2
   G add -A -- keelson.config.json; G commit -q -m "chore(keelson): declare worktreeBootstrap for the smoke" -- keelson.config.json
+  # teto próprio: a rodada real de 2026-09-28 passou de 2 h (forja de 3 rodadas + implement + fecho)
+  saved_timeout="$TIMEOUT"; [ "$TIMEOUT" -lt 10800 ] && TIMEOUT=10800
   roda parallel "/keelson:auto feature 'utilitários de texto e números' em DOIS módulos NOVOS e independentes: (1) src/slugify.py com slugify(s) — minúsculas, espaços e pontuação viram um único hífen, sem hífen nas pontas — e tests/test_slugify.py; (2) src/roman.py com to_roman(n) para 1..3999 e tests/test_roman.py. Os dois módulos não se tocam nem tocam src/calc.py; cada TASK mexe só no seu módulo e no seu teste. Trate como feature com o ciclo SDD completo (SPEC → PLAN → TASKs → implementação) e decomponha numa wave com as duas TASKs de implementação INDEPENDENTES na mesma wave. Esta sessão não tem humano interativo: decisões de rotina são suas; em escalação, assuma o default que você mesmo declarar e siga até a Entrega; não abra PR."
+  TIMEOUT="$saved_timeout"
   echo "### fatos: parallel" >> "$SUM"
   SD="$(slug_dir)"; printf -- '- slug: %s\n' "${SD:-nenhum}" >> "$SUM"
   fato "parallel/ficha-bootstrap-declarado"  'grep -q "worktreeBootstrap" "$CONSUMER/keelson.config.json"'
@@ -478,7 +485,7 @@ case "$SCEN" in
   broken) cen_broken ;;
   triage) cen_triage ;;
   report) cen_report ;;
-  all)    cen_init; cen_cycle; cen_parallel; cen_pause; cen_triage; cen_report; cen_broken ;;
+  all)    cen_init; cen_cycle; cen_pause; cen_triage; cen_report; cen_broken; cen_parallel ;;
   *) echo "ERRO: --scenario inválido: $SCEN" >&2; exit 2 ;;
 esac
 
