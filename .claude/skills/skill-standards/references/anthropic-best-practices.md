@@ -123,3 +123,4 @@ re-fetch, nunca acumule versões.
 | Frontmatter inválido | Validar name/description (limites acima) |
 | Descrição vaga | O quê + quando + termos-chave |
 | Presumir pacote instalado | Declarar a dependência |
+| História no lugar da regra (adaptação keelson, 4.442): "caso real", "Nª reincidência", "desde a 4.NNN", versão pinada, parágrafo colado com "E …" | A regra cita `(4.NNN)` e para; o caso mora na decisão — `scripts/check-doctrine.sh` |

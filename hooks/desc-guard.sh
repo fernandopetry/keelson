@@ -110,7 +110,7 @@ lista="$(printf '%s\n' "$viol" | while IFS="$(printf '\t')" read -r n lim rel; d
   printf '    — %s (%s caracteres; teto %s)\n' "$rel" "$n" "$lim"
 done)"
 
-reason="Guarda de description (teto: 250 para commands/skills, 350 para agents): há artefato(s) do plugin cuja description de frontmatter passa do teto. O Claude Code (>= v2.1.86) OCULTA da lista o comando acima de 250 (sem erro) e trunca a description da skill na tela /skills; agents acima de 350 estouram o orçamento sempre-carregado do plugin.
+reason="Guarda de description (teto: 250 para commands/skills, 350 para agents): há artefato(s) do plugin cuja description de frontmatter passa do teto. O Claude Code OCULTA da lista o comando acima de 250 (sem erro) e trunca a description da skill na tela /skills; agents acima de 350 estouram o orçamento sempre-carregado do plugin.
 ${lista}
 
 Encurte cada description para o teto indicado, com os termos-gatilho no início; o detalhe completo fica no corpo do artefato. Depois encerre."

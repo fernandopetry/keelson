@@ -45,8 +45,7 @@ Cada AC dos critérios de pronto tem ≥ 1 teste que o verifica, e o teste é **
   violação da 4.134, não prova — e `mutacao_protocolo: n/a` numa TASK cujo Critério de
   pronto **prescreve mutante** (prova por mutação de código, não a mutação de dados do
   predicado de escopo) é o mesmo achado: cruze o valor com a lista de mutantes do
-  Critério antes de aceitar o `n/a` (decisão 4.429 — caso real: mutantes prescritos,
-  `n/a` declarado e não corrigido até o gate).
+  Critério antes de aceitar o `n/a` (decisão 4.429).
 
 Cada um é **achado bloqueante**: o teste existe e passa, mas não é capaz de falhar junto
 com o comportamento — o AC conta como **sem teste**.
@@ -340,8 +339,8 @@ Vale para **todo invocador** — ciclo, `/keelson:review` e modo sob demanda.
   com credencial — e planta segredo real fora do repo. Prova que
   monta a árvore em container monta o caminho **read-only** e escreve fora dele —
   arquivo novo criado dentro de caminho montado nasce no repo real. E a rodada
-  inteira pressupõe **âncora parada** (decisão 4.290 — 3ª camada da família
-  4.134/4.276): todo gate despachado captura, na largada da própria execução, o par
+  inteira pressupõe **âncora parada** (decisão 4.290 — a régua da
+  4.134/4.276 na rodada): todo gate despachado captura, na largada da própria execução, o par
   `git rev-parse HEAD` + `git status --porcelain` dos arquivos do diff e o reconfere
   antes do veredito — divergência descarta o veredito e re-roda (ou escala), nunca
   emite sobre árvore possivelmente mutada por gate concorrente; e o **orquestrador**

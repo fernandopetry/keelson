@@ -134,7 +134,7 @@ if [ "$alheio" != "1" ]; then
       *)
         case "${CLAUDE_CODE_ENTRYPOINT:-}" in
           sdk-*)
-            reason="Guarda de waves (decisão 4.439): esta sessão NÃO tem humano (CLAUDE_CODE_ENTRYPOINT=${CLAUDE_CODE_ENTRYPOINT}) e há ${em_voo} tarefa(s) em segundo plano sem retorno — encerrar o turno agora ENCERRA A EXECUÇÃO: ninguém reacorda uma sessão sem humano (caso real: /keelson:init encerrou 'aguardando o staff-engineer' e a ficha ficou por gravar). Continue trabalhando NESTE turno até colher os reports: TaskOutput bloqueante em cada tarefa em voo (aqui é o canal correto, não duplicata — a notificação nunca chegaria), ou trabalho útil em outra frente até o retorno. Nunca encerre 'aguardando'. Despacho cujo resultado a etapa consome nasce com run_in_background: false (4.438)."
+            reason="Guarda de waves (decisão 4.439): esta sessão NÃO tem humano (CLAUDE_CODE_ENTRYPOINT=${CLAUDE_CODE_ENTRYPOINT}) e há ${em_voo} tarefa(s) em segundo plano sem retorno — encerrar o turno agora ENCERRA A EXECUÇÃO: ninguém reacorda uma sessão sem humano — a etapa fica por gravar (4.438). Continue trabalhando NESTE turno até colher os reports: TaskOutput bloqueante em cada tarefa em voo (aqui é o canal correto, não duplicata — a notificação nunca chegaria), ou trabalho útil em outra frente até o retorno. Nunca encerre 'aguardando'. Despacho cujo resultado a etapa consome nasce com run_in_background: false (4.438)."
             printf '%s' "$reason" | python3 -c 'import sys,json; print(json.dumps({"decision": "block", "reason": sys.stdin.read()}))' 2>/dev/null || exit 0
             exit 0 ;;
           *) exit 0 ;;

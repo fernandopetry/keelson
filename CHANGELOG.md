@@ -25,6 +25,29 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.190.3] — 2026-09-28
+
+Re-init: none
+
+Decision 4.442 — the embedded doctrine cites the decision and stops; a guard proves it.
+
+### Changed
+
+- **Last 21 narrative cuts.** Nine short "caso real" parentheticals (core guidelines,
+  conventions, `mutation-setup`, `init`), three "ex-§" pointers in convention headers and
+  `CLAUDE.md`, decision genealogy in `CODE-REVIEW` and `tasks`, "deixaram de escrever" in
+  the graph contract, two hook messages and the `>= v2.1.86` pin in the description
+  guard. No rule changed; every owning decision reference stays.
+
+### Added
+
+- **`scripts/check-doctrine.sh`** (maintainer guard, pre-commit and CI): refuses incident
+  narrative, recurrence counters, migration-relative phrasing and pinned plugin/harness
+  versions in the embedded doctrine and in hook messages; a ratchet in
+  `scripts/doctrine-baseline.tsv` refuses new over-long paragraphs while the existing
+  ones drain under eval. Suite in `scripts/tests/doctrine/`. The same rule is stated
+  where authors write: `CLAUDE.md`, `/skill-standards` and `/field-intake`.
+
 ## [0.190.2] — 2026-09-28
 
 Re-init: none

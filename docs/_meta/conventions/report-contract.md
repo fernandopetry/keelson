@@ -10,9 +10,9 @@
 
 **Por que esqueleto, não prosa** (a régua da decisão 4.77 aplicada ao report): prosa
 sobre forma é parafraseável — no fim de uma sessão longa, com contexto comprimido, a
-narrativa sobrevive e as linhas mecânicas evaporam (caso real: entrega de 20 TASKs sem
-a linha de duração, sem composição do diff, sem a linha do tracker e com as mensagens
-ao mantenedor **resumidas** — o Diretor ficou sem o que encaminhar). Esqueleto literal
+narrativa sobrevive e as linhas mecânicas evaporam — duração, composição do diff, linha
+do tracker e mensagens ao mantenedor somem ou saem **resumidas**, e o Diretor fica sem o
+que encaminhar (4.130). Esqueleto literal
 é lacuna a preencher, nunca item de memória.
 
 ## §1. Regras de preenchimento

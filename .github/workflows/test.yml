@@ -73,5 +73,8 @@ jobs:
       - name: Templates canônicos dos artefatos SDD (scripts/check-templates.sh)
         run: bash scripts/check-templates.sh
 
+      - name: Doutrina embarcada cita a decisão e para (scripts/check-doctrine.sh — 4.442)
+        run: bash scripts/check-doctrine.sh
+
       - name: Checks de release (versões · CHANGELOG · MIRRORS · bash -n)
         run: bash scripts/check-release.sh

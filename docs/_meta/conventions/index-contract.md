@@ -1,6 +1,6 @@
 # Artefatos, IDs e contrato do INDEX
 
-> Fonte única (ex-§6 do method-guide): árvore de artefatos, IDs, contrato da tabela "PLANs",
+> Fonte única: árvore de artefatos, IDs, contrato da tabela "PLANs",
 > template canônico do INDEX.md e receita de atualização — nenhum comando redefine nada disso.
 
 ```
@@ -371,8 +371,7 @@ Seção ainda sem conteúdo leva nota curta do que a preenche (ex.: "(vazio até
 "Riscos ativos" aponta um artefato **versionado** (TASK, PLAN, SPEC, brief) que carrega o
 mesmo registro — o INDEX é derivado, e um rebuild o reescreve dos artefatos: pendência cuja
 única morada é o INDEX morre no rebuild sem rastro. Quem estaciona um débito registra
-primeiro no artefato de origem e então espelha aqui. Caso real: débito de sessão registrado
-só no INDEX; o code-reviewer pegou antes do rebuild apagar.
+primeiro no artefato de origem e então espelha aqui.
 
 Variações por comando:
 

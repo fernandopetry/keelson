@@ -274,8 +274,8 @@ suíte relevante **uma vez** ao final. Não prove a mesma coisa em várias ferra
 
 **Modo de execução (decisão 4.436)**: o teto de uma rodada é o parâmetro `timeout` do
 próprio Bash tool — `timeout` do GNU coreutils **não** é comando da doutrina (o macOS não
-o tem; caso real: `command not found` e a rodada seguinte, sem teto e em foreground, morreu
-com a sessão). Rodada que pode passar do teto do tool roda em **background** e o resultado
+o tem: `command not found`, e a rodada seguinte, sem teto e em foreground, morre com a
+sessão). Rodada que pode passar do teto do tool roda em **background** e o resultado
 chega pela notificação do harness — colheita única, sem sondagem (4.400 vale para Bash em
 segundo plano como para agent). Saída por teto é "rodada não concluída", nunca regressão
 nem sucesso. Nada disso impede a morte do processo da sessão: o que sobrevive a ela é o

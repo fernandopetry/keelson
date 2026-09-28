@@ -86,7 +86,13 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   âncora (`Decisão 4.x · <hash do commit de bump>`; `Charter A.B.C` quando ele mudou) e
   bullets sob `Added` / `Changed` / `Fixed` / `Removed`, em **inglês** (é a face pública do
   pacote, como o `README.md`). Escreva pelo efeito no consumidor — o *porquê* fica na
-  decisão, a uma referência de distância. O `Status` do README traz só a manchete atual e
+  decisão, a uma referência de distância. O mesmo vale para a doutrina embarcada (4.442):
+  a regra cita `(4.NNN)` e para; caso, número medido, contador de reincidência, genealogia
+  ("extensão da…", "Nª camada"), comparação com a versão anterior ("desde a", "deixou de",
+  "ex-" + seção antiga) e versão pinada de plugin/harness moram no *Problema* da decisão; frase nova
+  entra na lista do assunto, nunca colada ao parágrafo com "E …" — provado por
+  `scripts/check-doctrine.sh` (pre-commit + CI; catraca de linhas longas em
+  `scripts/doctrine-baseline.tsv`). O `Status` do README traz só a manchete atual e
   aponta para o CHANGELOG; não volta a acumular prosa histórica.
 - **A leva de release passa pela wiki** (4.81): junto com a entrada do `CHANGELOG.md`,
   aplique o gatilho de página própria da seção *Wiki*. Publicar é automático — o que a
@@ -105,7 +111,8 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   O hook `scripts/git-hooks/pre-commit` bloqueia commit na `main` atrás do `origin/main`
   **e roda a guarda de qualidade** (4.83: `bash -n` nos scripts staged; suíte do grafo
   quando o motor muda; `check-release.sh` quando versão/CHANGELOG/wiki mudam;
-  `check-sync.sh` quando comando/agent/README/method-guide mudam, 4.147) — ative
+  `check-sync.sh` quando comando/agent/README/method-guide mudam, 4.147;
+  `check-doctrine.sh` quando doutrina embarcada, hook ou sua mensagem mudam, 4.442) — ative
   uma vez por clone: `git config core.hooksPath scripts/git-hooks`. O CI (`test.yml`)
   repete o conjunto em Linux a cada push/PR.
 
@@ -126,9 +133,9 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 - **Um dono por regra**: o core (`guidelines/core/`) diz *o quê* (agnóstico); o perfil diz
   *como* na linguagem. Não duplicar regra entre eles. Blocos compartilhados dos comandos
   têm dono único em `docs/_meta/conventions/` (13 arquivos; o cabeçalho de cada um
-  declara o dono): `sdd-conventions.md` (convenções comuns, ex-§3.0),
-  `index-contract.md` (artefatos/IDs + contrato/template/receita do INDEX, ex-§6),
-  `handoff-protocol.md` (handoff de verificação de tela, ex-§8), `commit-convention.md`
+  declara o dono): `sdd-conventions.md` (convenções comuns),
+  `index-contract.md` (artefatos/IDs + contrato/template/receita do INDEX),
+  `handoff-protocol.md` (handoff de verificação de tela), `commit-convention.md`
   (tipo/escopo/quebra da mensagem de commit no consumidor — o bloco de keys do tracker
   continua no §15 do protocolo Jira), `graph-contract.md` (sintaxe canônica de aresta,
   catálogo de arestas/checks do grafo e contrato do `scripts/graph.sh` — decisão 4.82),

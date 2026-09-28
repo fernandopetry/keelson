@@ -40,6 +40,10 @@ Cheque por comando, cite a saída como fato:
 - **Sem path estilo Windows** (`\` como separador) — `grep -n '\\\\' <arquivo>`.
 - **Profundidade de referência = 1 camada**: arquivos auxiliares que o artefato aponta
   não podem apontar para uma terceira camada de leitura obrigatória.
+- **Cita a decisão e para** — `bash scripts/check-doctrine.sh` (4.442): narrativa
+  "caso real", contador de reincidência, genealogia, "desde a"/"ex-§", versão pinada e
+  monolito novo (catraca de `scripts/doctrine-baseline.tsv`) saem como fato; o motor é
+  o mesmo do pre-commit, não re-derive.
 
 ## Etapa 2 — Juízo de conteúdo (régua do digest)
 

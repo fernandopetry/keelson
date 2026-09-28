@@ -106,7 +106,7 @@ ponta a ponta, e o validator decide com os próprios olhos (cobertura mista, §5
 | `task-ancora-dupla` | TASK com `Pertence a` **e** `Brief` preenchidos (âncora é exclusiva) | ERROR |
 | `feat-sem-verificacao` | FEAT com 1+ TASK declarante, **todas Done**, sem linha `**Verificação (gate 9)**:` sob o heading na SPEC (recorte do gate 9 por FEAT — decisão 4.90). A linha é livre no conteúdo (data e como, ou `n/a — motivo`); a **presença** é o declarado. SPEC `Status: Done` (ciclo fechado antes da 4.90) → `WARNING [legacy]`. TASK não-parseável sem status derruba o "todas Done" e o check silencia — degrada na direção segura, nunca inventa ERROR | ERROR · carência |
 | `metrica-sem-veredito` | SPEC com `**Fonte de medição**:` na §1.3 (regime da 4.99), **≥1 PLAN `Done`** que a referencia (`spec-ref`) e sem linha `**Veredito de métrica**:` — o loop measure-learn está aberto. SPEC sem a linha de fonte fica **fora** (acervo pré-4.99 não gera ruído; sem lógica de data). 1º check `INFO` do catálogo: lembrete vivo até o veredito, nunca muda o exit code | INFO |
-| `status-vs-closure` | TASK com closure preenchida (`**Data conclusão**:` ou `**Commit SHA**:` não-vazios sob `## Histórico de execução`) e `Status:` do cabeçalho ≠ `Done` — a closure encheu o histórico e esqueceu o campo que todo mundo lê (caso real: 5 TASKs erradas por 7 waves, só o sync do tracker viu — decisão 4.131). WARNING, nunca ERROR: TASK no meio da própria closure é estado transitório legítimo | WARNING |
+| `status-vs-closure` | TASK com closure preenchida (`**Data conclusão**:` ou `**Commit SHA**:` não-vazios sob `## Histórico de execução`) e `Status:` do cabeçalho ≠ `Done` — a closure encheu o histórico e esqueceu o campo que todo mundo lê (decisão 4.131). WARNING, nunca ERROR: TASK no meio da própria closure é estado transitório legítimo | WARNING |
 
 `ref-quebrada` cobre também a âncora avulsa (TASK com `**Brief**:` apontando BRIEF
 inexistente no slug) — não é check novo, é o genérico sobre `task-brief`. TASK sem
@@ -142,7 +142,7 @@ scripts/graph.sh <dir-do-slug> [--check] [--stage=plan|tasks] [--format=tsv|merm
   agregada do slug (total na SPEC · cobertos por PLANs anteriores · por este · gap),
   mapeamento FR → componente (de `Realiza`, com os ACs de `(cobre …)`), cobertura de
   FRs e ACs por TASK, cobertura por funcionalidade (só com FEATs) e status agregado.
-  É o que PLAN e TASK-MMM-INDEX **deixaram de escrever** — o artefato afirma
+  É o derivado que PLAN e TASK-MMM-INDEX **não escrevem** — o artefato afirma
   (`FRs cobertos`, `Realiza`, `Wave`), o grafo calcula. Convenção de "PLAN anterior":
   MMM menor sobre a mesma SPEC. `--plan MMM` restringe a um PLAN. Determinístico
   (IDs ordenados); imprime, nunca escreve — não existe cópia a divergir, logo não
@@ -178,8 +178,8 @@ Quando o `--check` acusa ERROR logo após a geração de artefatos (Etapa 5 do
    correção pingada continua defeito, por mais barata que a volta tenha ficado.
 2. **Correção é aguardada**: o re-despacho é síncrono do ponto de vista do fluxo — a main
    session espera o retorno e re-roda o script ela mesma. Agent em background + polling
-   de filesystem é anti-padrão (caso real: ~14 min de `sleep`-loop para um delta; régua
-   geral de espera de subagent: `sdd-conventions.md` — 4.118). A preservação de arestas
+   de filesystem é anti-padrão (régua geral de espera de subagent: `sdd-conventions.md` —
+   4.118). A preservação de arestas
    do **arquivo depois do pacote** (4.117) também se **prova**, não se presume — nos
    **dois** modos de aplicação da 4.309 (lote de `Edit`s ou `Write` integral):
    `scripts/edge-diff.sh <arquivo> [--base <ref>]` compara os campos de aresta e os ACs

@@ -92,7 +92,7 @@ if [ "$modo_nomeado" -eq 1 ]; then
 reason="$(cat <<EOF
 agent-guard (keelson, decisões 4.293/4.297): spawn do papel "${stype}" com nome de instância ("${nome}").
 
-Com Agent Teams habilitado no ambiente, subagent NOMEADO é lançado como teammate em qualquer sessão interativa — o retorno implícito do papel desaparece e a topologia do ciclo muda sem ninguém pedir (caso real de campo: gates terminando "mudos", veredito colhido por improviso). Papel do ciclo é despachado por tipo, SEM \`name\` — é o que mantém o canal de retorno determinístico em toda superfície.
+Com Agent Teams habilitado no ambiente, subagent NOMEADO é lançado como teammate em qualquer sessão interativa — o retorno implícito do papel desaparece e a topologia do ciclo muda sem ninguém pedir — gates terminam "mudos" e o veredito é colhido por improviso. Papel do ciclo é despachado por tipo, SEM \`name\` — é o que mantém o canal de retorno determinístico em toda superfície.
 
 Refaça a chamada sem o parâmetro \`name\`. Se o modo teams é DELIBERADO (\`--force-mode=teams\`, opt-in do ciclo): repita a chamada como está — este aviso não se repete para esta mesma chamada — e garanta que o prompt de despacho instrui o retorno via SendMessage (docs/_meta/conventions/agent-teams.md).
 EOF

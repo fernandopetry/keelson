@@ -1,6 +1,6 @@
 # Handoff de verificação de tela (gate de comportamento remoto)
 
-> Fonte única (ex-§8 do method-guide) do protocolo de handoff: ciclo de vida (§8.1),
+> Fonte única do protocolo de handoff: ciclo de vida (§8.1),
 > template canônico (§8.2) e prompt canônico da Entrega (§8.3).
 
 Quando o ciclo roda num ambiente **sem acesso a testes de tela** — worktree sem app/browser, execução na nuvem, containers indisponíveis — o gate de comportamento verificado não consegue exercitar a UI. Nesses casos a entrega **não engole o furo**: ela produz um **handoff de verificação** — documento com roteiro passo a passo e riscos + **prompt pronto** para um agente com acesso a tela fechar a verificação depois. O handoff é a diferença entre "não verifiquei e ninguém sabe" e "não verifiquei, e aqui está exatamente o que falta, como exercitar e o que está em risco".

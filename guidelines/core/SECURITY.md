@@ -54,7 +54,7 @@ correspondência aqui sai sem CWE.
 | **File Upload** | CWE-434 | Aceitar qualquer arquivo | Allowlist de tipo/extensão; validar o conteúdo real |
 | **Open Redirect** | CWE-601 | Redirecionar para destino vindo da entrada | Allowlist de destinos permitidos |
 | **Credencial hardcoded** | CWE-798 | Chave, senha ou token literal no fonte, em fixture ou em config commitada | Vem de variável de ambiente/secret store; o achado cita `arquivo:linha` e a regra que casou — **nunca o valor** |
-| **Credencial via shell** (decisão 4.236) | CWE-532 | Carregar arquivo de ambiente com `source`/`export` — o arquivo vira script: substituição de comando executa e a falha de parse **ecoa o segredo** na mensagem de erro (caso real: senha em texto plano no transcript) | Parser de chave=valor que não interpreta o conteúdo (dotenv/equivalente); a mensagem de erro do parser nunca é repassada |
+| **Credencial via shell** (decisão 4.236) | CWE-532 | Carregar arquivo de ambiente com `source`/`export` — o arquivo vira script: substituição de comando executa e a falha de parse **ecoa o segredo** na mensagem de erro — e a mensagem vai em texto plano ao transcript | Parser de chave=valor que não interpreta o conteúdo (dotenv/equivalente); a mensagem de erro do parser nunca é repassada |
 
 ---
 
