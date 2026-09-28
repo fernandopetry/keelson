@@ -30,7 +30,8 @@
 #               `espera: ~<N>min entre turnos em <K> intervalo(s) > 10min`
 #                 — soma dos intervalos entre o fim de um turno (linha `janela=`) e o
 #                 início do seguinte (`inicio=` da linha seguinte) maiores que 10 min:
-#                 espera por humano ou por agent em background; só quando há par medido
+#                 descontado o tempo com subagent em voo (janelas [fim−dur, fim] dos
+#                 agentes medidos, em união — 4.437): é a espera por HUMANO; só quando há par medido
 #   --teams     (só com --compose) o CHAMADOR declara que o ciclo rodou em
 #               AGENT_TEAMS (enum de orquestração do implement — decisão 4.296):
 #               havendo ranking, acrescenta a linha `cobertura:` — o ranking cobre
@@ -228,12 +229,35 @@ awk -v compose="$compose" -v teams="$teams" -v papel="$janelas" -v since="$since
       while (j >= 1 && jstop[j] > vs) { jstop[j + 1] = jstop[j]; jini[j + 1] = jini[j]; j-- }
       jstop[j + 1] = vs; jini[j + 1] = vi
     }
+    # espera = tempo do intervalo SEM subagent em voo (decisão 4.437): a janela de cada
+    # agent medido ([fim − dur, fim]) é descontada do intervalo (união, sem dupla contagem de
+    # paralelos) — o que sobra é espera por humano; "espera ~450 min" com 3 gaps de 15 min
+    # era a soma de janelas de developer contadas como espera
     pares = 0; esp = 0; kesp = 0
     for (i = 1; i < nj; i++) {
       if (jini[i + 1] == "") continue
-      gap = jini[i + 1] - jstop[i]
+      g0 = jstop[i]; g1 = jini[i + 1]
+      gap = g1 - g0
       pares++
-      if (gap > 600) { esp += gap; kesp++ }
+      if (gap <= 0) continue
+      # recorta as janelas de agent ao intervalo e mede a união
+      m = 0
+      for (k = 1; k <= ns; k++) {
+        a0 = sfim[k] - sdur[k]; a1 = sfim[k]
+        if (a0 < g0) a0 = g0
+        if (a1 > g1) a1 = g1
+        if (a1 > a0) { m++; w0[m] = a0; w1[m] = a1 }
+      }
+      for (x = 2; x <= m; x++) { v0 = w0[x]; v1 = w1[x]; y = x - 1
+        while (y >= 1 && w0[y] > v0) { w0[y + 1] = w0[y]; w1[y + 1] = w1[y]; y-- }
+        w0[y + 1] = v0; w1[y + 1] = v1 }
+      coberto = 0; ce = -1
+      for (x = 1; x <= m; x++) {
+        if (w0[x] > ce) { coberto += w1[x] - w0[x]; ce = w1[x] }
+        else if (w1[x] > ce) { coberto += w1[x] - ce; ce = w1[x] }
+      }
+      livre = gap - coberto
+      if (livre > 600) { esp += livre; kesp++ }
     }
     if (compose) {
       if (pico > 0) printf "pico: ~%dk tokens\n", int((pico + 500) / 1000)

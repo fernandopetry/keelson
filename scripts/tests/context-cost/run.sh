@@ -147,19 +147,20 @@ cat > "$R6/thoughts/local/session-window.log" <<'EOF'
 2026-08-20T11:10:00-0300 janela=410000 inicio=2026-08-20T10:50:00-0300
 2026-08-20T11:30:00-0300 janela=420000 inicio=2026-08-20T11:12:00-0300
 EOF
-# cru: colunas extras só no papel medido; espera = 1 intervalo > 10min (10:05 → 10:50) de 3 pares
+# cru: colunas extras só no papel medido; espera = 1 intervalo > 10min (10:05 → 10:50) de 3 pares,
+# descontado 1 min de janela do developer que ainda estava em voo (09:13:48 → 10:06, 4.437): 2640 s
 out="$(cc "" "$R6")"
 want="pico 623400
 papel keelson:developer 451600 2 3132 48
 papel keelson:code-reviewer 210000 1
-espera 2700 1 3"
+espera 2640 1 3"
 if [ "$out" = "$want" ]; then ok cru-medido; else falha "cru-medido: [$out]"; fi
 # compose: minutos parciais declarados (dur malformado não conta), chamadas somadas, espera
 out="$(cc "" "$R6" --compose)"
 want="pico: ~623k tokens
 papel: keelson:developer ~452k tokens (2 spawns · 52min em 1 medidos · 48 chamadas)
 papel: keelson:code-reviewer ~210k tokens (1 spawns)
-espera: ~45min entre turnos em 1 intervalo(s) > 10min"
+espera: ~44min entre turnos em 1 intervalo(s) > 10min"
 if [ "$out" = "$want" ]; then ok compose-medido; else falha "compose-medido: [$out]"; fi
 # --janelas: fan-out (decompositor + 2 redatores paralelos) e duas correções separadas
 R7="$TMP/repo-janelas"; mkdir -p "$R7/thoughts/local"

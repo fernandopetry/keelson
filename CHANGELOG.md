@@ -23,6 +23,44 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.188.0] — 2026-09-27
+
+Re-init: none
+
+Decision 4.437 — levers L3 (Jira beyond the timeout) and L7 (false telemetry in the
+report) of the transcript reading.
+
+### Changed
+
+- **The delivery no longer waits for the tracker.** The `entrega` tracker-sync runs in the
+  background; when its summary has not arrived by the time the report is written, the
+  **Tracker** line says `em voo` with the measuring command (`/keelson:jira-sync <slug>
+  --dry-run`) and **Telemetria** says `em voo (adendo)`; the late return wakes the session
+  once and becomes an addendum plus one line in the slug history; the ledger archive keeps
+  the `tracker` events until then. Measured: a 15-minute report stall.
+- **The transition cap is resolved once per execution by the caller** and travels as `teto:`
+  in every tracker-sync briefing (dispatch, closure, tasks, delivery); the agent declares the
+  received cap and never re-derives it. Link types are resolved once (`getIssueLinkTypes`
+  when exposed, else one attempt by name and a skipped link with an event — never name
+  variations); worklogs use the Jira duration format (`1h 30m`), one attempt.
+  **Closure sync is one dispatch per wave with all closed TASKs**, never per TASK (46 per-TASK
+  closures cost 164 agent-minutes in the epic).
+- **`window-marker` counts subagents from the transcript's `subagents/` folder** — one meta
+  file per spawn, foreground, background and nested alike; tokens from the subagent's own
+  transcript; deduplicated by agent id. Background spawns never produced a `totalTokens`
+  result, so tracker-sync was reported as 1 spawn against 8 real ones. The hook stays the
+  only transcript reader (4.239).
+- **`context-cost --compose`'s `espera:` is now human wait**: the union of measured agent
+  windows is subtracted from the gaps between turns. "espera ~450 min" against three
+  15-minute gaps was developer windows counted as waiting. Report contract, `auto`
+  delivery and the wiki say so.
+- `estimate-contract`: second calibration discontinuity (earlier lines carry the old
+  telemetry) and the unit named "agent hours in a continuous session"; the wall time from
+  `cycle-clock` is the calibration ruler. The task-size hours in `tasks.md` are untouched.
+- Not adopted, escalated with a default: a site-vocabulary cache written by the sync into
+  `jira.<PROJECT>.md` (contradicts the three-section map contract); the default is a fourth
+  section written by `/keelson:init jira` in its own batch.
+
 ## [0.187.0] — 2026-09-27
 
 Re-init: none

@@ -191,6 +191,68 @@ print("CONSUMED %d" % consumed)
   fi
 fi
 
+# Subagents pela pasta `<transcript sem .jsonl>/subagents/` (decisão 4.437): spawn em
+# background devolve toolUseResult SEM totalTokens/agentType (só "async_launched") e nunca
+# virava linha `agente=` — tracker-sync 1 contado contra 8 reais, scribe 5 contra 12. A pasta
+# tem 1 meta por spawn (foreground e background, aninhado incluído); tokens = soma do usage
+# das mensagens do próprio subagent; dur = último − primeiro timestamp; tools = tool_use.
+# Cada agentId entra no log UMA vez (`.window-agents.<key>`); agent ainda escrevendo (mtime
+# < 60 s) fica para o próximo Stop. Com a pasta presente, as linhas de toolUseResult do delta
+# são ignoradas (contariam o foreground duas vezes); sem a pasta, comportamento anterior.
+agents_out=""
+sub_dir="${transcript%.jsonl}/subagents"
+if [ -d "$sub_dir" ] && [ -n "$key" ]; then
+  seen_file="$(dirname "$log")/.window-agents.$key"
+  [ -f "$seen_file" ] || : > "$seen_file" 2>/dev/null || true
+  read -r -d '' AG_PY <<'PY2' || true
+import glob, json, os, sys, time
+from datetime import datetime, timezone, timedelta
+sub_dir, seen_file = sys.argv[1], sys.argv[2]
+try: seen = set(open(seen_file).read().split())
+except Exception: seen = set()
+agora = time.time()
+def local_iso(ts):
+    try:
+        d = datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(timezone(timedelta(hours=-3)))
+        return d.strftime("%Y-%m-%dT%H:%M:%S%z")
+    except Exception: return "-"
+novos = []
+for m in sorted(glob.glob(os.path.join(sub_dir, "agent-*.meta.json"))):
+    aid = os.path.basename(m)[len("agent-"):-len(".meta.json")]
+    if aid in seen: continue
+    j = m[:-len(".meta.json")] + ".jsonl"
+    if not os.path.isfile(j) or agora - os.path.getmtime(j) < 60: continue
+    try: tipo = (json.load(open(m)).get("agentType") or "?").replace(" ", "_")
+    except Exception: tipo = "?"
+    first = last = None; tokens = 0; tools = 0; ids = set()
+    for line in open(j, encoding="utf-8", errors="replace"):
+        line = line.strip()
+        if not line: continue
+        try: e = json.loads(line)
+        except Exception: continue
+        ts = e.get("timestamp")
+        if ts:
+            first = first or ts; last = ts
+        if e.get("type") == "assistant":
+            msg = e.get("message") or {}; mid = msg.get("id"); u = msg.get("usage") or {}
+            if u and mid not in ids:
+                ids.add(mid)
+                tokens += u.get("input_tokens", 0) + u.get("cache_read_input_tokens", 0) + u.get("cache_creation_input_tokens", 0) + u.get("output_tokens", 0)
+            tools += sum(1 for b in msg.get("content") or [] if isinstance(b, dict) and b.get("type") == "tool_use")
+    dur = "-"
+    if first and last:
+        try:
+            f = lambda x: datetime.fromisoformat(x.replace("Z", "+00:00"))
+            dur = int(round((f(last) - f(first)).total_seconds()))
+        except Exception: dur = "-"
+    print("AGENTE %s %d %s %d %s" % (tipo, tokens, dur, tools, local_iso(last) if last else "-"))
+    novos.append(aid)
+if novos:
+    with open(seen_file, "a") as fh: fh.write("".join(a + "\n" for a in novos))
+PY2
+  agents_out="$(printf '%s' "$AG_PY" | python3 - "$sub_dir" "$seen_file" 2>/dev/null || echo "")"
+fi
+
 turno="$(printf '%s\n' "$delta_out" | awk '$1=="TURNO"{print $2; exit}')"
 if [ -n "$janela" ]; then
   if [ -n "$turno" ]; then
@@ -199,9 +261,16 @@ if [ -n "$janela" ]; then
     echo "${ts} janela=${janela}" >> "$log" 2>/dev/null || true
   fi
 fi
-[ -n "$delta_out" ] || exit 0
+if [ -n "$agents_out" ]; then
+  delta_agents="$agents_out"
+elif [ -d "$sub_dir" ]; then
+  delta_agents=""   # pasta existe, nada novo terminado: nunca contar o foreground pelo toolUseResult
+else
+  delta_agents="$(printf '%s\n' "$delta_out" | awk '$1=="AGENTE"')"
+fi
+[ -n "$delta_out" ] || [ -n "$delta_agents" ] || exit 0
 
-printf '%s\n' "$delta_out" | while IFS=' ' read -r tag a b c d e; do
+printf '%s\n' "$delta_agents" | while IFS=' ' read -r tag a b c d e; do
   [ "$tag" = "AGENTE" ] || continue
   lts="$ts"
   [ -n "$e" ] && [ "$e" != "-" ] && lts="$e"

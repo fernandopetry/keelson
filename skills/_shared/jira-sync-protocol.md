@@ -67,7 +67,7 @@ disponibilidade, §0), `getAccessibleAtlassianResources`, `getVisibleJiraProject
 `getJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFields`,
 `searchJiraIssuesUsingJql`, `getTransitionsForJiraIssue`, `getJiraIssue`, `createJiraIssue`,
 `editJiraIssue`, `addCommentToJiraIssue`, `addWorklogToJiraIssue` (telemetria, §17),
-`transitionJiraIssue`, `createIssueLink`.
+`transitionJiraIssue`, `createIssueLink` (o **tipo de link** é resolvido uma vez por execução — pelo `getIssueLinkTypes` quando o conector o expõe pelo sufixo, senão **uma** tentativa pelo nome canônico e, na falha, link **pulado** com evento `tracker`; nunca retentar variações do nome — 5 erros por "Relates" num site em português foi o caso real, 4.437).
 Nomes de servidor variam por instalação (`mcp__<servidor>__<ferramenta>`) — resolva pelo
 **sufixo** da ferramenta, nunca por um prefixo fixo.
 
@@ -546,6 +546,7 @@ terminada a entrega da IA, o Diretor ainda analisa e pede ajustes — a unidade 
 desenvolvimento até **ele** movê-la; pós-desenvolvimento é ato humano, pela mesma régua que
 mantém o Epic intocado (4.62).
 
+- **O teto é resolvido uma vez por execução pelo invocador** (decisão 4.437): a main lê a linha `Trabalho iniciado (Story)` do mapa e passa `teto: <status-id>` no briefing de **cada** `tracker-sync`; o agent usa o recebido e **nunca rederiva** — cada spawn é uma janela nova, e dois spawns da mesma fatia aplicaram tetos diferentes num caso real.
 - **Declare o teto no output**, sempre que tocar a unidade de QA:
   `Story <KEY>: teto <coluna> · alvo <coluna> → movida | comentário (alvo além do teto)`.
   Teto aplicado em silêncio é indistinguível de teto esquecido — e foi esquecido em campo
@@ -827,7 +828,9 @@ fecho — publica também o worklog do trecho medido; rota sem marca de largada 
 **não publicável**, e isso é declarado (abaixo), nunca engolido:
 
 - **Worklog** (`addWorklogToJiraIssue`): duração medida do **trecho que fechou**
-  (`timeSpent`). Início do trecho = o mais recente entre a última marca do relógio do
+  (`timeSpent`, no formato de duração do Jira — unidades separadas por espaço, `1h 30m`,
+  nunca `1h30m`; rejeição de formato → uma tentativa só, evento `tracker` com a devolutiva
+  literal, sem retentar — 4.437). Início do trecho = o mais recente entre a última marca do relógio do
   ciclo (Cronologia/largada) e o fim do último worklog de telemetria já publicado na
   issue — vale igual para as closures por wave do gancho `implement`. **Pausa e retomada
   (decisão 4.382)**: a linha `- retomada:` da Cronologia é marca do relógio e **abre**

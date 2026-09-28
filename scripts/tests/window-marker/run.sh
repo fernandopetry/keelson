@@ -127,6 +127,33 @@ n="$(grep -c ' agente=' "$LOG5" 2>/dev/null)"
 [ "$n" = "2" ] && ok medidos-nao-duplicam || falha "medidos-nao-duplicam: [$n]"
 
 echo "---"
+
+# --- subagents/ (4.437): agentes contados pela pasta, tokens do próprio transcript, dedupe ---
+D9="$TMP/c9"; mkdir -p "$D9/thoughts/local"
+T9="$TMP/t9.jsonl"; transcript "$T9"; mkdir -p "$TMP/t9/subagents"
+printf '{"agentType":"keelson:tracker-sync","description":"Sync Jira"}\n' > "$TMP/t9/subagents/agent-abc1.meta.json"
+cat > "$TMP/t9/subagents/agent-abc1.jsonl" <<'EOF'
+{"type":"user","timestamp":"2026-09-27T10:00:00.000Z","message":{"content":"x"}}
+{"type":"assistant","timestamp":"2026-09-27T10:01:00.000Z","message":{"id":"m1","usage":{"input_tokens":1000,"cache_read_input_tokens":4000,"output_tokens":100},"content":[{"type":"tool_use","id":"u1","name":"Bash","input":{}}]}}
+{"type":"assistant","timestamp":"2026-09-27T10:05:00.000Z","message":{"id":"m2","usage":{"input_tokens":2000,"cache_read_input_tokens":4000,"output_tokens":100},"content":[{"type":"text","text":"ok"}]}}
+EOF
+touch -t 202601010000 "$TMP/t9/subagents/agent-abc1.jsonl"
+roda "{\"cwd\": \"$D9\", \"transcript_path\": \"$T9\"}"
+LOG9="$D9/thoughts/local/session-window.log"
+total=$((total + 1))
+grep -q ' agente=keelson:tracker-sync tokens=11200 dur=300s tools=1$' "$LOG9" 2>/dev/null && ok subagents-meta-conta || falha "subagents-meta-conta: [$(cat "$LOG9" 2>/dev/null)]"
+total=$((total + 1))
+if grep -q 'agente=keelson:developer' "$LOG9" 2>/dev/null; then falha "subagents-toolUseResult-ignorado"; else ok subagents-toolUseResult-ignorado; fi
+roda "{\"cwd\": \"$D9\", \"transcript_path\": \"$T9\"}"
+total=$((total + 1))
+[ "$(grep -c 'agente=keelson:tracker-sync' "$LOG9" 2>/dev/null)" = "1" ] && ok subagents-dedupe || falha "subagents-dedupe: $(grep -c agente= "$LOG9")"
+# agent ainda escrevendo (mtime recente) fica para o próximo Stop
+printf '{"agentType":"keelson:scribe","description":"x"}\n' > "$TMP/t9/subagents/agent-abc2.meta.json"
+printf '{"type":"assistant","timestamp":"2026-09-27T10:00:00.000Z","message":{"id":"m9","usage":{"input_tokens":10},"content":[]}}\n' > "$TMP/t9/subagents/agent-abc2.jsonl"
+roda "{\"cwd\": \"$D9\", \"transcript_path\": \"$T9\"}"
+total=$((total + 1))
+if grep -q 'agente=keelson:scribe' "$LOG9" 2>/dev/null; then falha "subagents-em-escrita-espera"; else ok subagents-em-escrita-espera; fi
+
 if [ "$fail" -gt 0 ]; then
   echo "window-marker: $fail de $total casos falharam"
   exit 1

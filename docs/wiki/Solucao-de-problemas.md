@@ -670,6 +670,14 @@ agentes reportam. TASK de brief avulso com `**Jira**: n/a — <motivo>` só sati
 quando a ficha tem `jira.issueType.standalone` nulo (avulsos não sincronizam); com o tipo
 preenchido, o avulso sincroniza como sub-tarefa e o `n/a` continua sendo cobrado.
 
+### A linha do Jira no relatório diz "em voo"
+
+O relatório de entrega não espera mais o sync final do Jira: se o agente de sync ainda não
+respondeu quando o relatório sai, a linha traz `em voo` e o comando que mede o estado
+(`/keelson:jira-sync <slug> --dry-run`). Quando o sync responde, o keelson publica um
+**adendo** com a linha medida e grava uma linha no histórico do slug. Se a sessão fechou
+antes disso, rode o comando de medição — nada se perde, só chega depois.
+
 ### O `jira.<PROJECT>.md` está crescendo com listas de issues
 
 O mapa é **config, nunca ledger**: as três seções do protocolo (Campos, Etapas/Colunas,

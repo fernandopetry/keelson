@@ -42,7 +42,12 @@ A dimensão de uma demanda é expressa em **duas camadas**:
   **Descontinuidade de calibração (decisão 4.300)**: a semântica mudou em 2026-08-29
   (`medium` passou de "caso de uso, 2–4 h" a "comportamento fim-a-fim, ~2–8 h") — par
   estimado × realizado anterior a essa data calibra com a régua velha; compare eras
-  separadas em `estimates.md`, nunca a série inteira como contínua.
+  separadas em `estimates.md`, nunca a série inteira como contínua. **Segunda
+  descontinuidade (decisão 4.437, 2026-09-27)**: linhas anteriores carregam a telemetria
+  antiga — `espera` que somava janelas de agent como espera humana e spawns em background
+  subcontados — e não calibram; a unidade da faixa é **horas de agente em sessão contínua**
+  (o estimator previu 26–64 h para fatias de 4,6–6 h de parede real, 3 vezes), e a régua de
+  calibração é a parede medida pelo `cycle-clock`, nunca a linha de espera.
 - **Faixa de tempo por fase** (`min–max`, em horas — ordem de grandeza, precedente do
   `value-test-protocol.md`), cobrindo o **ciclo inteiro**:
   - **forja/entrevista** — rodadas de brief prováveis, proporcional às lacunas do pedido;
