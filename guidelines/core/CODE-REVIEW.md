@@ -69,8 +69,7 @@ com confiança** por grep/imports, o filtro ampliado é insuficiente — rode a 
 completa**: é o único caso em que ela entra neste gate. Você é o dono da rodada escopada:
 **registre o comando/filtro executado e `N de M`**, porque o `qa` decide por ele se precisa
 re-rodar — e o subconjunto **nunca** é rotulado "equivalente à suíte"/"make test equivalente"
-(afirmação de fato sem execução, família 4.329; caso real: 622 testes chamados de
-equivalentes a uma suíte de 6.014 — decisão 4.436).
+(afirmação de fato sem execução, família 4.329; decisão 4.436).
 
 **Dispensa por diff inerte**: quando nenhum arquivo do diff é código que a suíte exercita
 (régua e âncora mecânica em `./TESTING.md`, "Diff inerte"), o gate não roda testes —

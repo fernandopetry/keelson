@@ -45,8 +45,7 @@ A dimensão de uma demanda é expressa em **duas camadas**:
   separadas em `estimates.md`, nunca a série inteira como contínua. **Segunda
   descontinuidade (decisão 4.437, 2026-09-27)**: linhas anteriores carregam a telemetria
   antiga — `espera` que somava janelas de agent como espera humana e spawns em background
-  subcontados — e não calibram; a unidade da faixa é **horas de agente em sessão contínua**
-  (o estimator previu 26–64 h para fatias de 4,6–6 h de parede real, 3 vezes), e a régua de
+  subcontados — e não calibram; a unidade da faixa é **horas de agente em sessão contínua**, e a régua de
   calibração é a parede medida pelo `cycle-clock`, nunca a linha de espera.
 - **Faixa de tempo por fase** (`min–max`, em horas — ordem de grandeza, precedente do
   `value-test-protocol.md`), cobrindo o **ciclo inteiro**:

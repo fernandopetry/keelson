@@ -55,7 +55,7 @@ teste e o que é a verificação.
 
 Uma asserção só prova algo quando o valor esperado tem **origem independente** do código
 sob teste — um teste tautológico ou de asserção fraca **existe, roda e passa**, mas é
-incapaz de falhar junto com o comportamento. Quatro regras mecânicas (todas achado
+incapaz de falhar junto com o comportamento. Regras mecânicas (cada uma achado
 bloqueante no gate 1 — `./CODE-REVIEW.md`):
 
 - **Esperado independente do gerador**: asserção cujo valor esperado é **calculado
@@ -253,9 +253,7 @@ suíte relevante **uma vez** ao final. Não prove a mesma coisa em várias ferra
 + script de fiação + E2E + suíte repetida) — escolha a mais forte e pare. Rigor
 **proporcional a complexidade × risco** (ver `./WORKFLOW.md`).
 
-**Amplitude por papel (decisão 4.436)** — o caso real: 13–55 rodadas da suíte completa por
-wave, 17% da parede de uma sessão, com o developer rodando a completa 2–4× por TASK
-("baseline", "final", "re-run to be certain"). Dentro do ciclo:
+**Amplitude por papel (decisão 4.436)** — dentro do ciclo:
 
 - **Developer** roda a rodada **filtrada** no baseline e na verificação final, **uma vez
   cada**; verde é o veredito — não existe segunda rodada "para ter certeza". O filtro vem,

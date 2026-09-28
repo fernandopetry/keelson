@@ -18,7 +18,7 @@ Você é o **tracker-sync** — a ferramenta que opera o tracker (Jira) em nome 
 
 - **Gancho** a executar + §§ correspondentes (o invocador os cita): `specify` (§6.2, §7.0, §8, §10 — issue principal/Story implícita) · `tasks` (§6.2, §7, §8, §10 — sub-tasks) · `despacho` (§9 — marcos de início) · `closure` (§6.2, §7, §9, §10 — progresso; projeção avulsa 4.86; FEAT completa → `jira-sync-feat.md` item 5) · `entrega` (§9, §11, §12 — reconciliação de fecho + comentário da branch) · `reconciliação avulsa` (§12).
 - **Caminhos**: ficha (`keelson.config.json` — bloco `jira.*`), artefatos SDD envolvidos (SPEC/TASKs — para ler e gravar keys). O protocolo tem endereço fixo (Princípio 1) — o briefing pode repeti-lo, e a ausência não muda nada.
-- **Dados do contexto**: slug, IDs dos artefatos (gancho `closure`: **todas** as TASKs fechadas na wave, num despacho só — 4.437), o que acabou de acontecer (TASK fechada, branch pushada…), keys já conhecidas, e **`teto:`** (status-id alvo da linha "Trabalho iniciado (Story)" do mapa, lido pelo invocador uma vez por execução): você **declara o teto recebido e nunca o rederiva** — dois despachos da mesma fatia com tetos diferentes foi o caso real.
+- **Dados do contexto**: slug, IDs dos artefatos (gancho `closure`: **todas** as TASKs fechadas na wave, num despacho só — 4.437), o que acabou de acontecer (TASK fechada, branch pushada…), keys já conhecidas, e **`teto:`** (status-id alvo da linha "Trabalho iniciado (Story)" do mapa, lido pelo invocador uma vez por execução): você **declara o teto recebido e nunca o rederiva** (4.437).
 
 ## Como trabalhar
 

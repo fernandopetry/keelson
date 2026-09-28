@@ -57,8 +57,7 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   **`scripts/smoke-consumer.sh`** (smoke operacional com modelo real, 4.390) → provar em
   consumidor DESCARTÁVEL, por fatos do disco, que init/re-init, o ciclo formal do auto,
   pause/continue e o baseline vermelho se comportam como a doutrina diz; roda sob demanda
-  do Diretor (rodada completa: ~US$20–60 e 1h30–2h de parede — o ciclo formal sozinho
-  passou de 60 min na 3ª rodada), nunca em pre-commit/CI ·
+  do Diretor (custa dólares e horas reais — última rodada medida na 4.438), nunca em pre-commit/CI ·
   **`evals/` + `scripts/eval-run.sh`** (camada de evals de comportamento, 4.304) → medir
   o efeito de mudança de doutrina em caso controlado A/B (braços `file:` ou `git:<ref>` com `regua:` declarada no caso;
   n≥2 é o mínimo do runner e comparação começa em 4 — piso empírico da 4.304, declarado
@@ -99,8 +98,7 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   via `${CLAUDE_PLUGIN_ROOT}` — é conteúdo embarcado: mudança nele entra no `CHANGELOG.md`
   e conta para o bump. `decisions.md`, `learning-log.md`, `proposal-inbox.md` e
   `method-guide.md` continuam registro do mantenedor, sem bump.
-- **Sessões paralelas colidem em §4.x e versão** (caso real: duas "4.60" no mesmo dia —
-  decisão 4.63): antes de numerar decisão ou bumpar, `git fetch` e confira o topo da main —
+- **Sessões paralelas colidem em §4.x e versão** (decisão 4.63): antes de numerar decisão ou bumpar, `git fetch` e confira o topo da main —
   e o pre-commit **recusa número de decisão ou versão já usados** (4.394: heading `### 4.N`
   novo duplicado ou ≤ o maior em HEAD; `## [X.Y.Z]` nova duplicada ou já commitada), a
   colisão que a guarda do topo não vê quando o commit alheio já entrou na história local.
@@ -160,7 +158,7 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 
 ## Modelo de time e contrato do Diretor (decisões 4.37–4.41 — dono do detalhe: `docs/_meta/decisions.md`)
 
-- O keelson simula um **time real** — desde a 4.40, os IDs dos agents **são** os nomes
+- O keelson simula um **time real** — os IDs dos agents **são** os nomes (4.40)
   dos papéis. Elenco: **Diretor** = humano · **Tech Lead** = main session · agents
   `po` (dono da demanda) · `pm` (decompõe épico — nunca abaixo do PO; 4.39) ·
   `developer` · `code-reviewer` · `qa` · `security-engineer` · `performance-engineer`
@@ -200,7 +198,7 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   que o explica). Fluxo ou decisão com ramificação ganha diagrama ` ```mermaid ` junto
   do texto quando facilitar o entendimento — o GitHub renderiza mermaid na wiki.
   Aspas dentro de rótulo mermaid → aspas simples (`'…'`) — entidade `&quot;` quebra o
-  parser do GitHub (caso real, 784ba51). Todo bloco da superfície publicada é provado
+  parser do GitHub. Todo bloco da superfície publicada é provado
   por `scripts/check-mermaid.sh` (4.248) no pre-commit e no CI — lint offline da
   classe + render real; sem rede degrada com aviso e o CI é o veredito.
   A régua vale para página própria; espelho segue o texto do dono, intocado.

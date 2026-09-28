@@ -34,7 +34,7 @@ gap. No output, o bloco `gates` dá lugar a
 área), detalhe}]` + `dedup: aplicada — N achados (pares arquivo:linha) | n/a — sem base`;
 os demais campos (`fora_de_escopo`, `licao_candidata`) valem igual.
 
-## Os gates 1–7 (de 9)
+## Os gates 1–7 (de 11)
 
 A **régua** de cada gate — o que exige, o que o faz falhar, a mecânica escopada de teste e
 lint — tem dono único em **`${CLAUDE_PLUGIN_ROOT}/guidelines/core/CODE-REVIEW.md`**: leia-a
@@ -49,7 +49,7 @@ que é específico de revisar uma **TASK**:
 6. Aderência ao Charter + perfil ativo (`profile` da ficha).
 7. Code review qualitativo.
 
-Gates 8 (segurança) e 9 (comportamento) não são seus: `security-engineer` e `qa`.
+Gates 8 (segurança), 9 (comportamento), 10 (performance) e 11 (design) não são seus: `security-engineer`, `qa`, `performance-engineer` e `product-designer`.
 
 ## Fluxo de revisão
 

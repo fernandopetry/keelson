@@ -219,8 +219,7 @@ conhecido; qualquer outro ERROR bloqueia normalmente (decisão 4.301).
 (contrato no cabeçalho do script — PHPUnit; outro runner é silêncio, não fato). Cada
 WARNING — `--group` sobre arquivo sem a anotação, arquivo em grupo excluído por padrão
 citado sem `--group`, `--testsuite` fora da suíte ou inexistente — entra no mesmo delta
-ao `scribe`, com a linha da TASK como âncora: é o comando executado no lugar da leitura
-que a 4.428 pedia e que não preveniu no campo. Script indisponível → declare, como no grafo.
+ao `scribe`, com a linha da TASK como âncora. Script indisponível → declare, como no grafo.
 **E a forma das TASKs passa pelo lint antes de gastar a rodada** (decisão 4.432):
 `bash "${CLAUDE_PLUGIN_ROOT}/scripts/artifact-lint.sh" {docsRoot}/<slug>` em modo diretório
 (os checks cruzados só existem nele; catálogo e severidades: `lint-contract.md`). Entram no
@@ -228,12 +227,11 @@ mesmo delta ao `scribe`: todo achado que **não** é `(W)` no catálogo (fato �
 seção ou campo ausente, id divergente) e os WARNING do grafo que atravessam fatias
 (`dep-bloqueia-assimetrica`, `wave-incoerente`); os `(W)` de padrão desta classe
 (`task-nome-tipo`, `task-criterio-grep-nao-ancorado`, `task-wave-overlap-arquivo`) vão como
-"corrija ou justifique em `duvidas`" — `task-overlap-fr` fica fora (saturado: 101 avisos em
-162 TASKs de um acervo real). **Um ajuste por (check × TASK)**, nunca por ocorrência, para o
+"corrija ou justifique em `duvidas`" — `task-overlap-fr` fica fora (saturado no acervo real —
+sinal sem valor de triagem). **Um ajuste por (check × TASK)**, nunca por ocorrência, para o
 pacote caber no `modo: edits`; a volta conta em `correções` da telemetria da forja e `classes`
-transcreve os ids do lint. Caso real: fase TASKs de 45–61 min por fatia, em que a rodada única
-(4.116) de validator + `qa` + PO se gastava em `Tipo` com anotação, aresta assimétrica e grep
-sem âncora, e a correção voltava com 3–4 scribes e revalidação — o lint leva segundos.
+transcreve os ids do lint. O lint custa segundos; o mesmo achado na rodada única (4.116) custa
+validator + `qa` + PO e uma volta de scribes.
 
 **Correção** (decisão 4.114): delta ao `scribe`, **aguardado**, com a lista literal de
 ERRORs e âncora por ajuste — com `modo:` declarado pela régua do pacote (4.309/4.349, `graph-contract.md` §4.1) e revalidação pela régua do protocolo (`validator-protocol.md` §4.5, 4.350); buraco de numeração não é defeito, arquivo existente nunca se renumera — protocolo do invocador: `graph-contract.md` §4.1.

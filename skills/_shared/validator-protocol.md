@@ -83,10 +83,6 @@ sinônimo de glossário, FR composto, sujeito vago são julgamento — `lint-con
   um ajuste o tocou (espírito 4.88). O fato mecânico do ramo acima roda antes e entra
   citado (`graph-contract.md` §5); o relatório segue o §5 abaixo, com `Classes` só do delta.
 
-Caso real de campo (plugin 0.147.0): a revalidação da SPEC custou 10,2 min contra 8,1 da
-primeira passada, e a das TASKs 17,8 contra 14,5 — o validator releu o artefato inteiro
-(19 leituras + 22 greps) para revalidar 8 erros já localizados.
-
 ## §5. Relatório
 
 ```markdown
@@ -112,7 +108,7 @@ primeira passada, e a das TASKs 17,8 contra 14,5 — o validator releu o artefat
 
 ## Próximos passos
 1. Resolver errors pendentes e validar novamente
-2. Quando errors == 0, promover Status (quem promove: regra do §3 — po/main session no ciclo com BRIEF; humano no avulso/guided)
+2. Quando errors == 0, promover Status (quem promove: regra do §4 — po/main session no ciclo com BRIEF; humano no avulso/guided)
 ```
 
 Múltiplos artefatos no input → validar em sequência e consolidar num relatório só.

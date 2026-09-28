@@ -115,7 +115,7 @@ consumidor quebra junto; mudança extensa mas mecânica, cujo diff é auto-evide
 certo ou errado (codemod, rename em massa), não sobe de categoria por volume. Aparência
 de trivial não resiste a raio de dano: na dúvida sobre quem consome o que muda, promova.
 
-**Emenda não é SPEC nova (decisão 4.398)**: a régua da 4.137 manda promover ao ciclo a linha que muda a promessa — mas quando a promessa já vive numa SPEC validada e a mudança é **uma** (out-of-scope que entra, AC ajustado, default), o custo de estar errado já foi pago na SPEC original; o que falta pagar é a validação **da mudança** pelo PO contra o brief, não uma SPEC, um PLAN e TASKs novas (smoke 4.395: uma função contra o out-of-scope custou um ciclo inteiro — 5× a rota pontual — para produzir uma SPEC-003 de um FR). Categoria 1b; sobe para 1 se a emenda exigir DEC ou componente novo.
+**Emenda não é SPEC nova (decisão 4.398)**: a régua da 4.137 manda promover ao ciclo a linha que muda a promessa — mas quando a promessa já vive numa SPEC validada e a mudança é **uma** (out-of-scope que entra, AC ajustado, default), o custo de estar errado já foi pago na SPEC original; o que falta pagar é a validação **da mudança** pelo PO contra o brief, não uma SPEC, um PLAN e TASKs novas. Categoria 1b; sobe para 1 se a emenda exigir DEC ou componente novo.
 
 **Bug de produção** (categorias 3/4 vindas de produção): o roteamento acima só acontece
 **depois** da Etapa 2.5 — severidade e impacto entram no artefato roteado (4.101).

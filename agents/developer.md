@@ -263,8 +263,7 @@ já `Done` de outra wave — mesmo "aditivo, sem quebra", mesmo só somando um m
 magnitude do conserto. Um `Blocked` seu, minutos antes na mesma sessão, não autoriza decidir
 sozinho o próximo furo parecido: o que ele provou é que a decisão é do Tech Lead, não que ela
 se repete sem novo reporte. E declarar a decisão só nas `notas`, depois do commit, é contornar
-em silêncio com atraso, não sinalizar (caso real: 3 furos no mesmo dia, o 2º e o 3º
-"reconciliados" pelo developer citando o 1º como precedente; o 3º custou 16 min de retry).
+em silêncio com atraso, não sinalizar.
 
 **Pendência documentada não é licença para Done** (decisão 4.71): registrar um bloqueio
 em `notas` — com evidência caprichada, curl, print, tudo — não muda o status que ele

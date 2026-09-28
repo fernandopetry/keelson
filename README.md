@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.190.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.190.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: `/keelson:update` measures the project against the newly installed version — the `CLAUDE.md` block byte for byte, the `AGENTS.md` pointer and the ficha's top-level blocks, via the new tree's `init-selfcheck.sh` — and combines that with the jump's `Re-init:` markers; a divergence the current jump does not explain is named as a re-init forgotten on an earlier jump. The self-check gains `ficha-campos` (ficha blocks missing against the template, warning only). Details in `CHANGELOG.md`.
+New in this release: doctrine cleanup — incident narratives, measured numbers, recurrence counters, migration phrasing and pinned versions leave the embedded doctrine and stay in the decision that records them; three stale contradictions fixed (gate count in the reviewer, "four rules" listing nine, a wrong section pointer). No rule changed.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

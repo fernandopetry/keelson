@@ -241,8 +241,7 @@ as dadas e **toda lição sem `paths`** — recorte que esconde lição é o pio
 camada, por isso `paths` é opt-in de precisão, nunca filtro de exclusão; frontmatter
 ilegível degrada para "sempre incluída" com `WARNING`. O cabeçalho da saída declara a
 contagem (`recorte=R (path=P tag=T sempre=S) excluidas=E`) e a saída vem na ordem path →
-tag → sempre. **O recorte tem de caber numa leitura** (decisão 4.435 — caso real: 482 KB e
-219 lições `sempre` que ninguém abriu): quem passa o recorte a um leitor usa `--max-bytes N`
+tag → sempre. **O recorte tem de caber numa leitura** (decisão 4.435): quem passa o recorte a um leitor usa `--max-bytes N`
 (corte na fronteira de lição, na ordem acima; as omitidas ficam **enumeradas por id** na
 linha final — enumerar não é esconder) ou `--compact` (uma linha por lição: id, via, origem,
 título, paths, tags — nenhuma some), e o leitor pede o texto por `show <id>`; `list`/`index` dão os títulos

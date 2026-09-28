@@ -25,6 +25,38 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.190.1] — 2026-09-28
+
+Re-init: none
+
+Decision 4.441 — incident narrative leaves the doctrine; the case and the number stay in the decision.
+
+### Changed
+
+- **Doctrine cites the decision and stops there.** Across 28 embedded files (commands, agents,
+  shared skills, core guidelines, conventions and the `wave-guard` message), inline incident
+  narratives ("caso real: …" with minutes, counts and sizes), recurrence counters
+  ("2ª/3ª reincidência da classe"), decision genealogy ("3ª camada da família…", "extensão da…"),
+  migration-relative phrasing ("desde a 4.NNN", "ex-§", "deixou de contar", "revoga a…"),
+  pinned plugin/harness versions (`0.147.0`, `0.152.0`, `Claude Code ≥2.1.224`), one commit
+  hash and one consumer identifier were removed. Every rule, trap example, lint name and
+  owning decision reference is unchanged; the text the consumer loads gets shorter without
+  getting vaguer. This is step 1 of the 2026-09-28 prompt audit; step 2 (the eight
+  accreted paragraphs rewritten as principle + list, one at a time under A/B eval) is a
+  separate release.
+- **Vocabulary.** SDD artifacts have a markdown header, not a front-matter: the five places
+  that still said "front-matter" for BRIEF/SPEC/PLAN now say header, and the translator
+  sentence in `sdd-conventions.md` is gone.
+
+### Fixed
+
+- `agents/code-reviewer.md` said "gates 1–7 (of 9)" and "gates 8 and 9 are not yours" in a
+  file that declares 11 gates; now "of 11", naming `performance-engineer` and
+  `product-designer` too.
+- `guidelines/core/TESTING.md` announced "four mechanical rules" above a list of nine; the
+  heading no longer counts.
+- `skills/_shared/validator-protocol.md` pointed the promotion rule at §3; it lives in §4.
+
 ## [0.190.0] — 2026-09-28
 
 Re-init: none

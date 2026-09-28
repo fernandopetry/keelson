@@ -136,8 +136,7 @@ mesma rodada, em paralelo** (decisão 4.113): a skill `spec-validator` (forma), 
 `product-analyst` (mérito — Etapa 4.1) e, quando `jira.enabled`, o `tracker-sync`
 (Etapa 5.3). Nenhum depende do outro — validator e analyst só leem a SPEC; o sync só
 escreve as linhas de key. A única exclusão: **nunca com o scribe ainda editando** o
-arquivo (pacote de ajustes pendente → primeiro ele termina). Encadeá-los em fila é puro
-custo de relógio: numa sessão real foram 3 × ~6 min seriais onde 1 × ~6 min bastava.
+arquivo (pacote de ajustes pendente → primeiro ele termina).
 
 **Se errors == 0**: prosseguir para Etapa 5 (atualização do INDEX).
 **Se errors > 0**: manter Status = Draft e reportar os errors — a crítica do

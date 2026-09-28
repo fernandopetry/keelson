@@ -118,7 +118,7 @@ relatório de aceitação do PO. As marcas de `Largada` e `Cronologia` são **me
 (`TZ=America/Sao_Paulo date`) e alimentam a linha de duração do report da Entrega —
 a regra (formato, degradação sem marca) é do `/keelson:auto`, Etapa 5 item 6.3
 (decisão 4.56). Veto do Diretor → o brief é **reescrito e re-emitido**,
-nunca apagado. A SPEC pareada grava `**Brief**: BRIEF-NNN` no front-matter; o par
+nunca apagado. A SPEC pareada grava `**Brief**: BRIEF-NNN` no cabeçalho; o par
 brief ↔ SPEC é a trilha de auditoria da aceitação.
 
 **Variação épico (decisões 4.39, 4.125, 4.126)**: brief de nível portfólio, gravado pelo
@@ -305,7 +305,7 @@ Todo escritor do INDEX (`/keelson:specify`, `/keelson:plan`, `/keelson:tasks`, `
 
 - **Header**: as 5 colunas acima, nesta ordem. O `/keelson:specify` já cria a seção "## PLANs" com o header (tabela vazia); quem adiciona a primeira linha **não** inventa header.
 - **Célula `Tasks`** = `X/Y M`: `X` tasks Done, `Y` total (`?` até o `/keelson:tasks` rodar), `M` marcador — `⏸` (nenhuma Done), `🟡` (parcial), `✅` (todas Done). Progressão: `0/? ⏸` (plan) → `0/N ⏸` (tasks) → `X/N 🟡` (implement, closure por task) → `N/N ✅` (última closure).
-- **Coluna `Status`** = o Status do front-matter do arquivo PLAN, **verbatim** (`Draft | Review | Approved | Done`), com um único sufixo permitido: `Done (sugerido)`, escrito pelo `/keelson:implement` quando a DoD está satisfeita mas a promoção humana ainda não aconteceu. O "status efetivo" que o `/keelson:rebuild-index` calcula serve **só** para posicionar a capacidade na seção "Capacidades" — nunca entra nesta coluna.
+- **Coluna `Status`** = o Status do cabeçalho do arquivo PLAN, **verbatim** (`Draft | Review | Approved | Done`), com um único sufixo permitido: `Done (sugerido)`, escrito pelo `/keelson:implement` quando a DoD está satisfeita mas a promoção humana ainda não aconteceu. O "status efetivo" que o `/keelson:rebuild-index` calcula serve **só** para posicionar a capacidade na seção "Capacidades" — nunca entra nesta coluna.
 
 ### Template canônico do INDEX.md (fonte única)
 

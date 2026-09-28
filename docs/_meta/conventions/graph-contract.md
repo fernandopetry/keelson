@@ -41,7 +41,7 @@ separados por vírgula** ou a palavra **`nenhuma`**:
 |---|---|---|
 | `spec-ref` | PLAN → SPEC | `**SPEC referenciada**:` |
 | `plan-covers` | PLAN → FR\|NFR | bullets de `FRs cobertos` / `NFRs cobertos` |
-| `comp-realiza` | COMP → FR\|NFR | `**Realiza**:` do bloco COMP — **única** fonte do mapeamento FR ↔ componente (4.409: a tabela §7 deixou de existir; quando presente no acervo, é ignorada) |
+| `comp-realiza` | COMP → FR\|NFR | `**Realiza**:` do bloco COMP — **única** fonte do mapeamento FR ↔ componente (tabela §7 presente no acervo é ignorada — 4.409) |
 | `comp-dep` | COMP → COMP | `**Dependências**:` do bloco COMP |
 | `belongs-to` | TASK → PLAN | `**Pertence a**:` |
 | `realiza` | TASK → FR | `**Realiza (FRs)**:` |
@@ -97,11 +97,11 @@ ponta a ponta, e o validator decide com os próprios olhos (cobertura mista, §5
 | `ac-sem-task` | AC de FR coberto sem `covers-ac` de TASK do PLAN | ERROR · carência |
 | `realiza-fora-cobertura` | TASK realiza FR que o PLAN dela não cobre | ERROR |
 | `feat-divergente` | `declares-feat` ≠ conjunto derivado (`realiza` × `feat-of`), ou primária fora dele — só roda quando o conjunto derivado é não-vazio (campo presente com SPEC sem FEATs é matéria do validator, WARNING+auto-fix) | ERROR |
-| `comp-realiza-fora-cobertura` | COMP realiza FR/NFR que o PLAN dele não cobre (`comp-realiza` fora de `plan-covers`) — ex-`fr-mapeado-fora-cobertura`, reescrito sobre `Realiza` (4.409) | ERROR |
+| `comp-realiza-fora-cobertura` | COMP realiza FR/NFR que o PLAN dele não cobre (`comp-realiza` fora de `plan-covers`) (4.409) | ERROR |
 | `fr-sem-comp` | FR coberto pelo PLAN sem nenhum COMP dele que o realize (`Realiza`) | ERROR · carência |
 | `comp-sem-fr` | COMP sem `**Realiza**` preenchido (nenhuma aresta `comp-realiza`) | WARNING |
 | `dep-bloqueia-assimetrica` | A depende de B sem B bloquear A (ou vice-versa) — suprimido quando quem deveria declarar é TASK `Done` de outro PLAN (reeditar artefato entregue seria pior que a assimetria) | WARNING |
-| `index-desatualizado` | checklist `### Wave N` do `TASK-MMM-INDEX.md` diverge do computado (TASK inexistente ou wave divergente) — best-effort; as tabelas de cobertura deixaram de ser escritas (4.409) e saem de `--format=tables` | WARNING |
+| `index-desatualizado` | checklist `### Wave N` do `TASK-MMM-INDEX.md` diverge do computado (TASK inexistente ou wave divergente) — best-effort; as tabelas de cobertura saem de `--format=tables` (4.409) | WARNING |
 | `brief-sem-criterio` | brief avulso sem heading `## Critério de aceite` (forma do esqueleto — decisão 4.86) | WARNING |
 | `task-ancora-dupla` | TASK com `Pertence a` **e** `Brief` preenchidos (âncora é exclusiva) | ERROR |
 | `feat-sem-verificacao` | FEAT com 1+ TASK declarante, **todas Done**, sem linha `**Verificação (gate 9)**:` sob o heading na SPEC (recorte do gate 9 por FEAT — decisão 4.90). A linha é livre no conteúdo (data e como, ou `n/a — motivo`); a **presença** é o declarado. SPEC `Status: Done` (ciclo fechado antes da 4.90) → `WARNING [legacy]`. TASK não-parseável sem status derruba o "todas Done" e o check silencia — degrada na direção segura, nunca inventa ERROR | ERROR · carência |
@@ -173,9 +173,7 @@ Quando o `--check` acusa ERROR logo após a geração de artefatos (Etapa 5 do
    âncora que falhou ou casou ambígua, com o motivo. `modo: edits` aplicado por `Write`
    integral sem motivo é report fora do contrato: o invocador registra a divergência no
    ledger (`pendencia`, lição candidata de processo — Etapa 4.5 do `/keelson:auto`) e
-   **não** re-despacha por isso (o artefato está correto; o que se perdeu foi o custo —
-   caso real de campo: 20 ajustes localizados aplicados por reescrita integral de 39KB,
-   106k tokens de saída e 17,7 min de janela; 2 de 3 TASKs do mesmo ciclo idem). E a 4.309 governa o **modo de aplicar** um pacote, nunca o número
+   **não** re-despacha por isso (o artefato está correto; o que se perdeu foi o custo — 4.349). E a 4.309 governa o **modo de aplicar** um pacote, nunca o número
    de voltas — a consolidação da 4.116 (uma rodada, uma volta) permanece intacta:
    correção pingada continua defeito, por mais barata que a volta tenha ficado.
 2. **Correção é aguardada**: o re-despacho é síncrono do ponto de vista do fluxo — a main
