@@ -25,6 +25,35 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.192.0] — 2026-09-28
+
+Re-init: none
+
+Decision 4.444 — first consumer session after 0.190.3, read by six transcript readers:
+three fixes with a mechanical pass, fifteen ranked candidates deferred to the Director.
+
+### Added
+
+- **Plugin root fallback in every agent that cites `${CLAUDE_PLUGIN_ROOT}`** (ten agents:
+  agile-coach, code-reviewer, developer, estimator, performance-engineer, po,
+  product-designer, qa, security-engineer, staff-engineer): the path belongs to the agent,
+  not to the briefing; when the variable arrives empty or literal, the root is the
+  `installPath` of `keelson` in `~/.claude/plugins/installed_plugins.json`, never a `find`
+  outside those two roots. `scripts/check-agents.sh` now proves it (a body citing the
+  variable without the fallback fails, independent of the `tools:` line), with fixtures in
+  `scripts/tests/agents-mcp/`.
+- **`agents/agile-coach.md`:** before writing `reincidencia:` or "not applied in the
+  installed plugin", the agent greps the literal of the earlier proposal in the installed
+  plugin and records the result (version and hit) in the ledger entry.
+
+### Fixed
+
+- **`hooks/largada-guard.sh` false positive on the default branch:** on `main` "this
+  branch" was computed as `HEAD --not <other refs>`, and when the other refs are old
+  branches every merged cycle counted as "only this branch". On the default branch
+  (`origin/HEAD`, else `init.defaultBranch`, `main` or `master`) only the working tree
+  counts now; two suite cases added.
+
 ## [0.191.0] — 2026-09-28
 
 Re-init: none

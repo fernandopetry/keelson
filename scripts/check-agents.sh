@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-# check-agents.sh — paridade MCP dos agents (decisão 4.105).
+# check-agents.sh — paridade MCP dos agents (decisão 4.105) e fallback da raiz do plugin (4.444).
+#
+# Raiz do plugin: corpo que cita `${CLAUDE_PLUGIN_ROOT}` carrega o fallback da 4.375
+# (`installPath` em `~/.claude/plugins/installed_plugins.json`) — no subagent a variável
+# não expande e, sem o endereço, o agent varre o disco atrás do arquivo.
 #
 # O que a doutrina exige e este script prova: todo servidor MCP citado no CORPO de um
 # agent (`mcp__<server>__…`) está concedido na lista `tools:` do próprio frontmatter —
@@ -51,11 +55,19 @@ for f in "$DIR"/*.md; do
   # frontmatter = do primeiro '---' ao seguinte; corpo = o resto do arquivo
   fm="$(awk 'NR==1 && $0=="---" {infm=1; next} infm && $0=="---" {exit} infm {print}' "$f")"
   tools_line="$(printf '%s\n' "$fm" | grep '^tools:' | head -1)"
+  body="$(awk 'NR==1 && $0=="---" {infm=1; next} infm && $0=="---" {infm=0; body=1; next} body {print}' "$f")"
+
+  # raiz do plugin (4.444): corpo que cita ${CLAUDE_PLUGIN_ROOT} carrega o fallback da 4.375 —
+  # sem ele o subagent, onde a variável não expande, varre o disco atrás do arquivo
+  if printf '%s\n' "$body" | grep -q 'CLAUDE_PLUGIN_ROOT' && ! printf '%s\n' "$body" | grep -q 'installed_plugins\.json'; then
+    line="$(grep -n 'CLAUDE_PLUGIN_ROOT' "$f" | head -1 | cut -d: -f1)"
+    echo "FALHA: $(basename "$f"): corpo cita \${CLAUDE_PLUGIN_ROOT} (linha ${line:-?}) sem o fallback da raiz do plugin — declare o installPath de ~/.claude/plugins/installed_plugins.json (4.375)"
+    fails=$((fails + 1))
+  fi
 
   # sem `tools:` explícito → herda tudo (inclusive MCP), nada a conferir
   [ -n "$tools_line" ] || continue
 
-  body="$(awk 'NR==1 && $0=="---" {infm=1; next} infm && $0=="---" {infm=0; body=1; next} body {print}' "$f")"
   cited="$(printf '%s\n' "$body" | servers)"
   [ -n "$cited" ] || continue
 
@@ -76,5 +88,5 @@ if [ "$fails" -gt 0 ]; then
   echo "check-agents: $fails violação(ões) em $checked agent(s)."
   exit 1
 fi
-echo "check-agents: paridade MCP ok em $checked agent(s)."
+echo "check-agents: paridade MCP e raiz do plugin ok em $checked agent(s)."
 exit 0

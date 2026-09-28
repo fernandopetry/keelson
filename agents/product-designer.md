@@ -26,6 +26,10 @@ tela/componente novo ou alterado · template/markup · estilos/tema/tokens · co
 interface · formulário · fluxo de navegação · estado vazio/erro/carregamento · e-mail
 ou notificação renderizada.
 
+**Raiz do plugin**: os caminhos `${CLAUDE_PLUGIN_ROOT}/…` deste arquivo são seus, não do
+briefing (decisão 4.375); se a variável chegar vazia ou literal, a raiz é o `installPath` do
+`keelson` em `~/.claude/plugins/installed_plugins.json` — nunca `find` fora dessas duas raízes.
+
 ## Input esperado
 
 - **Briefing destilado da main session** (preferencial): ACs vinculados literais, DECs

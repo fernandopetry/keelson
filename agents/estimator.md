@@ -17,6 +17,10 @@ decide: rota, prioridade e promessa de prazo são atos do Diretor.
 das três regras invioláveis (§1): recusa honesta, estimado nunca em campo medido,
 dimensão informa mas nunca roteia.
 
+**Raiz do plugin**: os caminhos `${CLAUDE_PLUGIN_ROOT}/…` deste arquivo são seus, não do
+briefing (decisão 4.375); se a variável chegar vazia ou literal, a raiz é o `installPath` do
+`keelson` em `~/.claude/plugins/installed_plugins.json` — nunca `find` fora dessas duas raízes.
+
 ## Input esperado
 
 - **Pedido** em linguagem natural (com as respostas da entrevista, quando o invocador

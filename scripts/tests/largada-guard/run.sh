@@ -14,7 +14,8 @@
 #           sessão contam (4.395 — posse é do wave-guard) · run-state de OUTRO slug não
 #           cobre este · branch EMPILHADA sobre ciclo-pai não mesclado (4.415: nega as
 #           demais refs; ref descendente e tracking próprio não silenciam; a mensagem lista
-#           só os artefatos do slug acusado) · sem ficha · sem git · stop_hook_active ·
+#           só os artefatos do slug acusado) · trunk com ref velha (4.444: na branch
+#           default só a working tree conta; suja continua acusando) · sem ficha · sem git · stop_hook_active ·
 #           anti-renudge (mesmo conjunto → silêncio; artefato novo → cutuca de novo) · JSON inválido.
 #
 # Uso: scripts/tests/largada-guard/run.sh
@@ -162,6 +163,14 @@ caso ref-descendente-nao-silencia-block block
 novo_repo; spec "$PROJ/docs/pagamentos/specs/SPEC-001-x.md"; commit spec-na-branch
 git -C "$PROJ" update-ref refs/remotes/origin/feat/pagamentos HEAD
 caso tracking-remoto-proprio-nao-silencia-block block
+
+# --- branch default (4.444): commit na trunk não é "só desta branch" ---
+# main recém-mergeada com uma ref velha (feat/pagamentos parada na base): sem o
+# curto-circuito, `HEAD --not feat/pagamentos` devolve o ciclo mergeado e acusa.
+novo_repo; git -C "$PROJ" checkout -q main; spec "$PROJ/docs/pagamentos/specs/SPEC-001-x.md"; commit spec-mergeada-na-main
+caso trunk-com-ref-velha-nao-acusa-allow allow
+spec "$PROJ/docs/pagamentos/plans/PLAN-001-x.md"
+caso trunk-working-tree-suja-block block
 
 # --- anti-renudge ---
 novo_repo; spec "$PROJ/docs/pagamentos/specs/SPEC-001-x.md"

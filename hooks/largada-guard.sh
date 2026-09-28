@@ -13,7 +13,8 @@
 #   1. artefato SDD (specs/SPEC-*, plans/PLAN-*, tasks/TASK-* sob <docsRoot>/<slug>/) criado
 #      ou alterado NESTA BRANCH — working tree + commits que só esta branch tem (nega as
 #      demais refs; fallback merge-base com main), nunca o passivo histórico já mergeado
-#      nem o ciclo-pai de uma branch empilhada (4.415);
+#      nem o ciclo-pai de uma branch empilhada (4.415); na branch DEFAULT só a working
+#      tree conta — commit na trunk nunca é "só desta branch" (4.444);
 #   2. NENHUM run-state para o slug em NENHUMA casa de sessão nem no caminho legado — de
 #      qualquer status: o auto abre na largada (open) e só remove depois do push;
 #   3. NENHUM evento de ledger (ativo ou arquivado em reported-*/, qualquer casa ou
@@ -57,6 +58,21 @@ docs_root="${docs_root%/}"
 # wave, 4.334) — negá-la apagaria o universo inteiro. Sem outra
 # ref, cai no merge-base com main.
 cur="$(git -C "$cwd" symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+# Na branch DEFAULT nada commitado é "só desta branch" (4.444): a negação das demais refs
+# deixa de fora as branches velhas e devolve todo ciclo já mergeado. Ali só a working
+# tree conta. Default = origin/HEAD; sem ele, init.defaultBranch, main ou master.
+na_default=0
+if [ -n "$cur" ]; then
+  def="$(git -C "$cwd" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null || true)"
+  def="${def#*/}"
+  if [ -n "$def" ]; then
+    [ "$cur" = "$def" ] && na_default=1
+  else
+    cfg="$(git -C "$cwd" config --get init.defaultBranch 2>/dev/null || true)"
+    case "$cur" in main|master) na_default=1 ;; esac
+    [ -n "$cfg" ] && [ "$cur" = "$cfg" ] && na_default=1
+  fi
+fi
 head_sha="$(git -C "$cwd" rev-parse HEAD 2>/dev/null || true)"
 outras=""
 for ref in $(git -C "$cwd" for-each-ref --format='%(refname)' refs/heads refs/remotes 2>/dev/null); do
@@ -74,7 +90,9 @@ done
 tocados="$(
   {
     git -C "$cwd" status --porcelain -uall 2>/dev/null | sed 's/^...//; s/^.* -> //' || true
-    if [ -n "$outras" ]; then
+    if [ "$na_default" -eq 1 ]; then
+      :
+    elif [ -n "$outras" ]; then
       # shellcheck disable=SC2086
       git -C "$cwd" log --name-only --pretty=format: HEAD --not $outras -- 2>/dev/null || true
     else

@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.191.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.192.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the developer ends every background process it started before reporting (a wait loop only after its exit condition is tested once), and the plan-validator flags a DEC marked irreversible whose justification names only the class of change or a look-alike decision instead of the cost of undoing this one.
+New in this release: every agent that reads plugin files carries the plugin-root fallback (no more `find /` inside subagents, proven by `check-agents.sh`), the launch guard no longer accuses merged cycles on the default branch, and the agile-coach checks the installed plugin before calling a proposal "not applied".
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
