@@ -17,11 +17,51 @@ Every versioned entry carries a machine-readable `Re-init: required | none` line
 its heading (§4.189): `required` means the release changed the injected CLAUDE block or the
 ficha (`keelson.config.json`) contract, so consumers must re-run `/keelson:init` after
 updating. `scripts/update.sh` reads these lines to tell the consumer whether the jump they
-just made needs a re-init. Markers up to `0.94.0` were backfilled on 2026-08-12 from entry
+just made needs a re-init, and since `0.190.0` also measures the project against the newly
+installed tree (§4.440), which catches a re-init forgotten on an earlier jump that the
+current jump's markers cannot see. Markers up to `0.94.0` were backfilled on 2026-08-12 from entry
 prose and maintainer records; when the two conflicted, `required` won (a redundant init is
 merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
+
+## [0.190.0] — 2026-09-28
+
+Re-init: none
+
+Decision 4.440 — the update measures the project, not only the jump.
+
+### Added
+
+- **`/keelson:update` measures the project against the newly installed version.** After the
+  CHANGELOG verdict, the script runs the new tree's `init-selfcheck.sh` on the project root
+  (the current folder or the git top level holding `keelson.config.json`, or `--root <dir>`)
+  and reads only what `/keelson:init` writes: the `CLAUDE.md` block (byte for byte),
+  the `AGENTS.md` pointer and the ficha's top-level blocks. The two sources combine: a
+  positive in either one means "run `/keelson:init`"; a positive measurement on a clean jump
+  is named as a re-init forgotten on an earlier jump (or a hand-edited block), which the
+  markers of the current jump cannot see; both clean means "no re-init"; anything
+  indeterminate without a positive stays "not determinable" (4.156). Without a ficha in the
+  folder the measurement is skipped and the script says the verdict came from the CHANGELOG
+  alone. The measurement also runs when the plugin was already on the latest version, so
+  re-running the update is a cheap check. As with 4.189, the measurement first appears on the
+  update **after** the one that installs this version (the running `update.sh` is the old one).
+- **Self-check item `ficha-campos`.** `init-selfcheck.sh` compares the ficha's top-level
+  blocks with `templates/keelson.config.example.json`: a ficha older than a block the current
+  version knows (`git`, `commit`, `models`…) is a `aviso`, never a `falha`; a key present with
+  `null` counts as present, extra consumer keys are not listed, and without a parser the item
+  says so instead of inventing an absence. `/keelson:init` completes each listed block with the
+  template default (merge rule: absent already means default to every reader, so completing
+  changes no behaviour). Only the first level is compared: at the second level the example
+  mixes sample values with defaults and would flag ~10 lines on a valid ficha.
+- `scripts/update.sh` gains `--root <dir>` and a proper argument loop (`--scope` and `--root`
+  in any order; unknown argument exits 2). The item names `claude-block-sincronizado`,
+  `agents-presente` and `ficha-campos` are now a cross-version contract read by older
+  `update.sh` copies (declared in the self-check header).
+- Suites: 11 update cases (real `init-selfcheck.sh` copied into the fake new tree; forgotten
+  init, clean, ficha-old + missing pointer, skipped without ficha, same version still measures,
+  argument order, indeterminate CHANGELOG, missing self-check, unknown argument) and 3
+  self-check cases; the pre-commit runs the update suite when the self-check engine changes.
 
 ## [0.189.0] — 2026-09-28
 

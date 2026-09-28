@@ -12,8 +12,11 @@
 #        sensitive-globs · perfil-resolve · perfil-reviewed · perfil-charter ·
 #        local-example · local-json-ignorado · local-placeholder ·
 #        artefatos-ignorados · playwright-flags · jira-campos · git-branch-config ·
-#        models-validos · claude-block-sincronizado · agents-presente
+#        models-validos · ficha-campos · claude-block-sincronizado · agents-presente
 # Exit: 0 sem falha · 1 com falha · 2 uso incorreto.
+# Contrato entre versões (4.440): os nomes claude-block-sincronizado, agents-presente e
+# ficha-campos são lidos pelo scripts/update.sh de versões ANTERIORES do plugin
+# (medição pós-update) — renomear um deles quebra o leitor antigo em silêncio.
 #
 # Bash 3.2-compatível; JSON via ficha.sh (irmão) e python3 (playwright/local.json;
 # ausente → aviso "sem parser", nunca ✗ inventado). Read-only.
@@ -25,7 +28,7 @@ LC_ALL=C
 export LC_ALL
 
 die2() { echo "ERRO: $*" >&2; exit 2; }
-usage() { sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; }
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 FICHA_SH="$HERE/ficha.sh"
@@ -310,6 +313,52 @@ PY
     else emit ok models-validos "desvios de modelo apontam agents do pacote: $m_n"; fi
   else
     emit aviso models-validos "sem python3 para validar o bloco models — confira à mão"
+  fi
+fi
+
+# ---- ficha: blocos de 1º nível do template presentes (4.440) ----
+# Ficha anterior a um bloco que a versão atual conhece (`git`, `commit`, `models`…) —
+# o /keelson:init completa com o default do template (Regra de merge). Só o 1º nível:
+# no 2º o template mistura valor de exemplo com default, e ausente ≡ null para todo
+# leitor (ficha.sh --get). Chave presente com null conta como presente. Sem template
+# no plugin-root → silencioso; sem parser → aviso "sem parser", nunca inventa ausência.
+# Nunca falha: adoção antiga não reprova por capacidade nova (mesma régua da 4.374).
+fc_tmpl="$PLUGROOT/templates/keelson.config.example.json"
+if [ -f "$fc_tmpl" ]; then
+  fc_keys() { # arquivo → chaves de 1º nível, uma por linha
+    if command -v python3 >/dev/null 2>&1; then
+      python3 - "$1" <<'PY' 2>/dev/null
+import json, sys
+try:
+    with open(sys.argv[1]) as f:
+        d = json.load(f)
+except Exception:
+    sys.exit(3)
+if not isinstance(d, dict):
+    sys.exit(3)
+for k in d:
+    print(k)
+PY
+    elif command -v jq >/dev/null 2>&1; then
+      jq -r 'keys_unsorted[]' "$1" 2>/dev/null
+    else
+      return 3
+    fi
+  }
+  fc_t="$(fc_keys "$fc_tmpl")"; fc_st=$?
+  fc_f="$(fc_keys "$ROOT/keelson.config.json")"; fc_st2=$?
+  if [ "$fc_st" -ne 0 ] || [ "$fc_st2" -ne 0 ]; then
+    emit aviso ficha-campos "sem parser (python3/jq) para comparar os blocos da ficha com o template — confira à mão"
+  else
+    fc_bad=""
+    for fc_k in $fc_t; do
+      printf '%s\n' "$fc_f" | grep -qx -- "$fc_k" || fc_bad="$fc_bad $fc_k"
+    done
+    if [ -n "$fc_bad" ]; then
+      emit aviso ficha-campos "blocos do template ausentes na ficha:$fc_bad — rode /keelson:init para completá-los com o default"
+    else
+      emit ok ficha-campos "todos os blocos de 1º nível do template presentes na ficha"
+    fi
   fi
 fi
 

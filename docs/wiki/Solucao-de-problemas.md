@@ -68,6 +68,20 @@ ausentes ou `CLAUDE.md` ausente aparecem como `falha` no relatório, nunca como
 silêncio. Reparo: rode `/keelson:init` de novo — a Etapa 5 sempre substitui o bloco
 pelo template atual (o bloco gerado nunca é "preservado" como um valor seu).
 
+### O update disse "init esquecido em salto anterior"
+
+Sintoma: `/keelson:update` terminou com "Veredito: exige /keelson:init" e a frase "sinal
+de /keelson:init esquecido em salto anterior", mesmo com a linha do CHANGELOG dizendo
+que nenhuma versão do salto exige. Não é contradição: a partir da versão `0.190.0` o
+update **mede o projeto** contra a versão recém-instalada (bloco do `CLAUDE.md`,
+`AGENTS.md`, blocos da ficha) além de ler o CHANGELOG, e a medição achou uma
+divergência que o salto de hoje não explica — quase sempre um `init` que ficou para
+trás numa atualização anterior, às vezes um bloco editado à mão. As linhas logo acima
+do veredito dizem qual item divergiu. Reparo: reinicie a sessão e rode `/keelson:init`;
+a Regra de merge preserva o que é seu e o self-check do init repete a mesma medição.
+Se você **quer** um `AGENTS.md` próprio de outra ferramenta, basta que ele exista: o
+item confere presença, não conteúdo.
+
 ### Desliguei `gates.review` na ficha e o reviewer continuou rodando
 
 Não é defeito. `gates.review` (e `gates.reviewThreshold`) governam a **cutucada de

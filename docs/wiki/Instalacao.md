@@ -87,13 +87,40 @@ Claude Desktop, que tem loja de plugins própria). Não acessa a rede e não mud
 ## Depois de atualizar: re-rodar o `init`
 
 Algumas versões mudam o bloco injetado no `CLAUDE.md` ou acrescentam campos na ficha.
-**O próprio `/keelson:update` avisa quando é o caso**: cada entrada do CHANGELOG carrega
-um marcador `Re-init: required` ou `Re-init: none`, e o update varre as versões do salto
-que você acabou de dar e diz se precisa re-rodar `/keelson:init`. Se ele responder "não
-determinável" (não conseguiu ler o CHANGELOG instalado), confira as entradas do salto no
+**O próprio `/keelson:update` avisa quando é o caso**, por duas fontes:
+
+- **O CHANGELOG do salto.** Cada entrada carrega um marcador `Re-init: required` ou
+  `Re-init: none`, e o update varre as versões entre a que você tinha e a que acabou de
+  instalar.
+- **O seu projeto, medido.** O update compara o que está no disco com o que a versão nova
+  escreve: o bloco do `CLAUDE.md` (byte a byte), o ponteiro `AGENTS.md` e os blocos da
+  ficha `keelson.config.json`. É isso que pega o caso mais comum de esquecimento: você
+  atualizou algumas versões atrás, o update avisou, e o `init` não foi rodado. O CHANGELOG
+  do salto de hoje não sabe disso; o disco sabe. Quando só a medição acusa, o veredito diz
+  "sinal de init esquecido em salto anterior".
+
+Rode da raiz do projeto (ou passe `--root <raiz>`): sem `keelson.config.json` na pasta
+corrente a medição é pulada, e o update diz que o veredito veio só do CHANGELOG. Se ele
+responder "não determinável" (não conseguiu ler o CHANGELOG instalado, ou não achou o
+script de medição na árvore nova), confira as entradas do salto no
 [CHANGELOG](https://github.com/fernandopetry/keelson/blob/main/CHANGELOG.md) à mão. Rodar o
 `init` de novo é seguro e idempotente: ele preserva o que você já configurou e só completa
-o que falta.
+o que falta — e rodar `/keelson:update` de novo, mesmo já na última versão, repete a
+medição e serve para conferir.
+
+```mermaid
+flowchart TD
+    U["/keelson:update"] --> C{"CHANGELOG do salto<br/>tem 'Re-init: required'?"}
+    U --> M{"Projeto diverge do que<br/>a versão nova escreve?"}
+    C -- sim --> E["Veredito: exige /keelson:init"]
+    M -- sim --> E
+    M -- "sim, e o salto estava limpo" --> F["…e nomeia: init esquecido<br/>em salto anterior"]
+    C -- não --> N{"Medição limpa?"}
+    M -- não --> N
+    N -- sim --> OK["Veredito: não exige"]
+    N -- "não medido (sem ficha)" --> P["Veredito só pelo CHANGELOG,<br/>declarado como tal"]
+    N -- indeterminado --> I["Veredito: não determinável<br/>(um init redundante é seguro)"]
+```
 
 ## Desinstalar
 

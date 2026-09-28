@@ -119,7 +119,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:postmortem` † | End-of-session postmortem — re-reads the whole session's interactions (corrections, retries, failed gates), separates defects from new scope, traces each gap to the mechanism that let it through, and produces the copy-paste maintainer message (with literal diffs via the agile-coach) that evolves the plugin |
 | `/keelson:mutation-setup` † | Guided setup of the mutation gate — detects the stack from the ficha, installs the canonical tool with confirmation, generates its config, proves the pipeline with a sample run and writes `quality.mutation` (diff-scoped, no threshold at first) |
 | `/keelson:e2e-setup` † | Guided setup of the E2E suite (Playwright) — installs with confirmation, generates the config and a smoke spec from the ficha (auth skeleton per realm, no committed secrets), proves the pipeline with `--list` and writes `quality.e2e` |
-| `/keelson:update` † | Update the installed plugin to the latest marketplace version via the Claude Code CLI (marketplace refresh + plugin update, in that order); the running session keeps the old version until restarted |
+| `/keelson:update` † | Update the installed plugin to the latest marketplace version via the Claude Code CLI (marketplace refresh + plugin update, in that order), then say whether `/keelson:init` must be re-run — from the jump's CHANGELOG markers and from measuring the project against the new version (CLAUDE block, `AGENTS.md`, ficha blocks), which catches a re-init forgotten on an earlier jump; the running session keeps the old version until restarted |
 | `/keelson:version` | Show the keelson version this session actually loaded and where the tree came from (CLI cache, development checkout, Claude Desktop's own store), compare it with the CLI's install record per scope and with the marketplace's local cache, and name the action — restart, `/keelson:update`, or update through the app; read-only, no network |
 | `/keelson:report` † | Rebuild the closing report from the session ledger — safety net for a resumed session or a report lost in the scroll; every change already closes with one automatically |
 
@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.189.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.190.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the membership of suite-filter targets cited in TASK criteria is a mechanical fact — `scripts/suite-filter-check.sh` opens the real test files and the PHPUnit config and warns on `--group` without the annotation, excluded group without `--group`, and `--testsuite` outside the suite (run by `/keelson:tasks` before the validator); a resume mark goes to the brief with the open pause, never to a delivered brief with a stale Status; the scribe refuses a correction `modo` outside its enum; `mutacao_protocolo: n/a` is rejected when the TASK prescribes a mutant. Details in `CHANGELOG.md`.
+New in this release: `/keelson:update` measures the project against the newly installed version — the `CLAUDE.md` block byte for byte, the `AGENTS.md` pointer and the ficha's top-level blocks, via the new tree's `init-selfcheck.sh` — and combines that with the jump's `Re-init:` markers; a divergence the current jump does not explain is named as a re-init forgotten on an earlier jump. The self-check gains `ficha-campos` (ficha blocks missing against the template, warning only). Details in `CHANGELOG.md`.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

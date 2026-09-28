@@ -14,7 +14,13 @@
 #     da árvore velha; árvore nova ausente/divergente → "nao determinavel";
 #   auto-substituição — o update troca o próprio update.sh no meio da execução e o
 #     relatório final ainda sai (fluxo inteiro dentro de main(), 4.386 — o script anterior falha este caso);
-#   CLI ausente → exit 1.
+#   CLI ausente → exit 1;
+#   medição do projeto (4.440) — init-selfcheck.sh REAL da árvore nova contra um
+#     projeto sintético: bloco velho + CHANGELOG limpo → "init esquecido em salto
+#     anterior"; tudo sincronizado → "nao exige"; sem ficha na pasta → medição pulada
+#     e o CHANGELOG decide; versão inalterada ainda mede; --root em qualquer ordem
+#     com --scope; CHANGELOG sem marcador + projeto limpo → "nao determinavel";
+#     selfcheck ausente na árvore → "nao determinavel"; argumento desconhecido → exit 2.
 #
 # Uso: scripts/tests/update/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -25,6 +31,7 @@ export LC_ALL
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 UPDATE="$HERE/../../update.sh"
+REPO="$(cd "$HERE/../../.." && pwd)"
 [ -f "$UPDATE" ] || { echo "ERRO: update.sh não encontrado em $UPDATE" >&2; exit 1; }
 if ! command -v jq >/dev/null 2>&1; then
   echo "update: AVISO — jq ausente (a leitura confiável da ficha exige jq); pulando." >&2
@@ -63,11 +70,29 @@ Re-init: none
 EOF
 }
 
-tree() { # versao marcador → cria $CACHE/<versao> com plugin.json, CHANGELOG e cópia do update.sh
+scripts_into() { # dir → copia o init-selfcheck.sh/ficha.sh REAIS e os templates que a medição lê
+  mkdir -p "$1/scripts" "$1/templates"
+  cp "$REPO/scripts/init-selfcheck.sh" "$REPO/scripts/ficha.sh" "$1/scripts/"
+  cp "$REPO/templates/keelson.config.example.json" "$REPO/templates/CLAUDE.keelson-block.md" "$1/templates/"
+}
+
+tree() { # versao marcador → cria $CACHE/<versao> com plugin.json, CHANGELOG, cópia do update.sh e os scripts da medição
   mkdir -p "$CACHE/$1/.claude-plugin" "$CACHE/$1/scripts"
   printf '{\n  "name": "keelson",\n  "version": "%s"\n}\n' "$1" > "$CACHE/$1/.claude-plugin/plugin.json"
   changelog "$CACHE/$1" "$2"
   cp "$UPDATE" "$CACHE/$1/scripts/update.sh"; chmod +x "$CACHE/$1/scripts/update.sh"
+  scripts_into "$CACHE/$1"
+}
+
+proj() { # sync|stale → $TMP/proj: ficha completa (o template real), CLAUDE.md com o bloco real e AGENTS.md
+  rm -rf "$TMP/proj"; mkdir -p "$TMP/proj"
+  cp "$REPO/templates/keelson.config.example.json" "$TMP/proj/keelson.config.json"
+  { printf '# Projeto\n\nTexto do humano.\n\n'; cat "$REPO/templates/CLAUDE.keelson-block.md"; } > "$TMP/proj/CLAUDE.md"
+  if [ "$1" = "stale" ]; then
+    sed -i.bak 's/^### Fonte da verdade$/### Fonte da verdade (versao velha do bloco)/' "$TMP/proj/CLAUDE.md"
+    rm -f "$TMP/proj/CLAUDE.md.bak"
+  fi
+  printf '# AGENTS.md\n\nVeja o CLAUDE.md.\n' > "$TMP/proj/AGENTS.md"
 }
 
 ficha() { # versao scope [versao2 scope2]
@@ -105,6 +130,12 @@ PY
         mkdir -p "$FAKE_CACHE/$FAKE_NEW_VERSION/.claude-plugin"
         printf '{ "name": "keelson", "version": "%s" }\n' "${FAKE_TREE_VERSION:-$FAKE_NEW_VERSION}" > "$FAKE_CACHE/$FAKE_NEW_VERSION/.claude-plugin/plugin.json"
         cp "$FAKE_NEW_CHANGELOG" "$FAKE_CACHE/$FAKE_NEW_VERSION/CHANGELOG.md"
+        # árvore nova completa: os scripts REAIS da medição (4.440) + templates
+        if [ "${FAKE_TREE_FULL:-0}" = "1" ]; then
+          mkdir -p "$FAKE_CACHE/$FAKE_NEW_VERSION/scripts" "$FAKE_CACHE/$FAKE_NEW_VERSION/templates"
+          cp "$FAKE_REPO/scripts/init-selfcheck.sh" "$FAKE_REPO/scripts/ficha.sh" "$FAKE_CACHE/$FAKE_NEW_VERSION/scripts/"
+          cp "$FAKE_REPO/templates/keelson.config.example.json" "$FAKE_REPO/templates/CLAUDE.keelson-block.md" "$FAKE_CACHE/$FAKE_NEW_VERSION/templates/"
+        fi
       fi
       # auto-substituição: o update troca o próprio script em disco no meio da execução
       [ "${FAKE_CLOBBER:-0}" = "1" ] && printf '#!/usr/bin/env bash\necho "ARQUIVO NOVO — nao deveria executar"\nexit 99\n' > "$FAKE_OLD_TREE/scripts/update.sh"
@@ -125,9 +156,10 @@ reset() { # limpa cache/ficha/log; árvore velha 0.10.0 (CHANGELOG velho com 0.1
   ficha 0.10.0 user
 }
 
-roda() { # args... → stdout+stderr em $TMP/out, exit em $st (env FAKE_* já exportado)
-  ( cd "$TMP" && HOME="$FAKEHOME" PATH="$BIN:$PATH" CLAUDE_PLUGIN_ROOT="$CACHE/0.10.0" \
+roda() { # args... → stdout+stderr em $TMP/out, exit em $st (env FAKE_* já exportado; RODA_CWD muda a pasta corrente)
+  ( cd "${RODA_CWD:-$TMP}" && HOME="$FAKEHOME" PATH="$BIN:$PATH" CLAUDE_PLUGIN_ROOT="$CACHE/0.10.0" \
       FAKE_LOG="$LOG" FAKE_FICHA="$FICHA" FAKE_CACHE="$CACHE" FAKE_NEW_CHANGELOG="${FAKE_NEW_CHANGELOG:-$NEWCL}" FAKE_OLD_TREE="$CACHE/0.10.0" \
+      FAKE_REPO="$REPO" \
       bash "$CACHE/0.10.0/scripts/update.sh" "$@" ) > "$TMP/out" 2>&1
   st=$?
 }
@@ -213,6 +245,107 @@ else falha "sobrevive-a-auto-substituicao: exit=$st $(cat "$TMP/out")"; fi
 total=$((total + 1))
 bash "$UPDATE" --reinit-scan 0.1.0 >/dev/null 2>&1; st=$?
 if [ "$st" -eq 2 ]; then ok reinit-scan-args-exit-2; else falha "reinit-scan-args-exit-2: $st"; fi
+
+# =====================================================================================
+# Medição do projeto contra a árvore nova (4.440) — init-selfcheck.sh REAL copiado para
+# a árvore nova; projeto sintético em $TMP/proj com a ficha = template real.
+# =====================================================================================
+CLNONE="$TMP/n2/CHANGELOG.md"   # salto limpo (0.12.0 = none), criado no controle acima
+
+# --- bloco velho + salto limpo → exige init, nomeado como esquecido em salto anterior ---
+reset; proj stale
+RODA_CWD="$TMP/proj" FAKE_TREE_FULL=1 FAKE_NEW_VERSION=0.12.0 FAKE_NEW_CHANGELOG="$CLNONE" roda
+total=$((total + 1))
+if [ "$st" -eq 0 ] && tem "Re-init: nenhuma versao do salto (0.10.0 -> 0.12.0) exige" \
+   && tem "Medicao do projeto ($TMP/proj) contra a versao 0.12.0:" \
+   && tem "claude-block-sincronizado: bloco do CLAUDE.md diverge do template atual" \
+   && tem "Veredito: exige /keelson:init" && tem "(itens: claude-block-sincronizado)." \
+   && tem "sinal de /keelson:init esquecido em salto anterior" && tem "reinicie a sessao"; then ok medicao-init-esquecido-em-salto-anterior
+else falha "medicao-init-esquecido-em-salto-anterior: exit=$st $(cat "$TMP/out")"; fi
+
+# --- tudo sincronizado + salto limpo → nao exige (controle) ---
+reset; proj sync
+RODA_CWD="$TMP/proj" FAKE_TREE_FULL=1 FAKE_NEW_VERSION=0.12.0 FAKE_NEW_CHANGELOG="$CLNONE" roda
+total=$((total + 1))
+if [ "$st" -eq 0 ] && tem "claude-block-sincronizado: bloco do CLAUDE.md idêntico ao template" \
+   && tem "agents-presente: AGENTS.md presente" && tem "ficha-campos: todos os blocos de 1º nível" \
+   && tem "Veredito: nao exige /keelson:init — salto sem Re-init: required e projeto sincronizado." \
+   && ! tem "init esquecido"; then ok medicao-sincronizada-nao-exige
+else falha "medicao-sincronizada-nao-exige: exit=$st $(cat "$TMP/out")"; fi
+
+# --- sincronizado, mas o salto exige → exige pelo CHANGELOG (medição não anula o marcador) ---
+reset; proj sync
+RODA_CWD="$TMP/proj" FAKE_TREE_FULL=1 FAKE_NEW_VERSION=0.12.0 roda
+total=$((total + 1))
+if [ "$st" -eq 0 ] && tem "ATENCAO: este salto inclui versao(oes)" \
+   && tem "Veredito: exige /keelson:init (versao(oes) do salto marcadas Re-init: required)."; then ok medicao-limpa-changelog-required-prevalece
+else falha "medicao-limpa-changelog-required-prevalece: exit=$st $(cat "$TMP/out")"; fi
+
+# --- ficha antiga (sem blocos novos) + AGENTS.md ausente → positivos nomeados ---
+reset; proj sync
+rm -f "$TMP/proj/AGENTS.md"
+cat > "$TMP/proj/keelson.config.json" <<'EOF'
+{ "profile": {}, "codePaths": {}, "sensitiveGlobs": [], "quality": {}, "gates": {}, "docsRoot": "docs", "jira": { "enabled": false } }
+EOF
+RODA_CWD="$TMP/proj" FAKE_TREE_FULL=1 FAKE_NEW_VERSION=0.12.0 FAKE_NEW_CHANGELOG="$CLNONE" roda
+total=$((total + 1))
+if [ "$st" -eq 0 ] && tem "ficha-campos: blocos do template ausentes na ficha: models commit git" \
+   && tem "(itens: agents-presente ficha-campos)." && tem "init esquecido em salto anterior"; then ok medicao-ficha-antiga-e-agents-ausente
+else falha "medicao-ficha-antiga-e-agents-ausente: exit=$st $(cat "$TMP/out")"; fi
+
+# --- sem ficha na pasta corrente → medição pulada, CHANGELOG decide e diz que decidiu sozinho ---
+reset
+FAKE_TREE_FULL=1 FAKE_NEW_VERSION=0.12.0 FAKE_NEW_CHANGELOG="$CLNONE" roda
+total=$((total + 1))
+if [ "$st" -eq 0 ] && tem "Medicao do projeto: pulada — sem keelson.config.json na pasta corrente" \
+   && tem "Veredito: nao exige /keelson:init pelo CHANGELOG do salto — projeto nao medido."; then ok medicao-pulada-sem-ficha
+else falha "medicao-pulada-sem-ficha: exit=$st $(cat "$TMP/out")"; fi
+
+# --- versão inalterada ainda mede (quem esqueceu o init re-roda o update para conferir) ---
+reset; proj stale
+RODA_CWD="$TMP/proj" FAKE_NEW_VERSION=0.10.0 roda
+total=$((total + 1))
+if [ "$st" -eq 0 ] && tem "ja estava na ultima versao publicada (0.10.0)" \
+   && tem "Medicao do projeto ($TMP/proj) contra a versao 0.10.0:" \
+   && tem "Veredito: exige /keelson:init" && tem "init esquecido em salto anterior" \
+   && ! tem "reinicie a sessao"; then ok medicao-versao-inalterada-ainda-mede
+else falha "medicao-versao-inalterada-ainda-mede: exit=$st $(cat "$TMP/out")"; fi
+
+# --- --root e --scope em qualquer ordem ---
+reset; proj sync; ficha 0.9.0 user 0.10.0 project
+FAKE_TREE_FULL=1 FAKE_NEW_VERSION=0.12.0 FAKE_NEW_CHANGELOG="$CLNONE" roda --root "$TMP/proj" --scope project
+total=$((total + 1))
+if [ "$st" -eq 0 ] && tem "keelson instalado: 0.10.0 (scope project)" && grep -q -- '--scope project' "$LOG" \
+   && tem "Medicao do projeto ($TMP/proj) contra a versao 0.12.0:" && tem "Veredito: nao exige"; then ok root-e-scope-em-qualquer-ordem
+else falha "root-e-scope-em-qualquer-ordem: exit=$st $(cat "$TMP/out")"; fi
+reset; proj sync; ficha 0.9.0 user 0.10.0 project
+FAKE_TREE_FULL=1 FAKE_NEW_VERSION=0.12.0 FAKE_NEW_CHANGELOG="$CLNONE" roda --scope project --root "$TMP/proj"
+total=$((total + 1))
+if [ "$st" -eq 0 ] && tem "(scope project)" && tem "Medicao do projeto ($TMP/proj)"; then ok scope-e-root-em-qualquer-ordem
+else falha "scope-e-root-em-qualquer-ordem: exit=$st $(cat "$TMP/out")"; fi
+
+# --- CHANGELOG sem marcador + projeto limpo → nao determinavel (limpo não vira "nao exige") ---
+reset; proj sync; mkdir -p "$TMP/n3"
+printf '# Changelog\n\n## [0.12.0] — 2026-08-12\n\nsem marcador\n\n## [0.11.0] — 2026-08-11\n\nRe-init: none\n\n## [0.10.0] — 2026-08-10\n\nRe-init: none\n' > "$TMP/n3/CHANGELOG.md"
+RODA_CWD="$TMP/proj" FAKE_TREE_FULL=1 FAKE_NEW_VERSION=0.12.0 FAKE_NEW_CHANGELOG="$TMP/n3/CHANGELOG.md" roda
+total=$((total + 1))
+if [ "$st" -eq 0 ] && tem "Re-init: nao determinavel para a(s) versao(oes): 0.12.0" \
+   && tem "ficha-campos: todos os blocos" && tem "Veredito: nao determinavel" && ! tem "Veredito: nao exige"; then ok changelog-indeterminado-nao-vira-nao-exige
+else falha "changelog-indeterminado-nao-vira-nao-exige: exit=$st $(cat "$TMP/out")"; fi
+
+# --- árvore nova sem init-selfcheck.sh → medição nao determinavel, nunca "nao exige" ---
+reset; proj sync
+RODA_CWD="$TMP/proj" FAKE_NEW_VERSION=0.12.0 FAKE_NEW_CHANGELOG="$CLNONE" roda
+total=$((total + 1))
+if [ "$st" -eq 0 ] && tem "nao determinavel — init-selfcheck.sh ausente na arvore" \
+   && tem "Veredito: nao determinavel" && ! tem "Veredito: nao exige"; then ok selfcheck-ausente-na-arvore-degrada
+else falha "selfcheck-ausente-na-arvore-degrada: exit=$st $(cat "$TMP/out")"; fi
+
+# --- argumento desconhecido → exit 2, sem chamar a CLI ---
+reset; roda --bogus
+total=$((total + 1))
+if [ "$st" -eq 2 ] && tem "argumento desconhecido: --bogus" && [ -z "$(chamadas)" ]; then ok argumento-desconhecido-exit-2
+else falha "argumento-desconhecido-exit-2: exit=$st $(cat "$TMP/out")"; fi
 
 echo "---"
 if [ "$fail" -gt 0 ]; then

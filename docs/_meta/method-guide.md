@@ -169,7 +169,7 @@ Detalhe completo (flags, fluxo, regras): `commands/specify-epic.md`.
 
 ### 3.16 `/keelson:update` — atualizar o plugin instalado
 
-Atualiza o keelson para a última versão do marketplace, **quando você decidir** (humano-only), via `scripts/update.sh` + CLI do Claude Code. Reporta versão antes/depois, o veredito de re-init (marcadores `Re-init:` do CHANGELOG — exige · não exige · não determinável) e termina lembrando de **reiniciar a sessão**: o update não vale para a sessão corrente.
+Atualiza o keelson para a última versão do marketplace, **quando você decidir** (humano-only), via `scripts/update.sh` + CLI do Claude Code. Reporta versão antes/depois e um veredito de re-init com duas fontes: os marcadores `Re-init:` do CHANGELOG do salto e a **medição do projeto** contra a versão recém-instalada (bloco do `CLAUDE.md`, `AGENTS.md` e blocos da ficha, pelo `init-selfcheck.sh` da árvore nova) — positivo em qualquer fonte exige `/keelson:init`; medição positiva com salto limpo é nomeada "init esquecido em salto anterior"; indeterminado sem positivo é "não determinável", nunca "não exige". Termina lembrando de **reiniciar a sessão**: o update não vale para a sessão corrente.
 
 Detalhe completo (flags, fluxo, regras): `commands/update.md`.
 

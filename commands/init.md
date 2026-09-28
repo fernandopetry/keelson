@@ -248,11 +248,18 @@ dos `quality.*`, matching real dos `sensitiveGlobs`, resolução/`reviewed`/`cha
 do perfil, `keelson.local.*` (versionamento, gitignore provado, placeholders),
 `check-ignore` dos diretórios de artefato, flags efetivas do Playwright por escopo,
 campos mínimos do Jira, validade do bloco `models` (chave existe no elenco de agents
-do pacote, alias conhecido) e o bloco injetado do `CLAUDE.md` **byte-a-byte** contra o
+do pacote, alias conhecido), os **blocos de 1º nível da ficha** contra o template do
+pacote (item `ficha-campos`, decisão 4.440 — ficha anterior a um bloco que esta versão
+conhece, como `git`, `commit` ou `models`, é `aviso`; a ação é **completar cada bloco
+listado com o default do template**, pela Regra de merge: ausente vale default para todo
+leitor, então completar não muda comportamento e faz o aviso convergir), o bloco injetado
+do `CLAUDE.md` **byte-a-byte** contra o
 template do pacote (item `claude-block-sincronizado` — divergência, marcadores ausentes
 ou arquivo ausente são `falha`, nunca aviso: "o bloco existe" não é "o bloco está
 atualizado", decisão 4.373) e a presença do `AGENTS.md` ponteiro (item `agents-presente`,
-ausente é `aviso`, decisão 4.374). Cada linha `falha`/`aviso` vira item do relatório. Exceção com
+ausente é `aviso`, decisão 4.374). Esses três itens são também o que o `/keelson:update`
+mede logo após atualizar (4.440) — o consumidor chega aqui já sabendo o que diverge.
+Cada linha `falha`/`aviso` vira item do relatório. Exceção com
 reparo imediato: `falha` em `hooks-executaveis` (hook sem `+x` falha em **silêncio** a
 cada disparo — decisão 4.180) → aplique o `chmod +x` que a linha indica no cache do
 plugin, declare no relatório que o reparo local **evapora no próximo update** e

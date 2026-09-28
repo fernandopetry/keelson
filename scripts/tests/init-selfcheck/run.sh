@@ -8,7 +8,9 @@
 # bloco models validado contra o elenco de agents do plugin (4.272), bloco do CLAUDE.md
 # comparado byte-a-byte contra o template do plugin — sincronizado, desatualizado,
 # sem marcadores e ausente (4.373); AGENTS.md presente vira ok, ausente vira aviso,
-# nunca falha (4.374).
+# nunca falha (4.374); ficha-campos compara os blocos de 1º nível da ficha com o
+# template REAL do pacote — bloco ausente vira aviso, presente-com-null conta como
+# presente, chave extra do consumidor não é listada, sem template é silêncio (4.440).
 #
 # Uso: scripts/tests/init-selfcheck/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível; exige git.
@@ -335,6 +337,67 @@ case "$got" in
   *"aviso	models-validos	alias fora do conjunto conhecido (opus/sonnet/haiku): developer=turbo — confira no harness"*)
     echo "ok   models-alias-estranho" ;;
   *) echo "FAIL models-alias-estranho:"; printf '%s\n' "$got" | grep models-validos | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+
+# ---- ficha-campos: blocos de 1º nível contra o template REAL do pacote (4.440) ----
+# O plugin-root falso não tem o template → nenhuma linha nos casos acima (silêncio
+# provado pelos want exatos). Aqui um plugin-root com o template real do repositório.
+PR3="$TMP/plugin3"
+cp -R "$PR" "$PR3"
+cp "$HERE/../../../templates/keelson.config.example.json" "$PR3/templates/keelson.config.example.json"
+R7="$(mkrepo ficha-campos)"
+mkdir -p "$R7/src"
+printf 'x\n' > "$R7/src/app.php"
+# ficha antiga: sem models, commit e git (blocos que entraram depois)
+cat > "$R7/keelson.config.json" <<'EOF'
+{
+  "profile": { "backend": { "lang": "php", "version": "8.5", "file": "plugin:backend/php.md" } },
+  "codePaths": { "backend": ["src"] },
+  "sensitiveGlobs": [".env*"],
+  "quality": { "test": "true" },
+  "gates": { "security": true },
+  "docsRoot": "docs",
+  "jira": { "enabled": false }
+}
+EOF
+git -C "$R7" add -A >/dev/null 2>&1
+git -C "$R7" commit -qm base >/dev/null 2>&1
+total=$((total + 1))
+got="$(bash "$SC" "$R7" --plugin-root "$PR3" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"
+case "$got" in
+  *"aviso	ficha-campos	blocos do template ausentes na ficha: models commit git — rode /keelson:init para completá-los com o default"*)
+    echo "ok   ficha-campos-blocos-ausentes" ;;
+  *) echo "FAIL ficha-campos-blocos-ausentes:"; printf '%s\n' "$got" | grep ficha-campos | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+# ficha completa, com bloco presente-mas-null e chave extra do consumidor → ok, sem listar a extra
+cat > "$R7/keelson.config.json" <<'EOF'
+{
+  "profile": { "backend": { "lang": "php", "version": "8.5", "file": "plugin:backend/php.md" } },
+  "codePaths": { "backend": ["src"] },
+  "sensitiveGlobs": [".env*"],
+  "quality": { "test": "true" },
+  "models": null,
+  "gates": { "security": true },
+  "docsRoot": "docs",
+  "commit": { "convention": "conventional" },
+  "git": { "branchStrategy": "unica" },
+  "jira": { "enabled": false },
+  "minhaChaveExtra": { "x": 1 }
+}
+EOF
+total=$((total + 1))
+got="$(bash "$SC" "$R7" --plugin-root "$PR3" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"
+case "$got" in
+  *"ok	ficha-campos	todos os blocos de 1º nível do template presentes na ficha"*)
+    echo "ok   ficha-campos-completa-null-e-extra" ;;
+  *) echo "FAIL ficha-campos-completa-null-e-extra:"; printf '%s\n' "$got" | grep ficha-campos | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+# sem template no plugin-root → nenhuma linha ficha-campos (silêncio, não aviso)
+total=$((total + 1))
+got="$(bash "$SC" "$R7" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"
+case "$got" in
+  *ficha-campos*) echo "FAIL ficha-campos-sem-template-silencio:"; printf '%s\n' "$got" | grep ficha-campos | sed 's/^/  /'; fail=$((fail + 1)) ;;
+  *) echo "ok   ficha-campos-sem-template-silencio" ;;
 esac
 
 # ---- ficha ausente → falha nomeada, exit 1 ----

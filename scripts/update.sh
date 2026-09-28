@@ -2,7 +2,7 @@
 # update.sh — atualiza o plugin keelson instalado, via CLI do Claude Code
 # (decisão 4.57). Invocado pelo /keelson:update; rodável também à mão.
 #
-# Uso: update.sh [--scope user|project|local]
+# Uso: update.sh [--scope user|project|local] [--root <raiz-do-projeto>]
 #      update.sh --reinit-scan <before> <after> <changelog>   (só a varredura — testes)
 #
 # Passos: refresh do marketplace E update do plugin — nesta ordem, porque
@@ -18,6 +18,17 @@
 # Sem CHANGELOG legível, sem marcador ou com a árvore lida divergindo da versão
 # instalada, degrada para "não determinável" — nunca afirma "não precisa" sem
 # evidência (régua da 4.156).
+# Em seguida MEDE o projeto (decisão 4.440): o CHANGELOG só enxerga o salto corrente,
+# e um /keelson:init esquecido num salto anterior só aparece comparando o disco do
+# consumidor com o que a árvore NOVA escreve — init-selfcheck.sh da árvore nova, com
+# --plugin-root nela, filtrado aos itens claude-block-sincronizado, agents-presente e
+# ficha-campos. Raiz do projeto: --root, ou a pasta corrente / topo do git com
+# keelson.config.json; sem ficha a medição é pulada e o CHANGELOG decide sozinho.
+# Os dois vereditos se combinam: positivo em qualquer fonte → exige init (medição
+# positiva com salto limpo é nomeada "init esquecido em salto anterior"); os dois
+# limpos → não exige; indeterminado sem positivo → não determinável. A medição roda
+# também quando o plugin já estava na última versão (é o caso de quem re-roda o
+# update para conferir).
 # O que NÃO faz: recarregar a sessão — o update só vale após reiniciar a
 # sessão do Claude Code, e o script termina dizendo exatamente isso.
 #
@@ -39,6 +50,13 @@ MARKETPLACE="keelson"
 PLUGIN_ID="${PLUGIN}@${MARKETPLACE}"
 INSTALLED_JSON="${HOME}/.claude/plugins/installed_plugins.json"
 PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
+SCOPE="user"
+ROOT_ARG=""
+RS_VERDICT="indet"   # veredito do CHANGELOG: required | none | indet | na (sem salto)
+MEASURE_ROOT=""
+MS_VERDICT="skip"    # veredito da medição: positive | clean | indet | skip (sem ficha)
+MS_LINES=""
+MS_REASON=""
 
 # Leitura confiável (ficha + jq, filtrada pelo scope) ou fallback best-effort
 # (parse de `claude plugin list`). Nunca aborta: erro de leitura → vazio.
@@ -70,6 +88,7 @@ jsonver() {
 reinit_scan() {
   rs_before="$1"; rs_after="$2"; rs_changelog="$3"
 
+  RS_VERDICT="indet"
   if [ ! -f "$rs_changelog" ]; then
     echo "Re-init: nao determinavel — CHANGELOG.md nao encontrado no plugin instalado."
     echo "Confira no repositorio do keelson se alguma versao do salto exige /keelson:init."
@@ -113,6 +132,7 @@ reinit_scan() {
       rs_req="$(printf '%s\n' "$rs_out" | sed -n 's/^REQ: *//p')"
       rs_ind="$(printf '%s\n' "$rs_out" | sed -n 's/^IND: *//p')"
       if [ -n "$rs_req" ]; then
+        RS_VERDICT="required"
         echo "ATENCAO: este salto inclui versao(oes) que mudaram algo que o /keelson:init"
         echo "escreve no projeto (bloco do CLAUDE.md, ficha ou arquivo novo) — re-rode"
         echo "/keelson:init apos reiniciar a sessao. Versao(oes): $rs_req"
@@ -120,9 +140,108 @@ reinit_scan() {
         echo "Re-init: nao determinavel para a(s) versao(oes): $rs_ind (entrada sem marcador"
         echo "\"Re-init:\" no CHANGELOG). Confira essas entradas a mao antes de assumir que nao."
       else
+        RS_VERDICT="none"
         echo "Re-init: nenhuma versao do salto ($rs_before -> $rs_after) exige /keelson:init."
       fi ;;
   esac
+}
+
+# --- Medição do projeto contra a árvore instalada (decisão 4.440) ---
+# Raiz: --root, senão a pasta corrente, senão o topo do git — sempre exigindo a ficha.
+resolve_root() {
+  MEASURE_ROOT=""
+  if [ -n "$ROOT_ARG" ]; then
+    [ -f "$ROOT_ARG/keelson.config.json" ] && MEASURE_ROOT="$(cd "$ROOT_ARG" && pwd)"
+    return 0
+  fi
+  if [ -f "$PWD/keelson.config.json" ]; then MEASURE_ROOT="$PWD"; return 0; fi
+  rr_top="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+  if [ -n "$rr_top" ] && [ -f "$rr_top/keelson.config.json" ]; then MEASURE_ROOT="$rr_top"; fi
+  return 0
+}
+
+# Roda o init-selfcheck.sh da árvore dada (com --plugin-root nela) sobre MEASURE_ROOT e
+# lê só os itens que o /keelson:init escreve. Nunca decide pelo exit code: qualquer
+# outro item em falha também devolve 1. Linha esperada ausente, script ausente ou item
+# degradado ("sem parser") → indet — régua da 4.156.
+sync_measure() { # <arvore>
+  ms_tree="$1"
+  MS_VERDICT="indet"; MS_LINES=""; MS_REASON=""
+  if [ ! -f "$ms_tree/scripts/init-selfcheck.sh" ]; then
+    MS_REASON="init-selfcheck.sh ausente na arvore $ms_tree"
+    return 0
+  fi
+  ms_out="$(bash "$ms_tree/scripts/init-selfcheck.sh" "$MEASURE_ROOT" --plugin-root "$ms_tree" 2>/dev/null || true)"
+  ms_pos=""; ms_ind=""
+  for ms_item in claude-block-sincronizado agents-presente ficha-campos; do
+    ms_line="$(printf '%s\n' "$ms_out" | awk -F'\t' -v it="$ms_item" '$2 == it { print; exit }')"
+    if [ -z "$ms_line" ]; then ms_ind="$ms_ind $ms_item"; continue; fi
+    ms_state="$(printf '%s\n' "$ms_line" | cut -f1)"
+    ms_detail="$(printf '%s\n' "$ms_line" | cut -f3-)"
+    MS_LINES="$MS_LINES
+  - $ms_item: $ms_detail"
+    case "$ms_state" in
+      ok) : ;;
+      aviso|falha)
+        case "$ms_detail" in
+          "sem parser"*|"sem python3"*) ms_ind="$ms_ind $ms_item" ;;
+          *) ms_pos="$ms_pos $ms_item" ;;
+        esac ;;
+      *) ms_ind="$ms_ind $ms_item" ;;
+    esac
+  done
+  if [ -n "$ms_pos" ]; then
+    MS_VERDICT="positive"; MS_REASON="$ms_pos"
+  elif [ -n "$ms_ind" ]; then
+    MS_VERDICT="indet"; MS_REASON="sem linha ou degradado:$ms_ind"
+  else
+    MS_VERDICT="clean"
+  fi
+  return 0
+}
+
+print_measure() { # <versao-medida>
+  echo ""
+  if [ -z "$MEASURE_ROOT" ]; then
+    echo "Medicao do projeto: pulada — sem keelson.config.json na pasta corrente (rode da raiz"
+    echo "do projeto ou passe --root <raiz>). O veredito abaixo vem so do CHANGELOG."
+    return 0
+  fi
+  echo "Medicao do projeto ($MEASURE_ROOT) contra a versao $1:"
+  [ -n "$MS_LINES" ] && printf '%s\n' "$MS_LINES" | sed '/^$/d'
+  [ "$MS_VERDICT" = "indet" ] && echo "  nao determinavel — $MS_REASON"
+  return 0
+}
+
+# Combina CHANGELOG (RS_VERDICT) e medição (MS_VERDICT). Positivo em qualquer fonte →
+# exige; os dois limpos → nao exige; indeterminado sem positivo → nao determinavel.
+# Medição pulada (sem ficha) deixa o CHANGELOG decidir sozinho, declarando isso.
+combined_verdict() {
+  echo ""
+  if [ "$MS_VERDICT" = "positive" ]; then
+    echo "Veredito: exige /keelson:init — o projeto diverge do que esta versao escreve"
+    echo "(itens:$MS_REASON)."
+    if [ "$RS_VERDICT" = "none" ] || [ "$RS_VERDICT" = "na" ]; then
+      echo "O salto corrente nao explica a divergencia:"
+      echo "sinal de /keelson:init esquecido em salto anterior (ou edicao fora do fluxo)."
+      echo "Rode /keelson:init apos reiniciar a sessao."
+    fi
+    return 0
+  fi
+  if [ "$RS_VERDICT" = "required" ]; then
+    echo "Veredito: exige /keelson:init (versao(oes) do salto marcadas Re-init: required)."
+    return 0
+  fi
+  case "$MS_VERDICT:$RS_VERDICT" in
+    clean:none) echo "Veredito: nao exige /keelson:init — salto sem Re-init: required e projeto sincronizado." ;;
+    clean:na)   echo "Veredito: nao exige /keelson:init — projeto sincronizado com a versao instalada." ;;
+    skip:none)  echo "Veredito: nao exige /keelson:init pelo CHANGELOG do salto — projeto nao medido." ;;
+    skip:na)    echo "Veredito: sem salto e projeto nao medido — nada a afirmar." ;;
+    *)
+      echo "Veredito: nao determinavel — sem evidencia suficiente para afirmar que nao precisa."
+      echo "Confira o CHANGELOG do salto; um /keelson:init redundante e idempotente." ;;
+  esac
+  return 0
 }
 
 # Report final (roda DEPOIS de `claude plugin update` substituir este arquivo
@@ -133,6 +252,19 @@ final_report() {
   echo ""
   if [ -n "$BEFORE" ] && [ "$AFTER" = "$BEFORE" ]; then
     echo "keelson ja estava na ultima versao publicada ($BEFORE). Nada a fazer."
+    # Sem salto, mas a medição ainda vale (4.440): quem esqueceu o init num salto
+    # anterior costuma re-rodar o update para conferir. A árvore corrente é a instalada.
+    RS_VERDICT="na"
+    resolve_root
+    if [ -n "$MEASURE_ROOT" ]; then
+      if [ "$(jsonver "$PLUGIN_DIR/.claude-plugin/plugin.json")" = "$BEFORE" ]; then
+        sync_measure "$PLUGIN_DIR"
+      else
+        MS_VERDICT="indet"; MS_LINES=""; MS_REASON="a arvore corrente ($PLUGIN_DIR) nao e a versao $BEFORE"
+      fi
+    fi
+    print_measure "$BEFORE"
+    combined_verdict
     return 0
   fi
 
@@ -166,6 +298,18 @@ final_report() {
     fi
   fi
 
+  # Medição do projeto contra a árvore nova (4.440) — só com árvore localizada e ficha.
+  resolve_root
+  if [ -n "$MEASURE_ROOT" ]; then
+    if [ -n "${TREE:-}" ]; then
+      sync_measure "$TREE"
+    else
+      MS_VERDICT="indet"; MS_LINES=""; MS_REASON="arvore nova nao localizada — nada a comparar"
+    fi
+  fi
+  print_measure "${AFTER:-?}"
+  combined_verdict
+
   echo ""
   echo "A sessao corrente continua na versao antiga — reinicie a sessao do"
   echo "Claude Code para carregar a versao nova."
@@ -185,10 +329,15 @@ fi
 # relatório (reproduzido pela suíte com um `claude` falso que trunca o script). Dentro
 # de main() tudo já está parseado antes da primeira chamada à CLI.
 main() {
-SCOPE="user"
-if [ "${1:-}" = "--scope" ] && [ -n "${2:-}" ]; then
-  SCOPE="$2"
-fi
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --scope) shift; [ $# -gt 0 ] || { echo "ERRO: --scope exige um valor (user|project|local)." >&2; exit 2; }; SCOPE="$1" ;;
+    --root)  shift; [ $# -gt 0 ] || { echo "ERRO: --root exige a raiz do projeto." >&2; exit 2; }; ROOT_ARG="$1" ;;
+    *) echo "ERRO: argumento desconhecido: $1" >&2
+       echo "Uso: update.sh [--scope user|project|local] [--root <raiz-do-projeto>]" >&2; exit 2 ;;
+  esac
+  shift
+done
 
 if ! command -v claude >/dev/null 2>&1; then
   echo "ERRO: CLI 'claude' nao encontrada no PATH — impossivel atualizar o plugin." >&2

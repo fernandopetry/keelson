@@ -81,8 +81,9 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   `Re-init: required|none` logo abaixo do heading (4.189, redação ampliada pela 4.374:
   `required` = a entrada mudou algum artefato que o `/keelson:init` escreve no projeto —
   o bloco injetado, o contrato da ficha ou um arquivo novo como o ponteiro `AGENTS.md`;
-  é o que `scripts/update.sh` lê para avisar o consumidor — provado por
-  `check-release.sh` na entrada corrente), linha de
+  é o que `scripts/update.sh` lê para avisar o consumidor, complementado pela medição
+  do disco do projeto contra a árvore nova, que pega o init esquecido em salto anterior
+  — 4.440; provado por `check-release.sh` na entrada corrente), linha de
   âncora (`Decisão 4.x · <hash do commit de bump>`; `Charter A.B.C` quando ele mudou) e
   bullets sob `Added` / `Changed` / `Fixed` / `Removed`, em **inglês** (é a face pública do
   pacote, como o `README.md`). Escreva pelo efeito no consumidor — o *porquê* fica na
