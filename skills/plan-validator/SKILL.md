@@ -50,7 +50,10 @@ por resultado e cobertura mista seguem o §5 do graph-contract.md.
 ## Etapa 3: checks de decisões arquiteturais (DEC) que permanecem seus
 
 ### WARNING se:
-- DEC `Irreversível: sim` sem justificativa em "Consequências"
+- DEC `Irreversível: sim` sem justificativa em "Consequências", ou com justificativa que
+  nomeia só a classe da mudança ("DDL", "tabela nova") ou uma DEC parecida — `sim` se
+  sustenta pelo custo de desfazer **esta** decisão, o que se perde ao revertê-la (dado,
+  contrato, efeito externo); sem esse custo, o valor é `não` (decisão 4.443)
 - **Decisão real rebaixada a linha `[herdada]`** (decisão 4.422): a linha não cita fonte que de fato dite a escolha (campo da ficha, § do perfil, DEC do INDEX, premissa/NFR da SPEC), ou a fonte dita só parte e a linha engole a escolha que **sobra** ao aplicá-la (ex.: teto de tempo herdado sobre um cliente que já faz retry), ou a escolha é irreversível/exceção — essas pedem a forma completa. A inversa **não** é defeito: DEC herdada em uma linha, sem alternativas nem `Reabrir se`, é a forma correta; DEC completa que só aplica padrão vigente com alternativa fabricada é INFO de inflação
 - Descarte de alternativa sem custo concreto — só adjetivo ("mais complexa", "pior"), sem nomear o que se perde ou quebra ao escolhê-la (decisão 4.136) — **só em PLAN `Draft`/`Review`**, mesma carência da régua do `Reabrir se`
 

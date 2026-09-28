@@ -207,6 +207,10 @@ para commitar) e a régua completa: §15 do
 
 ### 8. Retornar report estruturado
 
+**Processo em segundo plano que você iniciou, você encerra antes de reportar** (decisão
+4.443): laço de espera só depois de testar a condição de saída uma vez, e sem silenciar o
+erro na condição — laço sobre condição que nunca se satisfaz gira até o fim da sessão.
+
 Ao terminar, retornar report YAML exato — **e somente ele** (duas camadas, decisão 4.103 —
 régua no `sdd-conventions.md`): sem prosa em volta, `notas` em 1–3 linhas; a narrativa de
 implementação já vive no código, nos testes e no commit, e a closure é da main session:

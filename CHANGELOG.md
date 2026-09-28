@@ -25,6 +25,26 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.191.0] — 2026-09-28
+
+Re-init: none
+
+Decision 4.443 — field intake: a background process the developer starts ends before
+the report; `Irreversível: sim` is justified by the cost of undoing this decision.
+
+### Added
+
+- **`agents/developer.md`, step 8:** a background process the developer started is ended
+  before the report; a wait loop is written only after its exit condition was tested once,
+  and never with the error silenced in the condition. A loop over a condition that never
+  holds spins until the session ends, and the main session's Stop guard only sees it when
+  the main session stops.
+- **`skills/plan-validator/SKILL.md`, step 3:** a DEC marked `Irreversível: sim` whose
+  justification names only the class of change ("DDL", "new table") or a look-alike DEC is
+  a WARNING next to the existing "no justification" check: `sim` stands on the cost of
+  undoing **this** decision — what is lost when it is reverted (data, contract, external
+  effect); without that cost the value is `não`.
+
 ## [0.190.3] — 2026-09-28
 
 Re-init: none
