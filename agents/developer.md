@@ -50,7 +50,9 @@ corrigidos. Todo o resto do fluxo (perfil, testes, lint, report) vale igual.
 **Antes de tocar em qualquer arquivo**, rode a verificação escopada ao domínio da task
 (`quality.test` da ficha, filtrado) **uma vez** e registre o comando literal e o
 resultado — esse é o seu **baseline** (`${CLAUDE_PLUGIN_ROOT}/guidelines/core/TESTING.md`,
-"Verificação que falha não se contorna").
+"Verificação que falha não se contorna"; o filtro e a amplitude por papel vêm de
+"Verificação forte e única", 4.436). Em **retry** da mesma TASK o baseline registrado é
+reusado — não se roda de novo.
 
 **Escopo inerte**: quando nenhum arquivo do "Escopo > Inclui" é código que a suíte
 exercita — só docs, artefatos SDD, asset estático (régua e âncora mecânica em
@@ -141,8 +143,11 @@ cópia do diretório de trabalho não é protocolo válido (4.336 — leva `.env
 **Teste novo roda onde o time olha** (decisão 4.226): antes de reportar, confronte o
 grupo/tag/marcador de cada teste que você criou com as exclusões da config default do
 runner — teste em grupo excluído passa isolado e **nunca roda** na rodada padrão. A
-evidência é contável e vai em `verificacao.final`: o comando da rodada default listando
-o teste novo executado (`OK (N tests)` que o inclui), nunca só a rodada filtrada.
+evidência é contável e vai em `verificacao.final`: uma rodada com a **config default do
+runner** (sem `--group`/`--testsuite` que sobreponha as exclusões), restrita ao arquivo do
+teste novo, listando-o executado (`OK (N tests)` que o inclui) — a régua é propriedade do
+teste (ele roda na config que o time olha?), não amplitude da rodada (4.226/4.436): a
+completa não é o que se pede aqui.
 
 **Spec E2E como entregável** (`quality.e2e` na ficha — decisão 4.166): AC com efeito
 observável em tela → o spec E2E que o prova faz parte da task, tagueado `@<slug>` no
@@ -153,8 +158,9 @@ asserção para esverdear um vermelho é a violação do repro (4.159) e reprova
 
 ### 6. Rodar testes e lint localmente
 
-1. Executar a suíte via `quality.test` da ficha (mínimo: testes novos verdes) e comparar
-   **contra o baseline da etapa 2**: nenhum vermelho novo. Vermelho que não estava no
+1. Executar a rodada **filtrada** (o mesmo comando do baseline; `TESTING.md`, "Verificação
+   forte e única", 4.436) **uma vez** — verde é o veredito, não há re-rodada "para ter
+   certeza" — e comparar **contra o baseline da etapa 2**: nenhum vermelho novo. Vermelho que não estava no
    baseline é seu — corrija ou reporte; nunca estreite o filtro para escondê-lo.
    (Dispensa por escopo inerte declarada na etapa 2 vale aqui também — confira que o
    diff **real** continuou inerte antes de mantê-la.)

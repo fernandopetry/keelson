@@ -23,6 +23,44 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.187.0] — 2026-09-27
+
+Re-init: none
+
+Decision 4.436 — levers L5 (suite run 13–55× per wave) and L9 (session killed on the
+end-of-wave suite) of the transcript reading.
+
+### Changed
+
+- **Suite breadth per role now has one owner** (`TESTING.md`, "Verificação forte e única"):
+  the developer runs the **filtered** round once for the baseline and once at the end (filter
+  from the TASK's gate-1 command + known consumers, else the runner filter in the profile,
+  else the plain `quality.test` once, declared); a retry reuses the recorded baseline; the
+  **full suite runs once at the start of `/keelson:implement`** (the execution baseline,
+  recorded as a `marco` ledger event — a pre-existing red outside the scope is dealt with
+  there, never resurfacing as a "regression") and once in Etapa 4, compared with it; the
+  reviewer records command + `N of M` and never calls a subset "equivalent to the suite".
+  The 4.226 self-check is rephrased as a property (default runner config restricted to the
+  new test's file), which is what it always meant. Measured: ~55 full runs in one session,
+  17% of the wall time.
+- **Execution mode**: the cap is the Bash tool's own `timeout` parameter, never GNU
+  `timeout` (absent on macOS — the field case ran `command not found`, then an uncapped
+  foreground run that died with the session); a run that may exceed the cap goes to the
+  background and is collected once through the notification (4.400 now covers background
+  Bash). A run cut by the cap is "not concluded", never a regression. Doctrine does not
+  claim background survives a killed process.
+- **`compact-anchor` now also anchors `source=resume`** (matcher `compact|resume`): a
+  resumed session with a run in progress is told to resume the pointed stage (unmerged
+  `wt/*` worktrees integrate first; agents or suites in flight at the time of death do not
+  come back) or, when the run belongs to another session, to ask the Director for
+  `/keelson:continue` — never to invoke it. Measured: "Continue from where you left off"
+  answered "No response requested" and 71 minutes were lost.
+- `/keelson:continue` points at `/keelson:jira-sync <slug> --dry-run` on the partial-closure
+  branch: a dead session may have left the tracker closure half-transitioned and the
+  standalone implement does not run the §12 reconciliation.
+- Troubleshooting wiki: "the whole suite runs many times in one wave" and "the session died
+  mid-suite and the resume said nothing to do".
+
 ## [0.186.0] — 2026-09-27
 
 Re-init: none

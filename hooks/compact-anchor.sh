@@ -19,9 +19,11 @@ set -u
 
 input="$(cat)"
 
-# SessionStart com source=compact — defensivo caso o matcher mude
+# SessionStart com source=compact (4.146) ou source=resume (4.436: sessão retomada depois de
+# morrer com run em_andamento — o prompt de retomada do harness virava "No response requested"
+# e 71 min se perderam num caso real). startup/clear seguem calados.
 source_ev="$(printf '%s' "$input" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("source", ""))' 2>/dev/null || echo "")"
-[ "$source_ev" = "compact" ] || exit 0
+case "$source_ev" in compact|resume) ;; *) exit 0 ;; esac
 
 cwd="$(printf '%s' "$input" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("cwd", ""))' 2>/dev/null || echo "")"
 if [ -z "$cwd" ] || [ ! -d "$cwd" ]; then
@@ -69,10 +71,17 @@ if [ "$n" -eq 0 ] && [ -z "$ledger_line" ]; then
   exit 0
 fi
 
-echo "[keelson compact-anchor] Contexto recém-compactado — fatos do disco (imunes à sumarização, decisão 4.146):"
+if [ "$source_ev" = "resume" ]; then
+  echo "[keelson compact-anchor] Sessão RETOMADA — fatos do disco (decisão 4.436; o que estava em voo quando a sessão parou não sobreviveu):"
+else
+  echo "[keelson compact-anchor] Contexto recém-compactado — fatos do disco (imunes à sumarização, decisão 4.146):"
+fi
 if [ "$n" -gt 0 ]; then
   printf '%s\n' "Run keelson EM ANDAMENTO:${runs}"
   echo "Antes do próximo despacho, releia os artefatos apontados em 'retomada' (INDEX do slug + TASK-INDEX) — estado de wave, gates pendentes e pendências do Diretor se re-derivam do disco, nunca do resumo comprimido. Posse (decisão 4.251): run cujo campo 'sessao' aponte OUTRA sessão não é desta — não o retome nem o encerre; inventarie e escale ao humano."
+  if [ "$source_ev" = "resume" ]; then
+    echo "Retomada (4.436): 'Continue from where you left off' com run em andamento NÃO é 'nada a fazer' — se o run é desta sessão, retome a etapa apontada em 'retomada' (worktrees/branches wt/* sem merge se integram primeiro, §3.2.5 do implement; agent ou suíte em voo antes da parada não voltam — redespache); se é de outra sessão, peça ao Diretor que digite /keelson:continue <slug> (comando humano-only — não tente invocá-lo)."
+  fi
 fi
 [ -n "$ledger_line" ] && echo "$ledger_line"
 

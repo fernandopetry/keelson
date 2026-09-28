@@ -311,7 +311,8 @@ E esse custo não é fixo — o keelson calibra o peso pelo tamanho do risco:
   mudança entra pelo [modo sob demanda](Conceitos): developer e review, sem SPEC nem
   plano — veja
   [a pergunta sobre a porta](#pedi-um-ajuste-simples-e-o-keelson-abriu-spec-e-plano-como-evito).
-- **Os gates rodam por camada, não a cada passo.** Testes rodam por tarefa; revisão,
+- **Os gates rodam por camada, não a cada passo.** Testes rodam por tarefa (a rodada
+  filtrada ao escopo, uma vez; a suíte completa roda na largada e na entrega); revisão,
   segurança, performance e design rodam **uma vez por wave**, sobre o conjunto; o QA
   prova a funcionalidade inteira uma vez. E tarefas da mesma wave rodam em paralelo.
 - **Gate que não se aplica não roda.** Segurança só em mudança sensível, performance só

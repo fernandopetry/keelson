@@ -83,7 +83,7 @@ Stop	-	desc-guard.sh
 Stop	-	jira-guard.sh
 Stop	-	largada-guard.sh
 Stop	-	window-marker.sh
-SessionStart	compact	compact-anchor.sh"
+SessionStart	compact|resume	compact-anchor.sh"
 got="$(printf '%s\n' "$regs" | awk -F'\t' '{ n=$4; sub(/.*\//, "", n); print $1 "\t" $2 "\t" n }')"
 total=$((total + 1))
 if [ "$got" = "$expect" ]; then ok tabela-evento-matcher-congelada

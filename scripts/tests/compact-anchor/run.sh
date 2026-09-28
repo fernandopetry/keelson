@@ -76,9 +76,17 @@ contem "legado/ancora"  'Contexto recém-compactado'
 contem "legado/slug"    'slug: alfa'
 contem "legado/ledger"  '2 evento(s) ativo(s)'
 
-# 2. source ≠ compact → silêncio
+# 2. source ≠ compact/resume → silêncio
 roda "{\"source\": \"startup\", \"cwd\": \"$D1\"}"
 silencio "source-diverso"
+
+# 2b. source=resume (4.436) → âncora de retomada, run listado, instrução de retomar
+roda "{\"source\": \"resume\", \"cwd\": \"$D1\"}"
+contem "resume/ancora"   'Sessão RETOMADA'
+contem "resume/slug"     'slug: alfa'
+contem "resume/retomar"  'Retomada (4.436)'
+roda "{\"source\": \"clear\", \"cwd\": \"$D1\"}"
+silencio "clear-silencio"
 
 # 3. Mesa limpa → silêncio
 D3="$TMP/c3"; mkdir -p "$D3"

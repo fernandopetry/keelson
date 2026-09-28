@@ -253,6 +253,36 @@ suíte relevante **uma vez** ao final. Não prove a mesma coisa em várias ferra
 + script de fiação + E2E + suíte repetida) — escolha a mais forte e pare. Rigor
 **proporcional a complexidade × risco** (ver `./WORKFLOW.md`).
 
+**Amplitude por papel (decisão 4.436)** — o caso real: 13–55 rodadas da suíte completa por
+wave, 17% da parede de uma sessão, com o developer rodando a completa 2–4× por TASK
+("baseline", "final", "re-run to be certain"). Dentro do ciclo:
+
+- **Developer** roda a rodada **filtrada** no baseline e na verificação final, **uma vez
+  cada**; verde é o veredito — não existe segunda rodada "para ter certeza". O filtro vem,
+  nesta ordem: (1) o comando fixado no critério de gate 1 da TASK (+ os consumidores
+  conhecidos do símbolo compartilhado, 4.162); (2) o filtro do runner documentado no §7 do
+  perfil; (3) `quality.test` não parametrizável → o comando puro, 1×, declarado "sem filtro".
+  Critério de TASK que prescreve a completa vence a régua (roda 1×, na final). Retry da
+  mesma TASK **reusa o baseline registrado** (comando + resultado) e roda a final 1× sobre o
+  delta.
+- **Suíte completa**: 1× na **largada** do `/keelson:implement` (baseline da execução —
+  vermelho pré-existente fora do escopo se declara ali, pela régua abaixo, nunca aparece
+  como "regressão" no fim) e 1× na Etapa 4 (comparada com esse baseline). Não por wave
+  (o fecho da wave roda a relevante ao escopo dela) nem por TASK.
+- **Revisor** (gate 2): filtrada, e o subconjunto nunca é rotulado "equivalente à suíte" —
+  comando literal e `N de M` (afirmação de fato exige execução, 4.329).
+- Fora do ciclo (mudança pontual, sessão livre, `/keelson:review`): a final é o
+  `quality.test` puro, 1×.
+
+**Modo de execução (decisão 4.436)**: o teto de uma rodada é o parâmetro `timeout` do
+próprio Bash tool — `timeout` do GNU coreutils **não** é comando da doutrina (o macOS não
+o tem; caso real: `command not found` e a rodada seguinte, sem teto e em foreground, morreu
+com a sessão). Rodada que pode passar do teto do tool roda em **background** e o resultado
+chega pela notificação do harness — colheita única, sem sondagem (4.400 vale para Bash em
+segundo plano como para agent). Saída por teto é "rodada não concluída", nunca regressão
+nem sucesso. Nada disso impede a morte do processo da sessão: o que sobrevive a ela é o
+que está no disco (run-state, ledger, closures commitadas).
+
 ---
 
 ## Diff inerte: a suíte prova código

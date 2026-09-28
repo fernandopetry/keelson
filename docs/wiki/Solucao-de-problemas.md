@@ -215,8 +215,27 @@ configuração default do runner exclui (ex.: `@group` listado nas exclusões do
 confronta o marcador de cada teste novo com as exclusões da config e trata o caso como
 achado bloqueante (decisão 4.226; caso de campo: provas de segurança de 2 waves
 inertes). Correção típica: remover o grupo do teste-prova ou movê-lo para um grupo que
-a suíte default seleciona; a evidência pedida é a rodada default listando o teste
-executado.
+a suíte default seleciona; a evidência pedida é uma rodada com a configuração default do
+runner restrita ao arquivo do teste novo, listando-o executado — não a suíte inteira.
+
+### A suíte inteira roda muitas vezes numa mesma wave
+
+Não devia. Cada developer roda só a rodada **filtrada** ao escopo da tarefa, uma vez antes
+de tocar no código (baseline) e uma vez ao final; a suíte completa roda uma vez na largada
+da implementação e uma vez na entrega. Um vermelho que já existia fora do escopo aparece na
+largada, com destino declarado, e não como "regressão" no fim. Se você vê a completa rodando
+a cada tarefa, ou uma "segunda rodada para ter certeza", é desvio da régua — cite a seção
+"Verificação forte e única" do `TESTING.md` na conversa.
+
+### A sessão morreu no meio da suíte e a retomada disse "nada a fazer"
+
+Duas causas conhecidas. Uma rodada longa em primeiro plano sem teto pode morrer com a
+sessão (o `timeout` do GNU não existe no macOS — o keelson usa o teto do próprio comando
+ou roda a suíte em segundo plano e espera a notificação). E, ao reabrir a sessão, o
+harness pergunta "continue de onde parou": desde a 4.436 o keelson injeta o run em andamento
+nesse momento e retoma a etapa apontada, ou pede que você digite `/keelson:continue <slug>`
+se o run é de outra sessão. Se a closure do Jira ficou pela metade, `/keelson:jira-sync
+<slug> --dry-run` mostra o que a reconciliação vai alinhar.
 
 ### O relatório do gate de segurança diz `ferramentas_indisponiveis: gitleaks`
 
