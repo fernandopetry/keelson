@@ -227,6 +227,15 @@ largada, com destino declarado, e não como "regressão" no fim. Se você vê a 
 a cada tarefa, ou uma "segunda rodada para ter certeza", é desvio da régua — cite a seção
 "Verificação forte e única" do `TESTING.md` na conversa.
 
+### Rodei o keelson sem humano (`claude -p`, CI) e ele parou com trabalho pela metade
+
+Numa sessão sem humano, ninguém "acorda" o keelson quando um agente em segundo plano
+termina: se o turno encerra esperando, a execução acaba ali. Desde a 4.439 a guarda de
+waves detecta esse modo (`CLAUDE_CODE_ENTRYPOINT` do SDK) e bloqueia o encerramento
+enquanto houver tarefa em voo, mandando colher o resultado no mesmo turno. Se você viu o
+sintoma numa versão anterior, é isso; se vê ainda hoje, o comando despachou algo em segundo
+plano fora do ciclo formal — relate.
+
 ### A sessão morreu no meio da suíte e a retomada disse "nada a fazer"
 
 Duas causas conhecidas. Uma rodada longa em primeiro plano sem teto pode morrer com a

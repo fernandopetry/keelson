@@ -195,6 +195,25 @@ contem "notificado/cutuca" '"decision": "block"'
 DW3="$TMP/w3"; run_state "$DW3" eps "$DONO"; TW3="$TMP/tw3.jsonl"; tr_agent_bg d1 keelson:developer > "$TW3"
 roda "{\"stop_hook_active\": false, \"cwd\": \"$DW3\", \"session_id\": \"$EU\", \"transcript_path\": \"$TW3\"}"
 contem "alheio-em-voo/posse-segue" 'posse de terceiro'
+
+# --- 4.439: sessão sem humano (ENTRYPOINT sdk-*) com tarefa em voo → bloqueia SEMPRE; interativa cala ---
+roda_env() { # entrypoint stdin-json
+  CLAUDE_CODE_ENTRYPOINT="$1" bash "$HOOK" > "$TMP/out" 2>"$TMP/err" <<< "$2"
+  st=$?
+}
+DW4="$TMP/w4"; run_state "$DW4" zeta "$EU"; TW4="$TMP/tw4.jsonl"; tr_agent_bg d1 keelson:staff-engineer > "$TW4"
+roda_env sdk-cli "{\"stop_hook_active\": false, \"cwd\": \"$DW4\", \"session_id\": \"$EU\", \"transcript_path\": \"$TW4\"}"
+contem "sem-humano/bloqueia"        '"decision": "block"'
+contem "sem-humano/mensagem"        'CLAUDE_CODE_ENTRYPOINT=sdk-cli'
+roda_env sdk-cli "{\"stop_hook_active\": false, \"cwd\": \"$DW4\", \"session_id\": \"$EU\", \"transcript_path\": \"$TW4\"}"
+contem "sem-humano/bloqueia-de-novo" 'CLAUDE_CODE_ENTRYPOINT=sdk-cli'
+roda_env cli "{\"stop_hook_active\": false, \"cwd\": \"$DW4\", \"session_id\": \"$EU\", \"transcript_path\": \"$TW4\"}"
+silencio "terminal/cala"
+roda_env claude-vscode "{\"stop_hook_active\": false, \"cwd\": \"$DW4\", \"session_id\": \"$EU\", \"transcript_path\": \"$TW4\"}"
+silencio "vscode/cala"
+DW5="$TMP/w5"; run_state "$DW5" eta "$EU"; TW5="$TMP/tw5.jsonl"; { tr_agent_bg d1 keelson:developer; tr_notif d1; } > "$TW5"
+roda_env sdk-cli "{\"stop_hook_active\": false, \"cwd\": \"$DW5\", \"session_id\": \"$EU\", \"transcript_path\": \"$TW5\"}"
+contem "sem-humano-notificado/cutuca-normal" 'run do keelson com status EM ANDAMENTO'
 if [ "$fail" -gt 0 ]; then
   echo "wave-guard: $fail/$total asserções falharam"
   exit 1

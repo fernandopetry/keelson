@@ -119,12 +119,27 @@ fi
 # Subagent/Bash em SEGUNDO PLANO ainda sem notificação → o harness reacorda esta sessão
 # sozinho (4.348); cutucar aqui é o turno vazio que a 4.434 mediu (7–8× por sessão). Só
 # para run PRÓPRIO: posse de terceiro (4.251) continua acusada. Transcript ausente → como antes.
+# EXCEÇÃO (decisão 4.439): sessão SEM humano — `CLAUDE_CODE_ENTRYPOINT` começa com `sdk-`
+# (`claude -p`, SDK, smoke, CI; sondado em 2026-09-28: `cli`, `claude-vscode` e
+# `claude-desktop` são interativos, `sdk-cli` não) — ninguém a reacorda: encerrar o turno com
+# tarefa em voo ENCERRA A EXECUÇÃO (caso real: init acabou com a ficha por gravar). Ali o guard
+# bloqueia sempre (sem marker anti-renudge) e manda colher no mesmo turno.
 if [ "$alheio" != "1" ]; then
   transcript="$(printf '%s' "$input" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("transcript_path", ""))' 2>/dev/null || echo "")"
   TRANSCRIPT_FACTS="$(cd "$(dirname "$0")/../scripts" 2>/dev/null && pwd || true)/transcript-facts.sh"
   if [ -n "$transcript" ] && [ -f "$transcript" ] && [ -f "$TRANSCRIPT_FACTS" ]; then
     em_voo="$(bash "$TRANSCRIPT_FACTS" "$transcript" 2>/dev/null | awk -F'\t' '$1 == "agentes_em_voo" { print $2; exit }')"
-    case "$em_voo" in ''|0|*[!0-9]*) ;; *) exit 0 ;; esac
+    case "$em_voo" in
+      ''|0|*[!0-9]*) ;;
+      *)
+        case "${CLAUDE_CODE_ENTRYPOINT:-}" in
+          sdk-*)
+            reason="Guarda de waves (decisão 4.439): esta sessão NÃO tem humano (CLAUDE_CODE_ENTRYPOINT=${CLAUDE_CODE_ENTRYPOINT}) e há ${em_voo} tarefa(s) em segundo plano sem retorno — encerrar o turno agora ENCERRA A EXECUÇÃO: ninguém reacorda uma sessão sem humano (caso real: /keelson:init encerrou 'aguardando o staff-engineer' e a ficha ficou por gravar). Continue trabalhando NESTE turno até colher os reports: TaskOutput bloqueante em cada tarefa em voo (aqui é o canal correto, não duplicata — a notificação nunca chegaria), ou trabalho útil em outra frente até o retorno. Nunca encerre 'aguardando'. Despacho cujo resultado a etapa consome nasce com run_in_background: false (4.438)."
+            printf '%s' "$reason" | python3 -c 'import sys,json; print(json.dumps({"decision": "block", "reason": sys.stdin.read()}))' 2>/dev/null || exit 0
+            exit 0 ;;
+          *) exit 0 ;;
+        esac ;;
+    esac
   fi
 fi
 

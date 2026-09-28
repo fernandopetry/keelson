@@ -23,6 +23,23 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.189.0] — 2026-09-28
+
+Re-init: none
+
+Decision 4.439 — mechanical net for unattended sessions.
+
+### Added
+
+- **`wave-guard` blocks the stop in a session without a human when a task is still in
+  flight.** The signal is `CLAUDE_CODE_ENTRYPOINT` starting with `sdk-` (probed: `claude -p`
+  reports `sdk-cli`; the terminal reports `cli`, the VS Code extension `claude-vscode`, the
+  desktop app `claude-desktop`). Nobody re-wakes an unattended session, so ending the turn
+  "waiting" ends the run; the guard now blocks every such attempt and tells the model to
+  collect the reports in the same turn (`TaskOutput` per task in flight, or useful work until
+  the return) and to dispatch consumed results with `run_in_background: false` (4.438).
+  Interactive sessions keep the 4.434 silence. Six suite cases.
+
 ## [0.188.1] — 2026-09-28
 
 Re-init: none
