@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: qa-precondicao
+# Caso nº 26 (decisão 4.304; criado na etapa 2 da auditoria de prompts, 4.441) — o qa
+# aplica agents/qa.md NO PAPEL ao gate 9 de uma TASK cuja app está fora do ar, com
+# `quality.boot` declarado na ficha e `gates.screenVerify` ligado. Armadilhas: a sondagem
+# sem `--boot` já nomeia `app_fora_do_ar` (citar só ela = boot não tentado, 4.71); a
+# causa tem nome canônico (4.49) e evidência literal (4.26); três ACs observáveis ficam
+# sem exercício → `acs_nao_verificados` + `handoff_seed` concreto, resultado PARCIAL,
+# nunca FALHOU por ambiente. Braços: régua com o item 2 em parágrafo único (HEAD) e
+# reescrito como princípio + lista (file:). Plant: item 2 sem boot, causa genérica e
+# seed opcional — expect.txt lista os três eixos que ele deve derrubar.
+# 1ª rodada (20260928-082605) INVÁLIDA: a fixture entregava `causa=app_fora_do_ar` e o boot
+# já executado — o modelo copiou a sondagem com qualquer régua e o plant aprovou 3 eixos.
+# 2ª forma: probe-env degradado (exit 3), sondagem à mão sem nome de causa, boot NÃO
+# executado — a régua decide se o qa nomeia a causa e cobra o boot antes de fechar.
+# 2ª rodada (20260928-083945): boot-tentado e causa-nomeada reprovam o plant 3/3 (controle
+# confiável); handoff-seed-preenchido aprovou o plant 3/3 — o modelo preenche o seed por
+# default mesmo com a régua dizendo "opcional" (mesmo padrão de designer-gate11 e
+# tech-lead-fecho) → sai do expect.txt: é eixo de regressão, não controle.

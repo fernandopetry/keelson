@@ -69,47 +69,31 @@ ou notificação renderizada.
    por inspeção do diff e **declare** a base do achado.
 4. Cada achado: categoria do catálogo de `core/DESIGN.md`, `arquivo:linha`, severidade,
    correção objetiva citando o padrão canônico do produto (componente/token/tela de
-   referência) ou o item do gabarito. **Correção de alinhamento se soma antes de se
-   escrever (decisão 4.230)**: quando a correção prescreve técnica de medida (padding,
-   margin, largura) para igualar a coordenada de dois elementos, verifique por
-   **aritmética** — some as trilhas dos dois lados (padding + conteúdo + gap até o
-   valor) e confirme que batem; prescrição plausível mas não somada alinha o container,
-   não o caso, e o achado seguinte reabre pelo próprio remendo (caso real: "pr-5"
-   canônico, e a trilha real era 124px vs 20px — 2ª reprovação pela mesma causa). Isto
-   é verificação do achado, não direção de arte; sem os valores das duas trilhas
-   legíveis no diff/tokens, o achado sai como `sugestao` com a medida faltante nomeada.
-   **A mesma verificação vale para eco/espelho de estado, não só medida (decisão
-   4.307, extensão da 4.230)**: quando a correção prescreve que um elemento reflita o
-   estado de outro ("o cabeçalho mostra o item selecionado", "o contador acompanha o
-   filtro"), localize por `grep` **todos** os pontos que escrevem o estado espelhado
-   antes de escrever a correção e nomeie cada um na correção — ponto de escrita sem
-   tratamento nomeado é buraco, não detalhe (caso real: a tela decidia o estado por
-   dois caminhos — o seletor e o campo de id manual —; a correção nomeou um, o
-   developer ligou só esse, e o eco passou a afirmar com confiança um valor diferente
-   do que o corpo mostrava — defeito pior que o original). Sem a lista de escritores
-   legível no diff, o achado sai como `sugestao` com os pontos faltantes nomeados —
-   a mesma queda de severidade da medida faltante. **E vale para COMPOSIÇÃO, não só
-   medida ou eco de estado (decisão 4.323, 3º eixo da 4.230/4.307)**: quando a correção
-   prescreve mover, desaninhar ou reagrupar um bloco ("mover para a forma do canônico",
-   "desaninhar do container X"), componha a alternativa ANTES de escrever o achado —
-   simule o resultado nos estados **combinados** que a nova posição expõe (o vizinho
-   que passa a ficar ao lado, o contexto que deixa de envolver o bloco) e confirme que
-   nenhum elemento passa a **afirmar algo falso** na composição nova; prescrição que
-   resolve o container sem essa simulação pode trocar o defeito original por um pior —
-   a tela afirmando com confiança um fato que deixou de ser verdade (caso real: mover
-   um bloco para o padrão do canônico teria feito a tela afirmar um fato falso num
-   estado combinado específico — só não saiu escrito porque o revisor compôs a
-   alternativa antes de fechar o achado). **E a PREMISSA do achado se ancora antes da
-   severidade, não só a correção (decisão 4.344, 4º eixo — parente da 4.329 do gate 7)**:
-   quando a severidade depende de um ESTADO ser alcançável (combinação de valores, ordem
-   de eventos, condição de borda), a prova de alcançabilidade vem de quem **produz** o
-   estado — localize por `grep` o validador/guard/máquina de estados/contrato de API que
-   decide se ele ocorre e cite-o no cenário; "o formulário aceita o valor" ou "a tela não
-   impede" prova só ausência de bloqueio numa camada que apenas **exibe**. Sem a âncora
-   no produtor, o achado sai como `sugestao` com a premissa a verificar nomeada — a mesma
-   queda de severidade da medida faltante (caso real: cenário classificado `alta` por um
-   formulário tolerante a um valor que o backend recusava estruturalmente antes de o
-   estado existir; ancorada no produtor, a severidade caiu ao nível real).
+   referência) ou o item do gabarito. **A correção se verifica antes de se escrever**
+   (decisões 4.230 · 4.307 · 4.323 · 4.344) — é verificação do achado, não direção de arte:
+   - **Medida** (padding, margin, largura para igualar a coordenada de dois elementos —
+     4.230): verifique por **aritmética** — some as trilhas dos dois lados (padding +
+     conteúdo + gap até o valor) e confirme que batem; prescrição plausível mas não
+     somada alinha o container, não o caso, e o achado seguinte reabre pelo próprio remendo.
+   - **Eco/espelho de estado** ("o cabeçalho mostra o item selecionado", "o contador
+     acompanha o filtro" — 4.307): localize por `grep` **todos** os pontos que escrevem o
+     estado espelhado antes de escrever a correção e nomeie cada um; ponto de escrita sem
+     tratamento nomeado é buraco, não detalhe — o eco passa a afirmar com confiança um
+     valor diferente do que o corpo mostra, defeito pior que o original.
+   - **Composição** (mover, desaninhar ou reagrupar um bloco — 4.323): componha a
+     alternativa antes de escrever o achado — simule o resultado nos estados
+     **combinados** que a nova posição expõe (o vizinho que passa a ficar ao lado, o
+     contexto que deixa de envolver o bloco) e confirme que nenhum elemento passa a
+     **afirmar algo falso** na composição nova.
+   - **Premissa de alcançabilidade** (severidade que depende de um estado ser alcançável:
+     combinação de valores, ordem de eventos, condição de borda — 4.344, parente da 4.329
+     do gate 7): a prova vem de quem **produz** o estado — localize por `grep` o
+     validador/guard/máquina de estados/contrato de API que decide se ele ocorre e cite-o
+     no cenário; "o formulário aceita o valor" ou "a tela não impede" prova só ausência de
+     bloqueio numa camada que apenas **exibe**.
+
+   Verificação não legível no diff/tokens (as duas trilhas, a lista de escritores, a
+   premissa no produtor) → o achado sai como `sugestao` com o que falta nomeado.
 5. Decisão: **qualquer** padrão descuidado do catálogo em superfície que o usuário vê
    ou opera → REPROVADO.
 

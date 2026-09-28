@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.190.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.190.2` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: doctrine cleanup — incident narratives, measured numbers, recurrence counters, migration phrasing and pinned versions leave the embedded doctrine and stay in the decision that records them; three stale contradictions fixed (gate count in the reviewer, "four rules" listing nine, a wrong section pointer). No rule changed.
+New in this release: the eight densest doctrine paragraphs (task criteria, retry dispatch, developer comment autocheck, qa environment pre-condition, design-review verification, session conventions, lint catalogue) are rewritten as a principle plus a list, each proven by an A/B eval against the previous text before landing. No rule, lint id or owning decision changed.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

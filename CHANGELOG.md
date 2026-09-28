@@ -25,6 +25,37 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.190.2] — 2026-09-28
+
+Re-init: none
+
+Decision 4.441 — step 2 of the prompt audit: accreted paragraphs become principle + list, proven by eval.
+
+### Changed
+
+- **Eight accreted paragraphs rewritten as principle + list.** `commands/tasks.md` (gate-1
+  criterion: the three properties of a verification command; the eight anti-circumvention
+  tests), `commands/implement.md` (the retry dispatch: pair of proofs, condition not list,
+  declared parent, same oracle everywhere, "who cites this text?"), `agents/developer.md`
+  (the Art. 7 comment autocheck as one test with its two narrative axes),
+  `agents/qa.md` (environment pre-condition as three proofs and four failure exits),
+  `agents/product-designer.md` (the four verification axes of a finding), the session
+  conventions bullets on subagent waiting, dispatch by type, branch/commit policy and
+  pathspec commits in `docs/_meta/conventions/sdd-conventions.md`, and the TASK row of the
+  lint catalogue in `lint-contract.md` (ids and severities in the table, the contract of
+  each heuristic in a "Notas do grupo TASK" list). Every rule, trap example, lint id and
+  owning decision reference is preserved; the 7 028-character paragraph of `tasks.md`
+  becomes a list whose longest line is under 1 300 characters. Each rewrite ran an A/B eval against the previous text before
+  landing (`developer-closure`, `designer-gate11`, `implement-wave-plan`, `tech-lead-fecho`,
+  `scribe-tasks-criterios`, and the new `qa-precondicao`): no axis regressed.
+
+### Added
+
+- **Eval case `evals/qa-precondicao`** (maintainer tooling, not shipped to consumers): the
+  qa on paper, app down, `quality.boot` declared, probe degraded — graders for the boot
+  attempt, the canonical cause name, the handoff seed and "tests still run"; plant on the
+  first two.
+
 ## [0.190.1] — 2026-09-28
 
 Re-init: none
