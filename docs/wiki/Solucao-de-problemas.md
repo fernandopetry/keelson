@@ -79,7 +79,9 @@ não é configurável — é parte do método. O efeito de cada campo está na
 ### O lembrete de revisão voltou depois de eu já ter revisado
 
 A cutucada de encerramento (`review-guard`, e a irmã `security-guard` para mudança
-sensível) olha o diff acumulado da branch — que cresce a cada correção quando o commit
+sensível) só aparece em sessão que **editou código** (ou despachou um developer, ou rodou
+`git` que escreve na árvore): sessão de `/keelson:update`, de triagem ou de leitura numa
+branch cheia de commits de outras sessões não é cutucada. Quando aparece, ela olha o diff acumulado da branch — que cresce a cada correção quando o commit
 fica para o fim, como no modo sob demanda. Ela cala quando o veredito do revisor está no
 **ledger da sessão** (o Tech Lead anota o evento `gate` ao receber o report) e o diff de
 código é o mesmo que ele revisou — a identidade do diff é marcada no despacho do revisor e
@@ -637,6 +639,15 @@ Etapa sem relatório de validação fica sem cauda — e sai da linha; janela se
 fica sem o parêntese de custo. O número é observação para
 melhorar a escrita dos documentos ao longo do tempo; o ciclo nunca para nem muda de
 rota por causa dele.
+
+### O lembrete do Jira apareceu enquanto as TASKs ainda estavam sendo escritas
+
+Não acontece mais: o `jira-guard` fica em silêncio enquanto um `scribe` ou um `tracker-sync`
+está rodando em segundo plano — as TASKs do fan-out são sincronizadas depois que todas
+existem, e o sync em voo ainda vai gravar as keys. Ele volta a cobrar assim que esses
+agentes reportam. TASK de brief avulso com `**Jira**: n/a — <motivo>` só satisfaz o lembrete
+quando a ficha tem `jira.issueType.standalone` nulo (avulsos não sincronizam); com o tipo
+preenchido, o avulso sincroniza como sub-tarefa e o `n/a` continua sendo cobrado.
 
 ### O `jira.<PROJECT>.md` está crescendo com listas de issues
 

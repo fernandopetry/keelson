@@ -23,6 +23,41 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.185.0] — 2026-09-27
+
+Re-init: none
+
+Decision 4.434 — Stop hooks read the session transcript (lever L2 of the transcript
+reading): ~20 empty turns per session in the measured epic came from guards that could not
+tell what *this* session did from what the branch carries.
+
+### Added
+
+- **`scripts/transcript-facts.sh`**: mechanical facts from the session transcript the Stop
+  payload hands over — did this session write code (Edit under a code path, a
+  `keelson:developer` spawn, or a Bash that writes: `git commit/merge/pull/rebase/…`,
+  `sed -i`, `>` into a code path)? which background agents or commands are still in flight
+  (launched, not yet notified, not collected by `TaskOutput`)? An orphan never counts as in
+  flight (launch older than 90 min, or the subagent transcript idle for 30 min) — silencing
+  needs proof of life. Missing or unreadable transcript → the hooks behave exactly as before.
+  Suite: 24 cases; 0.05 s on a 9.6 MB transcript.
+
+### Changed
+
+- **`review-guard` and `security-guard` stay silent in a session that wrote no code.** An
+  update, triage or read-only session on an epic branch with 400 commits is no longer told
+  "215 files, ~20966 lines" to review. A session that edits code, dispatches a developer or
+  merges is nudged as before (positive controls in both suites).
+- **`jira-guard` stays silent while a `tracker-sync` or a `scribe` runs in the background**
+  (the fan-out TASKs are synced after all of them exist; the sync in flight will write the
+  keys) and nudges again once they report. `**Jira**: n/a — <reason>` on a TASK satisfies it
+  **only** when `jira.issueType.standalone` is null — with a type set, standalone TASKs sync
+  as sub-tasks (protocol §7) and `n/a` is still charged.
+- **`wave-guard` stays silent when the session's own run has a subagent or command in
+  flight** — the harness re-wakes the session by itself (4.348); a third party's run is still
+  reported (4.251). This narrows 4.165's "once per state" to "once per state with nothing in
+  flight".
+
 ## [0.184.0] — 2026-09-27
 
 Re-init: none

@@ -220,7 +220,8 @@ num estado silencioso (mitigação declarada na decisão 4.263).
 
 Nota esperada no consumidor: os hooks de gate (review/security/jira-guard) medem o diff
 acumulado da branch contra a main — os commits de merge inflam essa medida e a cutucada
-de Stop pode cobrar review/gate 8 sobre o conjunto. Declare no output que o escopo
+de Stop pode cobrar review/gate 8 sobre o conjunto (desde a 4.434 só em sessão que editou
+código, despachou developer ou rodou git que escreve — esta sessão se enquadra pelo merge). Declare no output que o escopo
 tocado já foi auditado aqui (gates da Etapa 5 + suíte), para o Diretor não ler a
 cutucada como gate pendente.
 

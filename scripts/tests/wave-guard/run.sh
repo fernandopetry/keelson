@@ -177,6 +177,24 @@ contem "forja/etapa"      'na forja'
 contem "forja/regra"      'reportou'
 contem "forja/redespacho" 'Re-despache com o delta'
 
+
+# --- transcript sintético (decisão 4.434) ---
+tr_agent_bg() { # id tipo → lançado sem notificação
+  printf '{"type":"assistant","message":{"content":[{"type":"tool_use","id":"%s","name":"Agent","input":{"subagent_type":"%s","run_in_background":true,"prompt":"x"}}]}}\n' "$1" "$2"
+  printf '{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"%s","content":"Async agent launched successfully. agentId: ag-%s"}]}}\n' "$1" "$1"
+}
+tr_notif() { printf '{"type":"user","message":{"content":"<task-notification><task-id>ag-%s</task-id></task-notification>"}}\n' "$1"; }
+
+# --- 4.434: subagent em background sem notificação → silêncio; notificado → cutuca; posse alheia segue ---
+DW1="$TMP/w1"; run_state "$DW1" gama "$EU"; TW1="$TMP/tw1.jsonl"; tr_agent_bg d1 keelson:developer > "$TW1"
+roda "{\"stop_hook_active\": false, \"cwd\": \"$DW1\", \"session_id\": \"$EU\", \"transcript_path\": \"$TW1\"}"
+silencio "em-voo/cala"
+DW2="$TMP/w2"; run_state "$DW2" delta "$EU"; TW2="$TMP/tw2.jsonl"; { tr_agent_bg d1 keelson:developer; tr_notif d1; } > "$TW2"
+roda "{\"stop_hook_active\": false, \"cwd\": \"$DW2\", \"session_id\": \"$EU\", \"transcript_path\": \"$TW2\"}"
+contem "notificado/cutuca" '"decision": "block"'
+DW3="$TMP/w3"; run_state "$DW3" eps "$DONO"; TW3="$TMP/tw3.jsonl"; tr_agent_bg d1 keelson:developer > "$TW3"
+roda "{\"stop_hook_active\": false, \"cwd\": \"$DW3\", \"session_id\": \"$EU\", \"transcript_path\": \"$TW3\"}"
+contem "alheio-em-voo/posse-segue" 'posse de terceiro'
 if [ "$fail" -gt 0 ]; then
   echo "wave-guard: $fail/$total asserções falharam"
   exit 1

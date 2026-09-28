@@ -115,6 +115,21 @@ LEDGER="$SCRIPTS_DIR/ledger.sh"
 # diff-facts.sh --identity (4.377): identidade do diff para o marker anti-renudge.
 DIFF_FACTS="$SCRIPTS_DIR/diff-facts.sh"
 
+# --- Sessão que não escreveu código → silêncio (decisão 4.434) ---
+# O diff da branch pode ser de outras sessões (épico com 400 commits): o transcript desta
+# sessão diz se ELA editou code path, despachou developer ou commitou; nada disso → o gate
+# não é deste turno. Transcript ausente/ilegível → comportamento anterior (nunca cala por dúvida).
+TRANSCRIPT_FACTS="$SCRIPTS_DIR/transcript-facts.sh"
+transcript="$(printf '%s' "$input" | jq -r '.transcript_path // ""' 2>/dev/null || echo "")"
+if [ -n "$transcript" ] && [ -f "$transcript" ] && [ -f "$TRANSCRIPT_FACTS" ]; then
+  cp_csv="$(printf '%s\n' "${code_paths:-}" | paste -sd, - 2>/dev/null || true)"
+  tf="$(bash "$TRANSCRIPT_FACTS" "$transcript" ${cp_csv:+--code-paths "$cp_csv"} 2>/dev/null || true)"
+  if [ -n "$tf" ] && [ "$(printf '%s\n' "$tf" | awk -F'\t' '$1 == "escreveu_codigo" { print $2; exit }')" = "0" ]; then
+    echo "review-guard: esta sessão não editou código (transcript) — o diff da branch é de outra sessão; silêncio (4.434)." >&2
+    exit 0
+  fi
+fi
+
 cd "$proj" 2>/dev/null || exit 0
 
 # --- Escopo e identidade pelo dono único (decisão 4.378) ---

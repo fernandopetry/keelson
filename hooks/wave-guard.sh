@@ -116,6 +116,18 @@ if [ "$n" -eq 0 ]; then
   exit 0
 fi
 
+# Subagent/Bash em SEGUNDO PLANO ainda sem notificação → o harness reacorda esta sessão
+# sozinho (4.348); cutucar aqui é o turno vazio que a 4.434 mediu (7–8× por sessão). Só
+# para run PRÓPRIO: posse de terceiro (4.251) continua acusada. Transcript ausente → como antes.
+if [ "$alheio" != "1" ]; then
+  transcript="$(printf '%s' "$input" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("transcript_path", ""))' 2>/dev/null || echo "")"
+  TRANSCRIPT_FACTS="$(cd "$(dirname "$0")/../scripts" 2>/dev/null && pwd || true)/transcript-facts.sh"
+  if [ -n "$transcript" ] && [ -f "$transcript" ] && [ -f "$TRANSCRIPT_FACTS" ]; then
+    em_voo="$(bash "$TRANSCRIPT_FACTS" "$transcript" 2>/dev/null | awk -F'\t' '$1 == "agentes_em_voo" { print $2; exit }')"
+    case "$em_voo" in ''|0|*[!0-9]*) ;; *) exit 0 ;; esac
+  fi
+fi
+
 # Válvula por estado (4.165): fingerprint dos campos do run — janela append-only.
 # Composto com o session_id do LEITOR (padrão do skill-standards-nudge): o marcador
 # é por repo, e sem o id a sessão A engoliria a cutucada devida à sessão B — o caso

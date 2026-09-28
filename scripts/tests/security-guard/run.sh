@@ -218,6 +218,20 @@ D17="$TMP/c17"; repo_base "$D17"
 roda "$D17" "$P"; contem "rename-sai-do-escopo/cutuca" '"decision": "block"'
 
 echo "---"
+
+# --- transcript sintético (decisão 4.434) ---
+tr_edit() { printf '{"type":"assistant","message":{"content":[{"type":"tool_use","id":"u1","name":"Edit","input":{"file_path":"%s","old_string":"a","new_string":"b"}}]}}\n' "$1"; }
+
+# Sessão que não editou código → silêncio (4.434); com Edit na área sensível → cutuca; ausente → cutuca
+DS1="$TMP/s1"; repo "$DS1"; TS1="$TMP/ts1.jsonl"; tr_edit "$DS1/docs/x/INDEX.md" > "$TS1"
+roda "$DS1" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\", \"transcript_path\": \"$TS1\"}"
+silencio "transcript/sem-codigo-cala"
+DS2="$TMP/s2"; repo "$DS2"; TS2="$TMP/ts2.jsonl"; tr_edit "$DS2/src/auth.php" > "$TS2"
+roda "$DS2" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\", \"transcript_path\": \"$TS2\"}"
+contem "transcript/com-codigo-cutuca" '"decision": "block"'
+DS3="$TMP/s3"; repo "$DS3"
+roda "$DS3" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\", \"transcript_path\": \"$TMP/nao-existe.jsonl\"}"
+contem "transcript/ausente-cutuca-como-antes" '"decision": "block"'
 if [ "$fail" -gt 0 ]; then
   echo "security-guard: $fail de $total casos falharam"
   exit 1

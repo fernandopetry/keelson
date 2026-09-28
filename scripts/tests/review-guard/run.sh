@@ -329,6 +329,29 @@ D28="$TMP/c28"; repo_base "$D28" 1 1
 roda "$D28" "$P"; contem "rename-sai-do-escopo/cutuca" '"decision": "block"'
 
 echo "---"
+
+# --- transcript sintético (decisão 4.434) ---
+tr_edit() { printf '{"type":"assistant","message":{"content":[{"type":"tool_use","id":"u1","name":"Edit","input":{"file_path":"%s","old_string":"a","new_string":"b"}}]}}\n' "$1"; }
+tr_agent_bg() { # id tipo → lançado sem notificação
+  printf '{"type":"assistant","message":{"content":[{"type":"tool_use","id":"%s","name":"Agent","input":{"subagent_type":"%s","run_in_background":true,"prompt":"x"}}]}}\n' "$1" "$2"
+  printf '{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"%s","content":"Async agent launched successfully. agentId: ag-%s"}]}}\n' "$1" "$1"
+}
+
+# 29. Sessão que NÃO editou código (transcript só com Edit em docs) → silêncio (4.434)
+D29="$TMP/c29"; repo "$D29"; T29="$TMP/t29.jsonl"; tr_edit "$D29/docs/x/INDEX.md" > "$T29"
+roda "$D29" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\", \"transcript_path\": \"$T29\"}"
+silencio "transcript/sem-codigo-cala"
+# 30. Controle positivo: mesma árvore, transcript com Edit sob codePaths → cutuca
+D30="$TMP/c30"; repo "$D30"; T30="$TMP/t30.jsonl"; tr_edit "$D30/src/novo.php" > "$T30"
+roda "$D30" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\", \"transcript_path\": \"$T30\"}"
+contem "transcript/com-codigo-cutuca" '"decision": "block"'
+# 31. developer despachado conta como código; transcript ausente → comportamento anterior (cutuca)
+D31="$TMP/c31"; repo "$D31"; T31="$TMP/t31.jsonl"; tr_agent_bg a1 keelson:developer > "$T31"
+roda "$D31" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\", \"transcript_path\": \"$T31\"}"
+contem "transcript/developer-cutuca" '"decision": "block"'
+D32="$TMP/c32"; repo "$D32"
+roda "$D32" "{\"stop_hook_active\": false, \"session_id\": \"sessao-eu\", \"transcript_path\": \"$TMP/nao-existe.jsonl\"}"
+contem "transcript/ausente-cutuca-como-antes" '"decision": "block"'
 if [ "$fail" -gt 0 ]; then
   echo "review-guard: $fail de $total casos falharam"
   exit 1

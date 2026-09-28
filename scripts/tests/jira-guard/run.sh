@@ -115,6 +115,27 @@ caso cwd-ausente-allow allow '{"stop_hook_active": false}'
 caso json-invalido-allow allow '{nao e json'
 
 echo "---"
+
+# --- transcript sintético (decisão 4.434) ---
+tr_agent_bg() { # id tipo → lançado sem notificação
+  printf '{"type":"assistant","message":{"content":[{"type":"tool_use","id":"%s","name":"Agent","input":{"subagent_type":"%s","run_in_background":true,"prompt":"x"}}]}}\n' "$1" "$2"
+  printf '{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"%s","content":"Async agent launched successfully. agentId: ag-%s"}]}}\n' "$1" "$1"
+}
+tr_notif() { printf '{"type":"user","message":{"content":"<task-notification><task-id>ag-%s</task-id></task-notification>"}}\n' "$1"; }
+
+payload_tr() { printf '{"cwd": "%s", "stop_hook_active": false, "transcript_path": "%s"}' "$PROJ" "$1"; }
+# --- 4.434: em voo cala; notificado volta a cutucar; n/a declarado satisfaz ---
+novo_repo; spec "$PROJ/docs/slug/tasks/TASK-001-001-x.md"; TJ1="$TMP/tj1.jsonl"; tr_agent_bg s1 keelson:scribe > "$TJ1"
+caso scribe-em-voo-allow allow "$(payload_tr "$TJ1")"
+novo_repo; spec "$PROJ/docs/slug/tasks/TASK-001-001-x.md"; TJ2="$TMP/tj2.jsonl"; tr_agent_bg t1 keelson:tracker-sync > "$TJ2"
+caso tracker-sync-em-voo-allow allow "$(payload_tr "$TJ2")"
+novo_repo; spec "$PROJ/docs/slug/tasks/TASK-001-001-x.md"; TJ3="$TMP/tj3.jsonl"; { tr_agent_bg s1 keelson:scribe; tr_notif s1; } > "$TJ3"
+caso scribe-notificado-block block "$(payload_tr "$TJ3")"
+novo_repo; spec "$PROJ/docs/slug/tasks/TASK-001-001-x.md"; TJ4="$TMP/tj4.jsonl"; tr_agent_bg d1 keelson:developer > "$TJ4"
+caso developer-em-voo-nao-cala-block block "$(payload_tr "$TJ4")"
+novo_repo; spec "$PROJ/docs/slug/tasks/TASK-001-001-x.md" '**Jira**: n/a — brief avulso, sem sub-tarefa'; caso jira-na-standalone-null-allow allow
+novo_repo; printf '{ "docsRoot": "docs", "jira": { "enabled": true, "issueType": { "standalone": "Task" } } }\n' > "$PROJ/keelson.config.json"; spec "$PROJ/docs/slug/tasks/TASK-001-001-x.md" '**Jira**: n/a — brief avulso'; caso jira-na-standalone-preenchido-block block
+novo_repo; spec "$PROJ/docs/slug/tasks/TASK-001-001-x.md"; caso transcript-ausente-block block "$(payload_tr "$TMP/nao-existe.jsonl")"
 if [ "$fail" -gt 0 ]; then
   echo "jira-guard: $fail de $total casos falharam"
   exit 1

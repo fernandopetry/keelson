@@ -42,6 +42,7 @@ except Exception:
 j = d.get("jira") or {}
 print("1" if j.get("enabled") is True else "0")
 print(d.get("docsRoot") or "docs")
+print("1" if (j.get("issueType") or {}).get("standalone") is None else "0")
 PY
 )"
 if [ -z "$ficha" ]; then exit 0; fi
@@ -49,6 +50,10 @@ enabled="$(printf '%s' "$ficha" | sed -n 1p)"
 [ "$enabled" = "1" ] || exit 0
 docs_root="$(printf '%s' "$ficha" | sed -n 2p)"
 if [ -z "$docs_root" ]; then docs_root="docs"; fi
+# `jira.issueType.standalone` nulo → TASK de brief avulso não sincroniza (protocolo §7); só então
+# `**Jira**: n/a — <motivo>` é declaração e não omissão (4.434). Com standalone preenchido, o
+# avulso sincroniza como sub-tarefa da Story avulsa e n/a continua cobrado.
+standalone_null="$(printf '%s' "$ficha" | sed -n 3p)"
 
 # --- candidatos: artefatos SDD tocados nesta branch (não o passivo histórico) ---
 base=""
@@ -68,6 +73,7 @@ if [ -z "$tocados" ]; then exit 0; fi
 
 tem_key() {
   grep -Eq '^\*\*Jira( Story)?\*\*:[[:space:]]*[A-Z][A-Z0-9_]*-[0-9]+' "$1" 2>/dev/null && return 0
+  if [ "${standalone_null:-0}" = "1" ] && grep -Eq '^\*\*Jira\*\*:[[:space:]]*n/a\b' "$1" 2>/dev/null; then return 0; fi
   grep -Eq '(^|[[:space:]*])Jira\*{0,2}:[[:space:]]*[A-Z][A-Z0-9_]*-[0-9]+' "$1" 2>/dev/null && return 0
   return 1
 }
@@ -110,6 +116,18 @@ EOF
 
 total=$((pend_spec + pend_task))
 if [ "$total" -eq 0 ]; then exit 0; fi
+
+# Sync ou fan-out EM VOO → não é omissão (decisão 4.434): `tracker-sync` em background ainda
+# vai gravar as keys; `scribe` em background ainda está escrevendo as TASKs que a Etapa 7 do
+# tasks sincroniza depois de todas prontas. Transcript ausente → comportamento anterior.
+transcript="$(printf '%s' "$input" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("transcript_path", ""))' 2>/dev/null || echo "")"
+TRANSCRIPT_FACTS="$(cd "$(dirname "$0")/../scripts" 2>/dev/null && pwd || true)/transcript-facts.sh"
+if [ -n "$transcript" ] && [ -f "$transcript" ] && [ -f "$TRANSCRIPT_FACTS" ]; then
+  if bash "$TRANSCRIPT_FACTS" "$transcript" 2>/dev/null | grep -Eq '^em_voo	[^	]+	keelson:(tracker-sync|scribe)$'; then
+    echo "jira-guard: tracker-sync/scribe em voo (transcript) — o sync ainda vai gravar as keys; silêncio (4.434)." >&2
+    exit 0
+  fi
+fi
 if [ "$pend_task" -gt 0 ]; then
   detalhes="${detalhes}
 — ${pend_task} TASK(s) sem key na closure"
