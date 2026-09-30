@@ -17,6 +17,14 @@
 #     chamada com o agent certo.
 #   - validators são SKILLS (fora do elenco): spawn genérico é legítimo QUANDO o
 #     briefing cita o SKILL.md canônico (validator-protocol §2) — sem citar → deny.
+#   - keelson:scribe com pacote de correção (decisão 4.445): `modo:` no briefing
+#     só aceita os valores do enum da graph-contract §4.1 (`edits` | `reescrita`);
+#     valor fora do enum, ou "pacote de correção" sem `modo:` algum → deny 1×
+#     (mesma válvula) — fatos × julgamento é o eixo da revalidação (validator-
+#     protocol §4.5), nunca um valor de `modo:`. Redação (SPEC/PLAN/TASK) passa:
+#     não há `modo:` nem "pacote de correção" no briefing. Um `modo:` válido
+#     em qualquer linha basta — citar o contrato ou outro "modo" em prosa não
+#     nega sozinho (falso-positivo custa 1 retry; o scribe é o backstop, 4.429).
 # Exploração/pesquisa genéricas passam: o fingerprint exige verbo de papel, não
 # a mera menção a um artefato SPEC-/PLAN-/TASK-.
 #
@@ -43,8 +51,29 @@ esac
 
 stype="$(printf '%s' "$input" | jq -r '.tool_input.subagent_type // empty' 2>/dev/null || true)"
 nome="$(printf '%s' "$input" | jq -r '.tool_input.name // empty' 2>/dev/null || true)"
+texto="$(printf '%s' "$input" | jq -r '((.tool_input.description // "") + " " + (.tool_input.prompt // ""))' 2>/dev/null || true)"
 modo_nomeado=0
+modo_scribe=0      # 1 = `modo:` fora do enum · 2 = pacote de correção sem `modo:`
+modo_valores=""
 case "$stype" in
+  keelson:scribe)
+    # Pacote de correção (4.445): o campo `modo:` do briefing é lido antes da
+    # regra do nome. Chave `modo:` (negrito/crase/aspas opcionais) seguida do
+    # primeiro token — `modo_aplicado:` e `modo de …` não casam.
+    modo_valores="$(printf '%s\n' "$texto" \
+      | grep -Eio '(^|[^_[:alnum:]])modo[*]*:[[:space:]`*"'"'"']*[[:alnum:]_-]+' 2>/dev/null \
+      | sed -E 's/^[^:]*:[[:space:]`*"'"'"']*//' | sort -u | tr '\n' ' ' || true)"
+    modo_valores="${modo_valores% }"
+    if [ -n "$modo_valores" ]; then
+      printf '%s\n' "$modo_valores" | tr ' ' '\n' | grep -qxE 'edits|reescrita' || modo_scribe=1
+    elif printf '%s' "$texto" | grep -Eiq 'pacotes? de corre(ç|c)(ão|ao|ões|oes)'; then
+      modo_scribe=2
+    fi
+    if [ "$modo_scribe" -eq 0 ]; then
+      [ -n "$nome" ] || exit 0
+      modo_nomeado=1
+    fi
+    ;;
   keelson:*)
     # Elenco: anônimo passa sempre; nomeado segue para o deny 1× (4.293/4.297).
     [ -n "$nome" ] || exit 0
@@ -52,13 +81,15 @@ case "$stype" in
     ;;
 esac
 
-texto="$(printf '%s' "$input" | jq -r '((.tool_input.description // "") + " " + (.tool_input.prompt // ""))' 2>/dev/null || true)"
-if [ "$modo_nomeado" -eq 0 ]; then
+if [ "$modo_nomeado" -eq 0 ] && [ "$modo_scribe" -eq 0 ]; then
   [ -z "${texto// /}" ] && exit 0
 fi
 
+# --- pacote de correção ao scribe (4.445): motivo próprio, sem heurística ---
+if [ "$modo_scribe" -ne 0 ]; then
+  motivo_extra=""
 # --- despacho nomeado de papel (4.293/4.297): motivo próprio, sem heurística ---
-if [ "$modo_nomeado" -eq 1 ]; then
+elif [ "$modo_nomeado" -eq 1 ]; then
   motivo_extra=""
 # --- validators (skills): genérico passa SE o briefing cita o SKILL.md canônico ---
 elif printf '%s' "$texto" | grep -Eiq 'spec-validator|plan-validator|task-validator'; then
@@ -88,7 +119,25 @@ if [ -n "$git_dir" ]; then
   fi
 fi
 
-if [ "$modo_nomeado" -eq 1 ]; then
+if [ "$modo_scribe" -eq 1 ]; then
+reason="$(cat <<EOF
+agent-guard (keelson, decisão 4.445): pacote de correção ao "${stype}" com \`modo: ${modo_valores}\` — valor fora do enum.
+
+\`modo:\` é o modo de ESCRITA do scribe e só aceita \`edits\` (até ~20 ajustes, todos ancorados, sem mudar numeração ou estrutura de seções) ou \`reescrita\` (qualquer outro caso) — régua do pacote em graph-contract.md §4.1 (4.309/4.349). Fatos × julgamento é OUTRO eixo: decide a revalidação que vem depois (ramo mecânico ou validator delta-scoped — validator-protocol.md §4.5, 4.350), nunca entra em \`modo:\`.
+
+Refaça a chamada com \`modo: edits\` ou \`modo: reescrita\`, derivado pelo tamanho e pelas âncoras do pacote. Repetir a chamada como está gasta o despacho: o scribe para antes de ler o insumo e devolve o valor em \`duvidas\` (4.429).
+EOF
+)"
+elif [ "$modo_scribe" -eq 2 ]; then
+reason="$(cat <<EOF
+agent-guard (keelson, decisão 4.445): pacote de correção ao "${stype}" sem \`modo:\` declarado.
+
+O invocador declara o modo de escrita — \`modo: edits\` (até ~20 ajustes, todos ancorados, sem mudar numeração ou estrutura de seções) ou \`modo: reescrita\` (qualquer outro caso) — pela régua do pacote em graph-contract.md §4.1 (4.309/4.349); o scribe obedece e não re-deriva. Fatos × julgamento é o eixo da revalidação (validator-protocol.md §4.5), não um valor de \`modo:\`.
+
+Refaça a chamada com o campo \`modo:\` no briefing. Repetir a chamada como está gasta o despacho: o scribe para antes de ler o insumo e devolve a ausência em \`duvidas\` (4.429).
+EOF
+)"
+elif [ "$modo_nomeado" -eq 1 ]; then
 reason="$(cat <<EOF
 agent-guard (keelson, decisões 4.293/4.297): spawn do papel "${stype}" com nome de instância ("${nome}").
 

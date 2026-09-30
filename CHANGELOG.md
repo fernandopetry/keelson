@@ -25,6 +25,34 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.193.0] — 2026-09-30
+
+Re-init: none
+
+Decision 4.445 — field intake: the `modo:` field of a correction package sent to the
+scribe is now checked at spawn time, before the dispatch is spent.
+
+### Added
+
+- **`hooks/agent-guard.sh` checks `modo:` on every `keelson:scribe` correction package:**
+  a briefing whose `modo:` value is outside `edits | reescrita`, or a briefing that says
+  "pacote de correção" with no `modo:` at all, is denied once with a reason that names the
+  value received and separates the two axes — `modo:` is the *writing* mode
+  (`graph-contract.md` §4.1), while facts × judgement decides the *revalidation* branch
+  (`validator-protocol.md` §4.5) and is never a `modo:` value. The same call repeated
+  passes (the scribe remains the backstop, 4.429); a valid value on any line is enough, so
+  quoting the contract or the PO's "modo resolução" in prose does not trigger it; plain
+  authoring spawns (SPEC/PLAN/TASK) are untouched. Twelve new cases in
+  `scripts/tests/agent-guard/run.sh`.
+
+### Changed
+
+- **`commands/auto.md` (Steps 1 and 3.5), `commands/tasks.md` (Step 5):** next to
+  "`modo:` declared", the text now says only `edits` or `reescrita` fit and that
+  facts × judgement is the revalidation axis, not a `modo:` value.
+- **`docs/_meta/conventions/sdd-conventions.md`:** the dispatch-by-type bullet lists the
+  new check among what the `agent-guard` proves.
+
 ## [0.192.0] — 2026-09-28
 
 Re-init: none

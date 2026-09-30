@@ -511,6 +511,38 @@ reabre os gates de comportamento. Se uma sessão entrar nesse loop mesmo assim, 
 parar e fechar declarando o estado dos gates — e rode `/keelson:postmortem`: a mensagem
 ao mantenedor é o caminho de correção do processo.
 
+### O despacho ao scribe foi recusado: "pacote de correção … `modo:` fora do enum"
+
+O sintoma: no meio de um ciclo, a sessão tenta mandar um pacote de correção ao `scribe`
+(ajustes vindos do validator, do PO ou de um gate) e o hook `agent-guard` recusa a chamada
+uma vez, dizendo que o `modo:` declarado não é `edits` nem `reescrita` — ou que o pacote
+veio sem `modo:`.
+
+O que acontece: o pacote de correção carrega dois eixos diferentes, e eles não se misturam.
+O campo `modo:` é o **modo de escrita** do scribe e só tem dois valores: `edits` (poucos
+ajustes, todos ancorados, sem mexer na estrutura) ou `reescrita` (qualquer outro caso). Já
+"fatos × julgamento" é outra pergunta — decide como o artefato é **revalidado** depois
+(só lint e grafo, ou validator de novo) — e nunca vira valor de `modo:`. Um valor como
+`modo: julgamento` faria o scribe parar antes de ler o pacote e devolver o campo como
+dúvida; o hook recusa antes, para não gastar o despacho.
+
+```mermaid
+flowchart LR
+  P['pacote de correção'] --> M{'modo: edits ou reescrita?'}
+  M -- sim --> S['scribe aplica']
+  M -- outro valor ou ausente --> H['agent-guard recusa 1×']
+  H --> C['corrija o campo e refaça']
+  S --> R{'só fatos do lint?'}
+  R -- sim --> L['lint + grafo']
+  R -- não --> V['validator delta-scoped']
+```
+
+O conserto: refaça a chamada com `modo: edits` ou `modo: reescrita`, escolhido pelo tamanho
+e pelas âncoras do pacote. Repetir a chamada idêntica passa pelo hook, mas o scribe para do
+mesmo jeito — o despacho é gasto à toa. Se a recusa apareceu num despacho que **não** era
+pacote de correção (uma redação que citou `modo:` em outro sentido), repita a chamada: o
+aviso não se repete para a mesma chamada.
+
 ### Os papéis ficaram "mudos" numa sessão com Agent Teams
 
 O sintoma: você usa o recurso experimental **Agent Teams** do Claude Code

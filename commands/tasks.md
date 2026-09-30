@@ -256,7 +256,7 @@ transcreve os ids do lint. O lint custa segundos; o mesmo achado na rodada únic
 validator + `qa` + PO e uma volta de scribes.
 
 **Correção** (decisão 4.114): delta ao `scribe`, **aguardado**, com a lista literal de
-ERRORs e âncora por ajuste — com `modo:` declarado pela régua do pacote (4.309/4.349, `graph-contract.md` §4.1) e revalidação pela régua do protocolo (`validator-protocol.md` §4.5, 4.350); buraco de numeração não é defeito, arquivo existente nunca se renumera — protocolo do invocador: `graph-contract.md` §4.1.
+ERRORs e âncora por ajuste — com `modo:` declarado pela régua do pacote (4.309/4.349, `graph-contract.md` §4.1; só `edits` ou `reescrita` — fatos × julgamento é o eixo da revalidação, não do `modo:`, 4.445) e revalidação pela régua do protocolo (`validator-protocol.md` §4.5, 4.350); buraco de numeração não é defeito, arquivo existente nunca se renumera — protocolo do invocador: `graph-contract.md` §4.1.
 
 Com o grafo e o lint limpos (e o scribe encerrado), invocar a skill `task-validator` em modo batch
 (apontando para o TASK-MMM-INDEX) — em paralelo com o `tracker-sync` da Etapa 7 quando o
