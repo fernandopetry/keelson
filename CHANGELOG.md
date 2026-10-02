@@ -25,6 +25,22 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.199.0] — 2026-10-02
+
+Re-init: none
+
+Decision 4.451 — a gate-9 pre-condition recipe writes what the product would write.
+
+### Added
+
+- **`commands/tasks.md`, "Roteiro do gate 9":** state assembled outside the product — direct
+  SQL, seed, fixture — reproduces the invariant the real flow leaves when it reaches that
+  state (every column, row or snapshot the product writes on close, publish, approve),
+  checked against the real source of the flow, and the recipe names the TASK that owns that
+  invariant; an invariant born in a later TASK of the same PLAN enters the gate-9 package
+  reconciliation (4.140). A stale recipe assembles a state the product never produces, and
+  the step dies on a server error instead of proving the AC.
+
 ## [0.198.0] — 2026-10-02
 
 Re-init: none

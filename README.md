@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.198.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.199.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a screen state named in the FR (empty, error, loading, no permission) is fixed in the TASK as a verifiable element — text, action, what is hidden — instead of the FR sentence repeated.
+New in this release: a gate-9 pre-condition recipe that assembles state outside the product (SQL, seed, fixture) must write the same invariant the product writes, checked against the real flow and reconciled when a later TASK changes it.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
