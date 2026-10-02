@@ -211,6 +211,12 @@ mostra (o caso de uso ou o controller), e a parte de renderização ganha um car
 nomeado — um teste E2E, ou um passo no Roteiro do gate 9 da TASK de tela — com a nota
 inline de cobertura parcial na forma que o `/keelson:tasks` já usa.
 
+Se a ficha tem `quality.e2e`, o carregador esperado é o teste E2E, um por critério de
+aceitação: ele prova a tela na própria wave, enquanto o Roteiro só prova no fecho da
+funcionalidade, waves depois. Escolher o Roteiro mesmo assim é permitido, mas pede um
+motivo escrito ao lado (um fluxo que o runner não alcança, por exemplo); sem o motivo o
+validator avisa "carregador fora do default".
+
 ### O fecho diz "lição sem destino" mas eu vi a lição ser escrita
 
 O fecho só aceita "roteada" quando `scripts/lessons.sh <raiz> show <id>` encontra a

@@ -25,6 +25,26 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.201.0] — 2026-10-02
+
+Re-init: none
+
+Decision 4.453 — with `quality.e2e` in the ficha, the loader of a visible AC *is* the E2E
+spec per AC; the gate-9 script only with a stated reason.
+
+### Changed
+
+- **`commands/tasks.md`, AC layer paragraph:** the 4.428 sentence now reads as a default
+  with a motivated exception — with `quality.e2e` the loader is the E2E spec per AC (it
+  proves the screen in gate 1 of the same wave), the gate-9 script only with an inline
+  reason (a flow the runner cannot reach), and the same rule binds the Tech Lead's answer to
+  a scribe doubt; without `quality.e2e`, the gate-9 step of the screen TASK.
+- **`skills/task-validator/SKILL.md`:** new reading check "loader outside the default"
+  (WARNING) — a visible AC with `quality.e2e` whose named loader is the gate-9 script with
+  no inline reason.
+- **Wiki, *Solução de problemas*:** the "visible AC without loader" entry explains the
+  default and the new warning.
+
 ## [0.200.0] — 2026-10-02
 
 Re-init: none

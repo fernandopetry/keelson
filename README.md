@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.200.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.201.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a best-effort sink (audit, telemetry, notification) is fixed with two criteria — it receives the data, and with the sink failing the main flow keeps its promise and the failure stays observable.
+New in this release: with `quality.e2e` in the ficha, a visible AC is loaded by an E2E spec per AC — proven in the same wave — and the gate-9 script needs a stated reason; the task-validator warns when the loader leaves the default silently.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
