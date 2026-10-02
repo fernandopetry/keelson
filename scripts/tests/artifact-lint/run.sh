@@ -69,6 +69,7 @@ runcase defeitos-c      defeitos-c 1 defeitos-c.txt
 runcase defeitos-d      defeitos-d 0 defeitos-d.txt
 runcase arquivo-valido  valido/specs/SPEC-001-login.md 0 arquivo-unico-valido.txt
 runcase arquivo-defeito defeitos/tasks/TASK-001-005-refactor-extrai.md 1 arquivo-unico-defeito.txt
+runcase arquivo-mutacao-contada valido/tasks/TASK-001-003-mutacao-contada.md 0 arquivo-unico-mutacao-contada.txt
 
 # determinismo: duas execuções idênticas byte a byte
 total=$((total + 1))

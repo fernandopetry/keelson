@@ -25,6 +25,30 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.194.0] — 2026-10-01
+
+Re-init: none
+
+Decision 4.446 — field intake: a cited template decides "extract or duplicate" at fixation
+time; the countable-form lint also accepts the `métodos: N` label form.
+
+### Added
+
+- **`commands/tasks.md` item (h):** a scope or context line that cites a template ("same
+  mechanism as X", "like Y") now carries the written decision — `extrair para <shared
+  symbol/place>` or `duplicar — <reason>` — taken after a Grep for the canonical
+  implementation (an existing shared place is reuse, not a choice). A helper or test double
+  that two or more TASKs of the same wave will use follows the edge protocol (4.106): one
+  TASK creates it and carries it in its scope, the siblings depend on it.
+
+### Fixed
+
+- **`scripts/artifact-lint.sh` — `task-mutacao-sem-contagem`:** the countable pair is also
+  recognised in the label form (`métodos que tocam a tabela: 4; provas: 4`), not only as
+  `4 métodos … 4 provas`; a literal `N` and spelled-out numbers are still flagged — the
+  count is the digit. Positive fixture in
+  `scripts/tests/artifact-lint/fixtures/valido/tasks`, forms stated in `lint-contract.md`.
+
 ## [0.193.0] — 2026-09-30
 
 Re-init: none

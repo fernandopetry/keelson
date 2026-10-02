@@ -678,10 +678,14 @@ END {
   if (nSecTest > 0)
     for (t in cmdGroup) if (!(t in prohGroup))
       emit("WARNING", "task-prova-seguranca-com-grupo", "teste de seguranca no Inclui (" secName ") e comando de verificacao com --group " t " — confirme que a config default da suite nao exclui a tag (4.233)")
-  # criterio de mutacao de escopo sem o par contavel N metodos / N provas
+  # criterio de mutacao de escopo sem o par contavel N metodos / N provas — o numero
+  # pode vir antes da palavra ("4 metodos") ou depois de rotulo ("metodos: 4"; 4.446);
+  # `N` literal e numero por extenso nao contam: o par contavel e o digito (4.232)
   lcAll = tolower(critAll)
   if ((lcAll ~ /tenant|predicado de escopo|escopo de (dono|tenant|agregado)/) && lcAll ~ /muta/) {
-    if (!(lcAll ~ /[0-9]+[ \t]*m[eé]+todos?/ && lcAll ~ /[0-9]+[ \t]*provas?/))
+    temMet = (lcAll ~ /[0-9]+[ \t]*m[eé]+todos?/ || lcAll ~ /m[eé]+todos?[^0-9:=]*[:=][ \t]*[0-9]+/)
+    temProva = (lcAll ~ /[0-9]+[ \t]*provas?/ || lcAll ~ /provas?[^0-9:=]*[:=][ \t]*[0-9]+/)
+    if (!(temMet && temProva))
       emit("WARNING", "task-mutacao-sem-contagem", "criterio menciona mutacao de predicado de escopo sem o par contavel \"N metodos ... N provas\" (4.232)")
   }
   # 4.368 (LRN-021, 2a reincidencia da 4.93): criterio que nomeia arquivo de teste como
