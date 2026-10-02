@@ -25,6 +25,22 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.197.0] — 2026-10-02
+
+Re-init: none
+
+Decision 4.449 — a compound write proves the failure of the second write.
+
+### Added
+
+- **`commands/tasks.md` item (i), "resists circumvention" block:** a scope item or AC whose
+  effect is two or more dependent writes — the second uses the result of the first, or only
+  both together realise the AC (create the aggregate and copy its children, save and
+  publish) — requires a criterion that injects a failure into the second write and asserts
+  that no effect of the first persists (or that the compensation leaves an observable
+  trace). "Inside a transaction" in prose is not proof: the mutant removes the transaction
+  boundary and the test must fail.
+
 ## [0.196.0] — 2026-10-02
 
 Re-init: none
