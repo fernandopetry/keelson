@@ -22,7 +22,9 @@
 #
 # Só as seções `## Critérios de pronto` e `## Roteiro do gate 9` entram (as seções de
 # aresta, graph-contract §2); um item = bullet de topo + continuações. Cada trecho em
-# crase com `phpunit`/`--group`/`--testsuite`/`--filter` é um comando; os alvos são os
+# crase com `phpunit`/`--group`/`--testsuite`/`--filter` é um comando — salvo o fragmento
+# de flag sem runner precedido de negação ("nasce sem `--group X`"), que é proibição e
+# também trava o fallback da linha sem crase (4.454); os alvos são os
 # nomes do `--filter` (`A|B` → A, B), os caminhos `*.php` do próprio comando ou, sem
 # nenhum dos dois, os `*Test`/`*Test.php` em crase do item. Nome que resolve para mais
 # de um arquivo (classes homônimas) é julgado pela UNIÃO: só acusa quando nenhum deles
@@ -191,15 +193,28 @@ while IFS= read -r task; do
       if (g != "-" || s != "-" || t != "-") print "CMD\t" line "\t" g "\t" s "\t" t
     }
     {
-      line = $1; text = $2; item_t = ""; ncmd = 0
+      line = $1; text = $2; item_t = ""; ncmd = 0; negfrag = 0
       n = split(text, seg, "`")
       for (i = 2; i <= n; i += 2) {           # trechos em crase
         c = seg[i]
+        # fragmento de flag sem runner (`--group X` sozinho) precedido de negacao — "nasce
+        # sem `--group X`", "nunca `@group X`" — e proibicao, nao comando: sai da conta e
+        # trava o fallback da linha inteira (4.454); fragmento sem negacao segue contando
+        if (c ~ /^[ \t]*[-@]/ && c !~ /phpunit|vendor\/bin|paratest|pest/) {
+          lp = tolower(seg[i - 1])
+          while ((j = index(lp, "não")) > 0) lp = substr(lp, 1, j - 1) "nao" substr(lp, j + length("não"))
+          if (lp ~ /(^|[^a-z])(sem|nunca|jamais|nao|proib[a-z]*)[ \t*_]*$/) { negfrag = 1; continue }
+        }
         if (c ~ /phpunit|--group|--testsuite|--filter/) { scan_cmd(c, line); ncmd++ }
         else if (c ~ /^[A-Za-z_][A-Za-z0-9_]*Test$/) item_t = addl(item_t, c)
         else if (c ~ /^[A-Za-z0-9_.\/-]+Test\.php$/) item_t = addl(item_t, c)
       }
-      if (ncmd == 0 && text ~ /--group|--testsuite/) scan_cmd(text, line)
+      # sem crase: a linha inteira e o comando, salvo quando a flag vem sob negacao (4.454)
+      if (ncmd == 0 && !negfrag && text ~ /--group|--testsuite/) {
+        lt = tolower(text)
+        while ((j = index(lt, "não")) > 0) lt = substr(lt, 1, j - 1) "nao" substr(lt, j + length("não"))
+        if (lt !~ /(^|[^a-z])(sem|nunca|jamais|nao|proib[a-z]*)[ \t*_`]*(--group|@group)/) scan_cmd(text, line)
+      }
       print "ITEM\t" line "\t" (item_t == "" ? "-" : item_t)
     }
   ' "$TMP/items" > "$TMP/cmds"

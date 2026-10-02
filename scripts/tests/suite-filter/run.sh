@@ -108,6 +108,8 @@ cat > "$T" <<'MD'
   BetaTest' --group skip-migration"` → ok
 - [ ] (k) arquivo da suíte por `<file>`: `phpunit --testsuite Integration --filter OldTest` → ok
 - [ ] (l) forma com igual: `phpunit --group=skip-migration --filter=AlphaTest` → ok
+- [ ] (n) proibição em crase não é comando: `AlphaTest` nasce **sem** `--group skip-migration`; prova: `phpunit --filter AlphaTest` → ok
+- [ ] (o) proibição sem crase não é comando: AlphaTest nasce sem --group skip-migration; roda no make test → ok
 
 ## Roteiro do gate 9 (fixado ANTES do código)
 
@@ -141,8 +143,10 @@ eq "1. (i) alvos do item quando o comando não os traz: acusa AlphaTest" "1" "$(
 eq "1. (j) aspa colada + filtro partido: sem achado (os dois têm o grupo)" "0" "$(conta "$out" ":21)" "WARNING")"
 eq "1. (k) arquivo por <file> pertence à suíte" "0" "$(conta "$out" "WARNING" "OldTest")"
 eq "1. (l) forma --group=/--filter= acusa AlphaTest" "1" "$(conta "$out" ":25)" "tests/Unit/AlphaTest.php")"
-eq "1. (m) Roteiro do gate 9 entra: --group fast sobre AlphaTest" "1" "$(conta "$out" ":29)" "--group fast")"
-eq "1. fora das seções de aresta → nada" "0" "$(printf '%s\n' "$out" | grep -c ':8)\|:33)')"
+eq "1. (m) Roteiro do gate 9 entra: --group fast sobre AlphaTest" "1" "$(conta "$out" ":31)" "--group fast")"
+eq "1. (n) fragmento --group X sob negação não vira comando sobre AlphaTest" "0" "$(conta "$out" ":26)" "WARNING")"
+eq "1. (o) flag sob negação sem crase não vira comando" "0" "$(conta "$out" ":27)" "WARNING")"
+eq "1. fora das seções de aresta → nada" "0" "$(printf '%s\n' "$out" | grep -c ':8)\|:35)')"
 contem "1. resumo declara a criar" "$out" "INFO	suite-filter-resumo	"
 naocontem "1. exclude de caminho dentro de testsuite não vira grupo excluído" "$out" "@group tests/Unit/Sub/Excluded"
 naocontem "1. grupo de <include> não é excluído" "$out" "@group fast\`, excluído"

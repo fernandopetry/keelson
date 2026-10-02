@@ -168,9 +168,12 @@ duas delas editando o mesmo arquivo é receita para uma sobrescrever o trabalho 
 outra. O conserto certo é na decomposição, antes de implementar: mover uma das TASKs
 para outra wave (declarando a dependência entre elas) ou redesenhar o corte para que
 cada uma tenha seus próprios arquivos. Nasce como WARNING porque a detecção lê os
-caminhos escritos nos bullets: item descrito só em prosa (sem caminho de arquivo) não
-entra na conta — achado ausente não garante que não há colisão, então a conferência
-na hora de implementar continua valendo.
+caminhos escritos nos bullets — e também o nome de arquivo citado sem diretório
+(`RegistroRepository.php`), que casa pelo nome com outra citação na mesma wave; quando o
+achado diz "casada pelo nome", confira o diretório antes de concluir que é o mesmo
+arquivo. Item descrito só em prosa (sem caminho nem nome de arquivo) não entra na conta
+— achado ausente não garante que não há colisão, então a conferência na hora de
+implementar continua valendo.
 
 ### O validator acusou "comando contradiz critério" numa TASK
 
@@ -179,7 +182,8 @@ linha proibindo exatamente essa tag (ex.: a lição do projeto diz "prova de seg
 nunca leva `@group skip-migration`" e o comando do critério prescreve
 `--group skip-migration`). O developer executa o comando literal, então o comando vence
 a prosa em silêncio — corrija o lado errado antes de implementar: ou o comando (caso
-típico), ou a proibição, se ela não se aplica a este contexto. Nasce como WARNING; o
+típico), ou a proibição, se ela não se aplica a este contexto. Escrever "nasce sem
+`--group <tag>`" é proibição, não comando: essa menção não dispara o aviso. Nasce como WARNING; o
 `task-validator` escala para ERROR quando a proibição é uma lição real do projeto que o
 comando viola (decisão 4.215).
 
@@ -198,7 +202,8 @@ filtro à filiação real, e dê um comando a cada filiação quando o critério
 de grupos ou suítes diferentes. Só arquivo que já existe entra na conta; arquivo que a
 própria TASK vai criar é n/a. Só o PHPUnit é coberto; noutro runner o script cala e a
 conferência segue por leitura. Se o achado parecer errado (grupo herdado de uma classe
-avó, grupo vindo de trait), confira o arquivo e siga: é WARNING, nunca bloqueio.
+avó, grupo vindo de trait), confira o arquivo e siga: é WARNING, nunca bloqueio. A flag
+citada sozinha sob negação ("nasce **sem** `--group <tag>`") não é lida como comando.
 
 ### O validator acusou "AC visível sem carregador" numa TASK
 

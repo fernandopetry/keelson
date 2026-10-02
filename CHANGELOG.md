@@ -25,6 +25,36 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.201.1] — 2026-10-02
+
+Re-init: none
+
+Decision 4.454 — field intake: a bare file name counts for the same-wave collision
+check, and "sem" (without) is a negation for the lint and for the suite-filter check.
+
+### Fixed
+
+- **`scripts/artifact-lint.sh`, `task-wave-overlap-arquivo`:** a file cited by bare name
+  (no directory) with a code/config extension now enters the universe and matches by
+  name — another bare name or a path with the same basename — inside the same wave of the
+  same PLAN; the message says "casada pelo nome" so the validator checks the directory
+  before escalating. Version-like tokens, `e.g.`, globs, SDD artifact names and framework
+  names in prose (`Vue.js`) stay out; two distinct paths with the same basename never
+  collide; a pair already reported by full path is not reported twice.
+- **`scripts/artifact-lint.sh`, `task-comando-contradiz-criterio`:** an occurrence of
+  `--group <tag>` preceded by "sem" ("nasce sem `--group X`") is no longer read as a
+  command — per occurrence, other tags on the line keep counting — and never feeds the
+  prohibition side.
+- **`scripts/suite-filter-check.sh`:** a backticked flag fragment without a runner that
+  follows a negation ("sem", "nunca", "não", "proib…") is a prohibition, not a command; it
+  also stops the whole-line fallback. Fragments without negation still count.
+
+### Changed
+
+- **`lint-contract.md` §3, `skills/task-validator/SKILL.md`, wiki *Solução de problemas*:**
+  universe and negation rules updated; the validator checks the directory before escalating
+  a by-name collision.
+
 ## [0.201.0] — 2026-10-02
 
 Re-init: none

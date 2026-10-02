@@ -30,7 +30,7 @@ nunca leva `@group integration` fora da suíte dedicada.
 
 ### Inclui
 
-- Validação do par identificador-senha
+- Validação do par identificador-senha em Autenticador.php e src/Auth/Servico.php
 - Registro de tentativa
 
 ### Não inclui

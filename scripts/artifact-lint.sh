@@ -548,13 +548,17 @@ sect == "crit" && line ~ /(^|[ `|(])(grep|egrep|rg) / {
     nGrepSolto++
 }
 (sect == "crit" || sect == "gate9") && line ~ /--group[ \t]+[A-Za-z0-9_-]/ {
-  # 4.215: lado comando — tag de grupo usada por comando de verificacao (linha sem negacao)
+  # 4.215: lado comando — tag de grupo usada por comando de verificacao (linha sem negacao).
+  # Ocorrencia precedida de "sem" ("nasce sem `--group X`") nao e comando e sai da conta
+  # — por ocorrencia, as demais tags da linha seguem; "sem" nunca vira proibicao (4.454)
   lline = tolower(line)
   if (lline !~ /nunca|jamais|proib/ && index(lline, "não") == 0 && index(lline, " nao ") == 0) {
-    s = line
+    s = line; off = 0
     while (match(s, /--group[ \t]+[A-Za-z0-9_-]+/)) {
       t = substr(s, RSTART, RLENGTH); sub(/^--group[ \t]+/, "", t)
-      cmdGroup[t] = 1
+      pre = tolower(substr(line, 1, off + RSTART - 1))
+      if (pre !~ /(^|[^a-z])sem[ \t*_`]*$/) cmdGroup[t] = 1
+      off += RSTART + RLENGTH - 1
       s = substr(s, RSTART + RLENGTH)
     }
   }
@@ -828,22 +832,52 @@ lint_dir_cross() { # $1 = dir do slug
           t = substr(s, RSTART, RLENGTH); s = substr(s, RSTART + RLENGTH)
           sub(/[.-]+$/, "", t)
           if (index(t, "//") > 0) continue
-          if (t !~ /\//) continue
           if (t !~ /\.[A-Za-z0-9]+$/) continue
+          if (t !~ /\//) {
+            # nome solto (4.454): entra so com extensao da allowlist e nome antes do ponto
+            # (`v1.2`, `e.g.`, `.env` ficam fora) e nunca o nome de um artefato SDD citado
+            # como referencia; casa pelo nome dentro da mesma wave, chave `*/nome`
+            if (tolower(t) !~ /^[a-z0-9_][a-z0-9_.-]*\.(php|vue|ts|tsx|js|jsx|mjs|py|rb|go|java|kt|cs|sql|json|ya?ml|md|css|scss|html|twig|xml|toml)$/) continue
+            if (t ~ /^(SPEC|PLAN|TASK|BRIEF|FEAT)-[0-9]/) continue
+            # nome de framework/runtime em prosa ("componente em Vue.js") nao e arquivo
+            if (tolower(t) ~ /^(vue|node|next|nuxt|react|angular|svelte|solid|preact|express|nest|three|chart|alpine|d3|jquery|ember|backbone|moment|day|anime|gsap|pixi|phaser|socket|rx|lodash|p5|vite|webpack|rollup|esbuild|babel|tailwind|bootstrap)\.(js|ts|io)$/) continue
+            t = "*/" t
+          }
           if (!(t in paths)) { paths[t] = 1; order[++np] = t }
         }
       }
       END {
         if (ST == "Done") exit
         if (WV !~ /^[0-9]+$/) exit
-        for (i = 1; i <= np; i++) print M "\t" WV "\t" order[i] "\t" FILE
+        for (i = 1; i <= np; i++) {
+          t = order[i]
+          if (t ~ /^\*\//) { print M "\t" WV "\t" t "\t" FILE "\tbare"; continue }
+          print M "\t" WV "\t" t "\t" FILE "\tpath"
+          # o caminho tambem concorre pelo nome: nome solto noutra TASK casa com ele
+          n = split(t, a, "/"); print M "\t" WV "\t*/" a[n] "\t" FILE "\tderived"
+        }
       }
     ' "$f"
   done > "$TMP/waveinc.tsv"
   awk -F'\t' '
-    { k = $1 SUBSEP $2 SUBSEP $3; seen[k] = (k in seen) ? seen[k] ", " $4 : $4; cnt[k]++; wv[k] = $2; p[k] = $3 }
-    END { for (k in cnt) if (cnt[k] > 1)
-      printf "WARNING\ttask-wave-overlap-arquivo\t%s no Inclui de %d TASKs da wave %s do mesmo PLAN (%s) — colisao de escrita em wave paralelizavel (4.228)\n", p[k], cnt[k], wv[k], seen[k] }
+    { k = $1 SUBSEP $2 SUBSEP $3
+      if (!((k, $4) in has)) { has[k, $4] = 1; cnt[k]++; seen[k] = (k in seen) ? seen[k] ", " $4 : $4 }
+      wv[k] = $2; p[k] = $3; g[k] = $1 SUBSEP $2
+      if ($5 == "bare") bare[k] = 1
+    }
+    END {
+      for (k in cnt) if (cnt[k] > 1 && p[k] !~ /^\*\//) {
+        printf "WARNING\ttask-wave-overlap-arquivo\t%s no Inclui de %d TASKs da wave %s do mesmo PLAN (%s) — colisao de escrita em wave paralelizavel (4.228)\n", p[k], cnt[k], wv[k], seen[k]
+        n = split(p[k], a, "/"); dup[g[k] SUBSEP "*/" a[n]] = 1
+      }
+      # chave por nome so emite quando ao menos uma TASK citou o nome solto (dois caminhos
+      # distintos de mesmo basename nunca colidem por nome) e o caminho completo ainda nao
+      # acusou o mesmo par (4.454)
+      for (k in cnt) if (cnt[k] > 1 && p[k] ~ /^\*\// && (k in bare) && !((g[k] SUBSEP p[k]) in dup)) {
+        b = p[k]; sub(/^\*\//, "", b)
+        printf "WARNING\ttask-wave-overlap-arquivo\t%s no Inclui de %d TASKs da wave %s do mesmo PLAN (%s) — colisao de escrita em wave paralelizavel, casada pelo nome do arquivo citado sem diretorio (4.228, 4.454)\n", b, cnt[k], wv[k], seen[k]
+      }
+    }
   ' "$TMP/waveinc.tsv" >> "$OUT"
 }
 

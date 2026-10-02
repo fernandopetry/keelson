@@ -30,7 +30,7 @@ rótulo seguido de número — a forma que o lint reconhece ao lado de "N métod
 
 ### Inclui
 
-- Repositório de alocações com escopo por tenant
+- Repositório de alocações com escopo por tenant em AlocacaoRepository.php e src/Alocacao/Servico.php
 
 ### Não inclui
 
