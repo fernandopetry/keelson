@@ -25,6 +25,23 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.200.0] — 2026-10-02
+
+Re-init: none
+
+Decision 4.452 — a best-effort sink is proven on both sides: it receives the data, and its
+failure stays observable.
+
+### Changed
+
+- **`commands/tasks.md` item (i)** is now "a Then with more than one effect proves the
+  failure of the second" and carries two branches: dependent writes (unchanged from 4.449)
+  and a **best-effort sink** (audit, telemetry, notification), which requires two criteria —
+  the sink receives the data, and, with the sink failing, the main flow keeps what the SPEC
+  promises **and the failure stays observable** (log, metric, queue). A test double that
+  swallows the failure without a trace leaves "wrote" and "failed silently" with the same
+  green.
+
 ## [0.199.0] — 2026-10-02
 
 Re-init: none
