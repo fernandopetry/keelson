@@ -25,6 +25,21 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.198.0] — 2026-10-02
+
+Re-init: none
+
+Decision 4.450 — a UI state named in the FR becomes a verifiable element in the criterion.
+
+### Added
+
+- **`commands/tasks.md` item (j), "resists circumvention" block:** an FR or AC that names a
+  screen state (empty, error, loading, no permission) gets a criterion naming what the screen
+  shows in that state — literal text or i18n key, the action available, what is hidden —
+  checked against the state rules of `core/DESIGN.md` (the empty state points to the next
+  step). "Shows the empty state" is the FR sentence repeated, satisfied by any placeholder,
+  and gate 11 only catches it after the code is written.
+
 ## [0.197.0] — 2026-10-02
 
 Re-init: none
