@@ -25,6 +25,25 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.196.0] — 2026-10-02
+
+Re-init: none
+
+Decision 4.448 — a universe the demand names with a number is counted during exploration,
+never just quoted.
+
+### Added
+
+- **Exploration memo convention (`sdd-conventions.md`), cited by `/keelson:auto` (Step 0)
+  and `/keelson:brief` (Step 2):** when the request, the product document or an inherited
+  NFR names a universe with a number ("at least N active users", "up to N rows per screen"),
+  the exploration counts that universe in the local data — a one-line read-only query over
+  the filter that defines it — and records the count in the memo. The number is fixed in the
+  BRIEF or SPEC only with the count beside it (`[evidência: medido]`); an order-of-magnitude
+  gap between the quoted and the counted value becomes a last-call question with a proposal
+  and a default. Without local data, the memo states the count is unavailable and the number
+  enters as `anedota`.
+
 ## [0.195.0] — 2026-10-02
 
 Re-init: none

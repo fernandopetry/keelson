@@ -51,7 +51,7 @@ Em paralelo, despache o **`product-analyst` em modo documento** (subagente): o d
 
 ## Etapa 2: ancoragem no código
 
-Formule as perguntas de negócio que o **código responde** e despache-as ao `code-scout` (subagente; conclusão ancorada `arquivo:linha`, "não encontrado" é resposta válida — 4.73). Destile no **memo de exploração** — caminho de escrita via `bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-dir.sh" <raiz> adopt-memo <slug>` (convenção comum, 4.315 — o `/keelson:specify` já o consome pela mesma cadeia: zero encanamento novo).
+Formule as perguntas de negócio que o **código responde** e despache-as ao `code-scout` (subagente; conclusão ancorada `arquivo:linha`, "não encontrado" é resposta válida — 4.73). Destile no **memo de exploração** — caminho de escrita via `bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-dir.sh" <raiz> adopt-memo <slug>` (convenção comum, 4.315 — o `/keelson:specify` já o consome pela mesma cadeia: zero encanamento novo). Universo que o documento nomeia com número é **contado** aqui, no dado local, antes de virar fato do BRIEF (convenção do memo, 4.448).
 
 **Achado relevante é confirmado com o Diretor, não assumido**: "o código hoje faz X (arquivo:linha) — o documento pede Y; isso é mudança intencional ou o documento não sabia?" — a resposta vira fato do BRIEF.
 
