@@ -25,6 +25,30 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.202.0] — 2026-10-02
+
+Re-init: none
+
+Decision 4.455 — by order of the Director, the two deferred proposals of the same field
+intake enter the doctrine, and the mutation campaign covers the lint's cross-file checks.
+
+### Added
+
+- **`guidelines/core/DESIGN.md`, "Teclado":** a modal or dialog whose action can remove its
+  own trigger (a control rendered from data) returns focus, on close, to a stable anchor —
+  the region title, the container or the next control — never to `body`. Read by the
+  `product-designer` in gate 11.
+- **`commands/plan.md`, step 4, principle 9:** a PLAN that relaxes a composite access/scope
+  filter of the SPEC enumerates the filters that make up that concept (membership, owner/self,
+  restricted, tenant) and states which ones still hold in the writer and the route; relaxing
+  one never relaxes the others (CWE-639).
+
+### Changed
+
+- **`scripts/tests/mutation/run.sh`:** the lint's cross-file checks, which emit through
+  `printf` instead of `emit()`, now get their own mutants (`if (0) printf`); all four die on
+  the existing fixtures, so the ratchet stays without a lint survivor.
+
 ## [0.201.1] — 2026-10-02
 
 Re-init: none

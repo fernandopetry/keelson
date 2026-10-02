@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.201.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.202.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the same-wave file-collision check also sees a file cited by bare name, and "sem `--group X`" is read as a prohibition — not a command — by the lint and by the suite-filter check.
+New in this release: a modal that removes its own trigger returns focus to a stable anchor (gate 11), and a PLAN that relaxes one access filter of the SPEC must state which neighbouring filters still hold (CWE-639).
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

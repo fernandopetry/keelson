@@ -6,8 +6,10 @@
 # emits do lint suprimidos com a suíte verde): para CADA ponto de emissão de diagnóstico
 # em artifact-lint.sh, graph.sh e index-check.sh — `emit("SEV", "id", …)` / `finding("SEV",
 # "id", …)` — gera um mutante que suprime só aquela linha (`0 && emit(...)`) e roda as
-# suítes que cobrem o motor (própria + corpus). Mutante que atravessa tudo verde é um
-# diagnóstico que nenhuma fixture exige.
+# suítes que cobrem o motor (própria + corpus). Os checks cruzados do lint (lint_dir_cross)
+# emitem por `printf "SEV\tid\t…"` em vez de emit(): o mutante deles é `if (0) printf`
+# (4.455 — o impact-scout achou os quatro printf fora da campanha). Mutante que atravessa
+# tudo verde é um diagnóstico que nenhuma fixture exige.
 #
 # Catraca (expected/survivors.txt): a lista dos sobreviventes CONHECIDOS. Sobrevivente
 # fora da lista → vermelho (check ou ramo novo sem fixture — a régua da 4.82); sobrevivente
@@ -90,8 +92,21 @@ mutate() { # motor arquivo função
   cp "$keep" "$orig"
 }
 
+mutate_printf() { # motor arquivo — pontos de emissão por printf "SEV\tid\t…" (checks cruzados)
+  motor="$1"; file="$2"
+  orig="$W/scripts/$file"; keep="$TMP/$file.orig"; cp "$orig" "$keep"
+  grep -nE 'printf "(ERROR|WARNING|INFO)\\t[a-z0-9-]+\\t' "$keep" | while IFS=: read -r ln rest; do
+    id="$(printf '%s' "$rest" | grep -oE 'printf "(ERROR|WARNING|INFO)\\t[a-z0-9-]+\\t' | head -1 | sed -E 's/.*\\t([a-z0-9-]+)\\t$/\1/')"
+    key="$motor $id@$ln"
+    awk -v n="$ln" 'NR==n { sub(/printf/, "if (0) printf") } { print }' "$keep" > "$orig"
+    if ! valido "$motor"; then echo "INVALIDO  $key (mutante quebra o script — não conta)"; continue; fi
+    if run_suites "$motor"; then echo "SOBREVIVE $key"; echo "$key" >> "$OUT"; else echo "morto     $key"; fi
+  done
+  cp "$keep" "$orig"
+}
+
 {
-  [ -n "$ONLY" ] && [ "$ONLY" != "lint" ]  || mutate lint  artifact-lint.sh emit
+  [ -n "$ONLY" ] && [ "$ONLY" != "lint" ]  || { mutate lint  artifact-lint.sh emit; mutate_printf lint artifact-lint.sh; }
   [ -n "$ONLY" ] && [ "$ONLY" != "graph" ] || mutate graph graph.sh finding
   [ -n "$ONLY" ] && [ "$ONLY" != "index" ] || mutate index index-check.sh finding
 } | tee "$TMP/tabela.txt" | { if [ "$REPORT" -eq 1 ]; then cat; else grep -c . >/dev/null; fi; }

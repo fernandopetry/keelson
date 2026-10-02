@@ -55,7 +55,9 @@
 
 - **Contraste AA:** 4.5:1 para texto normal; 3:1 para texto grande e componentes de UI.
 - **Teclado:** o fluxo principal se completa por teclado, com foco visível e ordem de
-  tabulação seguindo a leitura.
+  tabulação seguindo a leitura. Modal/diálogo cuja ação pode remover o próprio gatilho
+  (controle renderizado por dado) devolve o foco, ao fechar, a uma âncora estável —
+  título da região, contêiner ou próximo controle —, nunca ao `body` (4.455).
 - **Nome acessível:** todo controle tem rótulo; ícone sozinho tem rótulo textual;
   imagem informativa tem alternativa em texto.
 - **Nunca só cor:** estado ou informação não se transmite apenas por cor.

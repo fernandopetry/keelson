@@ -107,6 +107,7 @@ indisponível → executar as Etapas 4–5 inline é o fallback, declarado no ou
 6. **Definition of Done do PLAN** — SPEC com `**Fonte de medição**:` na §1.3 → a DoD inclui o item de métrica operacional (template §9; decisão 4.99). Sabor `instrumentação` → o trabalho de instrumentar entra nos componentes deste PLAN (sem componente que emita o evento, o item da DoD é insatisfazível).
 7. **IDs escopados**: `DEC-MMM-XXX`, `COMP-MMM-XXX`, `TRISK-MMM-XXX`.
 8. **DEC marcada como irreversível ou não**: cada DEC tem campo `Irreversível: sim | não` — valor **literal** do enum, sem prosa; a justificativa mora em Contexto/Consequências da própria DEC (valor fora do enum é ERROR do lint, `plan-dec-irreversivel-enum` — decisão 4.367). Se sim, será propagada ao INDEX.
+9. **Relaxar um filtro de acesso/escopo da SPEC não relaxa os vizinhos** (4.455): PLAN que afrouxa um filtro composto da SPEC (ex.: "fora do universo") enumera os filtros que compõem esse conceito — pertencimento, dono/self, restrito, tenant — e declara quais continuam valendo no writer e na rota; relaxar um nunca relaxa os demais (CWE-639).
 
 ## Etapa 5: estrutura obrigatória do arquivo PLAN (contrato de forma — executado pelo `scribe`)
 
