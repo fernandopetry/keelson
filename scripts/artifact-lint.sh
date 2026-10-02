@@ -688,6 +688,15 @@ END {
     if (!(temMet && temProva))
       emit("WARNING", "task-mutacao-sem-contagem", "criterio menciona mutacao de predicado de escopo sem o par contavel \"N metodos ... N provas\" (4.232)")
   }
+  # 4.447: esperado com placeholder — "OK (N tests)", "N > 0", "OK (N)" — e o estado honesto
+  # da fixacao sem shell; o numero vem do baseline do developer. Conta, nao reprova.
+  nPh = 0
+  for (i = 1; i <= nItem; i++) {
+    li = tolower(items[i])
+    if (li ~ /\(n (tests?|testes?|assertions?)\)/ || li ~ /(^|[^a-z0-9_])n[ \t]*>=?[ \t]*[01]([^0-9]|$)/ || li ~ /ok \(n\)/) nPh++
+  }
+  if (nPh > 0)
+    emit("WARNING", "task-criterio-esperado-placeholder", nPh " criterio(s) com placeholder no esperado (\"OK (N tests)\", \"N > 0\") — o numero vem do baseline do developer antes de comecar; a fixacao confere por Grep, nao executa (4.447)")
   # 4.368 (LRN-021, 2a reincidencia da 4.93): criterio que nomeia arquivo de teste como
   # alvo e cita comando de suite sem isolar o alvo — "OK (N tests)" do agregado nao prova
   # que o alvo rodou quando a config exclui por grupo/tag. Absolvem: --filter/--group/

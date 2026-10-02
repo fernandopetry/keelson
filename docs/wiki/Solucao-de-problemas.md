@@ -375,6 +375,19 @@ Como resolver: se a marca real existe em algum lugar (a marca de despacho que o
 grave-a no formato completo; se o instante se perdeu de vez, deixe o campo **vazio** ou
 com um `—` — a lacuna honesta é a ausência, nunca uma frase no lugar do valor.
 
+### O lint acusa `task-criterio-esperado-placeholder` numa TASK
+
+O aviso conta os critérios cuja saída esperada traz um `N` no lugar do número — `OK (N
+tests)`, `N > 0`. Não é erro e não trava nada: quem redige a TASK não tem shell, então o
+comando é conferido (o alvo existe, o filtro bate com o arquivo real) mas não executado, e
+o número fica em aberto de propósito. Quem o preenche é o developer, na primeira ação da
+TASK: ele roda o comando antes de tocar em qualquer arquivo e registra o resultado como
+baseline no report.
+
+Como ler: o número de avisos diz quantos critérios dependem dessa primeira execução. Se
+um item com placeholder vier **sem comando nenhum**, aí sim é defeito (critério sem
+verificação executável) e o validator reprova por essa outra regra.
+
 ### O validator acusa `spec-ac-fora-gwt` em ACs que já estão em Given-When-Then
 
 O aviso é sobre **vocabulário**, não sobre estrutura: o lint procura as palavras "dado",

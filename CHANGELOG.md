@@ -25,6 +25,39 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.195.0] — 2026-10-02
+
+Re-init: none
+
+Decision 4.447 — the gate-1 criterion is *checked* at fixation and *executed* by the
+developer's baseline; a new lint counts the honest placeholders.
+
+### Added
+
+- **`scripts/artifact-lint.sh` — `task-criterio-esperado-placeholder` (WARNING):** counts
+  the criteria whose expected output carries a placeholder instead of the number
+  (`OK (N tests)`, `OK (N)`, `N > 0`). It is not a form defect: the TASK author has no
+  shell, so the command is checked but not run, and the number comes from the developer's
+  baseline before any file is touched. The lint makes that state visible; the
+  `task-validator` does not escalate it, and `/keelson:tasks` keeps it out of the scribe
+  correction delta. Fixture `defeitos/tasks/TASK-001-016`, contract in `lint-contract.md`,
+  wiki entry in *Solução de problemas*.
+
+### Changed
+
+- **`commands/tasks.md`, gate-1 criterion principle:** the command/expected pair is
+  *falsifiable and checked at fixation* — target, filter affiliation and tool flags read
+  from the real config by Grep — and *executed by the developer in the baseline* (step 2).
+  The same wording reaches the template-file case, the absence criterion (checked against
+  the parent commit by Grep, run in the baseline) and the "did not get worse" baseline.
+  Item (c) states that `N` in "N métodos, N provas" is the number counted by Grep at
+  fixation, never the letter.
+- **`agents/developer.md`, step 2:** a criterion fixed with a placeholder receives the
+  measured number here, recorded in `verificacao.baseline`.
+- **`skills/task-validator/SKILL.md`:** the new fact is cited as fixation state, never
+  escalated; a placeholder item with no command at all falls under the existing
+  "no executable verification" rule.
+
 ## [0.194.0] — 2026-10-01
 
 Re-init: none

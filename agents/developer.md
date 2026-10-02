@@ -58,6 +58,10 @@ resultado — esse é o seu **baseline** (`${CLAUDE_PLUGIN_ROOT}/guidelines/core
 "Verificação forte e única", 4.436). Em **retry** da mesma TASK o baseline registrado é
 reusado — não se roda de novo.
 
+Critério fixado com placeholder no esperado (`OK (N tests)`, `N > 0`) recebe aqui o
+número medido: a fixação confere o comando por Grep e não o executa — o `N` é a lacuna
+que só a sua execução preenche. Registre-o em `verificacao.baseline` (4.447).
+
 **Escopo inerte**: quando nenhum arquivo do "Escopo > Inclui" é código que a suíte
 exercita — só docs, artefatos SDD, asset estático (régua e âncora mecânica em
 `TESTING.md`, "Diff inerte") — baseline e rodada da etapa 6 são dispensados, com a
