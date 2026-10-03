@@ -547,6 +547,23 @@ sect == "crit" && line ~ /(^|[ `|(])(grep|egrep|rg) / {
   if (line !~ /Reflection/ && line !~ / -[a-zA-Z]*v/ && line !~ /['"]\^/)
     nGrepSolto++
 }
+sect == "crit" && line ~ /(^|[ `|(])(grep|egrep) / {
+  # 4.456: grep RECURSIVO cujo alvo e um diretorio inteiro sem caminho (`backend`, `.`)
+  # casa cache/vendor/autoload e o criterio de ausencia nunca converge; `git grep` (so
+  # rastreados) e caminho com "/" (subarvore escolhida) ficam fora; `rg` honra .gitignore
+  s = line; off = 0
+  while (match(s, /(^|[ `|(])(grep|egrep) [^`|]*/)) {
+    c = substr(s, RSTART, RLENGTH); pre = substr(line, 1, off + RSTART - 1)
+    off += RSTART + RLENGTH - 1; s = substr(s, RSTART + RLENGTH)
+    if (pre ~ /git[ \t]*$/) continue
+    sub(/^[ `|(]+/, "", c)
+    if (c !~ / -[a-zA-Z]*[rR][a-zA-Z]*([ \t]|$)/ && c !~ /--recursive/) continue
+    n = split(c, w, /[ \t]+/); npos = 0; last = ""
+    for (i = 2; i <= n; i++) if (w[i] != "" && w[i] !~ /^-/) { npos++; last = w[i] }
+    sub(/[.,;:)]+$/, "", last)
+    if (npos >= 2 && last != "" && last !~ /\// && last !~ /['"]/) nGrepAmplo++
+  }
+}
 (sect == "crit" || sect == "gate9") && line ~ /--group[ \t]+[A-Za-z0-9_-]/ {
   # 4.215: lado comando — tag de grupo usada por comando de verificacao (linha sem negacao).
   # Ocorrencia precedida de "sem" ("nasce sem `--group X`") nao e comando e sai da conta
@@ -675,6 +692,9 @@ END {
   # criterio com grep de texto sem ancora
   if (nGrepSolto > 0)
     emit("WARNING", "task-criterio-grep-nao-ancorado", nGrepSolto " criterio(s) com grep/rg de padrao textual sem exclusao de comentario nem ancora executavel — fronteira de simbolo (\\b/::/->) limita a palavra mas segue casando docblock/prosa (4.161, 4.255)")
+  # criterio de ausencia com grep recursivo sobre diretorio inteiro (raiz do modulo)
+  if (nGrepAmplo > 0)
+    emit("WARNING", "task-criterio-grep-alvo-amplo", nGrepAmplo " criterio(s) com grep recursivo sobre diretorio inteiro sem caminho fonte — casa cache/vendor/autoload e o criterio de ausencia nunca converge; prefira `git grep -w <simbolo> -- <dir-fonte>` (so rastreados, palavra inteira) (4.456)")
   # comando de verificacao contradiz proibicao de tag da mesma TASK
   for (t in cmdGroup) if (t in prohGroup)
     emit("WARNING", "task-comando-contradiz-criterio", "comando de verificacao usa --group " t " e outra linha da mesma TASK proibe a tag " t " (4.215)")

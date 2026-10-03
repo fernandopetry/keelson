@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.202.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.203.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a modal that removes its own trigger returns focus to a stable anchor (gate 11), and a PLAN that relaxes one access filter of the SPEC must state which neighbouring filters still hold (CWE-639).
+New in this release: a recursive `grep` over a whole directory in a TASK criterion is a lint warning with the remedy in the message (`git grep -w <symbol> -- <source-dir>`); the task-validator escalates it for absence checks.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

@@ -25,6 +25,29 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.203.0] — 2026-10-02
+
+Re-init: none
+
+Decision 4.456 — by order of the Director, the remaining proposal of the 2026-10-02 field
+intake: a recursive grep over a whole directory becomes a lint fact.
+
+### Added
+
+- **`scripts/artifact-lint.sh`, `task-criterio-grep-alvo-amplo` (WARNING):** a criterion
+  whose `grep`/`egrep` is recursive and whose target is a whole directory cited without a
+  path (`backend`, `.`) is flagged — the command also reads caches, `vendor/` and generated
+  autoload, so an absence criterion never converges. The message carries the remedy:
+  `git grep -w <symbol> -- <source-dir>`. `git grep`, `rg` and a target with `/` stay out.
+  The task-validator escalates to ERROR when the criterion is an absence check.
+- **Wiki, *Solução de problemas*:** new entry for the warning.
+
+### Changed
+
+- **`lint-contract.md` §3, `skills/task-validator/SKILL.md`:** the new check and its
+  escalation rule. Word boundaries (`\b`/`-w`) still do not absolve
+  `task-criterio-grep-nao-ancorado` (4.255 stands).
+
 ## [0.202.0] — 2026-10-02
 
 Re-init: none

@@ -175,6 +175,16 @@ arquivo. Item descrito só em prosa (sem caminho nem nome de arquivo) não entra
 — achado ausente não garante que não há colisão, então a conferência na hora de
 implementar continua valendo.
 
+### O lint acusou "grep recursivo sobre diretório inteiro" num critério
+
+Um critério de ausência ("o nome antigo não aparece mais") usa `grep -r` sobre um
+diretório inteiro citado sem caminho (`backend`, `.`). Esse comando lê também cache,
+`vendor/` e autoload gerado — o nome antigo sobrevive ali depois do código estar certo, e
+o critério nunca fica verde. Troque por `git grep -w <símbolo> -- <diretório-fonte>`: só
+arquivos rastreados e palavra inteira (sem casar `removeX` quando o alvo é `moveX`), ou
+aponte a subárvore (`backend/src`). É WARNING; o `task-validator` escala quando o
+critério é de ausência.
+
 ### O validator acusou "comando contradiz critério" numa TASK
 
 O lint achou, na mesma TASK, um comando de verificação usando `--group <tag>` e outra
