@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.203.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.204.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a recursive `grep` over a whole directory in a TASK criterion is a lint warning with the remedy in the message (`git grep -w <symbol> -- <source-dir>`); the task-validator escalates it for absence checks.
+New in this release: the fan-out decomposer of `/keelson:tasks` self-checks the frozen manifest (wave vs dependencies, FR in `Realiza` only with a cited AC, a creator for every shared helper); a TASK cannot both demand a behaviour change and forbid touching the tests that expect the old one; the closure commit is never an anchor for positive controls.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

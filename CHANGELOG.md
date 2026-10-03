@@ -25,6 +25,32 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.204.0] — 2026-10-02
+
+Re-init: none
+
+Decision 4.457 — by order of the Director, three items of the fan-out field report enter
+`/keelson:tasks`.
+
+### Added
+
+- **`commands/tasks.md`, step 0.5 (fan-out decomposer):** "self-check before freezing" the
+  manifest — each TASK's wave is 1 + the highest wave of its `Depende de`; an FR enters
+  `Realiza` only when some criterion of the TASK cites one of its ACs (ACs distributed AC by
+  AC, partial coverage stated inline); a helper or test double used by 2+ TASKs has a
+  creating TASK in the manifest. No writer sees the whole, so what is not checked here only
+  comes back from the validator after every file is written.
+
+### Changed
+
+- **`commands/tasks.md`, item (e) of "resists circumvention":** the "cannot coexist" class
+  gains the scope × restriction pair — requiring a behaviour change while forbidding changes
+  to the tests that expect the old behaviour; list the tests the new behaviour fails in
+  `Inclui`, or drop the restriction.
+- **`commands/tasks.md`, non-regression rule:** the closure commit is named as a forbidden
+  anchor for positive controls and diffs — it only touches docs/INDEX/status and is born
+  after the code, so a criterion anchored on it always fails.
+
 ## [0.203.0] — 2026-10-02
 
 Re-init: none
