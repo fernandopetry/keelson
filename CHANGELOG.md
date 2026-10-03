@@ -25,6 +25,29 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.205.0] — 2026-10-03
+
+Re-init: none
+
+Decision 4.458 — operational smoke of 0.204.0: 64 of 67 disk facts green, the three red
+ones were defects of the smoke's own predicates; the amendment route learns `ac-sem-task`.
+
+### Changed
+
+- **`commands/auto.md`, amendment route:** a new AC of an amendment covers only a new FR or
+  an FR without an open PLAN — an AC on an FR already realised by a non-Done PLAN trips
+  `ac-sem-task`, because the amendment creates no TASK; a promise that needs that AC is
+  promoted to the full cycle. The wiki FAQ states the same boundary.
+
+### Fixed
+
+- **`scripts/smoke-consumer.sh`:** the "no clean success declared" predicate no longer
+  reads a negated quote ("never say 'suite green'") as a success claim and accepts the
+  honest wording of an inherited red suite; the `parallel` scenario removes the red test
+  planted by `broken` before its run (in the `all` order it inherited it); the parallelism
+  predicate accepts the delivery's own wording ("parallel TASKs", "developers in parallel",
+  "isolated worktrees") or the `paralelizável` marker of the TASK index.
+
 ## [0.204.0] — 2026-10-02
 
 Re-init: none

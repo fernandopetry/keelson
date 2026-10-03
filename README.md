@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.204.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.205.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the fan-out decomposer of `/keelson:tasks` self-checks the frozen manifest (wave vs dependencies, FR in `Realiza` only with a cited AC, a creator for every shared helper); a TASK cannot both demand a behaviour change and forbid touching the tests that expect the old one; the closure commit is never an anchor for positive controls.
+New in this release: the operational smoke of 0.204.0 came back 64/67 green with the three red facts traced to the smoke's own predicates (fixed); the amendment route now says that a new AC on an FR with an open PLAN is not an amendment — it goes to the full cycle.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

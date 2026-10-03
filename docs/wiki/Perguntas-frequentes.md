@@ -22,7 +22,9 @@ do escopo e agora entra, um critério de aceite ajustado, um default que muda. E
 rota de **emenda**: o PO valida a mudança contra o seu brief, a SPEC é emendada no lugar
 (versão sobe, o histórico do slug registra), e a implementação segue pelo caminho curto,
 com o critério emendado como prova. Só volta ao ciclo completo se a mudança pedir uma
-decisão técnica nova ou um componente novo. A diferença medida no nosso próprio teste: a
+decisão técnica nova, um componente novo, ou um critério de aceite novo sobre um requisito
+que um PLAN ainda em andamento já realiza — esse critério precisa de TASK, e emenda não
+cria TASK. A diferença medida no nosso próprio teste: a
 mesma função custou um ciclo inteiro quando o keelson a tratou como SPEC nova, e um
 quinto disso pelo caminho curto.
 
