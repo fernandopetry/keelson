@@ -185,6 +185,15 @@ arquivos rastreados e palavra inteira (sem casar `removeX` quando o alvo é `mov
 aponte a subárvore (`backend/src`). É WARNING; o `task-validator` escala quando o
 critério é de ausência.
 
+### O lint acusou "git diff contra a branch default com esperado vazio" num critério
+
+Um critério de ausência ("esta TASK não tocou `src/Legacy/`") usa `git diff main...HEAD`
+e espera saída vazia. Numa branch de feature esse intervalo inclui tudo que as waves
+anteriores já mudaram, então a saída nunca fica vazia e o critério reprova a implementação
+certa. O intervalo responde "a branch nunca tocou isso", não "esta TASK não tocou isso".
+Ancore na base da TASK: `git diff <SHA do commit-pai>..HEAD -- <caminho>`. É WARNING; o
+`task-validator` escala quando a TASK está em wave 2 ou posterior.
+
 ### O validator acusou "comando contradiz critério" numa TASK
 
 O lint achou, na mesma TASK, um comando de verificação usando `--group <tag>` e outra

@@ -564,6 +564,22 @@ sect == "crit" && line ~ /(^|[ `|(])(grep|egrep) / {
     if (npos >= 2 && last != "" && last !~ /\// && last !~ /['"]/) nGrepAmplo++
   }
 }
+sect == "crit" && line ~ /git diff/ {
+  # 4.459: `git diff <default>...HEAD` com esperado VAZIO — em branch de feature o range
+  # contra a default carrega as waves anteriores e o vazio e insatisfazivel por construcao;
+  # "esta TASK nao tocou X" ancora na base da TASK (commit-pai). Range contra SHA/ref que
+  # nao e a default fica fora; esperado "nao vazio" (presenca) fica fora.
+  s = line; hit = 0
+  while (match(s, /git diff[^`|]*/)) {
+    c = substr(s, RSTART, RLENGTH); s = substr(s, RSTART + RLENGTH)
+    if (c ~ /[ \t](origin\/)?(main|master|develop|development|trunk|<default>|<base>)\.\.\.?HEAD([ \t]|$)/) hit = 1
+  }
+  if (hit) {
+    l = tolower(line)
+    gsub(/não[- ]vazi[oa]/, "", l); gsub(/nao[- ]vazi[oa]/, "", l); gsub(/non-?empty/, "", l)
+    if (l ~ /vazi[oa]|0 linhas|nenhuma? (arquivo|linha)|sem saída|sem saida/) nDiffBase++
+  }
+}
 (sect == "crit" || sect == "gate9") && line ~ /--group[ \t]+[A-Za-z0-9_-]/ {
   # 4.215: lado comando — tag de grupo usada por comando de verificacao (linha sem negacao).
   # Ocorrencia precedida de "sem" ("nasce sem `--group X`") nao e comando e sai da conta
@@ -695,6 +711,9 @@ END {
   # criterio de ausencia com grep recursivo sobre diretorio inteiro (raiz do modulo)
   if (nGrepAmplo > 0)
     emit("WARNING", "task-criterio-grep-alvo-amplo", nGrepAmplo " criterio(s) com grep recursivo sobre diretorio inteiro sem caminho fonte — casa cache/vendor/autoload e o criterio de ausencia nunca converge; prefira `git grep -w <simbolo> -- <dir-fonte>` (so rastreados, palavra inteira) (4.456)")
+  # criterio de ausencia por diff ancorado na branch default (carrega as waves anteriores)
+  if (nDiffBase > 0)
+    emit("WARNING", "task-criterio-diff-base-vazio", nDiffBase " criterio(s) com `git diff <default>...HEAD` e esperado vazio — em branch de feature o range contra a default carrega as waves anteriores e o vazio e insatisfazivel; \"esta TASK nao tocou X\" ancora na base da TASK: `git diff <SHA do commit-pai>..HEAD -- <caminho>` (4.459)")
   # comando de verificacao contradiz proibicao de tag da mesma TASK
   for (t in cmdGroup) if (t in prohGroup)
     emit("WARNING", "task-comando-contradiz-criterio", "comando de verificacao usa --group " t " e outra linha da mesma TASK proibe a tag " t " (4.215)")

@@ -25,6 +25,38 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.206.0] — 2026-10-06
+
+Re-init: none
+
+Decision 4.459 — field intake: an absence criterion written as `git diff <default>...HEAD`
+with an empty expected output is a lint fact; four other proposals deferred, one of them
+escalated to the Director.
+
+### Added
+
+- **`scripts/artifact-lint.sh`, check `task-criterio-diff-base-vazio` (WARNING):** a
+  TASK criterion whose `git diff` range is `<default>...HEAD` (or `..HEAD`; `main`,
+  `master`, `develop`, `trunk`, with or without `origin/`, or the `<default>`/`<base>`
+  placeholders) and whose expected output is declared empty on the same line. On a
+  feature branch that range carries every earlier wave, so the empty output is
+  unsatisfiable by construction and the criterion fails the correct implementation. The
+  message carries the fix: anchor on the TASK's base, `git diff <parent SHA>..HEAD --
+  <path>`. Presence criteria (`not empty`) and ranges anchored on a SHA do not trip it.
+  Fixture planted with two positive controls on their own lines; count stays at 1.
+- **`skills/task-validator`:** escalates the fact to ERROR when the TASK is in wave 2 or
+  later or declares `Depende de` (earlier waves exist by construction); wave 1 without
+  dependencies stays WARNING.
+- **`docs/wiki/Solucao-de-problemas.md`:** entry for the new fact.
+
+### Changed
+
+- **`commands/tasks.md`, absence bullet (step 3):** an absence-by-diff criterion anchors
+  its range on the TASK's base (parent commit), never on the default branch; cites the
+  lint fact.
+- **`docs/_meta/conventions/lint-contract.md`:** TASK group table and note for the new
+  check (what matches, what absolves, the one-line best-effort boundary).
+
 ## [0.205.0] — 2026-10-03
 
 Re-init: none

@@ -43,6 +43,9 @@ Cobrir o caso vazio antes da validação.
 - [ ] AC-001-001 verificado com credencial vazia
 - [ ] Sem parâmetro de confirmação — verificação executável: `grep -icE "confirm" src/Login.php` → 0
 - [ ] Nome antigo ausente — verificação executável: `grep -rl moverRegistro backend` → vazio (e `git grep -rn moverRegistro backend` já é a forma rastreada; `grep -rn Legado src/` escolhe a subárvore)
+- [ ] Legado intocado — verificação executável: `git diff --name-only main...HEAD -- src/Legacy/` → vazio
+- [ ] Login tocado — verificação executável: `git diff --name-only main...HEAD -- src/` → não vazio, inclui `src/Login.php`
+- [ ] Legado intocado nesta TASK — verificação executável: `git diff 3f2a9c1..HEAD -- src/Legacy/` → vazio
 
 ## Riscos específicos
 
