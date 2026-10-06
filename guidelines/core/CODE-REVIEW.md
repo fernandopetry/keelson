@@ -455,21 +455,38 @@ ela converge ou escala.
   correção **não** tocou (decisão 4.289): o espaço tem dois lados por construção —
   reagir de menos / reagir de mais — e verificar só o lado que motivou a correção é
   meio teste.
-- **Teto: 1 retry por gate, depois escala.** Achado → correção → re-review do delta. Se
-  o gate reprova de novo, a 3ª rodada **não roda por decisão própria**: escale ao
-  Diretor com o estado (o que passou · o que resta · proposta + default). É a mesma
-  régua que o `/keelson:implement` sempre teve ("1 retry, depois escala humano"),
-  valendo agora em qualquer invocação. Achado de **segurança** persistente escala como
-  **bloqueio** — o Diretor decide o rumo; nunca se contorna nem se commita por cima.
-  Achado de **ausência de prova** sobre código que o revisor já julga correto (falta o
-  teste que mate o mutante, falta cobertura falsificável) **conta para o teto como
-  qualquer achado** — não é categoria de exceção (decisão 4.110): o Charter trata
-  comportamento sem prova externa e falsificável como **não verificado**, e quem está no
-  meio dos retries tem exatamente o incentivo de classificar o restante como "mecânico"
-  para não escalar — o conflito que "gerador ≠ avaliador" existe para eliminar, aplicado
-  à própria decisão de escalar, que a régua tira das mãos de quem rodou os retries. Caso
-  genuinamente mecânico vai **na proposta** da escalação (estado + ação nomeada + default
-  "aplicar e fechar"), nunca como justificativa para pulá-la.
+- **Teto: 1 retry por gate; a rodada extra existe só com correção nomeada pelo avaliador
+  (decisões 4.88, 4.110, 4.460).** Achado → correção → re-review do delta. Se o gate
+  reprova de novo, o veredito da 2ª reprova decide a **forma** da escalação — escalar é
+  obrigatório nas duas:
+  - **Correção nomeada** — o veredito que reprova traz, no próprio achado, o arquivo e a
+    mudança que fecham o achado e a prova que o fecharia (teste, comando, passo do
+    roteiro), e aplicá-la é reversível no modo corrente (um commit na branch no ciclo;
+    diff na árvore sem commit fora dele) → o condutor **aplica exatamente essa correção**
+    numa rodada extra (escopo: o apontado, nunca varredura), re-roda o gate sobre o delta
+    e escala **com o resultado**: correção aplicada + veredito do re-gate, default
+    "manter", alternativa "reverter" nomeando o commit (ou o diff). O Diretor confirma ou
+    reverte; nunca escolhe entre consertar e deixar o defeito no código.
+  - **Sem correção nomeada** (diagnóstico aberto, decisão de produto, ação irreversível,
+    achado de segurança) → escale com o estado (o que passou · o que resta · proposta +
+    default), sem rodada extra.
+  - **Quem nomeia é o avaliador, nunca o condutor**: a correção vale como nomeada só se
+    está escrita no veredito do gate; o condutor que a deduz ou completa está
+    classificando o achado como "mecânico" — a justificativa que a 4.110 proíbe, porque
+    quem está no meio dos retries tem exatamente o incentivo de não escalar. Achado de
+    **ausência de prova** (falta o teste que mate o mutante, falta cobertura
+    falsificável) conta para o teto como qualquer achado; com o teste nomeado no veredito
+    ele se qualifica para a rodada extra como qualquer correção nomeada — sem ele, escala.
+  - **Teto duro: no máximo 2 retries (3 rodadas de gate) por gate.** A rodada extra que
+    reprova escala sem terceira; a varredura por classe segue o teto declarado no
+    despacho (4.187), que conta rodadas, não retries.
+  - **Quando escalar é do invocador**: no `/keelson:auto`, parte isolável leva a pergunta
+    (manter × reverter) em lote na Entrega — linhas "Decisões tomadas em seu nome" e
+    "Pendente de você" do relatório — e só o que bloqueia o restante interrompe o ciclo;
+    `/keelson:review` e warroom escalam na hora, com o resultado anexo; `/keelson:guided`
+    e `/keelson:merge` ficam fora da rodada extra (o humano responde na hora; a reversão
+    do merge é o `--abort`). Achado de **segurança** persistente escala como **bloqueio**
+    — o Diretor decide o rumo; nunca se contorna nem se commita por cima.
 - **Achado de classe fecha com a varredura como entregável (decisão 4.173).** Quando o
   achado nomeia um padrão repetível por busca (comentário, chamada, import, nomenclatura)
   e cita exemplos, os exemplos são **ilustração, nunca a lista de tarefas**: o retry
@@ -547,7 +564,8 @@ nenhum gate por parte responde — o código realiza o que o texto pede, e só o
   reaparece: a passada existe para o que nenhuma wave viu. O outcome declara a
   componente sempre: `dedup: aplicada — N achados | n/a — sem base determinável`.
 - **Outcome declarado, nunca implícito**: `convergiu` ou a lista de gaps. Gap segue o
-  fluxo normal — correção antes do push (régua de re-gate acima, 1 retry) ou parte
+  fluxo normal — correção antes do push (régua de re-gate acima: 1 retry, rodada
+  extra só com correção nomeada) ou parte
   estacionada com a pergunta pronta na Entrega; push silencioso com gap aberto é a
   falha que o passo existe para impedir.
 - **Registro reaproveitável** (padrão da 4.122): rodada `convergiu` entra no "Histórico

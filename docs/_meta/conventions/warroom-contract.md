@@ -104,7 +104,7 @@ começo, fim e conta a pagar.
    canônica; `qa` quando há comportamento observável; `performance-engineer`/`product-designer`
    pelos gatilhos usuais. Inventário **derivado do diff**, nunca de memória (4.335). Gates em
    paralelo, pacote de contexto único (4.89); correção converge com **1 retry** e depois
-   escala (4.88). O Tech Lead anota o evento `gate` de cada veredito no ledger — é o que
+   escala (4.88; correção nomeada no veredito leva a rodada extra aplicada, 4.460). O Tech Lead anota o evento `gate` de cada veredito no ledger — é o que
    cala o `review-guard` sobre o diff da janela (4.365).
 3. **Fecho de cada linha**: veredito aprovado (ou correção convergida) → `settle <hash>
    resolvida <o que rodou>`; reprovação que não convergiu → a linha **fica aberta** e vai ao

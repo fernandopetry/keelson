@@ -30,4 +30,4 @@ Os **commits de marco** (decisão 4.119 — regra: `sdd-conventions.md`, "Commit
 
 ## Paradas por exceção (régua estrita — Diretor presente)
 
-Mesmo entre os checkpoints, **pare e pergunte na hora** em: ambiguidade crítica na SPEC; DEC irreversível; mudança de risco (auth, schema, exclusão de dados, config de produção) antes de aplicar; `ERROR` de validator que não se auto-corrige; quality gate que falha após 1 retry; achado de segurança (gate 8). O modo guiado existe para o Diretor decidir junto — a escada de reação do `/keelson:auto` não se aplica.
+Mesmo entre os checkpoints, **pare e pergunte na hora** em: ambiguidade crítica na SPEC; DEC irreversível; mudança de risco (auth, schema, exclusão de dados, config de produção) antes de aplicar; `ERROR` de validator que não se auto-corrige; quality gate que falha após 1 retry (sem a rodada extra da 4.460 — aqui o humano responde na hora); achado de segurança (gate 8). O modo guiado existe para o Diretor decidir junto — a escada de reação do `/keelson:auto` não se aplica.

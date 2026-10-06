@@ -25,6 +25,40 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.207.0] — 2026-10-06
+
+Re-init: none
+
+Decision 4.460 — a gate that fails twice with the fix already named by the reviewer now
+gets that fix applied and escalates with the result; the Director confirms or reverts,
+never chooses between fixing and leaving the defect in the code.
+
+### Changed
+
+- **`guidelines/core/CODE-REVIEW.md`, re-gate convergence (owner of the retry cap):** the
+  cap is still 1 retry per gate and escalation on the second failure is still mandatory;
+  what changes is the shape. When the failing verdict itself names the fix (file + change
+  + the proof that closes it) and applying it is reversible (a commit on the branch in the
+  cycle, an uncommitted diff outside it), the conductor applies exactly that fix in one
+  extra round, re-runs the gate on the delta and escalates **with the result** (default
+  keep, alternative revert naming the commit). The naming is the **reviewer's**, never the
+  conductor's — a fix the conductor deduces is the "mechanical" self-classification that
+  4.110 forbids, and still escalates without the extra round. Hard cap: 2 retries (3 gate
+  rounds) per gate. Security findings, open diagnoses, product decisions and irreversible
+  actions escalate as before.
+- **`commands/auto.md`:** the extra round is rung 1 of the reaction ladder (reversible);
+  its keep-or-revert question goes into the batch at Delivery, under "Decisões tomadas em
+  seu nome" and "Pendente de você"; it is not a parked part. Only a failure that blocks
+  everything else interrupts the cycle mid-wave.
+- **`commands/implement.md`, `commands/review.md`, `commands/warroom.md`,
+  `docs/_meta/conventions/sdd-conventions.md`, `warroom-contract.md`:** point at the
+  owner; `/keelson:review` and the war room escalate immediately with the result attached.
+- **`commands/guided.md`, `commands/merge.md`:** explicitly outside the extra round (the
+  human answers on the spot; a merge reverts with `--abort`, not a commit). Close-out,
+  suite, mutation and post-merge sync failures are not re-gates and keep the plain cap.
+- **Wiki (`Solucao-de-problemas.md`, `Conceitos.md`):** the "small change taking hours"
+  entry and the gates overview describe what the Director now receives.
+
 ## [0.206.0] — 2026-10-06
 
 Re-init: none

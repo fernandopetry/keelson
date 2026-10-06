@@ -43,7 +43,8 @@ vazio → frontmatter do agent (régua em `sdd-conventions.md`).
 
 **Princípio inviolável 5**: falha de suíte ou reprovação de gate é **1 retry, depois
 escala** (régua geral do `sdd-conventions.md`) — nunca force o fechamento driblando a
-régua.
+régua. A rodada extra com correção nomeada (4.460) não vale aqui: a reversão do merge é
+o `--abort`, não um commit.
 
 ## Input
 

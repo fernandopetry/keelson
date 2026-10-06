@@ -184,7 +184,8 @@ requisito de origem — a entrega só segue com a lacuna corrigida ou virada em 
 explícita para você. A terceira nunca trava a entrega: vira uma sugestão de consolidação
 que chega para você decidir.
 
-Falhou? Um retry, depois escala para você. E a régua que atravessa tudo:
+Falhou? Um retry, depois escala para você — e, se o revisor já nomeou a correção, ela
+chega aplicada: você confirma ou manda reverter. E a régua que atravessa tudo:
 
 > **Gerador ≠ avaliador.** A prova de que um artigo do Charter foi cumprido é externa e
 > falsificável — um teste, uma ferramenta que reprova, um humano com contexto limpo. Um

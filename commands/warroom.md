@@ -116,7 +116,8 @@ Execute o contrato do `/keelson:review` com alvo `<base>..HEAD` (dono da rodada:
    `product-designer` pelos gatilhos do item 1. Modelo por papel: `ficha.sh --get
    models.<agent>`.
 3. Reprovação → `developer` corrige o achado (escopo: o achado), re-review sobre o delta,
-   **1 retry**; ainda reprovado → escala ao Diretor com proposta + default.
+   **1 retry**; ainda reprovado → escala ao Diretor com proposta + default — com correção
+   nomeada no veredito, a rodada extra já aplicada vai junto (4.460).
 4. **Anote no ledger** o evento `gate` de cada veredito (origem = o agent) — é o que cala o
    `review-guard`/`security-guard` sobre o diff da janela.
 

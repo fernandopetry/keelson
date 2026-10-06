@@ -123,7 +123,7 @@ TASK em disco, sem commit) com um briefing efêmero:
 3. Houve achado de performance corrigido → o **`performance-engineer`** também roda de novo, sobre o delta (convergência 4.88).
 4. Houve achado de design corrigido → o **`product-designer`** também roda de novo, sobre o delta (convergência 4.88).
 5. Correção com **efeito observável** → **`qa`** (gate 9): prova o comportamento rodando os testes e exercitando a app quando o ambiente permite. Ambiente sem tela com `gates.screenVerify` ativo → o `qa` reporta `PARCIAL` com `handoff_seed` e evidência de sondagem (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/handoff-protocol.md`); aqui isso vira **pendência declarada no output**, não handoff em disco (revisão avulsa não tem PLAN para ancorar o doc).
-6. REPROVADO: 1 retry com instruções precisas, depois escala ao humano com o diagnóstico.
+6. REPROVADO: 1 retry com instruções precisas, depois escala ao humano com o diagnóstico — correção nomeada no veredito da 2ª reprova → rodada extra aplicada e escalação na hora com o resultado (4.460; dono: `core/CODE-REVIEW.md` §Convergência).
 
 ## Etapa 8: achados estruturais viram demanda
 
