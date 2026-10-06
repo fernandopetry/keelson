@@ -78,7 +78,10 @@ git checkout release
 3. **Branch de destino** (`--into` ou a corrente) e **cada branch de origem** existem
    (`git rev-parse --verify`, local ou `origin/<branch>` após `git fetch origin`). Alguma
    não existe → parar e listar **todas** as ausentes antes de tentar qualquer merge
-   (falha tardia no meio da fila é pior que falha cedo).
+   (falha tardia no meio da fila é pior que falha cedo). A resolução por fallback
+   remoto (`origin/<branch>`) serve só para achar a **ref a mesclar**; o nome usado
+   nas Etapas 3 e 6 continua sendo o `<branch>` **como o invocador passou**, nunca o
+   caminho completo da ref remota.
 4. Se `--into` foi passado, `git checkout <into>` antes de seguir (destino sujo cai no
    passo 1).
 
@@ -121,8 +124,11 @@ Com `--dry-run`, o loop termina aqui para esta branch: reporte o diagnóstico (E
 
 ### Etapa 3: merge real
 
-`git merge --no-commit --no-ff <branch>`. Conflito textual → os arquivos com marcadores
-`<<<<<<<` entram na lista de gatilhos da Etapa 5.
+`git merge --no-commit --no-ff <ref-resolvida>`, onde `<ref-resolvida>` é a branch
+local se existir, senão `origin/<branch>` (resolução da Etapa 0). A ref resolvida é
+interna a este passo: toda referência a "`<branch>`" no resto do comando (Etapas 5 e 6)
+continua sendo o **nome nu** dado pelo invocador, não a ref resolvida. Conflito
+textual → os arquivos com marcadores `<<<<<<<` entram na lista de gatilhos da Etapa 5.
 
 ### Etapa 4: suíte sobre o merge staged
 
@@ -176,6 +182,15 @@ exceção declarada no dono da régua
 pathspec (o git recusa commit parcial durante merge — exceção à régua do pathspec
 declarada no `sdd-conventions.md`; o controle compensatório é a árvore limpa da Etapa 0
 e o `git add` restrito da Etapa 5).
+
+Nos dois formatos abaixo, `<branch>` na mensagem é **sempre o nome nu** da branch —
+como o invocador o passou, sem prefixo de remote — mesmo que o merge real (Etapa 3)
+tenha usado `origin/<branch>` como ref. Automações de consumidor (scripts de deploy,
+por exemplo) extraem a key da tarefa do início da mensagem de merge via regex ancorado
+em `Merge branch '<KEY>`; um prefixo de remote colado no nome (`origin/PROJ-123`)
+quebra esse casamento e a automação deixa de reconhecer a tarefa mesclada. Barra que
+já era parte legítima do nome dado pelo invocador (ex. `feat/slug-tarefa-1`) não é
+prefixo de remote e fica intocada.
 
 1. **Branch limpa** (nenhum gatilho na Etapa 5) → `git commit` com a mensagem default:
    ```
