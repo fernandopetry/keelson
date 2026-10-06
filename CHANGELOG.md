@@ -25,6 +25,23 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.208.0] — 2026-10-06
+
+Re-init: none
+
+Decision 4.461 — by order of the Director, item 4 of the 2026-10-06 field intake enters
+`/keelson:implement` with the "also" default.
+
+### Changed
+
+- **`commands/implement.md`, closure item 5 (`alvo: projeto`):** when the finding's domain
+  has its own doctrine artefact designated by the project (the project's `CLAUDE.md` or
+  the config names the document — a numbered design-system catalogue with its checklist,
+  an API guide), the lesson also lands there, in that document's format, in the same
+  closure commit. The lesson file under `lessons/` stays mandatory: it is what
+  `lessons.sh` reaches at TASK fixation. Same mechanism as the short anti-pattern line
+  already written to the active language profile.
+
 ## [0.207.0] — 2026-10-06
 
 Re-init: none
