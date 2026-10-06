@@ -25,6 +25,28 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.209.0] — 2026-10-06
+
+Re-init: none
+
+Decision 4.462 — by order of the Director, items 2, 3 and 5 of the 2026-10-06 field
+intake enter `/keelson:tasks`.
+
+### Changed
+
+- **`commands/tasks.md`, gate 9 script:** a step whose AC needs specific data on the
+  subject (pagination past the limit, a null value, an empty catalogue) names the data and
+  the proof that the subject has it (a count measured at fixation) or the recipe that
+  builds it; without one of the two, change the subject or move the AC to gate 1.
+- **`commands/tasks.md`, extract-or-duplicate bullet (step 3):** an `Inclui` item that
+  orders a reusable artefact to be created (i18n key, helper, constant, component) goes
+  through the same Grep of the canonical at fixation — when an equivalent exists, the
+  item names it and forbids the new one.
+- **`commands/tasks.md`, item (j):** now "state **or position** of the interface": a
+  position or order named in the FR (a field in an existing panel, a column, a menu item)
+  gets a criterion that transcribes the declared order and proves it by DOM order, also in
+  the TASK that extends a component from an earlier wave.
+
 ## [0.208.0] — 2026-10-06
 
 Re-init: none
