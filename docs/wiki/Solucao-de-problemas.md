@@ -588,6 +588,24 @@ mesmo jeito — o despacho é gasto à toa. Se a recusa apareceu num despacho qu
 pacote de correção (uma redação que citou `modo:` em outro sentido), repita a chamada: o
 aviso não se repete para a mesma chamada.
 
+### Um `git stash` foi recusado: "stash-guard … muta a árvore de trabalho compartilhada"
+
+O sintoma: no meio de um ciclo, um agent (ou a própria sessão) tenta rodar `git stash`,
+`git stash pop` ou `git stash apply` e o hook `stash-guard` recusa, apontando para a forma
+que não toca em nada.
+
+O que acontece: a pilha de stash é **uma por repositório**. Quem dá `pop` recebe o topo da
+pilha — que pode ser um stash seu, de outra sessão, ou de outra branch. E `push`, `drop` e
+`clear` mexem no que outro ator ainda está lendo. Por isso o keelson trata a árvore de
+trabalho como recurso compartilhado: comparar antes e depois é `git stash create` (fotografa
+sem mover) mais uma worktree, ou `git diff > arquivo.patch`. `create`, `list` e `show`
+passam sem ruído.
+
+O que fazer: nada, na maior parte das vezes — o agent lê a recusa e usa a forma certa. Se
+**você** quer mesmo mexer na pilha (é o seu stash, você sabe o que tem nele), repita o
+comando prefixado com `KEELSON_ALLOW_STASH=1`. No seu terminal o hook nunca age; ele só vê
+comandos emitidos pelo modelo.
+
 ### Os papéis ficaram "mudos" numa sessão com Agent Teams
 
 O sintoma: você usa o recurso experimental **Agent Teams** do Claude Code

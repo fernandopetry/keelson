@@ -46,6 +46,7 @@ Cobrir o caso vazio antes da validação.
 - [ ] Legado intocado — verificação executável: `git diff --name-only main...HEAD -- src/Legacy/` → vazio
 - [ ] Login tocado — verificação executável: `git diff --name-only main...HEAD -- src/` → não vazio, inclui `src/Login.php`
 - [ ] Legado intocado nesta TASK — verificação executável: `git diff 3f2a9c1..HEAD -- src/Legacy/` → vazio
+- [ ] Guard chamado — verificação executável: `grep -cE "^\s*return $this->guard\(\)" src/Login.php` → 1
 
 ## Riscos específicos
 

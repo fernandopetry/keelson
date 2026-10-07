@@ -28,6 +28,11 @@
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/noverify-guard.sh",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/stash-guard.sh",
+            "timeout": 30
           }
         ]
       }

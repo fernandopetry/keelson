@@ -25,6 +25,39 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.210.0] — 2026-10-07
+
+Re-init: none
+
+Decision 4.463 — field intake of 2026-10-07: a developer compared baseline and
+implemented state with `git stash` on the shared tree and popped someone else's stash;
+a `$` inside double quotes in a criterion's `grep` was expanded by the shell before the
+tool saw the pattern.
+
+### Added
+
+- **`hooks/stash-guard.sh` (PreToolUse · Bash):** denies `git stash` forms that mutate the
+  working tree or consume the stash stack — bare, `push`, `save`, `pop`, `apply`, `drop`,
+  `clear`, `branch`. `create`, `list`, `show` and `store` pass. Same mechanics as
+  `noverify-guard`: simple-command boundary, env-prefix and `git -C` covered, quoted text
+  absolved unless an interpreter is on the line, named escape `KEELSON_ALLOW_STASH=1`,
+  graceful fallback. Only model-issued commands pass through the hook; the human's terminal
+  never does. Suite `scripts/tests/stash-guard/run.sh`; registered in the frozen
+  `hooks-manifest` table and in the pre-commit hook:suite pairs.
+- **`artifact-lint.sh`, check `task-criterio-cifrao-aspas-duplas` (WARNING):** `grep`/
+  `egrep`/`rg`/`sed` in a criterion with an unescaped `$` inside double quotes followed by
+  an identifier, digit, `{`, `(` or special parameter — the shell expands it before the
+  tool sees the pattern. Single quotes, `\$` and a trailing `$` absolve. Contract in
+  `lint-contract.md`; the `task-validator` escalates to ERROR when the criterion expects
+  an empty result (the empty output would approve any diff).
+
+### Changed
+
+- **`agents/developer.md`:** baseline and before/after comparison follow the mutation
+  rule — the tree you implement in never receives `git stash push`/`pop`/`apply`,
+  `checkout -- <path>` or `reset` to compare states; compare with `git stash create` plus a
+  worktree, or `git diff > patch`.
+
 ## [0.209.0] — 2026-10-06
 
 Re-init: none

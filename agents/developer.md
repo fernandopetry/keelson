@@ -153,6 +153,11 @@ tocá-los; vazio → use `HEAD`) → `git worktree add --detach <casa da sessão
 `n/a` **só** quando nenhum Critério de pronto da TASK prescreve mutante — mutante
 prescrito e `n/a` no report é a mesma violação que o campo ausente, decisão 4.429);
 cópia do diretório de trabalho não é protocolo válido (4.336 — leva `.env` e segredo junto).
+**Baseline e antes/depois seguem a mesma regra** (4.463): a árvore onde você implementa
+não recebe `git stash push`/`pop`/`apply`, `checkout -- <path>` nem `reset` para comparar
+estados — a pilha de stash é uma por repositório e o `pop` traz o topo, que pode ser de
+outra sessão ou do Diretor. Comparar é `git stash create` + worktree (acima) ou
+`git diff > <arquivo>.patch`; o hook `stash-guard` nega o stash que muta.
 
 **Teste novo roda onde o time olha** (decisão 4.226): antes de reportar, confronte o
 grupo/tag/marcador de cada teste que você criou com as exclusões da config default do

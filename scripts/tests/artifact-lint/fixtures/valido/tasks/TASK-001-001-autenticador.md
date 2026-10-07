@@ -46,6 +46,9 @@ Seguir o contrato do COMP-001-001.
 - [ ] AC-001-001 coberto por teste de integração
 - [ ] Registro de tentativa coberto por teste
 - [ ] Caminho legado ausente — verificação executável: `grep -c '^use Legado\Autenticador' src/` → 0
+- [ ] Guard chamado — verificação executável: `grep -cE '^\s*return \$this->guard\(\)' src/Autenticador.php` → 1
+- [ ] Guard chamado (forma escapada) — verificação executável: `grep -cE "^\s*return \$this->guard\(\)" src/Autenticador.php` → 1
+- [ ] Namespace fecha a linha — verificação executável: `grep -c "^namespace App\\Auth;$" src/Autenticador.php` → 1
 - [ ] Suíte unitária verde — verificação executável: `vendor/bin/phpunit --group unit` → `OK`
 
 ## Roteiro do gate 9 (fixado ANTES do código)

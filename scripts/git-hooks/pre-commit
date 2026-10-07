@@ -409,7 +409,7 @@ done
 for par in "window-marker:window-marker" "compact-anchor:compact-anchor" \
            "review-guard:review-guard session-cycle" "security-guard:security-guard" \
            "wave-guard:wave-guard session-cycle" "compact-anchor:compact-anchor session-cycle" \
-           "warroom-guard:warroom" "noverify-guard:noverify" \
+           "warroom-guard:warroom" "noverify-guard:noverify" "stash-guard:stash-guard" \
            "worktree-guard:worktree-guard" "doc-guard:doc-guard" \
            "desc-guard:desc-guard" "jira-guard:jira-guard" "largada-guard:largada-guard"; do
   hook="${par%%:*}"; suites="${par#*:}"

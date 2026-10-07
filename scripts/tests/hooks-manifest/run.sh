@@ -73,6 +73,7 @@ if [ -z "$bad" ]; then ok comando-canonico-existente-executavel-timeout; else fa
 expect="PreToolUse	Edit|Write|NotebookEdit	worktree-guard.sh
 PreToolUse	Task|Agent	agent-guard.sh
 PreToolUse	Bash	noverify-guard.sh
+PreToolUse	Bash	stash-guard.sh
 Stop	-	doc-guard.sh
 Stop	-	security-guard.sh
 Stop	-	review-guard.sh
