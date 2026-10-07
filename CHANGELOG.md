@@ -25,6 +25,26 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.211.0] — 2026-10-07
+
+Re-init: none
+
+Decision 4.464 — by order of the Director, the two items deferred in 4.463 enter
+`/keelson:tasks`.
+
+### Changed
+
+- **`commands/tasks.md`, "it finds the target":** before prescribing "the mutant fails
+  the <verifier>" (type-check, lint, suite), the fixation greps what the verifier's real
+  config can see — `include`/`exclude` of the type-checker, `ignore` of the linter,
+  `testMatch` of the runner — and confirms the target file is inside; a file outside the
+  reach makes the proof inert by construction. Outside → name the verifier that covers it,
+  or put the config in the task's scope.
+- **`commands/tasks.md`, "it tells before from after":** a criterion whose expected value
+  depends on date or time (expiry, "today", a window, an age) prescribes an injected or
+  frozen clock in the test, never the system clock — otherwise the test passes, or the
+  mutant dies, only on certain days.
+
 ## [0.210.0] — 2026-10-07
 
 Re-init: none

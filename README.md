@@ -422,11 +422,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.210.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.211.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a `stash-guard` hook denies the `git stash` forms that mutate the shared working tree or pop the stack (the human keeps a named escape), and a lint check flags an unescaped `$` inside double quotes in a criterion's `grep` — the shell expands it before the tool sees the pattern (see `CHANGELOG.md`).
+New in this release: task fixation greps the verifier's real config (type-checker `include`, linter `ignore`, runner `testMatch`) before prescribing that a mutant fails it, and any criterion that depends on date or time prescribes a frozen or injected clock in the test (see `CHANGELOG.md`).
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
