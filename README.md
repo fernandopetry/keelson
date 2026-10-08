@@ -98,7 +98,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:estimate` | Size a demand before the cycle — predicted waves/tasks and a time range per phase (interview, artifacts, implementation, gates) via the estimator agent, calibrated by the project's estimated-vs-actual history; refuses to guess ("not estimable" with the named gaps) and never decides routing |
 | `/keelson:specify-epic` | Decompose an epic-sized request into prioritized independent demands via the PM agent — you confirm the split and the branch strategy (default: one epic branch, synced with main at every slice boundary), the living queue tracks per-slice state, each demand then runs its own cycle |
 | `/keelson:continue` † | Resume a slug from wherever it stopped — derives the state from committed artifacts (epic queue, TASK closures, brief statuses), shows "you are here" and proposes the single next step with a default; after a weekend nobody needs to remember anything |
-| `/keelson:auto-epic` † | Chain the remaining slices of an epic without you in between — one fresh `claude -p` session per slice (clean context, own session id), launched as a process detached from your terminal; the living queue in the epic BRIEF decides the next slice and the stop (a slice that does not advance the queue ends the relay with its reason on record); it is also the epic's resume door — a slice left partial by a crash, a pause or a `stop` is resumed by the next child session, a slice stopped *waiting for you* is never resumed blind; infrastructure failures retry the same slice; `status` and graceful `stop` (`--now` to interrupt) subcommands; merge, PR and deploy stay human |
+| `/keelson:auto-epic` † | Chain the remaining slices of an epic without you in between — one fresh `claude -p` session per slice (clean context, own session id), launched as a process detached from your terminal; the living queue in the epic BRIEF decides the next slice and the stop (a slice that does not advance the queue ends the relay with its reason on record); it is also the epic's resume door — a slice left partial by a crash, a pause or a `stop` is resumed by the next child session, a slice stopped *waiting for you* is never resumed blind; infrastructure failures retry the same slice; `status`, a live `watch` feed for a terminal (tool calls, Tech Lead text, wave, heartbeat, stall warning) and graceful `stop` (`--now` to interrupt) subcommands, `--notify` for system notifications at every milestone; merge, PR and deploy stay human |
 | `/keelson:pause` † | Pause the running cycle at a safe point — waits for the in-flight closure, requires a clean tree, writes a `pausa` mark into the brief's Cronologia, commits and pushes the branch, then closes the run; `/keelson:continue` writes the matching `retomada` mark with the measured stopped time (floor from the last commit when nobody marked the pause), on any machine — the report's `Duração` line gains a `pausas` tail |
 
 **Support:**
@@ -423,11 +423,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.217.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.218.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a view that shows an unbounded list is born navigable — search or filter, max height with scrolling or pagination, visible count, accessible name per item (`core/DESIGN.md`) — and `/keelson:tasks` fixes that criterion before the code (see `CHANGELOG.md`).
+New in this release: the epic relay can be watched live from a terminal (`auto-epic <slug> watch`: tool calls, Tech Lead text, wave, heartbeat and a stall warning) and can notify the system at every milestone (`--notify`) (see `CHANGELOG.md`).
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

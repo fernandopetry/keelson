@@ -1,6 +1,6 @@
 ---
-description: Encadeia as fatias restantes de um épico sem o Diretor entre elas — revezamento desacoplado, uma sessão `claude -p` por fatia com contexto limpo; pré-voo, status e stop; merge, PR e deploy continuam humanos
-argument-hint: "<slug | caminho de BRIEF épico> [status | stop] [--max-fatias N] [--timeout-min M]"
+description: Encadeia as fatias restantes de um épico sem o Diretor entre elas — revezamento desacoplado, uma sessão `claude -p` por fatia com contexto limpo; pré-voo, status, watch e stop; merge, PR e deploy continuam humanos
+argument-hint: "<slug | caminho de BRIEF épico> [status | watch | stop] [--notify] [--max-fatias N] [--timeout-min M]"
 disable-model-invocation: true
 ---
 
@@ -39,7 +39,8 @@ confirmação; nunca omita.
 ```
 
 Raiz do repo em todos os passos: `git rev-parse --show-toplevel` do working tree principal.
-`status` e `stop` não lançam nada — são consultas e parada do revezamento em curso.
+`status`, `watch` e `stop` não lançam nada — são consulta, acompanhamento e parada do
+revezamento em curso.
 
 ## Etapa 0: resolver o alvo e consultar
 
@@ -54,6 +55,13 @@ Raiz do repo em todos os passos: `git rev-parse --show-toplevel` do working tree
    seguro do revezamento é a fronteira de fatia (4.466). `stop --now` interrompe na hora e
    a fatia fica como sessão que caiu. Transcreva a saída e aponte `/keelson:auto-epic
    <slug-âncora>` (ou `/keelson:continue`) como retomada. Encerre.
+4. `watch` → **não execute aqui**: um feed contínuo não cabe no chat e a sessão não
+   transmite saída ao vivo. Responda com o comando pronto para o terminal do Diretor,
+   com `${CLAUDE_PLUGIN_ROOT}` já resolvido para o caminho real:
+   `bash "<raiz do plugin>/scripts/epic-run.sh" <raiz> watch <slug-âncora>` — e diga em
+   uma linha o que ele mostra (ferramenta chamada, texto do Tech Lead, wave, batimento
+   "sem evento há N" e o aviso de possível travamento acima de 10 min; sai sozinho quando o
+   revezamento para — 4.471). Encerre.
 
 ## Etapa 1: pré-voo (o script decide; você mostra)
 
@@ -90,16 +98,18 @@ consome, degrau 3, conflito de sync, base da branch fora da default) e onde o mo
 (`status`, `RESUMO.md`, run-state da sessão filha); (c) a árvore não deve ser usada por
 outra sessão enquanto o revezamento roda — a fatia commita em HEAD. Com `--max-fatias` ou
 `--timeout-min`, diga o teto; falha de infraestrutura (rede, API) ganha nova tentativa da
-mesma fatia após a espera, até `--retry` vezes (default 2). "Outra coisa" → o Diretor diz
-o quê.
+mesma fatia após a espera, até `--retry` vezes (default 2). Com `--notify`, o sistema
+avisa no fim de cada fatia, na parada e quando a sessão filha fica muda acima de 15 min
+(4.471). "Outra coisa" → o Diretor diz o quê.
 
 ## Etapa 3: lançar e encerrar o turno
 
 1. `bash "${CLAUDE_PLUGIN_ROOT}/scripts/epic-run.sh" <raiz> launch <BRIEF> [flags]` —
    ecoa `revezamento: lançado · pid · dir`. Transcreva.
 2. Mensagem de fecho (≤ 6 linhas): fatia inicial (nova ou retomada) · teto, se houver ·
-   como acompanhar (`/keelson:auto-epic <slug> status`) · como parar (`/keelson:auto-epic
-   <slug> stop`, gracioso; `--now` na hora) · onde o resumo de cada fatia aparece
+   como acompanhar (`/keelson:auto-epic <slug> status`; ao vivo no terminal, o comando
+   do `watch` já resolvido) · como parar (`/keelson:auto-epic <slug> stop`, gracioso;
+   `--now` na hora) · onde o resumo de cada fatia aparece
    (`thoughts/local/epic-run/<slug-âncora>/RESUMO.md`) · retomada depois de qualquer
    parada: `/keelson:auto-epic <slug-âncora>` de novo (fatia que aguarda você passa pelo
    `continue` com você presente).

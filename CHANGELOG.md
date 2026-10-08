@@ -25,6 +25,25 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.218.0] — 2026-10-08
+
+Re-init: none
+
+Decision 4.471 — the epic relay answers "running or stuck?" without a model.
+
+### Added
+
+- **`scripts/epic-run.sh watch <slug>`:** a live feed for a terminal, no model and no
+  tokens — follows the current slice's stream (switches files when the next slice starts)
+  and prints one readable line per event: time, tool called with a short summary, the Tech
+  Lead's text, child session start and end, wave progress from the run-state; a heartbeat
+  "no event for N" every 30 s of silence and a **possible stall** warning above 10 min with
+  the child pid and whether it is alive; exits on its own when the relay stops.
+  `/keelson:auto-epic <slug> watch` answers with the resolved command for your terminal.
+- **`launch --notify`:** system notifications (macOS `osascript`, Linux `notify-send`,
+  `KEELSON_NOTIFY_CMD` overrides) at the end of every slice, at the relay stop and once per
+  slice when the child goes silent above `--stale-min` (15).
+
 ## [0.217.1] — 2026-10-08
 
 Re-init: none

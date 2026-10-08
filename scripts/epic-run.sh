@@ -5,8 +5,10 @@
 # /keelson:continue; a fila do BRIEF épico é o único fato que decide a próxima.
 #
 # Uso: epic-run.sh <raiz> launch <BRIEF-epico> [--max-fatias N] [--timeout-min M] [--retry N]
-#                       [--retry-wait-sec S] [--force-claim] [--model M] [--dry-run] [-- <args extras ao claude>]
+#                       [--retry-wait-sec S] [--force-claim] [--notify] [--stale-min N]
+#                       [--model M] [--dry-run] [-- <args extras ao claude>]
 #      epic-run.sh <raiz> status <slug-ancora>
+#      epic-run.sh <raiz> watch  <slug-ancora> [--stale-min N] [--heartbeat-sec S]
 #      epic-run.sh <raiz> stop   <slug-ancora> [--now]
 #
 #   launch   pré-voo mecânico (nada é escrito numa recusa; a 1ª linha do stdout começa
@@ -51,6 +53,19 @@
 #            evento há <M> min · wave X/Y` (wave do run-state em_andamento do slug de
 #            destino, em qualquer casa; sem run → `forja`) · ou `revezamento: parado —
 #            <motivo> (<ts>)` · ou `nenhum revezamento`. Linhas seguintes: dir e RESUMO.
+#   watch    feed AO VIVO no terminal, sem modelo e sem token (4.471): segue o
+#            stream.jsonl da fatia em curso (troca de arquivo quando a próxima começa) e
+#            imprime uma linha legível por evento — hora · ferramenta chamada com resumo
+#            curto · trecho do texto do Tech Lead · avanço de wave lido do run-state ·
+#            início/fim de sessão. Batimento: sem evento há --heartbeat-sec (default 30)
+#            imprime "sem evento há N"; acima de --stale-min (default 10) avisa POSSÍVEL
+#            TRAVAMENTO com o pid do filho e se está vivo. Sai sozinho quando o
+#            revezamento para (imprime o motivo). Exige python3. Ctrl-C encerra só o watch.
+#   --notify (launch) notificação do sistema nos marcos (4.471): fim de cada fatia (com o
+#            resultado), parada do revezamento e filho mudo acima de --stale-min (default
+#            15, uma vez por fatia). macOS `osascript`, Linux `notify-send`; a variável
+#            KEELSON_NOTIFY_CMD (recebe título e mensagem como argumentos) substitui os
+#            dois — é o gancho de teste e de integração. Sem canal → no-op silencioso.
 #   stop     GRACIOSO por default: grava a marca `STOP`; a fatia em curso termina na
 #            Entrega e a próxima não é lançada (ponto seguro = fronteira de fatia). `--now`
 #            encerra o filho em voo e o driver na hora — a fatia fica como sessão que
@@ -84,6 +99,15 @@ agora() { TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z; }
 # nunca falha e o fallback BSD jamais rodaria; no macOS `-c` é opção ilegal e cai no `-f`.
 mtime() { stat -c %Y "$1" 2>/dev/null || stat -f %m "$1" 2>/dev/null || echo 0; }
 vivo() { [ -n "${1:-}" ] && kill -0 "$1" 2>/dev/null; }
+notificar() { # <título> <mensagem> — só quando o launch pediu --notify (status.tsv notify=1)
+  [ "$(st_get notify 2>/dev/null)" = "1" ] || return 0
+  if [ -n "${KEELSON_NOTIFY_CMD:-}" ]; then "$KEELSON_NOTIFY_CMD" "$1" "$2" >/dev/null 2>&1 || true
+  elif command -v osascript >/dev/null 2>&1; then
+    osascript -e "display notification \"$(printf '%s' "$2" | tr '"' "'")\" with title \"$(printf '%s' "$1" | tr '"' "'")\"" >/dev/null 2>&1 || true
+  elif command -v notify-send >/dev/null 2>&1; then notify-send "$1" "$2" >/dev/null 2>&1 || true
+  fi
+  return 0
+}
 encerrar_pid() { # TERM, depois KILL se insistir
   vivo "$1" || return 0
   kill -TERM "$1" 2>/dev/null; sleep 2
@@ -154,6 +178,7 @@ finalizar() { # <motivo>
   st_set estado parado; st_set motivo "$1"; st_set fim "$ts"
   rm -f "$DIR/driver.pid"
   echo "[$ts] parado — $1" >> "$DIR/launch.log"
+  notificar "keelson · ${SLUG:-épico}" "revezamento parado — $1"
 }
 
 case "$ACTION" in
@@ -162,9 +187,11 @@ launch|_loop)
   BRIEF="${1:-}"; [ -n "$BRIEF" ] || die2 "launch exige o caminho do BRIEF épico (relativo à raiz)"
   shift
   case "$BRIEF" in /*) BRIEF="${BRIEF#"$ROOT"/}" ;; esac
-  MAX=0; TMIN=0; MODEL=""; DRY=0; EXTRA=""; RETRY=2; RWAIT=600; FORCE_CLAIM=0
+  MAX=0; TMIN=0; MODEL=""; DRY=0; EXTRA=""; RETRY=2; RWAIT=600; FORCE_CLAIM=0; NOTIFY=0; STALE=15
   while [ $# -gt 0 ]; do
     case "$1" in
+      --notify) NOTIFY=1 ;;
+      --stale-min) shift; STALE="${1:-15}" ;;
       --max-fatias) shift; MAX="${1:-0}" ;;
       --timeout-min) shift; TMIN="${1:-0}" ;;
       --retry) shift; RETRY="${1:-0}" ;;
@@ -177,7 +204,7 @@ launch|_loop)
     esac
     shift
   done
-  case "$MAX$TMIN$RETRY$RWAIT" in *[!0-9]*) die2 "--max-fatias, --timeout-min, --retry e --retry-wait-sec exigem inteiro" ;; esac
+  case "$MAX$TMIN$RETRY$RWAIT$STALE" in *[!0-9]*) die2 "--max-fatias, --timeout-min, --retry, --retry-wait-sec e --stale-min exigem inteiro" ;; esac
   [ -f "$ROOT/$BRIEF" ] || recusa "BRIEF épico não existe: $BRIEF"
   [ -f "$ES" ] || die2 "epic-state.sh ausente ao lado deste script"
   SLUG="$(slug_ancora_de "$BRIEF")"
@@ -248,19 +275,21 @@ launch|_loop)
     : > "$DIR/status.tsv"
     st_set estado lancando; st_set brief "$BRIEF"; st_set lancado "$(agora)"
     st_set max_fatias "$MAX"; st_set timeout_min "$TMIN"; st_set retry "$RETRY"; st_set force_claim "$FORCE_CLAIM"
+    st_set notify "$NOTIFY"; st_set stale_min "$STALE"
     FC_FLAG=""; [ "$FORCE_CLAIM" -eq 1 ] && FC_FLAG="--force-claim"
+    NF_FLAG=""; [ "$NOTIFY" -eq 1 ] && NF_FLAG="--notify"
     (
       # desacoplado: o subshell morre logo e o laço é reparentado — sobrevive ao turno e à janela
       # shellcheck disable=SC2086
       nohup bash "$0" "$ROOT" _loop "$BRIEF" --max-fatias "$MAX" --timeout-min "$TMIN" --retry "$RETRY" \
-        --retry-wait-sec "$RWAIT" ${FC_FLAG:+"$FC_FLAG"} \
+        --retry-wait-sec "$RWAIT" --stale-min "$STALE" ${FC_FLAG:+"$FC_FLAG"} ${NF_FLAG:+"$NF_FLAG"} \
         ${MODEL:+--model "$MODEL"} -- $EXTRA >> "$DIR/launch.log" 2>&1 &
       echo $! > "$DIR/driver.pid"
     )
     sleep 1
     pid="$(cat "$DIR/driver.pid" 2>/dev/null)"
     echo "revezamento: lançado · pid ${pid:-?} · dir ${DIR#"$ROOT"/}"
-    echo "acompanhe: epic-run.sh <raiz> status $SLUG · pare: epic-run.sh <raiz> stop $SLUG"
+    echo "acompanhe: epic-run.sh <raiz> status $SLUG · ao vivo: epic-run.sh <raiz> watch $SLUG · pare: epic-run.sh <raiz> stop $SLUG"
     exit 0
   fi
 
@@ -302,8 +331,16 @@ O Diretor confirmou que a sessão dona do run em andamento morreu: ao assumir a 
     ) > "$DIR/fatia-$ES_PROX.stream.jsonl" 2> "$DIR/fatia-$ES_PROX.stderr.log" &
     child=$!
     st_set filho_pid "$child"
-    secs=0; rc=""
+    secs=0; rc=""; mudo_avisado=0
     while vivo "$child"; do
+      if [ "$mudo_avisado" -eq 0 ] && [ "$STALE" -gt 0 ] && [ -f "$DIR/fatia-$ES_ATUAL.stream.jsonl" ]; then
+        idade=$(( ( $(date +%s) - $(mtime "$DIR/fatia-$ES_ATUAL.stream.jsonl") ) / 60 ))
+        if [ "$idade" -ge "$STALE" ]; then
+          mudo_avisado=1
+          echo "[$(agora)] fatia $ES_ATUAL — sem evento há ${idade} min (filho pid $child vivo) — possível travamento" >> "$DIR/launch.log"
+          notificar "keelson · $SLUG" "fatia $ES_ATUAL sem evento há ${idade} min — possível travamento (pid $child)"
+        fi
+      fi
       if [ "$TMIN" -gt 0 ] && [ "$secs" -ge $((TMIN * 60)) ]; then
         encerrar_pid "$child"; wait "$child" 2>/dev/null; rc=124
         echo "[$(agora)] fatia $ES_PROX — teto de $TMIN min: filho encerrado" >> "$DIR/launch.log"
@@ -346,6 +383,7 @@ PY
     estado_fila "$BRIEF"
     if [ "$ES_FILA" != "$fila_antes" ]; then
       tent=0; ultima="$antes"
+      notificar "keelson · $SLUG" "fatia $antes ($ES_ATUAL_TITULO) entregue — fila avançou"
       continue
     fi
     # fila parada: infraestrutura (saída ≠ 0 ou sem evento result) tenta de novo; decisão não insiste
@@ -398,6 +436,119 @@ status)
   fi
   echo "dir: ${DIR#"$ROOT"/} · resumo: ${DIR#"$ROOT"/}/RESUMO.md"
   exit 0
+  ;;
+# =====================================================================================
+watch)
+  SLUG="${1:-}"; [ -n "$SLUG" ] || die2 "watch exige o slug-âncora"
+  shift; WSTALE=10; HB=30
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --stale-min) shift; WSTALE="${1:-10}" ;;
+      --heartbeat-sec) shift; HB="${1:-30}" ;;
+      *) die2 "opção desconhecida: $1" ;;
+    esac
+    shift
+  done
+  case "$WSTALE$HB" in *[!0-9]*) die2 "--stale-min e --heartbeat-sec exigem inteiro" ;; esac
+  DIR="$ROOT/thoughts/local/epic-run/$SLUG"
+  [ -f "$DIR/status.tsv" ] || { echo "nenhum revezamento para \`$SLUG\`"; exit 4; }
+  command -v python3 >/dev/null 2>&1 || die2 "watch exige python3"
+  exec python3 - "$DIR" "$ROOT" "$WSTALE" "$HB" <<'PYW'
+import json, os, sys, time, glob
+D, ROOT, STALE, HB = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
+
+def st():
+    d = {}
+    try:
+        for line in open(os.path.join(D, "status.tsv"), encoding="utf-8"):
+            k, _, v = line.rstrip("\n").partition("\t"); d[k] = v
+    except OSError: pass
+    return d
+
+def hora(): return time.strftime("%H:%M:%S")
+def say(txt): print("%s  %s" % (hora(), txt), flush=True)
+def vivo(pid):
+    try: os.kill(int(pid), 0); return True
+    except Exception: return False
+def wave(slug):
+    for f in glob.glob(os.path.join(ROOT, "thoughts/local/run-state-%s.md" % slug)) + \
+             glob.glob(os.path.join(ROOT, "thoughts/local/sessions/*/run-state-%s.md" % slug)):
+        try: txt = open(f, encoding="utf-8").read()
+        except OSError: continue
+        if "status: em_andamento" not in txt: continue
+        wc = wt = ""
+        for l in txt.splitlines():
+            if l.startswith("waves_concluidas:"): wc = l.split(":", 1)[1].strip()
+            if l.startswith("waves_total:"): wt = l.split(":", 1)[1].strip()
+        return (wc, wt)
+    return None
+
+def resumo_tool(name, inp):
+    inp = inp or {}
+    if name == "Bash": return (inp.get("description") or inp.get("command") or "")[:110]
+    for k in ("file_path", "path", "pattern", "description", "prompt", "skill", "command"):
+        if inp.get(k): return str(inp[k])[:110]
+    return ""
+
+def evento(ev):
+    t = ev.get("type")
+    if t == "system" and ev.get("subtype") == "init":
+        say("> sessao filha %s iniciada" % str(ev.get("session_id", ""))[:8])
+    elif t == "assistant":
+        for b in (ev.get("message") or {}).get("content") or []:
+            if not isinstance(b, dict): continue
+            if b.get("type") == "text" and b.get("text"):
+                txt = " ".join(b["text"].split())
+                say("TL: " + (txt[:160] + ("..." if len(txt) > 160 else "")))
+            elif b.get("type") == "tool_use":
+                nome = b.get("name", "?"); r = resumo_tool(nome, b.get("input"))
+                say("[%s] %s" % (nome, r))
+    elif t == "result":
+        say("= sessao filha encerrou - custo US$%s - %s s" % (ev.get("total_cost_usd"), (ev.get("duration_ms") or 0) // 1000))
+
+say("watch - revezamento de %s (Ctrl-C encerra so o watch)" % os.path.basename(D))
+cur = None; fh = None; last_ev = time.time(); last_hb = time.time(); last_wave = None; stale_said = False; fatia_said = None
+while True:
+    s = st()
+    estado = s.get("estado", "")
+    if estado == "parado":
+        say("= revezamento parado - %s" % s.get("motivo", "")); break
+    log = s.get("log", "")
+    path = os.path.join(D, log) if log else None
+    if estado == "rodando" and s.get("fatia") and fatia_said != s.get("fatia"):
+        fatia_said = s.get("fatia")
+        say("== fatia %s (%s - %s) - iniciada %s" % (fatia_said, s.get("titulo", ""), s.get("modo", ""), s.get("iniciada", "")))
+        last_ev = time.time(); stale_said = False
+    if estado == "aguardando_retry":
+        say("~ aguardando nova tentativa da fatia %s (falha de infraestrutura)" % s.get("fatia", "")); time.sleep(HB); continue
+    if path and path != cur and os.path.exists(path):
+        if fh: fh.close()
+        fh = open(path, encoding="utf-8", errors="replace"); cur = path
+    got = False
+    if fh:
+        while True:
+            pos = fh.tell(); line = fh.readline()
+            if not line: break
+            if not line.endswith("\n"): fh.seek(pos); break
+            got = True; last_ev = time.time(); stale_said = False
+            try: evento(json.loads(line))
+            except Exception: pass
+    w = wave(s.get("slug_destino", ""))
+    if w and w != last_wave:
+        last_wave = w
+        if w[1] not in ("", "0"): say("~ wave %s/%s" % w)
+    if not got:
+        quiet = time.time() - last_ev
+        if time.time() - last_hb >= HB and quiet >= HB:
+            last_hb = time.time()
+            m, sec = int(quiet // 60), int(quiet % 60)
+            if quiet >= STALE * 60 and not stale_said:
+                stale_said = True
+                pid = s.get("filho_pid", ""); say("!! POSSIVEL TRAVAMENTO: sem evento ha %dmin - filho pid %s %s" % (m, pid or "?", "vivo" if pid and vivo(pid) else "ausente"))
+            else:
+                say("... sem evento ha %dmin%02ds" % (m, sec))
+        time.sleep(1)
+PYW
   ;;
 # =====================================================================================
 stop)

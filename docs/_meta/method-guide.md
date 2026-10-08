@@ -319,8 +319,12 @@ sua confirmação à sessão filha). Recusa estratégia `por-fatia`, fila na reg
 árvore suja e driver já vivo. Falha de infraestrutura (saída ≠ 0 ou sem `result`) repete
 a mesma fatia após a espera, até `--retry` vezes; parada por decisão não insiste. `status`
 responde em uma linha (fatia, modo, idade do último evento, wave) e, parado, mostra o
-fim do último relatório; `stop` é gracioso (a fatia em curso entrega, a próxima não lança)
-e `stop --now` interrompe na hora. A sessão filha roda com `--dangerously-skip-permissions`
+fim do último relatório; `watch` é o feed ao vivo para um terminal, sem modelo e sem token
+(ferramenta chamada com resumo, texto do Tech Lead, wave do run-state, batimento "sem
+evento há N" e aviso de possível travamento acima de 10 min; sai quando o revezamento
+para); `--notify` no lançamento dispara notificação do sistema no fim de cada fatia, na
+parada e quando a sessão filha fica muda acima de 15 min (decisão 4.471); `stop` é
+gracioso (a fatia em curso entrega, a próxima não lança) e `stop --now` interrompe na hora. A sessão filha roda com `--dangerously-skip-permissions`
 (decisão do Diretor); merge, PR e deploy continuam humanos; a fila nunca ganha estado
 novo (decisão 4.465).
 

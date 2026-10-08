@@ -23,7 +23,11 @@
 #      dona possivelmente viva (casa tocada agora) → exit 6 posse-incerta; --force-claim
 #      aceita e o prompt leva a confirmação (FORCE=1);
 #  11. (4.466) falha de infraestrutura (saída ≠ 0, sem result) → nova tentativa após a
-#      espera, teto por --retry; parada por decisão (saída 0 + result, fila parada) → não insiste.
+#      espera, teto por --retry; parada por decisão (saída 0 + result, fila parada) → não insiste;
+#  12. (4.467) --notify: KEELSON_NOTIFY_CMD recebe (título, mensagem) no fim de cada fatia
+#      e na parada; sem a flag, nenhuma chamada;
+#  13. (4.467) watch: feed ao vivo imprime a fatia, a sessão filha, o texto do Tech Lead e
+#      a parada, e sai sozinho; sem evento acima de --stale-min avisa POSSÍVEL TRAVAMENTO.
 #
 # Uso: scripts/tests/epic-run/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -276,6 +280,46 @@ espera_fim "$D" 90 && ok "infra/fim.txt existe" || bad "infra/fim não apareceu"
 contem "infra/motivo" "$(cat "$D/fim.txt" 2>/dev/null)" "fatia 1 falhou 2 vez(es) por infraestrutura (último exit 1)"
 n="$(grep -c '^argv:' "$FAKE_LOG")"; [ "$n" = "2" ] && ok "infra/2 tentativas" || bad "infra/invocações = $n"
 contem "infra/log da espera" "$(cat "$D/launch.log")" "nova tentativa 2/2 em 1s"
+
+# ---------- 12. --notify (4.467) ----------
+cat > "$BIN/notify-fake" <<'SH'
+#!/usr/bin/env bash
+printf '%s|%s\n' "$1" "$2" >> "$NOTIFY_LOG"
+SH
+chmod +x "$BIN/notify-fake"
+export NOTIFY_LOG="$TMP/notify.log"; : > "$NOTIFY_LOG"
+R="$(mkrepo notify)"; : > "$FAKE_LOG"; export FAKE_BRIEF="$R/$BRIEF_REL"
+out="$(KEELSON_NOTIFY_CMD="$BIN/notify-fake" FAKE_MODE=advance PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL" --notify)"; st=$?
+D="$R/thoughts/local/epic-run/anc"
+espera_fim "$D" 60 && ok "notify/fim" || bad "notify/fim não apareceu" "$(cat "$D/launch.log" 2>/dev/null)"
+n="$(grep -c 'entregue — fila avançou' "$NOTIFY_LOG")"; [ "$n" = "3" ] && ok "notify/3 fatias notificadas" || bad "notify/entregues = $n" "$(cat "$NOTIFY_LOG")"
+contem "notify/parada notificada" "$(cat "$NOTIFY_LOG")" "revezamento parado — fila toda entregue"
+contem "notify/título" "$(cat "$NOTIFY_LOG")" "keelson · anc|"
+: > "$NOTIFY_LOG"
+R="$(mkrepo nonotify)"; : > "$FAKE_LOG"; export FAKE_BRIEF="$R/$BRIEF_REL"
+out="$(KEELSON_NOTIFY_CMD="$BIN/notify-fake" FAKE_MODE=advance PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL" --max-fatias 1)"; st=$?
+D="$R/thoughts/local/epic-run/anc"; espera_fim "$D" 60 >/dev/null
+[ ! -s "$NOTIFY_LOG" ] && ok "notify/sem flag não notifica" || bad "notify/notificou sem flag" "$(cat "$NOTIFY_LOG")"
+
+# ---------- 13. watch (4.467) ----------
+R="$(mkrepo watch)"; : > "$FAKE_LOG"; export FAKE_BRIEF="$R/$BRIEF_REL"
+out="$(FAKE_MODE=slow FAKE_SLEEP=65 PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL" --max-fatias 1)"; st=$?
+D="$R/thoughts/local/epic-run/anc"
+sleep 2
+bash "$ER" "$R" watch anc --heartbeat-sec 1 --stale-min 1 > "$TMP/watch.out" 2>&1 &
+WPID=$!
+espera_fim "$D" 120 >/dev/null
+i=0; while kill -0 "$WPID" 2>/dev/null && [ "$i" -lt 15 ]; do sleep 1; i=$((i + 1)); done
+if kill -0 "$WPID" 2>/dev/null; then bad "watch/não saiu sozinho" "$(cat "$TMP/watch.out")"; kill "$WPID" 2>/dev/null; else ok "watch/saiu ao parar"; fi
+w="$(cat "$TMP/watch.out")"
+contem "watch/cabeçalho" "$w" "watch - revezamento de anc"
+contem "watch/fatia" "$w" "== fatia 1 (Login - nova)"
+contem "watch/sessão filha" "$w" "sessao filha fake-"
+contem "watch/texto do TL" "$w" "TL: Entrega da fatia (fake"
+contem "watch/batimento" "$w" "... sem evento ha"
+contem "watch/travamento" "$w" "!! POSSIVEL TRAVAMENTO: sem evento ha 1min - filho pid"
+contem "watch/parada" "$w" "= revezamento parado - teto de fatias (1) atingido"
+contem "nenhum/watch" "$(bash "$ER" "$R" watch outro 2>/dev/null)" "nenhum revezamento"
 
 if [ "$fail" -gt 0 ]; then echo "epic-run: $fail/$total asserções falharam"; exit 1; fi
 echo "epic-run: $total asserções ok"

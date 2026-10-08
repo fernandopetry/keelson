@@ -138,7 +138,12 @@ nova tentativa da mesma fatia, com espera entre elas; parada por decisão não i
 
 Para acompanhar: `/keelson:auto-epic <slug> status` responde em uma linha — qual fatia,
 desde quando, há quanto tempo o último evento, em que wave; parado, mostra o fim do último
-relatório. Para parar: `/keelson:auto-epic <slug> stop` deixa a fatia em curso terminar na
+relatório. Para **ver ao vivo**, `/keelson:auto-epic <slug> watch` devolve um comando para
+você colar num terminal (o chat não transmite feed contínuo): ele imprime cada ferramenta
+que a sessão da fatia chama, o que o Tech Lead escreve, a wave em curso, um batimento
+"sem evento há N" e um aviso de possível travamento quando a sessão fica muda por mais de
+dez minutos — é a resposta para "está rodando ou travou?". Lançando com `--notify`, o
+sistema avisa no fim de cada fatia, na parada e quando a sessão fica muda. Para parar: `/keelson:auto-epic <slug> stop` deixa a fatia em curso terminar na
 Entrega e não lança a próxima (o ponto seguro é a fronteira de fatia); `stop --now`
 interrompe na hora. O relatório de cada fatia entregue fica em
 `thoughts/local/epic-run/<slug>/RESUMO.md`, e o `continue` o mostra na retomada. Enquanto
