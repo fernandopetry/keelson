@@ -80,7 +80,9 @@ aguarda() { echo "pré-voo: aguarda-diretor — $*"; exit 5; }
 incerta() { echo "pré-voo: posse-incerta — $*"; exit 6; }
 usage() { sed -n '2,/^# Bash 3.2-compat/p' "$0" | sed 's/^# \{0,1\}//'; }
 agora() { TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z; }
-mtime() { stat -f %m "$1" 2>/dev/null || stat -c %Y "$1" 2>/dev/null || echo 0; }
+# GNU primeiro: no Linux `stat -f %m` é ponto de montagem do filesystem (sai 0 com "/"),
+# nunca falha e o fallback BSD jamais rodaria; no macOS `-c` é opção ilegal e cai no `-f`.
+mtime() { stat -c %Y "$1" 2>/dev/null || stat -f %m "$1" 2>/dev/null || echo 0; }
 vivo() { [ -n "${1:-}" ] && kill -0 "$1" 2>/dev/null; }
 encerrar_pid() { # TERM, depois KILL se insistir
   vivo "$1" || return 0

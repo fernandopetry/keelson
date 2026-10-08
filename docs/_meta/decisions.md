@@ -4665,6 +4665,9 @@ Estas decisões nasceram na afinação do fluxo spec-driven do projeto que deu o
 
 **Rodada do smoke (2026-10-08, plugin 0.213.0, `init` + `epic`)**: 13/13 fatos do `init`; no `epic`, o `specify-epic` sem humano decompôs em 2 fatias (73 s, US$0,60), o `launch` passou no pré-voo e o revezamento entregou as duas fatias sem intervenção — fatia 1 em 11 min (US$6,79), fatia 2 em 13 min (US$6,53), fila `concluído`, nenhum `AskUserQuestion` pendurado, nenhum run em andamento ao fim, suíte do consumidor verde; parede do cenário 25 min 45 s, custo ≈ US$13,92. O único vermelho (9/10) era predicado do smoke: o fato "briefs filhos aceitos" filtrava o brief épico pelo **caminho** (`grep -vc -- -epic`) e o diretório do consumidor tinha `-epic` no nome — corrigido para filtrar pelo nome do arquivo (mesma classe da 4.458). Achado cosmético corrigido junto: o stream emite mais de um evento `result` quando um Stop hook cutuca no fim, e o relatório da fatia repetia a linha `[result]` — fica o último. Patch **0.213.1**.
 
+
+**Rodada do CI (2026-10-08, patch 0.217.1)**: o passo de shellcheck do Ubuntu acusava SC2317 na função `cleanup` da suíte (chamada só pelo `trap`; o shellcheck local, 0.11, chama o mesmo caso de SC2329 e a diretiva só cobria esse) e, por falhar antes, escondia a suíte `epic-run` rodando em Linux pela primeira vez: 3/78 vermelhas no `status`, porque `mtime()` tentava `stat -f %m` antes do `-c %Y` — no GNU, `-f %m` é o ponto de montagem do filesystem e sai 0, o fallback nunca roda. Reproduzido localmente com um `stat` que emula o GNU (3/78 antes, 78/78 depois); ordem invertida, macOS continua caindo no `-f`.
+
 ---
 
 ### 4.467 — Intake 2026-10-08: contrato servidor→tela citado da fonte (lint `task-contrato-sem-ancora`); leitor da camada de aplicação conferido por Grep; fim de wave cobra o gate 9 por FEAT pelo grafo; reviewer e performance-engineer leem a régua da worktree no próprio agent; quatro adiadas e uma devolvida

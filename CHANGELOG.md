@@ -25,6 +25,21 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.217.1] — 2026-10-08
+
+Re-init: none
+
+Decision 4.466 (CI round) — the `epic-run` suite ran on Linux for the first time once the
+shellcheck step stopped masking it, and 3 of 78 assertions were red.
+
+### Fixed
+
+- **`scripts/epic-run.sh`, `status`:** the log age was computed with `stat -f %m` first,
+  which on GNU stat is the filesystem mount point and exits 0, so the `-c %Y` fallback
+  never ran and `status` aborted on Linux. GNU form first, BSD form as fallback.
+- **`scripts/tests/epic-run/run.sh`:** the trap-only `cleanup` silences SC2317 as well as
+  SC2329 — the CI shellcheck emits the former, the local 0.11 the latter.
+
 ## [0.217.0] — 2026-10-08
 
 Re-init: none
