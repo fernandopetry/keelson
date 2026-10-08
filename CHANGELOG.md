@@ -25,6 +25,46 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.214.0] — 2026-10-08
+
+Re-init: none
+
+Decision 4.467 — field intake of 2026-10-08: screen TASK criteria fixed the server
+contract from the PLAN instead of the route source; a read route was decomposed without
+its application-layer reader; the per-FEAT gate 9 was silently deferred to the final
+stage; a reviewer planted a mutant on the main tree.
+
+### Added
+
+- **`artifact-lint.sh`, check `task-contrato-sem-ancora` (WARNING):** a "Critérios de
+  pronto" item that fixes an HTTP status (`HTTP 422`, `status 201`, `statusCode: 500`) or
+  a `success:` envelope without an `arquivo:linha` anchor on the same line. The PLAN and
+  the SPEC say what the server should return; the route, Action or DTO source says what
+  it returns today. Contract in `lint-contract.md`; the `task-validator` escalates to
+  ERROR when the route already exists in the repository, and leaves the WARNING when the
+  TASK creates the route. A bare `→ 200` does not trigger.
+- **`/keelson:tasks`, item (a2):** a criterion that consumes an existing route, Action or
+  DTO cites `arquivo:linha` of the source for every fact it fixes — status and envelope,
+  value domain, field name and what it holds, existing label or accessible name, the
+  fixed refusal rule.
+
+### Changed
+
+- **`/keelson:tasks`, principle 2:** a route or screen that reads data has its
+  application-layer reader checked by Grep at fixation time — missing → the TASK includes
+  it or depends on the TASK that creates it. The trigger no longer depends on counting
+  layers.
+- **`/keelson:implement`, end of wave (§3.6, item 2):** the per-FEAT gate 9 is checked
+  against the graph, never from memory — `graph.sh <slug> --check` runs before the wave
+  bulletin; `feat-sem-verificacao` on a FEAT that completed in this wave reopens the wave
+  now. Deferring to the final stage is not an exit, and `consolidado` in the TASK report
+  does not replace the `**Verificação (gate 9)**` line in the SPEC.
+- **`agents/code-reviewer.md`, `agents/performance-engineer.md`:** both read in their
+  own file that a proof that writes to the tree (mutant, fault injection, temporary
+  fixture or test) runs in its own worktree, with the `show-toplevel` self-check —
+  pointer to `core/CODE-REVIEW.md`, §Orquestração, the same form the security-engineer
+  already carries.
+
 ## [0.213.1] — 2026-10-08
 
 Re-init: none

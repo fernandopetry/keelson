@@ -597,6 +597,12 @@ sect == "crit" && line ~ /(^|[ `|(])(grep|egrep|rg|sed) /{
     if (hit) nCifrao++
   }
 }
+sect == "crit" && line ~ /((HTTP[ \/]?|[Ss]tatus(Code|_code)?[ :=`"'*]*)[1-5][0-9][0-9]([^0-9]|$)|success["'`]?[ ]*[:=])/ {
+  # 4.467: fato do contrato servidor→tela (status HTTP, envelope `success:`) fixado sem
+  # ancora `arquivo:linha` no mesmo item — PLAN/SPEC nao e fonte do que o servidor
+  # devolve hoje. Absolve qualquer `nome.ext:NNN` na linha; best-effort por linha.
+  if (line !~ /\.[A-Za-z0-9]+:[0-9]+/) nContrato++
+}
 (sect == "crit" || sect == "gate9") && line ~ /--group[ \t]+[A-Za-z0-9_-]/ {
   # 4.215: lado comando — tag de grupo usada por comando de verificacao (linha sem negacao).
   # Ocorrencia precedida de "sem" ("nasce sem `--group X`") nao e comando e sai da conta
@@ -732,6 +738,9 @@ END {
   if (nDiffBase > 0)
     emit("WARNING", "task-criterio-diff-base-vazio", nDiffBase " criterio(s) com `git diff <default>...HEAD` e esperado vazio — em branch de feature o range contra a default carrega as waves anteriores e o vazio e insatisfazivel; \"esta TASK nao tocou X\" ancora na base da TASK: `git diff <SHA do commit-pai>..HEAD -- <caminho>` (4.459)")
   # `$` nao escapado em aspas duplas: o shell expande antes de grep/rg/sed ver o padrao
+  # status HTTP / envelope `success:` fixado sem ancora arquivo:linha da fonte
+  if (nContrato > 0)
+    emit("WARNING", "task-contrato-sem-ancora", nContrato " criterio(s) fixa(m) status HTTP ou `success:` sem ancora `arquivo:linha` da fonte no mesmo item — PLAN/SPEC nao e fonte do que o servidor devolve hoje; cite a rota/Action/DTO real (4.467)")
   if (nCifrao > 0)
     emit("WARNING", "task-criterio-cifrao-aspas-duplas", nCifrao " criterio(s) com `$` nao escapado dentro de aspas duplas em grep/rg/sed — o shell expande `$nome`/`${…}`/`$(…)` antes de a ferramenta ver o padrao e o comando busca outra coisa; use aspas simples ou `\\$` (4.463)")
   # comando de verificacao contradiz proibicao de tag da mesma TASK

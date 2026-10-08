@@ -185,6 +185,17 @@ arquivos rastreados e palavra inteira (sem casar `removeX` quando o alvo é `mov
 aponte a subárvore (`backend/src`). É WARNING; o `task-validator` escala quando o
 critério é de ausência.
 
+### O lint acusou `task-contrato-sem-ancora` num critério de tela
+
+Um critério de TASK fixa um fato do contrato entre servidor e tela — `status 422`,
+`HTTP 201`, `success: false` — sem dizer de onde esse fato veio. O PLAN e a SPEC dizem o
+que o servidor *deveria* devolver; o que ele devolve hoje está no código da rota, da
+Action ou do DTO. Critério fixado do PLAN põe gerador e developer na mesma crença, e a
+tela nasce certa contra um servidor que responde outra coisa. Cite `arquivo:linha` da
+fonte na mesma linha do critério (`app/Http/Actions/SalvarConfig.php:42`). É WARNING; o
+`task-validator` escala quando a rota já existe no repositório. Rota que nasce na própria
+TASK fica no aviso.
+
 ### O lint acusou "git diff contra a branch default com esperado vazio" num critério
 
 Um critério de ausência ("esta TASK não tocou `src/Legacy/`") usa `git diff main...HEAD`

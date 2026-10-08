@@ -67,6 +67,7 @@ Gates 8 (segurança), 9 (comportamento), 10 (performance) e 11 (design) não sã
 
 Para cada gate:
 - Executar os checks.
+- Prova que **escreve** na árvore (mutante, injeção de falha, fixture ou teste temporário) roda em **worktree própria**, nunca na árvore principal — régua e autocheck (`git rev-parse --show-toplevel` ≠ raiz do checkout antes da 1ª escrita) em `${CLAUDE_PLUGIN_ROOT}/guidelines/core/CODE-REVIEW.md`, §Orquestração (decisão 4.361); developers e outros gates leem e rodam suíte na principal enquanto você revisa.
 - OK ou FAIL com motivo específico e localização (arquivo:linha).
 
 Não pular para próximo se um falhou. Continuar todos para feedback completo.
