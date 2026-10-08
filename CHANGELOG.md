@@ -25,6 +25,24 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.215.0] — 2026-10-08
+
+Re-init: none
+
+Decision 4.468 — item M7 of the 2026-10-08 field intake, applied on the Director's order:
+a screen AC whose acceptance the server decides was proved only against a mocked server.
+
+### Added
+
+- **`/keelson:tasks`, item (k):** an AC whose accept/refuse rule lives in the backend
+  (validation, refusal status, value domain, permission) requires at least one case in
+  its carrier that does not intercept the call carrying the rule — real backend, state
+  seeded by the gate 9 recipe. A mocked response is for transient state and injected
+  failure. A spec that only `route.fulfill`s the write asserts the body the screen sent,
+  never that the server accepts it.
+- **`task-validator`, step 3:** an AC of server rule whose only named carrier intercepts
+  the call → WARNING, by reading; n/a without `quality.e2e`/`gates.screenVerify`.
+
 ## [0.214.0] — 2026-10-08
 
 Re-init: none

@@ -423,11 +423,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.214.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.215.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a screen TASK criterion that fixes an HTTP status or a `success:` envelope without an `arquivo:linha` anchor to the server source is flagged by the lint (`task-contrato-sem-ancora`); the end of a wave runs `graph.sh --check` so a FEAT that completed without its gate 9 line reopens the wave; the code-reviewer and the performance-engineer read in their own file that a proof that writes to the tree runs in its own worktree (see `CHANGELOG.md`).
+New in this release: a screen AC whose accept/refuse rule lives in the backend is no longer proved only against a mocked server — the TASK carries at least one case against the real backend with seeded state (`/keelson:tasks`, item (k)); the `task-validator` flags an AC whose only carrier intercepts the call (see `CHANGELOG.md`).
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
