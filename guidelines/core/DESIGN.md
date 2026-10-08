@@ -33,6 +33,11 @@
 - **Toda vista de dados trata os quatro estados: vazio, carregando, erro, populado.**
   Vista nova sem os quatro = achado bloqueante. O vazio orienta o próximo passo do
   usuário, não anuncia apenas "nenhum registro".
+- **Lista de tamanho não limitado é navegável (decisão 4.470):** vista que exibe
+  coleção sem teto conhecido (resultados, histórico, catálogo) nasce com busca ou
+  filtro, altura máxima com rolagem ou paginação, contagem visível e nome acessível
+  por item — a lista que cabe na tela com 10 registros é inutilizável com 10 mil, e o
+  gate 11 só a pega depois do código.
 - **Controles têm estados interativos visíveis** (hover/focus/active/disabled) — botão
   que não reage ao ponteiro parece quebrado antes de ser clicado.
 - **Toda ação tem resposta perceptível:** operação longa mostra progresso; sucesso e
@@ -73,7 +78,8 @@
 
 ## Régua
 
-- **Régua (Art. 10):** toda vista de dados nova trata vazio/carregando/erro; nenhum
+- **Régua (Art. 10):** toda vista de dados nova trata vazio/carregando/erro e lista sem
+  teto é navegável; nenhum
   componente reinventa padrão que o produto já tem; toda ação tem resposta
   perceptível; contraste e teclado no piso AA.
 - **Anti-falso-positivo:** além do catálogo, achado só entra **ancorado** num padrão

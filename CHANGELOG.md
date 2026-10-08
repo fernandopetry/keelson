@@ -25,6 +25,22 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.217.0] — 2026-10-08
+
+Re-init: none
+
+Decision 4.470 — item M3 of the 2026-10-08 field intake, applied on the Director's order:
+a screen showed an unbounded list with no search, no max height, no count and no
+accessible name per item, and only the design gate caught it after the code was written.
+
+### Added
+
+- **`core/DESIGN.md`, "Estados e feedback":** a view that shows a collection with no
+  known ceiling is born with search or filter, a max height with scrolling or pagination,
+  a visible count and an accessible name per item; the Art. 10 rule names it.
+- **`/keelson:tasks`, item (j):** an FR or AC that shows an unbounded list gets a
+  navigability criterion checked against that rule, before the code.
+
 ## [0.216.0] — 2026-10-08
 
 Re-init: none

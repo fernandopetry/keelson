@@ -423,11 +423,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.216.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.217.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the wave bulletin states the literal suite command and the count that ran, and a filtered run without the `quality.test` suite is declared partial; a process a role started is stopped by PID or port, never by `pkill` on a name nor by taking the environment down (see `CHANGELOG.md`).
+New in this release: a view that shows an unbounded list is born navigable — search or filter, max height with scrolling or pagination, visible count, accessible name per item (`core/DESIGN.md`) — and `/keelson:tasks` fixes that criterion before the code (see `CHANGELOG.md`).
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
