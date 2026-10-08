@@ -310,9 +310,17 @@ próxima fatia consome, degrau 3, conflito de sync, base da branch fora da defau
 encerra a fatia sem marcar `entregue`. O driver relê a fila depois de cada sessão: avançou
 → próxima; não avançou, toda entregue ou aguardando-produto → para, com o motivo em
 `thoughts/local/epic-run/<slug>/` (fim, `status.tsv`, `RESUMO.md` com o relatório de cada
-fatia). Pré-voo mecânico recusa estratégia `por-fatia`, árvore suja, run em andamento e
-driver já vivo. `status` responde em uma linha (fatia, idade do último evento, wave);
-`stop` encerra o filho em voo. A sessão filha roda com `--dangerously-skip-permissions`
+fatia). Pré-voo mecânico com três saídas (decisão 4.466): `ok` (fatia nova, ou fatia parcial
+**retomável** — queda, pausa feita na sessão dela, `stop`, run de sessão morta pela régua
+do `claim`), `aguarda-diretor` (a fatia fechou o run com o prefixo `aguarda Diretor:` —
+parou por decisão sua; o `continue` interativo a retoma com você presente, e só depois o
+revezamento relança) e `posse-incerta` (sessão dona pode estar viva; `--force-claim` leva a
+sua confirmação à sessão filha). Recusa estratégia `por-fatia`, fila na regra 1/5/6,
+árvore suja e driver já vivo. Falha de infraestrutura (saída ≠ 0 ou sem `result`) repete
+a mesma fatia após a espera, até `--retry` vezes; parada por decisão não insiste. `status`
+responde em uma linha (fatia, modo, idade do último evento, wave) e, parado, mostra o
+fim do último relatório; `stop` é gracioso (a fatia em curso entrega, a próxima não lança)
+e `stop --now` interrompe na hora. A sessão filha roda com `--dangerously-skip-permissions`
 (decisão do Diretor); merge, PR e deploy continuam humanos; a fila nunca ganha estado
 novo (decisão 4.465).
 

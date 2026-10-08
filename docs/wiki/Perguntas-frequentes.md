@@ -267,8 +267,11 @@ num processo separado da sua sessão — uma sessão nova por fatia, com context
 uma retomando pelo `continue` e indo até a Entrega. A fila do brief épico decide a próxima
 fatia e o fim; o que precisaria de você (pendência que a próxima fatia consumiria,
 conflito ao sincronizar com a main, decisão de última instância) encerra a fatia sem
-marcá-la entregue, e o revezamento para com o motivo gravado. `status` mostra onde está;
-`stop` interrompe; o relatório de cada fatia fica em `thoughts/local/epic-run/<slug>/RESUMO.md`.
+marcá-la entregue, e o revezamento para com o motivo gravado. Depois de qualquer parada
+(máquina desligou, `stop`, pausa feita dentro da sessão da fatia), o mesmo comando retoma;
+a fatia que parou esperando você passa primeiro pelo `continue` com você presente.
+`status` mostra onde está; `stop` deixa a fatia em curso entregar e não lança a próxima;
+o relatório de cada fatia fica em `thoughts/local/epic-run/<slug>/RESUMO.md`.
 As fatias rodam sem pedir permissão de ferramenta — o comando avisa antes de você
 confirmar. Merge e PR continuam seus. Detalhes no [fluxo de épicos](Fluxo-de-epicos).
 

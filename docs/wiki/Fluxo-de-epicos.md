@@ -113,7 +113,10 @@ flowchart TD
     E --> F{"A fila avançou?"}
     F -- "sim, e sobra fatia" --> E
     F -- "sim, toda entregue" --> G["Para: /keelson:integrate é seu"]
-    F -- "não" --> H["Para com o motivo registrado<br/>/keelson:continue 'slug' retoma"]
+    F -- "não" --> H["Para com o motivo registrado"]
+    H --> I{"Parou por decisão sua?"}
+    I -- "sim" --> J["/keelson:continue 'slug' com você presente<br/>depois /keelson:auto-epic de novo"]
+    I -- "não (queda, pausa, stop)" --> A
 ```
 
 O que uma fatia decide sozinha e o que a faz parar está escrito no [guia do
@@ -124,9 +127,20 @@ sincronizar com a main, a base da branch fora da default — encerra a fatia **s
 `entregue`, e o revezamento para ali com o motivo. Cada fatia roda sem pedir permissão
 de ferramenta (ninguém responderia), por isso o comando diz isso antes de você confirmar.
 
+**Retomar depois de qualquer parada é o mesmo comando.** A máquina desligou, a internet
+caiu, você deu `stop`, ou pausou com `/keelson:pause` dentro da sessão de uma fatia: rode
+`/keelson:auto-epic <slug>` de novo. O pré-voo lê o estado da fatia parcial e a sessão
+seguinte a retoma na wave onde parou. A única parada que ele **não** retoma sozinho é a
+fatia que parou esperando uma decisão sua: ali ele mostra a pergunta pendente e roda o
+`/keelson:continue` nesta sessão, com você presente, até entregar essa fatia — e só então
+lança o revezamento pelas restantes. Queda de rede ou de API no meio de uma fatia ganha
+nova tentativa da mesma fatia, com espera entre elas; parada por decisão não insiste.
+
 Para acompanhar: `/keelson:auto-epic <slug> status` responde em uma linha — qual fatia,
-desde quando, há quanto tempo o último evento, em que wave. Para parar: `/keelson:auto-epic
-<slug> stop`. O relatório de cada fatia entregue fica em
+desde quando, há quanto tempo o último evento, em que wave; parado, mostra o fim do último
+relatório. Para parar: `/keelson:auto-epic <slug> stop` deixa a fatia em curso terminar na
+Entrega e não lança a próxima (o ponto seguro é a fronteira de fatia); `stop --now`
+interrompe na hora. O relatório de cada fatia entregue fica em
 `thoughts/local/epic-run/<slug>/RESUMO.md`, e o `continue` o mostra na retomada. Enquanto
 o revezamento roda, não use a árvore do projeto noutra sessão: a fatia commita em cima do
 que estiver lá. Estratégia `por-fatia` fica fora — ali a fatia seguinte depende de um merge

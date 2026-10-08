@@ -288,11 +288,17 @@ desenho, quando algo exigia você: uma pendência que a próxima fatia consumiri
 ao sincronizar a branch com a main, a base da branch fora da default, ou uma decisão de
 última instância. O detalhe está no relatório da fatia em
 `thoughts/local/epic-run/<slug>/RESUMO.md` e no estado de execução que a sessão fechou.
-`/keelson:continue <slug>` retoma do ponto exato, mostrando o resumo. `morto — driver sumiu
-sem registrar fim` é outra coisa: o processo foi encerrado por fora (máquina reiniciada,
-`kill`); a fatia em curso fica como qualquer sessão que caiu, e o `continue` a retoma.
-Se o pré-voo recusou lançar (`estratégia por-fatia`, `árvore suja`, `run em andamento`,
-`thoughts/ não está no .gitignore`), o motivo diz o que resolver — nada disso se contorna.
+O próprio `status`, parado, mostra o fim desse relatório. Rode `/keelson:auto-epic <slug>`
+de novo: se a fatia parou esperando uma decisão sua (`aguarda-diretor`), ele mostra a
+pergunta e roda o `/keelson:continue` com você presente antes de relançar; se parou por
+outro motivo, o revezamento a retoma. `falhou N vezes por infraestrutura` é rede ou API
+fora do ar: o `stderr` da fatia diz qual; relance quando a causa passar. `morto — driver
+sumiu sem registrar fim` é o processo encerrado por fora (máquina reiniciada, `kill`); a
+fatia em curso fica como qualquer sessão que caiu e o mesmo comando a retoma.
+`posse-incerta` significa que a sessão que conduzia a fatia foi tocada há menos de vinte
+minutos e pode estar viva: espere, ou confirme que ela morreu quando o comando perguntar.
+Se o pré-voo recusou lançar (`estratégia por-fatia`, `árvore suja`, `thoughts/ não está
+no .gitignore`), o motivo diz o que resolver — nada disso se contorna.
 
 ### A sessão morreu no meio da suíte e a retomada disse "nada a fazer"
 

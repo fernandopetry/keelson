@@ -43,7 +43,11 @@ principal.
    run `em_andamento` → responda *"nada em andamento — não há ciclo para pausar"* e
    encerre: sessão livre não tem o que pausar (a mudança sob demanda fecha com o
    relatório). Run `em_andamento` de **outra** sessão → terceira saída da posse (4.251):
-   não pausa, inventaria e escala ao Diretor; `FORCE=1` não é saída.
+   não pausa, inventaria e escala ao Diretor; `FORCE=1` não é saída. Run da sessão
+   filha de um revezamento vivo (`epic-run.sh <raiz> status <slug-âncora>` diz `rodando`)
+   → a pausa segura é a fronteira de fatia: aponte `/keelson:auto-epic <slug> stop`
+   (4.466). Pausa feita **dentro** da sessão da fatia (este comando, na sessão que a
+   conduz) é estado retomável — tanto pelo `/keelson:continue` quanto pelo revezamento.
 2. **Warroom ativo nesta sessão** (`bash "${CLAUDE_PLUGIN_ROOT}/scripts/warroom.sh" <raiz>
    status`) → não há run (os dois estados se excluem): aponte `/keelson:warroom close`,
    que fecha a janela e cobra a dívida.

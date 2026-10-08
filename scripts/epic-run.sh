@@ -4,18 +4,25 @@
 # `claude -p` próprio (contexto limpo, sessão própria), lendo o estado do disco pelo
 # /keelson:continue; a fila do BRIEF épico é o único fato que decide a próxima.
 #
-# Uso: epic-run.sh <raiz> launch <BRIEF-epico> [--max-fatias N] [--timeout-min M]
-#                                              [--model M] [--dry-run] [-- <args extras ao claude>]
+# Uso: epic-run.sh <raiz> launch <BRIEF-epico> [--max-fatias N] [--timeout-min M] [--retry N]
+#                       [--retry-wait-sec S] [--force-claim] [--model M] [--dry-run] [-- <args extras ao claude>]
 #      epic-run.sh <raiz> status <slug-ancora>
-#      epic-run.sh <raiz> stop   <slug-ancora>
+#      epic-run.sh <raiz> stop   <slug-ancora> [--now]
 #
-#   launch   pré-voo mecânico (toda recusa é exit 3 com o motivo em stdout; nada é escrito):
-#            BRIEF existe · estratégia `unica` (por-fatia depende de merge do Diretor,
-#            4.190) · `epic-state.sh` na regra 4 (fatia entregue/nenhuma + próxima
-#            pendente; qualquer outra regra ou `aviso` recusa, com o rótulo) · árvore limpa
-#            (`git status --porcelain` vazio) · `claude` no PATH · `thoughts/` ignorado
-#            (`git check-ignore`, 4.51) · nenhum run-state `em_andamento` do slug de
-#            destino em casa alguma · nenhum driver vivo para o épico. Passou → cria
+#   launch   pré-voo mecânico (nada é escrito numa recusa; a 1ª linha do stdout começa
+#            com a classe): `pré-voo: recusado` (exit 3) · `pré-voo: aguarda-diretor`
+#            (exit 5) · `pré-voo: posse-incerta` (exit 6). Recusa: BRIEF ausente ·
+#            estratégia ≠ `unica` (fatia dependente de merge é ato do Diretor, 4.190) ·
+#            fila na regra 1/5/6 ou com `aviso` · árvore suja · `claude` fora do PATH ·
+#            `thoughts/` não ignorado (4.51) · driver vivo. Regra 4 (próxima pendente)
+#            parte limpo. Regra 2/3 (fatia `em ciclo` parcial — 4.466) é RETOMÁVEL quando
+#            o run-state mais recente do slug de destino está `encerrado — pausa…`/outro
+#            motivo, ou não existe, ou está `em_andamento` de dona MORTA pela régua do
+#            `claim --check` (4.396); `encerrado — aguarda Diretor: …` → aguarda-diretor
+#            (a fatia parou por decisão sua: o /keelson:continue INTERATIVO a retoma com
+#            você presente — nunca o revezamento); dona possivelmente viva → posse-incerta
+#            (espere o limiar ou `--force-claim`, que leva ao filho a sua confirmação de
+#            que a dona morreu — FORCE=1 é ato do humano, 4.431). Passou → cria
 #            thoughts/local/epic-run/<slug-ancora>/ (driver.pid, status.tsv, launch.log)
 #            e lança o laço DESACOPLADO (nohup + subshell: sobrevive ao fim do turno e ao
 #            fechamento da janela que o lançou). Ecoa `revezamento: lançado · pid · dir`.
@@ -29,22 +36,31 @@
 #            texto do assistente em fatia-N.result.txt (python3; ausente, declarado) e
 #            anexado ao RESUMO.md — é o resumo que a próxima retomada humana lê. Depois
 #            de cada fatia relê a fila: a mesma fatia ainda pendente → `fatia N não
-#            avançou` (escalação, degrau 3 ou falha — o motivo está no run-state/ledger
-#            da sessão filha); regra 6 → `fila toda entregue`; 5 → `aguardando-produto`;
-#            outra/aviso → rótulo. --max-fatias N para no teto; --timeout-min M mata a
-#            fatia que passar do teto (0 = sem teto).
+#            avançou` — o progresso é a FILA ter mudado (fatia retomada que entrega
+#            também avança); regra 6 → `fila toda entregue`; 5 → `aguardando-produto`;
+#            1/aviso → rótulo; 2/3 → a próxima sessão retoma a fatia parcial. Fila
+#            parada com o filho saindo ≠ 0 ou SEM evento `result` é falha de
+#            INFRAESTRUTURA (rede, API, processo morto): nova tentativa da MESMA fatia
+#            após --retry-wait-sec (default 600) até --retry vezes (default 2); saída 0
+#            com `result` e fila parada é parada por DECISÃO — não se insiste. Marca
+#            `STOP` no dir (stop gracioso) é lida antes de lançar a próxima fatia.
+#            --max-fatias N para no teto; --timeout-min M mata a fatia que passar do teto
+#            (0 = sem teto).
 #            Fim: fim.txt (`<ts>\t<motivo>`), status.tsv `estado parado`, driver.pid removido.
 #   status   uma linha: `revezamento: rodando · fatia N (<título>) · iniciada <ts> · último
 #            evento há <M> min · wave X/Y` (wave do run-state em_andamento do slug de
 #            destino, em qualquer casa; sem run → `forja`) · ou `revezamento: parado —
 #            <motivo> (<ts>)` · ou `nenhum revezamento`. Linhas seguintes: dir e RESUMO.
-#   stop     encerra o filho em voo e o driver; grava `pedido do Diretor` como motivo. A
-#            fatia interrompida fica como o /keelson:continue a encontrar (run-state da
-#            sessão filha, closures commitadas).
+#   stop     GRACIOSO por default: grava a marca `STOP`; a fatia em curso termina na
+#            Entrega e a próxima não é lançada (ponto seguro = fronteira de fatia). `--now`
+#            encerra o filho em voo e o driver na hora — a fatia fica como sessão que
+#            caiu (retomável pelo launch ou pelo /keelson:continue). Motivo gravado:
+#            `pedido do Diretor`.
 #
 # Vocabulário da fila NUNCA muda (4.156): o motivo de parada vive aqui e no run-state,
 # nunca num estado novo na tabela do BRIEF.
-# Exit: 0 ok · 2 uso incorreto · 3 pré-voo recusou · 4 nada em andamento (status/stop).
+# Exit: 0 ok · 2 uso incorreto · 3 pré-voo recusou · 4 nada em andamento (status/stop) ·
+#       5 aguarda Diretor · 6 posse incerta.
 # Bash 3.2-compatível; python3 opcional (extração do texto).
 
 set -u
@@ -60,6 +76,8 @@ PERM_FLAG="${KEELSON_EPIC_PERM:---dangerously-skip-permissions}"
 
 die2() { echo "ERRO: $*" >&2; exit 2; }
 recusa() { echo "pré-voo: recusado — $*"; exit 3; }
+aguarda() { echo "pré-voo: aguarda-diretor — $*"; exit 5; }
+incerta() { echo "pré-voo: posse-incerta — $*"; exit 6; }
 usage() { sed -n '2,/^# Bash 3.2-compat/p' "$0" | sed 's/^# \{0,1\}//'; }
 agora() { TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%z; }
 mtime() { stat -f %m "$1" 2>/dev/null || stat -c %Y "$1" 2>/dev/null || echo 0; }
@@ -90,12 +108,24 @@ estado_fila() { # <brief> → ES_REGRA ES_ROTULO ES_ESTRATEGIA ES_AVISO ES_PROX 
   ES_AVISO="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="aviso"{print 1; exit}')"
   ES_PROX="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="fatia" && $4=="pendente"{print $2; exit}')"
   ES_PROX_SLUG="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="fatia" && $4=="pendente"{print $3; exit}')"
-  ES_PROX_TITULO=""
-  if [ -n "$ES_PROX" ]; then
-    ES_PROX_TITULO="$(awk -F'|' -v n="$ES_PROX" '
+  ES_FILA="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="fatia"')"
+  # fatia ATUAL: a `em ciclo` (regra 2/3 — retomada) ou, sem ela, a próxima pendente
+  ES_ATUAL="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="fatia" && $4 ~ /^em ciclo/ {print $2; exit}')"
+  ES_ATUAL_SLUG="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="fatia" && $4 ~ /^em ciclo/ {print $3; exit}')"
+  ES_ATUAL_MODO="retomada"
+  if [ -z "$ES_ATUAL" ]; then ES_ATUAL="$ES_PROX"; ES_ATUAL_SLUG="$ES_PROX_SLUG"; ES_ATUAL_MODO="nova"; fi
+  ES_ATUAL_TITULO=""
+  if [ -n "$ES_ATUAL" ]; then
+    ES_ATUAL_TITULO="$(awk -F'|' -v n="$ES_ATUAL" '
       /^\|/ { a=$2; gsub(/^[ \t]+|[ \t]+$/, "", a); if (a == n) { t=$3; gsub(/^[ \t]+|[ \t]+$/, "", t); gsub(/\*\*/, "", t); print t; exit } }
     ' "$ROOT/$1")"
   fi
+  ES_PROX_TITULO="$ES_ATUAL_TITULO"
+}
+
+run_state_recente() { # <slug> → ecoa o run-state MAIS RECENTE do slug (qualquer status, qualquer casa) ou nada
+  # shellcheck disable=SC2012
+  ls -t "$ROOT"/thoughts/local/run-state-"$1".md "$ROOT"/thoughts/local/sessions/*/run-state-"$1".md 2>/dev/null | head -1
 }
 
 slug_ancora_de() { d="$(dirname "$1")"; d="$(dirname "$d")"; basename "$d"; }
@@ -130,11 +160,14 @@ launch|_loop)
   BRIEF="${1:-}"; [ -n "$BRIEF" ] || die2 "launch exige o caminho do BRIEF épico (relativo à raiz)"
   shift
   case "$BRIEF" in /*) BRIEF="${BRIEF#"$ROOT"/}" ;; esac
-  MAX=0; TMIN=0; MODEL=""; DRY=0; EXTRA=""
+  MAX=0; TMIN=0; MODEL=""; DRY=0; EXTRA=""; RETRY=2; RWAIT=600; FORCE_CLAIM=0
   while [ $# -gt 0 ]; do
     case "$1" in
       --max-fatias) shift; MAX="${1:-0}" ;;
       --timeout-min) shift; TMIN="${1:-0}" ;;
+      --retry) shift; RETRY="${1:-0}" ;;
+      --retry-wait-sec) shift; RWAIT="${1:-600}" ;;
+      --force-claim) FORCE_CLAIM=1 ;;
       --model) shift; MODEL="${1:-}" ;;
       --dry-run) DRY=1 ;;
       --) shift; EXTRA="$*"; break ;;
@@ -142,7 +175,7 @@ launch|_loop)
     esac
     shift
   done
-  case "$MAX$TMIN" in *[!0-9]*) die2 "--max-fatias e --timeout-min exigem inteiro" ;; esac
+  case "$MAX$TMIN$RETRY$RWAIT" in *[!0-9]*) die2 "--max-fatias, --timeout-min, --retry e --retry-wait-sec exigem inteiro" ;; esac
   [ -f "$ROOT/$BRIEF" ] || recusa "BRIEF épico não existe: $BRIEF"
   [ -f "$ES" ] || die2 "epic-state.sh ausente ao lado deste script"
   SLUG="$(slug_ancora_de "$BRIEF")"
@@ -156,31 +189,69 @@ launch|_loop)
       unica|"") : ;;
       *) recusa "estratégia \`$ES_ESTRATEGIA\` — o revezamento exige \`unica\` (fatia dependente de merge é ato do Diretor, 4.190)" ;;
     esac
-    [ "$ES_REGRA" = "4" ] || recusa "fila na regra ${ES_REGRA:--} (${ES_ROTULO:-sem rótulo}) — o revezamento só larga com a próxima fatia pendente e nada em ciclo"
-    [ -n "$ES_PROX" ] || recusa "nenhuma fatia pendente"
+    case "$ES_REGRA" in
+      4) : ;;
+      2|3) : ;;   # fatia em ciclo parcial / fila desatualizada — retomável (4.466), julgada abaixo
+      6) recusa "fila na regra 6 (${ES_ROTULO}) — nada a revezar; o PR do épico é o /keelson:integrate" ;;
+      5) recusa "fila na regra 5 (${ES_ROTULO}) — a próxima fatia aguarda produto" ;;
+      1) recusa "fila na regra 1 (${ES_ROTULO}) — a forja da fatia aguarda produto: /keelson:brief" ;;
+      *) recusa "fila na regra ${ES_REGRA:--} (${ES_ROTULO:-sem rótulo})" ;;
+    esac
+    [ -n "$ES_ATUAL" ] || recusa "nenhuma fatia pendente nem em ciclo"
     git -C "$ROOT" rev-parse --show-toplevel >/dev/null 2>&1 || recusa "raiz não é repositório git"
     [ -z "$(git -C "$ROOT" status --porcelain 2>/dev/null)" ] || recusa "árvore suja — commite ou descarte antes (a fatia nasce de HEAD)"
     command -v claude >/dev/null 2>&1 || recusa "CLI \`claude\` ausente no PATH"
     git -C "$ROOT" check-ignore -q "thoughts/local/epic-run/$SLUG/x" 2>/dev/null \
       || recusa "thoughts/ não está no .gitignore — rode /keelson:init (Etapa 5.5) antes"
-    if rs="$(run_state_vivo "$ES_PROX_SLUG")"; then
-      recusa "run em andamento para \`$ES_PROX_SLUG\` (${rs#"$ROOT"/}) — retome pelo /keelson:continue ou encerre antes"
-    fi
     if [ -f "$DIR/driver.pid" ] && vivo "$(cat "$DIR/driver.pid" 2>/dev/null)"; then
       recusa "revezamento já em curso para \`$SLUG\` (pid $(cat "$DIR/driver.pid")) — \`status\`/\`stop\` antes"
     fi
-    echo "pré-voo: ok · épico $SLUG · estratégia ${ES_ESTRATEGIA:-unica} · próxima fatia $ES_PROX ($ES_PROX_TITULO → $ES_PROX_SLUG)"
+    # Fatia parcial (4.466): o run-state do slug de destino diz POR QUE ela parou.
+    RETOMADA=""
+    if rs="$(run_state_vivo "$ES_ATUAL_SLUG")"; then
+      posse="$(cd "$ROOT" && bash "$HERE/run-state.sh" "$ROOT" claim "$ES_ATUAL_SLUG" --check 2>/dev/null)"; pst=$?
+      case "$posse" in
+        "posse: assumivel"*) RETOMADA="run em andamento de sessão morta (${posse#posse: assumivel · }) — o continue da sessão filha assume a posse (4.396)" ;;
+        "posse: propria"*)   recusa "run em andamento DESTA sessão para \`$ES_ATUAL_SLUG\` (${rs#"$ROOT"/}) — termine ou encerre aqui" ;;
+        *) if [ "$FORCE_CLAIM" -eq 1 ]; then
+             RETOMADA="posse forçada pelo Diretor (--force-claim): ${posse#posse: }"
+           else
+             incerta "run em andamento para \`$ES_ATUAL_SLUG\` (${rs#"$ROOT"/}): ${posse#posse: recusada · } — espere o limiar, confirme a morte da dona com --force-claim, ou retome pelo /keelson:continue (exit claim $pst)"
+           fi ;;
+      esac
+    elif [ "$ES_ATUAL_MODO" = "retomada" ]; then
+      rr="$(run_state_recente "$ES_ATUAL_SLUG")"
+      if [ -n "$rr" ]; then
+        motivo_rs="$(sed -n 's/^status:[ 	]*//p' "$rr" | head -1)"
+        case "$motivo_rs" in
+          *"aguarda Diretor"*|*"degrau 3"*)
+            # shellcheck disable=SC2012
+            ult="$(ls -t "$DIR"/fatia-*.result.txt 2>/dev/null | head -1)"
+            aguarda "a fatia $ES_ATUAL ($ES_ATUAL_TITULO) parou por decisão sua — run ${rr#"$ROOT"/}: \`$motivo_rs\`${ult:+ · último relatório: ${ult#"$ROOT"/}} — retome pelo /keelson:continue $SLUG com você presente; depois relance o revezamento" ;;
+          *) RETOMADA="run ${rr#"$ROOT"/} \`$motivo_rs\` — retomável pelo continue da sessão filha" ;;
+        esac
+      else
+        RETOMADA="fatia em ciclo sem run-state nesta máquina — o continue da sessão filha deriva o ponto dos artefatos commitados"
+      fi
+    fi
+    if [ "$ES_ATUAL_MODO" = "retomada" ]; then
+      echo "pré-voo: ok · épico $SLUG · estratégia ${ES_ESTRATEGIA:-unica} · retomar fatia $ES_ATUAL ($ES_ATUAL_TITULO → $ES_ATUAL_SLUG) · $RETOMADA"
+    else
+      echo "pré-voo: ok · épico $SLUG · estratégia ${ES_ESTRATEGIA:-unica} · próxima fatia $ES_ATUAL ($ES_ATUAL_TITULO → $ES_ATUAL_SLUG)"
+    fi
     echo "permissões da sessão filha: $PERM_FLAG (decisão do Diretor, 4.465)"
     [ "$DRY" -eq 1 ] && { echo "dry-run: nada lançado"; exit 0; }
     mkdir -p "$DIR" || die2 "não criou $DIR"
-    rm -f "$DIR/fim.txt"
+    rm -f "$DIR/fim.txt" "$DIR/STOP"
     : > "$DIR/status.tsv"
     st_set estado lancando; st_set brief "$BRIEF"; st_set lancado "$(agora)"
-    st_set max_fatias "$MAX"; st_set timeout_min "$TMIN"
+    st_set max_fatias "$MAX"; st_set timeout_min "$TMIN"; st_set retry "$RETRY"; st_set force_claim "$FORCE_CLAIM"
+    FC_FLAG=""; [ "$FORCE_CLAIM" -eq 1 ] && FC_FLAG="--force-claim"
     (
       # desacoplado: o subshell morre logo e o laço é reparentado — sobrevive ao turno e à janela
       # shellcheck disable=SC2086
-      nohup bash "$0" "$ROOT" _loop "$BRIEF" --max-fatias "$MAX" --timeout-min "$TMIN" \
+      nohup bash "$0" "$ROOT" _loop "$BRIEF" --max-fatias "$MAX" --timeout-min "$TMIN" --retry "$RETRY" \
+        --retry-wait-sec "$RWAIT" ${FC_FLAG:+"$FC_FLAG"} \
         ${MODEL:+--model "$MODEL"} -- $EXTRA >> "$DIR/launch.log" 2>&1 &
       echo $! > "$DIR/driver.pid"
     )
@@ -195,25 +266,31 @@ launch|_loop)
   [ -d "$DIR" ] || die2 "dir do revezamento ausente: $DIR"
   echo $$ > "$DIR/driver.pid"
   trap 'finalizar "driver encerrado por sinal"; exit 0' TERM INT HUP
-  n=0
+  n=0; tent=0; ultima=""
   while :; do
     estado_fila "$BRIEF"
     if [ -n "$ES_AVISO" ]; then finalizar "fila com estado fora do vocabulário (aviso do epic-state)"; break; fi
     case "$ES_REGRA" in
-      4) : ;;
+      4|2|3) : ;;
       6) finalizar "fila toda entregue"; break ;;
       5) finalizar "próxima fatia aguardando-produto — ${ES_ROTULO}"; break ;;
       *) finalizar "fila na regra ${ES_REGRA:--} — ${ES_ROTULO:-sem rótulo}"; break ;;
     esac
-    [ -n "$ES_PROX" ] || { finalizar "nenhuma fatia pendente"; break; }
-    n=$((n + 1))
-    if [ "$MAX" -gt 0 ] && [ "$n" -gt "$MAX" ]; then finalizar "teto de fatias ($MAX) atingido — próxima pendente: $ES_PROX"; break; fi
+    [ -n "$ES_ATUAL" ] || { finalizar "nenhuma fatia pendente nem em ciclo"; break; }
+    if [ -f "$DIR/STOP" ]; then rm -f "$DIR/STOP"; finalizar "pedido do Diretor (stop)${ultima:+ — após a fatia $ultima}; próxima: $ES_ATUAL"; break; fi
+    if [ "$tent" -eq 0 ]; then
+      n=$((n + 1))
+      if [ "$MAX" -gt 0 ] && [ "$n" -gt "$MAX" ]; then finalizar "teto de fatias ($MAX) atingido — próxima: $ES_ATUAL"; break; fi
+    fi
     ts="$(agora)"
-    st_set estado rodando; st_set fatia "$ES_PROX"; st_set titulo "$ES_PROX_TITULO"
-    st_set slug_destino "$ES_PROX_SLUG"; st_set iniciada "$ts"; st_set log "fatia-$ES_PROX.stream.jsonl"
-    echo "[$ts] fatia $ES_PROX ($ES_PROX_TITULO → $ES_PROX_SLUG) — lançando claude -p" >> "$DIR/launch.log"
+    st_set estado rodando; st_set fatia "$ES_ATUAL"; st_set titulo "$ES_ATUAL_TITULO"; st_set modo "$ES_ATUAL_MODO"
+    st_set slug_destino "$ES_ATUAL_SLUG"; st_set iniciada "$ts"; st_set log "fatia-$ES_ATUAL.stream.jsonl"; st_set tentativa "$((tent + 1))"
+    echo "[$ts] fatia $ES_ATUAL ($ES_ATUAL_TITULO → $ES_ATUAL_SLUG · $ES_ATUAL_MODO · tentativa $((tent + 1))) — lançando claude -p" >> "$DIR/launch.log"
     prompt="/keelson:continue $SLUG
-Esta sessão não tem humano interativo: é a fatia $ES_PROX do revezamento do /keelson:auto-epic (regra da sessão sem humano: sdd-conventions.md, \"Sessão sem humano\"). Confirme a fatia proposta como default e execute a rota nesta sessão até a Entrega. Não abra PR, não mergeie."
+Esta sessão não tem humano interativo: é a fatia $ES_ATUAL do revezamento do /keelson:auto-epic (regra da sessão sem humano: sdd-conventions.md, \"Sessão sem humano\"). Confirme a proposta como default e execute a rota nesta sessão até a Entrega. Não abra PR, não mergeie."
+    [ "$FORCE_CLAIM" -eq 1 ] && prompt="$prompt
+O Diretor confirmou que a sessão dona do run em andamento morreu: ao assumir a posse, use FORCE=1 no claim (4.431)."
+    fila_antes="$ES_FILA"
     (
       # shellcheck disable=SC2086
       cd "$ROOT" && exec env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_ENTRYPOINT -u CLAUDE_CODE_CHILD_SESSION \
@@ -261,12 +338,26 @@ PY
       cat "$res"; printf '\n'
     } >> "$DIR/RESUMO.md"
     echo "[$(agora)] fatia $ES_PROX — claude saiu com $rc" >> "$DIR/launch.log"
-    antes="$ES_PROX"
+    antes="$ES_ATUAL"
     estado_fila "$BRIEF"
-    if [ "$ES_PROX" = "$antes" ]; then
-      finalizar "fatia $antes não avançou (exit $rc) — motivo no run-state/ledger da sessão filha e em fatia-$antes.result.txt"
+    if [ "$ES_FILA" != "$fila_antes" ]; then
+      tent=0; ultima="$antes"
+      continue
+    fi
+    # fila parada: infraestrutura (saída ≠ 0 ou sem evento result) tenta de novo; decisão não insiste
+    if [ "$rc" -ne 0 ] || ! grep -q '"type":"result"' "$DIR/fatia-$antes.stream.jsonl" 2>/dev/null; then
+      if [ "$tent" -lt "$RETRY" ]; then
+        tent=$((tent + 1))
+        echo "[$(agora)] fatia $antes — falha de infraestrutura (exit $rc); nova tentativa $((tent + 1))/$((RETRY + 1)) em ${RWAIT}s" >> "$DIR/launch.log"
+        st_set estado aguardando_retry; st_set proxima_tentativa_em "${RWAIT}s"
+        w=0; while [ "$w" -lt "$RWAIT" ]; do [ -f "$DIR/STOP" ] && break; sleep 5; w=$((w + 5)); done
+        continue
+      fi
+      finalizar "fatia $antes falhou $((tent + 1)) vez(es) por infraestrutura (último exit $rc) — veja fatia-$antes.stderr.log; relance quando a causa passar"
       break
     fi
+    finalizar "fatia $antes não avançou (exit $rc) — parada por decisão: motivo no run-state da sessão filha e em fatia-$antes.result.txt"
+    break
   done
   exit 0
   ;;
@@ -289,9 +380,17 @@ status)
       wc_="$(sed -n 's/^waves_concluidas:[ 	]*//p' "$rs" | head -1)"; wt_="$(sed -n 's/^waves_total:[ 	]*//p' "$rs" | head -1)"
       [ "${wt_:-0}" = "0" ] || wave="wave ${wc_:-0}/${wt_}"
     fi
-    echo "revezamento: rodando · fatia $(st_get fatia) ($(st_get titulo)) · iniciada $(st_get iniciada) · último evento há ${idade} min · ${wave} · driver pid $pid"
+    parando=""; [ -f "$DIR/STOP" ] && parando=" · PARANDO após esta fatia (stop gracioso)"
+    echo "revezamento: rodando · fatia $(st_get fatia) ($(st_get titulo) · $(st_get modo)) · iniciada $(st_get iniciada) · último evento há ${idade} min · ${wave} · driver pid $pid${parando}"
+  elif [ "$estado" = "aguardando_retry" ]; then
+    echo "revezamento: aguardando nova tentativa da fatia $(st_get fatia) (falha de infraestrutura; próxima em $(st_get proxima_tentativa_em)) · driver pid $pid"
   else
     echo "revezamento: parado — $(st_get motivo) ($(st_get fim))"
+    case "$(st_get motivo)" in
+      *"não avançou"*|*"falhou"*)
+        f="$(st_get fatia)"; r="$DIR/fatia-$f.result.txt"
+        if [ -s "$r" ]; then echo "último relatório (fatia $f, fim):"; tail -n 15 "$r" | sed 's/^/  /'; fi ;;
+    esac
   fi
   echo "dir: ${DIR#"$ROOT"/} · resumo: ${DIR#"$ROOT"/}/RESUMO.md"
   exit 0
@@ -299,14 +398,21 @@ status)
 # =====================================================================================
 stop)
   SLUG="${1:-}"; [ -n "$SLUG" ] || die2 "stop exige o slug-âncora"
+  shift; NOW=0
+  while [ $# -gt 0 ]; do case "$1" in --now) NOW=1 ;; *) die2 "opção desconhecida: $1" ;; esac; shift; done
   DIR="$ROOT/thoughts/local/epic-run/$SLUG"
   pid="$(cat "$DIR/driver.pid" 2>/dev/null)"
   vivo "$pid" || { echo "nenhum revezamento em curso para \`$SLUG\`"; exit 4; }
+  if [ "$NOW" -eq 0 ]; then
+    : > "$DIR/STOP"
+    echo "revezamento: parando — a fatia $(st_get fatia) ($(st_get titulo)) termina na Entrega e a próxima não é lançada · \`stop --now\` interrompe agora"
+    exit 0
+  fi
   filho="$(st_get filho_pid)"
   encerrar_pid "$pid"          # o trap do driver registra o fim
   encerrar_pid "$filho"
-  finalizar "pedido do Diretor (stop)"
-  echo "revezamento: parado — pedido do Diretor · fatia $(st_get fatia) interrompida · retome pelo /keelson:continue $SLUG"
+  finalizar "pedido do Diretor (stop --now)"
+  echo "revezamento: parado — pedido do Diretor · fatia $(st_get fatia) interrompida no meio · retomável por /keelson:auto-epic $SLUG ou /keelson:continue $SLUG"
   exit 0
   ;;
 *) die2 "ação desconhecida: $ACTION" ;;

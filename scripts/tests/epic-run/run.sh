@@ -13,8 +13,17 @@
 #      flags obrigatórias presentes, status "parado";
 #   5. fatia que não avança → fim "fatia 1 não avançou", 1 invocação só;
 #   6. --max-fatias 1 → para no teto com a 2ª ainda pendente;
-#   7. status durante a execução ("rodando · fatia 1") e stop → "pedido do Diretor",
-#      filho morto, segundo launch recusado enquanto vivo e aceito depois.
+#   7. status durante a execução ("rodando · fatia 1"), stop gracioso (fatia em curso
+#      entrega, próxima não lança) e stop --now (filho morto na hora); segundo launch
+#      recusado enquanto vivo e aceito depois;
+#   8. (4.466) fatia parcial RETOMÁVEL: em ciclo + run-state `encerrado — pausa` → launch
+#      aceito, a sessão filha retoma e a fila avança (progresso = fila mudou);
+#   9. (4.466) fatia parcial `encerrado — aguarda Diretor` → exit 5, classe aguarda-diretor;
+#  10. (4.466) run em_andamento de dona MORTA (casa parada há 2 h, sem processo) → aceito;
+#      dona possivelmente viva (casa tocada agora) → exit 6 posse-incerta; --force-claim
+#      aceita e o prompt leva a confirmação (FORCE=1);
+#  11. (4.466) falha de infraestrutura (saída ≠ 0, sem result) → nova tentativa após a
+#      espera, teto por --retry; parada por decisão (saída 0 + result, fila parada) → não insiste.
 #
 # Uso: scripts/tests/epic-run/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -58,10 +67,12 @@ cat > "$BIN/claude" <<'SH'
 } >> "$FAKE_LOG"
 printf '{"type":"system","subtype":"init","session_id":"fake-%s"}\n' "$$"
 printf '{"type":"assistant","message":{"content":[{"type":"text","text":"Entrega da fatia (fake %s)"}]}}\n' "$$"
+avanca() { perl -0pi -e 's/\| (pendente|em ciclo \([^)]*\)) \|/| entregue (2026-10-08) |/' "$FAKE_BRIEF"; }
 case "${FAKE_MODE:-advance}" in
-  stall) : ;;
-  slow) sleep "${FAKE_SLEEP:-6}"; sed -i.bak '0,/| pendente |/s//| entregue (2026-10-08) |/' "$FAKE_BRIEF" 2>/dev/null || perl -0pi -e 's/\| pendente \|/| entregue (2026-10-08) |/' "$FAKE_BRIEF"; rm -f "$FAKE_BRIEF.bak" ;;
-  *) perl -0pi -e 's/\| pendente \|/| entregue (2026-10-08) |/' "$FAKE_BRIEF" ;;
+  stall) : ;;                      # saída 0 + result, fila parada = parada por decisão
+  fail) exit 1 ;;                  # saída ≠ 0, sem result = infraestrutura
+  slow) sleep "${FAKE_SLEEP:-6}"; avanca ;;
+  *) avanca ;;
 esac
 printf '{"type":"result","session_id":"fake-%s","total_cost_usd":0.01,"duration_ms":10}\n' "$$"
 exit 0
@@ -149,7 +160,8 @@ R="$(mkrepo stall)"; : > "$FAKE_LOG"; export FAKE_BRIEF="$R/$BRIEF_REL"
 out="$(FAKE_MODE=stall PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL")"; st=$?
 D="$R/thoughts/local/epic-run/anc"
 espera_fim "$D" 60 && ok "stall/fim.txt existe" || bad "stall/fim.txt não apareceu" "$(cat "$D/launch.log" 2>/dev/null)"
-contem "stall/motivo" "$(cat "$D/fim.txt" 2>/dev/null)" "fatia 1 não avançou (exit 0)"
+contem "stall/motivo" "$(cat "$D/fim.txt" 2>/dev/null)" "fatia 1 não avançou (exit 0) — parada por decisão"
+contem "stall/status mostra relatório" "$(bash "$ER" "$R" status anc)" "último relatório (fatia 1"
 n="$(grep -c '^argv:' "$FAKE_LOG")"; [ "$n" = "1" ] && ok "stall/1 invocação só" || bad "stall/invocações = $n"
 contem "stall/status" "$(bash "$ER" "$R" status anc)" "parado — fatia 1 não avançou"
 
@@ -158,7 +170,7 @@ R="$(mkrepo teto)"; : > "$FAKE_LOG"; export FAKE_BRIEF="$R/$BRIEF_REL"
 out="$(FAKE_MODE=advance PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL" --max-fatias 1)"; st=$?
 D="$R/thoughts/local/epic-run/anc"
 espera_fim "$D" 60 && ok "teto/fim.txt existe" || bad "teto/fim.txt não apareceu" "$(cat "$D/launch.log" 2>/dev/null)"
-contem "teto/motivo" "$(cat "$D/fim.txt" 2>/dev/null)" "teto de fatias (1) atingido — próxima pendente: 2"
+contem "teto/motivo" "$(cat "$D/fim.txt" 2>/dev/null)" "teto de fatias (1) atingido — próxima: 2"
 n="$(grep -c '^argv:' "$FAKE_LOG")"; [ "$n" = "1" ] && ok "teto/1 invocação" || bad "teto/invocações = $n"
 
 # ---------- 7. status em voo, stop, relançar ----------
@@ -167,20 +179,103 @@ out="$(FAKE_MODE=slow FAKE_SLEEP=20 PATH="$BIN:$PATH" bash "$ER" "$R" launch "$B
 D="$R/thoughts/local/epic-run/anc"
 sleep 3
 st_out="$(bash "$ER" "$R" status anc)"
-contem "slow/status rodando" "$st_out" "revezamento: rodando · fatia 1 (Login)"
+contem "slow/status rodando" "$st_out" "revezamento: rodando · fatia 1 (Login · nova)"
 contem "slow/status forja" "$st_out" "· forja ·"
 out2="$(PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL")"; st2=$?
 [ "$st2" -eq 3 ] && ok "slow/relançar recusado em voo" || bad "slow/relançar exit $st2" "$out2"
 contem "slow/relançar motivo" "$out2" "já em curso"
-filho="$(awk -F'\t' '$1=="filho_pid"{print $2}' "$D/status.tsv")"
 out3="$(bash "$ER" "$R" stop anc)"
-contem "slow/stop ecoa" "$out3" "pedido do Diretor"
+contem "slow/stop gracioso ecoa" "$out3" "revezamento: parando"
+contem "slow/status parando" "$(bash "$ER" "$R" status anc)" "PARANDO após esta fatia"
+espera_fim "$D" 60 && ok "slow/fim após a fatia em curso" || bad "slow/fim não apareceu" "$(cat "$D/launch.log" 2>/dev/null)"
+contem "slow/motivo gracioso" "$(cat "$D/fim.txt" 2>/dev/null)" "pedido do Diretor (stop) — após a fatia 1; próxima: 2"
+n="$(grep -c '^argv:' "$FAKE_LOG")"; [ "$n" = "1" ] && ok "slow/só 1 fatia rodou" || bad "slow/invocações = $n"
+grep -q "| 1 | Login | anc | entregue" "$R/$BRIEF_REL" && ok "slow/fatia 1 entregue antes de parar" || bad "slow/fatia 1 não entregou"
+grep -q "| 2 | Relatórios | anc | pendente" "$R/$BRIEF_REL" && ok "slow/fatia 2 ficou pendente" || bad "slow/fatia 2 mudou"
+# --now: relança (a Entrega real commita o BRIEF; o claude falso não — commita aqui) e mata na hora
+( cd "$R" && git -c user.email=t@t -c user.name=t commit -qam "fatia 1 (fake)" )
+: > "$FAKE_LOG"
+out="$(FAKE_MODE=slow FAKE_SLEEP=20 PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL")"; st=$?
+[ "$st" -eq 0 ] && ok "now/relançado" || bad "now/relançar exit $st" "$out"
+sleep 3
+filho="$(awk -F'\t' '$1=="filho_pid"{print $2}' "$D/status.tsv")"
+out3="$(bash "$ER" "$R" stop anc --now)"
+contem "now/stop ecoa" "$out3" "pedido do Diretor"
 sleep 1
-if [ -n "$filho" ] && kill -0 "$filho" 2>/dev/null; then bad "slow/filho ainda vivo ($filho)"; else ok "slow/filho morto"; fi
-contem "slow/status parado" "$(bash "$ER" "$R" status anc)" "parado — pedido do Diretor"
+if [ -n "$filho" ] && kill -0 "$filho" 2>/dev/null; then bad "now/filho ainda vivo ($filho)"; else ok "now/filho morto"; fi
+contem "now/status parado" "$(bash "$ER" "$R" status anc)" "parado — pedido do Diretor (stop --now)"
+( cd "$R" && git -c user.email=t@t -c user.name=t commit -qam "fatia (fake)" >/dev/null 2>&1 || true )
 out4="$(FAKE_MODE=advance PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL" --dry-run)"; st4=$?
 [ "$st4" -eq 0 ] && ok "slow/relançar aceito depois do stop" || bad "slow/relançar depois exit $st4" "$out4"
 contem "nenhum/status" "$(bash "$ER" "$R" status outro 2>/dev/null)" "nenhum revezamento"
+
+# ---------- 8–10. fatia parcial (4.466) ----------
+mkparcial() { # nome → raiz com fatia 1 em ciclo (brief filho + PLAN + TASKs Done/Todo), commitada
+  r="$(mkrepo "$1")"
+  perl -0pi -e 's/\| 1 \| Login \| anc \| pendente \|/| 1 | Login | anc | em ciclo (docs\/anc\/briefs\/BRIEF-002.md) |/' "$r/$BRIEF_REL"
+  d="$r/docs/anc"; mkdir -p "$d/plans" "$d/tasks"
+  printf '# BRIEF-002: Login\n\n**Slug**: anc\n**Status**: Emitido\n**SPEC**: SPEC-002\n' > "$d/briefs/BRIEF-002.md"
+  printf '# PLAN-002: Login\n\n**Status**: Approved\n\n## Cobertura\n\n**SPEC referenciada**: SPEC-002\n' > "$d/plans/PLAN-002-login.md"
+  printf '# TASK-002-001: T1\n\n**Status**: Done\n' > "$d/tasks/TASK-002-001-t.md"
+  printf '# TASK-002-002: T2\n\n**Status**: Todo\n' > "$d/tasks/TASK-002-002-t.md"
+  ( cd "$r" && git -c user.email=t@t -c user.name=t add -A && git -c user.email=t@t -c user.name=t commit -q -m "parcial" )
+  printf '%s\n' "$r"
+}
+mkrun() { # raiz sid status-linha → casa de sessão com run-state do slug anc
+  c="$1/thoughts/local/sessions/20261008-090000-$2"; mkdir -p "$c"
+  printf 'sessao: %s\niniciada: 2026-10-08T09:00:00-0300\nestado: ativa\nslugs: anc\n' "$2" > "$c/session.meta"
+  printf 'status: %s\nslug: anc\nplan: PLAN-002\nwaves_concluidas: 1\nwaves_total: 2\nretomada: wave 2\nsessao: %s\n' "$3" "$2" > "$c/run-state-anc.md"
+  printf '%s\n' "$c"
+}
+export RUN_STATE_SESSAO="lancador-1"
+
+# 8. pausa dentro da sessão da fatia → retomável; a filha avança a fila (em ciclo → entregue)
+R="$(mkparcial p8)"; mkrun "$R" "sess-pausa" "encerrado — pausa: TASK-002-001 closure (wave 1 de 2)" >/dev/null
+: > "$FAKE_LOG"; export FAKE_BRIEF="$R/$BRIEF_REL"
+out="$(FAKE_MODE=advance PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL" --dry-run)"; st=$?
+[ "$st" -eq 0 ] && ok "parcial-pausa/dry-run aceito" || bad "parcial-pausa/dry-run exit $st" "$out"
+contem "parcial-pausa/retomar" "$out" "retomar fatia 1 (Login → anc)"
+contem "parcial-pausa/motivo" "$out" "encerrado — pausa"
+out="$(FAKE_MODE=advance PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL")"; st=$?
+D="$R/thoughts/local/epic-run/anc"
+espera_fim "$D" 60 && ok "parcial-pausa/fim.txt existe" || bad "parcial-pausa/fim não apareceu" "$(cat "$D/launch.log" 2>/dev/null)"
+contem "parcial-pausa/fila toda entregue" "$(cat "$D/fim.txt" 2>/dev/null)" "fila toda entregue"
+n="$(grep -c '^argv:' "$FAKE_LOG")"; [ "$n" = "3" ] && ok "parcial-pausa/3 sessões (1 retomada + 2 novas)" || bad "parcial-pausa/invocações = $n" "$(cat "$FAKE_LOG")"
+contem "parcial-pausa/modo no status.tsv" "$(cat "$D/launch.log")" "retomada · tentativa 1"
+
+# 9. aguarda Diretor → exit 5
+R="$(mkparcial p9)"; mkrun "$R" "sess-ag" "encerrado — aguarda Diretor: parte estacionada que a fatia 2 consome" >/dev/null
+out="$(PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL")"; st=$?
+[ "$st" -eq 5 ] && ok "aguarda/exit 5" || bad "aguarda/exit $st" "$out"
+contem "aguarda/classe" "$out" "pré-voo: aguarda-diretor"
+contem "aguarda/aponta continue" "$out" "retome pelo /keelson:continue anc com você presente"
+[ ! -d "$R/thoughts/local/epic-run" ] && ok "aguarda/nada escrito" || bad "aguarda/escreveu"
+
+# 10. run em_andamento: dona morta (casa parada há 2 h) → aceito; dona recente → posse-incerta; --force-claim → aceito
+R="$(mkparcial p10)"; c="$(mkrun "$R" "sess-morta" "em_andamento")"
+find "$c" -type f -exec touch -t "$(date -v-2H +%Y%m%d%H%M 2>/dev/null || date -d '2 hours ago' +%Y%m%d%H%M)" {} +
+out="$(PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL" --dry-run)"; st=$?
+[ "$st" -eq 0 ] && ok "dona-morta/aceito" || bad "dona-morta/exit $st" "$out"
+contem "dona-morta/motivo" "$out" "run em andamento de sessão morta"
+touch "$c/run-state-anc.md"
+out="$(PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL" --dry-run)"; st=$?
+[ "$st" -eq 6 ] && ok "dona-viva/exit 6" || bad "dona-viva/exit $st" "$out"
+contem "dona-viva/classe" "$out" "pré-voo: posse-incerta"
+: > "$FAKE_LOG"; export FAKE_BRIEF="$R/$BRIEF_REL"
+out="$(FAKE_MODE=advance PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL" --force-claim --max-fatias 1)"; st=$?
+[ "$st" -eq 0 ] && ok "force-claim/aceito" || bad "force-claim/exit $st" "$out"
+D="$R/thoughts/local/epic-run/anc"
+espera_fim "$D" 60 && ok "force-claim/fim" || bad "force-claim/fim não apareceu" "$(cat "$D/launch.log" 2>/dev/null)"
+contem "force-claim/prompt leva FORCE=1" "$(cat "$FAKE_LOG")" "use FORCE=1 no claim"
+
+# 11. infraestrutura: nova tentativa após a espera, teto por --retry; decisão não insiste
+R="$(mkrepo infra)"; : > "$FAKE_LOG"; export FAKE_BRIEF="$R/$BRIEF_REL"
+out="$(FAKE_MODE=fail PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL" --retry 1 --retry-wait-sec 1)"; st=$?
+D="$R/thoughts/local/epic-run/anc"
+espera_fim "$D" 90 && ok "infra/fim.txt existe" || bad "infra/fim não apareceu" "$(cat "$D/launch.log" 2>/dev/null)"
+contem "infra/motivo" "$(cat "$D/fim.txt" 2>/dev/null)" "fatia 1 falhou 2 vez(es) por infraestrutura (último exit 1)"
+n="$(grep -c '^argv:' "$FAKE_LOG")"; [ "$n" = "2" ] && ok "infra/2 tentativas" || bad "infra/invocações = $n"
+contem "infra/log da espera" "$(cat "$D/launch.log")" "nova tentativa 2/2 em 1s"
 
 if [ "$fail" -gt 0 ]; then echo "epic-run: $fail/$total asserções falharam"; exit 1; fi
 echo "epic-run: $total asserções ok"

@@ -25,6 +25,42 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.213.0] — 2026-10-08
+
+Re-init: none
+
+Decision 4.466 — `/keelson:auto-epic` becomes the epic's resume door: a partial slice
+left by a crash, a pause or a `stop` is resumed by the next child session; a slice that
+stopped *waiting for the Director* waits for him.
+
+### Added
+
+- **Pre-flight with three outcomes** (`scripts/epic-run.sh launch`, first stdout line
+  carries the class): `ok` — next slice pending, or a partial slice whose latest run-state
+  is `encerrado — pausa…`/another reason, absent, or `em_andamento` of a dead session per
+  the `claim --check` rule; `aguarda-diretor` (exit 5) — the slice closed its run with the
+  canonical `aguarda Diretor:` prefix: the command shows the pending question and runs
+  `/keelson:continue` in the current session, with you present, before relaunching;
+  `posse-incerta` (exit 6) — the owning session may still be alive: the command asks, and
+  `--force-claim` carries your confirmation to the child session.
+- **Infrastructure retry:** a child that exits non-zero or without a `result` event while
+  the queue did not move is retried on the same slice after `--retry-wait-sec` (default
+  600 s), up to `--retry` times (default 2); exit 0 with a `result` and an unmoved queue is
+  a stop by decision and is not retried.
+- **Graceful `stop`:** the slice in flight finishes its delivery and the next one is not
+  launched (the safe point is the slice boundary); `stop --now` interrupts at once.
+  `status`, when stopped, prints the tail of the last slice report.
+
+### Changed
+
+- **Progress is "the queue changed"**, not "the next pending slice changed": a resumed
+  slice that delivers also counts.
+- **`sdd-conventions.md`, "Sessão sem humano":** a slice that ends for a Director decision
+  closes its run with `aguarda Diretor: <motivo>`; the resume mark runs only with an open
+  pause. `/keelson:auto` (step 3 of the ladder), `/keelson:continue` and `/keelson:pause`
+  (a child-session run of a live relay → `auto-epic stop`; a pause taken inside the
+  slice's own session is resumable by both doors) point at it.
+
 ## [0.212.0] — 2026-10-08
 
 Re-init: required
