@@ -315,7 +315,7 @@ O Diretor confirmou que a sessão dona do run em andamento morreu: ao assumir a 
     if command -v python3 >/dev/null 2>&1; then
       python3 - "$DIR/fatia-$ES_PROX.stream.jsonl" > "$res" 2>/dev/null <<'PY' || : > "$res"
 import json, sys
-out = []
+out = []; result = None
 for line in open(sys.argv[1], encoding="utf-8", errors="replace"):
     line = line.strip()
     if not line: continue
@@ -326,8 +326,10 @@ for line in open(sys.argv[1], encoding="utf-8", errors="replace"):
             if isinstance(b, dict) and b.get("type") == "text" and b.get("text"):
                 out.append(b["text"])
     elif ev.get("type") == "result":
-        out.append("\n[result] session=%s cost_usd=%s duration_ms=%s" % (
-            ev.get("session_id"), ev.get("total_cost_usd"), ev.get("duration_ms")))
+        # um Stop hook que cutuca no fim faz o stream emitir mais de um `result`: fica o último
+        result = "\n[result] session=%s cost_usd=%s duration_ms=%s" % (
+            ev.get("session_id"), ev.get("total_cost_usd"), ev.get("duration_ms"))
+if result: out.append(result)
 sys.stdout.write("\n\n".join(out))
 PY
     else

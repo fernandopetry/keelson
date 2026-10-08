@@ -25,6 +25,22 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.213.1] — 2026-10-08
+
+Re-init: none
+
+Decision 4.466 (smoke round) — the `epic` smoke scenario ran on a real model: the relay
+delivered both slices without intervention; the one red fact was a smoke predicate.
+
+### Fixed
+
+- **`scripts/epic-run.sh`:** the per-slice report kept one `[result]` line per `result`
+  event of the stream (a Stop hook that nudges at the end makes the CLI emit more than
+  one); only the last one is kept.
+- **`scripts/smoke-consumer.sh`, scenario `epic`:** the "child briefs accepted" fact
+  filtered the epic brief by path instead of by file name — any consumer directory with
+  `-epic` in its name zeroed the count.
+
 ## [0.213.0] — 2026-10-08
 
 Re-init: none

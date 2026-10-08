@@ -506,7 +506,8 @@ cen_epic() {
   fato "epic/fim-registrado"        '[ -f "$D/fim.txt" ]'
   fato "epic/fila-toda-entregue"    'grep -q "fila toda entregue" "$D/fim.txt" 2>/dev/null'
   fato "epic/2-fatias-no-resumo"    '[ "$(grep -c "^## Fatia " "$D/RESUMO.md" 2>/dev/null)" = "2" ]'
-  fato "epic/briefs-filhos-aceitos" '[ "$(grep -l "Status.*Aceito" "$CONSUMER"/docs/*/briefs/BRIEF-*.md 2>/dev/null | grep -vc -- -epic)" -ge 2 ]'
+  # filtro pelo NOME do arquivo, nunca pelo caminho: um diretório com "-epic" no nome zerava a contagem
+  fato "epic/briefs-filhos-aceitos" '[ "$(grep -l "Status.*Aceito" "$CONSUMER"/docs/*/briefs/BRIEF-*.md 2>/dev/null | grep -vc -- "-epic\.md$")" -ge 2 ]'
   fato "epic/sem-pergunta-pendurada" '! grep -l "\"name\":\"AskUserQuestion\"" "$D"/fatia-*.stream.jsonl >/dev/null 2>&1'
   fato "epic/status-parado"         'bash "$PLUGIN/scripts/epic-run.sh" "$CONSUMER" status "$anc" | grep -q "parado — fila toda entregue"'
   fato "epic/sem-run-em-andamento"  '! grep -l "^status: em_andamento" "$CONSUMER"/thoughts/local/sessions/*/run-state-*.md "$CONSUMER"/thoughts/local/run-state-*.md >/dev/null 2>&1'
