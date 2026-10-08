@@ -25,6 +25,28 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.216.0] — 2026-10-08
+
+Re-init: none
+
+Decision 4.469 — items M5 and M6b of the 2026-10-08 field intake, applied on the
+Director's order: the end-of-wave suite ran filtered and let a regression through; a
+subagent's broad `pkill` took down the Director's Docker environment.
+
+### Added
+
+- **`core/TESTING.md`, "Verificação forte e única":** a process a role started to prove
+  something (dev server, background runner, browser) is stopped by the PID it captured
+  when starting it or by port (`lsof -ti :PORT`), never by `pkill`/`killall` on a name nor
+  by taking the whole environment down. What cannot be identified stays up and is
+  declared. Pointers at the point of use in `developer`, `code-reviewer` and `qa`.
+
+### Changed
+
+- **`/keelson:implement`, end of wave (§3.6, item 4):** the wave bulletin states the
+  literal command and the count that ran (`N of M`); a `--filter`/`--group` run without
+  the `quality.test` suite is declared **partial** and names what was left out.
+
 ## [0.215.0] — 2026-10-08
 
 Re-init: none

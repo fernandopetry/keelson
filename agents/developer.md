@@ -223,6 +223,8 @@ para commitar) e a régua completa: §15 do
 **Processo em segundo plano que você iniciou, você encerra antes de reportar** (decisão
 4.443): laço de espera só depois de testar a condição de saída uma vez, e sem silenciar o
 erro na condição — laço sobre condição que nunca se satisfaz gira até o fim da sessão.
+O encerramento é por **PID ou porta**, nunca por nome — régua em
+`${CLAUDE_PLUGIN_ROOT}/guidelines/core/TESTING.md`, "Verificação forte e única" (4.469).
 
 Ao terminar, retornar report YAML exato — **e somente ele** (duas camadas, decisão 4.103 —
 régua no `sdd-conventions.md`): sem prosa em volta, `notas` em 1–3 linhas; a narrativa de

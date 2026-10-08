@@ -281,6 +281,14 @@ segundo plano como para agent). Saída por teto é "rodada não concluída", nun
 nem sucesso. Nada disso impede a morte do processo da sessão: o que sobrevive a ela é o
 que está no disco (run-state, ledger, closures commitadas).
 
+**Encerrar o que se subiu (decisão 4.469)**: processo que o papel iniciou para provar —
+servidor de dev, runner em background, browser — é encerrado pelo **PID** que ele próprio
+capturou ao subir ou pela **porta** (`lsof -ti :PORTA`), nunca por `pkill`/`killall` de
+nome nem derrubando o ambiente inteiro (`docker compose down`, `docker stop` do que não
+subiu): o nome casa processos do Diretor e de outras sessões na mesma máquina, e o
+container pode ser de quem está fora do ciclo. Processo que não se consegue identificar
+por PID ou porta fica em pé e é declarado no report, nunca "limpo" por nome.
+
 ---
 
 ## Diff inerte: a suíte prova código

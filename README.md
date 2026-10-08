@@ -423,11 +423,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.215.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.216.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a screen AC whose accept/refuse rule lives in the backend is no longer proved only against a mocked server — the TASK carries at least one case against the real backend with seeded state (`/keelson:tasks`, item (k)); the `task-validator` flags an AC whose only carrier intercepts the call (see `CHANGELOG.md`).
+New in this release: the wave bulletin states the literal suite command and the count that ran, and a filtered run without the `quality.test` suite is declared partial; a process a role started is stopped by PID or port, never by `pkill` on a name nor by taking the environment down (see `CHANGELOG.md`).
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
