@@ -38,7 +38,7 @@ ER="$HERE/../../epic-run.sh"
 [ -f "$ER" ] || { echo "ERRO: epic-run.sh não encontrado" >&2; exit 1; }
 
 TMP="$(mktemp -d)" || { echo "ERRO: mktemp falhou" >&2; exit 1; }
-# shellcheck disable=SC2329  # invocada pelo trap
+# shellcheck disable=SC2317,SC2329  # invocada só pelo trap (SC2317 no shellcheck do CI, SC2329 no 0.11)
 cleanup() { pkill -f "epic-run.sh $TMP" 2>/dev/null; rm -rf "$TMP"; }
 trap cleanup EXIT
 
