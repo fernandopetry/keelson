@@ -260,6 +260,18 @@ ainda pendente cite aquela pasta, caso em que ela fica. Nada em `thoughts/` é
 versionado, então o pior caso de um engano é perder anotação temporária — o que
 importa está commitado.
 
+### Posso deixar o épico rodar inteiro sem voltar a cada fatia?
+
+Pode: `/keelson:auto-epic <slug>`. Ele confirma com você uma vez e lança um revezamento
+num processo separado da sua sessão — uma sessão nova por fatia, com contexto limpo, cada
+uma retomando pelo `continue` e indo até a Entrega. A fila do brief épico decide a próxima
+fatia e o fim; o que precisaria de você (pendência que a próxima fatia consumiria,
+conflito ao sincronizar com a main, decisão de última instância) encerra a fatia sem
+marcá-la entregue, e o revezamento para com o motivo gravado. `status` mostra onde está;
+`stop` interrompe; o relatório de cada fatia fica em `thoughts/local/epic-run/<slug>/RESUMO.md`.
+As fatias rodam sem pedir permissão de ferramenta — o comando avisa antes de você
+confirmar. Merge e PR continuam seus. Detalhes no [fluxo de épicos](Fluxo-de-epicos).
+
 ### Voltei de um fim de semana e não lembro onde o épico parou. E agora?
 
 `/keelson:continue <slug>`. Ele lê a fila viva do épico e os artefatos commitados,

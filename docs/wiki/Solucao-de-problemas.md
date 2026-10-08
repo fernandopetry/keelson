@@ -280,6 +280,20 @@ enquanto houver tarefa em voo, mandando colher o resultado no mesmo turno. Se vo
 sintoma numa versão anterior, é isso; se vê ainda hoje, o comando despachou algo em segundo
 plano fora do ciclo formal — relate.
 
+### O revezamento do `auto-epic` parou antes da última fatia
+
+`/keelson:auto-epic <slug> status` diz o motivo em uma linha. `fatia N não avançou`
+significa que a sessão daquela fatia encerrou sem marcar a fila como entregue — por
+desenho, quando algo exigia você: uma pendência que a próxima fatia consumiria, um conflito
+ao sincronizar a branch com a main, a base da branch fora da default, ou uma decisão de
+última instância. O detalhe está no relatório da fatia em
+`thoughts/local/epic-run/<slug>/RESUMO.md` e no estado de execução que a sessão fechou.
+`/keelson:continue <slug>` retoma do ponto exato, mostrando o resumo. `morto — driver sumiu
+sem registrar fim` é outra coisa: o processo foi encerrado por fora (máquina reiniciada,
+`kill`); a fatia em curso fica como qualquer sessão que caiu, e o `continue` a retoma.
+Se o pré-voo recusou lançar (`estratégia por-fatia`, `árvore suja`, `run em andamento`,
+`thoughts/ não está no .gitignore`), o motivo diz o que resolver — nada disso se contorna.
+
 ### A sessão morreu no meio da suíte e a retomada disse "nada a fazer"
 
 Duas causas conhecidas. Uma rodada longa em primeiro plano sem teto pode morrer com a

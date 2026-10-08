@@ -262,6 +262,23 @@ if printf '%s\n' "$staged" | grep -qE '^(hooks/wave-guard\.sh$|scripts/tests/wav
   fi
 fi
 
+# Suíte do epic-run: obrigatória quando o motor do revezamento ou a suíte mudam (4.465)
+if printf '%s\n' "$staged" | grep -qE '^scripts/(epic-run\.sh$|tests/epic-run/)'; then
+  if [ -f scripts/tests/epic-run/run.sh ]; then
+    echo "[keelson pre-commit] epic-run.sh/suíte no commit — rodando scripts/tests/epic-run/run.sh" >&2
+    if ! out="$(bash scripts/tests/epic-run/run.sh 2>&1)"; then
+      printf '%s\n' "$out" | tail -25 | sed 's/^/    /' >&2
+      echo "[keelson pre-commit] BLOQUEADO: suíte do epic-run falhou (acima, resumida)." >&2
+      echo "  Corrija — ou, se a mudança de comportamento é intencional, ajuste as asserções" >&2
+      echo "  (fixture nova acompanha critério novo). Escape consciente: KEELSON_SKIP_TESTS=1" >&2
+      exit 1
+    fi
+    printf '%s\n' "$out" | tail -1 | sed 's/^/[keelson pre-commit] /' >&2
+  else
+    echo "[keelson pre-commit] aviso: scripts/tests/epic-run/run.sh ausente — suíte não conferida." >&2
+  fi
+fi
+
 # Suíte do map: obrigatória quando o motor ou as fixtures mudam (4.104)
 if printf '%s\n' "$staged" | grep -qE '^scripts/(map-check\.sh$|tests/map/)'; then
   if [ -f scripts/tests/map/run.sh ]; then

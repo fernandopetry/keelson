@@ -168,6 +168,8 @@ continuam humanos) ·
 `/keelson:continue` (retomar um slug de onde parou — fila do épico, wave interrompida
 ou próxima fatia, derivado dos artefatos commitados; grava a marca de retomada com o
 tempo parado medido) ·
+`/keelson:auto-epic` (encadear as fatias restantes de um épico sem parar — uma sessão
+por fatia, lançada em processo desacoplado; `status` e `stop`) ·
 `/keelson:pause` (parar o ciclo num ponto seguro — closure commitada, marca de pausa
 commitada e pushada no BRIEF, para o continue medir o tempo parado de qualquer máquina) ·
 `/keelson:mutation-setup` (instalar e configurar o mutation testing — grava

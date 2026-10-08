@@ -34,6 +34,12 @@
 # mesmo diretório continua cobrado. Falha de `ps`/parse degrada para a acusação
 # de posse atual (nunca para silêncio — erro de leitura não vira absolvição).
 #
+# Revezamento (decisão 4.465): run cujo `slug:` é o destino de um revezamento VIVO do
+# /keelson:auto-epic (thoughts/local/epic-run/<ancora>/driver.pid com processo vivo e
+# status.tsv apontando o slug) pertence à sessão filha que o driver lançou — não é meu
+# nem é terceiro a inventariar: sai da checagem em silêncio, por arquivo, como a
+# descendência. Driver morto → volta a ser posse de terceiro (a terceira saída vale).
+#
 # Cutuca 1× por ESTADO do run, não por turno (decisão 4.165): com agents em
 # background, encerrar o turno e ser reacordado pela task-notification é o
 # desenho correto (anti-polling, 4.118) — bloquear todo encerramento cobrava um
@@ -84,6 +90,20 @@ descende_do_dono() {
   return 1
 }
 
+# Revezamento vivo (4.465): devolve 0 quando algum driver do auto-epic está vivo e
+# declara este slug como destino da fatia em curso.
+revezamento_cobre() {
+  _slug="$1"
+  for _d in "$cwd"/thoughts/local/epic-run/*/; do
+    [ -f "$_d/driver.pid" ] && [ -f "$_d/status.tsv" ] || continue
+    _pid="$(cat "$_d/driver.pid" 2>/dev/null)"
+    case "$_pid" in ''|*[!0-9]*) continue ;; esac
+    kill -0 "$_pid" 2>/dev/null || continue
+    awk -F'\t' -v s="$_slug" '$1=="slug_destino" && $2==s {f=1} END {exit f?0:1}' "$_d/status.tsv" 2>/dev/null && return 0
+  done
+  return 1
+}
+
 n=0
 alheio=0
 detalhes=""
@@ -101,6 +121,10 @@ for f in "$cwd"/thoughts/local/run-state-*.md "$cwd"/thoughts/local/sessions/*/r
     # arquivo sai da checagem; a decisão é por arquivo (um run MEU ao lado
     # continua cobrado).
     if descende_do_dono "$dono"; then
+      continue
+    fi
+    # Revezamento (4.465): run da sessão filha de um driver vivo — não é meu nem terceiro.
+    if revezamento_cobre "$(sed -n 's/^slug:[ 	]*//p' "$f" 2>/dev/null | sed -n 1p)"; then
       continue
     fi
     alheio=1

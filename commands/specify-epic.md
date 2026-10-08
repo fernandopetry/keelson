@@ -55,8 +55,14 @@ Invocar o agent `pm` com: o pedido épico **verbatim**, a lista dos slugs de `{d
    /keelson:continue <slug-âncora>
    ```
 
+   E para rodar as fatias restantes sem parar entre elas (uma sessão por fatia, decisão 4.465):
+
+   ```
+   /keelson:auto-epic <slug-âncora>
+   ```
+
    O `continue` lê a fila e propõe o próximo passo — ninguém precisa lembrar qual fatia é a próxima nem como compor o comando.
-5. Deixe explícito: **disparar cada ciclo é decisão do Diretor** — este comando não inicia nenhum.
+5. Deixe explícito: **disparar cada ciclo é decisão do Diretor** — este comando não inicia nenhum; o `/keelson:auto-epic` é a forma de dar essa decisão uma vez para o épico inteiro (4.465).
 
 ## Limites
 

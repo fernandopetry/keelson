@@ -33,6 +33,11 @@
 #   triage  /keelson:triage de uma demanda nova DEPOIS do ciclo: o comando classifica e
 #           roteia sem executar — linha de triagem no Histórico do INDEX, categoria e
 #           comando proposto na resposta, nenhum arquivo de código/artefato tocado (4.401).
+#   epic    /keelson:specify-epic de um épico de 2 fatias triviais (sem humano) + revezamento
+#           pelo scripts/epic-run.sh (4.465): fila toda entregue sem intervenção, 2 fatias no
+#           RESUMO, briefs filhos aceitos, nenhuma pergunta pendurada, status parado, suíte
+#           verde. Única prova de sessão -p encadeando sessão -p; roda por último (abre slug e
+#           branch próprios).
 #   report  /keelson:report do slug: relatório reconstruído do ledger e do repositório,
 #           com a seção obrigatória "Cobertura deste relatório" e a linha de duração;
 #           eventos consumidos arquivados em reported-*/ e a casa marcada reportada (4.401).
@@ -40,9 +45,9 @@
 # somado/mediana/pico, Bash com 1 script × com 2+ encadeados, e tokens por papel, lidos do
 # transcript da sessão do consumidor.
 #
-# Uso: smoke-consumer.sh [--scenario init|cycle|parallel|pause|triage|report|broken|all] [--results DIR]
+# Uso: smoke-consumer.sh [--scenario init|cycle|parallel|pause|triage|report|broken|epic|all] [--results DIR]
 #                        [--model M] [--timeout S] [--plugin-dir DIR] [--consumer DIR]
-#   --scenario   default all (ordem: init → cycle → pause → triage → report → broken → parallel; o parallel vai por
+#   --scenario   default all (ordem: init → cycle → pause → triage → report → broken → parallel → epic; o parallel vai por
 #                último porque abre slug e branch próprios — e tem teto próprio de 3 h (rodada real: 2h+); cada um assume o
 #                estado deixado pelo anterior; --consumer reaproveita um consumidor).
 #   --results    raiz das saídas (default: mktemp); raw.json/result.txt por cenário + summary.md.
@@ -484,6 +489,32 @@ cen_report() {
   fato "report/codigo-intocado"             '[ -z "$(G status --porcelain -- src tests 2>/dev/null)" ]'
 }
 
+# --- epic: specify-epic sem humano + revezamento pelo epic-run.sh (4.465) ---
+cen_epic() {
+  roda epic-specify "/keelson:specify-epic épico 'operações extras' em src/calc.py: fatia 1 = função power(a, b) com testes; fatia 2 = função modulo(a, b) com testes — duas fatias independentes, nesta ordem, estratégia unica. Esta sessão não tem humano interativo: confirme a decomposição e a estratégia com o default; não inicie ciclo algum."
+  echo "### fatos: epic" >> "$SUM"
+  brief="$(find "$CONSUMER"/docs -path "*/briefs/*-epic.md" 2>/dev/null | sort | head -1)"
+  fato "epic/brief-epico-existe" '[ -n "$brief" ]'
+  [ -n "$brief" ] || return 0
+  rel="${brief#"$CONSUMER"/}"; anc="$(basename "$(dirname "$(dirname "$brief")")")"
+  if [ -n "$(G status --porcelain)" ]; then G add -A; G commit -q -m "docs: epic brief (smoke)"; fi
+  out="$(bash "$PLUGIN/scripts/epic-run.sh" "$CONSUMER" launch "$rel" --timeout-min $(( TIMEOUT / 60 )) ${MODEL:+--model "$MODEL"} -- --plugin-dir "$PLUGIN" --strict-mcp-config)"
+  printf -- '- launch: %s\n' "$(printf '%s' "$out" | tr '\n' ' ' | cut -c1-200)" >> "$SUM"
+  fato "epic/launch-aceito" 'printf "%s" "$out" | grep -q "revezamento: lançado"'
+  D="$CONSUMER/thoughts/local/epic-run/$anc"
+  i=0; while [ ! -f "$D/fim.txt" ] && [ "$i" -lt $(( TIMEOUT * 2 )) ]; do sleep 30; i=$(( i + 30 )); done
+  fato "epic/fim-registrado"        '[ -f "$D/fim.txt" ]'
+  fato "epic/fila-toda-entregue"    'grep -q "fila toda entregue" "$D/fim.txt" 2>/dev/null'
+  fato "epic/2-fatias-no-resumo"    '[ "$(grep -c "^## Fatia " "$D/RESUMO.md" 2>/dev/null)" = "2" ]'
+  fato "epic/briefs-filhos-aceitos" '[ "$(grep -l "Status.*Aceito" "$CONSUMER"/docs/*/briefs/BRIEF-*.md 2>/dev/null | grep -vc -- -epic)" -ge 2 ]'
+  fato "epic/sem-pergunta-pendurada" '! grep -l "\"name\":\"AskUserQuestion\"" "$D"/fatia-*.stream.jsonl >/dev/null 2>&1'
+  fato "epic/status-parado"         'bash "$PLUGIN/scripts/epic-run.sh" "$CONSUMER" status "$anc" | grep -q "parado — fila toda entregue"'
+  fato "epic/sem-run-em-andamento"  '! grep -l "^status: em_andamento" "$CONSUMER"/thoughts/local/sessions/*/run-state-*.md "$CONSUMER"/thoughts/local/run-state-*.md >/dev/null 2>&1'
+  fato "epic/suite-verde"           '( cd "$CONSUMER" && python3 -m unittest discover -s tests -t . >/dev/null 2>&1 )'
+  for f in "$D"/fatia-*.stream.jsonl "$D"/RESUMO.md "$D"/launch.log; do [ -f "$f" ] && cp "$f" "$RESULTS/epic-$(basename "$f")"; done
+  return 0
+}
+
 case "$SCEN" in
   init)   cen_init ;;
   cycle)  cen_cycle ;;
@@ -492,7 +523,8 @@ case "$SCEN" in
   broken) cen_broken ;;
   triage) cen_triage ;;
   report) cen_report ;;
-  all)    cen_init; cen_cycle; cen_pause; cen_triage; cen_report; cen_broken; cen_parallel ;;
+  epic)   cen_epic ;;
+  all)    cen_init; cen_cycle; cen_pause; cen_triage; cen_report; cen_broken; cen_parallel; cen_epic ;;
   *) echo "ERRO: --scenario inválido: $SCEN" >&2; exit 2 ;;
 esac
 

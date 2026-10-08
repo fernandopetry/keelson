@@ -86,6 +86,12 @@ andamento termina e fica commitada), registra a pausa no brief e envia a branch 
 remoto. Quando voltar, em qualquer máquina, `/keelson:continue <slug>` mostra desde
 quando está parado e retoma — e o relatório final diz quanto do tempo total foi pausa.
 
+Numa demanda grande fatiada em épico, cada fatia termina na Entrega e espera você rodar o
+`/keelson:continue`. Para deixar as fatias restantes rodarem uma atrás da outra sem você no
+meio — uma sessão nova por fatia, num processo que sobrevive a fechar a janela —, use
+`/keelson:auto-epic <slug>`; o [fluxo de épicos](Fluxo-de-epicos) explica o que faz o
+revezamento parar e como acompanhar.
+
 ## 4. Revisar e integrar
 
 **A autonomia termina nos commits.** Abrir PR, mergear para a branch principal e

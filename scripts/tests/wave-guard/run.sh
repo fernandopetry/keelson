@@ -16,7 +16,9 @@
 #   7. casa da sessão (4.314): run MEU em thoughts/local/sessions/*/ também é
 #      visto — o glob duplo cobre as duas casas;
 #   8. forja (4.348): run aberto na largada (plan: —, waves_total: 0) bloqueia e a
-#      mensagem carrega a regra do subagent que já reportou (re-despacho).
+#      mensagem carrega a regra do subagent que já reportou (re-despacho);
+#   9. revezamento (4.465): run de terceiro cujo slug é destino de um driver VIVO do
+#      auto-epic → silêncio; driver morto → volta a acusar posse de terceiro.
 #
 # Os cwd de cada caso NÃO são repos git: sem janela de fingerprints (4.165), cada
 # invocação cutuca de novo — o que isola os casos entre si.
@@ -214,6 +216,27 @@ silencio "vscode/cala"
 DW5="$TMP/w5"; run_state "$DW5" eta "$EU"; TW5="$TMP/tw5.jsonl"; { tr_agent_bg d1 keelson:developer; tr_notif d1; } > "$TW5"
 roda_env sdk-cli "{\"stop_hook_active\": false, \"cwd\": \"$DW5\", \"session_id\": \"$EU\", \"transcript_path\": \"$TW5\"}"
 contem "sem-humano-notificado/cutuca-normal" 'run do keelson com status EM ANDAMENTO'
+# --- 4.465: revezamento do auto-epic — run da sessão filha de um driver vivo não é terceiro ---
+DR="$TMP/rv"; run_state "$DR" theta "$DONO"
+mkdir -p "$DR/thoughts/local/epic-run/anc"
+sleep 60 & RVPID=$!
+echo "$RVPID" > "$DR/thoughts/local/epic-run/anc/driver.pid"
+printf 'estado\trodando\nslug_destino\ttheta\n' > "$DR/thoughts/local/epic-run/anc/status.tsv"
+roda "{\"stop_hook_active\": false, \"cwd\": \"$DR\", \"session_id\": \"$EU\"}"
+silencio "revezamento/driver-vivo-cala"
+printf 'estado\trodando\nslug_destino\toutro\n' > "$DR/thoughts/local/epic-run/anc/status.tsv"
+roda "{\"stop_hook_active\": false, \"cwd\": \"$DR\", \"session_id\": \"$EU\"}"
+contem "revezamento/outro-slug-acusa" 'posse de terceiro'
+printf 'estado\trodando\nslug_destino\ttheta\n' > "$DR/thoughts/local/epic-run/anc/status.tsv"
+kill "$RVPID" 2>/dev/null; wait "$RVPID" 2>/dev/null
+roda "{\"stop_hook_active\": false, \"cwd\": \"$DR\", \"session_id\": \"$EU\"}"
+contem "revezamento/driver-morto-acusa" 'posse de terceiro'
+run_state "$DR" iota "$EU"; sleep 60 & RVPID=$!; echo "$RVPID" > "$DR/thoughts/local/epic-run/anc/driver.pid"
+roda "{\"stop_hook_active\": false, \"cwd\": \"$DR\", \"session_id\": \"$EU\"}"
+contem     "revezamento/meu-continua-cobrado" 'slug: iota'
+nao_contem "revezamento/filha-omitida"       'slug: theta'
+kill "$RVPID" 2>/dev/null; wait "$RVPID" 2>/dev/null
+
 if [ "$fail" -gt 0 ]; then
   echo "wave-guard: $fail/$total asserções falharam"
   exit 1

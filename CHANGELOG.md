@@ -25,6 +25,53 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.212.0] — 2026-10-08
+
+Re-init: required
+
+Decision 4.465 — the remaining slices of an epic chain without the Director in between:
+one fresh `claude -p` session per slice, launched as a detached relay.
+
+### Added
+
+- **`/keelson:auto-epic <slug | epic BRIEF> [status | stop] [--max-fatias N] [--timeout-min M]`
+  (human-only):** mechanical pre-flight (refuses `por-fatia`, a queue not at "next slice
+  pending", a dirty tree, a missing `claude`, `thoughts/` not ignored, a run in progress,
+  a live relay), one confirmation, then launches the relay and ends the turn. `status`
+  answers in one line (slice, since when, age of the last event, wave); `stop` ends the
+  slice in flight. Invoking it is the Director's act for the whole epic.
+- **`scripts/epic-run.sh`:** the relay engine — detached from the launching session
+  (survives the turn and the window), one `claude -p "/keelson:continue <slug> …"` per
+  slice with a **clean environment** (a child launched from inside a session inherits the
+  parent's `CLAUDE_CODE_ENTRYPOINT`, which would disarm the no-human guard), the
+  transcript text of each slice appended to `thoughts/local/epic-run/<slug>/RESUMO.md`.
+  After every slice it re-reads the queue: same slice still pending → stops with
+  `fatia N não avançou`; all delivered → stops; the queue vocabulary never changes.
+  Suite `scripts/tests/epic-run/` with a fake `claude` on the PATH (pre-commit + CI).
+- **Smoke scenario `epic`** in `scripts/smoke-consumer.sh` (on demand): the only proof of
+  a `-p` session chaining `-p` sessions on a real model.
+
+### Changed
+
+- **`sdd-conventions.md`, "Sessão sem humano" — single owner of what a no-human session
+  decides alone:** routine confirmation becomes a recorded default; an independent parked
+  question accumulates in the report; what needs the Director (a parked part the next
+  slice consumes, step 3 of the ladder, a sync conflict, a branch base off the default, a
+  persistent vulnerability) ends the slice **without** marking it delivered; the resume
+  mark is skipped; the delivery's `tracker-sync` is awaited. `/keelson:auto`,
+  `/keelson:continue` and `/keelson:specify-epic` point at that owner.
+- **`/keelson:continue`:** the local handover shows the relay state (`running` → do not
+  dispatch, `stopped — reason` → the resume point, with the `RESUMO.md`).
+- **`hooks/wave-guard.sh`:** a run owned by the child session of a live relay driver is
+  neither mine nor a third party's — it leaves the check silently; a dead driver restores
+  the third-party message.
+- **Injected CLAUDE block:** the human-only note lists `/keelson:auto-epic` (hence
+  `Re-init: required`).
+- **Child session permissions:** the relay runs each slice with
+  `--dangerously-skip-permissions` (nobody would answer a prompt) — the Director's
+  decision, declared in the command, the dry-run and the output; `KEELSON_EPIC_PERM`
+  overrides.
+
 ## [0.211.0] — 2026-10-07
 
 Re-init: none

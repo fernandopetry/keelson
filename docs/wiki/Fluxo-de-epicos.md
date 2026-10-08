@@ -21,6 +21,7 @@ documento de produto
         ▼
 /keelson:continue       ← daqui em diante, é só isto, sempre
         │  (propõe a próxima fatia → /keelson:auto roda o ciclo)
+        │  ou /keelson:auto-epic: as fatias restantes, uma atrás da outra, sem você
         ▼
 /keelson:integrate      ← fila concluída: PR do épico (merge é seu)
 ```
@@ -88,9 +89,48 @@ ciclos atualizam. Você nunca edita essa tabela na mão.
 
 Você confirma (ou diz "outra coisa") — **nada roda sem a sua confirmação**, mas você
 nunca precisa lembrar em que ponto o épico estava nem como se escreve o comando da
-fatia 3. Confirmada a retomada, ele grava no brief da fatia a marca de retorno com o
+fatia 3. Quer dar essa confirmação uma vez só, para todas as fatias restantes? É o
+`/keelson:auto-epic`, na seção abaixo. Confirmada a retomada, ele grava no brief da fatia a marca de retorno com o
 tempo parado medido. Para parar no fim do dia com a pausa registrada (e a branch
 enviada, para continuar noutra máquina), use `/keelson:pause`.
+
+## Rodar as fatias restantes sem parar: `/keelson:auto-epic`
+
+Por desenho, cada fatia termina na sua Entrega e espera você rodar o `continue`. Quando
+você quer que o épico atravesse as fatias restantes sem essa parada — de noite, num fim
+de semana —, `/keelson:auto-epic <slug>` lança um **revezamento**: um processo separado
+da sua sessão (sobrevive a você fechar a janela) que roda **uma sessão nova por fatia**,
+com contexto limpo, cada uma retomando pelo `continue` e indo até a Entrega. A fila do
+brief épico é o único juiz: fatia entregue → a próxima começa; fila toda entregue → o
+revezamento para e o próximo passo é o `/keelson:integrate`.
+
+```mermaid
+flowchart TD
+    A["/keelson:auto-epic 'slug'"] --> B{"Pré-voo ok?<br/>(fila, estratégia única, árvore limpa)"}
+    B -- "não" --> C["Mostra o motivo e para"]
+    B -- "sim" --> D["Você confirma uma vez"]
+    D --> E["Sessão nova: /keelson:continue → ciclo da fatia → Entrega"]
+    E --> F{"A fila avançou?"}
+    F -- "sim, e sobra fatia" --> E
+    F -- "sim, toda entregue" --> G["Para: /keelson:integrate é seu"]
+    F -- "não" --> H["Para com o motivo registrado<br/>/keelson:continue 'slug' retoma"]
+```
+
+O que uma fatia decide sozinha e o que a faz parar está escrito no [guia do
+método](Guia-do-metodo) (regra da sessão sem humano): confirmação de rotina vira decisão
+registrada em seu nome; pergunta estacionada que não bloqueia nada fica no relatório da
+fatia; o que exige você — uma pendência que a próxima fatia consumiria, um conflito ao
+sincronizar com a main, a base da branch fora da default — encerra a fatia **sem** marcar
+`entregue`, e o revezamento para ali com o motivo. Cada fatia roda sem pedir permissão
+de ferramenta (ninguém responderia), por isso o comando diz isso antes de você confirmar.
+
+Para acompanhar: `/keelson:auto-epic <slug> status` responde em uma linha — qual fatia,
+desde quando, há quanto tempo o último evento, em que wave. Para parar: `/keelson:auto-epic
+<slug> stop`. O relatório de cada fatia entregue fica em
+`thoughts/local/epic-run/<slug>/RESUMO.md`, e o `continue` o mostra na retomada. Enquanto
+o revezamento roda, não use a árvore do projeto noutra sessão: a fatia commita em cima do
+que estiver lá. Estratégia `por-fatia` fica fora — ali a fatia seguinte depende de um merge
+seu.
 
 ## Perguntas que vão aparecer
 

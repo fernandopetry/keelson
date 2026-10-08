@@ -297,6 +297,27 @@ postmortem. Fôlego continua não sendo gatilho: o modelo nunca pausa por conta 
 
 Detalhe completo: `commands/pause.md`.
 
+### 3.30 `/keelson:auto-epic` — encadear as fatias de um épico sem parar (humano-only)
+
+O revezamento: o Diretor invoca uma vez e as fatias restantes da fila do BRIEF épico
+rodam em sequência, **uma sessão `claude -p` por fatia** — contexto limpo e id de sessão
+próprio —, lançadas por `scripts/epic-run.sh` num processo desacoplado da sessão que o
+chamou (sobrevive ao fim do turno e ao fechamento da janela). Cada sessão filha retoma
+pelo `/keelson:continue` e roda o ciclo da fatia até a Entrega sob a regra da sessão sem
+humano (dono: `sdd-conventions.md`): confirmação de rotina vira default registrado,
+estacionada independente acumula no relatório, e o que exige o Diretor (parte que a
+próxima fatia consome, degrau 3, conflito de sync, base da branch fora da default)
+encerra a fatia sem marcar `entregue`. O driver relê a fila depois de cada sessão: avançou
+→ próxima; não avançou, toda entregue ou aguardando-produto → para, com o motivo em
+`thoughts/local/epic-run/<slug>/` (fim, `status.tsv`, `RESUMO.md` com o relatório de cada
+fatia). Pré-voo mecânico recusa estratégia `por-fatia`, árvore suja, run em andamento e
+driver já vivo. `status` responde em uma linha (fatia, idade do último evento, wave);
+`stop` encerra o filho em voo. A sessão filha roda com `--dangerously-skip-permissions`
+(decisão do Diretor); merge, PR e deploy continuam humanos; a fila nunca ganha estado
+novo (decisão 4.465).
+
+Detalhe completo: `commands/auto-epic.md`.
+
 ## 4. Skills
 
 Skills não geram artefatos novos — validam ou consultam. As três validators rodam **automaticamente** ao final do comando correspondente, mas podem ser invocadas sob demanda ("valide a SPEC-002", "lint no PLAN-001").
