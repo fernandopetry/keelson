@@ -17,6 +17,8 @@
 #      entrega, próxima não lança) e stop --now (filho morto na hora); segundo launch
 #      recusado enquanto vivo e aceito depois;
 #   8. (4.466) fatia parcial RETOMÁVEL: em ciclo + run-state `encerrado — pausa` → launch
+#      8b. (0.219.1) retomada que não avança grava stream/result/RESUMO com o número da
+#      fatia retomada e para por decisão, nunca por "infraestrutura"
 #      aceito, a sessão filha retoma e a fila avança (progresso = fila mudou);
 #   9. (4.466) fatia parcial `encerrado — aguarda Diretor` → exit 5, classe aguarda-diretor;
 #  10. (4.466) run em_andamento de dona MORTA (casa parada há 2 h, sem processo) → aceito;
@@ -249,6 +251,19 @@ espera_fim "$D" 60 && ok "parcial-pausa/fim.txt existe" || bad "parcial-pausa/fi
 contem "parcial-pausa/fila toda entregue" "$(cat "$D/fim.txt" 2>/dev/null)" "fila toda entregue"
 n="$(grep -c '^argv:' "$FAKE_LOG")"; [ "$n" = "3" ] && ok "parcial-pausa/3 sessões (1 retomada + 2 novas)" || bad "parcial-pausa/invocações = $n" "$(cat "$FAKE_LOG")"
 contem "parcial-pausa/modo no status.tsv" "$(cat "$D/launch.log")" "retomada · tentativa 1"
+
+# 8b. (0.219.1) retomada cuja filha NÃO avança a fila: os arquivos da fatia levam o número da
+# fatia retomada (1), não o da próxima pendente (2) — e a parada é por decisão, não infraestrutura
+R="$(mkparcial p8b)"; mkrun "$R" "sess-pausa-b" "encerrado — pausa: TASK-002-001 closure (wave 1 de 2)" >/dev/null
+: > "$FAKE_LOG"; export FAKE_BRIEF="$R/$BRIEF_REL"
+out="$(FAKE_MODE=stall PATH="$BIN:$PATH" bash "$ER" "$R" launch "$BRIEF_REL" --retry 0)"; st=$?
+D="$R/thoughts/local/epic-run/anc"
+espera_fim "$D" 60 && ok "retomada-parada/fim.txt existe" || bad "retomada-parada/fim não apareceu" "$(cat "$D/launch.log" 2>/dev/null)"
+contem "retomada-parada/motivo é decisão" "$(cat "$D/fim.txt" 2>/dev/null)" "fatia 1 não avançou (exit 0) — parada por decisão"
+[ -f "$D/fatia-1.stream.jsonl" ] && ok "retomada-parada/stream da fatia 1" || bad "retomada-parada/stream com número errado" "$(ls "$D")"
+[ ! -f "$D/fatia-2.stream.jsonl" ] && ok "retomada-parada/nenhum stream da fatia 2" || bad "retomada-parada/stream gravado como fatia 2"
+contem "retomada-parada/RESUMO da fatia 1" "$(cat "$D/RESUMO.md" 2>/dev/null)" "## Fatia 1 — Login"
+contem "retomada-parada/status aponta o relatório" "$(bash "$ER" "$R" status anc)" "último relatório (fatia 1"
 
 # 9. aguarda Diretor → exit 5
 R="$(mkparcial p9)"; mkrun "$R" "sess-ag" "encerrado — aguarda Diretor: parte estacionada que a fatia 2 consome" >/dev/null

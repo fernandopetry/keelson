@@ -132,7 +132,7 @@ ACTION="${1:-}"
 shift
 
 # ---------- leitura da fila (epic-state é o único leitor) ----------
-estado_fila() { # <brief> → ES_REGRA ES_ROTULO ES_ESTRATEGIA ES_AVISO ES_PROX ES_PROX_SLUG ES_PROX_TITULO ES_OUT
+estado_fila() { # <brief> → ES_REGRA ES_ROTULO ES_ESTRATEGIA ES_AVISO ES_AVISO_TXT ES_PROX ES_PROX_SLUG ES_ATUAL* ES_FILA ES_OUT
   ES_OUT="$( cd "$ROOT" && bash "$ES" "$1" 2>/dev/null )" || ES_OUT=""
   ES_REGRA="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="regra"{print $2; exit}')"
   ES_ROTULO="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="regra"{print $3; exit}')"
@@ -157,7 +157,7 @@ estado_fila() { # <brief> → ES_REGRA ES_ROTULO ES_ESTRATEGIA ES_AVISO ES_PROX 
                if (a == n) { t=f[3]; gsub(SUBSEP, "|", t); gsub(/^[ \t]+|[ \t]+$/, "", t); gsub(/\*\*/, "", t); print t; exit } }
     ' "$ROOT/$1")"
   fi
-  ES_PROX_TITULO="$ES_ATUAL_TITULO"
+  # a fatia EM VOO é sempre ES_ATUAL (retomada ou nova); ES_PROX é só a próxima pendente (0.219.1)
 }
 
 run_state_recente() { # <slug> → ecoa o run-state MAIS RECENTE do slug (qualquer status, qualquer casa) ou nada
@@ -376,7 +376,7 @@ O Diretor confirmou que a sessão dona do run em andamento morreu: ao assumir a 
         -u CLAUDE_PID -u CLAUDECODE \
         claude -p "$prompt" --output-format stream-json --verbose $PERM_FLAG \
         ${MODEL:+--model "$MODEL"} $EXTRA
-    ) > "$DIR/fatia-$ES_PROX.stream.jsonl" 2> "$DIR/fatia-$ES_PROX.stderr.log" &
+    ) > "$DIR/fatia-$ES_ATUAL.stream.jsonl" 2> "$DIR/fatia-$ES_ATUAL.stderr.log" &
     child=$!
     st_set filho_pid "$child"
     secs=0; rc=""; mudo_avisado=0
@@ -391,16 +391,16 @@ O Diretor confirmou que a sessão dona do run em andamento morreu: ao assumir a 
       fi
       if [ "$TMIN" -gt 0 ] && [ "$secs" -ge $((TMIN * 60)) ]; then
         encerrar_pid "$child"; wait "$child" 2>/dev/null; rc=124
-        echo "[$(agora)] fatia $ES_PROX — teto de $TMIN min: filho encerrado" >> "$DIR/launch.log"
+        echo "[$(agora)] fatia $ES_ATUAL — teto de $TMIN min: filho encerrado" >> "$DIR/launch.log"
         break
       fi
       sleep 5; secs=$((secs + 5))
     done
     if [ -z "$rc" ]; then wait "$child"; rc=$?; fi
     st_set filho_pid ""
-    res="$DIR/fatia-$ES_PROX.result.txt"
+    res="$DIR/fatia-$ES_ATUAL.result.txt"
     if command -v python3 >/dev/null 2>&1; then
-      python3 - "$DIR/fatia-$ES_PROX.stream.jsonl" > "$res" 2>/dev/null <<'PY' || : > "$res"
+      python3 - "$DIR/fatia-$ES_ATUAL.stream.jsonl" > "$res" 2>/dev/null <<'PY' || : > "$res"
 import json, sys
 out = []; result = None
 for line in open(sys.argv[1], encoding="utf-8", errors="replace"):
@@ -420,13 +420,13 @@ if result: out.append(result)
 sys.stdout.write("\n\n".join(out))
 PY
     else
-      printf 'python3 ausente — texto não extraído; stream em %s\n' "fatia-$ES_PROX.stream.jsonl" > "$res"
+      printf 'python3 ausente — texto não extraído; stream em %s\n' "fatia-$ES_ATUAL.stream.jsonl" > "$res"
     fi
     {
-      printf '\n## Fatia %s — %s — %s → %s — exit %s\n\n' "$ES_PROX" "$ES_PROX_TITULO" "$ts" "$(agora)" "$rc"
+      printf '\n## Fatia %s — %s — %s → %s — exit %s\n\n' "$ES_ATUAL" "$ES_ATUAL_TITULO" "$ts" "$(agora)" "$rc"
       cat "$res"; printf '\n'
     } >> "$DIR/RESUMO.md"
-    echo "[$(agora)] fatia $ES_PROX — claude saiu com $rc" >> "$DIR/launch.log"
+    echo "[$(agora)] fatia $ES_ATUAL — claude saiu com $rc" >> "$DIR/launch.log"
     antes="$ES_ATUAL"
     estado_fila "$BRIEF"
     if [ "$ES_FILA" != "$fila_antes" ]; then

@@ -25,6 +25,20 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.219.1] — 2026-10-11
+
+Re-init: none
+
+Decision 4.472 (patch) — the relay loop named a resumed slice's files after the next pending slice.
+
+### Fixed
+
+- `scripts/epic-run.sh`: when resuming a slice left `em ciclo`, the loop wrote its stream,
+  stderr, result, RESUMO section and log lines under the number of the **next pending** slice
+  instead of the slice actually running (and under an empty number when none followed); the
+  `result` check then missed the file and a stop by decision was retried as an infrastructure
+  failure. Suite case 8b covers resume + stalled queue.
+
 ## [0.219.0] — 2026-10-11
 
 Re-init: none
