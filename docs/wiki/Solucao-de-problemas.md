@@ -309,7 +309,12 @@ fatia em curso fica como qualquer sessão que caiu e o mesmo comando a retoma.
 `posse-incerta` significa que a sessão que conduzia a fatia foi tocada há menos de vinte
 minutos e pode estar viva: espere, ou confirme que ela morreu quando o comando perguntar.
 Se o pré-voo recusou lançar (`estratégia por-fatia`, `árvore suja`, `thoughts/ não está
-no .gitignore`), o motivo diz o que resolver — nada disso se contorna.
+no .gitignore`, `fila com aviso`), o motivo diz o que resolver — nada disso se contorna.
+`fila com aviso` vem com a fatia e a causa: um estado fora do vocabulário da fila, ou uma
+barra vertical `|` crua dentro de uma célula da tabela (escreva `\|`, como em qualquer
+tabela markdown). Corrija o texto do brief épico, commite e lance de novo.
+`nenhum BRIEF épico não-concluído` significa que o slug não tem épico em andamento: a
+demanda única segue pelo `/keelson:auto`; para decompor, `/keelson:specify-epic`.
 
 ### A sessão morreu no meio da suíte e a retomada disse "nada a fazer"
 

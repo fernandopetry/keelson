@@ -35,7 +35,7 @@ confirmação; nunca omita.
 ## Input
 
 ```
-/keelson:auto-epic <slug | caminho de BRIEF épico> [status | stop] [--max-fatias N] [--timeout-min M]
+/keelson:auto-epic <slug | caminho de BRIEF épico> [status | watch | stop] [--notify] [--max-fatias N] [--timeout-min M]
 ```
 
 Raiz do repo em todos os passos: `git rev-parse --show-toplevel` do working tree principal.
@@ -44,9 +44,13 @@ revezamento em curso.
 
 ## Etapa 0: resolver o alvo e consultar
 
-1. Caminho de BRIEF épico → é ele. Slug → o BRIEF épico **não-concluído** mais recente em
-   `{docsRoot}/<slug>/briefs/*-epic.md` (mesma regra da Etapa 0 do `/keelson:continue`).
-   Sem épico → responda que o revezamento só existe para épico e aponte o `/keelson:auto`.
+1. O alvo vai ao script **como o Diretor digitou** — caminho de BRIEF épico ou slug: o
+   `epic-run.sh` resolve o slug no disco a cada chamada (BRIEF épico **não-concluído**
+   mais recente em `{docsRoot}/<slug>/briefs/*-epic.md`, a regra da Etapa 0 do
+   `/keelson:continue`) e ecoa `brief: <caminho>` na 2ª linha do pré-voo. Nunca responda
+   "não há épico" por memória desta sessão: outra sessão pode ter acabado de gravá-lo
+   (4.472) — a recusa `nenhum BRIEF épico não-concluído` é o único fato que autoriza
+   apontar o `/keelson:auto` (demanda única) ou o `/keelson:specify-epic` (decompor).
 2. `status` → `bash "${CLAUDE_PLUGIN_ROOT}/scripts/epic-run.sh" <raiz> status <slug-âncora>`:
    transcreva a linha (rodando com fatia, instante de início, idade do último evento e wave;
    parado com motivo; ou nenhum revezamento) e o caminho do `RESUMO.md`. Encerre.
@@ -82,8 +86,10 @@ flags que o Diretor passou. A primeira linha do stdout traz a classe (4.466):
   confirmação viaja no prompt da sessão filha; `FORCE=1` é ato do humano, 4.431);
   "Não" → espere o limiar ou feche aquela sessão.
 - **`pré-voo: recusado`** (exit 3) → transcreva e **pare**: estratégia `por-fatia`
-  (fatia dependente só larga após merge, ato do Diretor — 4.190), fila na regra 1/5/6,
-  árvore suja, `thoughts/` não ignorado, driver já vivo. Nada aqui se contorna.
+  (fatia dependente só larga após merge, ato do Diretor — 4.190), fila na regra 1/5/6
+  ou com `aviso` (a linha traz fatia e motivo: estado fora do vocabulário, `|` sem
+  escape numa célula), árvore suja, `thoughts/` não ignorado, driver já vivo. Nada aqui
+  se contorna; a fila só muda pela mão do Diretor, declarada.
 
 Passou → monte o **"você está aqui"**: a fila com estados (a saída do `epic-state.sh` já
 está no dry-run) e a fatia pela qual o revezamento começa ou retoma.

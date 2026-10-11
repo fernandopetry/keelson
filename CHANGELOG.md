@@ -25,6 +25,35 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.219.0] — 2026-10-11
+
+Re-init: none
+
+Decision 4.472 — the relay engine resolves the slug on disk, the queue parser honours `\|`, and a pre-flight refusal carries its reason.
+
+### Added
+
+- `scripts/epic-run.sh launch` accepts the **anchor slug** as well as the epic BRIEF path: the
+  engine resolves, on disk and on every call, the most recent non-concluded epic BRIEF under
+  `<docsRoot>/<slug>/briefs/*-epic.md`, echoes `brief: <path>` as the second pre-flight line
+  (plus an `aviso:` line when more than one epic is active), and refuses with `nenhum BRIEF
+  épico não-concluído` (pointing at `/keelson:auto` and `/keelson:specify-epic`) when there
+  is none. `/keelson:auto-epic` hands the script whatever you typed and never answers "no
+  epic" from session memory — another session may have just written it. `--dry-run` now
+  prints the queue it read (`fila: fatia …`).
+
+### Fixed
+
+- The epic queue parser (`epic-state.sh`, and the slice title in `epic-run.sh`, now read only
+  from the `## Fila` section) honours the GFM escape `\|` inside a cell and tolerates a row
+  without a trailing `|`; a row with more cells than the header degrades to an `aviso` that
+  states the count and suggests the escape, instead of silently reading the wrong column.
+- With a non-parseable row **before** the first pending slice, `epic-state.sh` now answers
+  rule `-` (no slice elected) instead of electing the next pending one — the behaviour §4.156
+  described but the script did not enforce.
+- Pre-flight refusals (and the relay's own stop) transcribe every `aviso` line with slice and
+  reason; `epic-state.sh` called with the repo root in front now replies with its usage.
+
 ## [0.218.0] — 2026-10-08
 
 Re-init: none

@@ -25,9 +25,11 @@
 # Colunas da fila mapeadas PELO HEADER da tabela (4.156): além do contrato canônico
 # (| # | Fatia | Slug de destino | Estado |), aceita o formato de campo
 # (| # | Fatia | Estado | Âncora |) — negrito/backtick no estado é removido e o
-# caminho do brief filho pode vir da coluna Âncora. Estado fora do vocabulário
-# fechado (pendente · em ciclo · entregue · aguardando-produto) degrada com `aviso`
-# e nunca elege fatia por conta (regra `-` quando não sobra fato parseável).
+# caminho do brief filho pode vir da coluna Âncora. `\|` escapado (GFM) é texto da
+# célula; linha com célula A MAIS que o header (`|` cru) degrada com `aviso` que diz a
+# contagem (4.472). Estado fora do vocabulário fechado (pendente · em ciclo · entregue ·
+# aguardando-produto) degrada com `aviso` e nunca elege fatia por conta: a regra 4/5 só
+# elege pendente ANTERIOR a qualquer linha não-parseável; depois dela, regra `-`.
 # Exit: 0 ok · 2 uso incorreto. Read-only; bash 3.2 + awk POSIX.
 
 set -u
@@ -44,7 +46,7 @@ while [ $# -gt 0 ]; do
     --docs-root) shift; [ $# -gt 0 ] || die2 "--docs-root exige um diretório."; DOCSROOT="$1" ;;
     -h|--help) usage; exit 0 ;;
     -*) die2 "opção desconhecida: $1" ;;
-    *) [ -z "$BRIEF" ] || die2 "apenas um BRIEF por vez."; BRIEF="$1" ;;
+    *) [ -z "$BRIEF" ] || die2 "apenas um BRIEF por vez (recebido também: $1). Uso: epic-state.sh <caminho-do-BRIEF-epico> [--docs-root <dir>] — sem a raiz do repo na frente"; BRIEF="$1" ;;
   esac
   shift
 done
@@ -70,14 +72,20 @@ TMP="$(mktemp -d)" || die2 "mktemp falhou."
 trap 'rm -rf "$TMP"' EXIT
 awk '
   function trim(s) { sub(/^[ \t]+/, "", s); sub(/[ \t]+$/, "", s); return s }
-  BEGIN { slugcol = 4; estcol = 5; anccol = 0 }
+  BEGIN { slugcol = 4; estcol = 5; anccol = 0; hn = 0 }
   /^## Fila/ { on = 1; next }
   /^## /     { on = 0 }
   on && /^\|/ {
-    n = split($0, c, "|")
+    line = $0
+    sub(/[ \t]+$/, "", line)
+    if (line !~ /\|$/) line = line "|"      # GFM admite linha sem `|` final
+    gsub(/\\\|/, SUBSEP, line)              # `\|` escapado (GFM) é texto da célula, não separador
+    n = split(line, c, "|")
+    for (i = 1; i <= n; i++) gsub(SUBSEP, "|", c[i])
     if (n < 4) next
     num = trim(c[2])
     if (num == "#") {                       # header: mapeia as colunas pelo nome
+      hn = n
       slugcol = 0; estcol = 0; anccol = 0
       for (i = 3; i < n; i++) {
         col = tolower(trim(c[i]))
@@ -89,6 +97,10 @@ awk '
       next
     }
     if (num !~ /^[0-9]+$/) next
+    if (hn > 0 && n > hn) {                 # célula A MAIS que o header: `|` sem escape deslocou as
+      printf "%s\t-\t__colunas:%d/%d__\t\n", num, n - 2, hn - 2   # colunas — degradar, nunca ler a errada
+      next                                  # (célula a menos é GFM válido: a linha segue parseável)
+    }
     if (n <= estcol) next
     slug = (slugcol > 0 ? trim(c[slugcol]) : "-")
     est = trim(c[estcol])
@@ -154,7 +166,7 @@ verifica() { # $1 = estado declarado (parênteses podem ter o caminho) $2 = ânc
 
 regra=""; regra_det=""
 all_entregue=1
-nao_parseavel=0
+nao_parseavel=0; bad_n=""
 prox_estado=""; prox_n=""
 while IFS='	' read -r n slug estado ancora; do
   case "$estado" in
@@ -183,10 +195,17 @@ while IFS='	' read -r n slug estado ancora; do
       all_entregue=0
       printf 'fatia\t%s\t%s\t%s\t%s\n' "$n" "$slug" "$estado" "-"
       if [ -z "$prox_estado" ]; then prox_estado="$estado"; prox_n="$n"; fi ;;
+    __colunas:*)
+      # contagem de colunas diferente do header: `|` sem escape dentro de célula (escreva `\|`)
+      all_entregue=0
+      nao_parseavel=1; [ -n "$bad_n" ] || bad_n="$n"
+      cols="${estado#__colunas:}"; cols="${cols%__}"
+      printf 'fatia\t%s\t%s\t%s\t%s\n' "$n" "-" "-" "-"
+      printf 'aviso\t%s\tlinha com %s colunas e header com %s — `|` sem escape dentro de célula? (escreva `\\|`); fila fora do contrato (index-contract.md); derive dos artefatos\n' "$n" "${cols%/*}" "${cols#*/}" ;;
     *)
       # vocabulário desconhecido → degradar, nunca eleger fatia por conta (4.156)
       all_entregue=0
-      nao_parseavel=1
+      nao_parseavel=1; [ -n "$bad_n" ] || bad_n="$n"
       printf 'fatia\t%s\t%s\t%s\t%s\n' "$n" "$slug" "$estado" "-"
       printf 'aviso\t%s\testado nao-parseavel: "%s" — fila fora do contrato (index-contract.md); derive dos artefatos\n' "$n" "$estado" ;;
   esac
@@ -195,7 +214,8 @@ done < "$TMP/fila.tsv"
 if [ -z "$regra" ]; then
   if [ "$all_entregue" = 1 ]; then
     regra=6; regra_det="fila toda entregue — apontar /keelson:integrate (PR do epico, ato do Diretor)"
-  elif [ -n "$prox_estado" ]; then
+  elif [ -n "$prox_estado" ] && { [ "$nao_parseavel" -eq 0 ] || [ "$prox_n" -lt "$bad_n" ]; }; then
+    # pendente ANTES de qualquer linha não-parseável é fato; depois dela seria eleição por cima (4.156)
     case "$prox_estado" in
       aguardando-produto*)
         regra=5; regra_det="proxima fatia aguardando produto ($prox_n) — mostrar a pendencia; fatia posterior nao bloqueada pode ser proposta (julgamento do comando)" ;;
@@ -203,7 +223,7 @@ if [ -z "$regra" ]; then
         regra=4; regra_det="proxima fatia pendente ($prox_n) — propor /keelson:auto com o epico no titulo (sync de largada 4.126)" ;;
     esac
   elif [ "$nao_parseavel" = 1 ]; then
-    regra='-'; regra_det="fila com estado nao-parseavel e nenhum fato restante — derive dos artefatos e corrija a fila declarando"
+    regra='-'; regra_det="fila com linha nao-parseavel (fatia $bad_n) antes de qualquer fatia elegivel — derive dos artefatos e corrija a fila declarando; nenhuma fatia eleita"
   else
     regra=6; regra_det="fila toda entregue — apontar /keelson:integrate (PR do epico, ato do Diretor)"
   fi

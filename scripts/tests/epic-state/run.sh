@@ -160,6 +160,40 @@ runcase id-sem-casar-prefixo "$R" 2 "pre-task"
 R="$(mkepic_legado sa1 '| 1 | Quiz | **em ciclo** (2026-08-10) | `briefs/BRIEF-999.md` |')"
 runcase em-ciclo-sem-artefatos "$R" 2 "aviso	1	fatia em ciclo sem brief filho resolvivel"
 
+# ---- célula com `|` (4.472 — fixture do artefato de campo: título "(Jira \| histórico)") ----
+
+# `\|` escapado (GFM) é texto da célula: a fatia 1 parseia e é a próxima
+R="$(mkepic esc1 '| 1 | Origem (Jira \| histórico) | ancora | pendente |
+| 2 | Segunda | ancora | pendente |')"
+runcase pipe-escapado-parseia "$R" 4 "pendente (1)"
+total=$((total + 1))
+out="$( cd "$R" && bash "$ES" docs/ancora/briefs/BRIEF-2026-08-06-plataforma-epic.md --docs-root docs 2>/dev/null )"
+case "$out" in *"aviso"*) echo "FAIL pipe-escapado-sem-aviso"; printf '%s\n' "$out" | sed 's/^/  /'; fail=$((fail + 1)) ;; *) echo "ok   pipe-escapado-sem-aviso" ;; esac
+
+# `|` SEM escape desloca as colunas: aviso com a contagem e nenhuma fatia eleita por cima
+R="$(mkepic esc2 '| 1 | Origem (Jira | histórico) | ancora | pendente |
+| 2 | Segunda | ancora | pendente |')"
+runcase pipe-sem-escape-aviso "$R" - "linha com 5 colunas e header com 4"
+
+# estado fora do vocabulário ANTES da primeira pendente → regra -, nunca elege a seguinte
+R="$(mkepic ord1 '| 1 | Um | ancora | esperando aprovacao |
+| 2 | Dois | ancora | pendente |')"
+runcase nao-parseavel-antes-da-pendente "$R" - "nenhuma fatia eleita"
+
+# pendente ANTES da linha não-parseável continua fato: regra 4 na fatia 1
+R="$(mkepic ord2 '| 1 | Um | ancora | pendente |
+| 2 | Dois | ancora | esperando aprovacao |')"
+runcase pendente-antes-do-nao-parseavel "$R" 4 "pendente (1)"
+
+# linha sem `|` final (GFM admite) não vira aviso
+R="$(mkepic semfim '| 1 | Um | ancora | pendente
+| 2 | Dois | ancora | pendente |')"
+runcase sem-pipe-final "$R" 4 "pendente (1)"
+
+# célula A MENOS que o header (âncora omitida no formato de campo) é GFM válido: parseia, sem aviso
+R="$(mkepic_legado menos '| 1 | Digest | pendente |')"
+runcase celula-a-menos-parseia "$R" 4 "pendente (1)"
+
 # cabeçalho do épico ecoado
 total=$((total + 1))
 out="$( cd "$R" && bash "$ES" docs/ancora/briefs/BRIEF-2026-08-06-plataforma-epic.md --docs-root docs 2>/dev/null )"
@@ -172,6 +206,12 @@ esac
 total=$((total + 1))
 bash "$ES" "$TMP/nao-existe.md" >/dev/null 2>&1
 [ $? -eq 2 ] && echo "ok   brief-inexistente-exit-2" || { echo "FAIL brief-inexistente-exit-2"; fail=$((fail + 1)); }
+
+# raiz na frente (assinatura dos outros scripts) → a mensagem aponta o uso (4.472)
+total=$((total + 1))
+err="$(bash "$ES" "$R" "$R/docs/ancora/briefs/BRIEF-2026-08-06-plataforma-epic.md" 2>&1 >/dev/null)"; st=$?
+case "$st:$err" in 2:*"sem a raiz do repo na frente"*) echo "ok   raiz-na-frente-aponta-uso" ;; *) echo "FAIL raiz-na-frente-aponta-uso ($st)"; printf '%s
+' "$err" | sed 's/^/  /'; fail=$((fail + 1)) ;; esac
 
 echo "---"
 if [ "$fail" -gt 0 ]; then echo "epic-state: $fail de $total casos falharam"; exit 1; fi

@@ -315,8 +315,11 @@ fatia). Pré-voo mecânico com três saídas (decisão 4.466): `ok` (fatia nova,
 do `claim`), `aguarda-diretor` (a fatia fechou o run com o prefixo `aguarda Diretor:` —
 parou por decisão sua; o `continue` interativo a retoma com você presente, e só depois o
 revezamento relança) e `posse-incerta` (sessão dona pode estar viva; `--force-claim` leva a
-sua confirmação à sessão filha). Recusa estratégia `por-fatia`, fila na regra 1/5/6,
-árvore suja e driver já vivo. Falha de infraestrutura (saída ≠ 0 ou sem `result`) repete
+sua confirmação à sessão filha). Recusa estratégia `por-fatia`, fila na regra 1/5/6
+ou com aviso do `epic-state.sh` (a recusa transcreve fatia e motivo), árvore suja e driver
+já vivo. O alvo é o caminho do BRIEF épico ou o slug — o script resolve o slug no disco a
+cada chamada (épico não-concluído mais recente), nunca a sessão de memória (decisão 4.472);
+a fila honra `\|` escapado dentro de célula. Falha de infraestrutura (saída ≠ 0 ou sem `result`) repete
 a mesma fatia após a espera, até `--retry` vezes; parada por decisão não insiste. `status`
 responde em uma linha (fatia, modo, idade do último evento, wave) e, parado, mostra o
 fim do último relatório; `watch` é o feed ao vivo para um terminal, sem modelo e sem token

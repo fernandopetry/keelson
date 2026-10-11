@@ -28,6 +28,9 @@
 #      e na parada; sem a flag, nenhuma chamada;
 #  13. (4.467) watch: feed ao vivo imprime a fatia, a sessão filha, o texto do Tech Lead e
 #      a parada, e sai sozinho; sem evento acima de --stale-min avisa POSSÍVEL TRAVAMENTO.
+#  14. (4.472) launch por slug resolve o BRIEF épico não-concluído mais recente no disco
+#      (concluído não conta; sem épico recusa apontando o /keelson:auto); célula com `\|`
+#      escapado parseia inteira no título; `|` cru vira recusa com o detalhe do aviso.
 #
 # Uso: scripts/tests/epic-run/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -320,6 +323,36 @@ contem "watch/batimento" "$w" "... sem evento ha"
 contem "watch/travamento" "$w" "!! POSSIVEL TRAVAMENTO: sem evento ha 1min - filho pid"
 contem "watch/parada" "$w" "= revezamento parado - teto de fatias (1) atingido"
 contem "nenhum/watch" "$(bash "$ER" "$R" watch outro 2>/dev/null)" "nenhum revezamento"
+
+# ---------- 14. launch por slug + `\|` na célula + recusa transcreve o aviso (4.472) ----------
+R="$(mkrepo slug)"
+perl -0pi -e 's/\| 1 \| Login \|/| 1 | Login (SSO \\| senha) |/' "$R/$BRIEF_REL"
+( cd "$R" && git -c user.email=t@t -c user.name=t commit -qam "pipe escapado" )
+out="$(PATH="$BIN:$PATH" bash "$ER" "$R" launch anc --dry-run)"; st=$?
+[ "$st" -eq 0 ] && ok "slug/dry-run exit 0" || bad "slug/dry-run exit $st" "$out"
+contem "slug/resolveu o brief" "$out" "brief: $BRIEF_REL"
+contem "slug/título com pipe inteiro" "$out" "próxima fatia 1 (Login (SSO | senha) → anc)"
+# épico concluído não é alvo; sem épico ativo recusa apontando /keelson:auto
+R2="$(mkrepo slug-concluido)"
+perl -0pi -e 's/\*\*Status\*\*: Emitido/**Status**: concluído/' "$R2/$BRIEF_REL"
+( cd "$R2" && git -c user.email=t@t -c user.name=t commit -qam "concluido" )
+out="$(PATH="$BIN:$PATH" bash "$ER" "$R2" launch anc --dry-run)"; st=$?
+[ "$st" -eq 3 ] && ok "slug/concluído exit 3" || bad "slug/concluído exit $st" "$out"
+contem "slug/concluído motivo" "$out" "nenhum BRIEF épico não-concluído"
+out="$(PATH="$BIN:$PATH" bash "$ER" "$R" launch outro --dry-run)"; st=$?
+[ "$st" -eq 3 ] && ok "slug/inexistente exit 3" || bad "slug/inexistente exit $st" "$out"
+# dois épicos: o mais recente (id por data) ganha
+cp "$R/$BRIEF_REL" "$R/docs/anc/briefs/BRIEF-2026-10-09-segundo-epic.md"
+( cd "$R" && git -c user.email=t@t -c user.name=t add -A && git -c user.email=t@t -c user.name=t commit -qm "2o epico" )
+out="$(PATH="$BIN:$PATH" bash "$ER" "$R" launch anc --dry-run)"
+contem "slug/mais recente" "$out" "brief: docs/anc/briefs/BRIEF-2026-10-09-segundo-epic.md"
+# `|` sem escape na célula: a recusa carrega o detalhe do aviso (fatia + motivo)
+R3="$(mkrepo pipe-cru)"
+perl -0pi -e 's/\| 1 \| Login \|/| 1 | Login (SSO | senha) |/' "$R3/$BRIEF_REL"
+( cd "$R3" && git -c user.email=t@t -c user.name=t commit -qam "pipe cru" )
+out="$(PATH="$BIN:$PATH" bash "$ER" "$R3" launch "$BRIEF_REL" --dry-run)"; st=$?
+[ "$st" -eq 3 ] && ok "aviso/pipe-cru exit 3" || bad "aviso/pipe-cru exit $st" "$out"
+contem "aviso/pipe-cru transcrito" "$out" "fatia 1: linha com 5 colunas e header com 4"
 
 if [ "$fail" -gt 0 ]; then echo "epic-run: $fail/$total asserções falharam"; exit 1; fi
 echo "epic-run: $total asserções ok"

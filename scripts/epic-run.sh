@@ -4,18 +4,23 @@
 # `claude -p` próprio (contexto limpo, sessão própria), lendo o estado do disco pelo
 # /keelson:continue; a fila do BRIEF épico é o único fato que decide a próxima.
 #
-# Uso: epic-run.sh <raiz> launch <BRIEF-epico> [--max-fatias N] [--timeout-min M] [--retry N]
+# Uso: epic-run.sh <raiz> launch <BRIEF-epico | slug-ancora> [--max-fatias N] [--timeout-min M] [--retry N]
 #                       [--retry-wait-sec S] [--force-claim] [--notify] [--stale-min N]
 #                       [--model M] [--dry-run] [-- <args extras ao claude>]
 #      epic-run.sh <raiz> status <slug-ancora>
 #      epic-run.sh <raiz> watch  <slug-ancora> [--stale-min N] [--heartbeat-sec S]
 #      epic-run.sh <raiz> stop   <slug-ancora> [--now]
 #
-#   launch   pré-voo mecânico (nada é escrito numa recusa; a 1ª linha do stdout começa
-#            com a classe): `pré-voo: recusado` (exit 3) · `pré-voo: aguarda-diretor`
+#   launch   o alvo é o caminho do BRIEF épico ou o slug-âncora: slug resolve o BRIEF
+#            épico NÃO-concluído mais recente em <docsRoot>/<slug>/briefs/*-epic.md
+#            (docsRoot via ficha.sh; sem ficha: `docs`) — lookup do disco a cada chamada,
+#            nunca memória da sessão (4.472). Pré-voo mecânico (nada é escrito numa
+#            recusa; a 1ª linha do stdout começa com a classe; a 2ª é `brief: <caminho>`):
+#            `pré-voo: recusado` (exit 3) · `pré-voo: aguarda-diretor`
 #            (exit 5) · `pré-voo: posse-incerta` (exit 6). Recusa: BRIEF ausente ·
 #            estratégia ≠ `unica` (fatia dependente de merge é ato do Diretor, 4.190) ·
-#            fila na regra 1/5/6 ou com `aviso` · árvore suja · `claude` fora do PATH ·
+#            fila na regra 1/5/6 ou com `aviso` (a recusa transcreve o detalhe de cada
+#            aviso — fatia e motivo) · árvore suja · `claude` fora do PATH ·
 #            `thoughts/` não ignorado (4.51) · driver vivo. Regra 4 (próxima pendente)
 #            parte limpo. Regra 2/3 (fatia `em ciclo` parcial — 4.466) é RETOMÁVEL quando
 #            o run-state mais recente do slug de destino está `encerrado — pausa…`/outro
@@ -85,6 +90,7 @@ export LC_ALL
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ES="$HERE/epic-state.sh"
+FICHA="$HERE/ficha.sh"
 # Modo de permissão da sessão filha (decisão do Diretor, 4.465): sem humano para
 # responder prompt, o filho roda sem perguntas. Sobrescrevível por KEELSON_EPIC_PERM.
 PERM_FLAG="${KEELSON_EPIC_PERM:---dangerously-skip-permissions}"
@@ -132,6 +138,7 @@ estado_fila() { # <brief> → ES_REGRA ES_ROTULO ES_ESTRATEGIA ES_AVISO ES_PROX 
   ES_ROTULO="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="regra"{print $3; exit}')"
   ES_ESTRATEGIA="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="epico"{print $4; exit}')"
   ES_AVISO="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="aviso"{print 1; exit}')"
+  ES_AVISO_TXT="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="aviso"{printf "%sfatia %s: %s", (k++ ? " · " : ""), $2, $3}')"
   ES_PROX="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="fatia" && $4=="pendente"{print $2; exit}')"
   ES_PROX_SLUG="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="fatia" && $4=="pendente"{print $3; exit}')"
   ES_FILA="$(printf '%s\n' "$ES_OUT" | awk -F'\t' '$1=="fatia"')"
@@ -142,8 +149,12 @@ estado_fila() { # <brief> → ES_REGRA ES_ROTULO ES_ESTRATEGIA ES_AVISO ES_PROX 
   if [ -z "$ES_ATUAL" ]; then ES_ATUAL="$ES_PROX"; ES_ATUAL_SLUG="$ES_PROX_SLUG"; ES_ATUAL_MODO="nova"; fi
   ES_ATUAL_TITULO=""
   if [ -n "$ES_ATUAL" ]; then
-    ES_ATUAL_TITULO="$(awk -F'|' -v n="$ES_ATUAL" '
-      /^\|/ { a=$2; gsub(/^[ \t]+|[ \t]+$/, "", a); if (a == n) { t=$3; gsub(/^[ \t]+|[ \t]+$/, "", t); gsub(/\*\*/, "", t); print t; exit } }
+    ES_ATUAL_TITULO="$(awk -v n="$ES_ATUAL" '
+      /^## Fila/ { on = 1; next }
+      /^## /     { on = 0 }
+      on && /^\|/ { line=$0; gsub(/\\\|/, SUBSEP, line); split(line, f, "|")   # `\|` escapado é texto (4.472)
+               a=f[2]; gsub(/^[ \t]+|[ \t]+$/, "", a)
+               if (a == n) { t=f[3]; gsub(SUBSEP, "|", t); gsub(/^[ \t]+|[ \t]+$/, "", t); gsub(/\*\*/, "", t); print t; exit } }
     ' "$ROOT/$1")"
   fi
   ES_PROX_TITULO="$ES_ATUAL_TITULO"
@@ -155,6 +166,28 @@ run_state_recente() { # <slug> → ecoa o run-state MAIS RECENTE do slug (qualqu
 }
 
 slug_ancora_de() { d="$(dirname "$1")"; d="$(dirname "$d")"; basename "$d"; }
+
+docs_root() { # docsRoot da ficha (sem ficha/ilegível → docs)
+  dr=""
+  if [ -f "$FICHA" ]; then dr="$(bash "$FICHA" "$ROOT" --get docsRoot --default docs 2>/dev/null || true)"; fi
+  [ -n "$dr" ] || dr="docs"
+  printf '%s' "$dr"
+}
+
+brief_epico_de() { # <slug-âncora> → caminho relativo do BRIEF épico NÃO-concluído mais recente; vazio se nenhum
+  dir="$ROOT/$(docs_root)/$1/briefs"
+  [ -d "$dir" ] || return 0
+  found=""; nc=0; lista=""
+  for f in "$dir"/*-epic.md; do            # id por data no nome: o glob já vem em ordem cronológica
+    [ -f "$f" ] || continue
+    st="$(sed -n 's/^\*\*Status\*\*[ 	]*:[ 	]*//p' "$f" | sed -n 1p | sed 's/[ 	]*$//' | tr '[:upper:]' '[:lower:]')"
+    case "$st" in conclu*) continue ;; esac
+    found="$f"; nc=$((nc + 1)); lista="$lista ${f##*/}"
+  done
+  # mais de um épico ativo é ambiguidade visível: escolhido o mais recente, dito no pré-voo
+  [ "$nc" -gt 1 ] && BRIEF_NOTA="aviso: $nc BRIEFs épicos não-concluídos em $1 (${lista# }) — escolhido o mais recente; passe o caminho se não for este"
+  [ -n "$found" ] && printf '%s' "${found#"$ROOT"/}"
+}
 
 run_state_vivo() { # <slug> → ecoa o run em_andamento (qualquer casa) ou falha
   for f in "$ROOT"/thoughts/local/run-state-"$1".md "$ROOT"/thoughts/local/sessions/*/run-state-"$1".md; do
@@ -184,9 +217,19 @@ finalizar() { # <motivo>
 case "$ACTION" in
 # =====================================================================================
 launch|_loop)
-  BRIEF="${1:-}"; [ -n "$BRIEF" ] || die2 "launch exige o caminho do BRIEF épico (relativo à raiz)"
+  BRIEF="${1:-}"; [ -n "$BRIEF" ] || die2 "launch exige o BRIEF épico (caminho relativo à raiz) ou o slug-âncora"
   shift
   case "$BRIEF" in /*) BRIEF="${BRIEF#"$ROOT"/}" ;; esac
+  BRIEF_NOTA=""
+  if [ ! -f "$ROOT/$BRIEF" ]; then
+    case "$BRIEF" in
+      */*|*.md) recusa "BRIEF épico não existe: $BRIEF" ;;
+      *) # slug-âncora: o motor resolve no disco, agora (4.472) — nunca a sessão de memória
+         resolvido="$(brief_epico_de "$BRIEF")"
+         [ -n "$resolvido" ] || recusa "nenhum BRIEF épico não-concluído em $(docs_root)/$BRIEF/briefs/*-epic.md — o revezamento só existe para épico (demanda única: /keelson:auto; decompor: /keelson:specify-epic)"
+         BRIEF="$resolvido" ;;
+    esac
+  fi
   MAX=0; TMIN=0; MODEL=""; DRY=0; EXTRA=""; RETRY=2; RWAIT=600; FORCE_CLAIM=0; NOTIFY=0; STALE=15
   while [ $# -gt 0 ]; do
     case "$1" in
@@ -213,7 +256,7 @@ launch|_loop)
   if [ "$ACTION" = "launch" ]; then
     estado_fila "$BRIEF"
     [ -n "$ES_OUT" ] || recusa "epic-state.sh não leu a fila de $BRIEF"
-    [ -z "$ES_AVISO" ] || recusa "fila com estado fora do vocabulário (aviso do epic-state) — corrija a fila antes"
+    [ -z "$ES_AVISO" ] || recusa "fila com aviso do epic-state — $ES_AVISO_TXT — corrija a fila antes"
     case "$ES_ESTRATEGIA" in
       unica|"") : ;;
       *) recusa "estratégia \`$ES_ESTRATEGIA\` — o revezamento exige \`unica\` (fatia dependente de merge é ato do Diretor, 4.190)" ;;
@@ -268,8 +311,13 @@ launch|_loop)
     else
       echo "pré-voo: ok · épico $SLUG · estratégia ${ES_ESTRATEGIA:-unica} · próxima fatia $ES_ATUAL ($ES_ATUAL_TITULO → $ES_ATUAL_SLUG)"
     fi
+    echo "brief: $BRIEF"
+    [ -z "$BRIEF_NOTA" ] || echo "$BRIEF_NOTA"
     echo "permissões da sessão filha: $PERM_FLAG (decisão do Diretor, 4.465)"
-    [ "$DRY" -eq 1 ] && { echo "dry-run: nada lançado"; exit 0; }
+    if [ "$DRY" -eq 1 ]; then  # a fila lida (saída do epic-state) é o "você está aqui" do comando
+      printf '%s\n' "$ES_FILA" | sed 's/^fatia	/fila: fatia /'
+      echo "dry-run: nada lançado"; exit 0
+    fi
     mkdir -p "$DIR" || die2 "não criou $DIR"
     rm -f "$DIR/fim.txt" "$DIR/STOP"
     : > "$DIR/status.tsv"
@@ -300,7 +348,7 @@ launch|_loop)
   n=0; tent=0; ultima=""
   while :; do
     estado_fila "$BRIEF"
-    if [ -n "$ES_AVISO" ]; then finalizar "fila com estado fora do vocabulário (aviso do epic-state)"; break; fi
+    if [ -n "$ES_AVISO" ]; then finalizar "fila com aviso do epic-state — $ES_AVISO_TXT"; break; fi
     case "$ES_REGRA" in
       4|2|3) : ;;
       6) finalizar "fila toda entregue"; break ;;
