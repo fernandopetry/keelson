@@ -25,6 +25,32 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.222.0] — 2026-10-12
+
+Re-init: none
+
+Decision 4.476 — `scripts/close-task.sh` is the canonical writer of a TASK closure; the closure commit never leaves with a diverging `Tasks` cell.
+
+### Added
+
+- `scripts/close-task.sh <dir-do-slug> TASK-MMM-XXX --sha <SHA> [--inicio] [--fim] [--jira]
+  [--gate8] [--gate9] [--dry-run]`: writes, line by line and anchored on the template's
+  literal markers, `Status: Done`, the four `Histórico de execução` fields and the quality
+  gates checklist of the TASK, ticks the TASK in `TASK-MMM-INDEX.md`, recomputes the `Tasks`
+  cell of the PLAN row in `INDEX.md` from the real TASK files (same rule as `index-check.sh`)
+  and stamps `Última atualização`; then runs `index-check.sh` and exits 1 when
+  `index-tasks-cell` is still reported for that PLAN. Never adds or removes a line (the
+  heading-preserving invariant is proved before writing; violated → nothing written, exit 4);
+  an artefact outside the template (no `**Status**`, no `## Histórico de execução`, no
+  `**Commit SHA**`) is refused with exit 3 and the manual anchored Edit remains the path.
+  Idempotent. Suite with 20 cases.
+
+### Changed
+
+- `/keelson:implement` §3.4.2: the closure calls the writer first; the manual anchored Edit
+  stays as the fallback for legacy artefacts, and the semantic moves (capability implemented,
+  FEAT completed) stay with the main session. `index-contract.md` names the writer.
+
 ## [0.221.1] — 2026-10-12
 
 Re-init: none

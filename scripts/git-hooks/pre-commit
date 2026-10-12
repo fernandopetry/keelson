@@ -398,7 +398,7 @@ run_suite() {
     echo "[keelson pre-commit] aviso: scripts/tests/$sdir/run.sh ausente — suíte não conferida." >&2
   fi
 }
-for par in "ficha:ficha diff-facts" "next-id:next-id" "index-check:index" \
+for par in "ficha:ficha diff-facts" "next-id:next-id" "index-check:index close-task" "close-task:close-task" \
            "diff-facts:diff-facts review-guard security-guard ledger" "artifact-lint:artifact-lint" \
            "run-state:run-state session-cycle" "ledger:ledger review-guard security-guard session-cycle" \
            "init-selfcheck:init-selfcheck update" "probe-env:probe-env" \
