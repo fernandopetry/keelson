@@ -423,7 +423,7 @@ done
 
 # Hooks com suíte própria (4.314): hook ou fixtures no commit → a suíte roda
 # (o run_suite dedupa contra as rodadas acima).
-for par in "window-marker:window-marker" "compact-anchor:compact-anchor" \
+for par in "window-marker:window-marker" "subagent-window-marker:window-marker" "compact-anchor:compact-anchor" \
            "review-guard:review-guard session-cycle" "security-guard:security-guard" \
            "wave-guard:wave-guard session-cycle" "compact-anchor:compact-anchor session-cycle" \
            "warroom-guard:warroom" "noverify-guard:noverify" "stash-guard:stash-guard" \

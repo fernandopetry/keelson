@@ -37,6 +37,12 @@
 # (fim do turno anterior → início deste). Sem registro no delta, a linha sai
 # como antes.
 #
+# SubagentStop (decisão 4.474): registrado também nesse evento (via o wrapper
+# hooks/subagent-window-marker.sh — cada script entra no manifesto uma vez). Aí o hook
+# mede só o subagent do `agent_id` do payload, sem a carência de mtime, e não escreve
+# `janela=` nem avança o offset. Sessão sem humano (`claude -p`) só tem um Stop, no fim:
+# é este evento que põe o custo por papel no log antes do report de fecho.
+#
 # Escopo: só age em projeto keelson (keelson.config.json na raiz ou thoughts/local/
 # já existente) — fora disso, exit 0 sem tocar o filesystem.
 #
@@ -63,9 +69,23 @@ if [ -z "$transcript" ] || [ ! -f "$transcript" ]; then
   exit 0
 fi
 
+# Evento (decisão 4.474): em `SubagentStop` o hook mede SÓ o subagent que acabou de
+# parar (`agent_id` do payload — a pasta subagents/ é a mesma, o transcript_path é o
+# da sessão principal) e não escreve `janela=` nem avança o offset do delta: a linha
+# de janela é do turno da main session, e em sessão sem humano (`claude -p`) o Stop
+# dispara uma vez, no fim — sem este evento o report de fecho nasce sem custo por papel.
+evento="$(printf '%s' "$input" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("hook_event_name", ""))' 2>/dev/null || echo "")"
+agent_now=""
+if [ "$evento" = "SubagentStop" ]; then
+  agent_now="$(printf '%s' "$input" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("agent_id", ""))' 2>/dev/null || echo "")"
+  agent_now="${agent_now#agent-}"
+  [ -n "$agent_now" ] || exit 0
+fi
+
 # janela atual = usage da última mensagem do assistant (input + cache_read +
 # cache_creation). Só o final do transcript é lido — custo constante por Stop.
-janela="$(tail -c 262144 "$transcript" 2>/dev/null | python3 -c '
+janela=""
+[ "$evento" = "SubagentStop" ] || janela="$(tail -c 262144 "$transcript" 2>/dev/null | python3 -c '
 import sys, json
 best = None
 for line in sys.stdin:
@@ -109,7 +129,7 @@ delta_out=""
 offset=0
 off_file=""
 key="$(printf '%s' "$transcript" | cksum 2>/dev/null | awk '{print $1}')"
-if [ -n "$key" ]; then
+if [ -n "$key" ] && [ "$evento" != "SubagentStop" ]; then
   off_file="$(dirname "$log")/.window-offset.$key"
   if [ -f "$off_file" ]; then
     offset="$(cat "$off_file" 2>/dev/null || echo 0)"
@@ -208,6 +228,8 @@ if [ -d "$sub_dir" ] && [ -n "$key" ]; then
 import glob, json, os, sys, time
 from datetime import datetime, timezone, timedelta
 sub_dir, seen_file = sys.argv[1], sys.argv[2]
+# SubagentStop (4.474): só o agent que parou, sem a carência de mtime (ele terminou)
+only = sys.argv[3] if len(sys.argv) > 3 else ""
 try: seen = set(open(seen_file).read().split())
 except Exception: seen = set()
 agora = time.time()
@@ -220,8 +242,10 @@ novos = []
 for m in sorted(glob.glob(os.path.join(sub_dir, "agent-*.meta.json"))):
     aid = os.path.basename(m)[len("agent-"):-len(".meta.json")]
     if aid in seen: continue
+    if only and aid != only: continue
     j = m[:-len(".meta.json")] + ".jsonl"
-    if not os.path.isfile(j) or agora - os.path.getmtime(j) < 60: continue
+    if not os.path.isfile(j): continue
+    if not only and agora - os.path.getmtime(j) < 60: continue
     try: tipo = (json.load(open(m)).get("agentType") or "?").replace(" ", "_")
     except Exception: tipo = "?"
     first = last = None; tokens = 0; tools = 0; ids = set()
@@ -250,7 +274,7 @@ for m in sorted(glob.glob(os.path.join(sub_dir, "agent-*.meta.json"))):
 if novos:
     with open(seen_file, "a") as fh: fh.write("".join(a + "\n" for a in novos))
 PY2
-  agents_out="$(printf '%s' "$AG_PY" | python3 - "$sub_dir" "$seen_file" 2>/dev/null || echo "")"
+  agents_out="$(printf '%s' "$AG_PY" | python3 - "$sub_dir" "$seen_file" "$agent_now" 2>/dev/null || echo "")"
 fi
 
 turno="$(printf '%s\n' "$delta_out" | awk '$1=="TURNO"{print $2; exit}')"

@@ -25,6 +25,24 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.221.0] — 2026-10-12
+
+Re-init: none
+
+Decision 4.474 — the window log gains a `SubagentStop` writer: cost per role exists before the closing report in unattended sessions.
+
+### Added
+
+- `hooks/subagent-window-marker.sh` (new, registered on `SubagentStop`) delegates to
+  `window-marker.sh`, which now reads `hook_event_name`: on `SubagentStop` it measures only
+  the subagent named by `agent_id` (no mtime grace — it has finished), writes its
+  `agente=<type> tokens=… dur=… tools=…` line stamped with the return instant, and writes
+  no `janela=` line nor advances the delta offset (those belong to the main session's turn).
+  The `Stop` path is unchanged and never repeats an agent already written (same seen-file).
+  In a `claude -p` session the `Stop` hooks fire once, at the very end, so until now the
+  closing report of every relay slice was born without `Custo por papel` and `janelas`.
+  Suite: 6 new cases; hooks manifest table frozen with the new event.
+
 ## [0.220.0] — 2026-10-12
 
 Re-init: required

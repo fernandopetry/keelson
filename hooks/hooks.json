@@ -104,6 +104,17 @@
           }
         ]
       }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/subagent-window-marker.sh",
+            "timeout": 30
+          }
+        ]
+      }
     ]
   }
 }

@@ -115,7 +115,9 @@ modelo — uma linha `<ts> janela=<tokens>[ inicio=<ts>]` por Stop (`inicio=` é
 registro que abriu o turno — decisão 4.354) e uma linha
 `<ts> agente=<tipo> tokens=<N>[ dur=<S>s][ tools=<N>]` por subagent concluído,
 carimbada com o instante do retorno (duração e chamadas de ferramenta quando o
-harness as traz — 4.354). Quem
+harness as traz — 4.354), escrita no `SubagentStop` de cada agent (4.474 — em sessão
+sem humano o Stop dispara uma vez, no fim, e a linha de papel precisa existir antes do
+report). Quem
 compõe é `bash "${CLAUDE_PLUGIN_ROOT}/scripts/context-cost.sh" <raiz>
 --compose` (pico = maior janela; ranking = soma por papel, decrescente, com minutos e
 chamadas quando medidos; `espera:` = soma dos intervalos > 10 min entre o fim de um

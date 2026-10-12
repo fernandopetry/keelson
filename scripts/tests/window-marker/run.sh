@@ -154,6 +154,32 @@ roda "{\"cwd\": \"$D9\", \"transcript_path\": \"$T9\"}"
 total=$((total + 1))
 if grep -q 'agente=keelson:scribe' "$LOG9" 2>/dev/null; then falha "subagents-em-escrita-espera"; else ok subagents-em-escrita-espera; fi
 
+# --- SubagentStop (4.474): só o agent do payload, sem carência de mtime, sem `janela=` nem offset ---
+n_jan_antes="$(grep -c ' janela=' "$LOG9" 2>/dev/null)"
+off_antes="$(cat "$D9/thoughts/local/.window-offset."* 2>/dev/null | head -1)"
+roda "{\"cwd\": \"$D9\", \"transcript_path\": \"$T9\", \"hook_event_name\": \"SubagentStop\", \"agent_id\": \"abc2\", \"agent_type\": \"keelson:scribe\", \"agent_transcript_path\": \"$TMP/t9/subagents/agent-abc2.jsonl\"}"
+total=$((total + 1))
+grep -q ' agente=keelson:scribe tokens=10 dur=0s tools=0$' "$LOG9" 2>/dev/null && ok subagentstop-conta-o-agent-recente || falha "subagentstop-conta-o-agent-recente: [$(cat "$LOG9" 2>/dev/null)]"
+total=$((total + 1))
+[ "$(grep -c ' janela=' "$LOG9" 2>/dev/null)" = "$n_jan_antes" ] && ok subagentstop-sem-janela || falha "subagentstop-sem-janela"
+total=$((total + 1))
+[ "$(cat "$D9/thoughts/local/.window-offset."* 2>/dev/null | head -1)" = "$off_antes" ] && ok subagentstop-sem-offset || falha "subagentstop-sem-offset"
+# o Stop seguinte não repete o agent já medido no SubagentStop
+roda "{\"cwd\": \"$D9\", \"transcript_path\": \"$T9\"}"
+total=$((total + 1))
+[ "$(grep -c 'agente=keelson:scribe' "$LOG9" 2>/dev/null)" = "1" ] && ok subagentstop-dedupe-no-stop || falha "subagentstop-dedupe-no-stop: $(grep -c 'agente=keelson:scribe' "$LOG9")"
+# SubagentStop de agent de outro id não mede o que ainda escreve
+printf '{"agentType":"keelson:po","description":"x"}\n' > "$TMP/t9/subagents/agent-abc4.meta.json"
+printf '{"type":"assistant","timestamp":"2026-09-27T10:00:00.000Z","message":{"id":"m4","usage":{"input_tokens":7},"content":[]}}\n' > "$TMP/t9/subagents/agent-abc4.jsonl"
+roda "{\"cwd\": \"$D9\", \"transcript_path\": \"$T9\", \"hook_event_name\": \"SubagentStop\", \"agent_id\": \"agent-abc2\"}"
+total=$((total + 1))
+if grep -q 'agente=keelson:po' "$LOG9" 2>/dev/null; then falha "subagentstop-so-o-agent-do-payload"; else ok subagentstop-so-o-agent-do-payload; fi
+# o wrapper registrado no manifesto delega ao medidor
+W="$HERE/../../../hooks/subagent-window-marker.sh"
+printf '%s' "{\"cwd\": \"$D9\", \"transcript_path\": \"$T9\", \"hook_event_name\": \"SubagentStop\", \"agent_id\": \"abc4\"}" | env -u CLAUDE_CODE_SESSION_ID -u KEELSON_SESSAO bash "$W" >/dev/null 2>&1
+total=$((total + 1))
+grep -q ' agente=keelson:po tokens=7' "$LOG9" 2>/dev/null && ok wrapper-delega || falha "wrapper-delega: [$(tail -2 "$LOG9" 2>/dev/null)]"
+
 if [ "$fail" -gt 0 ]; then
   echo "window-marker: $fail de $total casos falharam"
   exit 1
