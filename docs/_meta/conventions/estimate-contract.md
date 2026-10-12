@@ -64,7 +64,7 @@ parte da resposta, não ruído a esconder.
 ```markdown
 ## Estimativa — <título curto> (<YYYY-MM-DD>)
 
-- **Base**: <o que foi lido: pedido · INDEX de <slug> · calibração (N demandas) | sem base histórica>
+- **Base**: <o que foi lido: pedido · INDEX de <slug> · calibração (N demandas · fator ×F do modo <autônoma|com humano>) | sem base histórica>
 - **Dimensão**: ~N waves · ~N tasks (~X small · ~Y medium)
 - **Por fase**: forja <min–max> · artefatos <min–max> · implementação <min–max> · gates <min–max>
 - **Total**: <min–max> (horas de ciclo, não prazo de calendário)

@@ -133,8 +133,9 @@ licao_candidata:
 ```
 
 REPROVADO com `achados` não-vazio devolve a task para In Progress (1 retry, depois
-escala). Achado de severidade alta é sempre bloqueante; `sugestao` nunca reprova
-sozinha.
+escala). Achado de severidade alta é sempre bloqueante; `media` reprova só quando um
+AC/FR nomeia o eixo do achado (copy literal, formato, estado) — fora disso é `sugestao`
+(4.473); `sugestao` nunca reprova sozinha.
 
 ## Limites
 

@@ -22,7 +22,9 @@
 #   list  → 1 linha por lição: id<TAB>estado<TAB>area<TAB>heading<TAB>origem<TAB>absorvida_em
 #   match → cabeçalho `# lessons.sh match: acervo=N recorte=R (path=P tag=T sempre=S) excluidas=E legado=L`
 #           e depois cada lição do recorte, integral, separada por `---8<---`, na ordem
-#           path → tag → sempre (a que casa o arquivo dado vem primeiro — decisão 4.435).
+#           path → tag → sempre (a que casa o arquivo dado vem primeiro — decisão 4.435);
+#           dentro de cada tier, a mais `confirmada` vem primeiro (4.473 — é ela que o
+#           corte por `--max-bytes` preserva).
 #           `--compact`: uma linha por lição em vez do texto
 #           (`--- id=… estado=… via=… origem=… | <heading> | paths=<a;b> | tags=<x;y>`) —
 #           nenhuma lição some, o texto vem por `show <id>`.
@@ -347,14 +349,16 @@ case "$cmd" in
       else ne=$((ne + 1)); continue
       fi
       case "$motivo" in path) prio=0 ;; tag) prio=1 ;; *) prio=2 ;; esac
-      printf '%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n' "$prio" "$SEP" "$rn" "$SEP" "$rid" "$SEP" "$restado" "$SEP" "$motivo" "$SEP" "$rorigem" "$SEP" "$rheading" "$SEP" "$rpaths" "$SEP" "$rtags" >> "$sel"
+      case "$rconf" in ''|*[!0-9]*) rconf=0 ;; esac
+      printf '%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n' "$prio" "$SEP" "$rconf" "$SEP" "$rn" "$SEP" "$rid" "$SEP" "$restado" "$SEP" "$motivo" "$SEP" "$rorigem" "$SEP" "$rheading" "$SEP" "$rpaths" "$SEP" "$rtags" >> "$sel"
     done < "$REC"
     rec=$((np + nt + ns))
     echo "# lessons.sh match: acervo=$total recorte=$rec (path=$np tag=$nt sempre=$ns) excluidas=$ne legado=$legado"
-    # ordem: path → tag → sempre (4.435), estável dentro de cada tier
-    sort -s -t "$SEP" -k1,1n "$sel" > "$sel.ord" 2>/dev/null || cp "$sel" "$sel.ord"
+    # ordem: path → tag → sempre (4.435); dentro de cada tier, mais confirmada primeiro
+    # (4.473 — o corte por --max-bytes descarta as menos confirmadas), estável no empate
+    sort -s -t "$SEP" -k1,1n -k2,2nr "$sel" > "$sel.ord" 2>/dev/null || cp "$sel" "$sel.ord"
     usados=0; omitidas=""; nomit=0
-    while IFS="$SEP" read -r prio rn rid restado motivo rorigem rheading rpaths rtags; do
+    while IFS="$SEP" read -r prio rconf rn rid restado motivo rorigem rheading rpaths rtags; do
       if [ "$compact" = 1 ]; then
         echo "--- id=$rid estado=$restado via=$motivo origem=$rorigem | $rheading | paths=$rpaths | tags=$rtags"
         continue

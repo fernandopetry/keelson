@@ -25,6 +25,60 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.220.0] — 2026-10-12
+
+Re-init: required
+
+Decision 4.473 — field intake over the first real epic run by `/keelson:auto-epic` (three unattended slices): seven proposals the sessions reported themselves plus fifteen findings from an independent read of the transcripts.
+
+### Added
+
+- `/keelson:init` now asks for `quality.worktreeBootstrap` right after `quality.test` — the
+  command that leaves a fresh worktree ready to run the suite in isolation. With it, the
+  independent TASKs of a wave run in parallel; `null` is a valid, declared answer (shared
+  database or port), and without the key every wave runs sequentially. Existing consumers:
+  re-run `/keelson:init` to be asked.
+- `scripts/lessons.sh match`: inside each tier (path → tag → always), the lesson with the
+  higher `confirmada` count comes first, so a `--max-bytes` cut drops the least-confirmed
+  lessons instead of whatever happened to sort last. Two new suite cases.
+- `/keelson:auto` reaction ladder, step 2 gains two triggers: a call to an external production
+  service beyond the volume or duration the brief authorised (reads included), and a proof that
+  depends on a future clock window in an unattended session — park the part with the window
+  named, or prove it with an injected clock; sleeping in a loop is never an option.
+- `/keelson:implement` §3.6: before dispatching the `qa`, the main session measures the
+  roadmap's data preconditions (empty queue, table state, counts) at the source the step
+  reads, and the roadmap reconciliation now covers the step's **observer** (the counter,
+  column or table read as proof of activity or restoration).
+- `/keelson:tasks`: a numeric gate in the gate 9 roadmap is measured at the source the step
+  consults (an external system is measured there, never in the local mirror); one roadmap
+  step per example named in the AC; an AC split between the TASK that builds and the TASK
+  that fetches carries the literal clause in the TASK that enforces it; `extrair para
+  <symbol>` comes with a condition over the real universe of files, never a list of named
+  files; the fan-out manifesto self-check verifies claims about existing files ("does not
+  change") by Grep and the main session injects the per-TASK lessons (`lessons.sh match`)
+  that the shell-less decomposer cannot compute.
+- `/keelson:implement` §3.2: the dispatch is re-read against the TASK file before it goes;
+  prose never contradicts a literal criterion — an environment restriction travels as a fact,
+  not as a blanket prohibition.
+- `qa` pre-code mode recomputes every oracle (number, state, date, `EXPLAIN` plan) over the
+  fixed data and cross-checks it with the PLAN's DECs and the SPEC's promises; a criterion
+  that asserts a fact about the world without measuring it is a finding.
+- `product-designer`: `media` severity only rejects when an AC/FR names the axis of the
+  finding; otherwise it is a suggestion.
+- `estimator`: with three or more records of the same session mode (unattended × attended),
+  the whole range is multiplied by the median realised/estimated ratio of that mode and the
+  `Base` line declares the factor.
+
+### Changed
+
+- `/keelson:implement` §3.3: the dispatch mark (`ledger.sh mark gate`) exists only for the
+  two gates that have a guard (`code-reviewer`, `security-engineer`); an item the reviewer
+  defers to gate 8 makes gate 8 due in that wave (`n/a` cannot coexist with a deferred item).
+- `sdd-conventions.md`, waiting on a subagent: background dispatch only with a parallel front
+  of comparable length, otherwise awaited; a `sleep`/`stat`/`until` loop over the disk is not
+  waiting. The stale `TaskOutput` recipe is gone (the harness no longer has it).
+- `/keelson:auto` 4.312: in an unattended session the `code-scout` is dispatched awaited.
+
 ## [0.219.1] — 2026-10-11
 
 Re-init: none

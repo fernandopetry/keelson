@@ -37,7 +37,10 @@ briefing (decisão 4.375); se a variável chegar vazia ou literal, a raiz é o `
 
 1. **Leia a calibração primeiro.** Menos de 3 demandas fechadas em
    `estimates.md` → a linha `Base` declara `sem base histórica` e nenhum corretor é
-   aplicado. Com base, use os desvios registrados como corretor (ex.: "gates
+   aplicado. Com base, use os desvios registrados como corretor — com **3+ registros do
+   mesmo modo de sessão** (autônoma × com humano), multiplique a faixa inteira pela
+   mediana realizado/previsto desse modo e declare o fator na linha `Base`; "abaixo do
+   piso" repetido no mesmo modo é corretor não aplicado (4.473) — (ex.: "gates
    sistematicamente subestimados em ~40% → alargue a faixa de gates").
 2. **Teste de estimabilidade.** O pedido permite responder "que capacidades entrega?"
    e "que superfícies toca?"? Se não — veredito **`não estimável`** com as lacunas

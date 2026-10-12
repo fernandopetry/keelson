@@ -81,6 +81,13 @@ if [ $((n_int + n_om)) -eq 5 ]; then ok "max-bytes: integrais + omitidas = recor
 caso; g="$(bash "$LS" "$A" match --paths src/Domain/User.php --max-bytes 999999 2>/dev/null)"
 if ! printf '%s\n' "$g" | grep -q '^# lessons.sh match: omitidas='; then ok "max-bytes folgado: sem linha de omitidas"; else falha "max-bytes folgado"; fi
 caso; bash "$LS" "$A" match --max-bytes abc >/dev/null 2>&1; [ $? -eq 2 ] && ok "max-bytes inválido → exit 2" || falha "max-bytes inválido"
+# --- ordem dentro do tier: mais confirmada primeiro (4.473) ---
+caso; o="$(bash "$LS" "$A" match --paths src/Domain/User.php 2>/dev/null | grep '^---8<--- ' | awk '{print $2}' | sed 's/^id=//' | paste -sd, -)"
+if [ "$o" = "repositorio-sem-escopo-de-tenant,migration-sem-rollback,nome-de-branch-sem-acento,sem-frontmatter,toggle-de-tema-pelo-gesto-real" ]; then
+  ok "ordem: path primeiro; no tier sempre, confirmada 3 (legado) antes das de 0, estável no empate"; else falha "ordem por confirmada: [$o]"; fi
+caso; b2="$(bash "$LS" "$A" match --paths src/Domain/User.php --max-bytes 1300 2>/dev/null)"
+if printf '%s\n' "$b2" | grep -q '^---8<--- id=migration-sem-rollback ' && printf '%s\n' "$b2" | tail -1 | grep -q 'omitidas=.*nome-de-branch-sem-acento'; then
+  ok "max-bytes: a sempre mais confirmada entra, a de 0 cai para omitidas"; else falha "max-bytes por confirmada: [$(printf '%s\n' "$b2" | tail -1)]"; fi
 
 # --- match ---
 caso; m="$(bash "$LS" "$A" match --paths src/Domain/User.php 2>/dev/null)"
