@@ -251,6 +251,8 @@ cobertura_final: <% ou n/a>
 lint_warnings: <N ou 0>
 autocheck_comentarios: "<N introduzidos · M removidos no autocheck>"  # teste do Art. 7 por comentário (4.185/4.245/4.250); "0 · 0" é estado válido
 mutacao_protocolo: "<worktree <caminho> — <comando>> | n/a"  # onde o mutante rodou (4.428) — nunca a árvore onde você implementa; n/a só sem mutante prescrito no Critério (4.429), omissão não é estado
+mutantes:             # um por mutante prescrito (4.475): veredito por item é o que o revisor cita em vez de refazer; sobrevivente ou "equivalente" é decisão dele, não sua
+  - "<arquivo:linha — alteração> → morreu (<teste>) | sobreviveu | equivalente: <motivo>"
 acs_realizados:
   - AC-NNN-XXX
 escoteiro:            # limpezas do trecho tocado (Charter Art. 6); null se não houve

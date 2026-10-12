@@ -25,6 +25,21 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.221.1] — 2026-10-12
+
+Re-init: none
+
+Decision 4.475 (patch) — a mutation report with a verdict per mutant is cited by the reviewer, not re-run.
+
+### Changed
+
+- `guidelines/core/CODE-REVIEW.md` (gate 1, mutation closure): a developer report that carries
+  the full protocol and a verdict per mutant is a fact the reviewer cites; the reviewer re-runs
+  only the mutant the developer declared equivalent or surviving (there the re-run *is* the
+  verdict), the one the report brings without a verdict, or the one aimed at a test the retry
+  changed. `developer` report gains the `mutantes:` list (one line per prescribed mutant:
+  change → died/survived/equivalent with reason).
+
 ## [0.221.0] — 2026-10-12
 
 Re-init: none

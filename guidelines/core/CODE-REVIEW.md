@@ -45,7 +45,11 @@ Cada AC dos critérios de pronto tem ≥ 1 teste que o verifica, e o teste é **
   violação da 4.134, não prova — e `mutacao_protocolo: n/a` numa TASK cujo Critério de
   pronto **prescreve mutante** (prova por mutação de código, não a mutação de dados do
   predicado de escopo) é o mesmo achado: cruze o valor com a lista de mutantes do
-  Critério antes de aceitar o `n/a` (decisão 4.429).
+  Critério antes de aceitar o `n/a` (decisão 4.429). Report que traz o protocolo
+  completo e o veredito por mutante é **fato citado**, não refeito (4.475): o revisor
+  confere a lista contra o Critério e o eixo; reexecuta só o mutante que o developer
+  declarou equivalente ou sobrevivente (aí a reexecução **é** o veredito), o que o
+  report não traz com veredito, ou o que mira um teste que o retry alterou.
 
 Cada um é **achado bloqueante**: o teste existe e passa, mas não é capaz de falhar junto
 com o comportamento — o AC conta como **sem teste**.
