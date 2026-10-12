@@ -77,7 +77,8 @@ agent** (briefings distintos do `scribe`, nunca agents novos):
    (Etapas 1 a 3, template canônico da Etapa 3) + os insumos e uma **lista literal de arquivos**
    a redigir (fatia por wave; nunca "as TASKs da wave 2", que se sobrepõe). Redator
    **não cria nem renomeia ID e não toca aresta** — divergência com o manifesto volta
-   em `duvidas`, nunca se corrige localmente (mesmo mecanismo da 4.114).
+   em `duvidas`, nunca se corrige localmente (mesmo mecanismo da 4.114). O briefing
+   leva o caminho do catálogo do lint (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/lint-contract.md`, §3, grupo TASK): o redator, sem shell, relê antes de devolver cada critério com `grep`/`rg`/`$` e cada arquivo contra o template por esses fatos — classe catalogada que volta do lint custa uma rodada inteira de scribe (4.477).
 3. **`TASK-MMM-INDEX.md` é da main session nesta rota** (dono único — nenhum redator tem
    o todo): derive-o do manifesto (o checklist de waves é projeção dele; cobertura e
    status **não se escrevem** — `graph.sh --format=tables --plan MMM`, 4.409) **após o

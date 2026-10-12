@@ -25,6 +25,24 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.222.1] — 2026-10-12
+
+Re-init: none
+
+Decision 4.477 (patch) — the fan-out redactor self-checks against the lint catalogue, and the main session keeps tool output out of its window.
+
+### Changed
+
+- `/keelson:tasks` fan-out: the redactor briefing carries the path of the lint catalogue
+  (`lint-contract.md` §3, TASK group); the `scribe`, which has no shell, re-reads every
+  `grep`/`rg`/`$` criterion and every file against the template by those facts before
+  returning — a catalogued class that comes back from the lint costs a whole extra scribe
+  round.
+- `sdd-conventions.md`: tool output in the main session follows the two-layer rule — lint,
+  graph, suite, `git diff` and script reports go to a file in the session home; only the
+  signal (counts, actionable lines) enters the window, and a collected subagent report is
+  never re-read whole.
+
 ## [0.222.0] — 2026-10-12
 
 Re-init: none
