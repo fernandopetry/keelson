@@ -80,8 +80,8 @@ timestamp medido pelo próprio script) — e marque a casa:
 `bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-dir.sh" <raiz> mark-reported` (decisão 4.315;
 uma escrita de trabalho posterior da mesma sessão reabre sozinha). Relatório emitido numa
 sessão **nova** sobre o ledger de uma sessão anterior (`latest-for`, item 3 do continue)
-marca **também a casa consumida**: `mark-reported --dir <casa>` para cada casa cujo ledger
-entrou neste relatório (decisão 4.403) — a casa corrente, que só leu, pode nem existir; a
+arquiva e marca **também a casa consumida**: `ledger.sh <raiz> archive --casa <casa> [--keep …]` e depois `mark-reported --dir <casa>` para cada casa cujo ledger
+entrou neste relatório (decisão 4.403; o `--casa` existe para isso — `mv` à mão passa por cima da guarda do `--keep`, 4.479) — a casa corrente, que só leu, pode nem existir; a
 que trabalhou é a que precisa ficar `reportada`, senão fica `ativa` para sempre. Evento **ainda pendente** (handoff
 aberto, parte estacionada sem resposta) permanece ativo — ele é matéria do próximo fecho também.
 

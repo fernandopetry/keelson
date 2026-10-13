@@ -9,10 +9,13 @@
 #      ledger.sh <raiz-do-repo> mark gate <origem> <slug> [--ts <iso>]
 #      ledger.sh <raiz-do-repo> mark despacho <agent> <slug> <task-id> [--ts <iso>]
 #      ledger.sh <raiz-do-repo> mark-read despacho <agent> <slug> <task-id> [--consume]
-#      ledger.sh <raiz-do-repo> list [--archived]
+#      ledger.sh <raiz-do-repo> list [--archived] [--casa <pasta-da-sessão>]
 #      ledger.sh <raiz-do-repo> count
 #      ledger.sh <raiz-do-repo> last <tipo> <origem>
-#      ledger.sh <raiz-do-repo> archive [--keep <arquivo>]… [--ts <iso>]
+#      ledger.sh <raiz-do-repo> archive [--keep <arquivo>]… [--ts <iso>] [--casa <pasta-da-sessão>]
+#            (`--casa`: mira o ledger de OUTRA casa — a consumida por um report em sessão
+#            nova, 4.479 — em vez da casa corrente + legado; a pasta é a de `latest-for`,
+#            nunca `mv` à mão, que passa por cima da guarda do --keep)
 #
 #   append   cria <yyyymmdd-hhmmss>-<tipo>-<origem>.md no ledger da CASA DA SESSÃO
 #            (nome reservado atomicamente — dois append no mesmo segundo ganham
@@ -348,7 +351,14 @@ case "$ACTION" in
 
   list)
     MODE="active"
-    [ "${1:-}" = "--archived" ] && MODE="archived"
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --archived) MODE="archived" ;;
+        --casa) shift; [ $# -gt 0 ] && [ -d "$1" ] || die2 "--casa exige a pasta da sessão (existente)."; LDIR="$1/ledger"; LDIR_LEG="$LDIR" ;;
+        *) die2 "opção desconhecida: $1" ;;
+      esac
+      shift
+    done
     # shellcheck disable=SC2329,SC2317  # invocada indiretamente via em_cada_casa (SC2317: shellcheck novo re-acusa o corpo)
     list_casa() {
       if [ "$MODE" = "active" ]; then
@@ -390,6 +400,7 @@ case "$ACTION" in
                 esac
                 KEEPLIST="$KEEPLIST $kb" ;;
         --ts)   shift; [ $# -gt 0 ] || die2 "--ts exige um ISO 8601."; TS="$1" ;;
+        --casa) shift; [ $# -gt 0 ] && [ -d "$1" ] || die2 "--casa exige a pasta da sessão (existente)."; LDIR="$1/ledger"; LDIR_LEG="$LDIR" ;;
         *) die2 "opção desconhecida: $1" ;;
       esac
       shift

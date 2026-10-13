@@ -25,6 +25,20 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.224.1] — 2026-10-13
+
+Re-init: none
+
+Decision 4.479 (patch) — `ledger.sh` reaches the consumed house: `list`/`archive --casa <pasta-da-sessão>`.
+
+### Fixed
+
+- `scripts/ledger.sh list|archive --casa <pasta-da-sessão>` targets the ledger of another
+  session's house instead of the current one plus the legacy path. A `/keelson:report` run in
+  a new session over a previous session's house had no way to archive it through the script
+  and moved the files by hand, bypassing the `--keep` guard; `commands/report.md` now
+  prescribes `archive --casa <casa>` before `mark-reported --dir <casa>`. Suite: 3 new cases.
+
 ## [0.224.0] — 2026-10-13
 
 Re-init: none

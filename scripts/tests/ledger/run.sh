@@ -138,6 +138,21 @@ total=$((total + 1))
 msg="$(lg "" "$R" archive --keep 20260806-150000-pendencia-qa.md --ts "2026-08-06T18:32:00-0300" 2>/dev/null)"
 case "$msg" in *"1 evento(s) arquivado(s)"*"1 pendente(s) preservado(s)") ok archive-keep-pendencia-segue-valido ;; *) falha "archive-keep-pendencia-segue-valido: [$msg]" ;; esac
 
+# --casa: list e archive miram outra casa, nunca a corrente (4.479)
+total=$((total + 1))
+CASA2="$R/thoughts/local/sessions/20260806-200000-abcd1234"; mkdir -p "$CASA2/ledger"
+printf 'sessao: abcd1234-0000-0000-0000-000000000000\niniciada: 2026-08-06T20:00:00-0300\nestado: ativa\n' > "$CASA2/session.meta"
+printf 'ts: 2026-08-06T20:01:00-0300 · tipo: gate · origem: code-reviewer · slug: outro\nAPROVADO\n' > "$CASA2/ledger/20260806-200100-gate-code-reviewer.md"
+printf 'ts: 2026-08-06T20:02:00-0300 · tipo: pendencia · origem: qa · slug: outro\nhandoff aberto\n' > "$CASA2/ledger/20260806-200200-pendencia-qa.md"
+got="$(lg "" "$R" list --casa "$CASA2" 2>/dev/null | sed "s|$CASA2/ledger/||" | tr '\n' ' ')"
+[ "$got" = "20260806-200100-gate-code-reviewer.md 20260806-200200-pendencia-qa.md " ] && ok list-casa-outra || falha "list-casa-outra: [$got]"
+total=$((total + 1))
+msg="$(lg "" "$R" archive --casa "$CASA2" --keep 20260806-200200-pendencia-qa.md --ts "2026-08-06T20:30:00-0300" 2>/dev/null)"
+if [ -f "$CASA2/ledger/reported-20260806-203000/20260806-200100-gate-code-reviewer.md" ] && [ -f "$CASA2/ledger/20260806-200200-pendencia-qa.md" ] \
+   && [ -f "$LD/20260806-150000-pendencia-qa.md" ] && [ ! -d "$LD/reported-20260806-203000" ]; then ok archive-casa-outra-nao-toca-a-corrente; else falha "archive-casa-outra: [$msg]"; fi
+total=$((total + 1))
+lg "" "$R" archive --casa "$R/nao-existe" >/dev/null 2>&1; [ $? -eq 2 ] && ok archive-casa-inexistente-exit-2 || falha archive-casa-inexistente-exit-2
+
 # archive sem nada a mover
 lg "" "$R" archive --keep 20260806-150000-pendencia-qa.md --ts "2026-08-06T19:00:00-0300" >/dev/null 2>&1
 total=$((total + 1))
