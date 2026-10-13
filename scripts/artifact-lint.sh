@@ -5,10 +5,17 @@
 # executam este script e citam a saída como FATO (mesma régua do graph.sh, §5 do
 # graph-contract.md); a calibração final continua deles.
 #
-# Uso: artifact-lint.sh <caminho> [<caminho>…]
+# Uso: artifact-lint.sh [--fix] <caminho> [<caminho>…]
 #   <caminho>  arquivo SPEC-*.md, PLAN-*.md ou TASK-*.md (tipo inferido do caminho),
 #              ou diretório de slug ({docsRoot}/<slug>) — linta todos os artefatos
 #              e acrescenta os checks cross-arquivo (overlap de FR).
+#   --fix      (decisão 4.478) antes de lintar, corrige nas TASKs as classes puramente
+#              mecânicas — `task-criterio-cifrao-aspas-duplas` (segmento em aspas duplas
+#              com `$` vira aspas simples; com `'` dentro, `\$`) e `task-secao-ausente`
+#              só para as duas seções de conteúdo fixo do template, "Riscos específicos"
+#              e "Histórico de execução" (acrescentadas de templates/artifacts/TASK.md) —
+#              e imprime `FIXED<TAB>check<TAB>detalhe (arquivo)` antes dos achados. Sem a
+#              flag o script é read-only; com ela, idempotente.
 #
 # Saída: SEVERIDADE<TAB>check<TAB>detalhe, ordenada (LC_ALL=C).
 # Exit: 0 sem ERROR · 1 com ERROR · 2 uso incorreto.
@@ -29,15 +36,19 @@ LC_ALL=C
 export LC_ALL
 
 die2() { echo "ERRO: $*" >&2; exit 2; }
-usage() { sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//'; }
 
 [ $# -gt 0 ] || { usage >&2; exit 2; }
 case "$1" in -h|--help) usage; exit 0 ;; esac
+FIX=0
+if [ "$1" = "--fix" ]; then FIX=1; shift; [ $# -gt 0 ] || { usage >&2; exit 2; }; fi
 
 TMP="$(mktemp -d)" || die2 "mktemp falhou."
 trap 'rm -rf "$TMP"' EXIT
 OUT="$TMP/findings.txt"
-: > "$OUT"
+FIXES="$TMP/fixes.txt"
+: > "$OUT"; : > "$FIXES"
+TPL="$(cd "$(dirname "$0")/.." 2>/dev/null && pwd)/templates/artifacts/TASK.md"
 
 # ---------- awk: SPEC ----------
 cat > "$TMP/spec.awk" <<'AWK'
@@ -949,6 +960,77 @@ lint_dir_cross() { # $1 = dir do slug
   ' "$TMP/waveinc.tsv" >> "$OUT"
 }
 
+# --fix (4.478): só TASK, só as classes mecânicas; grava o arquivo apenas se mudou.
+cat > "$TMP/fix-cifrao.awk" <<'AWK'
+function fixseg(q,   inner, out, i, ch, nx) {
+  inner = substr(q, 2, length(q) - 2)
+  if (index(inner, "\047") == 0) return "\047" inner "\047"
+  out = ""
+  for (i = 1; i <= length(inner); i++) {
+    ch = substr(inner, i, 1); nx = substr(inner, i + 1, 1)
+    if (ch == "\\" && nx == "$") { out = out ch nx; i++; continue }
+    if (ch == "$" && nx ~ /[A-Za-z_{(0-9@*#?!]/) { out = out "\\$"; continue }
+    out = out ch
+  }
+  return "\"" out "\""
+}
+function fixspan(c,   out, q, t) {
+  out = ""
+  while (match(c, /"[^"]*"/)) {
+    q = substr(c, RSTART, RLENGTH); t = q; gsub(/\\\$/, "", t)
+    if (t ~ /\$[A-Za-z_{(0-9@*#?!]/) { q = fixseg(q); nfix++ }
+    out = out substr(c, 1, RSTART - 1) q; c = substr(c, RSTART + RLENGTH)
+  }
+  return out c
+}
+BEGIN { sect = "x"; nfix = 0 }
+/^## / { h = substr($0, 4); sub(/^[ \t]+/, "", h); sect = (h ~ /^Crit/) ? "crit" : "x"; print; next }
+sect == "crit" && $0 ~ /(^|[ `|(])(grep|egrep|rg|sed) / {
+  s = $0; out = ""
+  while (match(s, /(^|[ `|(])(grep|egrep|rg|sed) [^`|]*/)) {
+    rs = RSTART; rl = RLENGTH   # fixspan chama match() e sobrescreve RSTART/RLENGTH
+    out = out substr(s, 1, rs - 1) fixspan(substr(s, rs, rl)); s = substr(s, rs + rl)
+  }
+  print out s; next
+}
+{ print }
+END { print nfix > "/dev/stderr" }
+AWK
+fix_task() { # $1 = caminho da TASK
+  f="$1"; b="$(basename "$f")"
+  case "$b" in TASK-*-INDEX.md) return 0 ;; TASK-*.md) ;; *) return 0 ;; esac
+  # (a) cifrão em aspas duplas, só em linha de Critérios com grep/egrep/rg/sed (regex do check)
+  awk -f "$TMP/fix-cifrao.awk" "$f" > "$TMP/fix.new" 2> "$TMP/fix.n" || return 0
+  nfix="$(tr -d '[:space:]' < "$TMP/fix.n")"
+  case "$nfix" in ''|*[!0-9]*) nfix=0 ;; esac
+  if [ "$nfix" -gt 0 ] && ! cmp -s "$f" "$TMP/fix.new"; then
+    cat "$TMP/fix.new" > "$f"
+    printf 'FIXED\ttask-criterio-cifrao-aspas-duplas\t%s segmento(s) em aspas duplas com `$` reescrito(s) — aspas simples, ou `\\$` quando ha aspas simples dentro (%s)\n' "$nfix" "$b" >> "$FIXES"
+  fi
+  # (b) seções de conteúdo fixo do template: Riscos específicos e Histórico de execução
+  [ -f "$TPL" ] || return 0
+  hasR=0; hasH=0
+  grep -q '^## Riscos' "$f" && hasR=1
+  grep -q '^## Hist' "$f" && hasH=1
+  [ "$hasR" = 1 ] && [ "$hasH" = 1 ] && return 0
+  awk '/^## Riscos/ { on = 1 } on && /^---[ \t]*$/ { exit } on { print }' "$TPL" > "$TMP/tpl.riscos"
+  awk '/^## Hist/ { on = 1 } on { print }' "$TPL" > "$TMP/tpl.hist"
+  [ -s "$TMP/tpl.riscos" ] && [ -s "$TMP/tpl.hist" ] || return 0
+  [ -n "$(tail -c 1 "$f" 2>/dev/null)" ] && printf '\n' >> "$f"
+  if [ "$hasR" = 0 ] && [ "$hasH" = 0 ]; then
+    { printf '\n'; cat "$TMP/tpl.riscos"; printf -- '---\n\n'; cat "$TMP/tpl.hist"; } >> "$f"
+    printf 'FIXED\ttask-secao-ausente\tsecao "## Riscos especificos" acrescentada do template (%s)\n' "$b" >> "$FIXES"
+    printf 'FIXED\ttask-secao-ausente\tsecao "## Historico de execucao" acrescentada do template (%s)\n' "$b" >> "$FIXES"
+  elif [ "$hasH" = 0 ]; then
+    { printf '\n---\n\n'; cat "$TMP/tpl.hist"; } >> "$f"
+    printf 'FIXED\ttask-secao-ausente\tsecao "## Historico de execucao" acrescentada do template (%s)\n' "$b" >> "$FIXES"
+  else
+    awk -v R="$TMP/tpl.riscos" '
+      /^## Hist/ && !done { while ((getline l < R) > 0) print l; print "---"; print ""; done = 1 }
+      { print }' "$f" > "$TMP/fix.new" && cat "$TMP/fix.new" > "$f"
+    printf 'FIXED\ttask-secao-ausente\tsecao "## Riscos especificos" acrescentada do template (%s)\n' "$b" >> "$FIXES"
+  fi
+}
 for arg in "$@"; do
   if [ -d "$arg" ]; then
     found=0
@@ -956,17 +1038,20 @@ for arg in "$@"; do
       [ -f "$f" ] || continue
       case "$(basename "$f")" in *-INDEX.md) continue ;; esac
       found=1
+      [ "$FIX" = 1 ] && fix_task "$f"
       lint_file "$f"
     done
     [ "$found" = 1 ] || die2 "nenhum artefato SDD em: $arg"
     lint_dir_cross "$arg"
   elif [ -f "$arg" ]; then
+    [ "$FIX" = 1 ] && fix_task "$arg"
     lint_file "$arg"
   else
     die2 "caminho não existe: $arg"
   fi
 done
 
+[ -s "$FIXES" ] && sort "$FIXES"
 sort "$OUT"
 if grep -q '^ERROR' "$OUT"; then exit 1; fi
 exit 0

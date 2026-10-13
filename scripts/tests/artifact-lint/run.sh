@@ -86,6 +86,38 @@ total=$((total + 1))
 if cmp -s "$TMP/ck-antes.txt" "$TMP/ck-depois.txt"; then echo "ok   read-only"
 else echo "FAIL read-only: fixture modificada"; fail=$((fail + 1)); fi
 
+# --fix (4.478): só as classes mecânicas, só TASK; FIXED antes dos achados; idempotente
+total=$((total + 1))
+mkdir -p "$TMP/fx" && cp -R "$FIX/defeitos" "$TMP/fx/d" && cp -R "$FIX/defeitos-c" "$TMP/fx/c"
+fixout="$(bash "$LINT" --fix "$TMP/fx/d" 2>/dev/null </dev/null)"
+if printf '%s\n' "$fixout" | grep -q '^FIXED	task-criterio-cifrao-aspas-duplas	1 segmento(s) .* (TASK-001-002-corrige-login.md)$' \
+   && grep -qF "grep -cE '^\\s*return \$this->guard\\(\\)' src/Login.php" "$TMP/fx/d/tasks/TASK-001-002-corrige-login.md" \
+   && ! printf '%s\n' "$fixout" | grep -q 'task-criterio-cifrao-aspas-duplas	1 criterio'; then echo "ok   fix-cifrao-vira-aspas-simples"
+else echo "FAIL fix-cifrao-vira-aspas-simples"; printf '%s\n' "$fixout" | grep -i 'cifrao' | sed 's/^/  /'; fail=$((fail + 1)); fi
+total=$((total + 1))
+fixc="$(bash "$LINT" --fix "$TMP/fx/c" 2>/dev/null </dev/null)"
+if printf '%s\n' "$fixc" | grep -q '^FIXED	task-secao-ausente	secao "## Riscos especificos" acrescentada do template (TASK-001-001-limpa.md)$' \
+   && printf '%s\n' "$fixc" | grep -q '^FIXED	task-secao-ausente	secao "## Historico de execucao" acrescentada do template (TASK-001-001-limpa.md)$' \
+   && ! printf '%s\n' "$fixc" | grep -q 'task-secao-ausente	secao "## \(Riscos especificos\|Historico de execucao\)" ausente (TASK-001-001-limpa.md)' \
+   && printf '%s\n' "$fixc" | grep -q 'task-secao-ausente	secao "## Criterios de pronto" ausente (TASK-001-001-limpa.md)' \
+   && grep -q '^## Riscos específicos$' "$TMP/fx/c/tasks/TASK-001-001-limpa.md" && grep -q '^\*\*Commit SHA\*\*: $' "$TMP/fx/c/tasks/TASK-001-001-limpa.md"; then echo "ok   fix-secoes-fixas-do-template"
+else echo "FAIL fix-secoes-fixas-do-template"; printf '%s\n' "$fixc" | grep 'limpa' | sed 's/^/  /'; fail=$((fail + 1)); fi
+total=$((total + 1))
+ck1="$(cd "$TMP/fx" && find . -type f -exec cksum {} \; | sort)"
+bash "$LINT" --fix "$TMP/fx/d" >/dev/null 2>&1 </dev/null; bash "$LINT" --fix "$TMP/fx/c" >/dev/null 2>&1 </dev/null
+ck2="$(cd "$TMP/fx" && find . -type f -exec cksum {} \; | sort)"
+n2="$(bash "$LINT" --fix "$TMP/fx/c" 2>/dev/null </dev/null | grep -c '^FIXED')"
+if [ "$ck1" = "$ck2" ] && [ "$n2" = "0" ]; then echo "ok   fix-idempotente"; else echo "FAIL fix-idempotente ($n2 FIXED na 2a rodada)"; fail=$((fail + 1)); fi
+total=$((total + 1))
+printf '# TASK-001-009: x\n\n**Status**: Todo\n\n## Critérios de pronto\n\n- [ ] a — `grep -c "it'"'"'s $x" f` → 1\n- [ ] b — `grep -c "^foo$" f` → 1\n\n## Histórico de execução\n\n**Commit SHA**: \n' > "$TMP/fx/c/tasks/TASK-001-009-mista.md"
+bash "$LINT" --fix "$TMP/fx/c/tasks/TASK-001-009-mista.md" >/dev/null 2>&1 </dev/null
+if grep -q 'grep -c "it'"'"'s \\$x" f' "$TMP/fx/c/tasks/TASK-001-009-mista.md" && grep -q 'grep -c "^foo$" f' "$TMP/fx/c/tasks/TASK-001-009-mista.md" \
+   && [ "$(grep -n '^## ' "$TMP/fx/c/tasks/TASK-001-009-mista.md" | cut -d: -f2 | paste -sd'|' -)" = "## Critérios de pronto|## Riscos específicos|## Histórico de execução" ]; then echo "ok   fix-mista-escapa-e-insere-riscos-antes-do-historico"
+else echo "FAIL fix-mista"; sed 's/^/  /' "$TMP/fx/c/tasks/TASK-001-009-mista.md"; fail=$((fail + 1)); fi
+total=$((total + 1))
+bash "$LINT" --fix >/dev/null 2>&1 </dev/null; st=$?
+if [ "$st" -eq 2 ]; then echo "ok   fix-sem-caminho-exit-2"; else echo "FAIL fix-sem-caminho-exit-2: exit $st"; fail=$((fail + 1)); fi
+
 # uso incorreto
 total=$((total + 1))
 bash "$LINT" "$TMP/nao-existe.md" >/dev/null 2>&1

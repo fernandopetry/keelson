@@ -26,7 +26,7 @@
 ## §2. Invocação e saída
 
 ```
-scripts/artifact-lint.sh <caminho> [<caminho>…]
+scripts/artifact-lint.sh [--fix] <caminho> [<caminho>…]
 ```
 
 - `<caminho>`: arquivo `SPEC-*.md`, `PLAN-*.md` ou `TASK-*.md` (tipo inferido do nome),
@@ -36,7 +36,8 @@ scripts/artifact-lint.sh <caminho> [<caminho>…]
 - No consumidor: `${CLAUDE_PLUGIN_ROOT}/scripts/artifact-lint.sh`; num subagent executor
   sem a env var, derive a raiz do plugin do caminho do SKILL.md citado no briefing.
 - Saída: `SEVERIDADE<TAB>check<TAB>detalhe (arquivo)`, ordenada com `LC_ALL=C`.
-- Exit: `0` sem ERROR · `1` com ERROR · `2` uso incorreto. Read-only.
+- Exit: `0` sem ERROR · `1` com ERROR · `2` uso incorreto. Read-only sem `--fix`.
+- `--fix` (4.478): antes de lintar, corrige nas TASKs só o que é puramente mecânico — `task-criterio-cifrao-aspas-duplas` (segmento em aspas duplas com `$` passa a aspas simples; com `'` dentro, cada `$` vira `\$`) e `task-secao-ausente` para as duas seções de conteúdo fixo do template, "Riscos específicos" e "Histórico de execução" (acrescentadas de `templates/artifacts/TASK.md`, na ordem dele). Imprime `FIXED<TAB>check<TAB>detalhe (arquivo)` antes dos achados; idempotente; SPEC/PLAN e as seções de conteúdo da TASK nunca são tocados — o que exige redação continua indo ao `scribe`.
 - Bash 3.2+ e awk POSIX, sem dependências novas.
 
 ## §3. Catálogo (o que chega como fato)

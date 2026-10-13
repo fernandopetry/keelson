@@ -25,6 +25,28 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.223.0] — 2026-10-13
+
+Re-init: none
+
+Decision 4.478 — `artifact-lint.sh --fix` repairs the purely mechanical lint classes in TASKs, so a catalogued form defect no longer costs a scribe round.
+
+### Added
+
+- `scripts/artifact-lint.sh --fix <caminho>…`: before linting, fixes in TASK files only what
+  is purely mechanical — `task-criterio-cifrao-aspas-duplas` (a double-quoted segment with
+  `$` becomes single-quoted; when it carries a `'`, each `$` is escaped as `\$`) and
+  `task-secao-ausente` for the two fixed-content sections of the template, "Riscos
+  específicos" and "Histórico de execução" (appended from `templates/artifacts/TASK.md`, in
+  its order) — and prints `FIXED<TAB>check<TAB>detalhe (arquivo)` before the findings.
+  Idempotent; without the flag the script stays read-only; SPEC/PLAN and the content
+  sections of a TASK are never touched. Suite: 5 new cases.
+
+### Changed
+
+- `/keelson:tasks` Etapa 5 runs the lint with `--fix` in directory mode; the `FIXED` lines go
+  into the milestone commit and the delta to the `scribe` carries only what is left.
+
 ## [0.222.1] — 2026-10-12
 
 Re-init: none

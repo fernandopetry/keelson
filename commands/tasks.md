@@ -256,7 +256,7 @@ WARNING — `--group` sobre arquivo sem a anotação, arquivo em grupo excluído
 citado sem `--group`, `--testsuite` fora da suíte ou inexistente — entra no mesmo delta
 ao `scribe`, com a linha da TASK como âncora. Script indisponível → declare, como no grafo.
 **E a forma das TASKs passa pelo lint antes de gastar a rodada** (decisão 4.432):
-`bash "${CLAUDE_PLUGIN_ROOT}/scripts/artifact-lint.sh" {docsRoot}/<slug>` em modo diretório
+`bash "${CLAUDE_PLUGIN_ROOT}/scripts/artifact-lint.sh" --fix {docsRoot}/<slug>` em modo diretório — o `--fix` (4.478) resolve antes as classes puramente mecânicas (`$` em aspas duplas, seções de conteúdo fixo do template) e as declara em linhas `FIXED`, que entram no commit do marco; o delta ao `scribe` leva só o que sobrou —
 (os checks cruzados só existem nele; catálogo e severidades: `lint-contract.md`). Entram no
 mesmo delta ao `scribe`: todo achado que **não** é `(W)` no catálogo (fato — `task-tipo-enum`,
 seção ou campo ausente, id divergente) e os WARNING do grafo que atravessam fatias
