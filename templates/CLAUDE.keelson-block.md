@@ -163,6 +163,9 @@ Humanos-only (não aparecem na listagem): `/keelson:guided` (ciclo com checkpoin
 `/keelson:merge` (mesclar uma ou mais branches na branch de trabalho corrente, uma de
 cada vez, com commit de merge próprio por branch — push, merge remoto, PR e deploy
 continuam humanos) ·
+`/keelson:deploy` (ler uma coluna de board Jira, casar issue key com branch de nome
+exato e delegar a fila ao `/keelson:merge` — issue flagada fica de fora; só leitura no
+Jira, e push, PR e deploy continuam humanos) ·
 `/keelson:warroom` (abrir/fechar janela sem gate bloqueante, dívida em `DEBT.md`) ·
 `/keelson:verify-handoff` (fechar gate de tela remoto) ·
 `/keelson:continue` (retomar um slug de onde parou — fila do épico, wave interrompida
