@@ -25,6 +25,33 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.224.0] — 2026-10-13
+
+Re-init: none
+
+Decision 4.479 — smoke run of 0.223.0 in a disposable consumer (72 of 77 facts green): the promise is looked up in existing SPECs before a new SPEC is opened, and `--keep` only preserves what survives a report.
+
+### Added
+
+- `scripts/scope-scan.sh <dir-do-slug> <termo>…`: lists every §4.1 In-scope / §4.2 Out-of-scope
+  bullet of the slug's SPECs that cites the request's terms (case- and accent-insensitive),
+  with the SPEC id and Status. `/keelson:auto` Etapa 0 runs it before choosing "feature
+  nova": a hit in the Out-of-scope of an approved SPEC makes the amendment route (4.398) the
+  default, a hit in the In-scope is a promise already made; `/keelson:triage` row 1b cites it
+  as the fact. In the smoke the Tech Lead never opened the existing SPEC, whose
+  Out-of-scope excluded exactly the request, and paid a full cycle instead of an amendment.
+  Suite with 8 cases.
+
+### Changed
+
+- `scripts/ledger.sh archive --keep` accepts only `pendencia` and `tracker` events; any other
+  type is refused (exit 2, nothing moved) — a reported `fora_de_escopo` is consumed, and what
+  waits for the Director is born as a `pendencia` event. `/keelson:auto` step 10 and
+  `/keelson:report` say so. Suite: 2 new cases.
+- `scripts/smoke-consumer.sh`: the red test planted by the `broken` scenario is removed on
+  the base branch (`main`), not on the branch the scenario left behind — the `parallel` and
+  `epic` sessions branch from `main` and inherited the plant.
+
 ## [0.223.0] — 2026-10-13
 
 Re-init: none

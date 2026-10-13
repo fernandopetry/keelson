@@ -127,6 +127,17 @@ total=$((total + 1))
 arq="$(lg "" "$R" list --archived 2>/dev/null | grep -c '')"
 if [ "$arq" = "4" ]; then ok archive-movidos; else falha "archive-movidos: [$arq]"; fi
 
+# --keep de tipo que não sobrevive ao report (4.479): recusa, nada movido
+total=$((total + 1))
+printf 'achado fora da task\n' | lg "" "$R" append fora_de_escopo code-reviewer meu-slug --ts "2026-08-06T18:30:00-0300" >/dev/null 2>&1
+n_rep_antes="$(find "$LD" -type d -name 'reported-*' | wc -l | tr -d ' ')"
+lg "" "$R" archive --keep 20260806-183000-fora_de_escopo-code-reviewer.md --ts "2026-08-06T18:31:00-0300" >/dev/null 2>&1; rc=$?
+n_rep_depois="$(find "$LD" -type d -name 'reported-*' | wc -l | tr -d ' ')"
+if [ "$rc" -eq 2 ] && [ "$n_rep_antes" = "$n_rep_depois" ] && [ -f "$LD/20260806-183000-fora_de_escopo-code-reviewer.md" ]; then ok archive-keep-recusa-tipo-consumido; else falha "archive-keep-recusa-tipo-consumido: rc=$rc"; fi
+total=$((total + 1))
+msg="$(lg "" "$R" archive --keep 20260806-150000-pendencia-qa.md --ts "2026-08-06T18:32:00-0300" 2>/dev/null)"
+case "$msg" in *"1 evento(s) arquivado(s)"*"1 pendente(s) preservado(s)") ok archive-keep-pendencia-segue-valido ;; *) falha "archive-keep-pendencia-segue-valido: [$msg]" ;; esac
+
 # archive sem nada a mover
 lg "" "$R" archive --keep 20260806-150000-pendencia-qa.md --ts "2026-08-06T19:00:00-0300" >/dev/null 2>&1
 total=$((total + 1))

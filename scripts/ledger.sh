@@ -65,7 +65,9 @@
 #            Leitor: os stop-guards (review-guard/security-guard) comparam o `diff_id:`
 #            dele com a identidade atual do diff — "o veredito cobre a árvore?" (4.378);
 #            evento sem `diff_id:` cai na comparação por mtime (4.365).
-#   archive  move os ativos para reported-<yyyymmdd-hhmmss>/, preservando os --keep
+#   archive  move os ativos para reported-<yyyymmdd-hhmmss>/, preservando os --keep —
+#            só `pendencia` e `tracker` (em voo) podem ser preservados (4.479); outro tipo
+#            em --keep é recusado (exit 2, nada movido): evento reportado é consumido
 #            (evento que continua pendente permanece na pasta ativa)
 #
 # Leitura dupla (carência 4.314): list/count/archive agregam a casa da sessão E a
@@ -380,7 +382,13 @@ case "$ACTION" in
     KEEPLIST=""
     while [ $# -gt 0 ]; do
       case "$1" in
-        --keep) shift; [ $# -gt 0 ] || die2 "--keep exige o nome do arquivo."; KEEPLIST="$KEEPLIST $(basename "$1")" ;;
+        --keep) shift; [ $# -gt 0 ] || die2 "--keep exige o nome do arquivo."
+                kb="$(basename "$1")"
+                case "$kb" in
+                  *-pendencia-*.md|*-tracker-*.md) ;;
+                  *) die2 "--keep só preserva pendencia ou tracker em voo (4.479): $kb é de outro tipo — evento reportado é consumido; o que espera o Diretor nasce como evento pendencia." ;;
+                esac
+                KEEPLIST="$KEEPLIST $kb" ;;
         --ts)   shift; [ $# -gt 0 ] || die2 "--ts exige um ISO 8601."; TS="$1" ;;
         *) die2 "opção desconhecida: $1" ;;
       esac

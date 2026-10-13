@@ -74,7 +74,7 @@ seção **"Cobertura deste relatório"** é sempre presente.
 ## Etapa 3: fechar o ciclo do ledger
 
 Emitido o relatório, arquive os eventos consumidos —
-`bash "${CLAUDE_PLUGIN_ROOT}/scripts/ledger.sh" <raiz> archive --keep <pendente>…`
+`bash "${CLAUDE_PLUGIN_ROOT}/scripts/ledger.sh" <raiz> archive --keep <pendente>…` — `--keep` só de `pendencia` e de `tracker` em voo; outro tipo o script recusa (4.479): evento reportado é consumido
 (decisão 4.314: cada casa do ledger arquiva em `reported-<yyyymmdd-hhmmss>/` dentro de si;
 timestamp medido pelo próprio script) — e marque a casa:
 `bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-dir.sh" <raiz> mark-reported` (decisão 4.315;

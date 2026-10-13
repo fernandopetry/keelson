@@ -366,6 +366,9 @@ PY2
   G add -A -- keelson.config.json; G commit -q -m "chore(keelson): declare worktreeBootstrap for the smoke" -- keelson.config.json
   # 4.458: na ordem `all` o parallel herda a planta vermelha do broken; os fatos da planta já rodaram lá,
   # e este cenário mede uma base verde — a planta sai com commit próprio antes da rodada
+  # (4.479: a planta mora na BRANCH BASE — remover na branch do broken deixava `main` vermelha, e o
+  # /keelson:auto seguinte abre sua branch a partir dela)
+  G checkout -q main 2>/dev/null || true
   if [ -f "$CONSUMER/tests/test_legado_quebrado.py" ]; then
     G rm -q -- tests/test_legado_quebrado.py; G commit -q -m "test: remove the planted legacy test (smoke, after the broken scenario)" -- tests/test_legado_quebrado.py
   fi
