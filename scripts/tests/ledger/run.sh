@@ -419,6 +419,15 @@ lg "sess-um" "$R9" mark despacho developer slug-c TASK-002-002 --ts "2026-09-27T
 lg "sess-dois" "$R9" mark despacho developer slug-c TASK-002-002 --ts "2026-09-27T09:00:00-0300" >/dev/null 2>&1
 r6="$(lg "sess-tres" "$R9" mark-read despacho developer slug-c TASK-002-002 2>/dev/null)"
 [ "$r6" = "2026-09-27T08:00:00-0300" ] && ok mark-read-entre-casas-mais-antiga || falha "mark-read-entre-casas-mais-antiga: [$r6] casas=$(find "$R9/thoughts/local/sessions" -mindepth 1 -maxdepth 1 2>/dev/null | tr '\n' ' ')"
+# raiz com ESPAÇO no caminho (4.485): a lista de marcas é array — mark-read ecoa o ISO e
+# --consume apaga a marca; antes, o word-splitting partia o caminho e o sed não achava o arquivo
+total=$((total + 1))
+RSP="$TMP/raiz com espaco"; mkdir -p "$RSP"
+lg "" "$RSP" mark despacho developer slug-e TASK-003-003 --ts "2026-10-23T09:00:00-0300" >/dev/null 2>&1
+lg "sess-esp" "$RSP" mark despacho developer slug-e TASK-003-003 --ts "2026-10-23T08:30:00-0300" >/dev/null 2>&1
+r7="$(lg "sess-outra" "$RSP" mark-read despacho developer slug-e TASK-003-003 --consume 2>"$TMP/esp.err")"; rc7=$?
+r8="$(lg "sess-outra" "$RSP" mark-read despacho developer slug-e TASK-003-003 2>/dev/null)"
+if [ "$r7" = "2026-10-23T08:30:00-0300" ] && [ $rc7 -eq 0 ] && ! grep -q "can.t read" "$TMP/esp.err" && [ -z "$r8" ] && [ ! -f "$RSP/thoughts/local/session-ledger/mark-despacho-developer-slug-e-TASK-003-003" ]; then ok mark-read-raiz-com-espaco; else falha "mark-read-raiz-com-espaco: [$r7] rc=$rc7 [$r8] err=$(cat "$TMP/esp.err")"; fi
 # task-id fora da forma → exit 2; agent com barra → exit 2
 total=$((total + 1))
 lg "" "$R9" mark despacho developer slug-a T-1 >/dev/null 2>&1; a=$?

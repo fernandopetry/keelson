@@ -25,6 +25,21 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.224.5] — 2026-10-23
+
+Re-init: none
+
+Decision 4.485 (patch) — `scripts/ledger.sh mark-read` works when the project root has a space in its path.
+
+### Fixed
+
+- **`scripts/ledger.sh mark-read`** on a project root whose path contains a space: the list of
+  dispatch marks was accumulated in a string and iterated without quotes, so every mark path was
+  split at the spaces (`sed: can't read …`), the start timestamp was never echoed and `--consume`
+  never removed the mark — the closure would record `data_inicio` as a silent gap. The list is now
+  a bash array (`mark` was already correct). The ledger suite gains a case with a root named
+  `raiz com espaco` covering read and `--consume`.
+
 ## [0.224.4] — 2026-10-23
 
 Re-init: none

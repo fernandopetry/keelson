@@ -306,18 +306,22 @@ case "$ACTION" in
     name="mark-despacho-$AGENT-$SLUG-$TASKID"
     # casas lidas: a corrente, TODAS as de thoughts/local/sessions/*/ledger (a closure pode
     # rodar noutra sessão — a 4.325 valoriza o ciclo que atravessa sessões) e o legado
-    found=""
+    # array, nunca string iterada por word-splitting: a raiz do projeto pode ter espaço no
+    # caminho (4.485) — `mark` já funcionava, `mark-read` partia cada marca em pedaços
+    found=()
     for f in "$LDIR/$name" "$ROOT"/thoughts/local/sessions/*/ledger/"$name" "$LDIR_LEG/$name"; do
       [ -f "$f" ] || continue
-      case " $found " in *" $f "*) continue ;; esac
-      found="$found $f"
+      dup=0
+      for g in ${found[@]+"${found[@]}"}; do [ "$g" = "$f" ] && { dup=1; break; }; done
+      [ "$dup" = 1 ] && continue
+      found+=("$f")
     done
-    if [ -z "$found" ]; then
+    if [ "${#found[@]}" -eq 0 ]; then
       echo "ledger: sem marca de despacho para $AGENT/$SLUG/$TASKID — data_inicio fica como lacuna (—)." >&2
       exit 0
     fi
     best=""; bestc=""
-    for f in $found; do
+    for f in "${found[@]}"; do
       iso="$(sed -n 's/^ts: //p' "$f" | sed -n 1p)"
       [ -n "$iso" ] || continue
       pair="$(stamp "$iso" 2>/dev/null)" || continue
@@ -326,7 +330,7 @@ case "$ACTION" in
     done
     [ -n "$best" ] && printf '%s\n' "$best"
     if [ "$CONSUME" = 1 ]; then
-      for f in $found; do rm -f "$f"; done
+      for f in "${found[@]}"; do rm -f "$f"; done
     fi
     exit 0 ;;
 

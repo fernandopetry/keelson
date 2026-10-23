@@ -423,11 +423,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.224.4` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.224.5` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the shipped commands, agents and skills are reorganized for progressive disclosure — a `## Gotchas` section right after the principles, the essential rule at the top, legacy formats out of the main flow, monolithic lines split into sub-bullets — no rule changed owner, no behavior change.
+New in this release: `scripts/ledger.sh mark-read` no longer breaks when the project root has a space in its path — the dispatch-mark list is a bash array, so the TASK start timestamp is read and consumed as documented.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
