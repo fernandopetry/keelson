@@ -333,6 +333,21 @@ novo (decisão 4.465).
 
 Detalhe completo: `commands/auto-epic.md`.
 
+### 3.31 `/keelson:verify-handoff` — fechar o gate de tela remoto (humano-only)
+
+A outra ponta do handoff: uma entrega feita em ambiente sem tela deixou `HANDOFF-*.md`
+`Pendente` no slug, e este comando o fecha onde a app sobe de verdade — a **mesa principal**
+(`<root>`), nunca um worktree linkado. Pré-checks param tudo antes de agir (`<root>` limpo e
+sem trabalho de outra sessão, branch salva no remoto, alvo resolvido — sem argumento, a lista
+de pendentes vem de `scripts/handoff-scan.sh` e você escolhe); depois consolida a branch no
+`<root>`, sobe o ambiente pelo método do projeto, exercita cada item do roteiro pela skill
+`screen-verify` e grava o veredito no handoff. Fecha o gate e **para**: não faz merge nem
+deploy — aponta para o `/keelson:integrate`, que também pode encadeá-lo quando encontra
+handoff pendente. `--dry-run` imprime alvo e plano; `--keep-worktree` preserva o worktree da
+branch (checkout detached).
+
+Detalhe completo (flags, fluxo, regras): `commands/verify-handoff.md`.
+
 ## 4. Skills
 
 Skills não geram artefatos novos — validam ou consultam. As três validators rodam **automaticamente** ao final do comando correspondente, mas podem ser invocadas sob demanda ("valide a SPEC-002", "lint no PLAN-001").

@@ -61,14 +61,15 @@ mv_um() { # $1 origem, $2 destino — ambos relativos ao DIR
   mv "$DIR/$1" "$DIR/$2" 2>/dev/null
 }
 
-MOVIDOS=""
+# array, nunca string iterada por word-splitting — nome de .md legado pode ter espaço (4.487)
+MOVIDOS=()
 falha=""
 for f in "$DIR"/*.md; do
   [ -f "$f" ] || continue
   b="$(basename "$f")"
   if mv_um "$b" "legacy/$b"; then
     printf 'movido\t%s\n' "$b"
-    MOVIDOS="$MOVIDOS $b"
+    MOVIDOS+=("$b")
   else
     falha="$b"
     break
@@ -77,7 +78,7 @@ done
 
 if [ -n "$falha" ]; then
   echo "ERRO: falha ao mover $falha (destino ocupado ou permissão) — desfazendo." >&2
-  for b in $MOVIDOS; do
+  for b in ${MOVIDOS[@]+"${MOVIDOS[@]}"}; do
     if mv_um "legacy/$b" "$b"; then printf 'rollback\t%s\n' "$b"
     else echo "ERRO: rollback de $b falhou — estado inconsistente, resolva à mão." >&2; fi
   done

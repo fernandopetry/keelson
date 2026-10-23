@@ -25,6 +25,17 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.225.1] — 2026-10-23
+
+Re-init: none
+
+Decision 4.487 (patch) — three declared leftovers closed: `legacy-move.sh` rollback with a space in a file name, the `code-scout` description names `/keelson:specify`, `/keelson:verify-handoff` documented in the method guide.
+
+### Fixed
+
+- **`scripts/legacy-move.sh`** rollback when a legacy `.md` has a space in its name: the list of moved files was a string iterated without quotes, so undoing a failed move split the name and left the file stranded under `legacy/` with "resolve by hand" errors. The list is now a bash array; the suite gains a rollback case with `a b.md`.
+- **`agents/code-scout.md`** description lists `/keelson:specify` among its invokers (the exploration memo step dispatches it); `check-sync.sh` no longer warns.
+
 ## [0.225.0] — 2026-10-23
 
 Re-init: none

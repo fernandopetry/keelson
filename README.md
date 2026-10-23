@@ -423,11 +423,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.225.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.225.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the gate 1 criteria of `/keelson:tasks` check that a prescribed mutant sits on a branch some input of the cited function actually reaches, and the convergence pack of `/keelson:auto` and `/keelson:integrate` carries the exact `graph.sh` invocation (`--check`, `--format=tables --plan MMM`) — usage text or an exit outside 0/1 never reaches the `code-reviewer`.
+New in this release: `scripts/legacy-move.sh` undoes a failed move correctly when a legacy file name has a space, the `code-scout` description names every command that dispatches it, and `/keelson:verify-handoff` has its section in the method guide.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

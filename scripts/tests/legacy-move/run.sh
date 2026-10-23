@@ -83,6 +83,23 @@ else
   echo "FAIL rollback (exit $st): [$got]"; fail=$((fail + 1))
 fi
 
+# ---- rollback com ESPAÇO no nome do arquivo (4.487): o 1º movido ("a b.md") volta inteiro ----
+R3b="$(mkrepo rollback-espaco)"
+S3b="$R3b/docs/conflito espaco"
+mkdir -p "$S3b/legacy"
+printf 'a\n' > "$S3b/a b.md"
+printf 'c\n' > "$S3b/ccc.md"
+printf 'ocupado\n' > "$S3b/legacy/ccc.md"
+total=$((total + 1))
+got="$(bash "$LM" "$S3b" 2>"$TMP/esp.err")"; st=$?
+if [ "$st" -eq 1 ] && [ -f "$S3b/a b.md" ] && [ -f "$S3b/ccc.md" ] && [ ! -e "$S3b/legacy/a b.md" ] \
+   && [ ! -e "$S3b/legacy/a" ] && [ ! -e "$S3b/a" ] && [ ! -e "$S3b/b.md" ] \
+   && printf '%s\n' "$got" | grep -q '^rollback	a b.md$' && ! grep -q 'rollback de' "$TMP/esp.err"; then
+  echo "ok   rollback-nome-com-espaco"
+else
+  echo "FAIL rollback-nome-com-espaco (exit $st): [$got] err=$(cat "$TMP/esp.err")"; fail=$((fail + 1))
+fi
+
 # ---- INDEX.md presente → exit 2; nada a mover → aviso ----
 R4="$(mkrepo com-index)"
 S4="$R4/docs/pronto"; mkdir -p "$S4"; printf 'i\n' > "$S4/INDEX.md"
