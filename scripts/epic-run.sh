@@ -207,11 +207,13 @@ st_get() { awk -F'\t' -v k="$1" '$1==k{print $2; exit}' "$DIR/status.tsv" 2>/dev
 
 finalizar() { # <motivo>
   ts="$(agora)"
+  # a notificação sai ANTES do fim.txt: fim.txt é o último fato do run — quem espera por
+  # ele (watch, suíte, Diretor) já encontra a notificação entregue (4.489)
+  notificar "keelson · ${SLUG:-épico}" "revezamento parado — $1"
   printf '%s\t%s\n' "$ts" "$1" > "$DIR/fim.txt"
   st_set estado parado; st_set motivo "$1"; st_set fim "$ts"
   rm -f "$DIR/driver.pid"
   echo "[$ts] parado — $1" >> "$DIR/launch.log"
-  notificar "keelson · ${SLUG:-épico}" "revezamento parado — $1"
 }
 
 case "$ACTION" in

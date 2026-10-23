@@ -48,6 +48,9 @@ total=0; killed=0; surv=0
 W="$TMP/w"; mkdir -p "$W/scripts/tests"
 cp "$ROOT"/scripts/*.sh "$W/scripts/"
 for s in artifact-lint graph index corpus; do cp -R "$ROOT/scripts/tests/$s" "$W/scripts/tests/$s"; done
+# o lint lê templates/artifacts/TASK.md ao lado de scripts/ (--fix das seções fixas, 4.478):
+# sem a cópia, a suíte do lint já falha sem mutante e a campanha não prova nada (4.489)
+mkdir -p "$W/templates" && cp -R "$ROOT/templates/artifacts" "$W/templates/artifacts"
 
 valido() { # motor → 0 se o script mutado ainda roda na fixture válida do corpus (exit 0/1, sem erro de awk)
   case "$1" in

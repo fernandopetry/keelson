@@ -25,6 +25,17 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.226.1] — 2026-10-23
+
+Re-init: none
+
+Decision 4.489 (patch) — the `Test` workflow is green again on `main`: the mutation campaign ships the TASK template into its working tree, and the epic relay notifies before writing its end marker.
+
+### Fixed
+
+- **`scripts/tests/mutation/run.sh`** aborted with "lint suites already fail without a mutant" on every push since 0.223.0: `artifact-lint.sh --fix` reads `templates/artifacts/TASK.md` next to `scripts/`, and the campaign's temporary tree only carried `scripts/`. The tree now includes `templates/artifacts`.
+- **`scripts/epic-run.sh`**: the "revezamento parado" notification was sent after `fim.txt`, so a watcher that wakes on the end marker could miss it (the macOS CI job did). The notification now precedes the marker; `fim.txt` is the last fact of a run.
+
 ## [0.226.0] — 2026-10-23
 
 Re-init: required

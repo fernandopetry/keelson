@@ -426,11 +426,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.226.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.226.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: `/keelson:deploy` (human-only) builds the `/keelson:merge` queue from a Jira board column — contributed by Tiego Torelli in the first external PR merged with its author's commit preserved; the column and the flag field come from the project map, the branch pattern from the ficha.
+New in this release: the CI `Test` workflow is green again — the mutation campaign carries the TASK template into its working tree, and the epic relay sends its final notification before writing the end marker.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
