@@ -21,8 +21,7 @@ As credenciais e a URL de teste vêm do `keelson.local.json` na raiz do projeto 
 (ex.: `admin`, `portal`); chaves: `screenVerify.realms.<nome>.{baseUrl, login: {path,
 username, password}}` + `screenVerify.defaultRealm` — o arquivo real é lido em runtime.
 
-- **Formato flat legado** (`baseUrl` + `login` direto sob `screenVerify`, sem `realms`)
-  segue válido: equivale a um único realm implícito.
+- **Formato flat** (sem `realms`) → ver *Legado*, no fim deste arquivo.
 - **Arquivo ausente ou campo em branco** → **não invente credenciais nem URL**. Peça ao
   Diretor que rode `/keelson:init` (ou preencha o `keelson.local.json`), e **não** declare a
   verificação feita. "Não tenho as credenciais" nunca vira "está ok".
@@ -70,6 +69,17 @@ configuração do servidor (`.mcp.json` do projeto ou escopo do usuário), escri
 `/keelson:init` — **não** são ajustáveis em runtime. Precisa ver a janela para investigar?
 Isso é reconfiguração, não improviso: rode `/keelson:init` de novo (ou tire o `--headless`
 do `.mcp.json`) e diga isso ao Diretor.
+
+## Divisão com a suíte E2E (`quality.e2e` — decisão 4.166)
+
+Projeto com `quality.e2e` na ficha tem specs E2E versionados como **memória** desta
+verificação: comportamento que já tem spec se prova rodando o recorte
+(`<quality.e2e> --grep "@AC-NNN-XXX"`), sem browser dirigido. Esta skill entra no
+comportamento **novo** (ainda sem spec) e no julgamento que asserção não captura —
+layout, tema, estado visual. O que você verificar e aprovar aqui é insumo para o
+developer codificar em spec na própria task (régua:
+`${CLAUDE_PLUGIN_ROOT}/guidelines/core/TESTING.md`, "Specs E2E"); os artefatos de
+execução continuam nas pastas gitignored abaixo, e imagem nunca vira asserção commitada.
 
 ## 1. Subir/abrir o ambiente
 
@@ -150,9 +160,7 @@ esses arquivos são material transitório para o desenvolvedor, nunca vão para 
   cite a chave segura o espelho.
 - **Registre o caminho que a ferramenta devolveu**, não o que você pediu: se o servidor
   estiver com outro `--output-dir`, o arquivo caiu em outro lugar e o report tem que dizer
-  onde. Arquivo em **`.playwright-mcp/`** é o sinal de que o servidor está sem
-  `--output-dir` — reporte como config divergente (`/keelson:init` conserta), porque essa
-  pasta pode não estar coberta pelo `.gitignore` do projeto.
+  onde (`.playwright-mcp/` — ver Armadilhas).
 - **O arquivo nunca é a prova.** A prova durável é o **texto**: o que foi observado, no
   HANDOFF e no INDEX. O artefato é conveniência local — um clone limpo não o tem, e a
   verificação precisa continuar de pé sem ele (decisões 4.26/4.46).
@@ -176,19 +184,11 @@ Sintomas de ambiente que imitam bug de UI:
 - **Recurso externo bloqueado** (fonte, CDN) por `--allowed-origins`/`--blocked-origins` na
   config do servidor aparece como falha visual da app. Antes de abrir bug de estilo, cheque
   a rede: requisição bloqueada não é bug do código.
+- **Arquivo em `.playwright-mcp/`** é o sinal de que o servidor está sem `--output-dir`
+  (é o diretório default dele) — reporte como config divergente (`/keelson:init`
+  conserta), porque essa pasta pode não estar coberta pelo `.gitignore` do projeto.
 
 Um sintoma desses só vira bug depois de re-medido com o estado estável e o viewport são.
-
-## Divisão com a suíte E2E (`quality.e2e` — decisão 4.166)
-
-Projeto com `quality.e2e` na ficha tem specs E2E versionados como **memória** desta
-verificação: comportamento que já tem spec se prova rodando o recorte
-(`<quality.e2e> --grep "@AC-NNN-XXX"`), sem browser dirigido. Esta skill entra no
-comportamento **novo** (ainda sem spec) e no julgamento que asserção não captura —
-layout, tema, estado visual. O que você verificar e aprovar aqui é insumo para o
-developer codificar em spec na própria task (régua:
-`${CLAUDE_PLUGIN_ROOT}/guidelines/core/TESTING.md`, "Specs E2E"); os artefatos de
-execução continuam nas pastas gitignored acima, e imagem nunca vira asserção commitada.
 
 ## 4. Regras de segurança (não-negociáveis)
 
@@ -197,3 +197,10 @@ em dev, é **mudança sensível** — faça o mínimo para destravar a verifica�
 Diretor o que alterou**. Detalhes de ambiente/domínio (subir serviços, fixtures, pegadinhas
 de autorização) vivem em `guidelines/project/` — consulte-os quando o setup ou uma tela
 gated exigir.
+
+## Legado: formato flat do `keelson.local.json`
+
+`baseUrl` + `login` direto sob `screenVerify`, sem `realms`, segue válido em runtime:
+equivale a um único realm implícito (a seleção e o isolamento por realm acima valem
+para ele como realm único). O `/keelson:init` migra o arquivo para `realms` preservando
+os valores.

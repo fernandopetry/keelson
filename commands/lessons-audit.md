@@ -38,7 +38,7 @@ se aplica com confirmação do Diretor.
 ## Quando usar
 
 - Migração do arquivo único `lessons.md` para um arquivo por lição (decisão 4.376) e
-  adoção do ciclo de vida em acervo pré-4.221 (retrofit do formato).
+  adoção do ciclo de vida em acervo sem frontmatter (retrofit do formato — seção *Legado*).
 - Sinais de ruído: lição contestada no ciclo, lição antiga suspeita de obsoleta,
   formato heterogêneo (times diferentes escreveram de jeitos diferentes).
 - Periodicamente, como higiene — o acervo só cresce se ninguém o auditar.
@@ -59,9 +59,9 @@ se aplica com confirmação do Diretor.
    ou arquivo fora do versionamento → proveniência degrada para `indeterminada`,
    declarada no report. Nunca estimar data.
 3. Inventário pela saída do `list --estado todas`: coluna `origem` separa o que já mora
-   em `lessons/` do que ainda está no `lessons.md` legado (blocos `## [Área] …` e
-   tombstones de `## Revogadas`); `WARNING nao-parseavel` em stderr nomeia arquivo sem
-   frontmatter — candidato certo do retrofit da Etapa 2.
+   em `lessons/` do que ainda está no `lessons.md` legado, e `WARNING nao-parseavel` em
+   stderr nomeia arquivo sem frontmatter — os dois casos são o acervo legado da Etapa 2
+   (régua na seção *Legado*).
 
 ## Etapa 1: inventário mecânico (fatos por lição)
 
@@ -70,9 +70,7 @@ Para cada bloco:
 1. **Origem e última atualização** — precedência: data escrita na própria lição vence;
    senão, arquivo por lição: `git log --reverse --follow --format='%as %h' -- <arquivo>`
    (primeiro = origem, último = atualização); bloco do `lessons.md` legado: pickaxe pelo
-   heading (`git log --reverse -S"<heading do bloco>" --format='%as %h' -- guidelines/project/lessons.md`
-   — o dedupe atualiza em vez de duplicar, então "último touch do arquivo" superestima).
-   Indeterminável (squash agressivo, rename, shallow) → `indeterminada`.
+   heading (seção *Legado*). Indeterminável (squash agressivo, rename, shallow) → `indeterminada`.
 2. **Formato**: mora em `lessons/` com frontmatter (`estado`/`validade`/`confirmada`/
    `contestada`)? Declara `paths`/`tags`? Lição cuja Solução cita arquivo **existente**
    e que não declara `paths` é fato a favor de ganhar `paths` (proposta, nunca inferência
@@ -85,41 +83,11 @@ Para cada bloco:
 5. **Pares suspeitos de duplicata**: mesma área + Erro/Solução substancialmente
    sobrepostos.
 
-## Etapa 2: migração e retrofit (mecânico — aplica direto, salvo `--dry-run`)
+## Etapa 2: migração e retrofit (só acervo legado — mecânico, aplica direto salvo `--dry-run`)
 
-Cada bloco do `lessons.md` legado vira `guidelines/project/lessons/<slug>.md` (slug do
-heading em minúsculas ASCII — regra de nome no dono; colisão com arquivo existente é
-duplicata: vai para o teste 5 da Etapa 3, nunca sobrescreve) com frontmatter derivado
-do bloco, sem alterar Erro/Causa/Solução:
-
-```markdown
----
-area: <do [Área] do heading>
-estado: <do **Estado:**, ou ativa se ausente>
-validade: <do **Validade:**, ou indeterminada>
-confirmada: <dos **Contadores:**, ou 0>
-contestada: <dos **Contadores:**, ou 0>
-paths:               # só os arquivos citados na Solução que EXISTEM hoje (`test -f`), literais — glob nunca é inferido
-  - <caminho>
----
-## [Área] Descrição curta
-…
-```
-
-- `estado: ativa` é o retrofit conservador: lição pré-escada não é rebaixada sem
-  evidência (quase todas nasceram de defeito real; rebaixar sem fato seria o
-  falso-positivo do princípio 1). `tags` não se inventa: fica ausente até alguém
-  classificar. Lição sem arquivo citado fica **sem `paths`** — transversal, entra em
-  todo recorte; é o lado seguro.
-- Tombstone de `## Revogadas` vira arquivo com `estado: revogada` e corpo de 1 linha
-  (o motivo original); o histórico continua no git.
-- Arquivo já em `lessons/` mas sem frontmatter (`WARNING nao-parseavel`) ganha o
-  frontmatter pelo mesmo mapa, a partir dos campos `**Estado:**` etc. do corpo, se
-  existirem.
-- `lessons.md` sem bloco restante é removido (preâmbulo incluso — o git preserva); com
-  bloco que a migração não conseguiu parsear, fica, e o report nomeia o bloco.
-- O git preserva o antes — migração não precisa de backup. Migração é ato de escrita
-  do comando (o `lessons.sh` é read-only por contrato).
+Só existe quando a Etapa 0 (item 3) encontrou bloco no `lessons.md` ou arquivo sem
+frontmatter; acervo já migrado → pule, sem menção. A régua está na seção *Legado*, no
+fim deste arquivo.
 
 ## Etapa 3: vereditos (juízo por lição)
 
@@ -155,8 +123,7 @@ não pela auditoria — aqui ela é insumo, não gatilho.
   motivo, proposta) e aguardar o OK — sem OK, ficam `propostos` no report e nada muda.
 - Revogação: `estado: revogada` no frontmatter da lição (mais `absorvida_em` quando é
   absorção) e corpo reduzido a `<motivo> (revogada em <data>; histórico no git)`. Bloco
-  ainda no `lessons.md` legado (migração simulada ou parcial): mover para `## Revogadas`
-  como `- [Área] título — <motivo> (revogada em <data>; histórico no git)`.
+  ainda no `lessons.md` legado (migração simulada ou parcial) → seção *Legado*.
 - Reformulação confirmada: editar a lição preservando contadores e estado.
 
 ## Etapa 5: report
@@ -175,6 +142,54 @@ não pela auditoria — aqui ela é insumo, não gatilho.
 ```
 
 O commit das mudanças é seu (do Diretor) — o comando edita, reporta e para.
+
+## Legado: acervo sem frontmatter de ciclo de vida
+
+Vale para o arquivo único `lessons.md` (blocos `## [Área] …` e tombstones de
+`## Revogadas`) e para arquivo em `lessons/` sem frontmatter (`WARNING nao-parseavel`).
+Acervo já migrado nunca passa por aqui.
+
+**Origem (Etapa 1)** — bloco do `lessons.md`: pickaxe pelo heading
+(`git log --reverse -S"<heading do bloco>" --format='%as %h' -- guidelines/project/lessons.md`
+— o dedupe atualiza em vez de duplicar, então "último touch do arquivo" superestima).
+
+**Migração e retrofit (Etapa 2)** — cada bloco do `lessons.md` legado vira
+`guidelines/project/lessons/<slug>.md` (slug do heading em minúsculas ASCII — regra de
+nome no dono; colisão com arquivo existente é duplicata: vai para o teste 5 da Etapa 3,
+nunca sobrescreve) com frontmatter derivado do bloco, sem alterar Erro/Causa/Solução:
+
+```markdown
+---
+area: <do [Área] do heading>
+estado: <do **Estado:**, ou ativa se ausente>
+validade: <do **Validade:**, ou indeterminada>
+confirmada: <dos **Contadores:**, ou 0>
+contestada: <dos **Contadores:**, ou 0>
+paths:               # só os arquivos citados na Solução que EXISTEM hoje (`test -f`), literais — glob nunca é inferido
+  - <caminho>
+---
+## [Área] Descrição curta
+…
+```
+
+- `estado: ativa` é o retrofit conservador: lição pré-escada não é rebaixada sem
+  evidência (quase todas nasceram de defeito real; rebaixar sem fato seria o
+  falso-positivo do princípio 1). `tags` não se inventa: fica ausente até alguém
+  classificar. Lição sem arquivo citado fica **sem `paths`** — transversal, entra em
+  todo recorte; é o lado seguro.
+- Tombstone de `## Revogadas` vira arquivo com `estado: revogada` e corpo de 1 linha
+  (o motivo original); o histórico continua no git.
+- Arquivo já em `lessons/` mas sem frontmatter (`WARNING nao-parseavel`) ganha o
+  frontmatter pelo mesmo mapa, a partir dos campos `**Estado:**` etc. do corpo, se
+  existirem.
+- `lessons.md` sem bloco restante é removido (preâmbulo incluso — o git preserva); com
+  bloco que a migração não conseguiu parsear, fica, e o report nomeia o bloco.
+- O git preserva o antes — migração não precisa de backup. Migração é ato de escrita
+  do comando (o `lessons.sh` é read-only por contrato).
+
+**Revogação (Etapa 4)** — bloco ainda no `lessons.md` (migração simulada ou parcial):
+mover para `## Revogadas` como `- [Área] título — <motivo> (revogada em <data>;
+histórico no git)`.
 
 ## Limites
 

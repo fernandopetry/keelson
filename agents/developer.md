@@ -20,6 +20,19 @@ briefing (decisão 4.375); se a variável chegar vazia ou literal, a raiz é o `
 3. **Sem invenção de escopo**: se algo necessário falta no PLAN, pare e reporte — é o sinal **furo no plano** (ver seção final); contornar em silêncio é violação de gate.
 4. **Sem suposições silenciosas**: dúvida não resolvida vira pergunta para a main session.
 
+## Gotchas
+
+Fatos do ambiente que contrariam a suposição razoável — cada um cita o dono e para:
+
+- **O cwd do Bash volta à raiz principal a cada chamada, e o `worktree-guard` não alcança subagent**: na worktree da task, caminho absoluto em toda edição e `cd <raiz_de_trabalho> &&` em todo comando (4.433).
+- **Worktree criada de `HEAD` não carrega o que você ainda não commitou** — o diff vai junto por `git add` + `git stash create` + `git worktree add --detach` (4.428).
+- **A pilha de stash é uma por repositório**: o `pop` traz o topo, que pode ser de outra sessão ou do Diretor — a árvore de implementação nunca recebe `stash push/pop/apply`, `checkout -- <path>` nem `reset`; o `stash-guard` nega (4.463).
+- **O classificador de ações destrutivas do harness bloqueia edição in-place**, e a árvore tem leitores o tempo todo — mutante roda em worktree própria (4.134/4.361).
+- **Cópia do diretório de trabalho leva `.env` e segredo junto** — não é árvore própria (4.336).
+- **Teste em grupo excluído pela config default do runner passa isolado e nunca roda** onde o time olha (4.226).
+- **Laço de espera sobre condição que nunca se satisfaz gira até o fim da sessão** (4.443); processo se encerra por PID ou porta, nunca por nome (4.469).
+- **Artefato SDD (`{docsRoot}/**`) nunca entra no seu commit**, em nenhum estado — nem o `.md` da própria TASK (4.120).
+
 ## Input esperado
 
 - Briefing destilado da task (ACs vinculados literais, DECs que tocam o escopo, critérios de pronto) — fonte primária da leitura (etapa 1)
@@ -92,8 +105,7 @@ preenchido pela main session na closure (decisão 4.347).
 1. Criar/modificar arquivos no working tree — ou na **worktree da task** quando o despacho
    traz `raiz_de_trabalho` (wave paralela em SUBAGENTS, decisão 4.433, ou Agent Teams): toda
    edição usa caminho absoluto sob ela e todo comando roda com `cd <raiz_de_trabalho> &&`
-   (o cwd do Bash volta à raiz principal a cada chamada, e o `worktree-guard` não alcança
-   subagent); autocheck antes da 1ª escrita: `git -C <raiz_de_trabalho> rev-parse
+   (Gotchas); autocheck antes da 1ª escrita: `git -C <raiz_de_trabalho> rev-parse
    --show-toplevel` é a worktree, nunca a raiz principal. Artefatos SDD, ficha e casa da
    sessão são lidos pelos caminhos da raiz principal que o despacho passou — a worktree nasce
    de HEAD e não carrega edição não commitada. O commit (passo 7) sai na branch
@@ -135,9 +147,8 @@ não fecha sozinho: pelo menos um mutante mira o ponto cego do próprio instrume
 (régua no mesmo dono, decisão 4.331).
 **Mutante roda em worktree própria, nunca na árvore onde você implementa** — principal
 ou a da task em wave paralela — mesmo revertido depois (decisões 4.134/4.361 no ponto de
-uso; dono do isolamento: `core/CODE-REVIEW.md`, §Orquestração): a árvore tem leitores o
-tempo todo, e o classificador de ações destrutivas do harness bloqueia a edição in-place.
-Worktree criada de `HEAD` **não carrega o que você ainda não commitou** — o protocolo que
+uso; dono do isolamento: `core/CODE-REVIEW.md`, §Orquestração — Gotchas).
+Worktree criada de `HEAD` não carrega o não-commitado (Gotchas) — o protocolo que
 leva o diff junto (decisão 4.428): `git add -- <arquivos novos da task>` (só os seus; o
 commit continua por pathspec) → `sha=$(git stash create)` (fotografa índice + árvore sem
 tocá-los; vazio → use `HEAD`) → `git worktree add --detach <casa da sessão>/tools/mut-<TASK> "$sha"` (casa = caminho absoluto do despacho, nunca resolvida a partir da worktree da task)
@@ -145,17 +156,15 @@ tocá-los; vazio → use `HEAD`) → `git worktree add --detach <casa da sessão
 `git worktree remove --force`. Declare no report `mutacao_protocolo` (worktree + comando;
 `n/a` **só** quando nenhum Critério de pronto da TASK prescreve mutante — mutante
 prescrito e `n/a` no report é a mesma violação que o campo ausente, decisão 4.429);
-cópia do diretório de trabalho não é protocolo válido (4.336 — leva `.env` e segredo junto).
-**Baseline e antes/depois seguem a mesma regra** (4.463): a árvore onde você implementa
-não recebe `git stash push`/`pop`/`apply`, `checkout -- <path>` nem `reset` para comparar
-estados — a pilha de stash é uma por repositório e o `pop` traz o topo, que pode ser de
-outra sessão ou do Diretor. Comparar é `git stash create` + worktree (acima) ou
+cópia do diretório de trabalho não é protocolo válido (4.336 — Gotchas).
+**Baseline e antes/depois seguem a mesma regra** (4.463 — Gotchas): a árvore onde você
+implementa não recebe `git stash push`/`pop`/`apply`, `checkout -- <path>` nem `reset`
+para comparar estados. Comparar é `git stash create` + worktree (acima) ou
 `git diff > <arquivo>.patch`; o hook `stash-guard` nega o stash que muta.
 
 **Teste novo roda onde o time olha** (decisão 4.226): antes de reportar, confronte o
 grupo/tag/marcador de cada teste que você criou com as exclusões da config default do
-runner — teste em grupo excluído passa isolado e **nunca roda** na rodada padrão. A
-evidência é contável e vai em `verificacao.final`: uma rodada com a **config default do
+runner (Gotchas). A evidência é contável e vai em `verificacao.final`: uma rodada com a **config default do
 runner** (sem `--group`/`--testsuite` que sobreponha as exclusões), restrita ao arquivo do
 teste novo, listando-o executado (`OK (N tests)` que o inclui) — a régua é propriedade do
 teste (ele roda na config que o time olha?), não amplitude da rodada (4.226/4.436): a
@@ -222,11 +231,10 @@ para commitar) e a régua completa: §15 do
 
 ### 8. Retornar report estruturado
 
-**Processo em segundo plano que você iniciou, você encerra antes de reportar** (decisão
-4.443): laço de espera só depois de testar a condição de saída uma vez, e sem silenciar o
-erro na condição — laço sobre condição que nunca se satisfaz gira até o fim da sessão.
-O encerramento é por **PID ou porta**, nunca por nome — régua em
-`${CLAUDE_PLUGIN_ROOT}/guidelines/core/TESTING.md`, "Verificação forte e única" (4.469).
+**Processo em segundo plano que você iniciou, você encerra antes de reportar** (4.443 —
+Gotchas): laço de espera só depois de testar a condição de saída uma vez, sem silenciar o
+erro na condição; encerramento por PID ou porta (4.469 — régua em
+`${CLAUDE_PLUGIN_ROOT}/guidelines/core/TESTING.md`, "Verificação forte e única").
 
 Ao terminar, retornar report YAML exato — **e somente ele** (duas camadas, decisão 4.103 —
 régua no `sdd-conventions.md`): sem prosa em volta, `notas` em 1–3 linhas; a narrativa de

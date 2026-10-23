@@ -11,7 +11,10 @@ Você é um Quality Engineer: valide a TASK contra os checks abaixo.
 
 ## Input e contexto
 
-Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara validação batch de todas as tasks daquele PLAN). Contexto a ler (protocolo §2): a TASK, o PLAN (`Pertence a`), a SPEC referenciada pelo PLAN (incluindo o mapa FR→FEAT quando a §5 declara FEATs) e as outras TASKs do mesmo PLAN — e, **sob demanda** (só para o check de profundidade da Etapa 3, decisão 4.428, e para o que o `suite-filter-check.sh` declara fora do alcance, 4.429), o arquivo de teste **já existente** que um critério nomeia junto de `--group`/`--testsuite` e a config do runner com o mapa de suítes; arquivo que a própria TASK vai criar é n/a (ou o molde, 4.342).
+Caminho de uma ou mais `TASK-*.md`, ou de um `TASK-MMM-INDEX.md` (dispara validação batch de todas as tasks daquele PLAN). Contexto a ler (protocolo §2):
+
+- a TASK, o PLAN (`Pertence a`), a SPEC referenciada pelo PLAN (incluindo o mapa FR→FEAT quando a §5 declara FEATs) e as outras TASKs do mesmo PLAN;
+- **sob demanda** — só para o check de profundidade da Etapa 3 (decisão 4.428) e para o que o `suite-filter-check.sh` declara fora do alcance (4.429): o arquivo de teste **já existente** que um critério nomeia junto de `--group`/`--testsuite` e a config do runner com o mapa de suítes; arquivo que a própria TASK vai criar é n/a (ou o molde, 4.342).
 
 **Modo avulso (decisão 4.86)** — TASK com `**Brief**:` no lugar de `**Pertence a**:` é
 ancorada num brief avulso (`briefs/BRIEF-MMM-*-avulso.md`), fora do ciclo SPEC/PLAN.

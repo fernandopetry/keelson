@@ -423,11 +423,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.224.3` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.224.4` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: every command, skill and agent description opens with the use case and names every invoker; the person driving the session is "Diretor" throughout; duplicated rules and genealogy glued to decision citations are gone — no behavior change.
+New in this release: the shipped commands, agents and skills are reorganized for progressive disclosure — a `## Gotchas` section right after the principles, the essential rule at the top, legacy formats out of the main flow, monolithic lines split into sub-bullets — no rule changed owner, no behavior change.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

@@ -40,9 +40,12 @@ Produza um **resumo executivo** do estado de um slug, respondendo à pergunta es
    O script é read-only (compatível com o princípio inviolável); régua e contrato:
    `docs/_meta/conventions/graph-contract.md`. Indisponível/falhou → siga pelo INDEX,
    nomeando a causa.
-5. **Fato mecânico antes da síntese** (decisão 4.237): rode já o `index-check.sh` da
-   Etapa 3 — a síntese nasce sabendo o que do INDEX envelheceu, em vez de descobrir
-   depois de escrita.
+5. **Fato mecânico antes da síntese** (decisão 4.237): rode já
+   `bash "${CLAUDE_PLUGIN_ROOT}/scripts/index-check.sh" {docsRoot}/<slug>` — tabelas ×
+   arquivos, célula Tasks × TASKs reais, capacidade adiantada, seções e teto do histórico
+   chegam como fato (catálogo: index-contract.md). Read-only; indisponível → confira por
+   leitura e nomeie a causa. A síntese nasce sabendo o que do INDEX envelheceu, em vez
+   de descobrir depois de escrita; o resultado é tratado na Etapa 3.
 
 ## Etapa 2: síntese
 
@@ -56,11 +59,7 @@ Componha você mesmo o resumo executivo em markdown, calibrado ao foco — sem t
 
 ## Etapa 3: detecção de inconsistências (fato mecânico)
 
-O comando é `bash "${CLAUDE_PLUGIN_ROOT}/scripts/index-check.sh" {docsRoot}/<slug>` —
-já executado na Etapa 1 (item 5); aqui trata-se o resultado. Tabelas × arquivos, célula
-Tasks × TASKs reais, capacidade adiantada, seções e teto do histórico chegam como fato
-(catálogo: index-contract.md). Read-only; indisponível → confira por leitura e nomeie a
-causa.
+O `index-check.sh` já rodou na Etapa 1 (item 5); aqui trata-se o resultado.
 
 Se inconsistência:
 - Não bloquear resposta.

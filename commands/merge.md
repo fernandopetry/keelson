@@ -46,6 +46,16 @@ escala** (régua geral do `sdd-conventions.md`) — nunca force o fechamento dri
 régua. A rodada extra com correção nomeada (4.460) não vale aqui: a reversão do merge é
 o `--abort`, não um commit.
 
+## Gotchas
+
+Fatos do ambiente que contrariam a suposição razoável — cada um cita o dono e para:
+
+- **`git merge-tree --write-tree` exige git ≥ 2.38**; no fallback, o ensaio desfaz sempre — `&&` deixaria a árvore no meio de um merge exatamente no caso conflitado que o dry-run existe para detectar (4.74).
+- **O git recusa commit parcial durante merge**: o commit de merge sai sem pathspec — exceção declarada no `sdd-conventions.md`.
+- **Prefixo de remote na mensagem quebra automação do consumidor**: scripts de deploy extraem a key da tarefa por regex ancorado em `Merge branch '<KEY>`; `origin/PROJ-123` não casa e a tarefa mesclada deixa de ser reconhecida — o nome é sempre o nu, como o invocador o passou.
+- **`MERGE_HEAD` presente é merge pendente**: nunca empilhe outro; a linha `MERGE_HEAD` do output é obrigatória mesmo no caminho feliz (4.263).
+- **Os hooks de gate medem o diff acumulado da branch contra a main**: commits de merge inflam a medida e a cutucada de Stop cobra review/gate 8 sobre o conjunto em sessão que rodou git que escreve (4.434).
+
 ## Input
 
 ```
@@ -95,8 +105,7 @@ git merge-tree --write-tree <into> <branch>          # git ≥ 2.38, não toca a
 ```
 
 Fallback (git < 2.38) — o merge de ensaio **sempre** desfaz, inclusive quando conflita
-(`&&` deixaria a árvore no meio de um merge exatamente no caso que o dry-run existe
-para detectar):
+(Gotchas):
 
 ```bash
 git merge --no-commit --no-ff <branch>; status=$?; git merge --abort 2>/dev/null; (exit $status)
@@ -177,18 +186,14 @@ Etapa 6** (é este o caminho barato do comando: nenhum agent despachado).
 Commit de merge de dois pais usa o formato padrão do git, não Conventional Commits —
 exceção declarada no dono da régua
 (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/commit-convention.md`). O commit é sem
-pathspec (o git recusa commit parcial durante merge — exceção à régua do pathspec
-declarada no `sdd-conventions.md`; o controle compensatório é a árvore limpa da Etapa 0
-e o `git add` restrito da Etapa 5).
+pathspec (Gotchas; o controle compensatório é a árvore limpa da Etapa 0 e o `git add`
+restrito da Etapa 5).
 
 Nos dois formatos abaixo, `<branch>` na mensagem é **sempre o nome nu** da branch —
 como o invocador o passou, sem prefixo de remote — mesmo que o merge real (Etapa 3)
-tenha usado `origin/<branch>` como ref. Automações de consumidor (scripts de deploy,
-por exemplo) extraem a key da tarefa do início da mensagem de merge via regex ancorado
-em `Merge branch '<KEY>`; um prefixo de remote colado no nome (`origin/PROJ-123`)
-quebra esse casamento e a automação deixa de reconhecer a tarefa mesclada. Barra que
-já era parte legítima do nome dado pelo invocador (ex. `feat/slug-tarefa-1`) não é
-prefixo de remote e fica intocada.
+tenha usado `origin/<branch>` como ref (Gotchas). Barra que já era parte legítima do
+nome dado pelo invocador (ex. `feat/slug-tarefa-1`) não é prefixo de remote e fica
+intocada.
 
 1. **Branch limpa** (nenhum gatilho na Etapa 5) → `git commit` com a mensagem default:
    ```
@@ -229,15 +234,11 @@ prefixo de remote e fica intocada.
 - Push, merge para a branch principal remota, PR e deploy continuam com você.
 ```
 
-A linha `MERGE_HEAD` é obrigatória mesmo no caminho feliz: o output nunca deixa o repo
-num estado silencioso (mitigação declarada na decisão 4.263).
+A linha `MERGE_HEAD` é obrigatória mesmo no caminho feliz (4.263 — Gotchas).
 
-Nota esperada no consumidor: os hooks de gate (review/security/jira-guard) medem o diff
-acumulado da branch contra a main — os commits de merge inflam essa medida e a cutucada
-de Stop pode cobrar review/gate 8 sobre o conjunto (em sessão que editou
-código, despachou developer ou rodou git que escreve — 4.434; esta sessão se enquadra pelo merge). Declare no output que o escopo
-tocado já foi auditado aqui (gates da Etapa 5 + suíte), para o Diretor não ler a
-cutucada como gate pendente.
+Nota esperada no consumidor (4.434 — Gotchas): declare no output que o escopo tocado já
+foi auditado aqui (gates da Etapa 5 + suíte), para o Diretor não ler a cutucada de Stop
+como gate pendente.
 
 ## Limites
 

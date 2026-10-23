@@ -42,6 +42,16 @@ pergunta que o `/keelson:init` não fez × contrato do Diretor. Quem abstrai a r
 genérica do plugin é o mantenedor, que vê os outros consumidores — daqui vai **caso bem
 contado + diagnóstico + diff literal proposto**, nunca doutrina pronta.
 
+## Gotchas
+
+Fatos do ambiente que contrariam a suposição razoável — cada um cita o dono e para:
+
+- **O ledger aloca o `LRN` na escrita e não tem lock**: dois `agile-coach` em paralelo colidem o número — uma invocação por causa-raiz, uma de cada vez (4.95).
+- **`ganho` do `cycle-clock.sh --paralelismo` é piso**: as marcas datam o fechamento após gates/retry, e wave sequencial forçada sai com ganho > 1.0x — confronte com o ledger antes de ler como paralelismo (4.346).
+- **Fora da sessão, os números da forja vivem só no BRIEF** (Cronologia com caudas de telemetria e `Estimativa`, 4.313) e os da implementação nas closures commitadas das TASKs (4.200/4.308); pausa não marcada tem piso pelo último commit da branch (4.382).
+- **Telemetria ausente em qualquer fonte é omitida, nunca estimada** (4.239).
+- **"Proposto ao plugin" sem entrada no ledger não existe**: N mecanismos `processo` na Etapa 4 = N `mensagem_mantenedor` anexadas (4.362).
+
 ## Input
 
 ```
@@ -93,9 +103,7 @@ mecanismo inclui "por que chegou a produção / por que a detecção demorou".
   moram na closure commitada das TASKs (4.200/4.308) — o confronto com a seção
   `Estimativa` do BRIEF entra como fato quando ela existe. Com `--paralelismo`, mais
   duas linhas de instrumento: `ganho` (soma crua ÷ parede — quanto trabalho de agente
-  coube por hora de parede; **piso**, como a própria linha rotula: as marcas datam o
-  fechamento após gates/retry, e wave sequencial forçada sai com ganho > 1.0x — confronte
-  com o ledger antes de ler como paralelismo, 4.346) e `caminho-critico` (cadeia dependente mais longa, pelas
+  coube por hora de parede; **piso**, como a própria linha rotula — 4.346, Gotchas) e `caminho-critico` (cadeia dependente mais longa, pelas
   marcas + `Depende de`); **caminho-critico ≈ parede diz que mais paralelismo não
   compraria tempo — a alavanca é reestruturar a decomposição**, e é achado candidato
   da Etapa 2 (natureza `retrabalho de processo`); dep ignorada e ciclo saem contados/
@@ -140,8 +148,7 @@ Classificar cada mecanismo pelo dono — e agir no que é daqui:
   `core/WORKFLOW.md`, 4.376) e/ou no
   perfil do projeto — **aplicado nesta sessão**, citado no postmortem como contexto.
 - **Processo** (artefato do keelson induziu ou não preveniu): despachar o **`agile-coach`**
-  — **uma invocação por causa-raiz, uma de cada vez** (o ledger aloca o `LRN` na escrita
-  e não tem lock: dois em paralelo colidem o número — contrato do agent, decisão 4.95;
+  — **uma invocação por causa-raiz, uma de cada vez** (4.95 — Gotchas;
   `gatilho: correcao_humana`, com descrição, causa-raiz e origem). Ele deduplica no ledger, decide o dono e devolve `PROPOSTA_PLUGIN` +
   `mensagem_mantenedor` com o **diff literal** contra a versão instalada (decisões
   4.54/4.64). Você não redige proposta de plugin por conta própria — o formato dela tem dono.
@@ -164,8 +171,7 @@ Classificar cada mecanismo pelo dono — e agir no que é daqui:
    `mensagem_mantenedor` do `agile-coach` anexadas — uma por problema, cada uma com seu
    diff. **Autocheck contável antes de gravar** (decisão 4.362): N mecanismos
    classificados `processo` na Etapa 4 = N `mensagem_mantenedor` anexadas — mecanismo
-   sem a sua volta à Etapa 4 e é despachado; "proposto ao plugin" sem entrada no ledger
-   não existe. O que já foi consertado localmente aparece como contexto, não como pedido.
+   sem a sua volta à Etapa 4 e é despachado (Gotchas). O que já foi consertado localmente aparece como contexto, não como pedido.
 3. Sem achado generalizável → o postmortem existe do mesmo jeito (a conta honesta e os
    descartes **são** o resultado); o bloco ao mantenedor é que não se inventa.
 

@@ -25,6 +25,20 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.224.4] — 2026-10-23
+
+Re-init: none
+
+Decision 4.484 (patch) — second `/skill-standards` round over the shipped package (Level 2): each file reorganized for progressive disclosure, no rule changed owner, no behavior change.
+
+### Changed
+
+- **`## Gotchas` section** right after the principles in `commands/{auto,implement,init,tasks,merge,postmortem,e2e-setup,mutation-setup}.md` and `agents/{developer,qa,scribe,agile-coach,po}.md`: one line per environment fact that contradicts the reasonable assumption (deferred MCP tools, `git check-ignore` over `.gitignore` reading, `--isolated`, the comma in `lessons.sh --paths`, a subagent waking the main session once, worktrees born from `HEAD`, the single stash stack, …), each citing its decision or owner and stopping. The paragraphs that used to carry the same fact two to four times now point to the section. `skills/screen-verify/SKILL.md` keeps its *Armadilhas* list and absorbs the `.playwright-mcp/` gotcha from *Artefatos*.
+- **Essential rule at the top**: the reaction ladder of `/keelson:auto` (*Exceções*) moves from the tail to right after the principles; the pre-code mode of `agents/qa.md` moves down, before *Limites*; the split with the E2E suite in `screen-verify` moves before step 1; the `index-check.sh` command of the `status` skill lives in step 1 (step 3 only handles its result).
+- **Legacy out of the main flow**, each in its own `## Legado` section referenced from the point where it applies: `/keelson:init` (boolean `screenVerify` → object, flat `keelson.local.json` → `realms`, Jira map without the current markers), `/keelson:continue` (epic without a live queue), `/keelson:lessons-audit` (archive without lifecycle frontmatter — step 2 becomes a pointer), `screen-verify` (flat format).
+- **Monolithic lines split into sub-bullets**, content unchanged: the auth-per-realm bullet of `/keelson:e2e-setup`, the input line of `task-validator`, "Higiene e consistência da superfície" in `agents/qa.md`, axis 3 of `agents/product-analyst.md`, and the `comportamento_gate9` YAML comment of `/keelson:implement`, now a paragraph above the block.
+- `scripts/doctrine-baseline.tsv` tightened to the new state (`agents/qa.md` leaves the ratchet; `commands/implement.md` drops to 6).
+
 ## [0.224.3] — 2026-10-23
 
 Re-init: none

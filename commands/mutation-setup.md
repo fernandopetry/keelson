@@ -10,6 +10,14 @@ Você é um engenheiro de infraestrutura de testes. Sua função é deixar o gat
 
 **Princípio inviolável**: nada é gravado na ficha sem prova de que roda (régua do `/keelson:init`, Etapa 6 — comando fantasia é pior que campo vazio). E a primeira adoção nasce **sem threshold** (gate informativo): score mínimo é calibração que se mede em 1–2 entregas reais, nunca chute de setup.
 
+## Gotchas
+
+Fatos do ambiente que contrariam a suposição razoável — cada um cita o dono e para:
+
+- **Cache de bytecode/compilação/runner serve o fonte anterior**: o `.pyc` faz o mutante sair "morto" sem ter sido executado — cache desligado ou purgado antes de cada rodada (4.393; régua em `guidelines/core/TESTING.md`).
+- **Sobrevivente na rodada-amostra não é falha do setup** — é o gate funcionando.
+- **Ferramenta sem escopo de diff nativo** restringe pelos paths da config, dito no report — o motor só lê exit code (`TESTING.md`).
+
 ## Input
 
 ```
@@ -56,12 +64,12 @@ Regras de composição (a régua é de `guidelines/core/TESTING.md` — o motor 
 - **Escopo de diff** quando a ferramenta suporta: Infection `--git-diff-base=<base>` · Stryker `--incremental` · cargo-mutants `--in-diff` · sem suporte nativo → restrinja pelos paths da config e diga isso no report. `<base>` vem de `--base` ou da branch default detectada; ambíguo → pergunte.
 - **Sem threshold na primeira adoção** (`--min-msi` e afins ficam de fora): o gate nasce informativo — sobreviventes aparecem no report da entrega sem bloquear. O report deste comando termina com a instrução de calibração: após 1–2 entregas, olhar o score real e travar o threshold **na ficha, pelo Diretor**.
 - Paralelismo/custo (`--threads`, workers) conforme o runner do projeto.
-- **O instrumento executa o fonte mutado, nunca cache do fonte anterior** (régua em `TESTING.md`, decisão 4.393): componha o comando de forma que o cache de bytecode/compilação/runner seja desligado ou purgado antes de cada rodada. Python: `PYTHONDONTWRITEBYTECODE=1` no comando e `find . -name __pycache__ -prune -exec rm -rf {} +` (ou `--no-cache` do runner) antes do mutante — o `.pyc` do fonte anterior serve o comportamento antigo e o mutante sai "morto" sem ter sido executado. Outras stacks: cache do runner de testes (Jest `--no-cache`, ts-jest), opcache em CLI, artefatos de build incrementais — nomeie no report o que foi desligado.
+- **O instrumento executa o fonte mutado, nunca cache do fonte anterior** (régua em `TESTING.md`, 4.393 — Gotchas): componha o comando de forma que o cache de bytecode/compilação/runner seja desligado ou purgado antes de cada rodada. Python: `PYTHONDONTWRITEBYTECODE=1` no comando e `find . -name __pycache__ -prune -exec rm -rf {} +` (ou `--no-cache` do runner) antes do mutante. Outras stacks: cache do runner de testes (Jest `--no-cache`, ts-jest), opcache em CLI, artefatos de build incrementais — nomeie no report o que foi desligado.
 
 ## Etapa 5: prova falsificável antes de gravar
 
 1. **Existe**: o binário/entrypoint responde (`--version`).
-2. **O pipeline inteiro roda**: rodada-amostra em escopo mínimo — um arquivo pequeno de `codePaths` (Infection `--filter=<arquivo>` · Stryker `--mutate <arquivo>` · mutmut `--paths-to-mutate <arquivo>`), nunca a base toda. A amostra prova mutar → rodar suíte → reportar; sobrevivente na amostra **não é falha do setup** — é o gate funcionando.
+2. **O pipeline inteiro roda**: rodada-amostra em escopo mínimo — um arquivo pequeno de `codePaths` (Infection `--filter=<arquivo>` · Stryker `--mutate <arquivo>` · mutmut `--paths-to-mutate <arquivo>`), nunca a base toda. A amostra prova mutar → rodar suíte → reportar; sobrevivente na amostra não é falha do setup (Gotchas).
 3. Falhou → nomeie a causa (suíte vermelha de partida · runner errado na config · timeout) e **não grave** o comando; conserte ou reporte o bloqueio.
 
 ## Etapa 6: gravar e reportar
