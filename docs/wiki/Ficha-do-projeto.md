@@ -177,7 +177,8 @@ comportamento clássico** — bloco ausente = nada muda.
 ### `jira`
 
 Integração opcional, **desligada por padrão** e sempre *best-effort* — nunca bloqueia o
-ciclo. Funciona pelo **conector MCP Atlassian**: sem token, sem SDK, sem segredo na ficha.
+ciclo (a exceção é o `/keelson:deploy`, cujo insumo é o próprio board: ele exige o
+conector). Funciona pelo **conector MCP Atlassian**: sem token, sem SDK, sem segredo na ficha.
 O `/keelson:init` descobre em runtime os tipos de issue, status e campos do seu projeto e
 grava **IDs**. Para configurar (ou atualizar) só este bloco depois da adoção, rode
 `/keelson:init jira`: liga a integração num projeto que começou sem ela e, se o bloco já

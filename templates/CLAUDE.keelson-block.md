@@ -28,7 +28,8 @@
   SPEC/funcionalidades/TASKs em issues via conector MCP Atlassian — config por ID no bloco
   `jira` e no mapa `jira.mapFile`. É **best-effort** (nunca bloqueia — mas sempre conta:
   o fecho do ciclo reconcilia o slug e o relatório de entrega traz a linha de estado do
-  tracker) e **sem segredos**.
+  tracker) e **sem segredos**. Exceção declarada no §0 do protocolo (4.488): o
+  `/keelson:deploy` exige o conector — o board é o input dele.
 
 ### Como trabalhar
 
@@ -163,9 +164,9 @@ Humanos-only (não aparecem na listagem): `/keelson:guided` (ciclo com checkpoin
 `/keelson:merge` (mesclar uma ou mais branches na branch de trabalho corrente, uma de
 cada vez, com commit de merge próprio por branch — push, merge remoto, PR e deploy
 continuam humanos) ·
-`/keelson:deploy` (ler uma coluna de board Jira, casar issue key com branch de nome
-exato e delegar a fila ao `/keelson:merge` — issue flagada fica de fora; só leitura no
-Jira, e push, PR e deploy continuam humanos) ·
+`/keelson:deploy` (montar a fila do `/keelson:merge` a partir da coluna de deploy do
+board Jira — status do mapa, issue flagada fica de fora, branch pelo padrão da ficha;
+só leitura no Jira, e push, PR e o deploy de fato continuam humanos) ·
 `/keelson:warroom` (abrir/fechar janela sem gate bloqueante, dívida em `DEBT.md`) ·
 `/keelson:verify-handoff` (fechar gate de tela remoto) ·
 `/keelson:continue` (retomar um slug de onde parou — fila do épico, wave interrompida

@@ -25,6 +25,22 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.226.0] — 2026-10-23
+
+Re-init: required
+
+Decision 4.488 (minor) — `/keelson:deploy` (human-only) builds the `/keelson:merge` queue from a Jira board column. External PR #4 by Tiego Torelli (@ttorelli7), merged with the author's commit preserved; the maintainer's corrections land on top in the same batch.
+
+### Added
+
+- **`/keelson:deploy`** (human-only): reads one status of the project's board (the `Fila de merge` line of the project map, by ID; `--status` overrides), leaves out issues flagged as impeded — their own flag or one inherited from the flagged parent epic — and lists them, matches each key to its branch by the ficha's `git.branchNaming` pattern (exact `<KEY>` for externally named branches), and runs the queue through the `/keelson:merge` contract into the current branch (`--into` overrides). Read-only on Jira; push, PR and the actual deploy stay human. Proposed and written by Tiego Torelli in PR #4.
+- **Project map**: the Etapas/Colunas table accepts a read-only `Fila de merge` line — the status `/keelson:deploy` reads; the sync never executes it.
+
+### Changed
+
+- **Jira stays best-effort, with one declared exception**: `/keelson:deploy` requires the connector — the board is its input, so an unavailable connector stops with a clear error instead of degrading. Protocol §0 owns the exception; the `CLAUDE.md` block, README and the wiki carry the nuance.
+- **`CLAUDE.md` block**: the human-only note lists `/keelson:deploy` and the Jira bullet names the exception — hence `Re-init: required`.
+
 ## [0.225.1] — 2026-10-23
 
 Re-init: none

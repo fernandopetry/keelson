@@ -160,6 +160,11 @@ são testadas juntas antes do PR — em vez de o conflito só aparecer na hora d
 PR, ele é resolvido e provado ali. O comando nunca dá push nem mergeia para a branch
 principal; isso continua com você.
 
+`/keelson:deploy` (também só você invoca) é o ajudante desse merge: lê a coluna de
+deploy do seu board Jira, deixa de fora issue com flag de impedimento, casa cada key
+com a branch dela e passa a fila inteira pelo mesmo `/keelson:merge`. Apesar do nome,
+ele não publica nada — o deploy de verdade continua seu.
+
 ### Ele commita sem me perguntar?
 
 No ciclo (`/keelson:auto`, `/keelson:implement`), sim — commit faz parte da entrega. Em
@@ -212,6 +217,10 @@ não tudo de uma vez.
 Não. A integração vem **desligada** e é *best-effort* — nunca bloqueia o ciclo. Sem Jira,
 nada muda no funcionamento. E dá para ligar depois, sem refazer a adoção: `/keelson:init jira`
 configura só a integração (descobre tipos, workflow e monta o mapa do projeto).
+
+A única exceção é o `/keelson:deploy`: como o board é o insumo dele, sem conector ele
+para com erro claro em vez de seguir — e precisa da linha `Fila de merge` no mapa do
+projeto (ou de `--status=`) para saber que coluna ler.
 
 ### Trabalho fora do ciclo aparece no Jira?
 

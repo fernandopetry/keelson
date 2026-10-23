@@ -108,7 +108,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:init` | Interactive setup — detects the stack, writes the ficha, the `CLAUDE.md` block and an `AGENTS.md` pointer (created only if absent), checks the security tooling (`gitleaks`, the ecosystem's CVE auditor) and offers to install what is missing — recommended, never required; `init jira` scopes the run to the Jira integration (enable it late, re-measure a changed board) |
 | `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
 | `/keelson:merge` † | Merge one or more branches into the current working branch, one at a time — one merge commit per branch; a clean branch (no conflict, no semantic-reconciliation finding, green suite) commits directly with no agent dispatched, otherwise the developer resolves only the triggered files and the code-reviewer audits only that resolution's diff (push, remote merge, PR and deploy stay human) |
-| `/keelson:deploy` † | Read a Jira board column (`--status`, default "To Deploy"), match each issue key to the branch with the exact same name (local or `origin/`), skip issues flagged as impeded — their own flag or one inherited from the flagged parent epic — and delegate the whole queue to `/keelson:merge` (`--into` defaults to `master`); it only decides which branches enter the queue — the Jira connector is mandatory here, the read is JQL-only (never creates or transitions a card), and push, PR and the actual deploy stay human |
+| `/keelson:deploy` † | Build the `/keelson:merge` queue from the board's deploy column — the status comes from the project map's `Fila de merge` line (`--status` overrides), issues flagged as impeded (their own flag or one inherited from the flagged parent epic) are left out and listed, each key is matched to its branch by the ficha's `git.branchNaming` pattern (exact `<KEY>` for externally named branches), and the queue runs through the merge contract into the current branch (`--into` overrides); it only decides which branches enter — the Jira connector is mandatory here, the read is JQL-only (never creates or transitions a card), and push, PR and the actual deploy stay human |
 | `/keelson:jira-sync` | Reconcile a slug — or a single SPEC subtree — with Jira via the Atlassian MCP connector; `--phase start-dev\|finish-dev` walks the tree across the board — idempotent, best-effort (optional) |
 | `/keelson:review` † | Review an arbitrary diff (working tree, last commit, N commits, range, branch) against the keelson doctrine via independent reviewers; on your OK, dispatches the fix to the developer agent and re-reviews — for code that arrived without an SDD artifact |
 | `/keelson:audit` † | On-demand dependency audit against known vulnerabilities (CVE/NVD); `full` adds hygiene (outdated, abandoned, licenses) |
@@ -261,7 +261,9 @@ an honest pending item.
 If your team runs work on Jira, keelson can mirror the SDD cycle onto it — a SPEC becomes
 an issue (or Epic), each **feature** (a QA-testable flow declared in the SPEC, `FEAT-*`)
 becomes a Story, its TASKs become sub-tasks, and progress flows back as comments (or
-transitions). It's **off by default** and **best-effort**: it never blocks the cycle.
+transitions). It's **off by default** and **best-effort**: it never blocks the cycle. The one
+declared exception is `/keelson:deploy`, whose input *is* the board: there the connector is
+mandatory and an unavailable one stops with a clear error.
 
 - **Connector, not tokens.** It works through the **Atlassian MCP connector** — no API token,
   no SDK, nothing in `keelson.local.json`.
@@ -424,11 +426,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.225.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.226.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: `scripts/legacy-move.sh` undoes a failed move correctly when a legacy file name has a space, the `code-scout` description names every command that dispatches it, and `/keelson:verify-handoff` has its section in the method guide.
+New in this release: `/keelson:deploy` (human-only) builds the `/keelson:merge` queue from a Jira board column — contributed by Tiego Torelli in the first external PR merged with its author's commit preserved; the column and the flag field come from the project map, the branch pattern from the ficha.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

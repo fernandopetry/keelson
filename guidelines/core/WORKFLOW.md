@@ -158,7 +158,8 @@ brief, nunca contra a própria opinião; sem brief (fluxo avulso) ou no `/keelso
 mergear para a branch principal e deployar — a autonomia termina no push da branch de
 trabalho. Exceção declarada no dono da regra (`sdd-conventions.md`, item "Merge, PR e
 deploy são humanos"): o `/keelson:merge`, invocado pelo Diretor, mescla branches para
-dentro da branch de trabalho corrente — nunca para a principal.
+dentro da branch de trabalho corrente — nunca para a principal; o `/keelson:deploy`,
+também do Diretor, só monta a fila desse merge a partir do board Jira (4.488).
 
 ### Regras do modelo de tarefas
 

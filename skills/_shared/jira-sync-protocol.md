@@ -18,7 +18,9 @@ projeto · §4 idempotência · §5 modos create/link · §6 issue da SPEC (§6.
 - **Nunca bloqueia**: ferramentas do conector Atlassian indisponíveis (não autorizado,
   ambiente headless) **ou** qualquer chamada MCP que falhe (permissão, campo obrigatório,
   transição inexistente) → **avisa e segue** (com o rastro abaixo). O ciclo SDD nunca trava
-  por causa do Jira.
+  por causa do Jira. **Exceção declarada (4.488)**: `/keelson:deploy` (humano-only) tem o
+  board como **input** — sem conector não existe fila; ele faz a mesma prova abaixo e, em
+  vez de seguir, **para com a devolutiva literal da chamada**. Nada do ciclo depende dele.
 - **Indisponibilidade é provada, não presumida** (mesma régua da verificação de tela,
   decisão 4.26). Antes de concluir que o conector não está disponível: **carregue as
   ferramentas** — num harness que as entrega *deferred*, elas não aparecem na lista até serem
@@ -138,6 +140,11 @@ registro de execução, não config — não pertence ao arquivo.*
     Done` (com o 3º nível ativo, §6.1; Story implícita/isolada: mesma semântica com a
     SPEC/TASK no lugar da FEAT) — marco informado **na Story**; por ficar tipicamente além
     do teto, na prática vira comentário (§9).
+  - `Fila de merge | story | <coluna> | <status-id> | leitura do /keelson:deploy` — linha
+    **só de leitura** (4.488): o `/keelson:deploy` lê as issues do projeto nesse status
+    (qualquer nível, o JQL não filtra por tipo) para montar a fila do `/keelson:merge`;
+    nenhum gancho do sync a executa nem move card por ela. Ausente → o comando exige
+    `--status=`.
 
   **O catálogo de gatilhos é fechado**: as únicas linhas que o sync **executa** são os quatro
   marcos canônicos acima e as linhas de fase (§13). O mapa é editado por humano e acumula o

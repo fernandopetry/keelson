@@ -97,7 +97,8 @@ revezamento parar e como acompanhar.
 **A autonomia termina nos commits.** Abrir PR, mergear para a branch principal e
 publicar são atos seus. (Exceção que você mesmo invoca: `/keelson:merge` traz branches
 para dentro da sua branch de trabalho atual, resolvendo conflito e teste quebrado no
-caminho — nunca mergeia para a principal.)
+caminho — nunca mergeia para a principal; `/keelson:deploy` monta essa fila a partir da
+coluna de deploy do seu board Jira.)
 
 ```
 /keelson:integrate PLAN-001

@@ -134,7 +134,9 @@ estimativa e o par 1:1 com a SPEC, que é a trilha de auditoria da aceitação.
 
 **A autonomia termina nos commits.** PR, merge para a branch principal e deploy são
 seus. A única exceção é o comando `/keelson:merge`, que você mesmo invoca: ele traz
-branches para dentro da sua branch de trabalho atual — nunca para a principal.
+branches para dentro da sua branch de trabalho atual — nunca para a principal. O
+`/keelson:deploy` só monta a fila desse merge a partir do board Jira — o nome é da
+coluna, não do ato.
 
 ## Dimensionamento de demanda
 

@@ -244,26 +244,7 @@ mergeia para a branch principal remota, nunca abre PR, nunca faz deploy.
 
 Detalhe completo (flags, fluxo, regras): `commands/merge.md`.
 
-### 3.27 `/keelson:deploy` — fila de merge a partir de um board Jira (humano-only)
-
-Lê uma coluna de um board Jira (`<board>` = project key; `--status`, default
-`To Deploy`) via `searchJiraIssuesUsingJql` e monta a fila de branches para o
-`/keelson:merge` — ele decide **quais branches entram**, e só isso: todo o merge
-(dry-run de conflito, reconciliação semântica, suíte, commit por branch, corte da fila)
-é do `/keelson:merge`, invocado uma vez com a fila inteira e o destino
-(`--into=<branch-destino>`, 2º posicional, default `master`). O casamento issue→branch
-é **nome exato** (issue `X-123` ⇔ branch `X-123`, local ou `origin/`), sem heurística;
-issue sem branch é reportada à parte, sem abortar o lote. Issue com flag de impedimento
-— própria ou herdada de épico-pai flagado (campo `parent` da hierarquia do Jira Cloud,
-fallback `Epic Link` em instância clássica) — fica fora da fila, listada para o Diretor
-resolver no Jira. Diferente do sync (best-effort), aqui o conector é **obrigatório**:
-indisponível → erro claro e fim. Leitura pontual, nunca cria/transiciona card; fila
-vazia reporta "nada a mesclar" e para. Push, PR, merge remoto e o deploy de fato
-continuam humanos (decisão 4.463).
-
-Detalhe completo (flags, etapas, output): `commands/deploy.md`.
-
-### 3.28 `/keelson:warroom` — janela sem gate bloqueante, com dívida registrada (humano-only)
+### 3.27 `/keelson:warroom` — janela sem gate bloqueante, com dívida registrada (humano-only)
 
 Abre (`on <motivo>`) ou fecha (`close`) uma janela em que velocidade vale mais que rigor:
 na janela, nenhum gate bloqueia (o `code-reviewer`, o `qa` e os validators não são
@@ -282,7 +263,7 @@ merge e deploy continuam humanos. Régua e contrato do `DEBT.md`:
 
 Detalhe completo: `commands/warroom.md`.
 
-### 3.29 `/keelson:version` — qual keelson esta sessão executa
+### 3.28 `/keelson:version` — qual keelson esta sessão executa
 
 Mostra a versão **carregada nesta sessão** (lida do `plugin.json` da raiz do plugin, com a
 versão do Quality Charter) e de onde a árvore veio — cache da CLI, repositório de
@@ -298,7 +279,7 @@ Detalhe completo: `commands/version.md`.
 
 ---
 
-### 3.30 `/keelson:pause` — parar num ponto seguro, com a pausa commitada (humano-only)
+### 3.29 `/keelson:pause` — parar num ponto seguro, com a pausa commitada (humano-only)
 
 A forma mecânica do "pare em um lugar seguro": só o Diretor invoca, e só com um run em
 andamento nesta sessão (sessão livre não tem o que pausar; warroom fecha pelo `close`).
@@ -366,6 +347,26 @@ handoff pendente. `--dry-run` imprime alvo e plano; `--keep-worktree` preserva o
 branch (checkout detached).
 
 Detalhe completo (flags, fluxo, regras): `commands/verify-handoff.md`.
+
+### 3.32 `/keelson:deploy` — fila do merge a partir do board Jira (humano-only)
+
+Monta a fila do `/keelson:merge` a partir da **coluna de deploy** do board Jira e a
+mescla **pelo contrato dele** (`commands/merge.md`, Etapas 0–7, executado uma vez com a
+fila inteira — um comando humano-only não invoca outro; ele lê o contrato). Decide só
+**quais branches entram**: a coluna é a linha `Fila de merge` da seção Etapas/Colunas do
+mapa do projeto (status por ID; `--status=` sobrepõe), o projeto é `jira.projectKey` da
+ficha (posicional sobrepõe), issue com flag de impedimento — própria ou herdada de
+épico-pai flagado (`parent`, ou `Epic Link` em instância clássica) — fica fora e listada,
+e cada key casa com a branch pelo padrão `git.branchNaming` da ficha (`tracker-key` →
+`feat/<KEY>-…` ancorado na key; `slug`/ausente → nome exato `<KEY>`, convenção externa).
+Issue sem branch ou ambígua é reportada à parte, sem abortar o lote. Destino é a branch
+corrente, salvo `--into=`. **Aqui o conector Jira é obrigatório** — exceção declarada no
+§0 do protocolo (4.488): indisponível, ou `jira.enabled: false`, → erro claro e fim.
+Leitura pontual, nunca cria/transiciona card; fila vazia reporta "nada a mesclar" e para.
+O nome fala da coluna do board: push, PR, merge remoto e o deploy de fato continuam
+humanos (exceção declarada no `sdd-conventions.md`, 4.488).
+
+Detalhe completo (flags, etapas, output, gotchas): `commands/deploy.md`.
 
 ## 4. Skills
 

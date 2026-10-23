@@ -690,6 +690,24 @@ trata como achado e escala a você; quem decide é sempre o humano.
 
 ## Jira
 
+### O `/keelson:deploy` parou dizendo que o conector é obrigatório
+
+É o comportamento esperado, e é a única parte do keelson em que o Jira não é
+*best-effort*: o board é o insumo da fila, então sem conector não há o que montar. A
+mensagem traz a resposta literal da sondagem (ex.: `atlassianUserInfo: not
+authorized`). Autorize o conector Atlassian na sessão e rode de novo; nada foi
+buscado nem mesclado. Se a mensagem fala de `jira.enabled`, a integração está
+desligada na ficha — `/keelson:init jira` liga.
+
+### A fila do `/keelson:deploy` veio vazia, mas o board tem cards na coluna
+
+Três causas, todas declaradas no output: a coluna lida não é a que você esperava
+(confira a linha `Fila de merge` no mapa do projeto, ou passe `--status=`); as issues
+estão com flag de impedimento (própria ou herdada do épico) e aparecem na seção
+"Excluídas por flag"; ou nenhuma branch casa com o padrão da ficha
+(`git.branchNaming`: `tracker-key` espera `feat/<KEY>-…`, `slug` espera o nome exato
+`<KEY>`) — elas aparecem em "Sem branch correspondente".
+
 ### O ciclo terminou e o Jira não soube de nada
 
 A sincronização é *best-effort*: ela nunca bloqueia o ciclo, mas **sempre registra**. Uma
