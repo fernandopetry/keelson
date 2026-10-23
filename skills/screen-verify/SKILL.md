@@ -28,6 +28,10 @@ username, password}}` + `screenVerify.defaultRealm` — o arquivo real é lido e
   verificação feita. "Não tenho as credenciais" nunca vira "está ok".
 - **Nunca** ecoe a senha em log, relatório, screenshot de terminal ou mensagem. Use-a só no
   preenchimento do campo de login.
+- **Leitura do arquivo negada** pela plataforma (permissão do projeto ou do harness) é
+  `permissao_ambiente` (decisão 4.133): registre a negativa literal e siga a rota do §8.1 do
+  `handoff-protocol.md` — o Diretor executa ou autoriza. Ler o arquivo por outro canal
+  (shell, `cat`) é contorno, nunca saída.
 
 ### Seleção do realm
 
@@ -93,6 +97,11 @@ usuário e senha com os valores de `login` do **realm alvo** via `browser_fill_f
 rota de login**. A sessão (cookie httpOnly) persiste no contexto; navegue então à tela alvo
 (`<baseUrl><rota>`). Roteiro com **mais de um realm** → conclua um realm, `browser_close`,
 e recomece o login no próximo, respeitando o isolamento acima.
+
+A credencial entra **só** por `browser_fill_form`/`browser_type` no campo do formulário.
+`browser_evaluate` e `browser_run_code` devolvem o código inteiro no output — credencial
+dentro deles é log (`guidelines/core/SECURITY.md`, *Security Logging & Alerting Failures*,
+decisão 4.236), mesmo quando o script "só preenche o campo".
 
 ## 3. Executar o roteiro (o que verificar)
 

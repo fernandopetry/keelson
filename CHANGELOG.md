@@ -25,6 +25,25 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.224.2] — 2026-10-22
+
+Re-init: none
+
+Decision 4.480 (patch) — screen-verify: the credential only ever goes through form filling; a denied read of `keelson.local.json` is `permissao_ambiente`, never a workaround.
+
+### Changed
+
+- `skills/screen-verify/SKILL.md` §2 Login names the channel: the DEV credential enters only
+  through `browser_fill_form`/`browser_type` in the form field. `browser_evaluate` and
+  `browser_run_code` echo the whole script in their output, so a credential inside them is a
+  log line under `SECURITY.md` (4.236) even when the script "only fills the field". A field
+  ledger recorded the password reaching the transcript in plain text through the
+  code-execution tool.
+- "Dados de acesso" gains the third situation next to file-absent/field-blank: a read of
+  `keelson.local.json` denied by the platform (project or harness permission) is
+  `permissao_ambiente` (4.133) — record the literal denial and follow handoff-protocol §8.1;
+  reading the file through another channel (shell) is a workaround, not an exit.
+
 ## [0.224.1] — 2026-10-13
 
 Re-init: none

@@ -423,11 +423,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.224.1` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.224.2` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the 0.223.0 smoke run (72/77 facts) closed two calibration gaps — `scripts/scope-scan.sh` finds the promise in existing SPECs before a new SPEC is opened, and `ledger.sh archive --keep` only preserves `pendencia`/`tracker` (4.479); `artifact-lint.sh --fix` repairs the purely mechanical lint classes in TASKs before the scribe round (4.478); `scripts/close-task.sh` is the canonical writer of a TASK closure (4.476). Previously: the window log is written at every `SubagentStop`, so unattended sessions (`claude -p`) report cost per role (4.474). Previously: a field intake over the first real relay-run epic — unattended sessions no longer wait on a clock window or a background agent, the gate 9 roadmap measures its gates at the source the step reads, `/keelson:init` offers `quality.worktreeBootstrap`, and `lessons.sh` keeps the most-confirmed lessons under the byte cap (4.473). Previously: `/keelson:auto-epic` resolves the slug on disk through the engine (`epic-run.sh launch <slug>`), the epic queue parser honours `\|` inside a cell and never elects a slice past a non-parseable row, and pre-flight refusals carry the exact `aviso` (slice and reason).
+New in this release: the screen-verify skill names the credential channel — the DEV password only ever enters through form filling (code-execution tools echo their script), and a read of `keelson.local.json` denied by the platform is `permissao_ambiente`, never a workaround.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see
