@@ -1,6 +1,6 @@
 ---
 name: harness-audit
-description: "Ferramenta do MANTENEDOR (fora do pacote — decisão 4.182): auditoria recorrente da doutrina do keelson (CLAUDE.md, commands/, agents/, skills/, guidelines/, conventions/, templates/) em duas camadas — ponteiros mecânicos via scripts/check-refs.sh e juízes duplos cegos de poda com a régua 4.160 e plants de controle (4.186). Report-only: aplicar corte é leva própria. Ativar quando o Diretor pedir auditoria do harness, poda/simplificação da doutrina, ou revisão de redundância/utilidade das instruções."
+description: "Audita a doutrina do keelson (CLAUDE.md, commands/, agents/, skills/, guidelines/, conventions/, templates/) em duas camadas — ponteiros mecânicos via scripts/check-refs.sh e juízes duplos cegos de poda com a régua 4.160 e plants de controle (4.186). Report-only: aplicar corte é leva própria. Ativar quando o Diretor pedir auditoria do harness, poda/simplificação da doutrina, ou revisão de redundância/utilidade das instruções. Ferramenta do MANTENEDOR (fora do pacote — decisão 4.182)."
 ---
 
 # Skill: harness-audit

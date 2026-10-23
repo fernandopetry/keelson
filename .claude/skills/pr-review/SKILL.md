@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: "Parecer de PR recebida no repo do keelson — ferramenta do MANTENEDOR (fora do pacote, 4.182): fatos mecânicos, impacto 4.181, régua do Charter, veredito mergear (escada 4.268)/absorver/parcial/recusar. Ativar quando chegar PR para revisão."
+description: "Parecer de PR recebida no repo do keelson: fatos mecânicos, impacto 4.181, régua do Charter, veredito mergear (escada 4.268)/absorver/parcial/recusar. Ativar quando chegar PR para revisão. Ferramenta do MANTENEDOR (fora do pacote — decisão 4.182)."
 ---
 
 # Skill: pr-review

@@ -1,6 +1,6 @@
 ---
 name: idea-forge
-description: "Ferramenta do MANTENEDOR (fora do pacote — decisão 4.182): refina uma ideia de melhoria do keelson ANTES de virar leva de desenvolvimento — parte da ideia crua do Diretor, esclarece por perguntas dirigidas, conecta com o que já existe (decisões, inbox, learning-log, doutrina) e entrega um mini-brief julgado, pronto para virar leva ou ser descartado com motivo. Report-only: não edita doutrina nem código. Ativar quando o Diretor trouxer uma ideia, hipótese ou vontade de melhoria do keelson ainda sem forma — 'e se o keelson…', 'queria que…', 'faz sentido…?'."
+description: "Refina uma ideia de melhoria do keelson ANTES de virar leva de desenvolvimento — parte da ideia crua do Diretor, esclarece por perguntas dirigidas, conecta com o que já existe (decisões, inbox, learning-log, doutrina) e entrega um mini-brief julgado, pronto para virar leva ou ser descartado com motivo. Report-only: não edita doutrina nem código. Ativar quando o Diretor trouxer uma ideia, hipótese ou vontade de melhoria do keelson ainda sem forma — 'e se o keelson…', 'queria que…', 'faz sentido…?'. Ferramenta do MANTENEDOR (fora do pacote — decisão 4.182)."
 ---
 
 # Skill: idea-forge

@@ -1,6 +1,6 @@
 ---
 name: skill-standards
-description: "Ferramenta do MANTENEDOR (fora do pacote — decisão 4.182): valida skill, comando ou agent do keelson contra as boas práticas de autoria de Agent Skills da Anthropic — descrição o-quê+quando em 3ª pessoa, corpo <500 linhas, progressive disclosure de 1 camada, default com escape hatch, sem informação datada. Mantém digest local da doc oficial e o re-busca quando passa de 30 dias. Ativar quando uma skill/comando/agent for criado ou editado, ou quando o Diretor pedir verificação de boas práticas de autoria."
+description: "Valida skill, comando ou agent do keelson contra as boas práticas de autoria de Agent Skills da Anthropic — descrição o-quê+quando com o caso de uso na 1ª frase, corpo <500 linhas, progressive disclosure de 1 camada, default com escape hatch, gotchas no corpo, sem informação datada. Mantém digest local da doc oficial e o re-busca quando passa de 30 dias. Ativar quando uma skill/comando/agent for criado ou editado, ou quando o Diretor pedir verificação de boas práticas de autoria. Ferramenta do MANTENEDOR (fora do pacote — decisão 4.182)."
 ---
 
 # Skill: skill-standards
@@ -21,6 +21,10 @@ A régua vive em `references/anthropic-best-practices.md`, que abre com uma linh
    re-busque as fontes com WebFetch:
    - `https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices`
    - `https://code.claude.com/docs/en/skills`
+   - `https://agentskills.io/specification` e as páginas de `skill-creation/`
+     (`best-practices`, `optimizing-descriptions`, `evaluating-skills`, `using-scripts`)
+     — padrão aberto que a doc do Claude Code declara seguir e para onde remete a
+     parte de avaliação; o índice `https://agentskills.io/llms.txt` lista página nova.
 2. Reescreva o digest com o que a doc **diz hoje** (não acumule versões — o digest é
    espelho, não changelog) e atualize a linha `fetched:`.
 3. Item da régua que **mudou** desde o digest anterior → destaque no relatório da rodada:
@@ -50,22 +54,39 @@ Cheque por comando, cite a saída como fato:
 Para cada artefato, veredito **por item** — `ok` ou desvio com proposta concreta:
 
 1. **Descrição dispara certo**: diz **o quê** (ações concretas) e **quando** ativar
-   (gatilhos), em **3ª pessoa**; termos-chave que o pedido real do usuário usaria.
-   Vaga ("ajuda com X") ou em 1ª pessoa é desvio.
+   (gatilhos), em **3ª pessoa** ou imperativo ao agente ("Use quando…"), na **intenção
+   do usuário** — não na mecânica interna — com os termos-chave que o pedido real usaria,
+   inclusive quando ele não nomeia o domínio. **Caso de uso principal na 1ª frase**: a
+   listagem trunca a description e, estourado o orçamento, descarta inteira a das skills
+   menos usadas (números no digest); marcador de escopo vem depois. Vaga ("ajuda com
+   X"), em 1ª pessoa ou que descreve a mecânica é desvio. Artefato que o modelo invoca
+   sozinho prova com o **teste de gatilho** (Adaptações → *Avaliação*).
 2. **Concisão**: o corpo assume o que o modelo já sabe; frase que não muda comportamento
-   vs. o default é no-op (mesma régua 4.160 — deletar, nunca encurtar).
+   vs. o default é no-op (mesma régua 4.160 — deletar, nunca encurtar). Pergunta por
+   frase: "o agente erraria sem ela?".
 3. **Grau de liberdade calibrado**: operação frágil/sequência obrigatória → instrução
-   exata; espaço aberto → instrução de alto nível. Desvio típico: script exato onde
-   cabia princípio, ou vice-versa.
+   exata; espaço aberto → instrução de alto nível, onde o **motivo** em meia frase vale
+   mais que diretiva rígida (limite: Adaptações → *Porquê tem dono*). Desvio típico:
+   script exato onde cabia princípio, ou vice-versa.
 4. **Default + escape hatch**: uma ferramenta/caminho padrão nomeado, alternativa só com
    gatilho explícito — nunca menu de equivalentes.
-5. **Progressive disclosure**: corpo como índice pontudo; detalhe longo em arquivo
-   auxiliar referenciado, não inline.
+5. **Progressive disclosure**: corpo como índice pontudo, **essencial no topo** (a
+   compactação guarda só o início); detalhe longo em arquivo auxiliar referenciado com a
+   **condição de abertura** ("leia X se Y"), não inline nem "veja references/".
 6. **Sem informação datada** no fluxo principal (datas de corte, "a partir de versão X"
    em prosa viva) — legado vai para seção própria destacada do fluxo.
 7. **Terminologia consistente**: um termo por conceito, sempre o mesmo.
 8. **Scripts resolvem, não postergam**: tratamento de erro explícito, fallback gracioso,
-   constantes justificadas em comentário.
+   constantes justificadas em comentário; sem prompt interativo, `--help` curto, erro que
+   diz o que veio / o que era esperado / o que tentar, dado em stdout e diagnóstico em
+   stderr, saída de tamanho previsível.
+9. **Gotchas no corpo**: fato do ambiente que contraria a suposição razoável — a
+   correção que alguém teve de fazer ao agente — mora em seção própria do `SKILL.md`,
+   onde é lido antes da situação, não em auxiliar nem diluído em prosa. Gotcha que já
+   tem dono (lição, decisão, convenção) **aponta** para ele.
+10. **Procedimento, não declaração**: o artefato ensina *como abordar* a classe de
+    problema, não *o que produzir* para uma instância; detalhe específico (template de
+    saída, restrição) é bem-vindo quando o método em volta generaliza.
 
 ## Adaptações declaradas do keelson (prevalecem sobre a régua upstream)
 
@@ -76,10 +97,27 @@ Para cada artefato, veredito **por item** — `ok` ou desvio com proposta concre
 - **Dono único vence DRY-para-dentro**: quando a doc sugere embutir contexto na skill mas
   a regra já tem dono (`guidelines/`, `conventions/`), o artefato **aponta** para o dono
   (4.20) — duplicar para "ficar autocontido" é desvio aqui, não aderência.
+- **Porquê tem dono (4.442)**: a régua upstream pede explicar o motivo em instrução
+  flexível; no keelson o motivo mora na decisão, a uma referência de distância — o
+  artefato cita `(4.NNN)` e para. Motivo inline só quando muda o comportamento do modelo
+  (teste no-op, 4.160) e cabe em meia frase na mesma linha; caso, número medido,
+  reincidência, genealogia e comparação com versão anterior continuam na decisão —
+  `scripts/check-doctrine.sh` é o fato.
+- **Caso de uso na 1ª frase vale para ferramenta do mantenedor**: o marcador "Ferramenta
+  do MANTENEDOR (fora do pacote — 4.182)" continua na description — é o que diz ao leitor
+  que não é pacote — mas **depois** da frase de uso; marcador na abertura é desvio do
+  item 1.
 - **Avaliação**: o análogo do eval-driven da doc no keelson tem três camadas (4.304) —
   fixture/suíte (`scripts/tests/`) para o mecânico, `evals/` + `scripts/eval-run.sh` para
   efeito de doutrina em caso controlado A/B, e rodada de campo para o resto; harness novo
-  fora dessas camadas continua sendo desvio.
+  fora dessas camadas continua sendo desvio. O **teste de gatilho da description**
+  (upstream: ~20 queries, metade *near-miss* que não deve disparar; 3 rodadas; limiar
+  0,5; split treino/validação; escolha pela validação; sem copiar palavra de query falha)
+  é caso da camada `evals/` com grader `tool_used: Skill` no formato `claude plugin eval`.
+  Enquanto o `eval-run.sh` não grada invocação de ferramenta, a prova é rodada manual sob
+  demanda do Diretor (`claude -p "<query>" --output-format json`, filtrando `tool_use`
+  de `Skill`), declarada no relatório como manual; só para artefato que o modelo invoca
+  sozinho (`disable-model-invocation` dispensa); nunca em pre-commit/CI.
 
 ## Relatório
 
