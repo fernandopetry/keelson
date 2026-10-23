@@ -549,9 +549,12 @@ convergência, read-only) relê a SPEC contra o **estado final** do código e re
 nenhum gate por parte responde — o código realiza o que o texto pede, e só o que ele pede?
 
 - **Pacote**: SPEC (FRs/ACs) + DECs do PLAN + diff acumulado da branch + saída do
-  `graph.sh` sobre o slug. O grafo é o fato **estrutural** (cobertura FR→AC→TASK no
+  `graph.sh` sobre o slug nos modos `--check` e `--format=tables` (invocação e contrato
+  de exit: `graph-contract.md`). O grafo é o fato **estrutural** (cobertura FR→AC→TASK no
   texto) — cite-o, não o re-derive; a rodada acrescenta a camada **semântica** (a
-  realização no código).
+  realização no código). Texto de uso, saída vazia ou exit fora de 0/1 não é saída do
+  grafo: o pacote não se monta com ela — o invocador corrige a chamada antes de
+  despachar (4.486).
 - **Cada lacuna tem um de 4 tipos**, sempre com o source-ref (FR/AC/DEC citado):
   `ausente` — requisito sem realização alguma · `parcial` — existe mas não satisfaz o
   requisito por inteiro · `contradiz` — o código conflita com um FR ou uma DEC ·

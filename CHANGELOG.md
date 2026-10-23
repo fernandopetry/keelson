@@ -25,6 +25,20 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.225.0] — 2026-10-23
+
+Re-init: none
+
+Decision 4.486 (minor) — two field-intake items applied by the Diretor's order: a prescribed mutant must sit on a branch some input of the cited function reaches, and the convergence pack carries the exact `graph.sh` invocation.
+
+### Added
+
+- **`/keelson:tasks`, step 3 (gate 1 criteria)**: before prescribing an error reason or a mutant on a public function, the scribe checks by Grep that some input of that function reaches the branch the mutant changes — a guard or allowlist that the DEC orders first makes the branch unreachable and the mutant equivalent by construction. An unreachable branch is either tested as an exported pure function on its own or leaves the criterion.
+
+### Changed
+
+- **Convergence pack (`core/CODE-REVIEW.md`, `/keelson:auto` 2.4, `/keelson:integrate` 3.5)**: the `graph.sh` output in the pack is the `--check` and `--format=tables --plan MMM` output, with the exact `bash "${CLAUDE_PLUGIN_ROOT}/scripts/graph.sh" {docsRoot}/<slug> …` invocation written at both call sites. Without a mode the script prints its usage and exits 2; usage text, empty output or an exit outside 0/1 is not graph output and the `code-reviewer` is not dispatched until the call is fixed.
+
 ## [0.224.5] — 2026-10-23
 
 Re-init: none
