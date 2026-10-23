@@ -1,5 +1,5 @@
 ---
-description: Decompõe uma demanda grande (épico) em demandas independentes priorizadas via agente PM, grava o BRIEF épico e devolve a fila — cada demanda segue seu próprio ciclo SDD
+description: 'Decompõe uma demanda grande — épico, roadmap, iniciativa com 2+ capacidades — em demandas independentes priorizadas (agent pm), grava o BRIEF épico como fila viva e devolve a fila; cada uma segue seu ciclo SDD. Use quando o pedido não cabe numa SPEC'
 argument-hint: <pedido épico ou @arquivo> [--slug=<âncora>]
 ---
 
@@ -34,7 +34,7 @@ Invocar o agent `pm` com: o pedido épico **verbatim**, a lista dos slugs de `{d
 
 1. Apresente a decomposição **no corpo da conversa**, em tabela: prioridade · título · resumo · slug de destino · dependências · riscos. Inclua as `perguntas_ao_diretor` (cada uma com proposta + default).
 2. **Estratégia de branch (decisões 4.126/4.190)**: junto da tabela, proponha a estratégia — o default proposto vem de `git.branchStrategy` da ficha (campo ausente → `unica`): **`unica`** (todas as fatias empilhadas na branch do épico, sync com a main a cada fronteira de fatia, um PR ao final) · `por-fatia` (cada fatia na sua branch, regra 4.119 pura; o `/keelson:continue` passa a exigir merge da fatia da qual a próxima **depende** — 4.190). O Diretor pode sobrescrever o default épico a épico; a escolha entra na mesma confirmação abaixo e é **gravada no BRIEF**, que segue a única fonte de leitura. Nome da branch: dono em `sdd-conventions.md`, "Commit por marco" (com `git.branchNaming: "tracker-key"`, a key do Epic da Etapa 3 entra no nome — 4.192).
-3. **Só então** confirme via AskUserQuestion com pergunta **curta** (ex.: *"A decomposição acima está certa?"*, opções "Confirmo" / "Ajustar") — **nunca** embuta a tabela na pergunta (mesma lição do espelho, 4.14). Pediu ajuste → reapresente ajustada e confirme de novo.
+3. **Só então** confirme via AskUserQuestion com pergunta **curta** (ex.: *"A decomposição acima está certa?"*, opções "Confirmo" / "Ajustar") — **nunca** embuta a tabela na pergunta (4.14). Pediu ajuste → reapresente ajustada e confirme de novo.
 
 ## Etapa 3: persistir o BRIEF épico
 

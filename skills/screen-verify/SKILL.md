@@ -1,6 +1,6 @@
 ---
 name: screen-verify
-description: "Gate `screenVerify`: verificação visual autenticada em ambiente LOCAL via Playwright MCP (headless). Ativar para subir a app, LOGAR e inspecionar uma tela — screenshot, repro de bug ou fechar um HANDOFF. Credenciais DEV no keelson.local.json."
+description: 'Abre a app local, faz login (credenciais DEV) e inspeciona uma tela — screenshot, console, rede, mobile, dark mode — para provar que funciona, reproduzir bug ou fechar um HANDOFF; gate screenVerify. Ativar ao pedirem ver, testar ou printar uma tela'
 ---
 
 # Skill: screen-verify
@@ -8,7 +8,7 @@ description: "Gate `screenVerify`: verificação visual autenticada em ambiente 
 Você vai **autenticar e navegar** a aplicação do projeto em ambiente **local de
 desenvolvimento** para verificar uma tela — o gate `screenVerify`. Dados de acesso:
 `keelson.local.json` (abaixo); o **que** verificar: o roteiro (um `HANDOFF-*.md` ou o pedido
-do humano).
+do Diretor).
 
 **Fronteira de segurança (não-negociável):** só ambiente **local**. Dados locais são
 fictícios — logar localmente é seguro. **Nunca** aplique nada desta skill contra produção,
@@ -24,7 +24,7 @@ username, password}}` + `screenVerify.defaultRealm` — o arquivo real é lido e
 - **Formato flat legado** (`baseUrl` + `login` direto sob `screenVerify`, sem `realms`)
   segue válido: equivale a um único realm implícito.
 - **Arquivo ausente ou campo em branco** → **não invente credenciais nem URL**. Peça ao
-  humano que rode `/keelson:init` (ou preencha o `keelson.local.json`), e **não** declare a
+  Diretor que rode `/keelson:init` (ou preencha o `keelson.local.json`), e **não** declare a
   verificação feita. "Não tenho as credenciais" nunca vira "está ok".
 - **Nunca** ecoe a senha em log, relatório, screenshot de terminal ou mensagem. Use-a só no
   preenchimento do campo de login.
@@ -36,9 +36,9 @@ username, password}}` + `screenVerify.defaultRealm` — o arquivo real é lido e
 ### Seleção do realm
 
 O realm alvo vem do item do roteiro (campo **Realm** do `HANDOFF-*.md`) ou do pedido do
-humano. Na falta de indicação: realm único → use-o; vários → case a rota alvo com a
+Diretor. Na falta de indicação: realm único → use-o; vários → case a rota alvo com a
 `baseUrl` **mais específica** que a contenha. **Rota que não casa com nenhum realm →
-pergunte ao humano; nunca chute credencial** — logar com a conta errada mascara bug em vez
+pergunte ao Diretor; nunca chute credencial** — logar com a conta errada mascara bug em vez
 de revelar.
 
 ### Isolamento por realm (não-negociável)
@@ -69,7 +69,7 @@ O modo do browser (**headless por padrão**), o navegador e o diretório de saí
 configuração do servidor (`.mcp.json` do projeto ou escopo do usuário), escrita pelo
 `/keelson:init` — **não** são ajustáveis em runtime. Precisa ver a janela para investigar?
 Isso é reconfiguração, não improviso: rode `/keelson:init` de novo (ou tire o `--headless`
-do `.mcp.json`) e diga isso ao humano.
+do `.mcp.json`) e diga isso ao Diretor.
 
 ## 1. Subir/abrir o ambiente
 
@@ -107,8 +107,7 @@ decisão 4.236), mesmo quando o script "só preenche o campo".
 
 Chegando à tela com dados reais, escolha os passos relevantes:
 - **Erros de console** (`browser_console_messages`, `level: "error"`) e logs do server —
-  runtime/build quebrados. Sem `all: true` você vê só o que ocorreu desde a última
-  navegação; para o carregamento inteiro da sessão, passe `all: true`.
+  runtime/build quebrados (escopo por navegação: ver Armadilhas).
 - **Chamadas de rede** (`browser_network_requests`, `filter` por rota de API) — APIs que
   falharam; `browser_network_request` traz o corpo quando importar.
 - **Texto e estrutura** (`browser_snapshot`) — KPIs, listas, badges, estados vazios,
@@ -195,6 +194,6 @@ execução continuam nas pastas gitignored acima, e imagem nunca vira asserção
 
 Além da fronteira local-only e do sigilo da senha (acima): alterar permissões/senha, mesmo
 em dev, é **mudança sensível** — faça o mínimo para destravar a verificação e **diga ao
-humano o que alterou**. Detalhes de ambiente/domínio (subir serviços, fixtures, pegadinhas
+Diretor o que alterou**. Detalhes de ambiente/domínio (subir serviços, fixtures, pegadinhas
 de autorização) vivem em `guidelines/project/` — consulte-os quando o setup ou uma tela
 gated exigir.

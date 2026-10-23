@@ -1,5 +1,5 @@
 ---
-description: Reconstrói o INDEX.md de um slug do zero a partir dos artefatos (SPECs, PLANs, TASKs e TRIAGE legado), com backup do atual
+description: 'Reconstrói o INDEX.md de um slug quando ele sumiu, corrompeu ou não bate com os artefatos — regenera do zero a partir de SPECs, PLANs, TASKs e TRIAGE legado, com backup. Use ao refazer ou consertar o INDEX; mudança incremental é dos comandos próprios'
 argument-hint: <slug> [--dry-run]
 ---
 
@@ -9,7 +9,7 @@ Você é um Engenheiro de Documentação especialista em reconstruir o estado ca
 
 **Princípio inviolável 1**: a fonte da verdade são os arquivos individuais. O INDEX.md é derivado.
 
-**Princípio inviolável 2**: este comando **não modifica** nenhum SPEC, PLAN ou TASK — **nem o `HISTORY.md`** do slug (registro não derivável, decisão 4.414: não é lido, reescrito nem apagado). Apenas reconstrói o INDEX.
+**Princípio inviolável 2**: este comando **não modifica** nenhum SPEC, PLAN ou TASK — **nem o `HISTORY.md`** do slug (registro não derivável, decisão 4.414: não é lido, reescrito nem apagado — salvo o anexo verbatim da Etapa 0.5). Apenas reconstrói o INDEX.
 
 ## Input
 
@@ -39,8 +39,8 @@ INDEX.md deletado por engano, corrompido, divergente dos arquivos individuais (i
    - `{docsRoot}/<slug>/plans/PLAN-*.md`
    - `{docsRoot}/<slug>/tasks/TASK-*.md` (exceto TASK-*-INDEX.md)
    - `{docsRoot}/<slug>/legacy/TRIAGE-*.md` (slug migrado: fonte durável dos achados legados — o mais recente)
-4. Confirmar com usuário antes de prosseguir (a menos que `--dry-run`).
-5. **Arquivo do histórico dentro do INDEX antigo** (seção `## Arquivo do histórico` ou similar — `index-historico-arquivo-interno` do checker): antes de regenerar, anexe as entradas, verbatim e na ordem, ao `HISTORY.md` do slug (criando-o pelo esqueleto do index-contract.md se não existir) — é a única escrita fora do INDEX que este comando faz, e só de conteúdo que já existia. O INDEX novo não recria a seção; existindo `HISTORY.md`, leva a linha `**Histórico arquivado**: HISTORY.md` no cabeçalho.
+4. Confirmar com o Diretor antes de prosseguir (a menos que `--dry-run`).
+5. **Arquivo do histórico dentro do INDEX antigo** (seção `## Arquivo do histórico` ou similar — `index-historico-arquivo-interno` do checker): antes de regenerar, anexe as entradas, verbatim e na ordem, ao `HISTORY.md` do slug (criando-o pelo esqueleto do index-contract.md se não existir). O INDEX novo não recria a seção; existindo `HISTORY.md`, leva a linha `**Histórico arquivado**: HISTORY.md` no cabeçalho.
 
 ## Etapa 1: ler artefatos
 
@@ -156,4 +156,4 @@ Se `--dry-run`:
 
 ## Limites
 
-Não resolve inconsistências automaticamente, não promove status, e o backup cobre só o INDEX (SPECs/PLANs/TASKs/HISTORY.md nunca são tocados — princípio 2; a exceção declarada é o item 5 da Etapa 0, que só acrescenta ao HISTORY.md o que o INDEX antigo já carregava).
+Não resolve inconsistências automaticamente, não promove status, e o backup cobre só o INDEX (SPECs/PLANs/TASKs/HISTORY.md nunca são tocados — princípio 2).

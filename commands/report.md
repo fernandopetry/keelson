@@ -36,9 +36,7 @@ trabalhado nesta máquina → consulte
 `bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-dir.sh" <raiz> latest-for <slug>`; a casa
 anterior com eventos ativos em `ledger/` é fonte legítima deste relatório — **declare a
 origem** no cabeçalho (`reconstruído do ledger da sessão <id>, estado <estado do manifest>`)
-e leia os eventos de lá. O arquivamento da Etapa 3 então é sobre aquela casa (o `ledger.sh`
-da sessão corrente não a alcança — mova os arquivos consumidos para `reported-*/` dela à mão,
-mesmo formato).
+e leia os eventos de lá. O arquivamento da Etapa 3 é então sobre aquela casa (`archive --casa <casa>`).
 
 1. **Ledger de sessão** — `bash "${CLAUDE_PLUGIN_ROOT}/scripts/ledger.sh" <raiz> list` (mecanismo
    e formato: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`). Leia os

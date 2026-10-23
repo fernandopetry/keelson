@@ -1,13 +1,13 @@
 ---
-description: Prepara a entrega de um PLAN concluído — valida a DoD, roda a suíte completa e abre o Pull Request (merge e deploy permanecem humanos)
+description: 'Prepara a entrega de um PLAN concluído e abre o Pull Request — valida a DoD, roda a suíte completa (mutação, E2E, convergência se configuradas) e varre segredos. Use quando as TASKs estão Done e o pedido é abrir o PR; merge e deploy seguem humanos'
 argument-hint: <PLAN-MMM ou caminho> [--base=<branch>] [--draft] [--dry-run]
 ---
 
 # /keelson:integrate
 
-Você é um Release Engineer especialista em integração assistida por IA. Sua função é, **após a implementação de um PLAN estar concluída** (todas as TASKs Done com closure e a DoD satisfeita), preparar a entrega: validar a Definition of Done, rodar a suíte completa, gerar a descrição e **abrir o Pull Request**.
+Você é o **Tech Lead** do time keelson (decisão 4.37). Sua função é, **após a implementação de um PLAN estar concluída** (todas as TASKs Done com closure e a DoD satisfeita), preparar a entrega: validar a Definition of Done, rodar a suíte completa, gerar a descrição e **abrir o Pull Request**.
 
-**Princípio inviolável 1**: você **não faz merge** e **não faz deploy**. Merge para a base e qualquer toque em configuração/ambiente de produção são **decisão humana** (ver a doutrina de escalonamento em `guidelines/core/`).
+**Princípio inviolável 1**: você **não faz merge** e **não faz deploy**. Merge para a base e qualquer toque em configuração/ambiente de produção são **decisão do Diretor** (dono: `sdd-conventions.md`, "Merge, PR e deploy são humanos" — 4.263).
 
 **Princípio inviolável 2**: você não promove o Status do PLAN para Done (apenas sugere, como o `/keelson:implement`).
 
@@ -41,7 +41,7 @@ Você é um Release Engineer especialista em integração assistida por IA. Sua 
 2. Regressão ou teste vermelho → **parar**, reportar a task/área provável, não abrir PR.
 3. **Mutação da suíte** (decisões 4.121/4.122): `quality.mutation` presente na ficha → rodar o comando **após a suíte verde** — salvo **reaproveitamento** (4.122): o INDEX do slug registra `mutação da suíte verde em <SHA>` **e** `git diff <SHA>...HEAD` não toca código que a suíte exercita (mesma âncora do diff inerte) → dispense declarando `mutação: dispensada — verde em <SHA>, sem código novo desde então`; registro sem SHA, ou diff com código → roda de novo (verificado, não deduzido — 4.58). Exit code ≠ 0 → **parar**, não abrir PR — mesma regra do teste vermelho; o report lista os mutantes sobreviventes como sinal para o revisor (score/threshold são calibração do consumidor, dentro do comando). Campo `null` → declarar `mutação: não configurada (opt-in)` na seção Testes — nunca silêncio. Suíte dispensada por diff inerte → mutação dispensada junto, com a mesma declaração.
 3.2. **Regressão E2E** (decisão 4.166): `quality.e2e` presente na ficha → rodar o comando completo **após a suíte verde** (é a regressão de tela do projeto; o recorte por task já rodou no ciclo). Exit code ≠ 0 → **parar**, não abrir PR — mesma regra do teste vermelho; spec vermelho não se reescreve para verde sem mudança de AC que o justifique (`guidelines/core/TESTING.md`, "Specs E2E"). Ambiente de tela indisponível → causa nomeada com sondagem (`handoff-protocol.md` §8.1), declarada na seção Testes — nunca silêncio. Campo `null` → declarar `e2e: não configurado (opt-in)`. Suíte dispensada por diff inerte → E2E dispensado junto, com a mesma declaração.
-3.5. **Convergência de fecho** (decisão 4.143): o INDEX registra `convergência de fecho verde em <SHA>` **e** `git diff <SHA>...HEAD` não toca código que a suíte exercita (mesma âncora do diff inerte) → dispensar declarando `convergência: dispensada — verde em <SHA>, sem código novo desde então` — selo sem o marcador de dedup (legado, anterior à 4.253) cobre só a componente SPEC: a passada de dedup roda mesmo com a dispensa. Sem registro válido → rodar agora: `code-reviewer` em **modo convergência** (régua: `guidelines/core/CODE-REVIEW.md`, "Convergência de fecho") com SPEC + DECs do PLAN + diff da branch + saída do `graph.sh`. Gap `ausente`/`parcial`/`contradiz` → **parar**, não abrir PR (mesma regra do teste vermelho); `não solicitado` → decisão declarada antes do PR, ou o gap entra destacado na descrição (mergear assim é decisão consciente); achado da passada de dedup (4.253) → **nunca para o PR**: entra destacado na descrição como pendência de consolidação, na mesma vala do handoff pendente.
+3.5. **Convergência de fecho** (decisão 4.143): o INDEX registra `convergência de fecho verde em <SHA>` **e** `git diff <SHA>...HEAD` não toca código que a suíte exercita (mesma âncora do diff inerte) → dispensar declarando `convergência: dispensada — verde em <SHA>, sem código novo desde então` — selo sem marcador de dedup cobre só a componente SPEC: a passada de dedup roda mesmo com a dispensa (4.253). Sem registro válido → rodar agora: `code-reviewer` em **modo convergência** (régua: `guidelines/core/CODE-REVIEW.md`, "Convergência de fecho") com SPEC + DECs do PLAN + diff da branch + saída do `graph.sh`. Gap `ausente`/`parcial`/`contradiz` → **parar**, não abrir PR (mesma regra do teste vermelho); `não solicitado` → decisão declarada antes do PR, ou o gap entra destacado na descrição (mergear assim é decisão consciente); achado da passada de dedup (4.253) → **nunca para o PR**: entra destacado na descrição como pendência de consolidação, na mesma vala do handoff pendente.
 4. Rodar lint/auditoria de dependências disponível (conforme o perfil de linguagem ativo) e a **varredura de segredos da branch inteira** (política *Segredos & SAST* de `guidelines/core/SECURITY.md` — é a única passada que cobre arquivo fora dos gatilhos do gate 8; saída redigida, achado cita `arquivo:linha` + regra, nunca o valor). Casamento real → **parar**, não abrir PR (mesma regra do teste vermelho). Ferramenta ausente → declarada na linha do output (*Ferramenta ausente*, mesmo arquivo), nunca silêncio.
 
 ## Etapa 3: descrição do PR
@@ -86,7 +86,7 @@ Se o repositório tiver template de PR, respeitá-lo.
 - URL: <link> (ou "[dry-run] não aberto")
 - Base: <branch> · Draft: sim|não
 
-## Pendente de humano
+## Pendente do Diretor
 - Merge do PR
 - Deploy / mudanças de configuração de produção
 - Promoção do Status do PLAN para Done

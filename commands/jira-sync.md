@@ -1,5 +1,5 @@
 ---
-description: "Reconcilia um slug (ou uma SPEC dele) com o Jira via conector MCP Atlassian: cria/vincula épico, stories e sub-tasks, alinha o status e, com --phase (start-dev/finish-dev), move a árvore no quadro — idempotente (opcional, best-effort)"
+description: 'Reconcilia um slug (ou uma SPEC) com o Jira via conector MCP Atlassian — cria/vincula épico, stories e sub-tasks, alinha o status e, com --phase, move a árvore no quadro; idempotente, best-effort. Use quando o quadro está vazio ou desalinhado'
 argument-hint: <slug | PLAN-MMM | SPEC-NNN ou caminho da SPEC> [--dry-run] [--refresh-descriptions] [--phase start-dev|finish-dev]
 ---
 
@@ -154,5 +154,4 @@ sem tocar no Jira.
 
 Não cria PR nem faz merge/deploy; não altera SPEC/PLAN/TASK além das linhas `**Jira**:`
 (cabeçalho da SPEC, sob o heading da FEAT, closure da TASK); nunca bloqueia
-(best-effort — protocolo §0). Governança: decisões 4.22, 4.27, 4.28, 4.43, 4.53, 4.55,
-4.59, 4.60, 4.61 e 4.62 de `decisions.md`.
+(best-effort — protocolo §0).

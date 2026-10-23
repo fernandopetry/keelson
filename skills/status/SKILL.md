@@ -1,11 +1,11 @@
 ---
 name: status
-description: Resumo executivo do estado atual de um slug. Ativar quando perguntarem sobre estado, status, situação, progresso, o que está implementado ou em desenvolvimento, ou pedirem overview de um slug ou capacidade do sistema.
+description: 'Resume o estado atual de um slug — onde parou, o que está implementado ou em desenvolvimento, riscos, glossário, decisões irreversíveis; só lê. Ativar quando perguntarem estado, status, progresso ou overview de um slug ou capacidade do sistema'
 ---
 
 # Skill: status
 
-Produza um **resumo executivo** do estado de um slug, respondendo à pergunta específica do usuário.
+Produza um **resumo executivo** do estado de um slug, respondendo à pergunta específica do Diretor.
 
 **Princípio inviolável**: você **não modifica nenhum arquivo**. Apenas lê e sintetiza.
 
@@ -48,7 +48,7 @@ Produza um **resumo executivo** do estado de um slug, respondendo à pergunta es
 
 Componha você mesmo o resumo executivo em markdown, calibrado ao foco — sem template rígido. Pendência ou risco **reapresentado** segue a régua "lista reapresentada é lista medida" (dono: `docs/_meta/conventions/sdd-conventions.md`, decisão 4.237): item cuja fonte não foi conferida nesta rodada (INDEX estale acusado pelo `index-check.sh`, handoff não relido) sai marcado **`não medido`**, nunca como corrente. O que cada foco cobre:
 
-- **Visão geral**: resumo de 2–3 linhas do que a área faz hoje; capacidades por estágio (✅ implementadas · 🟡 em desenvolvimento, com PLAN-MMM e X/Y tasks Done · ⏸ especificadas, aguardando plan); próximo movimento sugerido; riscos ativos que merecem atenção (máx. 3); saúde do slug (contagens de SPECs/PLANs por status, decisões irreversíveis, termos do glossário, última atividade).
+- **Visão geral**: resumo de 2–3 linhas do que o slug faz hoje; capacidades por estágio (✅ implementadas · 🟡 em desenvolvimento, com PLAN-MMM e X/Y tasks Done · ⏸ especificadas, aguardando plan); próximo movimento sugerido; riscos ativos que merecem atenção (máx. 3); saúde do slug (contagens de SPECs/PLANs por status, decisões irreversíveis, termos do glossário, última atividade).
 - **`--focus=risks`**: riscos abertos do INDEX com mitigação + `Q-*` agregados das SPECs Approved + `TRISK-*` dos PLANs em desenvolvimento.
 - **`--focus=glossary`**: tabela do INDEX + inconsistências entre SPECs (termo definido de forma divergente, citando as SPECs).
 - **`--focus=in-progress`**: por PLAN em andamento — capacidade, tasks abertas, bloqueios, próximas tasks da wave atual.

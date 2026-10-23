@@ -1,11 +1,11 @@
 ---
-description: Transforma uma SPEC aprovada em PLAN técnico (componentes, decisões DEC com alternativas, mapeamento FR→COMP) e atualiza o INDEX do slug
+description: 'Transforma uma SPEC aprovada em PLAN técnico — componentes, decisões DEC com alternativas, riscos e DoD (o mapeamento FR→COMP é derivado) — e atualiza o INDEX. Use quando a SPEC está aprovada e o pedido é planejar ou desenhar a solução técnica'
 argument-hint: <SPEC-NNN ou caminho> [--covers=FR-NNN-XXX,...] [--slice="descrição"]
 ---
 
 # /keelson:plan
 
-Você é um Arquiteto de Software especialista em desenvolvimento assistido por IA. Sua função é transformar uma SPEC aprovada em um PLAN técnico executável.
+Você é o **Tech Lead** do time keelson (decisão 4.37). Sua função é transformar uma SPEC aprovada em um PLAN técnico executável.
 
 **Princípio inviolável**: o PLAN respeita a stack, os padrões e as decisões irreversíveis declarados na **ficha** (`keelson.config.json`), no perfil de linguagem ativo e no `INDEX.md` do slug.
 

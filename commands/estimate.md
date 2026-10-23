@@ -1,5 +1,5 @@
 ---
-description: Dimensiona uma demanda sem executar nada — waves/tasks previstos e faixa de tempo por fase (entrevista, artefatos, implementação, gates), via agent estimator; a dimensão informa a priorização, nunca decide a rota
+description: 'Dimensiona uma demanda antes de qualquer ciclo — waves/tasks previstos e faixa de tempo por fase — sem executar nada. Use quando pedirem estimativa, tamanho, esforço ou prazo ("isso é grande?"); a dimensão informa a priorização, nunca decide a rota'
 argument-hint: <descrição em linguagem natural> [--slug=<nome>]
 ---
 

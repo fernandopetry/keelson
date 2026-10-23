@@ -19,7 +19,7 @@ Você é o executor da **verificação de tela remota** (gate `screenVerify`): f
 
 | Arg/Flag | Uso |
 |---|---|
-| `[slug|branch]` | O que fechar. Sem argumento: varrer os worktrees e listar os HANDOFF `status: Pendente` para o humano escolher |
+| `[slug|branch]` | O que fechar. Sem argumento: varrer os worktrees e listar os HANDOFF `status: Pendente` para o Diretor escolher |
 | `--keep-worktree` | Não remover o worktree da branch. Em vez do checkout nomeado (Caminho B), usa `checkout origin/<branch>` (detached) para preservar o worktree |
 | `--dry-run` | Imprime o que faria (alvo, consolidação, itens a verificar) sem executar |
 
@@ -32,7 +32,7 @@ Você é o executor da **verificação de tela remota** (gate `screenVerify`): f
 3. **Base atualizada** (para as correções que possam surgir): `git -C <root> fetch origin`; se a base (`main`) está atrás → `git -C <root> pull --ff-only origin main`; divergida → relatar (não bloqueia, mas registre).
 4. **Resolver o alvo**:
    - **Com `[slug|branch]`**: localizar a branch e os `{docsRoot}/<slug>/handoffs/HANDOFF-*.md` com `status: Pendente`. Slug → a branch que carrega o trabalho (via `git worktree list`/`git branch`); branch → o slug sai do handoff que ela contém.
-   - **Sem argumento**: a lista `(worktree, branch, slug, HANDOFF-id, itens V* pendentes)` chega como fato — `bash "${CLAUDE_PLUGIN_ROOT}/scripts/handoff-scan.sh" --repo <root>` (4.154) — e o humano **escolhe** (via AskUserQuestion). Nenhum pendente → reportar e encerrar.
+   - **Sem argumento**: a lista `(worktree, branch, slug, HANDOFF-id, itens V* pendentes)` chega como fato — `bash "${CLAUDE_PLUGIN_ROOT}/scripts/handoff-scan.sh" --repo <root>` (4.154) — e o Diretor **escolhe** (via AskUserQuestion). Nenhum pendente → reportar e encerrar.
 5. **Branch salva no remoto**: `git -C <root> log origin/<branch>..<branch>` (e o `status` do worktree da branch) — nada pode se perder ao consolidar. Trabalho não pushado/uncommitado → **parar** e pedir commit+push antes.
 
 `--dry-run` para aqui, imprimindo alvo + plano.
@@ -69,12 +69,12 @@ Para cada `HANDOFF-*.md` pendente do alvo:
 ## Etapa 4: fechar o handoff (só com todos os itens ✅)
 
 1. Siga o **protocolo de conclusão do próprio handoff** (seção "6. Protocolo de conclusão" de cada HANDOFF — dono do formato: template §8.2 do `handoff-protocol.md`): status, INDEX (risco + Histórico), commit e push no `<root>`. As correções da Etapa 3 já foram em commits `fix(...)` próprios; se houve, reflita o estado no INDEX.
-2. **Parar aqui.** Não mergear.
+2. **Parar aqui.**
 
 ## Etapa 5: devolver o `<root>` e reportar
 
 1. Se a verificação **passou**: a branch está pronta para integrar. Aponte o próximo passo humano: **`/keelson:integrate <branch>`** (valida a DoD, roda a suíte e abre o PR). Não execute o merge.
-2. Ofereça devolver o `<root>` ao estado anterior se você o tirou da base (ex.: `git -C <root> checkout main`), conforme o humano preferir — sem apagar trabalho.
+2. Ofereça devolver o `<root>` ao estado anterior se você o tirou da base (ex.: `git -C <root> checkout main`), conforme o Diretor preferir — sem apagar trabalho.
 
 ## Output ao usuário
 

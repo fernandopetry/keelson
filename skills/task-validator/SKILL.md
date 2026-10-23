@@ -1,6 +1,6 @@
 ---
 name: task-validator
-description: "Valida TASKs SDD (TASK-*.md do projeto): vínculo ao PLAN (ou brief avulso), FRs realizados, ACs cobertos, dependências sem ciclos, campos de closure. Ativar após /keelson:tasks (gate de qualidade) ou sob demanda. Reporta por severidade."
+description: 'Valida TASKs SDD (TASK-*.md do projeto): vínculo ao PLAN, FRs realizados, ACs cobertos, dependências sem ciclos, campos de closure. Ativar após /keelson:tasks ou quando pedirem conferência das tasks ("estão prontas?"). Reporta por severidade'
 ---
 
 # Skill: task-validator
@@ -52,8 +52,7 @@ acrescenta `task-overlap-fr` (FR realizado por 2+ TASKs do mesmo PLAN) e
 best-effort declarado: só caminho parseável ou nome solto com extensão de código conta,
 e ausência de achado não prova ausência de colisão; 4.326, 4.454).
 
-Cada achado entra como `**[artifact-lint]** SEVERIDADE check — detalhe`; degradação
-por resultado e cobertura mista seguem o §5 do graph-contract.md.
+Cada achado entra como `**[artifact-lint]** SEVERIDADE check — detalhe`.
 
 ### Permanecem seus (o script não computa):
 - Âncora presente: `Pertence a` (ciclo) **ou** `Brief` (avulso) — ERROR se nenhuma (exclusividade e existência chegam como fato — Etapa 2)

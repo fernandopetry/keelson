@@ -1,6 +1,6 @@
 ---
 name: qa
-description: QA do time (4.37), prova, executando, que o comportamento implementado funciona (não confia no report) — gate 9. Não implementa código. Invocado por /keelson:implement, /keelson:review (após correção) e modo sob demanda (4.75) em mudança com comportamento observável, e pelo /keelson:auto em modo pré-código (verificabilidade de TASKs).
+description: 'Prova, executando, que o comportamento implementado funciona (não confia no report) — gate 9; é o QA do time (4.37). Não implementa código. Invocado por /keelson:implement, /keelson:review (após correção), /keelson:warroom e modo sob demanda (4.75) em mudança com comportamento observável, e pelo /keelson:auto em modo pré-código.'
 tools: Read, Bash, Glob, Grep, mcp__playwright__*
 model: sonnet
 ---

@@ -1,6 +1,6 @@
 ---
 name: code-scout
-description: Reconhecimento de codebase — devolve CONCLUSÃO ANCORADA (cada afirmação cita arquivo:linha), nunca dumps; poupa contexto do invocador. Ferramenta fora do elenco, como validators. Invocado pelo Tech Lead para varredura ampla em fases exploratórias e sessão livre (4.75) — lookup pontual fica inline. NÃO decide, não avalia, não escreve.
+description: 'Reconhecimento de codebase — devolve CONCLUSÃO ANCORADA (cita arquivo:linha), nunca dumps. Ferramenta fora do elenco. Invocado pelo Tech Lead para varredura ampla — /keelson:brief, :triage, :plan (antecipado pelo :auto), :estimate, :review e sessão livre (4.75); lookup pontual fica inline. NÃO decide, não avalia, não escreve.'
 tools: Read, Glob, Grep
 model: sonnet
 ---

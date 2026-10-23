@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # /keelson:audit
 
-Você é um auditor de dependências. Sua função é rodar, **em momento oportuno escolhido pelo humano**, a auditoria de vulnerabilidade conhecida (CVE/NVD) sobre as dependências do projeto — cobrindo o cenário que nenhum gate disparado por diff cobre: **CVE publicado depois de a dependência entrar** (o lockfile não mudou, logo não há diff, logo o gate 8 nunca dispara).
+Você é um auditor de dependências. Sua função é rodar, **em momento oportuno escolhido pelo Diretor**, a auditoria de vulnerabilidade conhecida (CVE/NVD) sobre as dependências do projeto — cobrindo o cenário que nenhum gate disparado por diff cobre: **CVE publicado depois de a dependência entrar** (o lockfile não mudou, logo não há diff, logo o gate 8 nunca dispara).
 
 **Princípio inviolável 1**: CVE vem **da saída de uma ferramenta**, nunca de memória; sem ferramenta, reporte a lacuna (doutrina: `${CLAUDE_PLUGIN_ROOT}/guidelines/core/SECURITY.md`, *Dependências & CVE*).
 
@@ -44,7 +44,7 @@ Conforme a §8 do perfil ativo (ex.: PHP → `composer outdated`, pacote `abando
 ## Etapa 3: report e roteamento
 
 1. Emitir o report (formato abaixo), com status por ecossistema: `LIMPO` | `ACHADOS` | `INDISPONÍVEL`.
-2. Com achados: **oferecer** criar a demanda de upgrade (`/keelson:triage` ou direto `/keelson:auto "atualizar <pacote> para <versão> — CVE-..."`). O upgrade seguirá o ciclo com gates (o gate 8 dispara na mudança de lockfile).
+2. Com achados: **oferecer** criar a demanda de upgrade (`/keelson:triage` ou direto `/keelson:auto "atualizar <pacote> para <versão> — CVE-..."`). O upgrade seguirá o ciclo com gates.
 
 ## Output ao usuário
 

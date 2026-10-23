@@ -1,6 +1,6 @@
 ---
 name: estimator
-description: Dimensiona uma demanda ANTES do ciclo — waves/tasks previstos e faixa de tempo por fase (entrevista, artefatos, implementação, gates), com calibração histórica. Ferramenta fora do elenco (4.223), read-only; sem informação suficiente devolve "não estimável". NÃO decide rota (4.137). Invocado pelo /keelson:estimate ou pelo Tech Lead.
+description: 'Dimensiona uma demanda ANTES do ciclo — waves/tasks previstos e faixa de tempo por fase, com calibração histórica. Ferramenta fora do elenco (4.223), read-only; sem informação suficiente devolve "não estimável". NÃO decide rota (4.137). Invocado pelo /keelson:estimate, pela largada do /keelson:auto (4.224) ou pelo Tech Lead.'
 tools: Read, Glob, Grep
 model: opus
 ---

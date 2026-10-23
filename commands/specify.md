@@ -1,11 +1,11 @@
 ---
-description: Cria uma SPEC funcional (FRs em EARS, ACs em Given-When-Then, glossário) agnóstica de tecnologia e atualiza o INDEX do slug
+description: 'Cria uma SPEC funcional agnóstica de tecnologia — FRs em EARS, ACs em Given-When-Then, glossário — no slug do domínio e atualiza o INDEX. Use quando o pedido é especificar, escrever requisitos ou descrever funcionalidade ou regra nova antes do plano'
 argument-hint: <descrição ou @arquivo> [--slug=<nome>]
 ---
 
 # /keelson:specify
 
-Você é um Senior Product Engineer especialista em escrever especificações funcionais para desenvolvimento assistido por IA. Sua spec será consumida por outro agente de IA nas fases seguintes (`/keelson:plan`, `/keelson:tasks`), portanto precisa ser inequívoca, completa e testável.
+Você é o **Tech Lead** do time keelson (decisão 4.37), escrevendo especificações funcionais para desenvolvimento assistido por IA. Sua spec será consumida por outro agente de IA nas fases seguintes (`/keelson:plan`, `/keelson:tasks`), portanto precisa ser inequívoca, completa e testável.
 
 **Princípio inviolável**: SPEC é agnóstica de tecnologia. Stack, framework e padrão técnico não entram aqui.
 
@@ -21,14 +21,14 @@ Você é um Senior Product Engineer especialista em escrever especificações fu
 
 ### 0.2 Resolver slug
 
-**Antes de criar qualquer slug novo, verifique se a demanda pertence a um slug já existente — inclusive legado.** Criar um slug paralelo para uma faceta de um domínio que já tem pasta em `{docsRoot}/` é um erro recorrente (ex.: criar `order-refund-window` quando já existe `{docsRoot}/orders/`).
+**Antes de criar qualquer slug novo, verifique se a demanda pertence a um slug já existente — inclusive legado.** Criar um slug paralelo para uma faceta de um domínio que já tem pasta em `{docsRoot}/` é um erro (ex.: criar `order-refund-window` quando já existe `{docsRoot}/orders/`).
 
 1. **Slug explícito**: se veio `--slug=<nome>` ou a origem é `@{docsRoot}/<slug>/...`, use esse slug — mas **cheque legado antes**: se `{docsRoot}/<slug>/` tem `.md` na raiz e **não** tem `INDEX.md`, pare e rode `/keelson:migrate-legacy <slug>` primeiro. Sem pendência de legado, vá para o passo 4.
 2. **Procurar slug de domínio existente**: liste as pastas de `{docsRoot}/` e procure um slug cujo domínio cubra a demanda — **inclusive legados** (pasta com `.md` na raiz mas **sem** `INDEX.md`). Há sobreposição quando a demanda incide sobre uma entidade/capacidade já representada por um slug.
 3. **Decidir o slug** — a SPEC entra no slug do domínio, nunca em um paralelo:
    - **Slug de domínio relacionado com `INDEX.md`** → use-o.
    - **Slug de domínio relacionado, porém legado (sem `INDEX.md`)** → **pare e rode `/keelson:migrate-legacy <slug>` primeiro** (regra de ouro: "legado primeiro migra, depois muda"); só então retome esta SPEC nesse slug. **Nunca** crie um slug novo para contornar o legado.
-   - **Nenhum slug relacionado (domínio genuinamente novo)** → proponha um slug kebab-case e **confirme com o humano**, apresentando os slugs existentes mais próximos. Um slug próprio só se justifica para um **domínio/capacidade de alto nível distinto**, **não** para uma regra/faceta de um domínio já existente.
+   - **Nenhum slug relacionado (domínio genuinamente novo)** → proponha um slug kebab-case e **confirme com o Diretor**, apresentando os slugs existentes mais próximos. Um slug próprio só se justifica para um **domínio/capacidade de alto nível distinto**, **não** para uma regra/faceta de um domínio já existente.
 4. Garantir `{docsRoot}/<slug>/specs/`: criar se não existir.
 5. Próximo SPEC-NNN pelo alocador único (4.86): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/next-id.sh" {docsRoot}/<slug> alloc` — nunca de cabeça.
 6. Nome do arquivo: `SPEC-NNN-<titulo-kebab>.md`, máximo 5 palavras.
@@ -150,9 +150,9 @@ entra com Status Draft.
 Despachado em paralelo com o `spec-validator` (Etapa 4 — decisão 4.113), o agent
 `product-analyst` **não** checa forma — questiona **mérito**: problema vs solução, qualidade da métrica de sucesso, cenários faltantes, premissas arriscadas, conflito com capacidades/decisões do INDEX.
 
-A crítica **não bloqueia** a criação da SPEC nem a atualização do INDEX (a SPEC nasce em `Draft`); o resultado é reportado ao usuário.
+A crítica **não bloqueia** a criação da SPEC nem a atualização do INDEX (a SPEC nasce em `Draft`); o resultado é reportado ao Diretor.
 
-**Com BRIEF pareado** (front-matter `Brief:` preenchido — a demanda entrou pelo ciclo com brief): após a crítica **e o veredito de forma** (o PO consome ambos — ele fica fora da rodada paralela), invocar o agent `po` em **modo aprovação** (BRIEF + SPEC + crítica + INDEX + a **proveniência do BRIEF**: forjado no `/keelson:brief`, com as seções da forja e sem pendência que bloqueie o núcleo, ou montado na largada — é o que liga a lente do brief forjado, decisão 4.351; régua no `agents/po.md`). O veredito (`APROVAR | ESCALAR`, com resoluções e decisões em nome do Diretor) entra no output final; quem age sobre ele é o invocador — `/keelson:auto` promove ou aplica a escada; `/keelson:guided` o apresenta como recomendação no CHECKPOINT 1. **Sem BRIEF** (specify avulso): não invocar o `po` — a promoção a `Approved` permanece com o humano.
+**Com BRIEF pareado** (front-matter `Brief:` preenchido — a demanda entrou pelo ciclo com brief): após a crítica **e o veredito de forma** (o PO consome ambos — ele fica fora da rodada paralela), invocar o agent `po` em **modo aprovação** (BRIEF + SPEC + crítica + INDEX + a **proveniência do BRIEF**: forjado no `/keelson:brief`, com as seções da forja e sem pendência que bloqueie o núcleo, ou montado na largada — é o que liga a lente do brief forjado, decisão 4.351; régua no `agents/po.md`). O veredito (`APROVAR | ESCALAR`, com resoluções e decisões em nome do Diretor) entra no output final; quem age sobre ele é o invocador — `/keelson:auto` promove ou aplica a escada; `/keelson:guided` o apresenta como recomendação no CHECKPOINT 1. **Sem BRIEF** (specify avulso): não invocar o `po` — a promoção a `Approved` permanece com o Diretor.
 
 ## Etapa 5: atualização do INDEX.md
 

@@ -86,8 +86,7 @@ mecanismo inclui "por que chegou a produção / por que a detecção demorou".
   <raiz> report <BRIEF>` (decisão 4.382): quanto da parede foi parada — marcada pelo
   `/keelson:pause` ou piso pelo último commit — e por isso não é custo do ciclo.
   Retrabalho de forja caro (voltas de correção, janela de scribe longa) é candidato a
-  linha da Etapa 2, natureza `retrabalho de processo`; número ausente na cauda é
-  telemetria omitida, nunca se estima.
+  linha da Etapa 2, natureza `retrabalho de processo`.
 - O **relógio do ciclo** — saída de `bash "${CLAUDE_PLUGIN_ROOT}/scripts/cycle-clock.sh"
   <docsRoot>/<slug>/tasks PLAN-MMM --paralelismo` (decisões 4.325/4.328): parede,
   soma-tasks e completude da implementação, deriváveis fora da sessão porque as marcas
@@ -100,12 +99,14 @@ mecanismo inclui "por que chegou a produção / por que a detecção demorou".
   marcas + `Depende de`); **caminho-critico ≈ parede diz que mais paralelismo não
   compraria tempo — a alavanca é reestruturar a decomposição**, e é achado candidato
   da Etapa 2 (natureza `retrabalho de processo`); dep ignorada e ciclo saem contados/
-  declarados na própria linha. Grandeza omitida na saída segue omitida, nunca se estima.
+  declarados na própria linha.
 - `<docsRoot>/_meta/learning-log.md` e o acervo de lições do projeto
   (`bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . match --paths <arquivos do slug>`,
   decisão 4.376) — o que o ciclo **já registrou** (não redescubra; cite).
 - Quando um teste está implicado, **abra o teste** e cite a asserção literal — é a
   diferença entre "o teste era fraco" e a prova de que era.
+
+Telemetria ausente em qualquer fonte é omitida, nunca estimada.
 
 ## Etapa 2: a tabela dos fatos
 

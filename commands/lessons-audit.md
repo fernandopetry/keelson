@@ -1,5 +1,5 @@
 ---
-description: Audita o acervo de lições do projeto (guidelines/project/lessons/) — migra o lessons.md legado para um arquivo por lição, mede origem via git, testa validade, sedimento e absorção; revogar/reformular só com confirmação
+description: 'Audita e limpa o acervo de lições do projeto (guidelines/project/lessons/) — lição expirada, obsoleta, duplicada ou já absorvida; migra o lessons.md legado. Use ao revisar, podar ou migrar lições ou quando uma parecer velha; revoga só com confirmação'
 argument-hint: [--dry-run]
 ---
 
@@ -25,7 +25,7 @@ apagado em silêncio: todo veredito aplicado aparece no report.
 **Princípio inviolável 3 — fato ≠ juízo.** Data de origem, âncora morta e condição de
 `Validade` testável são fatos (git/grep) e degradam para `indeterminada` quando não
 mensuráveis — nunca viram invenção plausível. Sedimento e no-op são juízo — e juízo só
-se aplica com confirmação do usuário.
+se aplica com confirmação do Diretor.
 
 ## Input
 
@@ -174,7 +174,7 @@ não pela auditoria — aqui ela é insumo, não gatilho.
 - **Pendente de você**: <confirmação dos vereditos de juízo · commit das mudanças · nada>
 ```
 
-O commit das mudanças é seu (do usuário) — o comando edita, reporta e para.
+O commit das mudanças é seu (do Diretor) — o comando edita, reporta e para.
 
 ## Limites
 

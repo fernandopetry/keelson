@@ -25,6 +25,30 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.224.3] — 2026-10-23
+
+Re-init: none
+
+Decision 4.482 (patch) — first `/skill-standards` round over the shipped package: descriptions open with the use case and name every invoker, the human has one name, the "why" that already has an owner leaves the prose.
+
+### Changed
+
+- 30 descriptions rewritten (13 model-invoked commands, the 5 skills, 12 agents): the first
+  sentence is the action and the trigger, not the internal mechanics or the role label, and
+  every agent description lists every command that dispatches it — `/keelson:warroom` was
+  missing from all six gate agents, `/keelson:postmortem` from `agile-coach`, `/keelson:brief`
+  from `product-analyst` and `code-scout`, `/keelson:e2e-setup` from `security-engineer`, the
+  `/keelson:auto` kickoff from `estimator`. All stay under the `desc-guard` ceilings (250 for
+  commands/skills, 350 for agents); the three canonical lists of gates 8/10/11 are unchanged.
+- The person driving the session is "Diretor" throughout the shipped doctrine (was Diretor /
+  humano / usuário / dev); "usuário" now means the product's end user only. Every opening
+  persona is "Tech Lead do time keelson" (`specify`, `plan`, `integrate`, `tasks`, `refine`
+  carried roles outside the 4.40 cast). Gate 8 verdict wording is `REPROVADO` everywhere (was
+  also "REJEIÇÃO IMEDIATA").
+- Duplicated rules inside one file and genealogy glued to a decision citation removed from
+  23 commands, 4 skills and 7 agents — the rule cites `(4.NNN)` and stops (4.442). No
+  behavior change: only deletions, reorderings and term swaps.
+
 ## [0.224.2] — 2026-10-22
 
 Re-init: none

@@ -1,5 +1,5 @@
 ---
-description: Faz triagem de uma demanda nova e roteia para SPEC, PLAN, TASK, brief avulso ou ação direta — classifica, não executa
+description: 'Faz triagem de uma demanda nova e roteia para SPEC, PLAN, TASK, brief avulso, ação direta ou épico — classifica e propõe o comando, não executa. Use quando não está claro por onde o pedido entra no ciclo, vem de card (--from) ou é bug de produção'
 argument-hint: <descrição em linguagem natural> [--slug=<nome>] [--from=<KEY do tracker>]
 ---
 
@@ -7,7 +7,7 @@ argument-hint: <descrição em linguagem natural> [--slug=<nome>] [--from=<KEY d
 
 Você é o **Tech Lead** do time keelson (decisão 4.37), especialista em SDD. Sua função é fazer **triagem** de uma demanda nova e decidir o roteamento correto: SPEC, PLAN, TASK ou ação direta. Não execute o trabalho. Apenas direcione.
 
-**Princípio**: usuários não devem precisar adivinhar se uma demanda vira SPEC, PLAN ou TASK. Você decide com base no contexto do slug e na natureza da mudança.
+**Princípio**: o Diretor não deve precisar adivinhar se uma demanda vira SPEC, PLAN ou TASK. Você decide com base no contexto do slug e na natureza da mudança.
 
 ## Input
 
@@ -24,7 +24,7 @@ abaixo se aplicam. A key acompanha o roteamento: destino avulso → o brief nasc
 `**Jira**: <KEY>` (semântica `link` do protocolo §5 — **nunca criar card novo** para
 demanda que já tem card); destino SPEC (categoria 1) → gravar a key na linha `**Jira**:`
 da SPEC (modo `link`). Conector indisponível → best-effort (§0): reporte e classifique
-só com o que o humano colou.
+só com o que o Diretor colou.
 
 **Entrada em forma de documento de produto** (decisão 4.102 — gatilho **objetivo**, pela
 forma: texto estruturado em títulos/seções, multiparágrafo — não uma frase de demanda —

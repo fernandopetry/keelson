@@ -79,9 +79,8 @@ git checkout release
    (`git rev-parse --verify`, local ou `origin/<branch>` após `git fetch origin`). Alguma
    não existe → parar e listar **todas** as ausentes antes de tentar qualquer merge
    (falha tardia no meio da fila é pior que falha cedo). A resolução por fallback
-   remoto (`origin/<branch>`) serve só para achar a **ref a mesclar**; o nome usado
-   nas Etapas 3 e 6 continua sendo o `<branch>` **como o invocador passou**, nunca o
-   caminho completo da ref remota.
+   remoto (`origin/<branch>`) serve só para achar a **ref a mesclar**; o nome que entra na mensagem é regra da
+   Etapa 6.
 4. Se `--into` foi passado, `git checkout <into>` antes de seguir (destino sujo cai no
    passo 1).
 
@@ -126,8 +125,7 @@ Com `--dry-run`, o loop termina aqui para esta branch: reporte o diagnóstico (E
 
 `git merge --no-commit --no-ff <ref-resolvida>`, onde `<ref-resolvida>` é a branch
 local se existir, senão `origin/<branch>` (resolução da Etapa 0). A ref resolvida é
-interna a este passo: toda referência a "`<branch>`" no resto do comando (Etapas 5 e 6)
-continua sendo o **nome nu** dado pelo invocador, não a ref resolvida. Conflito
+interna a este passo (o nome que entra na mensagem é regra da Etapa 6). Conflito
 textual → os arquivos com marcadores `<<<<<<<` entram na lista de gatilhos da Etapa 5.
 
 ### Etapa 4: suíte sobre o merge staged

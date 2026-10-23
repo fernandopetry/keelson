@@ -12,14 +12,13 @@ ele lança o **revezamento** de `${CLAUDE_PLUGIN_ROOT}/scripts/epic-run.sh` — 
 desacoplado desta sessão que roda **uma sessão `claude -p` por fatia**, cada uma retomando
 pelo `/keelson:continue` com contexto limpo e lendo o estado do disco. Invocar este comando
 **é** o ato do Diretor para o épico inteiro: a confirmação que o `continue` pediria a cada
-fatia foi dada aqui, uma vez (refina a régua "disparar cada ciclo é ato do Diretor" — 4.39,
-4.127).
+fatia foi dada aqui, uma vez (4.465).
 
 **Princípio inviolável 1**: a fila do BRIEF épico é o único fato que decide a próxima
 fatia e o fim — o revezamento relê a fila depois de cada sessão e para quando ela não
 avança; nunca inventa estado novo na tabela. Este comando é também a **porta de retomada
 do épico** (4.466): fatia parcial por queda, pausa ou `stop` é retomada pela sessão filha;
-fatia parada **aguardando você** nunca é retomada às cegas.
+fatia parada **aguardando o Diretor** nunca é retomada às cegas.
 
 **Princípio inviolável 2**: cada fatia é uma sessão **sem humano**: a regra do que ela
 decide sozinha e do que a encerra sem marcar `entregue` tem dono único em
@@ -75,15 +74,15 @@ flags que o Diretor passou. A primeira linha do stdout traz a classe (4.466):
 - **`pré-voo: ok`** → siga à Etapa 2. A linha diz se o revezamento começa por fatia nova
   ou **retoma** uma fatia parcial (queda, pausa feita na sessão dela, `stop`, run de
   sessão morta): a sessão filha a retoma pelo `continue`, na wave onde parou.
-- **`pré-voo: aguarda-diretor`** (exit 5) → a fatia parou por decisão sua e **não se
-  retoma sem você**: transcreva o motivo, mostre o último relatório que a linha aponta
+- **`pré-voo: aguarda-diretor`** (exit 5) → a fatia parou por decisão do Diretor e **não se
+  retoma sem ele**: transcreva o motivo, mostre o último relatório que a linha aponta
   (a pergunta pendente está nele) e execute `/keelson:continue <slug-âncora>` **nesta
-  sessão**, com você presente, até a Entrega dessa fatia; só então volte à Etapa 1 para
+  sessão**, com o Diretor presente, até a Entrega dessa fatia; só então volte à Etapa 1 para
   lançar o revezamento pelas restantes.
 - **`pré-voo: posse-incerta`** (exit 6) → há run em andamento cuja sessão pode estar viva
   (tocada há menos de 20 min). Uma pergunta via AskUserQuestion: *"A sessão anterior
   morreu? Forçar a posse?"* — "Sim" → repita o dry-run com `--force-claim` (a
-  confirmação viaja no prompt da sessão filha; `FORCE=1` é ato do humano, 4.431);
+  confirmação viaja no prompt da sessão filha; `FORCE=1` é ato do Diretor, 4.431);
   "Não" → espere o limiar ou feche aquela sessão.
 - **`pré-voo: recusado`** (exit 3) → transcreva e **pare**: estratégia `por-fatia`
   (fatia dependente só larga após merge, ato do Diretor — 4.190), fila na regra 1/5/6
@@ -117,8 +116,8 @@ avisa no fim de cada fatia, na parada e quando a sessão filha fica muda acima d
    do `watch` já resolvido) · como parar (`/keelson:auto-epic <slug> stop`, gracioso;
    `--now` na hora) · onde o resumo de cada fatia aparece
    (`thoughts/local/epic-run/<slug-âncora>/RESUMO.md`) · retomada depois de qualquer
-   parada: `/keelson:auto-epic <slug-âncora>` de novo (fatia que aguarda você passa pelo
-   `continue` com você presente).
+   parada: `/keelson:auto-epic <slug-âncora>` de novo (fatia que aguarda o Diretor passa pelo
+   `continue` com ele presente).
 3. **Encerre o turno.** O revezamento leva horas e não depende desta sessão: não espere, não
    sonde o log, não abra a árvore. O `wave-guard` reconhece o run da sessão filha enquanto o
    driver está vivo (4.465) e não o acusa como posse de terceiro.
@@ -128,7 +127,7 @@ avisa no fim de cada fatia, na parada e quando a sessão filha fica muda acima d
 Não conduz fatia (cada uma é uma sessão `claude -p` própria); não altera a fila nem o
 vocabulário de estados dela (4.156); não decide permissão por conta própria além do que a
 4.465 fixou; não faz merge, PR nem deploy (4.37/4.41); não relança sobre driver vivo nem
-sobre run de sessão viva sem a sua confirmação; não retoma fatia parada `aguarda Diretor`
-sem você presente; não responde pelo Diretor às perguntas estacionadas — elas ficam nos
+sobre run de sessão viva sem a confirmação do Diretor; não retoma fatia parada `aguarda Diretor`
+sem ele presente; não responde pelo Diretor às perguntas estacionadas — elas ficam nos
 relatórios de cada fatia (`RESUMO.md`) e no ledger da sessão filha, e nada estacionado é
 aplicado sem resposta.

@@ -1,6 +1,6 @@
 ---
 name: plan-validator
-description: "Valida PLANs SDD (PLAN-*.md do projeto): cobertura explícita, DEC com alternativas, mapeamento FR-componente. Ativar após /keelson:plan (gate de qualidade) ou sob demanda quando pedirem validação, revisão ou lint de PLAN."
+description: 'Valida PLANs SDD (PLAN-*.md do projeto): cobertura da SPEC, DEC com alternativas, mapeamento FR-componente. Ativar após /keelson:plan ou quando pedirem validação, revisão ou lint de PLAN — mesmo sem a palavra "validar" ("esse plano está bom?")'
 ---
 
 # Skill: plan-validator
@@ -35,8 +35,7 @@ Auto-fixes que continuam seus (protocolo §3): `Irreversível: SIM` → `sim` ·
 `Irreversível: não.` → `não` (pontuação terminal — 4.341) ·
 `Irreversivel:` → `Irreversível:` · zero-padding · formato de `Data`.
 
-Cada achado entra como `**[artifact-lint]** SEVERIDADE check — detalhe`; degradação
-por resultado e cobertura mista seguem o §5 do graph-contract.md.
+Cada achado entra como `**[artifact-lint]** SEVERIDADE check — detalhe`.
 
 ## Etapa 2: checks de cobertura que permanecem seus
 
