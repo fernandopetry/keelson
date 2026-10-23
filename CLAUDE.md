@@ -129,7 +129,9 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   tabela §5 do `method-guide.md` · comentário de `agents/` no `README.md` · §2/§3 do
   `decisions.md` (convenção de nomes) — e a description declara **todos** os invocadores.
   A parte mecânica (arquivo/`name:`/heading/tabela §5, ambos os sentidos) também é
-  provada pelo `check-sync.sh`; comentário do README e decisions.md seguem humanos.
+  provada pelo `check-sync.sh`, que ainda avisa (AVISO, 4.483) quando um comando/skill
+  despacha o agent e a description não o cita (`/keelson:<cmd>` ou `:<cmd>`);
+  comentário do README e decisions.md seguem humanos.
 - **Um dono por regra**: o core (`guidelines/core/`) diz *o quê* (agnóstico); o perfil diz
   *como* na linguagem. Não duplicar regra entre eles. Blocos compartilhados dos comandos
   têm dono único em `docs/_meta/conventions/` (13 arquivos; o cabeçalho de cada um

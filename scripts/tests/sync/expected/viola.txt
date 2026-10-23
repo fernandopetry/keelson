@@ -7,5 +7,6 @@ FALHA: README lista /keelson:fantasma mas não existe commands/fantasma.md nem s
 FALHA: agents/errado.md com frontmatter name: 'outro' ≠ nome do arquivo
 FALHA: agents/errado.md sem linha na tabela §5 do method-guide
 FALHA: tabela §5 do method-guide lista `inexistente` mas não existe agents/inexistente.md
+ok    toda description de agent declara os comandos que o despacham
 
 check-sync: 8 violação(ões), 1 aviso(s).

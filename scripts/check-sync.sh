@@ -14,6 +14,9 @@
 #     - heading `# Subagent: <nome>` presente
 #     - linha na tabela §5 do method-guide (`| \`<nome>\` |`)
 #     - linha da tabela §5 sem agents/<nome>.md correspondente
+#     - AVISO: comando/skill que despacha o agent e não aparece na `description:` dele
+#       (`/keelson:<cmd>` ou `:<cmd>`; decisão 4.483) — regra "a description declara todos
+#       os invocadores"; AVISO até a rodada limpa provar zero falso-positivo
 #
 # Limite honesto: o comentário de `agents/` no README é prosa com reticências —
 # fica com o humano; §2/§3 do decisions.md idem (convenção de nomes é juízo).
@@ -30,7 +33,7 @@ ROOT=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --root) shift; [ $# -gt 0 ] || { echo "ERRO: --root exige um caminho." >&2; exit 2; }; ROOT="$1" ;;
-    -h|--help) sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,27p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "ERRO: opção desconhecida: $1" >&2; exit 2 ;;
   esac
   shift
@@ -132,6 +135,63 @@ for name in $(awk '/^## 5/{s=1; next} s && /^## /{exit} s' "$GUIDE" \
     || { fail "tabela §5 do method-guide lista \`${name}\` mas não existe agents/${name}.md"; tab_ok=0; }
 done
 [ "$tab_ok" -eq 1 ] && ok "toda linha da tabela §5 tem agents/*.md correspondente"
+
+# ---------- Agents: comando que despacha → description do agent (AVISO, 4.483) ----------
+# Despacho = verbo de despacho (despach*/invoc*/invoqu*/deleg*/spawn*/acion*/via/agent/
+# subagente) com no máximo uma janela curta e nenhum outro `código` entre ele e o
+# `agent`, sem negação logo antes do verbo. Menção solta ("lista canônica na description do
+# `x`") não é despacho. Declarar = `/keelson:<cmd>` ou `:<cmd>` em qualquer ponto da
+# description; o nome puro só vale depois de "Invocad" (cláusula de invocadores).
+# Na dúvida o extrator não acusa: falso-negativo é aceito, falso-positivo não.
+AGENT_NAMES="$(for f in agents/*.md; do [ -f "$f" ] && basename "$f" .md; done | tr '\n' ',')"
+DISPATCHERS="$(ls commands/*.md skills/*/SKILL.md 2>/dev/null)"
+TAB="$(printf '\t')"
+pairs=""
+if [ -n "$AGENT_NAMES" ] && [ -n "$DISPATCHERS" ]; then
+  # shellcheck disable=SC2086
+  pairs="$(awk -v agl="$AGENT_NAMES" '
+    BEGIN { na = split(agl, ag, ",") }
+    {
+      n = split(FILENAME, seg, "/"); inv = seg[n]; sub(/\.md$/, "", inv)
+      if (inv == "SKILL") inv = seg[n - 1]
+      l = tolower($0); gsub(/invocador/, "", l); gsub(/\*/, "", l)
+      for (i = 1; i <= na; i++) {
+        if (ag[i] == "" || (ag[i] SUBSEP inv) in seen) continue
+        tok = "`" ag[i] "`"; off = 0; rest = l
+        while ((p = index(rest, tok)) > 0) {
+          at = off + p; st = at - 60; if (st < 1) st = 1
+          pre = substr(l, st, at - st)
+          while (match(pre, /(;|\. )/)) pre = substr(pre, RSTART + RLENGTH)
+          if (match(pre, /(^|[^a-z])((despach|invoc|invoqu|deleg|spawn|acion)[a-z]*|via|agent|subagente|subagents)([^a-z`][^`]*)?$/)) {
+            neg = substr(pre, RSTART > 12 ? RSTART - 12 : 1)
+            if (neg !~ /(^|[^a-z])(nunca|jamais|sem|dispens[a-z]*)([^a-z]|$)/ && neg !~ /n(ã|Ã)o /) {
+              seen[ag[i] SUBSEP inv] = 1
+              print ag[i] "\t" inv "\t" FILENAME ":" FNR
+              break
+            }
+          }
+          off = at + length(tok) - 1; rest = substr(l, off + 1)
+        }
+      }
+    }' $DISPATCHERS)"
+fi
+inv_ok=1
+while IFS="$TAB" read -r a c where; do
+  [ -n "$a" ] || continue
+  desc="$(frontmatter "agents/${a}.md" | grep -E '^description:' | head -1 | sed -E 's/^description:[[:space:]]*//')"
+  [ -n "$desc" ] || continue
+  printf '%s' "$desc" | grep -qE "(/keelson|[^A-Za-z0-9_]|^):${c}([^a-z0-9-]|\$)" && continue
+  case "$desc" in
+    *Invocad*)
+      clause="${desc#*Invocad}"
+      printf '%s' "$clause" | grep -qE "(^|[^A-Za-z0-9:_/-])${c}([^A-Za-z0-9-]|\$)" && continue ;;
+  esac
+  warn "agents/${a}.md não declara \`/keelson:${c}\` na description, mas ${where} despacha o agent"
+  inv_ok=0
+done <<EOF
+$pairs
+EOF
+[ "$inv_ok" -eq 1 ] && ok "toda description de agent declara os comandos que o despacham"
 
 echo ""
 if [ "$fails" -gt 0 ]; then

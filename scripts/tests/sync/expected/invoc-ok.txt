@@ -1,0 +1,7 @@
+ok    todo commands/*.md sincronizado com README (linha, †, nota do bloco)
+ok    toda linha /keelson:* do README tem comando ou skill correspondente
+ok    todo agents/*.md sincronizado (name:, heading, tabela §5)
+ok    toda linha da tabela §5 tem agents/*.md correspondente
+ok    toda description de agent declara os comandos que o despacham
+
+check-sync: tudo certo.

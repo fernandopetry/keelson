@@ -53,6 +53,11 @@ echo "ok   bash -n check-sync.sh"
 
 runcase ok    ok    0 ok.txt
 runcase viola viola 1 viola.txt
+# invocadores (4.483): verde · comando que despacha e a description não cita (AVISO, exit 0;
+# inclui o prefixo de nome `foo-extra` que não vale por `foo`) · menção que não é despacho
+runcase invoc-ok     invoc-ok     0 invoc-ok.txt
+runcase invoc-falta  invoc-falta  0 invoc-falta.txt
+runcase invoc-mencao invoc-mencao 0 invoc-mencao.txt
 
 # uso incorreto: raiz sem commands/ → exit 2
 total=$((total + 1))

@@ -1,0 +1,9 @@
+ok    todo commands/*.md sincronizado com README (linha, †, nota do bloco)
+ok    toda linha /keelson:* do README tem comando ou skill correspondente
+ok    todo agents/*.md sincronizado (name:, heading, tabela §5)
+ok    toda linha da tabela §5 tem agents/*.md correspondente
+AVISO: agents/dev.md não declara `/keelson:foo` na description, mas commands/foo.md:7 despacha o agent
+AVISO: agents/dev.md não declara `/keelson:baz` na description, mas skills/baz/SKILL.md:7 despacha o agent
+AVISO: agents/ana.md não declara `/keelson:baz` na description, mas skills/baz/SKILL.md:8 despacha o agent
+
+check-sync: tudo certo (3 aviso(s) — carência conhecida, não bloqueia).
