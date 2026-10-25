@@ -124,8 +124,11 @@ interna — é do developer na execução, nunca do plano.
    fecha a ponta carrega o item no próprio "Escopo > Inclui", nunca deduzido — inclusive
    a camada **intermediária** quando o dado atravessa 3+ camadas (nó que nunca virou task
    não é aresta que algum gate alcance). Rota ou tela que **lê** dado tem o leitor da
-   camada de aplicação conferido por Grep na fixação — ausente → a TASK o inclui ou
-   depende da que o cria (4.467).
+   camada de aplicação **e o campo que ele serializa** conferidos por Grep na fixação —
+   leitor ausente, ou campo que o critério da camada consumidora consome ("texto/frase/
+   rótulo do payload") e que a fonte não serializa hoje → a TASK o inclui, com critério
+   próprio sobre a chave serializada, ou depende da que o cria (4.467, 4.490); o campo
+   nunca fica implícito para o developer compor na tela.
 3. **Verificabilidade**: critério de pronto observável.
 4. **Vertical slicing — a prova executa no próprio fecho** (decisões 4.157/4.300):
    concluída, a TASK entrega um comportamento verificável **sozinho** — o critério de

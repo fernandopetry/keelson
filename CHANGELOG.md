@@ -25,6 +25,17 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.227.0] — 2026-10-25
+
+Re-init: none
+
+Decision 4.490 (minor) — field intake: the TASK forge checks the field the reader serializes, not just the reader; a reusable symbol born in a wave reaches the not-yet-dispatched TASKs at the wave close. Three proposals deferred by the queue's default.
+
+### Changed
+
+- **`/keelson:tasks`, principle 2**: a route or screen that reads data has both the application-layer reader **and the field it serializes** checked by Grep at fixation. A field the criterion consumes ("the payload's text/label") that the source does not serialize today goes into some TASK's `Inclui` with its own criterion on the serialized key, or the TASK depends on the one that creates it — it is never left for the developer to compose in the view.
+- **`/keelson:implement`, §3.6 item 7**: a reusable symbol created in this wave (map, helper, labelled enum, component, fixture) whose concept a not-yet-dispatched TASK touches is written into that TASK in the same edit — `extrair para <símbolo> (<caminho>)` in the scope and the proof in the form the "Extrair ou duplicar" rule already owns in the Done criteria; the context carries at most a one-line pointer. Gate 7 and the developer's own search stay as the net, not the first barrier.
+
 ## [0.226.1] — 2026-10-23
 
 Re-init: none
