@@ -426,11 +426,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.227.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.228.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the CI `Test` workflow is green again — the mutation campaign carries the TASK template into its working tree, and the epic relay sends its final notification before writing the end marker.
+New in this release: a lint check catches a TASK whose criterion cites a symbol a same-wave sibling creates, the pre-code QA recomputes ordering oracles key by key, and the ledger archive carries the window log into the dated report folder.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

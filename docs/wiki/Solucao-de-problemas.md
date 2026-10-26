@@ -175,6 +175,20 @@ arquivo. Item descrito só em prosa (sem caminho nem nome de arquivo) não entra
 — achado ausente não garante que não há colisão, então a conferência na hora de
 implementar continua valendo.
 
+### O lint acusou "consumidora não serializada atrás da criadora"
+
+Um critério de pronto (ou um passo do roteiro do gate 9) de uma TASK cita, entre crases,
+um símbolo — um `data-testid`, uma chave, um helper — que aparece no "Escopo > Inclui" de
+outra TASK do mesmo PLAN, na mesma wave ou numa anterior, e a primeira não declara
+`Depende de` a segunda. Como TASKs da mesma wave podem rodar em paralelo, o critério da
+consumidora só passa se a irmã já tiver criado o símbolo — e nada garante essa ordem. O
+conserto é na decomposição: declarar `Depende de` a criadora (a consumidora desce para a
+wave seguinte) ou, quando o símbolo é um contrato combinado entre as duas, listá-lo também
+no Inclui da consumidora. Uma nota em prosa no Contexto não resolve, porque ninguém a lê
+na hora de paralelizar. É WARNING porque o lint não sabe quem cria o símbolo — se ele já
+existe no repositório, a irmã só o usa e o achado pode ficar como está; o `task-validator`
+escala quando o símbolo nasce na irmã.
+
 ### O lint acusou "grep recursivo sobre diretório inteiro" num critério
 
 Um critério de ausência ("o nome antigo não aparece mais") usa `grep -r` sobre um

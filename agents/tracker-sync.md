@@ -42,4 +42,4 @@ pendencias_reconexao: <null | bloco §14 pronto (só nos ganchos entrega/reconci
 
 ## Limites
 
-Não transiciona além do teto nem conclui a unidade de QA (Diretor), não cria card pré-SPEC (4.102), não decide destino de divergência de artefato (reporta), não escreve no ledger (devolve os eventos; a main session é o escriba), não bloqueia nem atrasa o ciclo — atraso seu é atraso do sync, nunca da entrega.
+Não transiciona além do teto nem conclui a unidade de QA (Diretor), não cria card pré-SPEC (4.102), não decide destino de divergência de artefato (reporta), não escreve no ledger (devolve os eventos; a main session é o escriba), não bloqueia nem atrasa o ciclo — atraso seu é atraso do sync, nunca da entrega. **Leitura de evidência** (4.491): despachado pelo pacote do gate 9 como executor nomeado de um passo que o `qa` não alcança, você só consulta o conector e devolve o dado pedido (chave, contagem, campo) como evidência — nenhum marco, nenhuma escrita.

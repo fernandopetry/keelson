@@ -18,6 +18,11 @@
 # "defeitos-d" (4.427) planta area sensivel (dados pessoais em exportacao) sem NFR de
 # seguranca nem AC de negacao → spec-area-sensivel-sem-negacao (W); a fixture "valido" e a
 # contraprova: SPEC de login com AC de bloqueio fica em silencio.
+# "defeitos-e" (4.491) planta UMA consumidora paralela a criadora (simbolo em crase nos
+# Criterios da TASK-001-002 declarado no Inclui das irmas 001 e 003, mesma wave, sem
+# `Depende de`) → task-consumidor-paralelo-ao-criador (W), uma linha por consumidora e
+# token; os controles negativos ficam mudos: token tambem no proprio Inclui (003),
+# `Depende de` a uma declarante (004), criadora Done (005 → 006).
 #
 # Uso: scripts/tests/artifact-lint/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -67,6 +72,7 @@ runcase legado          legado   0 legado.txt
 runcase defeitos-b      defeitos-b 1 defeitos-b.txt
 runcase defeitos-c      defeitos-c 1 defeitos-c.txt
 runcase defeitos-d      defeitos-d 0 defeitos-d.txt
+runcase defeitos-e      defeitos-e 0 defeitos-e.txt
 runcase arquivo-valido  valido/specs/SPEC-001-login.md 0 arquivo-unico-valido.txt
 runcase arquivo-defeito defeitos/tasks/TASK-001-005-refactor-extrai.md 1 arquivo-unico-defeito.txt
 runcase arquivo-mutacao-contada valido/tasks/TASK-001-003-mutacao-contada.md 0 arquivo-unico-mutacao-contada.txt

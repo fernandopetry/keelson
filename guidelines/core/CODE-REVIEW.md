@@ -501,7 +501,10 @@ ela converge ou escala.
   o revisor viu fecharam".
 - **Evidência mecânica de ausência carrega controle positivo (decisão 4.186).** "O
   comando retornou 0 ocorrências" só é evidência se, no mesmo universo e na mesma
-  execução, um padrão que **tem** de bater bateu — sem o controle, "limpo" é
+  execução, a **mesma busca** — mesmo padrão, mesmo universo — bate com o artefato
+  reintroduzido (4.491): um padrão diferente que bate prova que o comando rodou, não
+  que o padrão detecta; em bundle minificado o marcador é string literal ou chave
+  i18n que sobrevive ao build, nunca o nome do módulo. Sem o controle, "limpo" é
   indistinguível de "o comando nunca executou". A falsificabilidade dos gates
   (4.52/4.93) cobre o código sob revisão; esta cláusula cobre o **instrumento do
   avaliador** — inclusive o comando re-executado da varredura (4.173).

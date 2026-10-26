@@ -133,9 +133,10 @@ o script não detecta modo (decisão 4.296). Sem log ou sem linhas de agente (ho
 indisponível, projeto sem ficha, rota sem subagents) → cauda/linha omitidas, sem
 lacuna declarada — são telemetria da dieta de contexto (meta da 4.103: ≤600k), não
 obrigação do report; e **custo nunca é gatilho** de parada ou de mudança de
-comportamento (4.23/4.24). O fecho que move o ledger para `reported-*/` move o log
-junto — mesma razão: sem o corte, o pico e o ranking da próxima rodada herdam os da
-anterior. O arquivo de offset (`.window-offset.*`, ao lado do log — na casa da
+comportamento (4.23/4.24). O `ledger.sh archive` do fecho move o log de janela junto
+com o ledger, para o mesmo `reported-<ts>/` datado (4.491) — mesma razão: sem o corte, o
+pico e o ranking da próxima rodada herdam os da anterior; e destino datado nunca
+sobrescreve o log de um report anterior da mesma sessão. O arquivo de offset (`.window-offset.*`, ao lado do log — na casa da
 sessão ou no legado) **permanece**: é ponteiro de leitura do transcript, não medição
 — apagá-lo faria o hook reprocessar e repovoar o log novo com agentes já reportados.
 

@@ -71,7 +71,12 @@
 #   archive  move os ativos para reported-<yyyymmdd-hhmmss>/, preservando os --keep —
 #            só `pendencia` e `tracker` (em voo) podem ser preservados (4.479); outro tipo
 #            em --keep é recusado (exit 2, nada movido): evento reportado é consumido
-#            (evento que continua pendente permanece na pasta ativa)
+#            (evento que continua pendente permanece na pasta ativa). O log de janela
+#            da mesma casa (<casa>/window.log; legado thoughts/local/session-window.log)
+#            vai junto para o MESMO reported-<ts>/ (4.491) — destino datado, nunca
+#            sobrescreve o log de um report anterior; `.window-offset.*` fica no lugar
+#            (ponteiro de leitura do transcript, 4.239). Log presente sem evento ativo
+#            também arquiva (o pico da próxima rodada não herda o desta).
 #
 # Leitura dupla (carência 4.314): list/count/archive agregam a casa da sessão E a
 # legada quando distintas (legado primeiro — é o trecho mais antigo da sessão que
@@ -411,10 +416,20 @@ case "$ACTION" in
     done
     have=0
     # shellcheck disable=SC2329,SC2317  # invocada indiretamente via em_cada_casa (SC2317: shellcheck novo re-acusa o corpo)
+    # log de janela da casa: irmão do ledger (legado: session-window.log ao lado de
+    # session-ledger/); vai para o mesmo reported-<ts>/ do archive (4.491)
+    window_log_de() {
+      if [ "$1" = "$ROOT/thoughts/local/session-ledger" ]; then
+        printf '%s\n' "$ROOT/thoughts/local/session-window.log"
+      else
+        printf '%s\n' "$(dirname "$1")/window.log"
+      fi
+    }
     have_casa() {
       for f in "$1"/*.md; do
         [ -f "$f" ] && { have=1; break; }
       done
+      [ -f "$(window_log_de "$1")" ] && have=1
       return 0
     }
     em_cada_casa have_casa
@@ -431,10 +446,16 @@ case "$ACTION" in
       for f in "$1"/*.md; do
         [ -f "$f" ] && { tem=1; break; }
       done
+      wlog="$(window_log_de "$1")"
+      [ -f "$wlog" ] && tem=1
       [ "$tem" = 1 ] || return 0
       dest="$1/reported-$compact"
       mkdir -p "$dest" || die2 "não consegui criar $dest"
-      moved=0; kept=0
+      moved=0; kept=0; wnote=""
+      if [ -f "$wlog" ]; then
+        mv "$wlog" "$dest/window.log" || die2 "não consegui mover $wlog"
+        wnote=" · log de janela arquivado"
+      fi
       for f in "$1"/*.md; do
         [ -f "$f" ] || continue
         b="$(basename "$f")"
@@ -449,7 +470,7 @@ case "$ACTION" in
           moved=$((moved + 1))
         fi
       done
-      printf 'ledger: %d evento(s) arquivado(s) em %s · %d pendente(s) preservado(s)\n' "$moved" "$dest" "$kept"
+      printf 'ledger: %d evento(s) arquivado(s) em %s · %d pendente(s) preservado(s)%s\n' "$moved" "$dest" "$kept" "$wnote"
       return 0
     }
     em_cada_casa archive_casa

@@ -153,6 +153,30 @@ if [ -f "$CASA2/ledger/reported-20260806-203000/20260806-200100-gate-code-review
 total=$((total + 1))
 lg "" "$R" archive --casa "$R/nao-existe" >/dev/null 2>&1; [ $? -eq 2 ] && ok archive-casa-inexistente-exit-2 || falha archive-casa-inexistente-exit-2
 
+# archive leva o log de janela da casa para o MESMO reported-<ts>/ (4.491): dois reports da
+# mesma sessão nunca sobrescrevem o log um do outro; o offset fica; log sem evento ativo
+# também arquiva
+total=$((total + 1))
+CASA3="$R/thoughts/local/sessions/20260806-210000-ef012345"; mkdir -p "$CASA3/ledger"
+printf 'sessao: ef012345-0000-0000-0000-000000000000\niniciada: 2026-08-06T21:00:00-0300\nestado: ativa\n' > "$CASA3/session.meta"
+printf 'ts: 2026-08-06T21:01:00-0300 · tipo: gate · origem: qa · slug: outro\nAPROVADO\n' > "$CASA3/ledger/20260806-210100-gate-qa.md"
+printf '2026-08-06T21:02:00-0300 janela=1000\n' > "$CASA3/window.log"
+printf '42\n' > "$CASA3/.window-offset.abc"
+msg="$(lg "" "$R" archive --casa "$CASA3" --ts "2026-08-06T21:30:00-0300" 2>/dev/null)"
+if [ -f "$CASA3/ledger/reported-20260806-213000/window.log" ] && [ ! -f "$CASA3/window.log" ] && [ -f "$CASA3/.window-offset.abc" ] \
+   && [ "$(cat "$CASA3/ledger/reported-20260806-213000/window.log")" = "2026-08-06T21:02:00-0300 janela=1000" ] \
+   && case "$msg" in *"1 evento(s) arquivado(s)"*"log de janela arquivado") true ;; *) false ;; esac; then ok archive-move-window-log; else falha "archive-move-window-log: [$msg]"; fi
+total=$((total + 1))
+printf '2026-08-06T21:40:00-0300 janela=2000\n' > "$CASA3/window.log"
+msg="$(lg "" "$R" archive --casa "$CASA3" --ts "2026-08-06T21:50:00-0300" 2>/dev/null)"
+if [ -f "$CASA3/ledger/reported-20260806-215000/window.log" ] && [ -f "$CASA3/ledger/reported-20260806-213000/window.log" ] \
+   && [ "$(cat "$CASA3/ledger/reported-20260806-213000/window.log")" = "2026-08-06T21:02:00-0300 janela=1000" ] \
+   && [ "$msg" = "ledger: 0 evento(s) arquivado(s) em $CASA3/ledger/reported-20260806-215000 · 0 pendente(s) preservado(s) · log de janela arquivado" ]; then ok archive-window-log-sem-evento-nao-sobrescreve; else falha "archive-window-log-sem-evento: [$msg]"; fi
+total=$((total + 1))
+printf '2026-08-06T21:55:00-0300 janela=3000\n' > "$R/thoughts/local/session-window.log"
+msg="$(lg "" "$R" archive --keep 20260806-150000-pendencia-qa.md --ts "2026-08-06T21:58:00-0300" 2>/dev/null)"
+if [ -f "$LD/reported-20260806-215800/window.log" ] && [ ! -f "$R/thoughts/local/session-window.log" ]; then ok archive-window-log-legado; else falha "archive-window-log-legado: [$msg]"; fi
+
 # archive sem nada a mover
 lg "" "$R" archive --keep 20260806-150000-pendencia-qa.md --ts "2026-08-06T19:00:00-0300" >/dev/null 2>&1
 total=$((total + 1))

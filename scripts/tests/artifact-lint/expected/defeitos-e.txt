@@ -1,0 +1,1 @@
+WARNING	task-consumidor-paralelo-ao-criador	data-testid="discard-card" citado nos Criterios/Roteiro de TASK-001-002-lista-descarte.md (wave 1) e declarado no Inclui de TASK-001-001-card-descarte.md (wave 1), TASK-001-003-contrato-congelado.md (wave 1) do mesmo PLAN, sem Depende de — consumidora nao serializada atras da criadora (4.491)

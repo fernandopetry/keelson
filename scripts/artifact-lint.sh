@@ -8,7 +8,8 @@
 # Uso: artifact-lint.sh [--fix] <caminho> [<caminho>…]
 #   <caminho>  arquivo SPEC-*.md, PLAN-*.md ou TASK-*.md (tipo inferido do caminho),
 #              ou diretório de slug ({docsRoot}/<slug>) — linta todos os artefatos
-#              e acrescenta os checks cross-arquivo (overlap de FR).
+#              e acrescenta os checks cross-arquivo (overlap de FR, colisao de
+#              arquivo e consumidora paralela a criadora na mesma wave).
 #   --fix      (decisão 4.478) antes de lintar, corrige nas TASKs as classes puramente
 #              mecânicas — `task-criterio-cifrao-aspas-duplas` (segmento em aspas duplas
 #              com `$` vira aspas simples; com `'` dentro, `\$`) e `task-secao-ausente`
@@ -958,6 +959,81 @@ lint_dir_cross() { # $1 = dir do slug
       }
     }
   ' "$TMP/waveinc.tsv" >> "$OUT"
+
+  # simbolo citado em crase nos Criterios/Roteiro de uma TASK e declarado em crase no
+  # Inclui de outra TASK do mesmo PLAN, em wave igual ou anterior, sem `Depende de`
+  # direto (4.491): a consumidora e candidata a rodar em paralelo com quem cria o que
+  # ela verifica. Universo fechado (4.227): span INTEIRO em crase, forma de
+  # identificador/caminho (sem espaco, >= 6 chars, com letra), nunca id de artefato
+  # SDD. Absolvem: token tambem no Inclui da consumidora (contrato congelado, 4.106),
+  # criadora ou consumidora Done, Wave nao numerica, wave da consumidora posterior.
+  for f in "$d"/tasks/TASK-*.md; do
+    [ -f "$f" ] || continue
+    b="$(basename "$f")"
+    case "$b" in *-INDEX.md) continue ;; esac
+    m="$(printf '%s\n' "$b" | sed -n 's/^TASK-\([0-9][0-9]*\)-[0-9][0-9]*[-.].*/\1/p')"
+    [ -n "$m" ] || continue
+    id="$(printf '%s\n' "$b" | sed -n 's/^\(TASK-[0-9][0-9]*-[0-9][0-9]*\)[-.].*/\1/p')"
+    awk -v FILE="$b" -v M="$m" -v ID="$id" '
+      function trim(s) { sub(/^[ \t]+/, "", s); sub(/[ \t]+$/, "", s); return s }
+      function simbolo(t) {
+        if (t ~ /[ \t]/ || length(t) < 6 || t !~ /[A-Za-z]/) return 0
+        if (t ~ /^(SPEC|PLAN|TASK|BRIEF|FEAT|AC|FR|NFR|COMP|DEC|MET)-[0-9]/) return 0
+        return 1
+      }
+      { line = $0; sub(/\r$/, "", line) }
+      sect == "" && line ~ /^\*\*Status\*\*[ \t]*:/ { v = line; sub(/^[^:]*:/, "", v); ST = trim(v) }
+      sect == "" && line ~ /^\*\*Wave\*\*[ \t]*:/   { v = line; sub(/^[^:]*:/, "", v); WV = trim(v) }
+      /^## /  { sect = (line ~ /^## Escopo/) ? "esc" : (line ~ /^## Crit/ || line ~ /^## Roteiro do gate 9/) ? "crit" : (line ~ /^## Depend/) ? "dep" : "x"; q = ""; next }
+      /^### / { q = (sect == "esc" && line ~ /^### Inclui/) ? "inc" : ""; next }
+      sect == "dep" && line ~ /^- \*\*Depende de\*\*[ \t]*:/ {
+        v = line; sub(/^[^:]*:/, "", v)
+        while (match(v, /TASK-[0-9]+-[0-9]+/)) { deps[substr(v, RSTART, RLENGTH)] = 1; v = substr(v, RSTART + RLENGTH) }
+      }
+      q == "inc" || sect == "crit" {
+        s = line
+        while (match(s, /`[^`]+`/)) {
+          t = substr(s, RSTART + 1, RLENGTH - 2); s = substr(s, RSTART + RLENGTH)
+          if (!simbolo(t)) continue
+          if (q == "inc") inc[t] = 1; else crit[t] = 1
+        }
+      }
+      END {
+        if (ST == "Done") exit
+        if (WV !~ /^[0-9]+$/) exit
+        for (t in inc) print M "\t" ID "\t" WV "\tinc\t" t "\t" FILE
+        for (t in crit) if (!(t in inc)) print M "\t" ID "\t" WV "\tcrit\t" t "\t" FILE
+        for (t in deps) print M "\t" ID "\t" WV "\tdep\t" t "\t" FILE
+      }
+    ' "$f"
+  done > "$TMP/symref.tsv"
+  awk -F'\t' '
+    $4 == "inc"  { k = $1 SUBSEP $5; cri[k] = (k in cri) ? cri[k] SUBSEP $2 : $2; wv[$2] = $3; file[$2] = $6 }
+    $4 == "crit" { con[++nc] = $1 SUBSEP $5 SUBSEP $2; wv[$2] = $3; file[$2] = $6 }
+    $4 == "dep"  { dep[$2 SUBSEP $5] = 1 }
+    END {
+      for (i = 1; i <= nc; i++) {
+        split(con[i], a, SUBSEP); k = a[1] SUBSEP a[2]; t = a[2]; b = a[3]
+        if (!(k in cri)) continue
+        n = split(cri[k], cs, SUBSEP); m = 0; serial = 0
+        for (j = 1; j <= n; j++) {
+          c = cs[j]
+          if (c == b) continue
+          if (wv[b] + 0 > wv[c] + 0) continue
+          # consumidora que depende de ALGUMA declarante esta serializada atras da
+          # criadora; as demais declarantes carregam o token como contrato (4.106)
+          if ((b SUBSEP c) in dep) { serial = 1; break }
+          m++; ds[m] = c
+        }
+        if (serial || m == 0) continue
+        # ordem estavel por nome de arquivo (saida determinista independe do `for in`)
+        for (x = 2; x <= m; x++) { y = ds[x]; z = x - 1; while (z >= 1 && file[ds[z]] > file[y]) { ds[z + 1] = ds[z]; z-- }; ds[z + 1] = y }
+        lista = ""
+        for (x = 1; x <= m; x++) lista = lista (x > 1 ? ", " : "") file[ds[x]] " (wave " wv[ds[x]] ")"
+        printf "WARNING\ttask-consumidor-paralelo-ao-criador\t%s citado nos Criterios/Roteiro de %s (wave %s) e declarado no Inclui de %s do mesmo PLAN, sem Depende de — consumidora nao serializada atras da criadora (4.491)\n", t, file[b], wv[b], lista
+      }
+    }
+  ' "$TMP/symref.tsv" >> "$OUT"
 }
 
 # --fix (4.478): só TASK, só as classes mecânicas; grava o arquivo apenas se mudou.

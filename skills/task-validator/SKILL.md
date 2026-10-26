@@ -53,7 +53,10 @@ sem consolidação declarada (4.90). Invocado com o **diretório do slug** (batc
 acrescenta `task-overlap-fr` (FR realizado por 2+ TASKs do mesmo PLAN) e
 `task-wave-overlap-arquivo` (mesmo arquivo no Inclui de 2+ TASKs da mesma wave —
 best-effort declarado: só caminho parseável ou nome solto com extensão de código conta,
-e ausência de achado não prova ausência de colisão; 4.326, 4.454).
+e ausência de achado não prova ausência de colisão; 4.326, 4.454) e
+`task-consumidor-paralelo-ao-criador` (símbolo em crase nos Critérios/Roteiro de uma TASK
+declarado no Inclui de outra do mesmo PLAN em wave igual ou anterior, sem `Depende de`;
+4.491).
 
 Cada achado entra como `**[artifact-lint]** SEVERIDADE check — detalhe`.
 
@@ -104,6 +107,7 @@ aberta (`plan-status-vs-tasks` — 4.153) e closure preenchida com Status ≠ Do
 - Fato `task-comando-contradiz-criterio` (4.215) **e** a proibição é regra de lição/convenção do projeto que o comando viola de verdade (o developer executa o comando, nunca a prosa — o comando vence em silêncio): escale para ERROR; menção legítima da tag (ex.: proibição sobre outro contexto que o comando não alcança) → o WARNING fica como está
 - Fato `task-prova-seguranca-com-grupo` (4.233) **e** a tag é grupo que a config default da suíte do projeto exclui (lição/convenção do projeto o diz, ou a ficha/perfil o declara): escale para ERROR — prova de segurança fixada fora da rodada default nunca roda onde o time olha; tag de grupo que a suíte default seleciona → o WARNING fica como está
 - Fato `task-wave-overlap-arquivo` (4.326) **e** o caminho é de fato o mesmo arquivo de código/config que ambas as TASKs editam: escale para ERROR — mesma wave é candidata a paralelo, e o conserto é da decomposição (re-sequenciar por wave/dependência, princípio 2 do `/keelson:tasks`), nunca confiar que o dispatch do implement vai pegar; token de prosa que o parser leu como caminho, ou arquivo que só uma das TASKs de fato edita → o WARNING fica como está; achado "casada pelo nome" (4.454) exige conferir o diretório antes de escalar — mesmo basename em diretórios distintos não é o mesmo arquivo
+- Fato `task-consumidor-paralelo-ao-criador` (4.491) **e** o símbolo não existe no repo (Grep) — nasce na TASK que o declara: escale para ERROR — o critério da consumidora só é executável com o código da irmã no disco, e mesma wave é candidata a paralelo; o conserto é a aresta `Depende de` (wave posterior) ou o item no próprio Inclui quando é contrato congelado (4.106), nunca nota em prosa. Símbolo que já existe no repo (a irmã só o usa) → o WARNING fica como está
 - Fato `task-mutacao-sem-contagem` (4.232) **e** a TASK toca camada de persistência com escopo (tenant/dono/agregado): escale para ERROR — sem o denominador "todo método que toca a tabela", método de escrita sem predicado sai da contagem por construção (IDOR real chegou ao gate 8 assim); menção a mutação fora de contexto de persistência → o WARNING fica como está
 
 ### WARNING se:

@@ -25,6 +25,27 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.228.0] — 2026-10-26
+
+Re-init: none
+
+Decision 4.491 (minor) — field intake: a criterion that cites a symbol a sibling TASK creates is serialized behind that sibling (new lint check plus the forge's own check); the pre-code QA recomputes ordering oracles key by key; the ledger archive carries the window log into the dated report folder; a gate-9 script step names its executor when the QA lacks the tool; a positive control is the same search with the artifact put back.
+
+### Added
+
+- **Lint check `task-consumidor-paralelo-ao-criador`** (WARNING, directory mode): a backtick span in a TASK's Done criteria or gate-9 script that also appears, as a whole span, in the `Inclui` of another TASK of the same PLAN at the same or an earlier wave, without `Depende de` from the consumer to a declaring TASK. Absolved: the span also in the consumer's own `Inclui` (frozen contract), a dependency on any declaring TASK, a `Done` side, a non-numeric wave. One line per consumer and span. The `task-validator` escalates to ERROR when the symbol does not exist in the repo yet — it is born in the sibling. Fixture `defeitos-e` with one planted defect and four negative controls; corpus and `valido` stay clean.
+
+### Changed
+
+- **`/keelson:tasks`**: the manifest self-check (iii) now covers any symbol one TASK's criterion cites and another creates (testid, key, helper) — `Depende de` to the creator or the item in the consumer's own `Inclui`, and a new edge reopens the wave check; in step 5, `task-wave-overlap-arquivo` and the new check go to the scribe as "fix" (both ends of the edge, INDEX re-derived) — only the validator's absolutions come back justified; the extract-or-duplicate rule no longer says siblings of the *same wave* cite the helper's creator in `Depende de` (a dependency puts the consumer in a later wave).
+- **`qa`, pre-code mode**: "order" joins the oracles recomputed by hand, and an ordering or tie-break oracle applies the complete, cited sort rule key by key to distinct values in each key — never copies an ordering measured with one constant key.
+- **Gate-9 script (`/keelson:tasks`, `/keelson:implement`)**: a step that needs a tool the `qa` does not have (a tracker read through the MCP connector, an external system) names its executor in the step — `tracker-sync` in read mode or the main session — and what it hands back as evidence; the wave reconciliation runs that step through the named executor before dispatching the `qa`. "By the main session or the QA" left the dispatch generic and the agent guard refused it. The `tracker-sync` gains the read-only evidence call: it reads, it moves no card.
+- **`core/CODE-REVIEW.md`, positive control (4.186)**: the control for a mechanical absence claim is the **same search** — same pattern, same universe — matching with the artifact put back; a different pattern that matches proves the command ran, not that the pattern detects. In a minified bundle the marker is a string literal or an i18n key that survives the build, never the module name.
+
+### Fixed
+
+- **`scripts/ledger.sh archive`** moves the session's window log (`<casa>/window.log`; legacy `thoughts/local/session-window.log`) into the same dated `reported-<ts>/` it creates, so a second report in the same session can no longer overwrite the first one's archived log with a hand-typed `mv`; a log with no active event is archived too, and `.window-offset.*` stays in place. The report contract names the script as the mover.
+
 ## [0.227.0] — 2026-10-25
 
 Re-init: none
