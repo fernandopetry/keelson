@@ -835,7 +835,10 @@ fecho — publica também o worklog do trecho medido; rota sem marca de largada 
 
 - **Worklog** (`addWorklogToJiraIssue`): duração medida do **trecho que fechou**
   (`timeSpent`, no formato de duração do Jira — unidades separadas por espaço, `1h 30m`,
-  nunca `1h30m`; rejeição de formato → uma tentativa só, evento `tracker` com a devolutiva
+  nunca `1h30m`; **nunca segundos** (4.492): a janela medida arredonda para minutos
+  inteiros, mínimo `1m`, e o valor passa pelo autocheck `^([0-9]+[wdhm])( [0-9]+[wdhm])*$`
+  antes da chamada — reprovou, corrija antes, não gaste a tentativa; rejeição de formato
+  → uma tentativa só, evento `tracker` com a devolutiva
   literal, sem retentar — 4.437). Início do trecho = o mais recente entre a última marca do relógio do
   ciclo (Cronologia/largada) e o fim do último worklog de telemetria já publicado na
   issue — vale igual para as closures por wave do gancho `implement`. **Pausa e retomada

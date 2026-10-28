@@ -426,11 +426,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.228.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.229.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: a lint check catches a TASK whose criterion cites a symbol a same-wave sibling creates, the pre-code QA recomputes ordering oracles key by key, and the ledger archive carries the window log into the dated report folder.
+New in this release: the developer's report counts prescribed mutants against executed ones and proves each mutant differs from HEAD, a lint check catches a symbol declared in two TASKs without a single owner, and telemetry worklogs never carry seconds.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

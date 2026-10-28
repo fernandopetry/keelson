@@ -189,6 +189,20 @@ na hora de paralelizar. É WARNING porque o lint não sabe quem cria o símbolo 
 existe no repositório, a irmã só o usa e o achado pode ficar como está; o `task-validator`
 escala quando o símbolo nasce na irmã.
 
+### O lint acusou "símbolo sem criadora única" entre TASKs
+
+Um mesmo símbolo entre crases — um helper, uma função, uma constante — aparece no
+"Escopo > Inclui" de duas ou mais TASKs do mesmo PLAN, e nenhuma delas é a dona: não há
+uma TASK que todas as outras declarem em `Depende de`. Na prática, duas TASKs vão criar o
+mesmo helper (duplicata, ou colisão de escrita se rodarem em paralelo), e isso só aparece
+na revisão de código. O conserto é na decomposição: uma TASK cria o símbolo e o carrega no
+Inclui; as outras o citam em `Depende de` e descem para a wave seguinte (uma cadeia de
+`Depende de` também serve). Símbolo que o PLAN já fixa entre crases — um contrato congelado
+numa DEC — é compartilhado por desenho e não dispara. É WARNING porque
+o lint não sabe se o símbolo já existe — quando ele já está no repositório e as TASKs só o
+usam, o achado pode ficar como está; o `task-validator` escala quando o símbolo nasce
+numa delas.
+
 ### O lint acusou "grep recursivo sobre diretório inteiro" num critério
 
 Um critério de ausência ("o nome antigo não aparece mais") usa `grep -r` sobre um

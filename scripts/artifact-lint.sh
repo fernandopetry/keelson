@@ -9,7 +9,8 @@
 #   <caminho>  arquivo SPEC-*.md, PLAN-*.md ou TASK-*.md (tipo inferido do caminho),
 #              ou diretório de slug ({docsRoot}/<slug>) — linta todos os artefatos
 #              e acrescenta os checks cross-arquivo (overlap de FR, colisao de
-#              arquivo e consumidora paralela a criadora na mesma wave).
+#              arquivo, consumidora paralela a criadora na mesma wave e simbolo
+#              compartilhado sem dona unica).
 #   --fix      (decisão 4.478) antes de lintar, corrige nas TASKs as classes puramente
 #              mecânicas — `task-criterio-cifrao-aspas-duplas` (segmento em aspas duplas
 #              com `$` vira aspas simples; com `'` dentro, `\$`) e `task-secao-ausente`
@@ -834,7 +835,8 @@ lint_file() { # $1 = caminho
 }
 
 # checks cross-arquivo (só no modo diretório): overlap de FR entre PLANs e entre
-# TASKs do mesmo PLAN; arquivo do Inclui repetido em TASKs da mesma wave (4.326)
+# TASKs do mesmo PLAN; arquivo do Inclui repetido em TASKs da mesma wave (4.326);
+# consumidora paralela a criadora (4.491); simbolo em 2+ Inclui sem dona unica (4.492)
 lint_dir_cross() { # $1 = dir do slug
   d="$1"
   for f in "$d"/plans/PLAN-*.md; do
@@ -1034,6 +1036,59 @@ lint_dir_cross() { # $1 = dir do slug
       }
     }
   ' "$TMP/symref.tsv" >> "$OUT"
+
+  # simbolo em crase no Inclui de 2+ TASKs do mesmo PLAN sem dona unica (4.492):
+  # nenhuma carregadora e alcancada por `Depende de` (fecho transitivo) de todas as
+  # outras — o helper nasce em duas (ou em nenhuma) e a colisao so aparece no gate 7.
+  # Universo: o mesmo span da 4.491 (symref), restrito a forma de simbolo — sem `/`
+  # (arquivo e da 4.228), sem `=`/aspas (atributo), sem ponto + sufixo final (nome de
+  # arquivo solto). Absolve o span que o PLAN do mesmo numero cita em crase: contrato
+  # congelado na DEC (4.300) e compartilhado por desenho. Done e Wave nao numerica ja
+  # ficam fora do symref.
+  for f in "$d"/plans/PLAN-*.md; do
+    [ -f "$f" ] || continue
+    m="$(basename "$f" | sed -n 's/^PLAN-\([0-9][0-9]*\)[-.].*/\1/p')"
+    [ -n "$m" ] || continue
+    awk -v M="$m" '{ s = $0; while (match(s, /`[^`]+`/)) { print M "\t" substr(s, RSTART + 1, RLENGTH - 2); s = substr(s, RSTART + RLENGTH) } }' "$f"
+  done > "$TMP/plancontrato.tsv"
+  awk -F'\t' '
+    function simb(t) {
+      if (index(t, "/") || index(t, "=") || index(t, "\"") || index(t, "\047")) return 0
+      if (t ~ /\.[A-Za-z0-9]+$/) return 0
+      return 1
+    }
+    # alcanca(a, b): b e alcancavel de a pelas arestas Depende de (fecho transitivo);
+    # qid isola o visitado por consulta — ciclo e do grafo (dep-ciclo), nao daqui
+    function alcanca(a, b, qid,   n, i, q) {
+      if (a == b) return 1
+      if ((qid SUBSEP a) in vis) return 0
+      vis[qid SUBSEP a] = 1
+      n = split(adj[a], q, SUBSEP)
+      for (i = 1; i <= n; i++) if (alcanca(q[i], b, qid)) return 1
+      return 0
+    }
+    FNR == NR { plano[$1 SUBSEP $2] = 1; next }
+    $4 == "inc" && simb($5) && !(($1 SUBSEP $5) in plano) { k = $1 SUBSEP $5; car[k] = (k in car) ? car[k] SUBSEP $2 : $2; cnt[k]++; wv[$2] = $3; file[$2] = $6 }
+    $4 == "dep" { adj[$2] = ($2 in adj) ? adj[$2] SUBSEP $5 : $5 }
+    END {
+      for (k in cnt) {
+        if (cnt[k] < 2) continue
+        n = split(car[k], cs, SUBSEP); split(k, kk, SUBSEP); t = kk[2]
+        dona = 0
+        for (i = 1; i <= n && !dona; i++) {
+          ok = 1
+          for (j = 1; j <= n; j++) { if (j == i) continue; if (!alcanca(cs[j], cs[i], ++qn)) { ok = 0; break } }
+          if (ok) dona = 1
+        }
+        if (dona) continue
+        # ordem estavel por nome de arquivo (saida determinista independe do `for in`)
+        for (x = 2; x <= n; x++) { y = cs[x]; z = x - 1; while (z >= 1 && file[cs[z]] > file[y]) { cs[z + 1] = cs[z]; z-- }; cs[z + 1] = y }
+        lista = ""
+        for (x = 1; x <= n; x++) lista = lista (x > 1 ? ", " : "") file[cs[x]] " (wave " wv[cs[x]] ")"
+        printf "WARNING\ttask-compartilhado-sem-dono\t%s no Inclui de %d TASKs do mesmo PLAN (%s) sem criadora unica — nenhuma e alcancada por Depende de de todas as outras (4.492)\n", t, n, lista
+      }
+    }
+  ' "$TMP/plancontrato.tsv" "$TMP/symref.tsv" >> "$OUT"
 }
 
 # --fix (4.478): só TASK, só as classes mecânicas; grava o arquivo apenas se mudou.

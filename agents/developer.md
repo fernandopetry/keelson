@@ -153,7 +153,8 @@ leva o diff junto (decisão 4.428): `git add -- <arquivos novos da task>` (só o
 commit continua por pathspec) → `sha=$(git stash create)` (fotografa índice + árvore sem
 tocá-los; vazio → use `HEAD`) → `git worktree add --detach <casa da sessão>/tools/mut-<TASK> "$sha"` (casa = caminho absoluto do despacho, nunca resolvida a partir da worktree da task)
 (sem branch, para não calar o `largada-guard`) → mutar e rodar a suíte **lá** →
-`git worktree remove --force`. Declare no report `mutacao_protocolo` (worktree + comando;
+`git -C <worktree> diff --stat HEAD` (é o `diff_vs_head` do report, 4.492 — vazio, o mutante
+não foi aplicado) → `git worktree remove --force`. Declare no report `mutacao_protocolo` (worktree + comando;
 `n/a` **só** quando nenhum Critério de pronto da TASK prescreve mutante — mutante
 prescrito e `n/a` no report é a mesma violação que o campo ausente, decisão 4.429);
 cópia do diretório de trabalho não é protocolo válido (4.336 — Gotchas).
@@ -262,7 +263,8 @@ lint_warnings: <N ou 0>
 autocheck_comentarios: "<N introduzidos · M removidos no autocheck>"  # teste do Art. 7 por comentário (4.185/4.245/4.250); "0 · 0" é estado válido
 mutacao_protocolo: "<worktree <caminho> — <comando>> | n/a"  # onde o mutante rodou (4.428) — nunca a árvore onde você implementa; n/a só sem mutante prescrito no Critério (4.429), omissão não é estado
 mutantes:             # um por mutante prescrito (4.475): veredito por item é o que o revisor cita em vez de refazer; sobrevivente ou "equivalente" é decisão dele, não sua
-  - "<arquivo:linha — alteração> → morreu (<teste>) | sobreviveu | equivalente: <motivo>"
+  - "<arquivo:linha — alteração> · diff_vs_head: +<a>/−<b> → morreu (<teste>) | sobreviveu | equivalente: <motivo>"  # diff vazio contra HEAD é identidade, não mutante (4.492)
+mutantes_prescritos: "N/M"  # N executados pelo protocolo / M prescritos no Critério (4.492); "0/0" exatamente quando mutacao_protocolo é n/a; N<M → Blocked (4.71) com falhas[].categoria teste | ambiente, nunca Done
 acs_realizados:
   - AC-NNN-XXX
 escoteiro:            # limpezas do trecho tocado (Charter Art. 6); null se não houve

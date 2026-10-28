@@ -49,7 +49,9 @@ Cada AC dos critérios de pronto tem ≥ 1 teste que o verifica, e o teste é **
   completo e o veredito por mutante é **fato citado**, não refeito (4.475): o revisor
   confere a lista contra o Critério e o eixo; reexecuta só o mutante que o developer
   declarou equivalente ou sobrevivente (aí a reexecução **é** o veredito), o que o
-  report não traz com veredito, ou o que mira um teste que o retry alterou.
+  report não traz com veredito ou com `diff_vs_head` não vazio — identidade não é
+  mutante (4.492) —, ou o que mira um teste que o retry alterou; `mutantes_prescritos`
+  com N<M sem `Blocked` é mutante prescrito sem prova.
 
 Cada um é **achado bloqueante**: o teste existe e passa, mas não é capaz de falhar junto
 com o comportamento — o AC conta como **sem teste**.

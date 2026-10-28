@@ -279,8 +279,9 @@ ao `scribe`, com a linha da TASK como âncora. Script indisponível → declare,
 (os checks cruzados só existem nele; catálogo e severidades: `lint-contract.md`). Entram no
 mesmo delta ao `scribe`: todo achado que **não** é `(W)` no catálogo (fato — `task-tipo-enum`,
 seção ou campo ausente, id divergente) e os achados do grafo que atravessam fatias
-(`dep-bloqueia-assimetrica`, `wave-incoerente`); `task-wave-overlap-arquivo` e
-`task-consumidor-paralelo-ao-criador` vão como **"corrija"** — re-sequenciar com as duas
+(`dep-bloqueia-assimetrica`, `wave-incoerente`); `task-wave-overlap-arquivo`,
+`task-consumidor-paralelo-ao-criador` e `task-compartilhado-sem-dono` (4.492) vão como
+**"corrija"** — re-sequenciar com as duas
 pontas da aresta e o INDEX re-derivado; nota em prosa não serializa TASKs paralelas, e só
 as absolvições do `task-validator` (Etapa 3) voltam justificadas em `duvidas` (4.491); os
 demais `(W)` de padrão desta classe (`task-nome-tipo`, `task-criterio-grep-nao-ancorado`)

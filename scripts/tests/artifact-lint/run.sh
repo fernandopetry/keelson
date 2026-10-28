@@ -23,6 +23,12 @@
 # `Depende de`) → task-consumidor-paralelo-ao-criador (W), uma linha por consumidora e
 # token; os controles negativos ficam mudos: token tambem no proprio Inclui (003),
 # `Depende de` a uma declarante (004), criadora Done (005 → 006).
+# "defeitos-f" (4.492) planta UM simbolo em crase no Inclui de 2 TASKs do mesmo PLAN sem
+# dona unica (001 e 002, sem `Depende de`) → task-compartilhado-sem-dono (W), uma linha
+# por simbolo; os controles negativos ficam mudos: consumidora serializada por
+# `Depende de` a criadora (003 → 004), criadora Done fora do universo (005 → 006),
+# contrato congelado citado em crase na DEC do PLAN (007 e 008, sem aresta — 4.300) e
+# cadeia transitiva de `Depende de` (011 → 010 → 009). SPEC/PLAN copiados de "valido".
 #
 # Uso: scripts/tests/artifact-lint/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -73,6 +79,7 @@ runcase defeitos-b      defeitos-b 1 defeitos-b.txt
 runcase defeitos-c      defeitos-c 1 defeitos-c.txt
 runcase defeitos-d      defeitos-d 0 defeitos-d.txt
 runcase defeitos-e      defeitos-e 0 defeitos-e.txt
+runcase defeitos-f      defeitos-f 0 defeitos-f.txt
 runcase arquivo-valido  valido/specs/SPEC-001-login.md 0 arquivo-unico-valido.txt
 runcase arquivo-defeito defeitos/tasks/TASK-001-005-refactor-extrai.md 1 arquivo-unico-defeito.txt
 runcase arquivo-mutacao-contada valido/tasks/TASK-001-003-mutacao-contada.md 0 arquivo-unico-mutacao-contada.txt

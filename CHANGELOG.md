@@ -25,6 +25,21 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.229.0] — 2026-10-28
+
+Re-init: none
+
+Decision 4.492 (minor) — field intake: the developer's report declares how many prescribed mutants ran and that each mutant differs from HEAD; a symbol declared in the `Inclui` of two or more TASKs without a single owner becomes a lint check; telemetry worklogs never carry seconds. Two proposals deferred by the queue's default.
+
+### Added
+
+- **Lint check `task-compartilhado-sem-dono`** (WARNING, directory mode): a backtick span in the `Inclui` of two or more TASKs of the same PLAN where no TASK is reached through `Depende de` (transitively) from all the others — the helper is born in two of them, or in none, and the collision only surfaces at gate 7. Same span universe as `task-consumidor-paralelo-ao-criador`, restricted to symbol form (no `/`, no `=` or quotes, no trailing file suffix); a span the PLAN itself cites in backticks (a frozen contract in a DEC) is shared by design and absolved; a `Done` TASK or a non-numeric wave is out of the universe. One line per symbol. The `task-validator` escalates to ERROR when the symbol does not exist in the repo yet; `/keelson:tasks` step 5 sends it to the scribe as "fix" with the two serialization checks. Fixture `defeitos-f` with one planted defect and four negative controls; the other fixtures and the corpus stay clean.
+
+### Changed
+
+- **`developer` report**: each line of `mutantes:` carries `diff_vs_head: +<a>/−<b>` — an empty diff against HEAD is the identity, not a mutant — and the report gains `mutantes_prescritos: "N/M"` (N run by the protocol / M prescribed in the criteria; `"0/0"` exactly when `mutacao_protocolo` is `n/a`); N<M returns `Blocked` with the cause in `falhas`, never `Done`. The worktree protocol captures `git -C <worktree> diff --stat HEAD` before removing the worktree — that is the value the report carries. The gate-1 rule in `core/CODE-REVIEW.md` has the reviewer re-run a mutant without a non-empty diff too, and reads N<M without `Blocked` as a prescribed mutant without proof.
+- **Jira sync protocol §17 (telemetry worklog)**: `timeSpent` never carries seconds — the measured window is rounded to whole minutes (minimum `1m`) and checked against `^([0-9]+[wdhm])( [0-9]+[wdhm])*$` before the call, so a malformed value is fixed before the single attempt is spent.
+
 ## [0.228.0] — 2026-10-26
 
 Re-init: none
