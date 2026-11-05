@@ -425,6 +425,7 @@ case "$ACTION" in
         printf '%s\n' "$(dirname "$1")/window.log"
       fi
     }
+    # shellcheck disable=SC2329,SC2317  # invocada indiretamente via em_cada_casa (SC2317: shellcheck novo re-acusa o corpo)
     have_casa() {
       for f in "$1"/*.md; do
         [ -f "$f" ] && { have=1; break; }
