@@ -25,6 +25,25 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.230.0] — 2026-11-05
+
+Re-init: required
+
+Decision 4.493 (minor) — the house conventions get a home, a writer and readers: `/keelson:conventions` measures in the code where each act lives and how it is built, previews "if I had to build X, I'd do it like this" with anchors, asks only what the code leaves open, and writes `guidelines/project/conventions.md`; the developer, gate 6, the TASK forge and the plan read it. Re-init required because the injected block's human-only note lists the new command.
+
+### Added
+
+- **`/keelson:conventions`** (human-only): per layer of the ficha, the `code-scout` answers five questions for each act of a closed catalog (screen, component, endpoint, service, data, job, test, config) — where it lives, which exemplar it follows, how it is named, which layer it calls, where its test lives — as `único` (straight to the preview), `concorrentes` (a question whose options are the patterns found, with anchor and count) or `não encontrado` (a question with three suggestions from the profile plus free text). The preview carries the origin of every line (`código` with anchor, or `Diretor`); the Director adjusts until "grava". An existing file changes per entry with its diff shown; `--refresh` re-measures `código` entries against the tree; `--dry-run` stops at the preview. The commit stays with the Director.
+- **`guidelines/project/conventions.md`** (opt-in), rule owned by `core/ARCHITECTURE.md` (section *Convenções do projeto*): one section per act, one dated entry per line with its origin and anchor; cut rule "only what the profile does not say and holds for any demand" (idiom is profile, what never changes is `invariants.md`, a fixed defect is a lesson, a slug fact is the MAP); a stale entry becomes a `revogada` line, never a deletion.
+
+### Changed
+
+- **Readers of the new file, all conditional on its existence** (`n/a (sem conventions.md)` declared otherwise): the `developer` loads the section of the act the task performs, and the entry wins over the profile where both speak; gate 6 of `core/CODE-REVIEW.md` (and the `code-reviewer` context load) checks place, skeleton, name and called layer of every new or moved file against the act's entry; `/keelson:tasks` checks path and name of a new file in `Inclui` against the entry (a contradiction passes only with the reason written in the TASK); `/keelson:plan` step 3 turns a design that contradicts an entry into an explicit DEC with "follow the convention" as the evaluated alternative.
+- **`/keelson:implement` closure, `alvo: projeto`**: a lesson about place, skeleton, name or layer has `conventions.md` as its designated doctrine artifact — the closure writes the line there too, origin `Diretor`, besides the lesson.
+- **`/keelson:init` maturity portrait** gains the line *Convenções do projeto* (present, or absent with the opt-in pointer); `code-scout` declares `:conventions` among its invokers.
+- **Injected block**: the human-only note lists `/keelson:conventions`.
+- **Wiki**: *Primeiros passos* step 1 sends the newcomer to `/keelson:conventions` before the first demand (with a flow diagram); *Conceitos* gains the row *Convenções do projeto* in "Onde cada coisa mora".
+
 ## [0.229.0] — 2026-10-28
 
 Re-init: none

@@ -60,7 +60,7 @@ Gates 8 (segurança), 9 (comportamento), 10 (performance) e 11 (design) não sã
 ### 1. Carregar contexto
 
 1. Ler report do developer.
-2. Ler a régua (`guidelines/core/CODE-REVIEW.md`), TASK, PLAN, SPEC, a ficha, o perfil ativo e `guidelines/project/invariants.md` quando existir (gate 6 — 4.242; ausente → o veredito do gate declara `n/a`). **Do perfil, leia sempre as seções §§1–5, 7, 9 e 11.** Inclua **§6** quando a task toca área sensível (lista canônica: description do `security-engineer`); **§8** quando toca manifesto/lockfile; **§10** quando envolve query/dataset pesado; **§12** quando os `quality.*` da ficha não bastarem. Perfil sem a espinha numerada 0–12 → leia o arquivo inteiro.
+2. Ler a régua (`guidelines/core/CODE-REVIEW.md`), TASK, PLAN, SPEC, a ficha, o perfil ativo e, quando existirem, `guidelines/project/invariants.md` (gate 6 — 4.242) e a seção do ato do diff em `guidelines/project/conventions.md` (gate 6 — 4.493); ausente → o veredito do gate declara `n/a` para cada um. **Do perfil, leia sempre as seções §§1–5, 7, 9 e 11.** Inclua **§6** quando a task toca área sensível (lista canônica: description do `security-engineer`); **§8** quando toca manifesto/lockfile; **§10** quando envolve query/dataset pesado; **§12** quando os `quality.*` da ficha não bastarem. Perfil sem a espinha numerada 0–12 → leia o arquivo inteiro.
 3. Listar arquivos modificados do report do developer; report ausente ou incompleto → `git diff --name-only`.
 
 ### 2. Aplicar os gates 1–7 em ordem

@@ -370,6 +370,7 @@ Você não gerencia o MAP: o time o semeia, atualiza e consome sozinho. Se quise
 | Rascunho de sessão, evidência efêmera | `thoughts/` (fora do git) |
 | Lições do projeto | `guidelines/project/lessons/` — um arquivo por lição, com ciclo de vida (`ativa` · `em-observacao` · `revogada`) e os caminhos que ela nomeia; só a ativa vira critério/regra, os leitores recebem só o recorte que toca a mudança (`scripts/lessons.sh`), e `/keelson:lessons-audit` audita o acervo (e migra o `lessons.md` antigo) |
 | Invariantes do projeto | `guidelines/project/invariants.md` (opcional) — o que **nunca pode mudar** neste projeto, um invariante falsificável por bullet, escrito por você. Quando existe, o planejamento e o gate de review checam contra ele; ausente, o gate declara `n/a` |
+| Convenções do projeto | `guidelines/project/conventions.md` (opcional) — **como esta casa faz** cada ato de código: onde mora a tela, qual esqueleto segue, como se nomeia, que camada chama, onde fica o teste. Nasce de `/keelson:conventions`, que mede no código e só pergunta o que o código não fecha; o developer, o gate de review, a forja de tasks e o plano leem a seção do ato antes de escrever. Ausente, cada um segue o vizinho mais próximo |
 
 Próximo: [A ficha do projeto](Ficha-do-projeto) ou o
 [Guia do método](Guia-do-metodo).

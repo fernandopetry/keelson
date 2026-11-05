@@ -311,6 +311,7 @@ Retrato de maturidade — o que sustenta a autonomia dos agentes neste projeto
 - **E2E**: <quality.e2e provado | ausente → gate 9 prova executando, mas sem regressão re-executável (opt-in: /keelson:e2e-setup)>
 - **Mutação**: <quality.mutation provado | ausente → suíte verde é evidência mais fraca (opt-in: /keelson:mutation-setup)>
 - **Invariantes do projeto**: <guidelines/project/invariants.md presente | ausente → gate 6 declara n/a (opt-in — 4.242)>
+- **Convenções do projeto**: <guidelines/project/conventions.md presente | ausente → developer, gate 6 e forja de TASKs seguem o vizinho; lugar e esqueleto da casa ficam com o Diretor (opt-in: /keelson:conventions — 4.493)>
 - **Ferramentas de segurança**: <gitleaks + auditor de CVE do ecossistema `ok` (security-tools.sh) | ausente → gate 8 revisa por leitura e declara `ferramentas_indisponiveis` em toda rodada (Etapa 4.8 — recomendado, não obrigatório)>
 ```
 

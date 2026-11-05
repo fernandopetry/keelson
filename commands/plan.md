@@ -67,7 +67,7 @@ registrada no PLAN.
 
 ## Etapa 3: validação contra guidelines
 
-Antes de gerar o PLAN: **stack proposto autorizado** pela ficha e pelo perfil de linguagem ativo; **decisões irreversíveis** (perfil/`guidelines/core/` ou INDEX.md) tocadas → parar e reportar; **invariantes do projeto** (`guidelines/project/invariants.md`, quando existe — régua em `guidelines/core/ARCHITECTURE.md`, decisão 4.242) violados pelo desenho → parar e reportar. Conflito irresolvível: parar antes de escrever.
+Antes de gerar o PLAN: **stack proposto autorizado** pela ficha e pelo perfil de linguagem ativo; **decisões irreversíveis** (perfil/`guidelines/core/` ou INDEX.md) tocadas → parar e reportar; **invariantes do projeto** (`guidelines/project/invariants.md`, quando existe — régua em `guidelines/core/ARCHITECTURE.md`, decisão 4.242) violados pelo desenho → parar e reportar; **convenções do projeto** (`guidelines/project/conventions.md`, quando existe — mesma régua, 4.493) contrariadas pelo desenho (componente fora do lugar, camada chamada que a entrada veda) → DEC explícita com a alternativa "seguir a convenção" avaliada, nunca silêncio. Conflito irresolvível: parar antes de escrever.
 
 **Decisão irreversível de outro slug** (colhida na 0.3.5 — decisão 4.241) **nunca para o fluxo**: conflito ou vizinhança com o desenho proposto vira **citação + justificativa** no campo próprio da §Aderência (Etapa 5), citando o INDEX alheio **pelo caminho** (`{docsRoot}/<outro-slug>/INDEX.md` — 4.124) e **só em prosa** — DEC de outro slug não entra em campo de aresta do grafo (âncora cross-slug reprova como ref quebrada por design, index-contract.md). O parar-e-reportar fica reservado às decisões do próprio slug e dos guidelines.
 

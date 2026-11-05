@@ -107,6 +107,39 @@ teste: *a restrição existiria mesmo que aquele PLAN nunca tivesse sido escrito
 
 ---
 
+## Convenções do projeto — `guidelines/project/conventions.md` (opt-in, decisão 4.493)
+
+Como **esta casa** faz cada ato de código — onde mora, qual esqueleto segue, como se
+nomeia, que camada chama e onde fica o teste — para tela, componente, endpoint,
+serviço, dados, job, teste e config. O perfil de linguagem diz como a linguagem faz;
+este arquivo diz o que só vale aqui. A fronteira é um teste: *outro projeto na mesma
+linguagem faria igual?* Se sim, é perfil; se não, é convenção da casa.
+
+- **Formato**: uma seção `## <ato>` por ato; uma entrada por linha,
+  `- [<aaaa-mm-dd> · <origem>] <fato> — <arquivo>:<linha>`. A origem é `código`
+  (medida, com âncora obrigatória) ou `Diretor` (decidida na entrevista, sem âncora).
+  Entrada que perdeu validade vira `[<data> · revogada] <fato> — <motivo>` no fim da
+  seção; nada é apagado. A data é a da **medição**, para a idade ficar visível.
+- **Corte**: só entra o que o perfil não diz e vale para qualquer demanda. Regra
+  idiomática da linguagem é perfil; o que nunca pode mudar é `invariants.md`; defeito
+  corrigido é lição (`lessons/`); fato de um slug é MAP. O arquivo cabe numa leitura —
+  seção que vira inventário de arquitetura perdeu o corte.
+- **Quem escreve**: `/keelson:conventions` (humano-only), medindo no código via
+  `code-scout` e perguntando ao Diretor só o que o código não fecha; o Diretor revisa e
+  commita. Edição à mão é bem-vinda — a origem `Diretor` existe para isso.
+- **Quem lê** (sempre condicional — só quando o arquivo existe): o `developer` ao
+  carregar contexto (a seção do ato que a task faz vale como o perfil), o gate 6 do
+  code review (lugar, esqueleto, nome e camada do diff batem com a entrada do ato), a
+  forja de TASKs (caminho e nome de arquivo novo no Inclui conferidos contra a entrada)
+  e a Etapa 3 do `/keelson:plan` (desenho que contraria uma entrada declara a
+  alternativa numa DEC, nunca em silêncio). Ausente → `n/a (sem conventions.md)`
+  **declarado**; os leitores seguem o vizinho (seção abaixo).
+- **Lição que revela convenção**: lição `alvo: projeto` de lugar, esqueleto, nome ou
+  camada tem este arquivo como artefato de doutrina designado — a closure grava a
+  linha aqui também, no formato acima, além da lição.
+
+---
+
 ## Nomear seguindo o vizinho
 
 Antes de nomear um tipo, arquivo, tabela ou coluna, **leia 2–3 vizinhos do mesmo

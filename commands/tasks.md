@@ -151,7 +151,10 @@ interna — é do developer na execução, nunca do plano.
    nome/prefixo conferido contra a convenção de nomenclatura do perfil ativo (prefixo
    reservado a design system, sufixo de camada) antes de escrito — prefixo que soa
    idiomático não dispensa a checagem. Perfil sem seção de nomenclatura → declare e
-   siga.
+   siga. **Com `guidelines/project/conventions.md` presente (4.493)**, caminho e nome
+   de arquivo novo no Inclui são conferidos também contra a entrada do ato (lugar e
+   nome) — a entrada vence o perfil; Inclui que contraria a entrada só passa com a
+   razão escrita na TASK.
 7. **Granularidade** (sobrescrita pela ficha/`CLAUDE.md` se declarado): medida por
    **esforço e comportamento entregue, nunca por contagem de arquivos** — a fatia
    vertical típica toca 1 arquivo por camada e continua atômica. `small` = comportamento

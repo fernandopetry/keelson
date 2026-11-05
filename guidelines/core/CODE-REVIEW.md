@@ -155,6 +155,13 @@ reabertura declarada.
   nenhum violado pelo diff. Arquivo ausente → `n/a (sem invariants.md)` declarado no
   veredito do gate, nunca omitido. A régua do artefato mora em `./ARCHITECTURE.md`
   (seção "Invariantes do projeto").
+- **Convenções do projeto** (`guidelines/project/conventions.md`, quando existe — 4.493):
+  lugar, esqueleto, nome e camada chamada de cada arquivo novo ou movido pelo diff batem
+  com a entrada do ato correspondente (tela, componente, endpoint, serviço, dados, job,
+  teste, config). Divergência é achado do gate 6 com a entrada citada; a entrada vence
+  o perfil quando os dois falam do mesmo ponto. Arquivo ausente → `n/a (sem
+  conventions.md)` declarado no veredito. Régua em `./ARCHITECTURE.md` (seção
+  "Convenções do projeto").
 - **Doc-trap fechada pelo próprio diff**: quando a correção elimina exatamente um
   defeito que o perfil/guideline do projeto documenta como armadilha ainda viva
   (linguagem tipo "não conte com", "ainda não faz", "armadilha verificada e viva"), o

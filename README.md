@@ -116,6 +116,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:migrate-legacy` | Migrate a legacy slug (docs without `INDEX.md`) to the SDD layout |
 | `/keelson:rebuild-index` | Rebuild a slug's `INDEX.md` from scratch out of its artifacts |
 | `/keelson:lessons-audit` | Audit the project lessons archive — migrate the legacy single file to one file per lesson, measure provenance via git, flag expired, obsolete or mechanically absorbed lessons; judgment cuts apply only with your OK |
+| `/keelson:conventions` † | House-conventions interview — measures in the code where each act lives (screen, component, endpoint, service, data, job, test, config), shows the "if I had to build X, I'd do it like this" preview with anchors, asks only what the code leaves open, and writes `guidelines/project/conventions.md` for the developer, gate 6 and the TASK forge to read; `--refresh` re-measures what aged |
 | `/keelson:warroom` † | Open (`on <motivo>`) or close a warroom window — changes ship with no blocking gate and every commit becomes an open line in `{docsRoot}/DEBT.md`, written by a Stop hook from `git log` so nobody has to remember; gate 8 survives on sensitive surfaces; `close` runs the gates over the accumulated diff and settles each line as resolved or leaves it as the Director's debt (push, PR, merge and deploy stay human) |
 | `/keelson:verify-handoff` † | Close a pending screen-verification `HANDOFF` — consolidates the branch, exercises each item in the real environment; no merge (points to `/keelson:integrate`) |
 | `/keelson:postmortem` † | End-of-session postmortem — re-reads the whole session's interactions (corrections, retries, failed gates), separates defects from new scope, traces each gap to the mechanism that let it through, and produces the copy-paste maintainer message (with literal diffs via the agile-coach) that evolves the plugin |
@@ -426,11 +427,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.229.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.230.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the developer's report counts prescribed mutants against executed ones and proves each mutant differs from HEAD, a lint check catches a symbol declared in two TASKs without a single owner, and telemetry worklogs never carry seconds.
+New in this release: `/keelson:conventions` interviews the codebase (and you, only where the code leaves it open) and writes `guidelines/project/conventions.md` — where each act lives, which skeleton it follows, how it is named, which layer it calls — read by the developer, gate 6, the TASK forge and the plan.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

@@ -60,6 +60,7 @@ corrigidos. Todo o resto do fluxo (perfil, testes, lint, report) vale igual.
 1. Ler o briefing do invocador (ACs, DECs, critérios de pronto) — fonte primária; TASK, PLAN e SPEC entram por **seção**, só o que o briefing não cobre (régua de carga: `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`, "Releitura é exceção declarada"). Briefing insuficiente para fechar os ACs → leia o artefato na íntegra e **declare no report** que o briefing não bastou.
 2. Ler o QUALITY-CHARTER (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/QUALITY-CHARTER.md`) e o perfil de linguagem ativo (`profile.<role>.file` da ficha; prefixo `plugin:` → `${CLAUDE_PLUGIN_ROOT}/guidelines/`, senão relativo à raiz do projeto). Os guidelines do projeto (`guidelines/project/`) valem junto com o perfil.
 3. **Do perfil, leia sempre as seções §§1–5, 7, 9 e 11.** Inclua **§6** quando a task toca área sensível (lista canônica: description do `security-engineer`); **§8** quando toca manifesto/lockfile; **§10** quando envolve query/dataset pesado; **§12** quando os `quality.*` da ficha não bastarem. Perfil sem a espinha numerada 0–12 → leia o arquivo inteiro.
+   **`guidelines/project/conventions.md`, quando existe** (régua em `guidelines/core/ARCHITECTURE.md`, seção *Convenções do projeto*, 4.493): leia a seção do **ato** que a task faz (tela, componente, endpoint, serviço, dados, job, teste, config) — lugar, esqueleto, nome, camada chamada e par de teste valem como o perfil; entrada e perfil em conflito → a entrada vence (é a casa). Ausente → siga o vizinho (`ARCHITECTURE.md`, "Nomear seguindo o vizinho").
 4. Mapear arquivos existentes relevantes (Glob, Grep).
 
 ### 2. Capturar o baseline de verificação
@@ -115,6 +116,7 @@ preenchido pela main session na closure (decisão 4.347).
 2. Respeitar:
    - Stack/versão, naming e anti-padrões do perfil de linguagem ativo
    - Padrão arquitetural (`${CLAUDE_PLUGIN_ROOT}/guidelines/core/ARCHITECTURE.md` + perfil)
+   - Lugar, esqueleto, nome e camada da entrada do ato em `guidelines/project/conventions.md`, quando existe (4.493)
 3. **Só toque arquivos em "Escopo > Inclui"** e auxiliares necessários (testes, types, fixtures) — dentro dos `codePaths` da ficha.
 4. **Regra do escoteiro** (Charter Art. 6): o trecho que você já edita fica melhor do que encontrou, dentro das três condições do Art. 6, declarado item a item no campo `escoteiro` do report. Melhoria maior → não faça: registre no campo `fora_de_escopo` do report (sinal ao Tech Lead, que estaciona sem inflar a task).
 5. **Comentário de código passa pelo teste do Art. 7 antes de todo report** (decisões 4.135/4.185/4.245 — vale em qualquer entrega, não só no retry). Para cada comentário que você introduziu ou alterou, apague-o mentalmente: o leitor perde algo que o código não devolve?

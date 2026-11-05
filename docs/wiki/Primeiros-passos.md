@@ -26,6 +26,34 @@ ausência de cada uma significa para a autonomia dos agentes. Nada ali bloqueia 
 mapa do que sustenta a confiança que você delega; a referência completa de cada campo
 está na [ficha](Ficha-do-projeto).
 
+O `init` conhece a **linguagem** do projeto (o perfil), não a **casa**: em que pasta
+mora uma tela, que esqueleto ela segue, como se nomeia um endpoint, que camada chama
+qual. Antes da primeira demanda, rode:
+
+```
+/keelson:conventions
+```
+
+Ele mede isso no código e mostra uma prévia — *"se eu precisasse criar uma tela, faria
+assim"* — com o arquivo-exemplo de cada resposta. Só pergunta o que o código não
+responde sozinho (dois padrões convivendo, ou nada ainda), sempre com três sugestões e
+espaço para a sua. Você ajusta a prévia até dizer "grava", e o resultado vai para
+`guidelines/project/conventions.md`, que o time lê antes de escrever qualquer arquivo.
+Commite-o junto com a ficha. Sem ele o time segue o vizinho mais próximo de cada
+arquivo, e você corrige "não é aí" na primeira demanda em vez de antes dela.
+
+```mermaid
+flowchart LR
+    A[init] --> B[conventions]
+    B --> C{o código<br/>responde?}
+    C -- sim --> D[prévia com âncora]
+    C -- não --> E[pergunta: 3 opções + a sua]
+    E --> D
+    D -- ajustar --> D
+    D -- grava --> F[guidelines/project/conventions.md]
+    F --> G[primeira demanda]
+```
+
 ## 2. Pedir a primeira demanda
 
 O modo padrão é **autônomo**. Você não precisa digitar comando nenhum: peça em linguagem

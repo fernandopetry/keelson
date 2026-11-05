@@ -183,7 +183,11 @@ commitada e pushada no BRIEF, para o continue medir o tempo parado de qualquer m
 `/keelson:update` (atualizar o plugin instalado — vale após reiniciar a sessão) ·
 `/keelson:report` (refazer o relatório de fecho — sessão retomada ou report perdido) ·
 `/keelson:postmortem` (postmortem de fim de sessão — relê as interações e produz a
-mensagem ao mantenedor do plugin).
+mensagem ao mantenedor do plugin) ·
+`/keelson:conventions` (entrevista de convenções da casa — mede no código onde cada
+ato mora, qual esqueleto segue, como se nomeia e que camada chama; pergunta só o que o
+código não fecha e grava `guidelines/project/conventions.md`, lido pelo developer, pelo
+gate 6 e pela forja de TASKs).
 
 <!-- ============================================================= -->
 <!-- fim do bloco keelson                                          -->

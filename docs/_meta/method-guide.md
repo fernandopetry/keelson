@@ -368,6 +368,27 @@ humanos (exceção declarada no `sdd-conventions.md`, 4.488).
 
 Detalhe completo (flags, etapas, output, gotchas): `commands/deploy.md`.
 
+### 3.33 `/keelson:conventions` — entrevista de convenções da casa (humano-only)
+
+Descobre e grava **como este projeto faz cada ato de código** — tela, componente,
+endpoint, serviço, dados, job, teste e config — em cinco perguntas por ato: onde mora,
+qual exemplar segue, como se nomeia, que camada chama e onde fica o teste. O perfil de
+linguagem responde pela linguagem; este arquivo responde pela casa. O `code-scout`
+mede no código (um por camada da ficha) e devolve cada pergunta como **único** (vai
+direto para a prévia), **concorrentes** (vira pergunta com os padrões encontrados como
+opções, âncora e contagem) ou **não encontrado** (vira pergunta com três sugestões do
+perfil e a resposta livre). A prévia "se eu precisasse criar uma tela, faria assim"
+mostra tudo com a origem de cada linha — `código` com âncora ou `Diretor` — e o
+Diretor ajusta até dizer "grava". Destino: `guidelines/project/conventions.md`, no
+formato e com a régua de corte de `guidelines/core/ARCHITECTURE.md` (seção
+*Convenções do projeto*); arquivo existente muda por entrada, com diff mostrado, e
+`--refresh` re-mede as entradas de origem `código`. Quem lê: `developer` (seção do ato
+da task), gate 6 do `code-reviewer`, forja de TASKs (caminho e nome no Inclui) e
+Etapa 3 do `/keelson:plan`; ausente, cada um declara `n/a` e segue o vizinho. O commit
+é do Diretor. Não escreve código, não toca perfil, `invariants.md` nem `lessons/`.
+
+Detalhe completo (catálogo de atos, etapas, output): `commands/conventions.md`.
+
 ## 4. Skills
 
 Skills não geram artefatos novos — validam ou consultam. As três validators rodam **automaticamente** ao final do comando correspondente, mas podem ser invocadas sob demanda ("valide a SPEC-002", "lint no PLAN-001").
