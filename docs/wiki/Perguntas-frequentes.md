@@ -428,6 +428,10 @@ grupo X") entra em todo recorte, de propósito: esconder lição é o pior erro 
 camada. Lição que virou lint, teste ou regra de perfil sai do recorte como
 **absorvida**, com a âncora de onde a regra vive agora. Ainda tem o `lessons.md` antigo?
 Ele continua sendo lido até você rodar `/keelson:lessons-audit`, que o migra.
+No modo sob demanda não há geração de TASKs: o recorte vai na seção `## Lições
+aplicáveis` do brief avulso, copiado da saída compacta do `lessons.sh match`, e o
+`developer` lê cada id antes de desenhar — o hook `agent-guard` recusa uma vez o despacho
+cujo brief avulso não traz a seção.
 
 ```mermaid
 flowchart LR
@@ -437,6 +441,7 @@ flowchart LR
   M --> R['recorte: casam por path + casam por tag + sem paths']
   R --> T['/keelson:tasks']
   R --> G['gate 7 do review']
+  R --> B['brief avulso: Lições aplicáveis']
 ```
 
 ### E se ele errar?

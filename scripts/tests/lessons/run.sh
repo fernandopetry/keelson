@@ -80,6 +80,11 @@ caso; n_int="$(printf '%s\n' "$b" | grep -c '^---8<---')"; n_om="$(printf '%s\n'
 if [ $((n_int + n_om)) -eq 5 ]; then ok "max-bytes: integrais + omitidas = recorte"; else falha "max-bytes soma: $n_int + $n_om"; fi
 caso; g="$(bash "$LS" "$A" match --paths src/Domain/User.php --max-bytes 999999 2>/dev/null)"
 if ! printf '%s\n' "$g" | grep -q '^# lessons.sh match: omitidas='; then ok "max-bytes folgado: sem linha de omitidas"; else falha "max-bytes folgado"; fi
+# --compact + --max-bytes juntos (4.494): o teto corta linhas compactas e enumera as omitidas
+caso; cm="$(bash "$LS" "$A" match --paths src/Domain/User.php --compact --max-bytes 260 2>/dev/null)"
+n_cm="$(printf '%s\n' "$cm" | grep -c '^--- id=')"; n_omc="$(printf '%s\n' "$cm" | tail -1 | sed -n 's/^# lessons.sh match: omitidas=\([0-9]*\) por --max-bytes 260: .*/\1/p')"
+if [ -n "$n_omc" ] && [ "$n_omc" -gt 0 ] && [ $((n_cm + n_omc)) -eq 5 ] && printf '%s\n' "$cm" | sed -n 2p | grep -q '^--- id=repositorio-sem-escopo-de-tenant .*via=path'; then
+  ok "compact + max-bytes: corta linhas compactas, path primeiro, compactas + omitidas = recorte"; else falha "compact + max-bytes: [$n_cm + $n_omc] [$(printf '%s\n' "$cm" | tail -1)]"; fi
 caso; bash "$LS" "$A" match --max-bytes abc >/dev/null 2>&1; [ $? -eq 2 ] && ok "max-bytes inválido → exit 2" || falha "max-bytes inválido"
 # --- ordem dentro do tier: mais confirmada primeiro (4.473) ---
 caso; o="$(bash "$LS" "$A" match --paths src/Domain/User.php 2>/dev/null | grep '^---8<--- ' | awk '{print $2}' | sed 's/^id=//' | paste -sd, -)"

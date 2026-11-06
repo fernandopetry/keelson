@@ -17,6 +17,11 @@
 #      resolução" do PO em prosa junto) → silêncio; redação sem `modo:` →
 #      silêncio; `modo_aplicado:` não é `modo:`; scribe NOMEADO com `modo:`
 #      ruim → o motivo do modo tem precedência.
+#   7. despacho sob demanda (4.494): keelson:developer com brief avulso citado e sem
+#      recorte de lições (nem no prompt nem na seção do arquivo) → deny 1× com a
+#      receita; válvula; seção presente, recorte no prompt, arquivo não encontrado
+#      (fail-open), TASK citada e cabeçalho do match → silêncio; nomeado sem lições →
+#      o motivo das lições precede o do nome.
 #
 # Uso: scripts/tests/agent-guard/run.sh
 # Exit: 0 tudo verde · 1 alguma divergência. Bash 3.2-compatível.
@@ -136,6 +141,61 @@ silencio "scribe/redacao"
 roda "$(scribe_json keelson:scribe scribe-1 'Correção' "$(printf 'Pacote de correção.\nmodo: fatos\n- FR-01: ajustar.')")"
 contem "scribe/nomeado/modo-primeiro" '4.445'
 contem "scribe/nomeado/valor"         'modo: fatos'
+
+# 7. Despacho sob demanda sem recorte de lições (4.494): brief avulso citado no prompt.
+mkdir -p "$PROJ/docs/gestao/briefs"
+BRIEF_SEM="docs/gestao/briefs/BRIEF-001-corrigir-modal-avulso.md"
+BRIEF_COM="docs/gestao/briefs/BRIEF-002-corrigir-placa-avulso.md"
+printf '# BRIEF-001: Corrigir modal\n\n**Tipo**: avulso\n**Status**: Aberto\n\n## Critério de aceite\n- modal mostra a placa\n' > "$PROJ/$BRIEF_SEM"
+printf '# BRIEF-002: Corrigir placa\n\n**Tipo**: avulso\n**Status**: Aberto\n\n## Critério de aceite\n- placa visível\n\n## Lições aplicáveis\n--- id=LRN-001 estado=ativa via=path origem=gate | fallback encadeado tem um caso por ramo | paths=src/** | tags=\n' > "$PROJ/$BRIEF_COM"
+dev_json() { jq -cn --arg p "$1" '{tool_name:"Agent",tool_input:{subagent_type:"keelson:developer",description:"Implementar brief",prompt:$p}}'; }
+
+# 7a. caminho citado, arquivo sem a seção → deny 1× com a receita.
+roda "$(dev_json "Implemente o brief avulso $BRIEF_SEM conforme o critério de aceite.")"
+contem "licoes/deny"    '"permissionDecision": "deny"'
+contem "licoes/decisao" '4.494'
+contem "licoes/secao"   'Lições aplicáveis'
+contem "licoes/flags"   '--compact --max-bytes'
+
+# 7b. Válvula: a mesma chamada repetida passa.
+roda "$(dev_json "Implemente o brief avulso $BRIEF_SEM conforme o critério de aceite.")"
+silencio "licoes/valvula"
+
+# 7c. Arquivo COM a seção → silêncio.
+roda "$(dev_json "Implemente o brief avulso $BRIEF_COM conforme o critério de aceite.")"
+silencio "licoes/secao-presente"
+
+# 7d. Recorte colado no prompt, sem caminho → silêncio.
+roda "$(dev_json "$(printf 'Implemente o BRIEF-003 (avulso).\nLições: --- id=LRN-007 estado=ativa via=path origem=gate | prettier escopado ao diff | paths=src/** | tags=\n')")"
+silencio "licoes/recorte-no-prompt"
+
+# 7e. Caminho citado e arquivo inexistente → fail-open (a falta não se prova).
+roda "$(dev_json "Implemente o brief avulso docs/outro/briefs/BRIEF-009-nao-existe-avulso.md.")"
+silencio "licoes/arquivo-ausente-fail-open"
+
+# 7f. Brief citado sem caminho e sem recorte → deny 1×.
+roda "$(dev_json "Implemente o BRIEF-004 avulso: trocar o campo lido no modal.")"
+contem "licoes/sem-caminho/deny" '4.494'
+
+# 7g. Caminho absoluto com a seção → silêncio.
+roda "$(dev_json "Implemente o brief avulso $PROJ/$BRIEF_COM.")"
+silencio "licoes/caminho-absoluto"
+
+# 7h. TASK ancorada em brief formal, sem a palavra avulso → fora do gatilho, silêncio.
+roda "$(dev_json "Implemente a TASK-003-001 (Brief: BRIEF-003) conforme o PLAN.")"
+silencio "licoes/task-de-brief-formal"
+
+# 7i. TASK ancorada em brief avulso, caminho do brief no prompt → fora do gatilho (lição vem como critério, 4.138).
+roda "$(dev_json "Implemente a TASK-001-001 (Brief: BRIEF-001, $BRIEF_SEM) conforme os critérios de pronto.")"
+silencio "licoes/task-de-brief-avulso"
+
+# 7j. Só o cabeçalho do match (acervo sem casamento) → marcador suficiente, silêncio.
+roda "$(dev_json "$(printf 'Implemente o BRIEF-005 avulso.\n# lessons.sh match: acervo=0 recorte=0 (path=0 tag=0 sempre=0) excluidas=0 legado=0\n')")"
+silencio "licoes/cabecalho-do-match"
+
+# 7k. Developer NOMEADO e sem lições → o motivo das lições tem precedência sobre o do nome.
+roda "$(jq -cn --arg p "Implemente o brief avulso $BRIEF_SEM." '{tool_name:"Agent",tool_input:{subagent_type:"keelson:developer",name:"dev-brief",description:"Implementar brief",prompt:$p}}')"
+contem "licoes/nomeado/precedencia" '4.494'
 
 if [ "$fail" -gt 0 ]; then
   echo "agent-guard: $fail/$total asserções falharam"

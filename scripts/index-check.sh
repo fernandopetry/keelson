@@ -87,21 +87,23 @@ done
 
 # ---- INDEX (awk extrai) + fatos → achados ----
 idxsize="$(wc -c < "$idx" | tr -d ' ')"
-awk -v idxsize="$idxsize" '
+awk -v idxsize="$idxsize" -v facts="$FACTS" '
   function trim(s) { sub(/^[ \t]+/, "", s); sub(/[ \t]+$/, "", s); return s }
   function cell(line, i,   n, c) { n = split(line, c, "|"); if (i + 1 > n) return ""; return trim(c[i + 1]) }
   function finding(sev, chk, det) { print sev "\t" chk "\t" det }
   function mnum(id,   x) { x = id; sub(/^[A-Z]+-/, "", x); return x + 0 }
 
   # ---------- fase 1: fatos do filesystem ----------
-  FNR == NR && $1 == "specfile" { fspec[$2 + 0] = $2; next }
-  FNR == NR && $1 == "planfile" { fplan[$2 + 0] = $2; fplanst[$2 + 0] = $3; next }
-  FNR == NR && $1 == "taskfile" {
+  # A fase se distingue pelo NOME do arquivo, nunca por FNR == NR: com $FACTS vazio
+  # (slug so de briefs avulsos) FNR == NR vale tambem no INDEX e o descartaria inteiro.
+  FILENAME == facts && $1 == "specfile" { fspec[$2 + 0] = $2; next }
+  FILENAME == facts && $1 == "planfile" { fplan[$2 + 0] = $2; fplanst[$2 + 0] = $3; next }
+  FILENAME == facts && $1 == "taskfile" {
     ttot[$2 + 0]++
     if ($3 == "Done") tdone[$2 + 0]++
     next
   }
-  FNR == NR { next }
+  FILENAME == facts { next }
   # fase 2 (INDEX.md): variação inócua de arquivo — CRLF e BOM — não é fato (graph-contract §1)
   { sub(/\r$/, ""); if (FNR == 1 && index($0, "\357\273\277") == 1) $0 = substr($0, 4) }
 

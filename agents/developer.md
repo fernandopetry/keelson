@@ -53,6 +53,12 @@ mexer. "Escopo > Inclui" = exatamente os arquivos dos
 achados; no report, `task_id` vira o alvo do briefing e `acs_realizados` lista os achados
 corrigidos. Todo o resto do fluxo (perfil, testes, lint, report) vale igual.
 
+**Modo sob demanda** (brief avulso sem TASK — 4.75/4.86): o brief avulso é o briefing e seu
+`## Critério de aceite` é o critério de pronto; não há TASK nem PLAN. A seção `## Lições
+aplicáveis` do brief é o recorte do acervo (4.494): leia cada id com
+`bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . show <id>` **antes de desenhar** (etapa 1) —
+lição `ativa` vale como regra, e o contorno fundamentado vira `licao_contestada` no report.
+
 ## Fluxo de trabalho
 
 ### 1. Carregar contexto completo

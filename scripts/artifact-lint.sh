@@ -1051,7 +1051,7 @@ lint_dir_cross() { # $1 = dir do slug
     [ -n "$m" ] || continue
     awk -v M="$m" '{ s = $0; while (match(s, /`[^`]+`/)) { print M "\t" substr(s, RSTART + 1, RLENGTH - 2); s = substr(s, RSTART + RLENGTH) } }' "$f"
   done > "$TMP/plancontrato.tsv"
-  awk -F'\t' '
+  awk -F'\t' -v plano_f="$TMP/plancontrato.tsv" '
     function simb(t) {
       if (index(t, "/") || index(t, "=") || index(t, "\"") || index(t, "\047")) return 0
       if (t ~ /\.[A-Za-z0-9]+$/) return 0
@@ -1067,7 +1067,9 @@ lint_dir_cross() { # $1 = dir do slug
       for (i = 1; i <= n; i++) if (alcanca(q[i], b, qid)) return 1
       return 0
     }
-    FNR == NR { plano[$1 SUBSEP $2] = 1; next }
+    # fase pelo NOME do arquivo, nunca FNR == NR: plancontrato vazio (PLAN sem crase)
+    # faria o symref inteiro cair aqui e o check nunca dispararia
+    FILENAME == plano_f { plano[$1 SUBSEP $2] = 1; next }
     $4 == "inc" && simb($5) && !(($1 SUBSEP $5) in plano) { k = $1 SUBSEP $5; car[k] = (k in car) ? car[k] SUBSEP $2 : $2; cnt[k]++; wv[$2] = $3; file[$2] = $6 }
     $4 == "dep" { adj[$2] = ($2 in adj) ? adj[$2] SUBSEP $5 : $5 }
     END {

@@ -25,6 +25,11 @@
 #     não há `modo:` nem "pacote de correção" no briefing. Um `modo:` válido
 #     em qualquer linha basta — citar o contrato ou outro "modo" em prosa não
 #     nega sozinho (falso-positivo custa 1 retry; o scribe é o backstop, 4.429).
+#   - keelson:developer com prompt que cita brief avulso (decisão 4.494): sem marcador
+#     de lições no prompt (`via=path|tag|sempre`, `## Lições aplicáveis`) e com o
+#     arquivo do brief citado sem a seção — ou sem caminho algum — → deny 1× (mesma
+#     válvula); caminho citado e arquivo não encontrado → fail-open.
+#     Prompt com TASK-MMM-XXX fica fora do gatilho; este motivo precede o do nome.
 # Exploração/pesquisa genéricas passam: o fingerprint exige verbo de papel, não
 # a mera menção a um artefato SPEC-/PLAN-/TASK-.
 #
@@ -55,6 +60,7 @@ texto="$(printf '%s' "$input" | jq -r '((.tool_input.description // "") + " " + 
 modo_nomeado=0
 modo_scribe=0      # 1 = `modo:` fora do enum · 2 = pacote de correção sem `modo:`
 modo_valores=""
+modo_licoes=0      # 1 = despacho sob demanda sem recorte de lições (4.494)
 case "$stype" in
   keelson:scribe)
     # Pacote de correção (4.445): o campo `modo:` do briefing é lido antes da
@@ -74,6 +80,32 @@ case "$stype" in
       modo_nomeado=1
     fi
     ;;
+  keelson:developer)
+    # Despacho sob demanda (4.494): prompt que cita brief avulso leva o recorte de
+    # lições — no próprio prompt (`via=path|tag|sempre`) ou na seção `## Lições
+    # aplicáveis` do arquivo do brief citado. Caminho citado e arquivo ausente →
+    # fail-open (a falta não se prova); nem caminho nem marcador → deny 1×.
+    # TASK citada (`TASK-MMM-XXX`) sai do gatilho: na rota com TASK a lição chega como
+    # critério (4.138). Cabeçalho `# lessons.sh match:` vale como marcador (acervo vazio).
+    if printf '%s' "$texto" | grep -Eq 'BRIEF-[0-9]+' && printf '%s' "$texto" | grep -Eiq 'avulso' \
+       && ! printf '%s' "$texto" | grep -Eq 'TASK-[0-9]+-[0-9]+' \
+       && ! printf '%s' "$texto" | grep -Eq 'via=(path|tag|sempre)|Li(ç|c)(õ|o)es aplic|lessons\.sh match:'; then
+      brief_path="$(printf '%s' "$texto" | grep -Eo '[^[:space:]`"'"'"'()<>]*briefs/BRIEF-[0-9]+[^[:space:]`"'"'"'()<>]*-avulso\.md' 2>/dev/null | head -n 1 || true)"
+      brief_file=""
+      case "$brief_path" in
+        '') modo_licoes=1 ;;
+        /*) brief_file="$brief_path" ;;
+        *)  brief_file="$proj/$brief_path" ;;
+      esac
+      if [ -n "$brief_file" ] && [ -f "$brief_file" ] && ! grep -Eq '^## Li(ç|c)(õ|o)es aplic' "$brief_file" 2>/dev/null; then
+        modo_licoes=1
+      fi
+    fi
+    if [ "$modo_licoes" -eq 0 ]; then
+      [ -n "$nome" ] || exit 0
+      modo_nomeado=1
+    fi
+    ;;
   keelson:*)
     # Elenco: anônimo passa sempre; nomeado segue para o deny 1× (4.293/4.297).
     [ -n "$nome" ] || exit 0
@@ -81,12 +113,15 @@ case "$stype" in
     ;;
 esac
 
-if [ "$modo_nomeado" -eq 0 ] && [ "$modo_scribe" -eq 0 ]; then
+if [ "$modo_nomeado" -eq 0 ] && [ "$modo_scribe" -eq 0 ] && [ "$modo_licoes" -eq 0 ]; then
   [ -z "${texto// /}" ] && exit 0
 fi
 
 # --- pacote de correção ao scribe (4.445): motivo próprio, sem heurística ---
 if [ "$modo_scribe" -ne 0 ]; then
+  motivo_extra=""
+# --- despacho sob demanda sem recorte de lições (4.494): motivo próprio ---
+elif [ "$modo_licoes" -eq 1 ]; then
   motivo_extra=""
 # --- despacho nomeado de papel (4.293/4.297): motivo próprio, sem heurística ---
 elif [ "$modo_nomeado" -eq 1 ]; then
@@ -135,6 +170,15 @@ agent-guard (keelson, decisão 4.445): pacote de correção ao "${stype}" sem \`
 O invocador declara o modo de escrita — \`modo: edits\` (até ~20 ajustes, todos ancorados, sem mudar numeração ou estrutura de seções) ou \`modo: reescrita\` (qualquer outro caso) — pela régua do pacote em graph-contract.md §4.1 (4.309/4.349); o scribe obedece e não re-deriva. Fatos × julgamento é o eixo da revalidação (validator-protocol.md §4.5), não um valor de \`modo:\`.
 
 Refaça a chamada com o campo \`modo:\` no briefing. Repetir a chamada como está gasta o despacho: o scribe para antes de ler o insumo e devolve a ausência em \`duvidas\` (4.429).
+EOF
+)"
+elif [ "$modo_licoes" -eq 1 ]; then
+reason="$(cat <<EOF
+agent-guard (keelson, decisão 4.494): despacho do "${stype}" para brief avulso sem o recorte de lições.
+
+No modo sob demanda o brief é o único artefato entre o Tech Lead e o developer — a lição que no ciclo chega como critério da TASK (4.138) chega aqui pela seção \`## Lições aplicáveis\` do brief: a saída de \`bash "\${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . match --paths <arquivos que o brief toca> --compact --max-bytes 40000\`, copiada — as linhas \`via=path\`/\`via=tag\` inteiras, as \`sempre\` que couberem e a linha de omitidas por id — nunca curada por título (esqueleto em docs/_meta/conventions/index-contract.md). O developer lê cada id com \`show <id>\` antes de desenhar.
+
+Refaça a chamada depois de gravar a seção no brief (ou cole o recorte compacto no prompt). Acervo que não casa → escreva \`nenhuma\` na seção. Se o despacho não é sob demanda, repita a chamada como está — este aviso não se repete para esta mesma chamada.
 EOF
 )"
 elif [ "$modo_nomeado" -eq 1 ]; then

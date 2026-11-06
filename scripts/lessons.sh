@@ -27,7 +27,8 @@
 #           corte por `--max-bytes` preserva).
 #           `--compact`: uma linha por lição em vez do texto
 #           (`--- id=… estado=… via=… origem=… | <heading> | paths=<a;b> | tags=<x;y>`) —
-#           nenhuma lição some, o texto vem por `show <id>`.
+#           nenhuma lição some, o texto vem por `show <id>`; com `--max-bytes` junto, o
+#           teto corta na linha compacta e as omitidas seguem enumeradas (4.494).
 #           `--max-bytes N`: corta na FRONTEIRA de lição quando o total passa de N bytes e
 #           encerra com `# lessons.sh match: omitidas=K por --max-bytes N: id1,id2,…` — as
 #           omitidas ficam enumeradas por id (recorte que esconde lição é o pior defeito;
@@ -360,21 +361,23 @@ case "$cmd" in
     usados=0; omitidas=""; nomit=0
     while IFS="$SEP" read -r prio rconf rn rid restado motivo rorigem rheading rpaths rtags; do
       if [ "$compact" = 1 ]; then
-        echo "--- id=$rid estado=$restado via=$motivo origem=$rorigem | $rheading | paths=$rpaths | tags=$rtags"
-        continue
+        cab="--- id=$rid estado=$restado via=$motivo origem=$rorigem | $rheading | paths=$rpaths | tags=$rtags"
+        tam=$(( ${#cab} + 1 ))
+      else
+        cab="---8<--- id=$rid estado=$restado via=$motivo origem=$rorigem"
+        tam=$(( $(wc -c < "$BLK/$rn.md") + ${#cab} + 1 ))
       fi
-      cab="---8<--- id=$rid estado=$restado via=$motivo origem=$rorigem"
       if [ "$maxbytes" -gt 0 ]; then
         # corte estrito na ordem de prioridade: estourou → esta e as seguintes ficam de fora
-        # (uma `sempre` menor nunca passa na frente de uma `path` maior)
-        tam=$(( $(wc -c < "$BLK/$rn.md") + ${#cab} + 1 ))
+        # (uma `sempre` menor nunca passa na frente de uma `path` maior); com --compact a
+        # unidade cortada é a linha compacta (4.494)
         if [ "$nomit" -gt 0 ] || [ $((usados + tam)) -gt "$maxbytes" ]; then
           omitidas="$omitidas,$rid"; nomit=$((nomit + 1)); continue
         fi
         usados=$((usados + tam))
       fi
       echo "$cab"
-      cat "$BLK/$rn.md"
+      [ "$compact" = 1 ] || cat "$BLK/$rn.md"
     done < "$sel.ord"
     if [ "$nomit" -gt 0 ]; then
       echo "# lessons.sh match: omitidas=$nomit por --max-bytes $maxbytes: ${omitidas#,} — \`show <id>\` traz o texto"

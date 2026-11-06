@@ -191,6 +191,9 @@ da Story `standalone` no tracker (protocolo Jira §7). Esqueleto literal:
 ## Critério de aceite
 - <observável e verificável — é contra isto que code-reviewer e qa avaliam>
 
+## Lições aplicáveis
+<recorte do acervo, copiado — nunca curado por título (4.494): saída de `bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . match --paths <arquivos que o brief toca, separados por vírgula> --compact --max-bytes 40000` — as linhas `via=path` e `via=tag` inteiras, as `sempre` que couberem no teto e a linha final de omitidas por id; `nenhuma` quando o acervo não casa>
+
 ## TASKs
 <nenhuma — o brief é a unidade de execução | TASK-MMM-001..N quando o trabalho reparte>
 
@@ -205,6 +208,14 @@ da Story `standalone` no tracker (protocolo Jira §7). Esqueleto literal:
 primeira pausa (`/keelson:pause`) a cria no fim do arquivo, aditiva, só para as linhas
 `pausa`/`retomada` — a `Largada` continua a fonte do worklog da rota (4.196) e o grafo
 ignora a seção (só heading, Status e critério entram no parser do brief avulso).
+
+**`## Lições aplicáveis` no avulso (decisão 4.494)**: no modo sob demanda o brief é o único
+artefato entre o Tech Lead e o developer — a lição que no ciclo chega como critério da TASK
+(4.138) chega aqui por esta seção, e a seção nasce com o brief, antes do despacho. O Tech Lead
+cola a saída compacta do `match` (`--compact --max-bytes`, régua em `core/WORKFLOW.md`),
+nunca uma seleção por título; o developer lê cada id com `show <id>` antes de desenhar e
+contesta pela `licao_contestada` do report. O grafo ignora a seção, como a Cronologia; o
+`agent-guard` recusa uma vez o despacho ao `developer` cujo brief avulso não a traz.
 
 Réguas (falsificáveis — na dúvida, promova): **avulso ou ciclo?** — muda o que o sistema
 promete, ou a decomposição exigiria escolher entre alternativas técnicas (haveria uma

@@ -427,11 +427,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.230.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.231.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: `/keelson:conventions` interviews the codebase (and you, only where the code leaves it open) and writes `guidelines/project/conventions.md` — where each act lives, which skeleton it follows, how it is named, which layer it calls — read by the developer, gate 6, the TASK forge and the plan.
+New in this release: the standalone brief carries the lessons cut (`## Lições aplicáveis`) so the developer reads the project's lessons before designing in on-demand mode, with the `agent-guard` cobbling the dispatch that skips it; `index-check.sh` no longer flags a correct INDEX of a briefs-only slug, and `artifact-lint.sh` no longer goes silent on a shared helper under a PLAN without backticks.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

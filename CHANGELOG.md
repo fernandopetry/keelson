@@ -25,6 +25,30 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.231.0] — 2026-11-06
+
+Re-init: none
+
+Decision 4.494 (minor) — field intake: the standalone brief carries the lessons cut (`## Lições aplicáveis`) so the developer reads the project's lessons before designing in on-demand mode, and the `agent-guard` refuses once a developer dispatch whose standalone brief lacks the section; two-file awk passes in `index-check.sh` and `artifact-lint.sh` tell the phase by `FILENAME`, never by `FNR == NR` — an empty first file no longer swallows the second.
+
+### Added
+
+- **Standalone brief skeleton** (`index-contract.md`): section `## Lições aplicáveis` between the acceptance criterion and the TASKs, filled by copying the compact output of `lessons.sh . match --paths <files the brief touches> --compact --max-bytes 40000` — the `via=path`/`via=tag` lines whole, the `sempre` lines that fit and the trailing omitted-ids line; never a hand-picked selection by title; `nenhuma` when nothing matches. In on-demand mode the brief is the only artifact between the Tech Lead and the developer: the lesson that reaches a TASK as a criterion in the cycle reaches the developer through this section here. The graph ignores the section, like `## Cronologia`.
+- **`developer` input, on-demand mode**: the standalone brief is the briefing and its acceptance criterion is the done criterion; each id of `## Lições aplicáveis` is read with `lessons.sh . show <id>` before designing; an active lesson is a rule, a justified workaround becomes `licao_contestada`.
+- **`agent-guard` hook**: a `keelson:developer` dispatch whose prompt cites a standalone brief (`BRIEF-NNN` plus "avulso") and carries no lessons marker — neither `via=path|tag|sempre` in the prompt nor `## Lições aplicáveis` in the cited brief file — is refused once with the recipe; the same call repeated passes (fingerprint valve). A cited file that cannot be found fails open. A prompt that cites a `TASK-MMM-XXX` is out of the trigger (on the TASK route the lesson arrives as a criterion), the `# lessons.sh match:` header counts as a marker (nothing matched), and this reason takes precedence over the named-instance one. Eleven new cases in the hook's suite.
+- **Fixtures**: `so-avulsos` in the `index-check` suite (complete INDEX, only standalone briefs, no SPEC/PLAN/TASK — must stay clean) and `defeitos-g` in the `artifact-lint` suite (two TASKs sharing a helper under a PLAN without a single backtick — must still report `task-compartilhado-sem-dono`). Both fail against the previous scripts.
+
+### Fixed
+
+- **`lessons.sh --compact --max-bytes N` had no ceiling**: the compact branch left the loop before the cut, so the two flags together printed every line. The ceiling now cuts at the compact line, in the same path → tag → sempre order, and the omitted ids stay enumerated on the last line; `core/WORKFLOW.md` says the two flags combine.
+- **`index-check.sh` reported five `index-secao-ausente` warnings on a correct INDEX** of a slug that has only standalone briefs: with no SPEC/PLAN/TASK the facts file was empty, `FNR == NR` held while reading the INDEX too, and the whole INDEX was discarded as if it were facts. The awk now tells the phase by `FILENAME`.
+- **`artifact-lint.sh` never emitted `task-compartilhado-sem-dono` when the PLAN had no backticks**: the plan-contract file was empty and the symbol references were swallowed by the same `FNR == NR` test. Same fix; `publish-wiki.sh` has the same construction but guards the first file against being empty, so it is unchanged.
+
+### Changed
+
+- **`sdd-conventions.md`** (dispatch inventory) lists the new refusal; the graph suite's `valido-avulso` brief carries the section, with its frozen outputs unchanged — the parser ignores it.
+- **Wiki**: *Perguntas frequentes* (lessons) names the on-demand route through the brief's section; *Solução de problemas* gains the section for the new recognizable refusal (developer dispatch refused: standalone brief without lessons).
+
 ## [0.230.0] — 2026-11-05
 
 Re-init: required

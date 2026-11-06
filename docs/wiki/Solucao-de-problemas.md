@@ -652,6 +652,35 @@ mesmo jeito — o despacho é gasto à toa. Se a recusa apareceu num despacho qu
 pacote de correção (uma redação que citou `modo:` em outro sentido), repita a chamada: o
 aviso não se repete para a mesma chamada.
 
+### O despacho ao developer foi recusado: "brief avulso sem o recorte de lições"
+
+O sintoma: numa mudança pontual (modo sob demanda), a sessão escreve o brief avulso, manda o
+`developer` implementar e o hook `agent-guard` recusa a chamada uma vez, pedindo a seção
+`## Lições aplicáveis` no brief.
+
+O que acontece: no ciclo, as lições do projeto chegam ao developer como critério da TASK.
+No modo sob demanda não há TASK — o brief é o único papel entre quem pede e quem codifica.
+Se ele não traz as lições que casam com os arquivos da mudança, o developer repete o erro
+que o projeto já registrou, e o gate acha depois, numa rodada a mais. Por isso o brief
+avulso tem a seção, preenchida pela saída compacta do `lessons.sh match`, copiada inteira
+(nunca uma escolha a olho pelos títulos): as lições que casam por caminho e por classe, as
+transversais que couberem e a lista das que ficaram de fora, por id. Acervo sem nada que
+case → escreva `nenhuma`.
+
+```mermaid
+flowchart LR
+  P['brief avulso'] --> M{'## Lições aplicáveis presente?'}
+  M -- sim --> D['developer lê cada id com show']
+  M -- não --> H['agent-guard recusa 1×']
+  H --> C['cole a saída do match --compact e refaça']
+```
+
+O conserto: rode `bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . match --paths <arquivos do
+brief, separados por vírgula> --compact --max-bytes 40000`, cole a saída na seção e refaça a
+chamada. Se o despacho **não** era de brief avulso (uma TASK que só cita um brief), repita a
+chamada: o aviso não se repete para a mesma chamada. Caminho do brief que o hook não encontra
+no projeto deixa a chamada passar — a cobrança só vale quando ele consegue ler o arquivo.
+
 ### Um `git stash` foi recusado: "stash-guard … muta a árvore de trabalho compartilhada"
 
 O sintoma: no meio de um ciclo, um agent (ou a própria sessão) tenta rodar `git stash`,

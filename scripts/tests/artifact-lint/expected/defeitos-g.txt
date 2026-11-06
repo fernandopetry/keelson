@@ -1,0 +1,1 @@
+WARNING	task-compartilhado-sem-dono	formatarDataHoje no Inclui de 2 TASKs do mesmo PLAN (TASK-001-001-helper-sem-dono-a.md (wave 1), TASK-001-002-helper-sem-dono-b.md (wave 1)) sem criadora unica — nenhuma e alcancada por Depende de de todas as outras (4.492)

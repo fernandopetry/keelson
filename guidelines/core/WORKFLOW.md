@@ -245,7 +245,7 @@ contagem (`recorte=R (path=P tag=T sempre=S) excluidas=E`) e a saída vem na ord
 tag → sempre. **O recorte tem de caber numa leitura** (decisão 4.435): quem passa o recorte a um leitor usa `--max-bytes N`
 (corte na fronteira de lição, na ordem acima; as omitidas ficam **enumeradas por id** na
 linha final — enumerar não é esconder) ou `--compact` (uma linha por lição: id, via, origem,
-título, paths, tags — nenhuma some), e o leitor pede o texto por `show <id>`; `list`/`index` dão os títulos
+título, paths, tags — nenhuma some); juntas, o teto corta as linhas compactas e enumera as omitidas (4.494), e o leitor pede o texto por `show <id>`; `list`/`index` dão os títulos
 (o índice é derivado — imprime-se, nunca se commita como fonte); `show <id|heading>` traz
 uma lição inteira. Quem escreve lição declara `paths`/`tags` quando o arquivo ou a classe
 é nomeável — é o que torna a lição encontrável sem carregar o acervo.
