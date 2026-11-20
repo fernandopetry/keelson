@@ -61,8 +61,10 @@ It **detects what it can** (language, version, test/lint commands, whether there
 frontend) and **only asks what it can't infer**. When your stack has no bundled profile,
 it offers to **generate one from the Charter** at the same quality bar as the PHP
 example — which you then review. It writes `keelson.config.json`, a managed block
-into your `CLAUDE.md`, and an `AGENTS.md` pointer to it (created only if absent, for
-tools that look for `AGENTS.md` instead).
+into your `AGENTS.md` (the file every agent tool reads — Claude Code, Codex, Cursor,
+Amp), and makes sure your `CLAUDE.md` imports it with a single `@AGENTS.md` line —
+Claude Code skips `AGENTS.md` whenever a `CLAUDE.md` exists without that import.
+A project that still carries the block in `CLAUDE.md` is migrated on the next init.
 
 Then work the cycle:
 
@@ -105,7 +107,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 
 | Command | What it does |
 |---------|--------------|
-| `/keelson:init` | Interactive setup — detects the stack, writes the ficha, the `CLAUDE.md` block and an `AGENTS.md` pointer (created only if absent), checks the security tooling (`gitleaks`, the ecosystem's CVE auditor) and offers to install what is missing — recommended, never required; `init jira` scopes the run to the Jira integration (enable it late, re-measure a changed board) |
+| `/keelson:init` | Interactive setup — detects the stack, writes the ficha, the managed block in `AGENTS.md` and the `@AGENTS.md` import in `CLAUDE.md` (migrating a block still living in `CLAUDE.md`), checks the security tooling (`gitleaks`, the ecosystem's CVE auditor) and offers to install what is missing — recommended, never required; `init jira` scopes the run to the Jira integration (enable it late, re-measure a changed board) |
 | `/keelson:integrate` | Validate the DoD, run the full suite, open the PR (merge and deploy stay human) |
 | `/keelson:merge` † | Merge one or more branches into the current working branch, one at a time — one merge commit per branch; a clean branch (no conflict, no semantic-reconciliation finding, green suite) commits directly with no agent dispatched, otherwise the developer resolves only the triggered files and the code-reviewer audits only that resolution's diff (push, remote merge, PR and deploy stay human) |
 | `/keelson:deploy` † | Build the `/keelson:merge` queue from the board's deploy column — the status comes from the project map's `Fila de merge` line (`--status` overrides), issues flagged as impeded (their own flag or one inherited from the flagged parent epic) are left out and listed, each key is matched to its branch by the ficha's `git.branchNaming` pattern (exact `<KEY>` for externally named branches), and the queue runs through the merge contract into the current branch (`--into` overrides); it only decides which branches enter — the Jira connector is mandatory here, the read is JQL-only (never creates or transitions a card), and push, PR and the actual deploy stay human |
@@ -122,7 +124,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:postmortem` † | End-of-session postmortem — re-reads the whole session's interactions (corrections, retries, failed gates), separates defects from new scope, traces each gap to the mechanism that let it through, and produces the copy-paste maintainer message (with literal diffs via the agile-coach) that evolves the plugin |
 | `/keelson:mutation-setup` † | Guided setup of the mutation gate — detects the stack from the ficha, installs the canonical tool with confirmation, generates its config, proves the pipeline with a sample run and writes `quality.mutation` (diff-scoped, no threshold at first) |
 | `/keelson:e2e-setup` † | Guided setup of the E2E suite (Playwright) — installs with confirmation, generates the config and a smoke spec from the ficha (auth skeleton per realm, no committed secrets), proves the pipeline with `--list` and writes `quality.e2e` |
-| `/keelson:update` † | Update the installed plugin to the latest marketplace version via the Claude Code CLI (marketplace refresh + plugin update, in that order), then say whether `/keelson:init` must be re-run — from the jump's CHANGELOG markers and from measuring the project against the new version (CLAUDE block, `AGENTS.md`, ficha blocks), which catches a re-init forgotten on an earlier jump; the running session keeps the old version until restarted |
+| `/keelson:update` † | Update the installed plugin to the latest marketplace version via the Claude Code CLI (marketplace refresh + plugin update, in that order), then say whether `/keelson:init` must be re-run — from the jump's CHANGELOG markers and from measuring the project against the new version (`AGENTS.md` block, `CLAUDE.md` import, ficha blocks), which catches a re-init forgotten on an earlier jump; the running session keeps the old version until restarted |
 | `/keelson:version` | Show the keelson version this session actually loaded and where the tree came from (CLI cache, development checkout, Claude Desktop's own store), compare it with the CLI's install record per scope and with the marketplace's local cache, and name the action — restart, `/keelson:update`, or update through the app; read-only, no network |
 | `/keelson:report` † | Rebuild the closing report from the session ledger — safety net for a resumed session or a report lost in the scroll; every change already closes with one automatically |
 
@@ -427,7 +429,7 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.231.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.232.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 

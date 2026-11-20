@@ -13,16 +13,16 @@
 # Após o update, lê o CHANGELOG.md recém-instalado (marcadores
 # "Re-init: required|none" por entrada — decisão 4.189, redação ampliada pela 4.374)
 # e reporta se alguma versão do salto (BEFORE, AFTER] mudou algum artefato que o
-# /keelson:init escreve no projeto (bloco do CLAUDE.md, ficha ou arquivo novo como
-# o ponteiro AGENTS.md), exigindo re-rodar /keelson:init no consumidor.
+# /keelson:init escreve no projeto (bloco do AGENTS.md, import do CLAUDE.md, ficha ou
+# arquivo novo), exigindo re-rodar /keelson:init no consumidor.
 # Sem CHANGELOG legível, sem marcador ou com a árvore lida divergindo da versão
 # instalada, degrada para "não determinável" — nunca afirma "não precisa" sem
 # evidência (régua da 4.156).
 # Em seguida MEDE o projeto (decisão 4.440): o CHANGELOG só enxerga o salto corrente,
 # e um /keelson:init esquecido num salto anterior só aparece comparando o disco do
 # consumidor com o que a árvore NOVA escreve — init-selfcheck.sh da árvore nova, com
-# --plugin-root nela, filtrado aos itens claude-block-sincronizado, agents-presente e
-# ficha-campos. Raiz do projeto: --root, ou a pasta corrente / topo do git com
+# --plugin-root nela, filtrado aos itens agents-block-sincronizado, claude-import-presente
+# e ficha-campos (4.495). Raiz do projeto: --root, ou a pasta corrente / topo do git com
 # keelson.config.json; sem ficha a medição é pulada e o CHANGELOG decide sozinho.
 # Os dois vereditos se combinam: positivo em qualquer fonte → exige init (medição
 # positiva com salto limpo é nomeada "init esquecido em salto anterior"); os dois
@@ -134,7 +134,7 @@ reinit_scan() {
       if [ -n "$rs_req" ]; then
         RS_VERDICT="required"
         echo "ATENCAO: este salto inclui versao(oes) que mudaram algo que o /keelson:init"
-        echo "escreve no projeto (bloco do CLAUDE.md, ficha ou arquivo novo) — re-rode"
+        echo "escreve no projeto (bloco do AGENTS.md, import do CLAUDE.md, ficha ou arquivo novo) — re-rode"
         echo "/keelson:init apos reiniciar a sessao. Versao(oes): $rs_req"
       elif [ -n "$rs_ind" ]; then
         echo "Re-init: nao determinavel para a(s) versao(oes): $rs_ind (entrada sem marcador"
@@ -173,7 +173,7 @@ sync_measure() { # <arvore>
   fi
   ms_out="$(bash "$ms_tree/scripts/init-selfcheck.sh" "$MEASURE_ROOT" --plugin-root "$ms_tree" 2>/dev/null || true)"
   ms_pos=""; ms_ind=""
-  for ms_item in claude-block-sincronizado agents-presente ficha-campos; do
+  for ms_item in agents-block-sincronizado claude-import-presente ficha-campos; do
     ms_line="$(printf '%s\n' "$ms_out" | awk -F'\t' -v it="$ms_item" '$2 == it { print; exit }')"
     if [ -z "$ms_line" ]; then ms_ind="$ms_ind $ms_item"; continue; fi
     ms_state="$(printf '%s\n' "$ms_line" | cut -f1)"

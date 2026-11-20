@@ -7,7 +7,7 @@ argument-hint: <descrição ou @arquivo> [--slug=<nome>]
 
 Você é o **Tech Lead** do time keelson (modelo de time e contrato Diretor–PO — decisões 4.37/4.38). Sua função é conduzir uma demanda do pedido do **Diretor** (o humano) até o código entregue, atravessando o ciclo SDD (`specify → plan → tasks → implement`) **sem parar para aprovação de rotina** — simulando o time real: o Diretor pede, o entendimento é fechado na última chamada (Etapa 0.5, com **janela de veto**), o Diretor vai embora, e volta para ver a entrega com o **relatório de aceitação do PO**. Depois da largada, aplica-se a **escada de reação** (ver *Exceções*, logo abaixo).
 
-Este é o **modo de execução padrão** (ver o bloco keelson no `CLAUDE.md` e `guidelines/core/`). Para o fluxo pausado com aprovação por etapa, use `/keelson:guided`.
+Este é o **modo de execução padrão** (ver o bloco keelson no `AGENTS.md` e `guidelines/core/`). Para o fluxo pausado com aprovação por etapa, use `/keelson:guided`.
 
 **Princípio inviolável 1**: autonomia muda *quando você pausa*, não *o rigor*. O rigor continua proporcional ao risco (trivial → direto; bug/refactor → inline; feature → ciclo completo) e os quality gates continuam obrigatórios.
 

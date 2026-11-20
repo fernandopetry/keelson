@@ -73,7 +73,7 @@ EOF
 scripts_into() { # dir → copia o init-selfcheck.sh/ficha.sh REAIS e os templates que a medição lê
   mkdir -p "$1/scripts" "$1/templates"
   cp "$REPO/scripts/init-selfcheck.sh" "$REPO/scripts/ficha.sh" "$1/scripts/"
-  cp "$REPO/templates/keelson.config.example.json" "$REPO/templates/CLAUDE.keelson-block.md" "$1/templates/"
+  cp "$REPO/templates/keelson.config.example.json" "$REPO/templates/AGENTS.keelson-block.md" "$1/templates/"
 }
 
 tree() { # versao marcador → cria $CACHE/<versao> com plugin.json, CHANGELOG, cópia do update.sh e os scripts da medição
@@ -84,15 +84,15 @@ tree() { # versao marcador → cria $CACHE/<versao> com plugin.json, CHANGELOG, 
   scripts_into "$CACHE/$1"
 }
 
-proj() { # sync|stale → $TMP/proj: ficha completa (o template real), CLAUDE.md com o bloco real e AGENTS.md
+proj() { # sync|stale → $TMP/proj: ficha completa (o template real), AGENTS.md com o bloco real e CLAUDE.md com o import (4.495)
   rm -rf "$TMP/proj"; mkdir -p "$TMP/proj"
   cp "$REPO/templates/keelson.config.example.json" "$TMP/proj/keelson.config.json"
-  { printf '# Projeto\n\nTexto do humano.\n\n'; cat "$REPO/templates/CLAUDE.keelson-block.md"; } > "$TMP/proj/CLAUDE.md"
+  { printf '# AGENTS.md\n\nNota de outra ferramenta.\n\n'; cat "$REPO/templates/AGENTS.keelson-block.md"; } > "$TMP/proj/AGENTS.md"
   if [ "$1" = "stale" ]; then
-    sed -i.bak 's/^### Fonte da verdade$/### Fonte da verdade (versao velha do bloco)/' "$TMP/proj/CLAUDE.md"
-    rm -f "$TMP/proj/CLAUDE.md.bak"
+    sed -i.bak 's/^### Fonte da verdade$/### Fonte da verdade (versao velha do bloco)/' "$TMP/proj/AGENTS.md"
+    rm -f "$TMP/proj/AGENTS.md.bak"
   fi
-  printf '# AGENTS.md\n\nVeja o CLAUDE.md.\n' > "$TMP/proj/AGENTS.md"
+  printf '# Projeto\n\nTexto do humano.\n\n@AGENTS.md\n' > "$TMP/proj/CLAUDE.md"
 }
 
 ficha() { # versao scope [versao2 scope2]
@@ -134,7 +134,7 @@ PY
         if [ "${FAKE_TREE_FULL:-0}" = "1" ]; then
           mkdir -p "$FAKE_CACHE/$FAKE_NEW_VERSION/scripts" "$FAKE_CACHE/$FAKE_NEW_VERSION/templates"
           cp "$FAKE_REPO/scripts/init-selfcheck.sh" "$FAKE_REPO/scripts/ficha.sh" "$FAKE_CACHE/$FAKE_NEW_VERSION/scripts/"
-          cp "$FAKE_REPO/templates/keelson.config.example.json" "$FAKE_REPO/templates/CLAUDE.keelson-block.md" "$FAKE_CACHE/$FAKE_NEW_VERSION/templates/"
+          cp "$FAKE_REPO/templates/keelson.config.example.json" "$FAKE_REPO/templates/AGENTS.keelson-block.md" "$FAKE_CACHE/$FAKE_NEW_VERSION/templates/"
         fi
       fi
       # auto-substituição: o update troca o próprio script em disco no meio da execução
@@ -258,8 +258,8 @@ RODA_CWD="$TMP/proj" FAKE_TREE_FULL=1 FAKE_NEW_VERSION=0.12.0 FAKE_NEW_CHANGELOG
 total=$((total + 1))
 if [ "$st" -eq 0 ] && tem "Re-init: nenhuma versao do salto (0.10.0 -> 0.12.0) exige" \
    && tem "Medicao do projeto ($TMP/proj) contra a versao 0.12.0:" \
-   && tem "claude-block-sincronizado: bloco do CLAUDE.md diverge do template atual" \
-   && tem "Veredito: exige /keelson:init" && tem "(itens: claude-block-sincronizado)." \
+   && tem "agents-block-sincronizado: bloco do AGENTS.md diverge do template atual" \
+   && tem "Veredito: exige /keelson:init" && tem "(itens: agents-block-sincronizado)." \
    && tem "sinal de /keelson:init esquecido em salto anterior" && tem "reinicie a sessao"; then ok medicao-init-esquecido-em-salto-anterior
 else falha "medicao-init-esquecido-em-salto-anterior: exit=$st $(cat "$TMP/out")"; fi
 
@@ -267,8 +267,8 @@ else falha "medicao-init-esquecido-em-salto-anterior: exit=$st $(cat "$TMP/out")
 reset; proj sync
 RODA_CWD="$TMP/proj" FAKE_TREE_FULL=1 FAKE_NEW_VERSION=0.12.0 FAKE_NEW_CHANGELOG="$CLNONE" roda
 total=$((total + 1))
-if [ "$st" -eq 0 ] && tem "claude-block-sincronizado: bloco do CLAUDE.md idêntico ao template" \
-   && tem "agents-presente: AGENTS.md presente" && tem "ficha-campos: todos os blocos de 1º nível" \
+if [ "$st" -eq 0 ] && tem "agents-block-sincronizado: bloco do AGENTS.md idêntico ao template" \
+   && tem "claude-import-presente: CLAUDE.md importa o AGENTS.md" && tem "ficha-campos: todos os blocos de 1º nível" \
    && tem "Veredito: nao exige /keelson:init — salto sem Re-init: required e projeto sincronizado." \
    && ! tem "init esquecido"; then ok medicao-sincronizada-nao-exige
 else falha "medicao-sincronizada-nao-exige: exit=$st $(cat "$TMP/out")"; fi
@@ -281,17 +281,18 @@ if [ "$st" -eq 0 ] && tem "ATENCAO: este salto inclui versao(oes)" \
    && tem "Veredito: exige /keelson:init (versao(oes) do salto marcadas Re-init: required)."; then ok medicao-limpa-changelog-required-prevalece
 else falha "medicao-limpa-changelog-required-prevalece: exit=$st $(cat "$TMP/out")"; fi
 
-# --- ficha antiga (sem blocos novos) + AGENTS.md ausente → positivos nomeados ---
+# --- ficha antiga (sem blocos novos) + CLAUDE.md sem o import → positivos nomeados ---
 reset; proj sync
-rm -f "$TMP/proj/AGENTS.md"
+printf '# Projeto\n\nTexto do humano, sem a linha de import.\n' > "$TMP/proj/CLAUDE.md"
 cat > "$TMP/proj/keelson.config.json" <<'EOF'
 { "profile": {}, "codePaths": {}, "sensitiveGlobs": [], "quality": {}, "gates": {}, "docsRoot": "docs", "jira": { "enabled": false } }
 EOF
 RODA_CWD="$TMP/proj" FAKE_TREE_FULL=1 FAKE_NEW_VERSION=0.12.0 FAKE_NEW_CHANGELOG="$CLNONE" roda
 total=$((total + 1))
 if [ "$st" -eq 0 ] && tem "ficha-campos: blocos do template ausentes na ficha: models commit git" \
-   && tem "(itens: agents-presente ficha-campos)." && tem "init esquecido em salto anterior"; then ok medicao-ficha-antiga-e-agents-ausente
-else falha "medicao-ficha-antiga-e-agents-ausente: exit=$st $(cat "$TMP/out")"; fi
+   && tem "claude-import-presente: CLAUDE.md sem a linha @AGENTS.md" \
+   && tem "(itens: claude-import-presente ficha-campos)." && tem "init esquecido em salto anterior"; then ok medicao-ficha-antiga-e-claude-sem-import
+else falha "medicao-ficha-antiga-e-claude-sem-import: exit=$st $(cat "$TMP/out")"; fi
 
 # --- sem ficha na pasta corrente → medição pulada, CHANGELOG decide e diz que decidiu sozinho ---
 reset

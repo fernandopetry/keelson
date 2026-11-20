@@ -6,7 +6,7 @@
 #     - toda linha existe na tabela Commands do README.md (`| \`/keelson:<nome>\` |`)
 #     - toda linha `/keelson:<x>` do README tem commands/<x>.md OU skills/<x>/ (skill)
 #     - humano-only (`disable-model-invocation: true`) ⇔ marcador ` †` na linha do README
-#     - humano-only citado na nota do bloco (templates/CLAUDE.keelson-block.md)
+#     - humano-only citado na nota do bloco (templates/AGENTS.keelson-block.md)
 #     - AVISO: comando sem heading `### … \`/keelson:<nome>\`` no method-guide.md
 #       (carência conhecida — não bloqueia; comando novo não deve nascer com ela)
 #   Agents (agents/*.md):
@@ -47,7 +47,7 @@ cd "$ROOT" || { echo "ERRO: não consegui entrar em $ROOT" >&2; exit 2; }
 
 README="README.md"
 GUIDE="docs/_meta/method-guide.md"
-BLOCK="templates/CLAUDE.keelson-block.md"
+BLOCK="templates/AGENTS.keelson-block.md"
 
 [ -d commands ] || { echo "ERRO: commands/ não existe em $ROOT" >&2; exit 2; }
 [ -d agents ]   || { echo "ERRO: agents/ não existe em $ROOT" >&2; exit 2; }

@@ -12,11 +12,12 @@
 #        sensitive-globs · perfil-resolve · perfil-reviewed · perfil-charter ·
 #        local-example · local-json-ignorado · local-placeholder ·
 #        artefatos-ignorados · playwright-flags · jira-campos · git-branch-config ·
-#        models-validos · ficha-campos · claude-block-sincronizado · agents-presente
+#        models-validos · ficha-campos · agents-block-sincronizado · claude-import-presente
 # Exit: 0 sem falha · 1 com falha · 2 uso incorreto.
-# Contrato entre versões (4.440): os nomes claude-block-sincronizado, agents-presente e
-# ficha-campos são lidos pelo scripts/update.sh de versões ANTERIORES do plugin
-# (medição pós-update) — renomear um deles quebra o leitor antigo em silêncio.
+# Contrato entre versões (4.440): os nomes agents-block-sincronizado, claude-import-presente
+# e ficha-campos são lidos pelo scripts/update.sh de versões ANTERIORES do plugin
+# (medição pós-update) — renomear um deles quebra o leitor antigo em silêncio (o leitor
+# devolve indet, nunca "não exige"; a troca da 4.495 veio com Re-init: required).
 #
 # Bash 3.2-compatível; JSON via ficha.sh (irmão) e python3 (playwright/local.json;
 # ausente → aviso "sem parser", nunca ✗ inventado). Read-only.
@@ -362,39 +363,52 @@ PY
   fi
 fi
 
-# ---- bloco CLAUDE.md sincronizado com o template atual do plugin (Etapa 5) ----
+# ---- bloco gerenciado do AGENTS.md sincronizado com o template atual do plugin (Etapa 5) ----
 # Caso real (2026-09-03): /keelson:init confirmou só a EXISTÊNCIA do bloco e reportou
 # "tudo provado e íntegro" com o bloco desatualizado (faltava a decisão 4.372 inteira) —
 # a Etapa 6 provava hooks, paths, binários etc., mas nunca o próprio bloco que ela injeta.
-tmpl="$PLUGROOT/templates/CLAUDE.keelson-block.md"
+# O alvo do bloco é o AGENTS.md (4.495); o CLAUDE.md só o importa.
+extract_block() { # <arquivo> → bloco entre os marcadores keelson (vazio se ausente)
+  awk '
+    /bloco gerenciado\. Gerado por/ { start=NR - 1 }
+    /fim do bloco keelson/ { end=NR + 1 }
+    { buf[NR] = $0 }
+    END { if (start && end) for (i = start; i <= end; i++) print buf[i] }
+  ' "$1"
+}
+tmpl="$PLUGROOT/templates/AGENTS.keelson-block.md"
 if [ -f "$tmpl" ]; then
-  if [ ! -f "$ROOT/CLAUDE.md" ]; then
-    emit falha claude-block-sincronizado "CLAUDE.md ausente na raiz do projeto — rode /keelson:init"
+  if [ ! -f "$ROOT/AGENTS.md" ]; then
+    emit falha agents-block-sincronizado "AGENTS.md ausente na raiz do projeto — rode /keelson:init"
   else
-    block="$(awk '
-      /bloco gerenciado\. Gerado por/ { start=NR - 1 }
-      /fim do bloco keelson/ { end=NR + 1 }
-      { buf[NR] = $0 }
-      END { if (start && end) for (i = start; i <= end; i++) print buf[i] }
-    ' "$ROOT/CLAUDE.md")"
+    block="$(extract_block "$ROOT/AGENTS.md")"
     if [ -z "$block" ]; then
-      emit falha claude-block-sincronizado "CLAUDE.md sem bloco gerenciado do keelson (marcadores ausentes) — rode /keelson:init"
+      emit falha agents-block-sincronizado "AGENTS.md sem bloco gerenciado do keelson (marcadores ausentes) — rode /keelson:init"
     elif [ "$block" = "$(cat "$tmpl")" ]; then
-      emit ok claude-block-sincronizado "bloco do CLAUDE.md idêntico ao template do plugin"
+      emit ok agents-block-sincronizado "bloco do AGENTS.md idêntico ao template do plugin"
     else
-      emit falha claude-block-sincronizado "bloco do CLAUDE.md diverge do template atual do plugin — rode /keelson:init para substituí-lo (Etapa 5)"
+      emit falha agents-block-sincronizado "bloco do AGENTS.md diverge do template atual do plugin — rode /keelson:init para substituí-lo (Etapa 5)"
     fi
   fi
 fi
 
-# ---- AGENTS.md presente na raiz (ponteiro para o CLAUDE.md — Etapa 5.7, decisão 4.374) ----
-# Ausência é estado legítimo em quem ainda não re-rodou o /keelson:init depois desta
-# versão — nunca falha, só aviso (reprovar adoção existente por capacidade nova seria
-# o próprio defeito que a calibração de severidade evita).
-if [ -f "$ROOT/AGENTS.md" ]; then
-  emit ok agents-presente "AGENTS.md presente na raiz"
+# ---- CLAUDE.md importa o AGENTS.md (Etapa 5.7, decisão 4.495) ----
+# Com CLAUDE.md ou CLAUDE.local.md presente, o Claude Code não carrega o AGENTS.md por
+# conta própria: a linha `@AGENTS.md` (própria, fora de bloco de código) é o elo. Bloco
+# legado ainda no CLAUDE.md é migração incompleta — duas cópias da regra. CLAUDE.md
+# ausente é aviso: o init o cria só com a linha, para fechar o furo do CLAUDE.local.md.
+if [ ! -f "$ROOT/CLAUDE.md" ]; then
+  emit aviso claude-import-presente "CLAUDE.md ausente — rode /keelson:init para criá-lo com a linha @AGENTS.md (garante a leitura do bloco em qualquer sessão)"
+elif [ -n "$(extract_block "$ROOT/CLAUDE.md")" ]; then
+  emit falha claude-import-presente "bloco gerenciado ainda no CLAUDE.md — migração incompleta: rode /keelson:init (Etapa 5.7 move o bloco para o AGENTS.md)"
+elif awk '
+    /^[[:space:]]*```/ { fence = !fence; next }
+    !fence && /^[[:space:]]*@(\.\/)?AGENTS\.md[[:space:]]*$/ { found = 1 }
+    END { exit !found }
+  ' "$ROOT/CLAUDE.md"; then
+  emit ok claude-import-presente "CLAUDE.md importa o AGENTS.md (@AGENTS.md)"
 else
-  emit aviso agents-presente "AGENTS.md ausente — rode /keelson:init para criar o ponteiro (ou, se o projeto já tem AGENTS.md de outra ferramenta, acrescente à mão um ponteiro para o CLAUDE.md)"
+  emit falha claude-import-presente "CLAUDE.md sem a linha @AGENTS.md — o Claude Code não lê o AGENTS.md: rode /keelson:init (Etapa 5.7)"
 fi
 
 sort "$OUT"

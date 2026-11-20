@@ -1,6 +1,7 @@
 <!-- ============================================================= -->
 <!-- keelson — bloco gerenciado. Gerado por /keelson:init.          -->
 <!-- Edite keelson.config.json, não este bloco.                    -->
+<!-- Ferramenta sem o plugin keelson instalado: ignore este bloco.  -->
 <!-- ============================================================= -->
 
 ## Keelson — padrão de qualidade e fluxo (spec-driven development)

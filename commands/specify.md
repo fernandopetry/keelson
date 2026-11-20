@@ -16,7 +16,7 @@ Você é o **Tech Lead** do time keelson (decisão 4.37), escrevendo especifica�
 ### 0.1 Carregar guidelines e memo
 
 1. Ler a **ficha** (`keelson.config.json`) na raiz — convenção comum (`${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`).
-2. Ler o `CLAUDE.md` do projeto se existir e extrair apenas o relevante para SPEC: glossário de domínio, convenções de linguagem, anti-padrões de spec.
+2. Ler as instruções do projeto (`AGENTS.md`/`CLAUDE.md`) se existirem e extrair apenas o relevante para SPEC: glossário de domínio, convenções de linguagem, anti-padrões de spec.
 3. **Memo de exploração**: se a demanda exigiu explorar o código/domínio, salve/complemente o memo — o caminho editável vem de `session-dir.sh <raiz> adopt-memo <slug>`, que herda memo de sessão anterior desta máquina quando houver (cadeia e regras: convenção comum — sdd-conventions.md, 4.315). Varredura ampla é delegada ao `code-scout`, que devolve conclusão ancorada em `arquivo:linha` (decisão 4.75) — a main session não varre a codebase inline.
 
 ### 0.2 Resolver slug
@@ -75,7 +75,7 @@ contexto do Tech Lead até o fim do ciclo. Despache o agent `scribe` com o pacot
 - **Alvo resolvido** (Etapa 0.2): slug, NNN, caminho do arquivo; `Brief: BRIEF-NNN` quando houver.
 - **Insumos** (caminhos, nunca conteúdo colado): BRIEF e/ou documento de origem, INDEX.md
   (glossário/decisões extraídos na 0.3 podem ir resumidos), memo de exploração e/ou
-  `MAP.md` do slug, recorte do `CLAUDE.md` do projeto (0.1).
+  `MAP.md` do slug, recorte das instruções do projeto (0.1).
 - **Decisões desta execução**: premissas resolvidas na Etapa 1 (o scribe as aplica, não as reabre).
 
 Receba o **sumário estruturado** (contrato de output no `agents/scribe.md`): `artefatos`,
@@ -173,7 +173,7 @@ Só quando a ficha tem `jira.enabled: true`: **despache o agent `tracker-sync`**
 1. Caminho da SPEC criada.
 2. Caminho do INDEX (criado ou atualizado).
 3. Resumo de 3 linhas do que foi especificado.
-4. Guidelines carregados (ficha lida; `CLAUDE.md` presente sim/não).
+4. Guidelines carregados (ficha lida; `AGENTS.md`/`CLAUDE.md` presente sim/não).
 5. Resultado da validação:
    - Auto-fixes aplicados
    - Errors pendentes (se houver)

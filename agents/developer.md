@@ -199,7 +199,7 @@ asserção para esverdear um vermelho é a violação do repro (4.159) e reprova
 
 ### 7. Commit
 
-- **Mensagem**: padrão de commit do projeto (ver `CLAUDE.md`/ficha); na ausência de um
+- **Mensagem**: padrão de commit do projeto (ver `AGENTS.md`/`CLAUDE.md`/ficha); na ausência de um
   declarado, a régua é `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/commit-convention.md` —
   **dono único** do tipo (lista fechada), do escopo e da marca de quebra.
 - **Commit por pathspec**: `git commit -m "<msg>" -- <arquivos da task>`, nunca `git add`

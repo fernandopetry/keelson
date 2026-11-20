@@ -5,7 +5,7 @@
 > demanda** (4.75/4.76) e o `/keelson:report` (rede de segurança). O output final do
 > `/keelson:implement` avulso mantém o template próprio (tabela de gates por wave);
 > executado dentro do `/keelson:auto`, quem fecha é a Entrega — com este esqueleto.
-> O bloco do consumidor (`templates/CLAUDE.keelson-block.md`) carrega a versão mínima
+> O bloco do consumidor (`templates/AGENTS.keelson-block.md`) carrega a versão mínima
 > do fecho sob demanda; este arquivo é o dono da forma completa.
 
 **Por que esqueleto, não prosa** (a régua da decisão 4.77 aplicada ao report): prosa

@@ -28,8 +28,8 @@ validando "de memória", sem ler o SKILL.md, usa outra régua — é desvio, e o
    de linguagem ativo — fonte **primária** de stack/convenções (a mesma de que o comando
    gerador gera).
 2. Ler o artefato-alvo e o contexto que a SKILL lista.
-3. Ler `CLAUDE.md` se existir — fonte **complementar**: ausência dele, ou omissão de uma
-   convenção nele, nunca gera ERROR.
+3. Ler as instruções do projeto (`AGENTS.md`/`CLAUDE.md`) se existirem — fonte
+   **complementar**: ausência delas, ou omissão de uma convenção nelas, nunca gera ERROR.
 4. Inicializar as listas `errors`, `warnings`, `infos`, `auto_fixes_applied`.
 
 ## §3. Severidades e auto-fix

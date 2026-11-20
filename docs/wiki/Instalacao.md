@@ -41,9 +41,13 @@ O `init` **detecta o que consegue** (linguagem, versão, comandos de teste e lin
 existência de frontend) e **só pergunta o que não dá para inferir**. Ao final ele escreve:
 
 - `keelson.config.json` — a [ficha do projeto](Ficha-do-projeto), versionada no repositório;
-- um bloco gerenciado no `CLAUDE.md` do projeto, que ensina o Claude a operar pelo keelson;
-- um `AGENTS.md` na raiz, criado só se o projeto ainda não tiver um — um ponteiro para o
-  `CLAUDE.md`, para ferramentas que seguem a convenção `agents.md` (Codex, Cursor e afins);
+- um bloco gerenciado no `AGENTS.md` do projeto, que ensina o agente a operar pelo keelson —
+  é o arquivo que o Claude Code, o Codex, o Cursor e as demais ferramentas da convenção
+  `agents.md` leem; se o seu `AGENTS.md` já existe, o bloco entra no fim e o resto fica como está;
+- a linha `@AGENTS.md` no `CLAUDE.md` (criado só com ela, se não existir): com um `CLAUDE.md`
+  na pasta o Claude Code não lê o `AGENTS.md` por conta própria — essa linha é o que liga um
+  ao outro. Projeto que ainda tinha o bloco dentro do `CLAUDE.md` é migrado: o bloco sai de lá
+  e vai para o `AGENTS.md`, o que você escreveu fica;
 - `keelson.local.json` *(quando necessário)* — credenciais de ambiente local; **não** vai para o git.
 
 Quando a sua stack não tem perfil embarcado, o `init` oferece **gerar um** a partir do
@@ -86,14 +90,14 @@ Claude Desktop, que tem loja de plugins própria). Não acessa a rede e não mud
 
 ## Depois de atualizar: re-rodar o `init`
 
-Algumas versões mudam o bloco injetado no `CLAUDE.md` ou acrescentam campos na ficha.
+Algumas versões mudam o bloco injetado no `AGENTS.md` ou acrescentam campos na ficha.
 **O próprio `/keelson:update` avisa quando é o caso**, por duas fontes:
 
 - **O CHANGELOG do salto.** Cada entrada carrega um marcador `Re-init: required` ou
   `Re-init: none`, e o update varre as versões entre a que você tinha e a que acabou de
   instalar.
 - **O seu projeto, medido.** O update compara o que está no disco com o que a versão nova
-  escreve: o bloco do `CLAUDE.md` (byte a byte), o ponteiro `AGENTS.md` e os blocos da
+  escreve: o bloco do `AGENTS.md` (byte a byte), a linha `@AGENTS.md` do `CLAUDE.md` e os blocos da
   ficha `keelson.config.json`. É isso que pega o caso mais comum de esquecimento: você
   atualizou algumas versões atrás, o update avisou, e o `init` não foi rodado. O CHANGELOG
   do salto de hoje não sabe disso; o disco sabe. Quando só a medição acusa, o veredito diz
@@ -126,7 +130,7 @@ flowchart TD
 
 Abra o gerenciador de plugins com `/plugin` e remova o `keelson@keelson` por lá.
 
-O `keelson.config.json`, o bloco no `CLAUDE.md` e os artefatos em `docs/` continuam no
+O `keelson.config.json`, o bloco no `AGENTS.md`, a linha `@AGENTS.md` do `CLAUDE.md` e os artefatos em `docs/` continuam no
 repositório — são seus. Remova-os à mão se quiser apagar o rastro.
 
 ## Verificar se está tudo certo

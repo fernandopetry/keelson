@@ -57,15 +57,14 @@ arquivo existe antes de gravar o caminho, e o relatório abre com
 (`/keelson:update`) e rode `/keelson:init` de novo — a Regra de merge preserva o que
 você já configurou; confira no relatório o item de perfil do self-check.
 
-### O init disse "tudo íntegro" mas o `CLAUDE.md` está desatualizado
+### O init disse "tudo íntegro" mas o `AGENTS.md` está desatualizado
 
 Sintoma: `/keelson:update` trouxe uma versão nova do plugin (um comando novo, um modo
-novo), mas o bloco gerenciado do `CLAUDE.md` do projeto não ganhou a atualização
-correspondente — mesmo com o `/keelson:init` relatando adoção íntegra. A partir da
-versão `0.156.0` o self-check compara o bloco do projeto **byte-a-byte** contra o
-template do pacote (item `claude-block-sincronizado`): divergência, marcadores
-ausentes ou `CLAUDE.md` ausente aparecem como `falha` no relatório, nunca como
-silêncio. Reparo: rode `/keelson:init` de novo — a Etapa 5 sempre substitui o bloco
+novo), mas o bloco gerenciado do `AGENTS.md` do projeto não ganhou a atualização
+correspondente — mesmo com o `/keelson:init` relatando adoção íntegra. O self-check
+compara o bloco do projeto **byte-a-byte** contra o template do pacote (item
+`agents-block-sincronizado`): divergência, marcadores ausentes ou `AGENTS.md` ausente
+aparecem como `falha` no relatório, nunca como silêncio. Reparo: rode `/keelson:init` de novo — a Etapa 5 sempre substitui o bloco
 pelo template atual (o bloco gerado nunca é "preservado" como um valor seu).
 
 ### O update disse "init esquecido em salto anterior"
@@ -73,14 +72,27 @@ pelo template atual (o bloco gerado nunca é "preservado" como um valor seu).
 Sintoma: `/keelson:update` terminou com "Veredito: exige /keelson:init" e a frase "sinal
 de /keelson:init esquecido em salto anterior", mesmo com a linha do CHANGELOG dizendo
 que nenhuma versão do salto exige. Não é contradição: a partir da versão `0.190.0` o
-update **mede o projeto** contra a versão recém-instalada (bloco do `CLAUDE.md`,
-`AGENTS.md`, blocos da ficha) além de ler o CHANGELOG, e a medição achou uma
+update **mede o projeto** contra a versão recém-instalada (bloco do `AGENTS.md`,
+linha `@AGENTS.md` do `CLAUDE.md`, blocos da ficha) além de ler o CHANGELOG, e a medição achou uma
 divergência que o salto de hoje não explica — quase sempre um `init` que ficou para
 trás numa atualização anterior, às vezes um bloco editado à mão. As linhas logo acima
 do veredito dizem qual item divergiu. Reparo: reinicie a sessão e rode `/keelson:init`;
 a Regra de merge preserva o que é seu e o self-check do init repete a mesma medição.
-Se você **quer** um `AGENTS.md` próprio de outra ferramenta, basta que ele exista: o
-item confere presença, não conteúdo.
+Um `AGENTS.md` com conteúdo de outra ferramenta continua seu: o `init` só mexe dentro dos
+marcadores do bloco keelson, e o self-check só compara o que está entre eles.
+
+### O Claude não segue o bloco do keelson (o `AGENTS.md` não é lido)
+
+Sintoma: o bloco está no `AGENTS.md`, mas a sessão age como se o keelson não existisse —
+não lê a ficha, não despacha os agents. Causa quase certa: há um `CLAUDE.md` (ou um
+`CLAUDE.local.md`) na pasta ou acima dela **sem a linha `@AGENTS.md`**. Com um desses
+arquivos presente, o Claude Code lê só eles e ignora o `AGENTS.md`; a linha de import é o
+que liga um ao outro. O self-check nomeia o caso (item `claude-import-presente`, `falha`)
+e o `/keelson:update` mede o mesmo item. Reparo: rode `/keelson:init` (a Etapa 5.7
+acrescenta a linha sem tocar no resto do arquivo) ou acrescente você mesmo `@AGENTS.md`
+numa linha própria, fora de bloco de código, e reinicie a sessão. Se o bloco keelson
+**ainda estiver dentro do `CLAUDE.md`**, o mesmo item acusa "migração incompleta": o
+`init` move o bloco para o `AGENTS.md` e deixa o que é seu no lugar.
 
 ### Desliguei `gates.review` na ficha e o reviewer continuou rodando
 

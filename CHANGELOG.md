@@ -25,6 +25,32 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.232.0] — 2026-11-20
+
+Re-init: required
+
+Decision 4.495 (minor) — `AGENTS.md` is the keelson instruction file in the consumer: `/keelson:init` writes the managed block there (the file every agent tool reads — Claude Code, Codex, Cursor, Amp) and makes sure `CLAUDE.md` imports it with a single `@AGENTS.md` line, because Claude Code skips `AGENTS.md` whenever a `CLAUDE.md` or `CLAUDE.local.md` exists without that import. A project that still carries the block inside `CLAUDE.md` is migrated on the next init: the block moves, the import line is added, everything outside the markers stays. Re-init required: the init writes to new places, and the self-check items the update measures changed name.
+
+### Added
+
+- **Etapa 5.7 of `/keelson:init`** now guards the `CLAUDE.md` side: removes a legacy keelson block (only the block — everything outside the markers stays), adds the `@AGENTS.md` line on its own line outside code fences when missing, and creates `CLAUDE.md` with just that line when the file is absent (cheap, and it closes the hole a later `CLAUDE.local.md` or a `claude-md`-only session would open). It never copies the block into `CLAUDE.md`.
+- **`agents-block-sincronizado`** self-check item: the `AGENTS.md` block compared byte for byte against the plugin template — divergent, markerless or absent file is `falha`.
+- **`claude-import-presente`** self-check item: `CLAUDE.md` without the `@AGENTS.md` line is `falha` (Claude Code reads nothing of keelson in that state); a keelson block still inside `CLAUDE.md` is `falha` ("migração incompleta"); `CLAUDE.md` absent is `aviso`. A line inside a fenced code block does not count; `@./AGENTS.md` does.
+- **Block header line** telling a tool without the keelson plugin to ignore the block — other agent tools now read it.
+- **Suites**: `init-selfcheck` gains the legacy-block, missing-import, import-only-in-fence and `@./AGENTS.md` cases on top of the synchronized/outdated/markerless/absent block cases retargeted to `AGENTS.md`; `update` retargets its fixtures and asserts the new item names. `smoke-consumer.sh` gains the **`migrate`** scenario (old adoption with the block in `CLAUDE.md` and the pointer `AGENTS.md` → init moves the block, drops the stale pointer, adds the import, keeps the human's local rule, and both self-check items come back `ok`); its `init`/`reinit` facts now read the block in `AGENTS.md` and the import in `CLAUDE.md`.
+
+### Changed
+
+- **Etapa 5 of `/keelson:init`** injects the block into `AGENTS.md`: absent → created with the block; present with a block → replaced between the markers; present without one (another tool's content, the team's own rules) → the block is appended, nothing outside the markers is touched; byte-identical to the old one-paragraph pointer → replaced whole, since that text would be wrong after Etapa 5.7 (a hand-edited pointer falls under the append rule and the report names the stale paragraph for the human).
+- **`scripts/update.sh`** measures `agents-block-sincronizado`, `claude-import-presente` and `ficha-campos`. An older `update.sh` reading this tree reports the vanished names as undeterminable, never as "no re-init needed"; this entry's `Re-init: required` carries the verdict for that jump.
+- **Doctrine that read "the project's `CLAUDE.md`"** as the complementary source of conventions now reads the project instructions (`AGENTS.md`/`CLAUDE.md`): `tasks`, `specify`, `implement`, `auto`, `migrate-legacy`, `update`, the `developer` and `agile-coach` agents, the validator protocol, the plan-validator and the commit convention.
+- **Templates**: `CLAUDE.keelson-block.md` → `AGENTS.keelson-block.md`; `AGENTS.keelson.md` → `AGENTS.pointer-legacy.md`, kept only for the byte-for-byte detection of the old pointer. `check-sync.sh`, `report-contract.md` and the repo's `CLAUDE.md` point at the new name.
+- **README**, method-guide §3.16/§3.25 and the wiki (*Instalação*, *Primeiros passos*, *Solução de problemas* — with a new section for "the block is in `AGENTS.md` but the session ignores it") describe the new layout.
+
+### Removed
+
+- Etapa 5.7's pointer creation and the `templates/AGENTS.keelson.md` pointer as something the init writes; the self-check items `claude-block-sincronizado` and `agents-presente`.
+
 ## [0.231.0] — 2026-11-06
 
 Re-init: none

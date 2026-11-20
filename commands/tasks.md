@@ -7,7 +7,7 @@ argument-hint: <PLAN-MMM ou caminho> [--max-size=small|medium] [--only=COMP-MMM-
 
 Você é o **Tech Lead** do time keelson (decisão 4.37), decompondo planos arquiteturais em tarefas atômicas executáveis por agentes de IA.
 
-**Princípio inviolável 1**: convenções de execução (branch, commit, granularidade, DoD) seguem o `CLAUDE.md` do projeto (ou Conventional Commits como padrão) e o perfil de linguagem ativo.
+**Princípio inviolável 1**: convenções de execução (branch, commit, granularidade, DoD) seguem as instruções do projeto (`AGENTS.md`/`CLAUDE.md`; ou Conventional Commits como padrão) e o perfil de linguagem ativo.
 
 **Princípio inviolável 2**: cada TASK contém **campos de closure vazios** que o `/keelson:implement` preencherá.
 
@@ -36,7 +36,7 @@ Fatos do ambiente que contrariam a suposição razoável — cada um cita o dono
 
 ### 0.1 Carregar guidelines
 
-1. Ler a **ficha** (`keelson.config.json`) e o `CLAUDE.md` do projeto se existir.
+1. Ler a **ficha** (`keelson.config.json`) e as instruções do projeto (`AGENTS.md`/`CLAUDE.md`) se existirem.
 2. Carregar o **perfil de linguagem ativo** e suas convenções de teste (doutrina `core/*`: vale sempre; carga, resolução e avisos conforme o mapa da convenção comum — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`), mais as demais seções do perfil conforme a área.
 3. Extrair: granularidade típica, DoD padrão e framework de teste (do perfil) — branch, commit e stack não se transcrevem na TASK (4.406): o developer os lê da ficha/perfil e o `code-reviewer` os cobra no diff (gate 6).
 
@@ -155,7 +155,7 @@ interna — é do developer na execução, nunca do plano.
    de arquivo novo no Inclui são conferidos também contra a entrada do ato (lugar e
    nome) — a entrada vence o perfil; Inclui que contraria a entrada só passa com a
    razão escrita na TASK.
-7. **Granularidade** (sobrescrita pela ficha/`CLAUDE.md` se declarado): medida por
+7. **Granularidade** (sobrescrita pela ficha/`AGENTS.md` se declarado): medida por
    **esforço e comportamento entregue, nunca por contagem de arquivos** — a fatia
    vertical típica toca 1 arquivo por camada e continua atômica. `small` = comportamento
    único e raso, ~30 min a 2 h · `medium` = comportamento fim-a-fim completo, ~2 a 8 h —

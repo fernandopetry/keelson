@@ -14,10 +14,12 @@ Responda o que ele perguntar (o resto ele detecta). Ao final, confira dois arqui
 - **`keelson.config.json`** — a [ficha](Ficha-do-projeto). Vale um olhar agora: se
   `quality.test` e `quality.lint` não forem os comandos reais do seu projeto, os quality
   gates vão reprovar por motivo errado.
-- **`CLAUDE.md`** — ganhou um bloco gerenciado do keelson. Não edite dentro dele; o
-  `init` reescreve esse bloco a cada execução.
+- **`AGENTS.md`** — ganhou um bloco gerenciado do keelson. Não edite dentro dele; o
+  `init` reescreve esse bloco a cada execução. O que estiver fora dos marcadores é seu.
+- **`CLAUDE.md`** — ganhou (ou já tinha) a linha `@AGENTS.md`. É ela que faz o Claude Code
+  ler o `AGENTS.md`; sem ela o bloco existe no disco e nenhuma sessão o lê.
 
-Faça o commit desses dois arquivos antes de começar — eles são configuração do time, não
+Faça o commit desses três arquivos antes de começar — eles são configuração do time, não
 rascunho de sessão.
 
 O relatório do `init` termina com um **Retrato de maturidade**: uma linha por camada de

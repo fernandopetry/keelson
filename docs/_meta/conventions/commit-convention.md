@@ -15,7 +15,7 @@
 <rodapés opcionais>
 ```
 
-Base: **Conventional Commits**. Padrão declarado no `CLAUDE.md`/ficha do projeto prevalece —
+Base: **Conventional Commits**. Padrão declarado nas instruções do projeto (`AGENTS.md`/`CLAUDE.md`) ou na ficha prevalece —
 esta régua vale quando o projeto não declara outro.
 
 - **`<tipo>`** — a natureza da mudança. **Lista fechada abaixo**; nada fora dela.

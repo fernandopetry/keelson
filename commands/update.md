@@ -47,7 +47,7 @@ O script atualiza marketplace→plugin, lê os `Re-init:` do CHANGELOG (4.189) e
 - Antes: <linha do script, ou "versão não exibida">
 - Agora: <linha do script, ou "versão não exibida">
 - Re-init pelo CHANGELOG: <linha do script — exige (com as versões) · não exige · não determinável>
-- Medição do projeto: <raiz medida e as linhas de bloco do `CLAUDE.md` · `AGENTS.md` · blocos da ficha, ou "pulada — sem ficha na pasta corrente">
+- Medição do projeto: <raiz medida e as linhas de bloco do `AGENTS.md` · import do `CLAUDE.md` · blocos da ficha, ou "pulada — sem ficha na pasta corrente">
 - Veredito: <linha `Veredito:` do script>
 
 ⚠ A sessão corrente continua na versão antiga — reinicie a sessão do Claude Code

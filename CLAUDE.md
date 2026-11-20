@@ -2,7 +2,7 @@
 
 Este repositório **é** o plugin (a raiz é o pacote). Não é um projeto consumidor — aqui se desenvolve
 o keelson; a doutrina que os consumidores recebem vive em `guidelines/` e o bloco
-injetado neles em `templates/CLAUDE.keelson-block.md`.
+injetado neles em `templates/AGENTS.keelson-block.md`.
 
 ## Antes de qualquer alteração — análise de efeito colateral (decisão 4.181)
 
@@ -79,7 +79,8 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
   que mexe nos 3 lugares escreve a entrada. Formato: `## [X.Y.Z] — AAAA-MM-DD`, linha
   `Re-init: required|none` logo abaixo do heading (4.189, redação ampliada pela 4.374:
   `required` = a entrada mudou algum artefato que o `/keelson:init` escreve no projeto —
-  o bloco injetado, o contrato da ficha ou um arquivo novo como o ponteiro `AGENTS.md`;
+  o bloco injetado no `AGENTS.md`, a linha `@AGENTS.md` do `CLAUDE.md`, o contrato da
+  ficha ou um arquivo novo;
   é o que `scripts/update.sh` lê para avisar o consumidor, complementado pela medição
   do disco do projeto contra a árvore nova, que pega o init esquecido em salto anterior
   — 4.440; provado por `check-release.sh` na entrada corrente), linha de
@@ -120,7 +121,7 @@ injetado neles em `templates/CLAUDE.keelson-block.md`.
 
 - Comando novo/renomeado → sincronizar **3 lugares**: `commands/*.md` · tabela *Commands*
   do `README.md` · §3.x do `docs/_meta/method-guide.md`. Comando humano-only
-  (`disable-model-invocation`) → também a nota do `templates/CLAUDE.keelson-block.md`.
+  (`disable-model-invocation`) → também a nota do `templates/AGENTS.keelson-block.md`.
   Continuam **3** — a página da wiki é derivada do method-guide (4.81); não escreva a
   quarta cópia. **Provado mecanicamente** por `scripts/check-sync.sh` (pre-commit + CI,
   decisão 4.147): linha do README, marcador `†` ⇔ flag, nota do bloco e (AVISO) seção

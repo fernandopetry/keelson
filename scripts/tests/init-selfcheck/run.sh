@@ -5,10 +5,11 @@
 # compara a saída inteira com a esperada. Regras provadas: matching real dos
 # sensitiveGlobs, check-ignore provado, local.json versionado é falha, flags efetivas
 # do Playwright por escopo, charter antigo vira aviso, jira com campo vazio é falha,
-# bloco models validado contra o elenco de agents do plugin (4.272), bloco do CLAUDE.md
+# bloco models validado contra o elenco de agents do plugin (4.272), bloco do AGENTS.md
 # comparado byte-a-byte contra o template do plugin — sincronizado, desatualizado,
-# sem marcadores e ausente (4.373); AGENTS.md presente vira ok, ausente vira aviso,
-# nunca falha (4.374); ficha-campos compara os blocos de 1º nível da ficha com o
+# sem marcadores e ausente (4.373/4.495); CLAUDE.md importa o AGENTS.md — com a linha
+# vira ok, sem a linha ou ainda com o bloco legado vira falha, ausente vira aviso, linha
+# só dentro de fence não conta (4.495); ficha-campos compara os blocos de 1º nível da ficha com o
 # template REAL do pacote — bloco ausente vira aviso, presente-com-null conta como
 # presente, chave extra do consumidor não é listada, sem template é silêncio (4.440).
 #
@@ -53,7 +54,7 @@ Conteúdo canônico do bloco.
 <!-- ============================================================= -->
 <!-- fim do bloco keelson                                          -->
 <!-- ============================================================= -->'
-printf '%s\n' "$BLOCO_TMPL" > "$PR/templates/CLAUDE.keelson-block.md"
+printf '%s\n' "$BLOCO_TMPL" > "$PR/templates/AGENTS.keelson-block.md"
 
 mkrepo() { r="$TMP/$1"; mkdir -p "$r"; git -C "$r" init -q; git -C "$r" config user.email t@t; git -C "$r" config user.name t; printf '%s\n' "$r"; }
 
@@ -85,16 +86,16 @@ EOF
 cat > "$R/.mcp.json" <<'EOF'
 { "mcpServers": { "playwright": { "command": "npx", "args": ["@playwright/mcp@latest", "--headless", "--output-dir", "thoughts/screen-verify", "--isolated"] } } }
 EOF
-printf '# Projeto\n\nTexto do humano, preservado.\n\n%s\n' "$BLOCO_TMPL" > "$R/CLAUDE.md"
-printf '# AGENTS.md\n\nVeja o CLAUDE.md.\n' > "$R/AGENTS.md"
+printf '# AGENTS.md\n\nNota de outra ferramenta, preservada.\n\n%s\n' "$BLOCO_TMPL" > "$R/AGENTS.md"
+printf '# Projeto\n\nTexto do humano, preservado.\n\n@AGENTS.md\n' > "$R/CLAUDE.md"
 git -C "$R" add -A >/dev/null 2>&1
 git -C "$R" commit -qm base >/dev/null 2>&1
 
 total=$((total + 1))
 got="$(bash "$SC" "$R" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
-want="ok	agents-presente	AGENTS.md presente na raiz
+want="ok	agents-block-sincronizado	bloco do AGENTS.md idêntico ao template do plugin
 ok	artefatos-ignorados	artifactsDir e .playwright-mcp/ ignorados (provado)
-ok	claude-block-sincronizado	bloco do CLAUDE.md idêntico ao template do plugin
+ok	claude-import-presente	CLAUDE.md importa o AGENTS.md (@AGENTS.md)
 ok	codepaths-existem	todos os codePaths existem
 ok	ficha-legivel	keelson.config.json parseado
 ok	hooks-executaveis	todos os hooks do plugin têm bit de execução
@@ -138,34 +139,76 @@ cat > "$R/.mcp.json" <<'EOF'
 { "mcpServers": { "playwright": { "command": "npx", "args": ["@playwright/mcp@latest", "--headless", "--output-dir", "thoughts/screen-verify", "--isolated"] } } }
 EOF
 
-# ---- bloco CLAUDE.md desatualizado (caso real: init reportou "tudo íntegro" com o ----
+# ---- bloco AGENTS.md desatualizado (caso real: init reportou "tudo íntegro" com o ----
 # bloco divergindo do template — falha, não aviso, e independe do resto da ficha) ----
-sed -i.bak 's/Conteúdo canônico do bloco\./Conteúdo canônico do bloco. Falta um parágrafo novo./' "$R/CLAUDE.md"
-rm -f "$R/CLAUDE.md.bak"
+sed -i.bak 's/Conteúdo canônico do bloco\./Conteúdo canônico do bloco. Falta um parágrafo novo./' "$R/AGENTS.md"
+rm -f "$R/AGENTS.md.bak"
 total=$((total + 1))
 got="$(bash "$SC" "$R" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
 case "$got" in
-  *"falha	claude-block-sincronizado	bloco do CLAUDE.md diverge do template atual do plugin — rode /keelson:init para substituí-lo (Etapa 5)"*)
-    [ "$st" -eq 1 ] && echo "ok   claude-block-desatualizado" || { echo "FAIL claude-block-desatualizado: exit $st"; fail=$((fail + 1)); } ;;
-  *) echo "FAIL claude-block-desatualizado:"; printf '%s\n' "$got" | grep claude-block | sed 's/^/  /'; fail=$((fail + 1)) ;;
+  *"falha	agents-block-sincronizado	bloco do AGENTS.md diverge do template atual do plugin — rode /keelson:init para substituí-lo (Etapa 5)"*)
+    [ "$st" -eq 1 ] && echo "ok   agents-block-desatualizado" || { echo "FAIL agents-block-desatualizado: exit $st"; fail=$((fail + 1)); } ;;
+  *) echo "FAIL agents-block-desatualizado:"; printf '%s\n' "$got" | grep agents-block | sed 's/^/  /'; fail=$((fail + 1)) ;;
 esac
-sed -i.bak 's/Conteúdo canônico do bloco\. Falta um parágrafo novo\./Conteúdo canônico do bloco./' "$R/CLAUDE.md"
-rm -f "$R/CLAUDE.md.bak"
+sed -i.bak 's/Conteúdo canônico do bloco\. Falta um parágrafo novo\./Conteúdo canônico do bloco./' "$R/AGENTS.md"
+rm -f "$R/AGENTS.md.bak"
 
-# ---- CLAUDE.md sem bloco (marcadores ausentes) ----
+# ---- AGENTS.md sem bloco (marcadores ausentes) ----
 R6="$(mkrepo sem-bloco)"
 cp -R "$R/." "$R6/" 2>/dev/null
 rm -rf "$R6/.git"
 git -C "$R6" init -q; git -C "$R6" config user.email t@t; git -C "$R6" config user.name t
-printf '# Projeto sem bloco keelson\n' > "$R6/CLAUDE.md"
+printf '# AGENTS.md sem bloco keelson\n' > "$R6/AGENTS.md"
 git -C "$R6" add -A >/dev/null 2>&1
 git -C "$R6" commit -qm base >/dev/null 2>&1
 total=$((total + 1))
 got="$(bash "$SC" "$R6" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
 case "$got" in
-  *"falha	claude-block-sincronizado	CLAUDE.md sem bloco gerenciado do keelson (marcadores ausentes) — rode /keelson:init"*)
-    [ "$st" -eq 1 ] && echo "ok   claude-block-sem-marcadores" || { echo "FAIL claude-block-sem-marcadores: exit $st"; fail=$((fail + 1)); } ;;
-  *) echo "FAIL claude-block-sem-marcadores:"; printf '%s\n' "$got" | grep claude-block | sed 's/^/  /'; fail=$((fail + 1)) ;;
+  *"falha	agents-block-sincronizado	AGENTS.md sem bloco gerenciado do keelson (marcadores ausentes) — rode /keelson:init"*)
+    [ "$st" -eq 1 ] && echo "ok   agents-block-sem-marcadores" || { echo "FAIL agents-block-sem-marcadores: exit $st"; fail=$((fail + 1)); } ;;
+  *) echo "FAIL agents-block-sem-marcadores:"; printf '%s\n' "$got" | grep agents-block | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+
+# ---- CLAUDE.md ainda com o bloco legado (migração incompleta) → falha (4.495) ----
+R8="$(mkrepo claude-legado)"
+cp -R "$R/." "$R8/" 2>/dev/null
+rm -rf "$R8/.git"
+git -C "$R8" init -q; git -C "$R8" config user.email t@t; git -C "$R8" config user.name t
+printf '# Projeto\n\nTexto do humano.\n\n%s\n' "$BLOCO_TMPL" > "$R8/CLAUDE.md"
+git -C "$R8" add -A >/dev/null 2>&1
+git -C "$R8" commit -qm base >/dev/null 2>&1
+total=$((total + 1))
+got="$(bash "$SC" "$R8" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
+case "$got" in
+  *"falha	claude-import-presente	bloco gerenciado ainda no CLAUDE.md — migração incompleta: rode /keelson:init (Etapa 5.7 move o bloco para o AGENTS.md)"*)
+    [ "$st" -eq 1 ] && echo "ok   claude-bloco-legado" || { echo "FAIL claude-bloco-legado: exit $st"; fail=$((fail + 1)); } ;;
+  *) echo "FAIL claude-bloco-legado:"; printf '%s\n' "$got" | grep claude-import | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+
+# ---- CLAUDE.md sem a linha @AGENTS.md → falha (o Claude Code não lê o AGENTS.md) ----
+printf '# Projeto\n\nTexto do humano, sem import.\n' > "$R8/CLAUDE.md"
+total=$((total + 1))
+got="$(bash "$SC" "$R8" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
+case "$got" in
+  *"falha	claude-import-presente	CLAUDE.md sem a linha @AGENTS.md — o Claude Code não lê o AGENTS.md: rode /keelson:init (Etapa 5.7)"*)
+    [ "$st" -eq 1 ] && echo "ok   claude-sem-import" || { echo "FAIL claude-sem-import: exit $st"; fail=$((fail + 1)); } ;;
+  *) echo "FAIL claude-sem-import:"; printf '%s\n' "$got" | grep claude-import | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+
+# ---- @AGENTS.md só dentro de bloco de código não é import → falha; com ./ fora dele → ok ----
+printf '# Projeto\n\n```\n@AGENTS.md\n```\n' > "$R8/CLAUDE.md"
+total=$((total + 1))
+got="$(bash "$SC" "$R8" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"
+case "$got" in
+  *"falha	claude-import-presente	CLAUDE.md sem a linha @AGENTS.md"*) echo "ok   claude-import-so-em-fence" ;;
+  *) echo "FAIL claude-import-so-em-fence:"; printf '%s\n' "$got" | grep claude-import | sed 's/^/  /'; fail=$((fail + 1)) ;;
+esac
+printf '# Projeto\n\n  @./AGENTS.md\n' > "$R8/CLAUDE.md"
+total=$((total + 1))
+got="$(bash "$SC" "$R8" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"
+case "$got" in
+  *"ok	claude-import-presente	CLAUDE.md importa o AGENTS.md (@AGENTS.md)"*) echo "ok   claude-import-com-ponto-barra" ;;
+  *) echo "FAIL claude-import-com-ponto-barra:"; printf '%s\n' "$got" | grep claude-import | sed 's/^/  /'; fail=$((fail + 1)) ;;
 esac
 
 # ---- caso defeituoso ----
@@ -192,14 +235,14 @@ git -C "$R2" commit -qm base >/dev/null 2>&1
 
 total=$((total + 1))
 got="$(bash "$SC" "$R2" --plugin-root "$PR" --claude-json "$TMP/nao-existe.json" 2>/dev/null)"; st=$?
-want="aviso	agents-presente	AGENTS.md ausente — rode /keelson:init para criar o ponteiro (ou, se o projeto já tem AGENTS.md de outra ferramenta, acrescente à mão um ponteiro para o CLAUDE.md)
+want="aviso	claude-import-presente	CLAUDE.md ausente — rode /keelson:init para criá-lo com a linha @AGENTS.md (garante a leitura do bloco em qualquer sessão)
 aviso	local-example	keelson.local.example.json ausente
 aviso	local-placeholder	keelson.local.json com campos em placeholder <...> — preencher (dev-only)
 aviso	perfil-charter	charter do perfil menor que o atual — re-derivar/revisar: backend(0.4.0<0.5.1)
 aviso	perfil-reviewed	perfil pendente de revisão humana (reviewed: false): backend
 aviso	quality-existe	comando não encontrado no PATH nem na raiz: quality.test(comando-que-nao-existe-xyz)
+falha	agents-block-sincronizado	AGENTS.md ausente na raiz do projeto — rode /keelson:init
 falha	artefatos-ignorados	não cobertos por git check-ignore: thoughts/screen-verify/ .playwright-mcp/
-falha	claude-block-sincronizado	CLAUDE.md ausente na raiz do projeto — rode /keelson:init
 falha	codepaths-existem	não existem no disco: src
 falha	jira-campos	jira.enabled com campo vazio: projectKey issueType.task
 falha	local-json-ignorado	keelson.local.json está VERSIONADO — segredo no repositório

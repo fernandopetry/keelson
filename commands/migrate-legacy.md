@@ -40,7 +40,7 @@ Ler todos os `.md` na raiz da pasta do slug (README.md tem prioridade) e **extra
 - **Capacidades de alto nível**: listas de funcionalidades, headers que descrevem capacidades, endpoints de API — frases curtas de "o que o slug faz".
 - **Glossário**: tabelas termo/definição, seções de conceitos, listas `**X**: definição`.
 - **Decisões arquiteturais**: seções de decisões/ADR/arquitetura, trechos "decidimos/optamos", arquivos `ADR-*.md`, `DECISIONS.md`, `ARCHITECTURE.md`.
-- **Stack mencionado**: tecnologias citadas — **validar contra a ficha e o `CLAUDE.md`** e reportar divergências sem corrigir.
+- **Stack mencionado**: tecnologias citadas — **validar contra a ficha e as instruções do projeto (`AGENTS.md`/`CLAUDE.md`)** e reportar divergências sem corrigir.
 
 Cada item extraído referencia o arquivo de origem, para revisão.
 

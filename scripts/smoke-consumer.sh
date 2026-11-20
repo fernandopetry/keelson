@@ -4,10 +4,14 @@
 # custa execução de LLM e minutos de parede — nunca em pre-commit/CI (contrato da 4.304).
 #
 # O que prova (fatos do DISCO e exit codes, nunca a narrativa do modelo):
-#   init    /keelson:init num projeto mínimo escreve ficha válida, bloco no CLAUDE.md,
-#           AGENTS.md ponteiro e thoughts/ ignorado; RE-init preserva a regra local do
-#           CLAUDE.md, o campo próprio da ficha e o AGENTS.md editado, restaura o bloco
+#   init    /keelson:init num projeto mínimo escreve ficha válida, bloco no AGENTS.md,
+#           `@AGENTS.md` no CLAUDE.md e thoughts/ ignorado; RE-init preserva a regra local do
+#           CLAUDE.md, o campo próprio da ficha e a nota alheia do AGENTS.md, restaura o bloco
 #           adulterado e não duplica marcadores (Regra de merge do init).
+#   migrate consumidor com adoção antiga — bloco no CLAUDE.md e AGENTS.md ponteiro — passa
+#           pelo init: o bloco muda de arquivo, o ponteiro obsoleto sai, a linha `@AGENTS.md`
+#           entra, a regra local do CLAUDE.md fica e o self-check fecha os dois itens (4.495).
+#           Recria o consumidor; por isso roda ANTES do init no `all`.
 #   cycle   /keelson:auto com uma feature de uma função: SPEC/PLAN/TASK/INDEX no slug,
 #           grafo e lint sem ERROR, código escrito, suíte do consumidor verde, trabalho
 #           em branch com commits, TASK Done, ledger da sessão com eventos.
@@ -45,9 +49,9 @@
 # somado/mediana/pico, Bash com 1 script × com 2+ encadeados, e tokens por papel, lidos do
 # transcript da sessão do consumidor.
 #
-# Uso: smoke-consumer.sh [--scenario init|cycle|parallel|pause|triage|report|broken|epic|all] [--results DIR]
+# Uso: smoke-consumer.sh [--scenario migrate|init|cycle|parallel|pause|triage|report|broken|epic|all] [--results DIR]
 #                        [--model M] [--timeout S] [--plugin-dir DIR] [--consumer DIR]
-#   --scenario   default all (ordem: init → cycle → pause → triage → report → broken → parallel → epic; o parallel vai por
+#   --scenario   default all (ordem: migrate → init → cycle → pause → triage → report → broken → parallel → epic; o parallel vai por
 #                último porque abre slug e branch próprios — e tem teto próprio de 3 h (rodada real: 2h+); cada um assume o
 #                estado deixado pelo anterior; --consumer reaproveita um consumidor).
 #   --results    raiz das saídas (default: mktemp); raw.json/result.txt por cenário + summary.md.
@@ -246,8 +250,9 @@ $RESPOSTAS"
   fato "init/ficha-json-valida"      'python3 -c "import json; json.load(open(\"$CONSUMER/keelson.config.json\"))" 2>/dev/null'
   fato "init/ficha-codepaths-src"    'python3 -c "import json; d=json.load(open(\"$CONSUMER/keelson.config.json\")); cp=d[\"codePaths\"]; import sys; sys.exit(0 if any(\"src\" in str(v) for v in cp.values()) else 1)" 2>/dev/null'
   fato "init/ficha-quality-test"     'grep -q "unittest" "$CONSUMER/keelson.config.json"'
-  fato "init/bloco-no-claude-md"     '[ "$(grep -c "keelson — bloco gerenciado" "$CONSUMER/CLAUDE.md" 2>/dev/null)" = "1" ] && [ "$(grep -c "fim do bloco keelson" "$CONSUMER/CLAUDE.md" 2>/dev/null)" = "1" ]'
-  fato "init/agents-md-ponteiro"     'grep -qi "CLAUDE.md" "$CONSUMER/AGENTS.md" 2>/dev/null'
+  fato "init/bloco-no-agents-md"     '[ "$(grep -c "keelson — bloco gerenciado" "$CONSUMER/AGENTS.md" 2>/dev/null)" = "1" ] && [ "$(grep -c "fim do bloco keelson" "$CONSUMER/AGENTS.md" 2>/dev/null)" = "1" ]'
+  fato "init/claude-md-importa-agents" 'grep -q "^@AGENTS.md" "$CONSUMER/CLAUDE.md" 2>/dev/null'
+  fato "init/claude-md-sem-bloco"    '! grep -q "keelson — bloco gerenciado" "$CONSUMER/CLAUDE.md" 2>/dev/null'
   fato "init/thoughts-ignorado"      'grep -q "thoughts" "$CONSUMER/.gitignore"'
   fato "init/suite-do-consumidor-intacta" '( cd "$CONSUMER" && python3 -m unittest discover -s tests -t . >/dev/null 2>&1 )'
   G add -A >/dev/null 2>&1; G commit -q -m "chore: keelson init" >/dev/null 2>&1 || true
@@ -260,12 +265,12 @@ p = sys.argv[1]; d = json.load(open(p)); d["custom"] = {"marcador": "CAMPO-PROPR
 json.dump(d, open(p, "w"), indent=2, ensure_ascii=False)
 PY
   printf '\nNOTA-PROPRIA-NO-AGENTS: instrução de outra ferramenta.\n' >> "$CONSUMER/AGENTS.md"
-  # adultera o bloco: remove a primeira linha de conteúdo após o cabeçalho do bloco
-  python3 - "$CONSUMER/CLAUDE.md" <<'PY'
+  # adultera o bloco (no AGENTS.md): remove a primeira linha de conteúdo após o cabeçalho do bloco
+  python3 - "$CONSUMER/AGENTS.md" <<'PY'
 import sys, re
 p = sys.argv[1]; t = open(p).read()
 lines = t.split("\n")
-# acha o fim do cabeçalho do bloco (4 linhas de comentário) e apaga a próxima linha não vazia
+# acha o fim do cabeçalho do bloco (linhas de comentário) e apaga a próxima linha não vazia
 try:
     i = next(k for k, l in enumerate(lines) if "keelson — bloco gerenciado" in l)
     j = i + 3
@@ -276,7 +281,7 @@ except (StopIteration, IndexError):
     removida = ""
 open(p + ".removida", "w").write(removida)
 PY
-  removida="$(cat "$CONSUMER/CLAUDE.md.removida" 2>/dev/null)"; rm -f "$CONSUMER/CLAUDE.md.removida"
+  removida="$(cat "$CONSUMER/AGENTS.md.removida" 2>/dev/null)"; rm -f "$CONSUMER/AGENTS.md.removida"
   printf -- '- linha do bloco removida para o re-init restaurar: %s\n' "${removida:-(bloco ausente)}" >> "$SUM"
   G add -A >/dev/null 2>&1; G commit -q -m "chore: customizações do consumidor + bloco adulterado" >/dev/null 2>&1 || true
 
@@ -287,10 +292,34 @@ Este projeto JÁ passou pelo init. $RESPOSTAS"
   fato "reinit/regra-local-preservada"   'grep -q "REGRA-LOCAL-DO-CONSUMIDOR" "$CONSUMER/CLAUDE.md"'
   fato "reinit/campo-proprio-preservado" 'grep -q "CAMPO-PROPRIO-DO-CONSUMIDOR" "$CONSUMER/keelson.config.json"'
   fato "reinit/agents-proprio-preservado" 'grep -q "NOTA-PROPRIA-NO-AGENTS" "$CONSUMER/AGENTS.md"'
-  fato "reinit/bloco-restaurado"         '[ -n "$removida" ] && grep -qF -- "$removida" "$CONSUMER/CLAUDE.md"'
-  fato "reinit/marcadores-unicos"        '[ "$(grep -c "keelson — bloco gerenciado" "$CONSUMER/CLAUDE.md")" = "1" ] && [ "$(grep -c "fim do bloco keelson" "$CONSUMER/CLAUDE.md")" = "1" ]'
+  fato "reinit/bloco-restaurado"         '[ -n "$removida" ] && grep -qF -- "$removida" "$CONSUMER/AGENTS.md"'
+  fato "reinit/marcadores-unicos"        '[ "$(grep -c "keelson — bloco gerenciado" "$CONSUMER/AGENTS.md")" = "1" ] && [ "$(grep -c "fim do bloco keelson" "$CONSUMER/AGENTS.md")" = "1" ]'
+  fato "reinit/claude-md-sem-bloco"      '! grep -q "keelson — bloco gerenciado" "$CONSUMER/CLAUDE.md"'
   fato "reinit/ficha-continua-valida"    'python3 -c "import json; json.load(open(\"$CONSUMER/keelson.config.json\"))" 2>/dev/null'
   G add -A >/dev/null 2>&1; G commit -q -m "chore: keelson re-init" >/dev/null 2>&1 || true
+}
+
+# ------------------------------------------------------------ migrate (4.495)
+# Adoção antiga: bloco no CLAUDE.md (junto da regra local do humano) e AGENTS.md ponteiro
+# puro. O init deve mover o bloco, trocar o ponteiro pelo bloco (byte-idêntico ao template
+# legado), acrescentar a linha de import e não tocar no que é do humano.
+cen_migrate() {
+  printf '\n# smoke-consumer — %s (migrate)\n' "$(date '+%Y-%m-%d %H:%M')" >> "$SUM"
+  novo_consumidor
+  { printf '# Projeto\n\n## Minha regra local\n\n- REGRA-LOCAL-DO-CONSUMIDOR: nunca remover.\n\n'; cat "$PLUGIN/templates/AGENTS.keelson-block.md"; } > "$CONSUMER/CLAUDE.md"
+  cp "$PLUGIN/templates/AGENTS.pointer-legacy.md" "$CONSUMER/AGENTS.md"
+  G add -A >/dev/null 2>&1; G commit -q -m "chore: adoção antiga — bloco no CLAUDE.md, AGENTS.md ponteiro" >/dev/null 2>&1 || true
+  roda migrate "/keelson:init
+
+Este projeto JÁ passou pelo init numa versão anterior do keelson. $RESPOSTAS"
+  echo "### fatos: migrate" >> "$SUM"
+  fato "migrate/bloco-no-agents-md"        '[ "$(grep -c "keelson — bloco gerenciado" "$CONSUMER/AGENTS.md" 2>/dev/null)" = "1" ] && [ "$(grep -c "fim do bloco keelson" "$CONSUMER/AGENTS.md" 2>/dev/null)" = "1" ]'
+  fato "migrate/ponteiro-antigo-removido"  '! grep -q "A doutrina deste projeto vive no" "$CONSUMER/AGENTS.md"'
+  fato "migrate/claude-md-sem-bloco"       '! grep -q "keelson — bloco gerenciado" "$CONSUMER/CLAUDE.md"'
+  fato "migrate/claude-md-importa-agents"  'grep -q "^@AGENTS.md" "$CONSUMER/CLAUDE.md"'
+  fato "migrate/regra-local-preservada"    'grep -q "REGRA-LOCAL-DO-CONSUMIDOR" "$CONSUMER/CLAUDE.md"'
+  fato "migrate/selfcheck-fecha-os-dois-itens" 'sc="$(bash "$PLUGIN/scripts/init-selfcheck.sh" "$CONSUMER" --plugin-root "$PLUGIN" 2>/dev/null)"; printf "%s\n" "$sc" | grep -q "^ok.agents-block-sincronizado" && printf "%s\n" "$sc" | grep -q "^ok.claude-import-presente"'
+  G add -A >/dev/null 2>&1; G commit -q -m "chore: keelson init (migração 4.495)" >/dev/null 2>&1 || true
 }
 
 # ------------------------------------------------------------ cycle
@@ -520,6 +549,7 @@ cen_epic() {
 }
 
 case "$SCEN" in
+  migrate) cen_migrate ;;
   init)   cen_init ;;
   cycle)  cen_cycle ;;
   parallel) cen_parallel ;;
@@ -528,7 +558,7 @@ case "$SCEN" in
   triage) cen_triage ;;
   report) cen_report ;;
   epic)   cen_epic ;;
-  all)    cen_init; cen_cycle; cen_pause; cen_triage; cen_report; cen_broken; cen_parallel; cen_epic ;;
+  all)    cen_migrate; cen_init; cen_cycle; cen_pause; cen_triage; cen_report; cen_broken; cen_parallel; cen_epic ;;
   *) echo "ERRO: --scenario inválido: $SCEN" >&2; exit 2 ;;
 esac
 

@@ -1,5 +1,5 @@
 ---
-description: 'Configura ou repara a adoção do keelson — ficha (keelson.config.json), perfil de linguagem, bloco no CLAUDE.md, AGENTS.md. Use ao adotar, logo após atualizar o plugin (re-init repara, nunca destrói) ou com ficha quebrada; `jira` re-mede só o Jira'
+description: 'Configura ou repara a adoção do keelson — ficha keelson.config.json, perfil de linguagem, bloco no AGENTS.md importado pelo CLAUDE.md. Use ao adotar, após atualizar o plugin (re-init repara, nunca destrói) ou com ficha quebrada; `jira` re-mede o Jira'
 argument-hint: "[jira]"
 ---
 
@@ -26,14 +26,15 @@ Fatos do ambiente que contrariam a suposição razoável — cada um cita o dono
 - **`init-selfcheck.sh` não tem flag de recorte**: no escopo `jira`, filtre os itens `jira-*` da saída.
 - **`.env` da raiz é candidato dos `sensitiveGlobs` como o de qualquer outro nível** — cobertura provada por matching real, nunca lida do glob (4.71/4.51).
 - **Mutação e E2E nunca rodam inteiros no self-check**: `--help`/dry-run; Playwright prova com `--list`, que enumera os specs sem subir a app.
+- **`CLAUDE.md` (ou `CLAUDE.local.md`) presente faz o Claude Code ignorar o `AGENTS.md`** (4.495): a linha `@AGENTS.md` da Etapa 5.7 é o único elo — sem ela o bloco existe no disco e nenhuma sessão o lê.
 
 ## Resultado esperado
 
 Ao final existem, no projeto:
 - `keelson.config.json` na raiz (a ficha) — preenchida e validada;
 - um perfil de linguagem ativo (exemplar embarcado **ou** gerado e pendente de revisão);
-- o bloco gerenciado do keelson no `CLAUDE.md`;
-- um `AGENTS.md` na raiz apontando para o `CLAUDE.md` (criado só se ausente);
+- o bloco gerenciado do keelson no `AGENTS.md` (o arquivo que toda ferramenta de agente lê);
+- um `CLAUDE.md` que importa o `AGENTS.md` com a linha `@AGENTS.md` — e sem bloco keelson próprio;
 - um relatório do que foi detectado, perguntado e o que falta revisar.
 
 ## Regra de merge — preservar × completar (vale para TODAS as etapas)
@@ -236,9 +237,28 @@ própria, nunca bloqueia a adoção.
    da verdade é o binário no PATH, medido de novo a cada rodada do gate. Escopo `jira` não
    executa esta etapa.
 
-## Etapa 5 — Injetar o bloco no `CLAUDE.md`
+## Etapa 5 — Injetar o bloco no `AGENTS.md`
 
-Insira o conteúdo de `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.keelson-block.md` no `CLAUDE.md` do projeto (crie o arquivo se não existir). Se um bloco keelson já existir (entre os marcadores `<!-- ... keelson ... -->`), **substitua-o** — não duplique. Este bloco **não** entra na Regra de merge do topo do comando: ele é gerado, não personalizado pelo Diretor, então "já existe" nunca é motivo para preservá-lo — a única prova de que está correto é o conteúdo bater com o template atual (Etapa 6 confere mecanicamente, decisão 4.373).
+O `AGENTS.md` é o arquivo de instruções que toda ferramenta de agente lê — Claude Code,
+Codex CLI, Cursor, Amp e as demais que seguem a convenção [agents.md](https://agents.md);
+por isso o bloco gerenciado mora nele (decisão 4.495). Insira o conteúdo de
+`${CLAUDE_PLUGIN_ROOT}/templates/AGENTS.keelson-block.md` no `AGENTS.md` do projeto:
+
+- **arquivo ausente** → crie-o só com o bloco;
+- **arquivo presente com bloco keelson** (entre os marcadores `<!-- ... keelson ... -->`) →
+  **substitua o bloco** — não duplique;
+- **arquivo presente sem bloco** (conteúdo de outra ferramenta, regra própria do time) →
+  **acrescente o bloco ao fim**, sem tocar numa linha fora dos marcadores;
+- **arquivo idêntico, byte a byte, a `${CLAUDE_PLUGIN_ROOT}/templates/AGENTS.pointer-legacy.md`**
+  (o ponteiro de um parágrafo "a doutrina vive no `CLAUDE.md`") → substitua o arquivo
+  inteiro pelo bloco: esse texto ficaria errado depois da Etapa 5.7. Ponteiro editado à
+  mão não bate byte a byte → vale a regra do acréscimo, e o relatório aponta o parágrafo
+  do ponteiro para o Diretor remover.
+
+Este bloco **não** entra na Regra de merge do topo do comando: ele é gerado, não
+personalizado pelo Diretor, então "já existe" nunca é motivo para preservá-lo — a única
+prova de que está correto é o conteúdo bater com o template atual (Etapa 6 confere
+mecanicamente, decisão 4.373).
 
 ## Etapa 5.5 — Garantir `thoughts/` fora do versionamento
 
@@ -250,9 +270,22 @@ Com `method: skill:screen-verify`, garanta **também** a linha `.playwright-mcp/
 
 Com `quality.e2e` preenchido (decisão 4.166), garanta a cobertura dos artefatos de execução do runner: no setup guiado (`/keelson:e2e-setup`) eles consolidam em `thoughts/e2e/` (decisão 4.168) — já sob a linha `thoughts/`, prove com `check-ignore`; config própria do projeto nos defaults do Playwright → linhas `test-results/` e `playwright-report/` (e o diretório do `storageState`, se houver). Os **specs** são código versionado; screenshot, trace e report de execução são transitórios e não entram no git.
 
-## Etapa 5.7 — Garantir um `AGENTS.md` apontando para o `CLAUDE.md` (decisão 4.374)
+## Etapa 5.7 — Garantir que o `CLAUDE.md` importa o `AGENTS.md` (decisão 4.495)
 
-Ferramentas de agente que não conhecem o `CLAUDE.md` — Codex CLI/GPT, Cursor, Amp e outras que seguem a convenção [agents.md](https://agents.md) — procuram um `AGENTS.md` na raiz. **Só se o arquivo estiver ausente**, crie-o a partir de `${CLAUDE_PLUGIN_ROOT}/templates/AGENTS.keelson.md`: um ponteiro puro para o `CLAUDE.md` do projeto, sem repetir nenhuma regra (mesmo princípio "um dono por regra" do `CLAUDE.md` do próprio keelson). **Se já existir** — de qualquer origem, inclusive conteúdo próprio de outra ferramenta —, **não toque**: este arquivo não tem marcadores como o bloco da Etapa 5, então não há como inserir sem risco de apagar instrução alheia. Registre no relatório que o projeto já tem `AGENTS.md` próprio e sugira, como nota, acrescentar à mão um ponteiro para o `CLAUDE.md` se ainda não houver um.
+Com um `CLAUDE.md` ou `CLAUDE.local.md` presente na raiz ou em diretório acima, o Claude
+Code lê só eles e **não carrega o `AGENTS.md`**; a linha `@AGENTS.md` no `CLAUDE.md` é o
+que liga um ao outro (import nativo, resolvido relativo ao arquivo, nunca lido duas vezes).
+Garanta os três fatos, sem tocar em nada que o Diretor escreveu:
+
+- **bloco keelson ainda no `CLAUDE.md`** (entre os marcadores) → remova só o bloco; tudo
+  fora dos marcadores fica. É a migração de quem adotou o keelson com o bloco no `CLAUDE.md`.
+- **linha `@AGENTS.md` ausente** → acrescente-a numa linha própria, fora de bloco de código
+  (o import só vale assim). Linha já presente, com ou sem `./`, conta.
+- **`CLAUDE.md` ausente** → crie-o só com a linha `@AGENTS.md`. Criar é barato e fecha o
+  furo: um `CLAUDE.local.md` que apareça depois, ou uma sessão configurada para ler só
+  `CLAUDE.md`, deixaria o `AGENTS.md` de fora.
+
+Nunca copie o bloco para o `CLAUDE.md`: um dono por regra.
 
 ## Etapa 6 — Self-check (falsificável, não confie na configuração)
 
@@ -268,11 +301,12 @@ pacote (item `ficha-campos`, decisão 4.440 — ficha anterior a um bloco que es
 conhece, como `git`, `commit` ou `models`, é `aviso`; a ação é **completar cada bloco
 listado com o default do template**, pela Regra de merge: ausente vale default para todo
 leitor, então completar não muda comportamento e faz o aviso convergir), o bloco injetado
-do `CLAUDE.md` **byte-a-byte** contra o
-template do pacote (item `claude-block-sincronizado` — divergência, marcadores ausentes
+do `AGENTS.md` **byte-a-byte** contra o
+template do pacote (item `agents-block-sincronizado` — divergência, marcadores ausentes
 ou arquivo ausente são `falha`, nunca aviso: "o bloco existe" não é "o bloco está
-atualizado", decisão 4.373) e a presença do `AGENTS.md` ponteiro (item `agents-presente`,
-ausente é `aviso`, decisão 4.374). Esses três itens são também o que o `/keelson:update`
+atualizado", decisão 4.373) e o import do `CLAUDE.md` (item `claude-import-presente` —
+`CLAUDE.md` sem a linha `@AGENTS.md`, ou ainda com o bloco legado, é `falha`; `CLAUDE.md`
+ausente é `aviso`, decisão 4.495). Esses três itens são também o que o `/keelson:update`
 mede logo após atualizar (4.440) — o consumidor chega aqui já sabendo o que diverge.
 Cada linha `falha`/`aviso` vira item do relatório. Exceção com
 reparo imediato: `falha` em `hooks-executaveis` (4.180 — Gotchas) → aplique o `chmod +x`

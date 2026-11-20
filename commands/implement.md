@@ -43,7 +43,7 @@ Fatos do ambiente que contrariam a suposição razoável — cada um cita o dono
 
 ### 0.2 Carregar guidelines e memo
 
-1. Ler a **ficha** (`keelson.config.json`; campos: convenção comum — sdd-conventions.md) e o `CLAUDE.md` do projeto se existir.
+1. Ler a **ficha** (`keelson.config.json`; campos: convenção comum — sdd-conventions.md) e as instruções do projeto (`AGENTS.md`/`CLAUDE.md`) se existirem.
 2. Carregar o **perfil de linguagem ativo** (doutrina `core/*`: vale sempre, carga conforme o mapa — `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/sdd-conventions.md`, também dono da resolução e avisos do perfil); em mudança sensível, some a seção de segurança do perfil e o `QUALITY-CHARTER` (`${CLAUDE_PLUGIN_ROOT}/guidelines/_meta/`); em queries pesadas, a seção de performance.
 3. **Memo de exploração e MAP do slug**: se existem, use-os como mapa do domínio e **passe os caminhos aos subagents** (memo: convenção comum — sdd-conventions.md; `{docsRoot}/<slug>/MAP.md`: contrato em `map-contract.md`, consumo sob 4.58).
 4. Validar consistência guideline ↔ PLAN.
