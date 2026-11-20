@@ -35,6 +35,11 @@ jobs:
           bad="$(git ls-files -s -- 'hooks/*.sh' 'scripts/*.sh' 'scripts/git-hooks/*' | grep -v '^100755' || true)"
           if [ -n "$bad" ]; then echo "script sem bit de execução:"; echo "$bad"; exit 1; fi
 
+      - name: AGENTS.md é a doutrina do repo — CLAUDE.md ou CLAUDE.local.md na raiz a esconderia (4.496)
+        run: |
+          for f in CLAUDE.md CLAUDE.local.md; do [ -e "$f" ] && { echo "$f na raiz esconde o AGENTS.md do Claude Code"; exit 1; }; done
+          test -s AGENTS.md
+
       - name: Versão do bash (o piso declarado é 3.2 — o job macOS prova com o /bin/bash do sistema)
         run: /bin/bash -c 'echo "$BASH_VERSION"'
 

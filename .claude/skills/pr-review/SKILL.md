@@ -24,7 +24,7 @@ Chegou uma Pull Request no repositório do keelson. Esta skill é um **sequencia
 4. **Régua de mérito — leia os donos, nunca replique.** É a mesma régua de uma leva interna:
    - `guidelines/_meta/QUALITY-CHARTER.md` — os artigos e a régua geral: **gerador ≠ avaliador** (checklist do autor não é prova; prova é externa e falsificável) e **rigor proporcional a complexidade × risco**.
    - `guidelines/core/CODE-REVIEW.md` — régua dos gates 1–7, quando há código no diff.
-   - `CLAUDE.md` do repo — o checklist do mantenedor: dono único por regra, critério de pacote 4.194, abstração 4.72, idiomas, bash 3.2/awk POSIX/bit `+x`, fixture obrigatória (4.260), degradar com WARNING — nunca inventar ERROR, poda 4.160 para texto de doutrina novo, `/skill-standards` se a PR cria/edita skill/comando/agent.
+   - `AGENTS.md` do repo — o checklist do mantenedor: dono único por regra, critério de pacote 4.194, abstração 4.72, idiomas, bash 3.2/awk POSIX/bit `+x`, fixture obrigatória (4.260), degradar com WARNING — nunca inventar ERROR, poda 4.160 para texto de doutrina novo, `/skill-standards` se a PR cria/edita skill/comando/agent.
 
    Steelman primeiro: julgue o **mérito da ideia** separado da execução — desenho ruim não condena problema real (na 4.263 a ideia foi absorvida e o desenho corrigido em 3 pontos).
 

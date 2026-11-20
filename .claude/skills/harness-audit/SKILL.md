@@ -1,12 +1,12 @@
 ---
 name: harness-audit
-description: "Audita a doutrina do keelson (CLAUDE.md, commands/, agents/, skills/, guidelines/, conventions/, templates/) em duas camadas — ponteiros mecânicos via scripts/check-refs.sh e juízes duplos cegos de poda com a régua 4.160 e plants de controle (4.186). Report-only: aplicar corte é leva própria. Ativar quando o Diretor pedir auditoria do harness, poda/simplificação da doutrina, ou revisão de redundância/utilidade das instruções. Ferramenta do MANTENEDOR (fora do pacote — decisão 4.182)."
+description: "Audita a doutrina do keelson (AGENTS.md, commands/, agents/, skills/, guidelines/, conventions/, templates/) em duas camadas — ponteiros mecânicos via scripts/check-refs.sh e juízes duplos cegos de poda com a régua 4.160 e plants de controle (4.186). Report-only: aplicar corte é leva própria. Ativar quando o Diretor pedir auditoria do harness, poda/simplificação da doutrina, ou revisão de redundância/utilidade das instruções. Ferramenta do MANTENEDOR (fora do pacote — decisão 4.182)."
 ---
 
 # Skill: harness-audit
 
 Auditoria interna do harness do keelson. Esta skill é um **protocolo de rodada** — a régua
-de poda tem dono (`CLAUDE.md` §Registro e governança, bullet 4.160) e o fato mecânico tem
+de poda tem dono (`AGENTS.md` §Registro e governança, bullet 4.160) e o fato mecânico tem
 motor (`scripts/check-refs.sh`); ela só impõe a sequência e as cegueiras. **Report-only**:
 a rodada termina no relatório; aplicar corte é leva própria com análise de impacto (4.181).
 
@@ -17,7 +17,7 @@ a rodada termina no relatório; aplicar corte é leva própria com análise de i
 
 2. **Baralho de superfícies.** Enumere por `git ls-files` (nunca `find .` — worktrees sob
    `.claude/` são cópia integral do repo e contaminariam o juízo de redundância):
-   `CLAUDE.md` · `commands/*.md` · `agents/*.md` · `skills/**/*.md` · `guidelines/**/*.md` ·
+   `AGENTS.md` · `commands/*.md` · `agents/*.md` · `skills/**/*.md` · `guidelines/**/*.md` ·
    `docs/_meta/conventions/*.md` · `templates/*.md`. Copie as superfícies para
    `.harness-eval/runs/<AAAA-MM-DD>-interno/deck/` e anote quais perfis têm
    `reviewed: true` (poda aplicada neles exigirá re-olhada humana).

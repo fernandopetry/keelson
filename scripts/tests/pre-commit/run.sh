@@ -11,6 +11,8 @@
 #     camada mecânica → nenhuma); suíte falhando → commit BLOQUEADO; suíte ausente
 #     → aviso e segue; KEELSON_SKIP_TESTS=1 → nada roda;
 #   sintaxe — .sh staged com bash -n quebrado → bloqueado;
+#   sombra (4.496) — CLAUDE.md staged ou CLAUDE.local.md solto na raiz → bloqueado
+#     (esconderia o AGENTS.md, a doutrina do repo, do Claude Code);
 #   número/versão já usados (4.394) — heading `### 4.N` novo duplicado ou ≤ maior de HEAD
 #     → bloqueado (nomeia o próximo livre; 4.100 não confunde com 4.10; edição sem heading
 #     novo passa); entrada `## [X.Y.Z]` nova duplicada ou já commitada → bloqueado;
@@ -123,6 +125,18 @@ tenta_commit; st=$?
 total=$((total + 1))
 if [ "$st" -ne 0 ] && grep -q 'bash -n falhou em scripts/quebrado.sh' "$TMP/err"; then ok bash-n-quebrado-bloqueia
 else falha "bash-n-quebrado-bloqueia: exit=$st $(tail -2 "$TMP/err")"; fi
+
+# --- CLAUDE.md (ou CLAUDE.local.md) na raiz esconde o AGENTS.md do Claude Code → bloqueado (4.496) ---
+novo_repo; printf '# sombra\n' > "$R/CLAUDE.md"; G add -A
+tenta_commit; st=$?
+total=$((total + 1))
+if [ "$st" -ne 0 ] && grep -q 'CLAUDE.md na raiz esconde o AGENTS.md' "$TMP/err"; then ok claude-md-na-raiz-bloqueia
+else falha "claude-md-na-raiz-bloqueia: exit=$st $(tail -2 "$TMP/err")"; fi
+novo_repo; printf '# sombra local\n' > "$R/CLAUDE.local.md"; printf 'x\n' > "$R/qualquer.txt"; G add qualquer.txt
+tenta_commit; st=$?
+total=$((total + 1))
+if [ "$st" -ne 0 ] && grep -q 'CLAUDE.local.md na raiz esconde o AGENTS.md' "$TMP/err"; then ok claude-local-md-untracked-bloqueia
+else falha "claude-local-md-untracked-bloqueia: exit=$st $(tail -2 "$TMP/err")"; fi
 
 # --- bit de execução ausente em script do pacote → bloqueado ---
 novo_repo; printf '#!/usr/bin/env bash\nexit 0\n' > "$R/hooks/novo-guard.sh"; chmod 644 "$R/hooks/novo-guard.sh"; G add -A

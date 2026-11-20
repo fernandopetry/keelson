@@ -7,7 +7,7 @@
 #
 # Superfícies varridas (via `git ls-files` — nunca `find .`, que enxergaria
 # cópias untracked como .claude/worktrees/):
-#   CLAUDE.md · commands/*.md · agents/*.md · skills/**/*.md · guidelines/**/*.md
+#   AGENTS.md · commands/*.md · agents/*.md · skills/**/*.md · guidelines/**/*.md
 #   docs/_meta/conventions/*.md · templates/*.md · templates/**/*.md (artifacts/, 4.405)
 #
 # Régua de precisão (falso-positivo em artefato legítimo é o pior defeito desta
@@ -51,9 +51,9 @@ if [ -z "$ROOT" ]; then
 fi
 [ -d "$ROOT" ] || { echo "ERRO: raiz inexistente: $ROOT" >&2; exit 2; }
 
-# Superfícies: doutrina do pacote + CLAUDE.md do repo (ls-files ignora untracked).
+# Superfícies: doutrina do pacote + AGENTS.md do repo (ls-files ignora untracked).
 surfaces="$(git -C "$ROOT" ls-files -- \
-  'CLAUDE.md' 'commands/*.md' 'agents/*.md' 'skills/*.md' 'skills/**/*.md' \
+  'AGENTS.md' 'commands/*.md' 'agents/*.md' 'skills/*.md' 'skills/**/*.md' \
   'guidelines/*.md' 'guidelines/**/*.md' 'docs/_meta/conventions/*.md' \
   'templates/*.md' 'templates/**/*.md' 2>/dev/null)"
 [ -n "$surfaces" ] || { echo "ERRO: nenhuma superfície encontrada em $ROOT" >&2; exit 2; }

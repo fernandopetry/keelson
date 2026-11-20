@@ -63,7 +63,7 @@ fi
 jq -n --arg rel "$rel" '{
   hookSpecificOutput: {
     hookEventName: "PostToolUse",
-    additionalContext: ("Artefato de instrução do keelson alterado (" + $rel + "): antes do commit desta leva, rode a skill /skill-standards sobre ele (roteamento do CLAUDE.md, decisão 4.212 — inclui checar o frescor do digest da doc Anthropic). Um lembrete por arquivo por sessão.")
+    additionalContext: ("Artefato de instrução do keelson alterado (" + $rel + "): antes do commit desta leva, rode a skill /skill-standards sobre ele (roteamento do AGENTS.md, decisão 4.212 — inclui checar o frescor do digest da doc Anthropic). Um lembrete por arquivo por sessão.")
   }
 }'
 exit 0

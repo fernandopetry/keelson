@@ -2,7 +2,7 @@
 
 All notable changes to keelson are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows the 0.x rule
-stated in `CLAUDE.md` — **new capability or break → minor**, **fix or fine-tuning → patch**,
+stated in `AGENTS.md` — **new capability or break → minor**, **fix or fine-tuning → patch**,
 bumped once per release batch.
 
 Every entry points at the governance decision that motivated it (`docs/_meta/decisions.md`,

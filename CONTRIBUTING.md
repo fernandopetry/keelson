@@ -74,6 +74,11 @@ often decide a verdict here:
   written in Portuguese; the public face (`README.md`, `CHANGELOG.md`, this
   file) and commit messages are in English, using
   [conventional commits](docs/_meta/conventions/commit-convention.md).
+- **Doctrine file.** The maintainer doctrine of this repository lives in
+  `AGENTS.md`, which Claude Code reads natively. There is no `CLAUDE.md`, and
+  the pre-commit hook and the CI refuse a `CLAUDE.md` or `CLAUDE.local.md` at
+  the root: either one makes Claude Code skip `AGENTS.md` silently. Personal
+  instructions go in `~/.claude/CLAUDE.md`, which loads alongside.
 - **No consumer identifiers.** Real project names, paths, URLs or keys from
   keelson consumers never enter doctrine or registries — abstract the general
   pattern instead.

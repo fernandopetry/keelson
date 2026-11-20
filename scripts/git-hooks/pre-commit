@@ -62,6 +62,17 @@ fi
 # ============ Parte 2: guarda de qualidade (decisão 4.83) ============
 [ "${KEELSON_SKIP_TESTS:-0}" = "1" ] && exit 0
 
+# A doutrina do repo é o AGENTS.md, lido nativamente pelo Claude Code (4.496). Um
+# CLAUDE.md ou CLAUDE.local.md na raiz — versionado ou não — faz o Claude Code ignorar
+# o AGENTS.md em silêncio: a sessão opera sem a doutrina e ninguém vê. Bloqueia.
+for shadow in CLAUDE.md CLAUDE.local.md; do
+  if [ -e "$shadow" ]; then
+    echo "[keelson pre-commit] BLOQUEADO: $shadow na raiz esconde o AGENTS.md (a doutrina do repo) do Claude Code (4.496)." >&2
+    echo "  Mova o conteúdo para o AGENTS.md (ou para ~/.claude/CLAUDE.md, que carrega junto) e remova o arquivo." >&2
+    exit 1
+  fi
+done
+
 # Nomes de arquivo do repo não têm espaço (convenção kebab dos templates) — o for é seguro.
 staged="$(git diff --cached --name-only --diff-filter=d 2>/dev/null || true)"
 [ -n "$staged" ] || exit 0

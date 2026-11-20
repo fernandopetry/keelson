@@ -5,7 +5,7 @@ description: "Sequencia a absorção de insumo de campo de consumidor — postmo
 
 # Skill: field-intake
 
-Você recebeu insumo de campo de um consumidor do keelson. Esta skill é um **sequenciador com ponteiros** — as regras têm donos (`docs/_meta/proposal-inbox.md`, `CLAUDE.md` §Registro e governança, decisões citadas); ela só impõe a ordem. Não pule etapas nem as reordene: as duas violações históricas são parecer-antes-de-registro e literal-de-consumidor em registro do plugin.
+Você recebeu insumo de campo de um consumidor do keelson. Esta skill é um **sequenciador com ponteiros** — as regras têm donos (`docs/_meta/proposal-inbox.md`, `AGENTS.md` §Registro e governança, decisões citadas); ela só impõe a ordem. Não pule etapas nem as reordene: as duas violações históricas são parecer-antes-de-registro e literal-de-consumidor em registro do plugin.
 
 ## Sequência
 

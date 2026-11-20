@@ -8,7 +8,7 @@ description: "Valida skill, comando ou agent do keelson contra as boas práticas
 Verificação de aderência às boas práticas de autoria da Anthropic para artefatos de
 instrução do keelson (skills, comandos, agents). Esta skill é um **protocolo de
 verificação**: a régua de conteúdo vem do digest cacheado da doc oficial (abaixo), a
-régua de poda continua com dono único (`CLAUDE.md` §Registro e governança, 4.160) e o
+régua de poda continua com dono único (`AGENTS.md` §Registro e governança, 4.160) e o
 frontmatter já tem motor (`scripts/check-frontmatter.sh`) — ela só impõe a sequência,
 o frescor da fonte e as adaptações do keelson.
 
@@ -90,7 +90,7 @@ Para cada artefato, veredito **por item** — `ok` ou desvio com proposta concre
 
 ## Adaptações declaradas do keelson (prevalecem sobre a régua upstream)
 
-- **Português é doutrina** (CLAUDE.md §Convenções): a preferência da doc por exemplos em
+- **Português é doutrina** (AGENTS.md §Convenções): a preferência da doc por exemplos em
   inglês não se aplica a docs/doutrina; `README.md` e CHANGELOG seguem em inglês.
 - **Nome estabelecido não renomeia por estética**: a preferência upstream por gerúndio
   não justifica rename — rename é quebra (minor + sincronização 3 lugares, 4.21).

@@ -19,7 +19,7 @@ Você é o **impact-scout** — a ferramenta de análise de efeito colateral do 
 Percorra todas — "n/a" declarado é resposta válida; dimensão pulada em silêncio, não.
 
 1. **Referências**: grep pelo nome do arquivo, `name:`/heading, slug de comando/skill e termos-chave da regra em todo o repo (`commands/`, `agents/`, `skills/`, `guidelines/`, `docs/`, `scripts/`, `templates/`, `hooks/`, `README.md`, `.github/`). Cada consumidor encontrado vira âncora.
-2. **Dono único**: a regra tocada tem dono declarado (`guidelines/core/`, `docs/_meta/conventions/`, perfil)? A mudança criaria segunda cópia da regra ou órfã a existente? (CLAUDE.md, seção *Ao mudar comando ou doutrina*.)
+2. **Dono único**: a regra tocada tem dono declarado (`guidelines/core/`, `docs/_meta/conventions/`, perfil)? A mudança criaria segunda cópia da regra ou órfã a existente? (AGENTS.md, seção *Ao mudar comando ou doutrina*.)
 3. **Guardas mecânicas**: quais checks cobrem a área e o invocador deve rodar — `check-sync.sh` (comando/agent ⇄ README/method-guide), `check-release.sh` (versão/CHANGELOG/wiki), suíte do grafo (`graph.sh`/catálogo), `bash -n` + suítes de `scripts/tests/` (scripts), modo `100755` (`hooks/`). Área sem guarda é achado: nomeie-a.
 4. **Alcance no consumidor**: o artefato embarca no plugin (raiz: `commands/`, `agents/`, `skills/`, `guidelines/`, `templates/`, `hooks/`, `scripts/`)? Se sim: minor ou patch? Exige re-init ou chega via `/keelson:update`? Wiki: "o que o consumidor faz mudou?" dispara página própria. `.claude/`, `docs/_meta/`, `CLAUDE.md` da raiz = mantenedor-only, sem bump.
 5. **Perfil revisado**: toca arquivo com `reviewed: true` no frontmatter? → a entrega deve sinalizar re-olhada humana.

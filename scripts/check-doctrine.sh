@@ -5,7 +5,7 @@
 # mensagem que um hook entrega ao modelo — traz história no lugar de regra. O caso, o
 # número medido, o contador de reincidência, a genealogia da decisão, a comparação com
 # a versão anterior e a versão pinada de plugin/harness moram em `docs/_meta/decisions.md`;
-# a doutrina cita `(4.NNN)` e segue. É a régua do CLAUDE.md ("escreva pelo efeito; o
+# a doutrina cita `(4.NNN)` e segue. É a régua do AGENTS.md do repo ("escreva pelo efeito; o
 # porquê fica na decisão, a uma referência de distância") virando fato mecânico, depois
 # da auditoria de 2026-09-28 (4.441) ter medido 46 narrativas inline e 34 parágrafos
 # com 5+ decisões coladas por "E …".
@@ -28,7 +28,7 @@
 #                  `--write-baseline` regrava a partir do estado atual (ato deliberado,
 #                  nunca do pre-commit).
 #
-# Superfícies (via `git ls-files` — nunca `find .`): CLAUDE.md · commands/*.md ·
+# Superfícies (via `git ls-files` — nunca `find .`): AGENTS.md · commands/*.md ·
 # agents/*.md · skills/**/*.md · guidelines/core/*.md · guidelines/_meta/*.md ·
 # templates/**/*.md · docs/_meta/conventions/*.md · hooks/*.sh · .claude/hooks/*.sh.
 # Em .sh só linhas que não são comentário contam (comentário é registro do mantenedor;
@@ -72,7 +72,7 @@ LONG=1500   # bytes — catraca por arquivo
 HARD=4000   # bytes — achado sempre
 
 surfaces="$(git -C "$ROOT" ls-files -- \
-  'CLAUDE.md' 'commands/*.md' 'agents/*.md' 'skills/*.md' 'skills/**/*.md' \
+  'AGENTS.md' 'commands/*.md' 'agents/*.md' 'skills/*.md' 'skills/**/*.md' \
   'guidelines/core/*.md' 'guidelines/_meta/*.md' 'templates/*.md' 'templates/**/*.md' \
   'docs/_meta/conventions/*.md' 'hooks/*.sh' '.claude/hooks/*.sh' 2>/dev/null)"
 [ -n "$surfaces" ] || { echo "ERRO: nenhuma superfície encontrada em $ROOT" >&2; exit 2; }
