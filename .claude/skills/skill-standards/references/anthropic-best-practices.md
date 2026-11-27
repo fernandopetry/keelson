@@ -1,6 +1,6 @@
 # Digest — Anthropic Agent Skills best practices
 
-fetched: 2026-10-22
+fetched: 2026-11-27
 
 Fontes:
 - https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
@@ -32,7 +32,8 @@ re-fetch, nunca acumule versões.
 
 - A janela de contexto é um bem compartilhado; só nome + description pré-carregam, o
   corpo carrega sob demanda e, uma vez carregado, **fica na conversa** nos turnos
-  seguintes (o arquivo não é relido; re-invocação com conteúdo idêntico vira nota curta).
+  seguintes (o arquivo não é relido; re-invocação com conteúdo idêntico vira nota curta,
+  conteúdo alterado — argumentos ou saída de `` !`cmd` `` — é anexado de novo).
   Escreva **instruções permanentes**, não passos de uma vez.
 - Pergunta por frase: "o agente erraria sem esta instrução?" — não → cortar. Se o agente
   já faz a tarefa inteira bem sem a skill, a skill talvez não agregue valor (teste).
@@ -70,27 +71,38 @@ re-fetch, nunca acumule versões.
 - No Claude Code, `description` + `when_to_use` são **truncadas em 1.536 chars** e a
   **listagem inteira tem orçamento de 1% da janela** do modelo: estourou, as descriptions
   das skills **menos invocadas** são descartadas (fica só o nome). Logo: caso de uso
-  principal **na primeira frase**. Ajustes: `skillListingBudgetFraction`,
-  `skillListingMaxDescChars`, `skillOverrides: "name-only"` para as de baixa prioridade;
-  `/doctor` estima o custo da listagem, `/skill-doctor` aponta as nunca usadas.
+  principal **na primeira frase**. Ajustes: `skillListingBudgetFraction` (ou a env
+  `SLASH_COMMAND_TOOL_CHAR_BUDGET`, em chars fixos), `skillListingMaxDescChars`,
+  `skillOverrides: "name-only"` para as de baixa prioridade (**não afeta skill de
+  plugin** — essas se gerenciam por `/plugin`); `/doctor` estima o custo da listagem,
+  `/skill-doctor` aponta as nunca usadas.
 - `name`: **≤64 chars**, só `[a-z0-9-]`, sem começar/terminar com hífen nem `--`, igual
   ao nome da pasta (spec), sem tag XML; preferência por gerúndio (`processing-pdfs`) ou
   frase nominal; nunca vago (`helper`, `utils`) nem reservado (`anthropic`, `claude`,
   `anthropic-skills*`, pasta `synced`). Caractere invisível/controle/`<>` no nome →
   a skill não carrega (ver com `claude --debug`, buscar `[names]`).
-- Skill chamada `verify` ou `simplify` no projeto/pessoal **roda sozinha antes de cada
-  commit** (Claude Code) — não use esses nomes sem querer esse efeito.
+- Skill chamada `verify` ou `simplify` (enterprise, pessoal, projeto, diretório adicional
+  ou arquivo em `.claude/commands/`) presente no início da sessão: o Claude Code instrui
+  o modelo a **rodá-la antes de cada commit, exceto mudança só de docs ou testes** — desde
+  que o modelo possa invocá-la (sem `disable-model-invocation`) e `includeGitInstructions`
+  não esteja desligado; as embarcadas, as de plugin e as da conta claude.ai não contam.
+  Não use esses nomes sem querer esse efeito.
+- Skill ou comando seu chamado `ship`, `ship-local` ou `steward` **não carrega** onde o
+  `/ship` embarcado existe — o embarcado vence.
 
 ## Frontmatter no Claude Code (todos opcionais; campo desconhecido é ignorado)
 
 - `when_to_use` · `argument-hint` · `arguments` (nomes posicionais para `$nome`) ·
   `disable-model-invocation` (só humano invoca; description fora do contexto; não
-  pré-carrega em subagent; não roda em tarefa agendada; se o modelo tentar, é bloqueado
-  e instruído a não reproduzir os passos) · `user-invocable: false` (só o modelo invoca)
+  pré-carrega em subagent; não roda em tarefa agendada; se o modelo tentar sem o
+  `/nome` como palavra separada na mensagem, a chamada é bloqueada e ele sugere que o
+  humano rode) · `user-invocable: false` (só o modelo invoca)
   · `allowed-tools` / `disallowed-tools` (valem só no turno; `allowed-tools` **não**
   é barrado por workspace trust — revise skill de repo antes de rodar) · `model` ·
-  `effort` · `context: fork` + `agent` + `background` (fork **não vê o histórico**: a
-  instrução tem de ser autocontida e ter tarefa explícita) · `hooks` · `paths` (glob que
+  `effort` · `context: fork` + `agent` + `background` (default `true`; `false` espera o
+  resultado no turno; fork **não vê o histórico**: a instrução tem de ser autocontida e
+  ter tarefa explícita) · `hooks` (registrados na invocação, valem pelo resto da sessão)
+  · `paths` (glob que
   limita a ativação automática; só arquivos dentro do cwd) · `shell` · `metadata` ·
   `license` · `compatibility` (≤500 chars; só se houver requisito de ambiente).
 - Frontmatter só é lido se o `---` de abertura é a 1ª linha; YAML inválido carrega a
@@ -104,9 +116,11 @@ re-fetch, nunca acumule versões.
 - Substituições: `$ARGUMENTS`, `$ARGUMENTS[N]`/`$N`, `$nome`, `${CLAUDE_SKILL_DIR}`,
   `${CLAUDE_PROJECT_DIR}`, `${CLAUDE_PLUGIN_ROOT}`, `${CLAUDE_PLUGIN_DATA}`,
   `${CLAUDE_SESSION_ID}`, `${CLAUDE_EFFORT}`; `$` literal escapa com `\`. Contexto
-  dinâmico: `` !`cmd` `` no início da linha (ou bloco ```` ```! ````); exit ≥2 **aborta a
-  invocação inteira** (exit 1 de grep/diff é normal; para outros, `|| true`); timeout
-  2 min; sem prompt de permissão (deny rule aborta; fora do auto mode, "ask" também).
+  dinâmico: `` !`cmd` `` no início da linha ou após espaço (ou bloco ```` ```! ````);
+  exit ≥2 **aborta a invocação inteira** (exit 1 de grep/diff é normal; para outros,
+  `|| true`); timeout 2 min; sem prompt de permissão (deny rule aborta; fora do auto
+  mode, "ask" também); hook `PreToolUse` não dispara para esses comandos — o evento é
+  `PreSkillShellCommand`.
 - Validação mecânica do frontmatter: `claude plugin validate <dir-de-skills>`
   (Claude Code) ou `skills-ref validate ./skill` (spec).
 
@@ -181,7 +195,8 @@ re-fetch, nunca acumule versões.
 - **Desenho para uso agêntico**: sem prompt interativo (hang) — tudo por flag/env/stdin;
   `--help` curto com exemplos; erro diz o que veio, o que era esperado e o que tentar;
   dado estruturado (JSON/CSV) em stdout, diagnóstico em stderr; idempotente (retry);
-  entrada ambígua → erro, não chute; `--dry-run` para destrutivo; exit codes distintos e
+  entrada ambígua → erro, não chute; `--dry-run` para destrutivo (e considerar flag
+  explícita `--confirm`/`--force`); exit codes distintos e
   documentados; saída previsível (harness trunca em 10–30K chars) → resumo por default,
   `--offset`/`--output` para o resto.
 
@@ -217,8 +232,9 @@ re-fetch, nunca acumule versões.
 
 ## Quando o modelo deixa de seguir a skill
 
-- Regra que **tem de valer sempre** → vira **hook** (do settings ou do frontmatter
-  `hooks` da skill); skill é lida uma vez, hook roda a cada evento.
+- Regra que **tem de valer sempre** → vira **hook** (em arquivo de settings ou no
+  `hooks/hooks.json` de um plugin); skill é lida uma vez, hook roda a cada evento, esteja
+  o modelo seguindo a skill ou não.
 - Orientação de **julgamento** → redigir para a tarefa inteira ("rode os testes após
   cada edição", não "rode os testes").
 - **Compactação** cortou a cauda → re-invocar; e manter o essencial no topo.
