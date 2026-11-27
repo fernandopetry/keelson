@@ -182,7 +182,9 @@ conector). Funciona pelo **conector MCP Atlassian**: sem token, sem SDK, sem seg
 O `/keelson:init` descobre em runtime os tipos de issue, status e campos do seu projeto e
 grava **IDs**. Para configurar (ou atualizar) só este bloco depois da adoção, rode
 `/keelson:init jira`: liga a integração num projeto que começou sem ela e, se o bloco já
-está preenchido, re-mede o quadro e aponta divergências sem sobrescrever nada.
+está preenchido, re-mede o quadro e aponta divergências sem sobrescrever nada. Para ver
+o que a configuração gravada faz com o quadro antes de um ciclo real, rode
+`/keelson:jira-preview` (só leitura).
 
 ```jsonc
 "jira": {

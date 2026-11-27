@@ -1,0 +1,53 @@
+config	ok	jira.enabled	true
+config	ok	jira.projectKey	APP
+config	ok	jira.site	cloudId abc-123
+config	ok	jira.issueType.spec	10000
+config	ok	jira.issueType.task	10003
+config	ok	jira.issueType.feature	10001
+config	info	jira.issueType.standalone	null — brief avulso nao sincroniza
+config	ok	jira.mode	create — o sync cria a raiz
+config	ok	jira.epicPolicy	multi-feature — SPEC com 0 ou 1 FEAT nao ganha Epic
+config	info	jira.transition	comment — os marcos comentam, o card nao anda sozinho
+config	info	jira.standaloneParent	null — Story avulsa nasce sem pai
+config	info	jira.telemetry	false
+config	info	jira.estimate	false
+config	info	niveis	presumidos: spec=1 feature=0 task=-1 standalone=0 — confirme no Jira
+mapa	ok	jira.mapFile	docs/_meta/jira.APP.md
+mapa	ok	secao-campos	presente
+mapa	ok	secao-etapas	presente
+mapa	info	secao-trilho	ausente — so transicao direta, sem caminho de varios saltos
+mapa	aviso	coluna-nivel	tabela de etapas sem a coluna Nivel — /keelson:init jira sugere a estrutura atual
+mapa	ok	marco-task-iniciada	alvo 3 (Fazendo)
+mapa	ok	marco-task-concluida	alvo 10001 (Feito)
+mapa	ok	marco-trabalho-iniciado	alvo 11606 (Em desenvolvimento)
+mapa	ok	marco-pronta-qa	alvo 10599 (Em revisão)
+mapa	info	fase-start-dev-epic	sem linha — o Epic nao se move (opt-in)
+mapa	falta	fase-start-dev-story	sem linha — esse nivel nao se move com --phase start-dev
+mapa	falta	fase-start-dev-subtask	sem linha — esse nivel nao se move com --phase start-dev
+mapa	info	fase-finish-dev-epic	sem linha — o Epic nao se move (opt-in)
+mapa	falta	fase-finish-dev-story	sem linha — esse nivel nao se move com --phase finish-dev
+mapa	falta	fase-finish-dev-subtask	sem linha — esse nivel nao se move com --phase finish-dev
+largada	spec-multi-feat	raiz criada no gancho do specify (a politica precisa contar as FEATs)
+cenario	spec-multi-feat	3 niveis pleno	Epic > Story por FEAT > sub-task por TASK
+marco	spec-multi-feat	todos	Epic	nada	-	Epic intocado pelos ganchos automaticos — so anda por --phase com linha epic
+marco	spec-multi-feat	Trabalho iniciado (Story)	Story	comentario	11606 (Em desenvolvimento)	transition comment: o card nao anda
+marco	spec-multi-feat	Funcionalidade pronta p/ QA	Story	comentario	10599 (Em revisão)	transition comment: o card nao anda
+marco	spec-multi-feat	TASK iniciada	sub-task	comentario	3 (Fazendo)	transition comment: o card nao anda
+marco	spec-multi-feat	TASK concluida	sub-task	comentario	10001 (Feito)	transition comment: o card nao anda
+fase	spec-multi-feat	start-dev	Epic	nao-move	-	sem linha epic para o verbo (opt-out)
+fase	spec-multi-feat	finish-dev	Epic	nao-move	-	sem linha epic para o verbo (opt-out)
+fase	spec-multi-feat	start-dev	Story	nao-move	-	sem linha story para o verbo (opt-out)
+fase	spec-multi-feat	finish-dev	Story	nao-move	-	sem linha story para o verbo (opt-out)
+fase	spec-multi-feat	start-dev	sub-task	nao-move	-	sem linha subtask para o verbo (opt-out)
+fase	spec-multi-feat	finish-dev	sub-task	nao-move	-	sem linha subtask para o verbo (opt-out)
+largada	spec-uma-feat	raiz criada no gancho do specify (a politica precisa contar as FEATs)
+cenario	spec-uma-feat	compacta	Story raiz sem pai > sub-task por TASK (sem Epic)
+marco	spec-uma-feat	Trabalho iniciado (Story)	Story raiz	comentario	11606 (Em desenvolvimento)	transition comment: o card nao anda
+marco	spec-uma-feat	Funcionalidade pronta p/ QA	Story raiz	comentario	10599 (Em revisão)	transition comment: o card nao anda
+marco	spec-uma-feat	TASK iniciada	sub-task	comentario	3 (Fazendo)	transition comment: o card nao anda
+marco	spec-uma-feat	TASK concluida	sub-task	comentario	10001 (Feito)	transition comment: o card nao anda
+fase	spec-uma-feat	start-dev	Story raiz	nao-move	-	sem linha story para o verbo (opt-out)
+fase	spec-uma-feat	finish-dev	Story raiz	nao-move	-	sem linha story para o verbo (opt-out)
+fase	spec-uma-feat	start-dev	sub-task	nao-move	-	sem linha subtask para o verbo (opt-out)
+fase	spec-uma-feat	finish-dev	sub-task	nao-move	-	sem linha subtask para o verbo (opt-out)
+cenario	avulso	nao sincroniza	issueType.standalone null — o brief avulso nao gera card

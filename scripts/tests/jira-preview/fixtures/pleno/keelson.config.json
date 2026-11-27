@@ -1,0 +1,11 @@
+{
+  "docsRoot": "docs",
+  "jira": {
+    "enabled": true, "telemetry": true, "estimate": false,
+    "site": "exemplo.atlassian.net", "cloudId": "abc-123", "projectKey": "OPS",
+    "mode": "create",
+    "issueType": { "spec": "10000", "feature": "10001", "task": "10003", "standalone": "10002" },
+    "epicPolicy": "always", "standaloneParent": "OPS-1",
+    "transition": "auto", "mapFile": "docs/_meta/jira.OPS.md", "boardId": null
+  }
+}

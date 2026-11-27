@@ -112,6 +112,7 @@ or `/keelson:auto` for the autonomous end-to-end cycle.
 | `/keelson:merge` † | Merge one or more branches into the current working branch, one at a time — one merge commit per branch; a clean branch (no conflict, no semantic-reconciliation finding, green suite) commits directly with no agent dispatched, otherwise the developer resolves only the triggered files and the code-reviewer audits only that resolution's diff (push, remote merge, PR and deploy stay human) |
 | `/keelson:deploy` † | Build the `/keelson:merge` queue from the board's deploy column — the status comes from the project map's `Fila de merge` line (`--status` overrides), issues flagged as impeded (their own flag or one inherited from the flagged parent epic) are left out and listed, each key is matched to its branch by the ficha's `git.branchNaming` pattern (exact `<KEY>` for externally named branches), and the queue runs through the merge contract into the current branch (`--into` overrides); it only decides which branches enter — the Jira connector is mandatory here, the read is JQL-only (never creates or transitions a card), and push, PR and the actual deploy stay human |
 | `/keelson:jira-sync` | Reconcile a slug — or a single SPEC subtree — with Jira via the Atlassian MCP connector; `--phase start-dev\|finish-dev` walks the tree across the board — idempotent, best-effort (optional) |
+| `/keelson:jira-preview` † | Jira rehearsal — shows, per scenario (SPEC with several features, single-feature SPEC with or without an Epic, standalone brief, epic), which cards would be born, under which parent, and what each cycle milestone and `--phase` verb would do to them under the current ficha and map; lists what is configured and what is missing, each line marked `medido` / `mapa` / `só a prova viva fecha`. Read-only by default; `--live` creates a tagged test tree in the project and walks the milestones for real, after your OK (never deletes) |
 | `/keelson:review` † | Review an arbitrary diff (working tree, last commit, N commits, range, branch) against the keelson doctrine via independent reviewers; on your OK, dispatches the fix to the developer agent and re-reviews — for code that arrived without an SDD artifact |
 | `/keelson:audit` † | On-demand dependency audit against known vulnerabilities (CVE/NVD); `full` adds hygiene (outdated, abandoned, licenses) |
 | `/keelson:status` | Executive summary of a slug's current state — what's done, in flight, planned |
@@ -429,11 +430,11 @@ republishes it. Edit the repository, never the wiki UI (decision 4.81).
 
 ## Status
 
-`0.232.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
+`0.233.0` (Quality Charter `0.6.0`) — early. The engine and the PHP reference profile
 are the stable core; the legacy PHP ladder (5.6/7.0/7.4/8.0) ships as reviewed-pending
 drafts, and the profile generator and non-PHP profiles are evolving.
 
-New in this release: the standalone brief carries the lessons cut (`## Lições aplicáveis`) so the developer reads the project's lessons before designing in on-demand mode, with the `agent-guard` cobbling the dispatch that skips it; `index-check.sh` no longer flags a correct INDEX of a briefs-only slug, and `artifact-lint.sh` no longer goes silent on a shared helper under a PLAN without backticks.
+New in this release: `/keelson:jira-preview` rehearses the Jira integration before a real cycle touches the board — per scenario, which cards would be born and what each milestone would do to them under the current ficha and map, what is configured and what is missing; read-only by default, `--live` proves it with tagged test cards after your OK.
 
 Full history in the [CHANGELOG](CHANGELOG.md); the reasoning behind each change in
 `docs/_meta/decisions.md`. Feedback and contributions welcome — see

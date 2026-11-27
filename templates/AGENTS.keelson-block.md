@@ -188,7 +188,10 @@ mensagem ao mantenedor do plugin) ·
 `/keelson:conventions` (entrevista de convenções da casa — mede no código onde cada
 ato mora, qual esqueleto segue, como se nomeia e que camada chama; pergunta só o que o
 código não fecha e grava `guidelines/project/conventions.md`, lido pelo developer, pelo
-gate 6 e pela forja de TASKs).
+gate 6 e pela forja de TASKs) ·
+`/keelson:jira-preview` (ensaio da integração Jira — mostra por cenário que cards
+nasceriam e o que cada marco faria com eles na configuração atual, e lista o que falta;
+só leitura, `--live` prova com cards de teste após o OK do Diretor).
 
 <!-- ============================================================= -->
 <!-- fim do bloco keelson                                          -->

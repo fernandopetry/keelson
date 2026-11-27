@@ -389,6 +389,27 @@ Etapa 3 do `/keelson:plan`; ausente, cada um declara `n/a` e segue o vizinho. O 
 
 Detalhe completo (catálogo de atos, etapas, output): `commands/conventions.md`.
 
+### 3.34 `/keelson:jira-preview` — ensaio da integração Jira (humano-only)
+
+Mostra, **antes de um ciclo real mover o quadro**, o que o keelson faria com a ficha e o
+mapa de hoje. A parte determinística é de `scripts/jira-preview.sh`: lê o bloco `jira`
+da ficha e o `jira.mapFile` e projeta três cenários — SPEC com várias funcionalidades,
+SPEC de funcionalidade única (com ou sem Epic, conforme `epicPolicy`) e brief avulso —
+com a árvore de cards, o momento em que nascem e o efeito de cada marco do ciclo e de
+cada verbo de fase (`move`, `comentario`, `nada`, `incerto`). O comando então mede no
+Jira, só com chamadas de leitura: os tipos existem e aninham, há campo obrigatório
+descoberto, os status-alvo existem e cada salto tem transição disponível numa issue
+real naquele status. Épico e `mode: link` são lidos do protocolo na fonte. Cada linha
+da prévia declara a origem — `medido`, `mapa` ou `só a prova viva fecha` — e a tabela
+final lista o que está configurado e o que falta, com a ação (quase sempre
+`/keelson:init jira`). `--live`, após o OK do Diretor, cria uma árvore mínima marcada
+`[keelson-ensaio]` no projeto, percorre os marcos e o `finish-dev` de verdade e compara
+previsto × real; nada é apagado. O ensaio prova configuração e workflow, não o disparo
+dos ganchos num ciclo nem a queda do conector. A régua é toda do protocolo de sync Jira;
+o comando não grava ficha, mapa nem artefato.
+
+Detalhe completo (etapas, formato da prévia, output): `commands/jira-preview.md`.
+
 ## 4. Skills
 
 Skills não geram artefatos novos — validam ou consultam. As três validators rodam **automaticamente** ao final do comando correspondente, mas podem ser invocadas sob demanda ("valide a SPEC-002", "lint no PLAN-001").

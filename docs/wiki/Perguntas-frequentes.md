@@ -216,7 +216,9 @@ não tudo de uma vez.
 
 Não. A integração vem **desligada** e é *best-effort* — nunca bloqueia o ciclo. Sem Jira,
 nada muda no funcionamento. E dá para ligar depois, sem refazer a adoção: `/keelson:init jira`
-configura só a integração (descobre tipos, workflow e monta o mapa do projeto).
+configura só a integração (descobre tipos, workflow e monta o mapa do projeto). Antes do
+primeiro ciclo, `/keelson:jira-preview` mostra o que essa configuração vai fazer com o
+quadro, sem escrever nada nele.
 
 A única exceção é o `/keelson:deploy`: como o board é o insumo dele, sem conector ele
 para com erro claro em vez de seguir — e precisa da linha `Fila de merge` no mapa do

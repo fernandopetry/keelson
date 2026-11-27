@@ -1,0 +1,66 @@
+config	ok	jira.enabled	true
+config	ok	jira.projectKey	OPS
+config	ok	jira.site	exemplo.atlassian.net
+config	ok	jira.issueType.spec	10000
+config	ok	jira.issueType.task	10003
+config	ok	jira.issueType.feature	10001
+config	ok	jira.issueType.standalone	10002
+config	ok	jira.mode	create — o sync cria a raiz
+config	ok	jira.epicPolicy	always — toda SPEC ganha Epic
+config	ok	jira.transition	auto — os marcos movem o card
+config	ok	jira.standaloneParent	OPS-1
+config	info	jira.telemetry	true
+config	info	jira.estimate	false
+config	info	niveis	presumidos: spec=1 feature=0 task=-1 standalone=0 — confirme no Jira
+mapa	ok	jira.mapFile	docs/_meta/jira.OPS.md
+mapa	ok	secao-campos	presente
+mapa	ok	secao-etapas	presente
+mapa	ok	secao-trilho	presente
+mapa	ok	marco-task-iniciada	alvo 3 (Fazendo)
+mapa	ok	marco-task-concluida	alvo 10001 (Feito)
+mapa	ok	marco-trabalho-iniciado	alvo 11606 (Em desenvolvimento)
+mapa	ok	marco-pronta-qa	alvo 10599 (Em revisão)
+mapa	info	fase-start-dev-epic	sem linha — o Epic nao se move (opt-in)
+mapa	ok	fase-start-dev-story	alvo 11606 (Em desenvolvimento)
+mapa	ok	fase-start-dev-subtask	alvo 3 (Fazendo)
+mapa	info	fase-finish-dev-epic	sem linha — o Epic nao se move (opt-in)
+mapa	ok	fase-finish-dev-story	alvo 10599 (Em revisão)
+mapa	ok	fase-finish-dev-subtask	alvo 10001 (Feito)
+mapa	ok	trilho-story	1 > 11606 > 10599 > 10700 > 10001
+mapa	ok	trilho-subtask	1 > 3 > 10001
+largada	spec-multi-feat	raiz criada na largada do ciclo (antes da SPEC), salvo modo link
+cenario	spec-multi-feat	3 niveis pleno	Epic > Story por FEAT > sub-task por TASK
+marco	spec-multi-feat	todos	Epic	nada	-	Epic intocado pelos ganchos automaticos — so anda por --phase com linha epic
+marco	spec-multi-feat	Trabalho iniciado (Story)	Story	move	11606 (Em desenvolvimento)	caminho pelo trilho — transicoes a medir
+marco	spec-multi-feat	Funcionalidade pronta p/ QA	Story	comentario	10599 (Em revisão)	alvo alem do teto 11606 — avancar e ato humano (--phase)
+marco	spec-multi-feat	TASK iniciada	sub-task	move	3 (Fazendo)	caminho pelo trilho — transicoes a medir
+marco	spec-multi-feat	TASK concluida	sub-task	move	10001 (Feito)	caminho pelo trilho — transicoes a medir
+fase	spec-multi-feat	start-dev	Epic	nao-move	-	sem linha epic para o verbo (opt-out)
+fase	spec-multi-feat	finish-dev	Epic	nao-move	-	sem linha epic para o verbo (opt-out)
+fase	spec-multi-feat	start-dev	Story	move	11606 (Em desenvolvimento)	ordem do Diretor — vale com comment e auto
+fase	spec-multi-feat	finish-dev	Story	move	10599 (Em revisão)	ordem do Diretor — vale com comment e auto
+fase	spec-multi-feat	start-dev	sub-task	move	3 (Fazendo)	ordem do Diretor — vale com comment e auto
+fase	spec-multi-feat	finish-dev	sub-task	move	10001 (Feito)	ordem do Diretor — vale com comment e auto
+largada	spec-uma-feat	raiz criada na largada do ciclo (antes da SPEC), salvo modo link
+cenario	spec-uma-feat	2 niveis via Story unica	Epic > Story (da FEAT unica, ou implicita espelhando a SPEC) > sub-task por TASK
+marco	spec-uma-feat	todos	Epic	nada	-	Epic intocado pelos ganchos automaticos — so anda por --phase com linha epic
+marco	spec-uma-feat	Trabalho iniciado (Story)	Story	move	11606 (Em desenvolvimento)	caminho pelo trilho — transicoes a medir
+marco	spec-uma-feat	Funcionalidade pronta p/ QA	Story	comentario	10599 (Em revisão)	alvo alem do teto 11606 — avancar e ato humano (--phase)
+marco	spec-uma-feat	TASK iniciada	sub-task	move	3 (Fazendo)	caminho pelo trilho — transicoes a medir
+marco	spec-uma-feat	TASK concluida	sub-task	move	10001 (Feito)	caminho pelo trilho — transicoes a medir
+fase	spec-uma-feat	start-dev	Epic	nao-move	-	sem linha epic para o verbo (opt-out)
+fase	spec-uma-feat	finish-dev	Epic	nao-move	-	sem linha epic para o verbo (opt-out)
+fase	spec-uma-feat	start-dev	Story	move	11606 (Em desenvolvimento)	ordem do Diretor — vale com comment e auto
+fase	spec-uma-feat	finish-dev	Story	move	10599 (Em revisão)	ordem do Diretor — vale com comment e auto
+fase	spec-uma-feat	start-dev	sub-task	move	3 (Fazendo)	ordem do Diretor — vale com comment e auto
+fase	spec-uma-feat	finish-dev	sub-task	move	10001 (Feito)	ordem do Diretor — vale com comment e auto
+largada	avulso	Story criada antes do codigo, na largada do brief
+cenario	avulso	Story avulsa	OPS-1 > Story avulsa > sub-task por TASK (so quando o trabalho reparte)
+marco	avulso	TASK iniciada	Story avulsa	incerto	3 (Fazendo)	alvo de linha subtask aplicado a card de nivel story — so a prova viva fecha
+marco	avulso	Funcionalidade pronta p/ QA	Story avulsa	comentario	10599 (Em revisão)	alvo alem do teto 11606 — avancar e ato humano (--phase)
+marco	avulso	TASK iniciada	sub-task	move	3 (Fazendo)	caminho pelo trilho — transicoes a medir
+marco	avulso	TASK concluida	sub-task	move	10001 (Feito)	caminho pelo trilho — transicoes a medir
+fase	avulso	start-dev	Story avulsa	move	11606 (Em desenvolvimento)	ordem do Diretor — vale com comment e auto
+fase	avulso	finish-dev	Story avulsa	move	10599 (Em revisão)	ordem do Diretor — vale com comment e auto
+fase	avulso	start-dev	sub-task	move	3 (Fazendo)	ordem do Diretor — vale com comment e auto
+fase	avulso	finish-dev	sub-task	move	10001 (Feito)	ordem do Diretor — vale com comment e auto

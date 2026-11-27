@@ -1,0 +1,20 @@
+config	ok	jira.enabled	true
+config	falta	jira.projectKey	obrigatorio com jira.enabled
+config	ok	jira.site	exemplo.atlassian.net
+config	ok	jira.issueType.spec	10000
+config	ok	jira.issueType.task	10003
+config	info	jira.issueType.feature	null — sem Story de funcionalidade (3o nivel desligado)
+config	info	jira.issueType.standalone	null — brief avulso nao sincroniza
+config	info	jira.mode	link — a raiz nunca e criada: a SPEC precisa trazer a key no cabecalho
+config	ok	jira.epicPolicy	always — toda SPEC ganha Epic
+config	ok	jira.transition	auto — os marcos movem o card
+config	info	jira.standaloneParent	null — Story avulsa nasce sem pai
+config	info	jira.telemetry	false
+config	info	jira.estimate	false
+config	info	niveis	presumidos: spec=1 feature=0 task=-1 standalone=0 — confirme no Jira
+mapa	falta	jira.mapFile	null — o sync so preenche titulo e descricao; nenhum card se move
+largada	spec-multi-feat	raiz criada na largada do ciclo (antes da SPEC), salvo modo link
+cenario	spec-multi-feat	inviavel	sub-task nao cabe sob o Epic e nao ha feature nem standalone de nivel 0 — nada e criado
+largada	spec-uma-feat	raiz criada na largada do ciclo (antes da SPEC), salvo modo link
+cenario	spec-uma-feat	inviavel	sub-task nao cabe sob o Epic e nao ha feature nem standalone de nivel 0 — nada e criado
+cenario	avulso	nao sincroniza	issueType.standalone null — o brief avulso nao gera card

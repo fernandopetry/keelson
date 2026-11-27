@@ -759,6 +759,32 @@ trata como achado e escala a você; quem decide é sempre o humano.
 
 ## Jira
 
+### Quero saber o que o keelson vai fazer com o quadro antes de rodar um ciclo
+
+Rode o ensaio:
+
+```
+/keelson:jira-preview
+```
+
+Ele não escreve nada no Jira. Lê a sua [ficha](Ficha-do-projeto) e o mapa do projeto,
+consulta o quadro e mostra, para cada tipo de demanda (várias funcionalidades,
+funcionalidade única, mudança avulsa), que cards nasceriam, embaixo de qual card, e o que
+acontece com eles a cada etapa do ciclo. No fim vem uma tabela do que está configurado e
+do que falta, com o comando que resolve cada item.
+
+Cada linha diz de onde veio: **medido** (o Jira respondeu agora), **mapa** (está na sua
+configuração, mas o Jira não confirmou) ou **só a prova viva fecha** (não havia card
+naquela coluna para testar a passagem). Para fechar essas últimas, rode
+`/keelson:jira-preview --live`: depois da sua confirmação, ele cria poucos cards de teste
+marcados `[keelson-ensaio]`, move de verdade e compara com o previsto. Os cards de teste
+ficam no quadro — fechar ou apagar é com você —, e notificações e automações do quadro
+disparam para eles como para qualquer card.
+
+O ensaio prova a configuração e o fluxo do quadro. Ele não prova que a sincronização vai
+rodar em cada etapa de um ciclo real, nem cobre o Jira fora do ar no meio do trabalho;
+para isso continua valendo a seção "O ciclo terminou e o Jira não soube de nada", abaixo.
+
 ### O `/keelson:deploy` parou dizendo que o conector é obrigatório
 
 É o comportamento esperado, e é a única parte do keelson em que o Jira não é

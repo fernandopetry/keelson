@@ -25,6 +25,23 @@ merge-preserving and harmless — a wrong `none` is not).
 
 ## [Unreleased]
 
+## [0.233.0] — 2026-11-27
+
+Re-init: required
+
+Decision 4.498 (minor) — `/keelson:jira-preview` rehearses the Jira integration before a real cycle moves the team's board: it shows, per scenario, which cards would be born, under which parent, and what each cycle milestone and `--phase` verb would do to them under the current ficha and map, then lists what is configured and what is missing. Re-init required: the managed block in `AGENTS.md` gained the note for the new human-only command.
+
+### Added
+
+- **`/keelson:jira-preview [--live]`** (human-only). Three scenarios come from the ficha and the map — SPEC with several features, single-feature SPEC (with or without an Epic, following `jira.epicPolicy`) and standalone brief — plus epic and `mode: link`, read from the sync protocol. Every line of the preview states its origin: `medido` (the connector answered in this run), `mapa` (derived from ficha and map only) or `só a prova viva fecha` (no real card in that status to sample). The preview closes with "what may surprise you" — `transition: comment` never moves a card, the QA card stops at the development column, the Epic only moves by `--phase` with an `epic` line — and a configured/missing table with the exact action for each gap.
+- **`--live`**: after an explicit OK, creates a minimal tree tagged `[keelson-ensaio]` in the project, walks the milestones and `finish-dev` for real and compares predicted × actual. Nothing is deleted: the report lists the keys for you to close or remove. Refused when the connector is down or a type, project or required field of the chosen scenario is missing.
+- **`scripts/jira-preview.sh`** — the deterministic half: ficha + map → tree, birth moment and effect (`move` / `comentario` / `nada` / `incerto`) of each milestone and phase verb, one TAB-separated fact per line; `--levels` takes the hierarchy levels measured in Jira. A map line the parser cannot read becomes a `nao-parseavel` warning, never a fact. Suite in `scripts/tests/jira-preview/` (5 fixtures with frozen output, 24 checks).
+
+### Changed
+
+- `/keelson:init jira` closes its report suggesting the rehearsal; `/keelson:jira-sync` with the integration off points to it as the slug-less preview.
+- **Maintainer tooling** (4.497): `scripts/eval-run.sh` accepts `--plant deck:<dir>` — a frozen defective output as the positive control, graded without calling the executor — and `--judge-model` to pin the model of the `llm` graders. Never runs in a consumer project.
+
 ## [0.232.0] — 2026-11-20
 
 Re-init: required

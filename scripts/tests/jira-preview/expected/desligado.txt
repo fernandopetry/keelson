@@ -1,0 +1,1 @@
+config	falta	jira.enabled	integracao desligada — /keelson:init jira liga

@@ -1,0 +1,9 @@
+{
+  "docsRoot": "docs",
+  "jira": {
+    "enabled": true, "site": "exemplo.atlassian.net", "cloudId": null, "projectKey": null,
+    "mode": "link",
+    "issueType": { "spec": "10000", "feature": null, "task": "10003", "standalone": null },
+    "transition": "auto", "mapFile": null
+  }
+}

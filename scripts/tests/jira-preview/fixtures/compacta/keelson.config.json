@@ -1,0 +1,11 @@
+{
+  "docsRoot": "docs",
+  "jira": {
+    "enabled": true,
+    "site": null, "cloudId": "abc-123", "projectKey": "APP",
+    "mode": "create",
+    "issueType": { "spec": "10000", "feature": "10001", "task": "10003", "standalone": null },
+    "epicPolicy": "multi-feature", "standaloneParent": null,
+    "transition": "comment", "mapFile": "docs/_meta/jira.APP.md"
+  }
+}
