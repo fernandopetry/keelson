@@ -12,3 +12,13 @@ name: scribe-tasks-criterios
 # (template + "critério verificável com comando e esperado", zero régua de contorno).
 # Eixo que o braço mínimo acerta em n≥4 é prosa candidata a poda com prova; eixo em que
 # erra é regra que fica — e vai para o lint se for mecanizável (mini-brief 4.420, item 1).
+# Rodadas 2026-11-27 (claude-sonnet-5-5, decisão 4.497): r1 20261127-070158 (n=4, US$10,71) INVÁLIDA — o
+# modelo recusou o REGUA-PLANT.md nas 4 execuções e escreveu a TASK correta (plant "aprovado" sem grader
+# frouxo) · r2 20261127-074032 (n=2, US$4,67, --plant deck:plant/deck) VÁLIDA: plant congelado reprovado nos
+# 4 eixos. Sinal das duas: HEAD 6/6 × MINIMA 6/6 em três eixos; condicao-nao-instancia 6/6 × 4/6; critérios
+# 1.038–1.530 palavras (HEAD) × 332–447 (MINIMA). plant/deck/ = plant-r1 da 20260920-112522 (Sonnet 5).
+# r3–r5 (n=4, juiz claude-sonnet-5-5, plant congelado, VÁLIDAS): 20261127-092043 sonnet-5-5 · 20261127-094231
+# haiku-5-5 · 20261127-100541 opus-5-5. HEAD×MINIMA por tier: condicao-nao-instancia 4×0 · 2×1 · 4×1 (regra paga;
+# o 4/6 da manhã no mesmo braço e modelo é o piso de ruído a n=4); licao-no-comando 4×4 · 4×3 · 4×4;
+# sink-com-assercao 4×4 nos três; sem-contradicao-com-plan 4×4 nos três (regressão do corte 4.421: segurou).
+# TASK: 1.630–2.278 × 881–966 palavras (Sonnet), 2.960–3.460 × 1.310–1.534 (Opus) — valor do excedente não medido.

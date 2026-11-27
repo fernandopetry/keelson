@@ -16,6 +16,16 @@ regra é a decisão **4.304** (`docs/_meta/decisions.md`); este arquivo é só p
   `developer-reuso` (os cinco últimos: leva 4.420 — a cadeia brief → SPEC → PLAN → TASK →
   código no mesmo domínio de fixtures, `pedidos`/frete do parceiro, para que uma rodada
   possa encadear a saída de um caso como insumo do seguinte).
+- **Plant por saída congelada** (4.497): `--plant deck:evals/<caso>/plant/deck` em vez de
+  `--plant file:…/REGUA-PLANT.md` — o braço-plant não chama o executor, os graders julgam
+  os `.md` defeituosos versionados no diretório. Use quando o modelo da rodada recusa a
+  régua quebrada e escreve a saída correta (o plant por régua sai "aprovado" sem nenhum
+  grader frouxo). O deck congelado é uma saída que os graders do caso já reprovaram; casos
+  com `plant/deck/` hoje: os seis da cadeia 4.420 (`tech-lead-brief`, `scribe-plan`,
+  `scribe-plan-heranca`, `scribe-tasks-criterios`, `developer-reuso`, `developer-comentarios`).
+- **Juiz com modelo próprio** (4.497): `--judge-model J` fixa o modelo dos graders `llm`;
+  sem a opção, o juiz acompanha o `--model`. Ao comparar executores de modelos diferentes,
+  fixe o juiz — senão a diferença medida mistura quem escreve com quem julga.
 - `--runs` mínimo 1; abaixo de 4 o sumário rotula a leitura como sinal (piso empírico da
   bancada, obs. 4.304 — não garantia). HOLD distingue variância intra-braço de juiz sem
   veredito válido (falha de infra).

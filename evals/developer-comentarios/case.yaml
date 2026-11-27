@@ -12,3 +12,8 @@ name: developer-comentarios
 # (porque-em-uma-linha). Plant: "comente generosamente". Se B vence ou empata PASS em
 # sem-parafrase sem perder porque-em-uma-linha, a reescrita entra no Art. 7 (Charter
 # versionado à parte).
+# Rodadas 2026-11-27 (decisão 4.497; n=4, juiz claude-sonnet-5-5, --plant deck:plant/deck, todas VÁLIDAS):
+# 20261127-092043 sonnet-5-5 · 20261127-094231 haiku-5-5 · 20261127-100541 opus-5-5. HEAD×MINIMA por tier:
+# (ART7×MINIMA) porque-em-uma-linha 3×0 · 4×0 · 4×0 (regra paga);
+# sem-docblock-de-tipo 4×4 nos três; sem-parafrase 1×2 · 2×4 · 4×3 (HOLD — reprova nos dois braços por
+# marcador `// Arrange`, rótulo `// AC-…` e eco do assert em teste; o Art. 7 não reduz isso).

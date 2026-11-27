@@ -11,3 +11,7 @@ name: developer-reuso
 # código autocontido". Se B empata PASS em n≥4, a instrução de reúso é no-op no gerador e
 # a rede fica só no gate 7 (4.207) + o par mecânico proposto; se B falha, a regra paga o
 # próprio custo e fica.
+# Rodadas 2026-11-27 (decisão 4.497; n=4, juiz claude-sonnet-5-5, --plant deck:plant/deck, todas VÁLIDAS):
+# 20261127-092043 sonnet-5-5 · 20261127-094231 haiku-5-5 · 20261127-100541 opus-5-5. HEAD×MINIMA por tier:
+# os três eixos 4×4 nos três tiers (36/36 × 36/36) — a instrução de reúso segue no-op no
+# gerador neste cenário; candidata a corte em leva própria, com 2º cenário e mapa 4.181.

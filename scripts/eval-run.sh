@@ -6,8 +6,9 @@
 # workspace isolado, julga cada saída por grader e compõe um veredito CONSULTIVO
 # por eixo — A / B / empate / HOLD (divergência intra-braço nunca vira média
 # silenciosa). Rodada com --plant exige que o braço-plant (régua deliberadamente
-# quebrada) REPROVE nos eixos declarados em <caso>/plant/expect.txt — plant
-# aprovado invalida a rodada inteira (controle positivo, 4.186).
+# quebrada, ou saída defeituosa congelada — fonte deck:) REPROVE nos eixos declarados
+# em <caso>/plant/expect.txt — plant aprovado invalida a rodada inteira (controle
+# positivo, 4.186).
 #
 # Fonte de braço:
 #   git:<ref>   → régua extraída de `git show <ref>:<regua>` — o caminho vem de `regua:`
@@ -22,17 +23,27 @@
 #                 os templates canônicos que a régua referencia por caminho; anexo
 #                 ausente no ref é AVISO (ref anterior à extração o tem inline).
 #   file:<path> → o arquivo inteiro é a régua.
+#   deck:<dir>  → SÓ no --plant: saída defeituosa congelada (os *.md do diretório, em
+#                 geral <caso>/plant/deck/). O braço-plant não chama o executor — copia
+#                 o deck para o workspace e roda só os graders. É o controle para modelo
+#                 que recusa a régua quebrada e escreve a saída correta: ali o plant por
+#                 régua deixa de exercitar os graders e a rodada sai inválida sem que
+#                 nenhum grader esteja frouxo.
 #
 # Uso: eval-run.sh <case-dir> --arm NOME=FONTE --arm NOME=FONTE
-#                  [--plant FONTE] [--runs N] [--model M]
+#                  [--plant FONTE] [--runs N] [--model M] [--judge-model J]
 #                  [--executor CMD] [--results DIR]
 #
 #   --arm       exatamente 2 braços; o veredito compara o 1º contra o 2º.
-#   --plant     3º braço de controle; exige <caso>/plant/expect.txt.
+#   --plant     3º braço de controle; exige <caso>/plant/expect.txt. Fonte de régua
+#               (git:/file:) ou deck:<dir> (saída defeituosa congelada, sem executor).
 #   --runs      execuções por braço (default: frontmatter `runs:` do prompt.md, senão 2);
 #               0 é recusado. Abaixo de 4, o sumário rotula a leitura como SINAL — piso
 #               empírico da bancada (obs. 4.304), não garantia de confiabilidade.
 #   --model     passa --model ao executor (default: frontmatter `model:`, senão o do executor).
+#   --judge-model  modelo do juiz dos graders `llm` (default: o mesmo do --model). Fixe-o
+#               ao comparar executores de modelos diferentes: com o juiz acompanhando o
+#               executor, a diferença medida mistura quem escreve com quem julga.
 #   (frontmatter `tools:` do caso: lista de --allowedTools do executor; default
 #   Read,Write,Edit,Glob,Grep — inclua Bash só quando o papel medido roda ferramenta.)
 #   --executor  binário que roda o prompt (default: claude) — a suíte injeta um fake.
@@ -72,7 +83,7 @@ shift
 [ -f "$CASE/prompt.md" ] || die "caso sem prompt.md: $CASE"
 [ -d "$CASE/graders" ] || die "caso sem graders/: $CASE"
 
-ARM1=""; ARM2=""; PLANT=""; RUNS=""; MODEL=""; EXECUTOR="claude"; RESULTS=""; TIMEOUT=""
+ARM1=""; ARM2=""; PLANT=""; RUNS=""; MODEL=""; JUDGE_MODEL=""; EXECUTOR="claude"; RESULTS=""; TIMEOUT=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --arm)      [ $# -ge 2 ] || die "--arm exige NOME=FONTE"
@@ -81,6 +92,7 @@ while [ $# -gt 0 ]; do
     --plant)    [ $# -ge 2 ] || die "--plant exige FONTE"; PLANT="$2"; shift 2 ;;
     --runs)     [ $# -ge 2 ] || die "--runs exige N"; RUNS="$2"; shift 2 ;;
     --model)    [ $# -ge 2 ] || die "--model exige M"; MODEL="$2"; shift 2 ;;
+    --judge-model) [ $# -ge 2 ] || die "--judge-model exige J"; JUDGE_MODEL="$2"; shift 2 ;;
     --executor) [ $# -ge 2 ] || die "--executor exige CMD"; EXECUTOR="$2"; shift 2 ;;
     --results)  [ $# -ge 2 ] || die "--results exige DIR"; RESULTS="$2"; shift 2 ;;
     --timeout)  [ $# -ge 2 ] || die "--timeout exige segundos"; TIMEOUT="$2"; shift 2 ;;
@@ -102,6 +114,7 @@ fm() { # $1 chave → valor do frontmatter do prompt.md, sem aspas envolventes
 case "$RUNS" in ''|*[!0-9]*) die "--runs inválido: $RUNS" ;; esac
 [ "$RUNS" -ge 1 ] || die "--runs inválido: $RUNS (mínimo 1 — rodada sem execução não é veredito, 4.377)"
 [ -n "$MODEL" ] || MODEL="$(fm model)"
+[ -n "$JUDGE_MODEL" ] || JUDGE_MODEL="$MODEL"
 TOOLS="$(fm tools)"; [ -n "$TOOLS" ] || TOOLS="Read,Write,Edit,Glob,Grep"   # frontmatter `tools:` — só quando o papel medido precisa executar (ex.: gate que roda ferramenta)
 [ -n "$TIMEOUT" ] || TIMEOUT="$(fm timeout)"; [ -n "$TIMEOUT" ] || TIMEOUT=900
 case "$TIMEOUT" in ''|*[!0-9]*) die "--timeout inválido: $TIMEOUT (segundos inteiros)" ;; esac
@@ -178,8 +191,31 @@ regua_para() { # $1 fonte → imprime a régua no stdout
       p="${1#file:}"
       [ -f "$p" ] || die "régua inexistente: $p"
       cat "$p" ;;
+    deck:*) die "fonte deck: só vale no --plant (saída congelada não é braço de comparação): $1" ;;
     *) die "fonte de braço inválida (git:<ref> ou file:<path>): $1" ;;
   esac
+}
+
+# deck plantado: diretório com pelo menos um .md — conferido antes de qualquer braço rodar
+deck_plant_ok() { # $1 fonte deck:<dir>
+  dp="${1#deck:}"
+  [ -d "$dp" ] || die "deck do plant inexistente: $dp"
+  [ -n "$(find "$dp" -maxdepth 1 -name '*.md' 2>/dev/null | head -1)" ] || die "deck do plant sem .md: $dp"
+  # O workspace do plant congelado só tem deck/: grader de arquivo (file_exists/regex) que
+  # o expect.txt cita e que olha FORA de deck/ julgaria arquivo ausente — FAIL sem ter
+  # detectado nada, e o sumário diria "plant reprovado (ok)". Recusa antes de rodar.
+  while IFS= read -r dg; do
+    [ -n "$dg" ] || continue
+    [ -f "$CASE/graders/$dg.md" ] || continue   # grader inexistente é acusado na agregação
+    dt="$(awk '/^---$/{c++;next} c==1 && $1=="type:"{print $2; exit}' "$CASE/graders/$dg.md")"
+    case "$dt" in file_exists|regex) ;; *) continue ;; esac
+    dpath="$(awk '/^---$/{c++;next} c==1 && $1=="path:"{sub(/^[^:]*: */,""); print; exit}' "$CASE/graders/$dg.md")"
+    [ -n "$dpath" ] || dpath="deck/*.md"
+    case "$dpath" in
+      deck/*) ;;
+      *) die "plant deck: não serve ao grader $dg ($dt com path: $dpath, fora de deck/) — o workspace do plant congelado só tem deck/; use plant por régua neste caso ou tire o eixo do expect.txt" ;;
+    esac
+  done < "$CASE/plant/expect.txt"
 }
 
 # ---------- execução de um braço ----------
@@ -189,6 +225,13 @@ executa() { # $1 nome  $2 fonte
   while [ "$i" -le "$RUNS" ]; do
     ws="$RES/run/$nome-r$i"
     mkdir -p "$ws/deck"
+    case "$fonte" in
+      deck:*)
+        # plant por saída congelada: o executor não roda; os graders julgam o deck defeituoso
+        cp "${fonte#deck:}"/*.md "$ws/deck/" || die "cópia do deck do plant falhou: ${fonte#deck:}"
+        julga_workspace "$nome" "$ws"
+        i=$((i + 1)); continue ;;
+    esac
     regua_para "$fonte" > "$ws/REGUA.md"
     if [ -d "$CASE/fixtures" ]; then cp -R "$CASE/fixtures/." "$ws/" || die "cópia de fixtures falhou"; fi
     ( cd "$ws" && exec_timeout "$TIMEOUT" "$EXECUTOR" -p "$PROMPT_BODY" --output-format json \
@@ -246,7 +289,7 @@ julga_workspace() { # $1 braço  $2 workspace
         ( cd "$jd" && exec_timeout "$TIMEOUT" "$EXECUTOR" -p "$jprompt" --output-format json \
             --strict-mcp-config \
             --permission-mode acceptEdits --allowedTools "Read" \
-            ${MODEL:+--model "$MODEL"} > raw.json 2> stderr.log ) || true
+            ${JUDGE_MODEL:+--model "$JUDGE_MODEL"} > raw.json 2> stderr.log ) || true
         # Veredito conflitante é INVALIDO (4.389): linha que cita PASS e FAIL juntos é eco
         # da instrução e não conta; sobrando PASS e FAIL em linhas distintas, o juiz não
         # concluiu — nunca "o último vence" em silêncio.
@@ -292,7 +335,11 @@ N2="${ARM2%%=*}"; F2="${ARM2#*=}"
 [ "$N1" != "$N2" ] || die "os 2 braços precisam de nomes distintos"
 regua_para "$F1" > /dev/null   # falha cedo, antes de gastar execução
 regua_para "$F2" > /dev/null
-[ -z "$PLANT" ] || regua_para "$PLANT" > /dev/null
+case "$PLANT" in
+  "") ;;
+  deck:*) deck_plant_ok "$PLANT" ;;
+  *) regua_para "$PLANT" > /dev/null ;;
+esac
 
 # só depois das réguas validadas: rodada recusada não deixa diretório em results/ (4.379)
 # Duas rodadas no mesmo segundo (ou EVAL_RUN_TS repetido) nunca compartilham agg/ —
@@ -325,7 +372,8 @@ SUM="$RES/summary.md"
   echo "braços: $N1=$F1 · $N2=$F2${PLANT:+ · plant=$PLANT}"
   runs_note=""
   [ "$RUNS" -ge 4 ] || runs_note=" (abaixo do piso empírico da bancada, 4 — obs. 4.304: leitura como sinal, não como comparação)"
-  echo "runs por braço: $RUNS$runs_note · modelo: ${MODEL:-default do executor} · executor: $(basename "$EXECUTOR")"
+  juiz_note=""; [ "$JUDGE_MODEL" = "$MODEL" ] || juiz_note=" · juiz: $JUDGE_MODEL"
+  echo "runs por braço: $RUNS$runs_note · modelo: ${MODEL:-default do executor}$juiz_note · executor: $(basename "$EXECUTOR")"
   echo
   echo "## Veredito por eixo (consultivo — 4.304)"
 } > "$SUM"

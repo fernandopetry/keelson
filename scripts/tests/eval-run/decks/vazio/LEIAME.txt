@@ -1,0 +1,1 @@
+diretório sem .md: o runner recusa (cenário 17)

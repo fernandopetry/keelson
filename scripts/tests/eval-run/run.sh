@@ -13,6 +13,8 @@
 # estourando --timeout → amostra INVALIDA (HOLD infra, juiz não roda); juiz conflitante →
 # INVALIDO (eco da instrução descontado); JSON inválido → veredito pelo deck, custo "nao
 # medido"; colisão de timestamp → sufixo; caminhos com espaço; isolamento entre braços.
+# (17) plant por saída congelada `deck:<dir>`: executor não roda no plant, graders julgam o
+# deck; deck aprovado → exit 3; deck inexistente/sem .md ou usado como --arm → exit 2.
 # Saídas congeladas em expected/ (linha "resultados:" normalizada — carrega timestamp).
 set -u
 # git herdado de contexto de hook (pre-commit exporta GIT_INDEX_FILE etc.) aponta para
@@ -243,7 +245,66 @@ else bad "cenário 16: --allowedTools Read,Bash não repassado"; cat "$FAKE_ARGL
   --runs 1 --executor "$EXEC" --results "$TMP/r16b" >/dev/null 2>&1
 if grep -q -- "--allowedTools Read,Write,Edit,Glob,Grep" "$FAKE_ARGLOG"; then ok "cenário 16 sem tools: default Read,Write,Edit,Glob,Grep"
 else bad "cenário 16: default de --allowedTools mudou"; cat "$FAKE_ARGLOG" >&2; fi
+# --judge-model (4.497): juiz com modelo próprio; sem a opção, o juiz acompanha o --model
+: > "$FAKE_ARGLOG"
+out="$("$RUNNER" case --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
+  --runs 1 --model M-EXEC --judge-model M-JUIZ --executor "$EXEC" --results "$TMP/r16c" 2>&1)"
+if grep -- "--allowedTools Read,Write,Edit,Glob,Grep" "$FAKE_ARGLOG" | grep -q -- "--model M-EXEC" \
+   && ! grep -- "--allowedTools Read,Write,Edit,Glob,Grep" "$FAKE_ARGLOG" | grep -q "M-JUIZ"; then ok "--judge-model: executor segue no --model"
+else bad "--judge-model: executor não ficou no --model"; cat "$FAKE_ARGLOG" >&2; fi
+if grep -- "--allowedTools Read --model" "$FAKE_ARGLOG" | grep -q -- "--model M-JUIZ" \
+   && ! grep -- "--allowedTools Read --model" "$FAKE_ARGLOG" | grep -q "M-EXEC"; then ok "--judge-model: juiz roda no modelo do juiz"
+else bad "--judge-model: juiz não recebeu o modelo próprio"; cat "$FAKE_ARGLOG" >&2; fi
+if printf '%s\n' "$out" | grep -q "modelo: M-EXEC · juiz: M-JUIZ"; then ok "--judge-model: sumário registra os dois modelos"
+else bad "--judge-model: sumário sem o modelo do juiz"; fi
+: > "$FAKE_ARGLOG"
+out="$("$RUNNER" case --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
+  --runs 1 --model M-EXEC --executor "$EXEC" --results "$TMP/r16d" 2>&1)"
+if grep -- "--allowedTools Read --model" "$FAKE_ARGLOG" | grep -q -- "--model M-EXEC" \
+   && ! printf '%s\n' "$out" | grep -q "juiz:"; then ok "sem --judge-model: juiz acompanha o --model, sumário inalterado"
+else bad "sem --judge-model: default do juiz mudou"; cat "$FAKE_ARGLOG" >&2; fi
 unset FAKE_ARGLOG
+
+# --- cenário 17: plant por saída congelada (deck:<dir>) — o executor não roda no plant ---
+export FAKE_STATE="$TMP/s17"; mkdir -p "$FAKE_STATE"
+out="$("$RUNNER" case --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
+  --plant deck:decks/plant-ruim --runs 2 --executor "$EXEC" --results "$TMP/r17" 2>&1)"
+rc=$?
+if [ $rc -eq 0 ]; then ok "cenário 17 exit 0 (deck defeituoso reprovado)"; else bad "cenário 17 exit $rc (esperado 0)"; fi
+if [ "$(printf '%s\n' "$out" | grep -c 'plant reprovado — grader detecta o defeito (ok)')" -eq 2 ]; then ok "cenário 17 os 2 eixos do expect reprovam o deck plantado"
+else bad "cenário 17: eixos do plant não reprovaram"; printf '%s\n' "$out" >&2; fi
+if printf '%s\n' "$out" | grep -q "plant=deck:decks/plant-ruim"; then ok "cenário 17 sumário registra a fonte deck:"
+else bad "cenário 17: sumário sem a fonte deck:"; fi
+ws17="$(find "$TMP/r17" -type d -name 'plant-r1' | head -1)"
+if [ -n "$ws17" ] && [ -f "$ws17/deck/TASK-001-001-plant.md" ] && [ ! -e "$ws17/REGUA.md" ] && [ ! -e "$ws17/raw.json" ]; then ok "cenário 17 plant sem executor: deck copiado, sem REGUA.md nem raw.json no workspace"
+else bad "cenário 17: workspace do plant não é o de deck congelado ($ws17)"; fi
+if [ -f "$(find "$TMP/r17" -type d -name 'A-r1' | head -1)/raw.json" ]; then ok "cenário 17 braços de comparação seguem executando"
+else bad "cenário 17: braço A sem raw.json"; fi
+export FAKE_STATE="$TMP/s17b"; mkdir -p "$FAKE_STATE"
+out="$("$RUNNER" case --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
+  --plant deck:decks/plant-camuflado --runs 2 --executor "$EXEC" --results "$TMP/r17b" 2>&1)"
+rc=$?
+if [ $rc -eq 3 ] && printf '%s\n' "$out" | grep -q "RODADA INVÁLIDA"; then ok "cenário 17 deck que os graders aprovam → RODADA INVÁLIDA, exit 3"
+else bad "cenário 17: deck camuflado deu exit $rc (esperado 3 + RODADA INVÁLIDA)"; fi
+"$RUNNER" case --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
+  --plant deck:decks/nao-existe --executor "$EXEC" --results "$TMP/r17c" >/dev/null 2>&1
+[ $? -eq 2 ] && [ ! -e "$TMP/r17c" ] && ok "deck: inexistente → exit 2 antes de executar" || bad "deck: inexistente não deu exit 2 limpo"
+"$RUNNER" case --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
+  --plant deck:decks/vazio --executor "$EXEC" --results "$TMP/r17d" >/dev/null 2>&1
+[ $? -eq 2 ] && [ ! -e "$TMP/r17d" ] && ok "deck: sem .md → exit 2 antes de executar" || bad "deck: sem .md não deu exit 2 limpo"
+"$RUNNER" case --arm A=deck:decks/plant-ruim --arm B=file:reguas/regua-ma.md \
+  --executor "$EXEC" --results "$TMP/r17e" >/dev/null 2>&1
+[ $? -eq 2 ] && ok "deck: como --arm → exit 2 (saída congelada não é braço)" || bad "deck: como --arm não deu exit 2"
+# grader de arquivo citado no expect.txt olhando FORA de deck/ → recusa (FAIL seria vácuo)
+cp -R case "$TMP/case17f"
+printf -- '---\ntype: regex\npattern: QUALQUER\nmode: contains\npath: FORA.md\n---\n' > "$TMP/case17f/graders/fora-do-deck.md"
+echo "fora-do-deck" >> "$TMP/case17f/plant/expect.txt"
+"$RUNNER" "$TMP/case17f" --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
+  --plant deck:decks/plant-ruim --executor "$EXEC" --results "$TMP/r17f" >/dev/null 2>&1
+[ $? -eq 2 ] && [ ! -e "$TMP/r17f" ] && ok "deck: com grader de arquivo fora de deck/ no expect → exit 2 (sem FAIL vácuo)" || bad "deck: com grader fora de deck/ não foi recusado"
+"$RUNNER" "$TMP/case17f" --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \
+  --plant file:reguas/regua-plant.md --runs 1 --executor "$EXEC" --results "$TMP/r17g" >/dev/null 2>&1
+[ $? -ne 2 ] && ok "o mesmo caso com plant por régua não é recusado (a recusa é só do deck:)" || bad "plant por régua foi recusado pelo check do deck:"
 
 # --- cenário 4: usos inválidos → exit 2 ---
 "$RUNNER" nao-existe --arm A=file:reguas/regua-boa.md --arm B=file:reguas/regua-ma.md \

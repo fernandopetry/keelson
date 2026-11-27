@@ -9,3 +9,7 @@ name: scribe-plan
 # há rota que o produza a partir de integração) e tipo de coluna lido do schema real
 # (4.108: percentuais da base são NUMERIC(5,2)). Braços: HEAD (Etapa 4 do plan.md +
 # template) × REGUA-MINIMA (só o template, zero princípio).
+# Rodadas 2026-11-27 (decisão 4.497; n=4, juiz claude-sonnet-5-5, --plant deck:plant/deck, todas VÁLIDAS):
+# 20261127-092043 sonnet-5-5 · 20261127-094231 haiku-5-5 · 20261127-100541 opus-5-5. HEAD×MINIMA por tier:
+# dec-custo-concreto 4×3 · 4×2 · 4×4 (HOLD); invariante-de-construcao e schema-lido-da-fonte 4×4 nos três —
+# a regra saiu do HEAD na 4.421, então o eixo virou regressão do corte: segurou, Haiku incluído.

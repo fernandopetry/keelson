@@ -10,3 +10,7 @@ name: scribe-plan-heranca
 # pedido (Q1 respondida). Plant: SPEC que contradiz o brief (ator genérico, confirmação
 # assíncrona em fila, percentual por item). Se B empata PASS com A em n≥4, a herança por
 # ponteiro não perde informação e o corte da 4.410b/c ganha prova.
+# Rodadas 2026-11-27 (decisão 4.497; n=4, juiz claude-sonnet-5-5, --plant deck:plant/deck, todas VÁLIDAS):
+# 20261127-092043 sonnet-5-5 · 20261127-094231 haiku-5-5 · 20261127-100541 opus-5-5. HEAD×MINIMA por tier:
+# (COMPLETA×HERDADA) ator-preservado 3×4 · 3×2 · 4×4 (HOLD, 10×10);
+# confirmacao-sincrona e percentual-por-pedido 4×4 nos três — o ponteiro segue sem perder informação.

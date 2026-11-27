@@ -10,3 +10,7 @@ name: tech-lead-brief
 # Braços: HEAD (Etapas 1–4 do brief.md) × REGUA-MINIMA (só o formato do BRIEF, zero princípio).
 # Limite declarado: a forja real é entrevista interativa; o papel mede só o passe de
 # inventário + ancoragem + classificação das perguntas.
+# Rodadas 2026-11-27 (decisão 4.497; n=4, juiz claude-sonnet-5-5, --plant deck:plant/deck, todas VÁLIDAS):
+# 20261127-092043 sonnet-5-5 · 20261127-094231 haiku-5-5 · 20261127-100541 opus-5-5. HEAD×MINIMA por tier:
+# premissa-com-selo 4×0 · 4×0 · 4×0 (regra paga); bloqueia-nucleo-marcado 1×0 · 2×1 · 4×0 (HEAD erra a
+# própria regra na 2ª lacuna em Sonnet/Haiku); codigo-antes-de-humano e metrica-vira-pergunta 4×4 nos três.
